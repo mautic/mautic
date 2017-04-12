@@ -61,27 +61,29 @@ $formId = $form['sessionId']->vars['data'];
                     <div class="tab-pane fade bdr-w-0" id="fields-container">
                         <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
                         <div id="mauticforms_fields">
-                            <div class="available-fields mb-md">
-                                        <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
-                                        <select class="chosen form-control" id="available_fields">
-                                            <option value=""></option>
-                                            <?php foreach ($fields as $fieldType => $field): ?>
+                            <div class="row">
+                                <div class="available-fields mb-md col-sm-8">
+                                            <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                                            <select class="chosen form-control" id="available_fields">
+                                                <option value=""></option>
+                                                <?php foreach ($fields as $fieldType => $field): ?>
 
-                                                <option class="list-group-item" data-toggle="ajaxmodal"
-                                                        data-target="#formComponentModal"
-                                                        data-href="<?php echo $view['router']->path(
-                                                            'mautic_formfield_action',
-                                                            [
-                                                                'objectAction' => 'new',
-                                                                'type' => $fieldType,
-                                                                'tmpl' => 'field',
-                                                                'formId' => $formId,
-                                                            ]
-                                                        ); ?>">     <?php echo $field; ?></option>
+                                                    <option class="list-group-item" data-toggle="ajaxmodal"
+                                                            data-target="#formComponentModal"
+                                                            data-href="<?php echo $view['router']->path(
+                                                                'mautic_formfield_action',
+                                                                [
+                                                                    'objectAction' => 'new',
+                                                                    'type' => $fieldType,
+                                                                    'tmpl' => 'field',
+                                                                    'formId' => $formId,
+                                                                ]
+                                                            ); ?>">     <?php echo $field; ?></option>
 
-                                            <?php endforeach; ?>
+                                                <?php endforeach; ?>
 
-                                        </select>
+                                            </select>
+                                </div>
                             </div>
                             <div class="drop-here">
                             <?php foreach ($formFields as $field): ?>
