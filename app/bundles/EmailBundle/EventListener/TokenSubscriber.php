@@ -147,17 +147,8 @@ class TokenSubscriber extends CommonSubscriber
                 continue;
             }
 
-            $leadVal   = $isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']];
+            $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
             $filterVal = $data['filter'];
-
-            if (!is_array($filterVal) && in_array($data['type'], ['number', 'boolean'])) {
-                $filterVal = $data['type'] === 'number' ? (float) $filterVal : (bool) $filterVal;
-            }
-
-            if (in_array($data['operator'], ['like', '!like'])) {
-                $leadVal   = (string) $leadVal;
-                $filterVal = (string) $filterVal;
-            }
 
             switch ($data['operator']) {
                 case '=':

@@ -33,8 +33,9 @@ class OneSignalApi extends AbstractNotificationApi
      */
     public function send($endpoint, $data)
     {
-        $appId      = $this->factory->getParameter('notification_app_id');
-        $restApiKey = $this->factory->getParameter('notification_rest_api_key');
+        $apiKeys    = $this->integrationHelper->getIntegrationObject('OneSignal')->getKeys();
+        $appId      = $apiKeys['app_id'];
+        $restApiKey = $apiKeys['rest_api_key'];
 
         if (!$restApiKey) {
             throw new MissingApiKeyException();

@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
@@ -29,6 +30,11 @@ use Symfony\Component\Form\FormBuilder;
  */
 abstract class AbstractIntegration
 {
+    /**
+     * @var bool
+     */
+    protected $coreIntegration = false;
+
     /**
      * @var MauticFactory
      */
@@ -47,7 +53,7 @@ abstract class AbstractIntegration
     /**
      * @var array Decrypted keys
      */
-    protected $keys;
+    protected $keys = [];
 
     /**
      * @var CacheStorageHelper
@@ -95,6 +101,14 @@ abstract class AbstractIntegration
      */
     public function init()
     {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCoreIntegration()
+    {
+        return $this->coreIntegration;
     }
 
     /**
@@ -1711,6 +1725,18 @@ abstract class AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+    }
+
+    /**
+     * @param FormBuilder $builder
+     * @param array       $options
+     */
+    public function modifyForm($builder, $options)
+    {
+        $this->dispatcher->dispatch(
+            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD,
+            new PluginIntegrationFormBuildEvent($this, $builder, $options)
+        );
     }
 
     /**

@@ -68,14 +68,15 @@ class PluginController extends FormController
 
         foreach ($integrationObjects as $name => $object) {
             $settings = $object->getIntegrationSettings();
-            $pluginId = $settings->getPlugin()->getId();
-            if (isset($plugins[$pluginId])) {
+            $plugin   = $settings->getPlugin();
+            $pluginId = $plugin ? $plugin->getId() : $name;
+            if (isset($plugins[$pluginId]) || $pluginId === $name) {
                 $integrations[$name] = [
                     'name'     => $object->getName(),
                     'display'  => $object->getDisplayName(),
                     'icon'     => $integrationHelper->getIconPath($object),
                     'enabled'  => $settings->isPublished(),
-                    'plugin'   => $settings->getPlugin()->getId(),
+                    'plugin'   => $pluginId,
                     'isBundle' => false,
                 ];
             }
