@@ -409,8 +409,9 @@ class LeadListRepository extends CommonRepository
                     if ($batchExpr->count() and count($expr)) {
                         $expr->add($batchExpr);
                     }
-
-                    $q->andWhere($expr);
+                    if (!empty($expr) && $expr->count() > 0) {
+                        $q->andWhere($expr);
+                    }
                 } elseif ($nonMembersOnly) {
                     // Only leads that are part of the list that no longer match filters and have not been manually removed
                     $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
@@ -436,8 +437,7 @@ class LeadListRepository extends CommonRepository
                     $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                     $sq->select('l.id')
                         ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
-                    if ($includesContactFields and $expr) {
+                    if ($includesContactFields && $expr && $expr->count() > 0) {
                         $sq->andWhere($expr);
                     }
 
@@ -452,8 +452,9 @@ class LeadListRepository extends CommonRepository
                     if ($batchExpr->count()) {
                         $mainExpr->add($batchExpr);
                     }
-
-                    $q->andWhere($mainExpr);
+                    if (!empty($mainExpr) && $mainExpr->count() > 0) {
+                        $q->andWhere($mainExpr);
+                    }
                 }
 
                 // Set limits if applied
@@ -512,8 +513,9 @@ class LeadListRepository extends CommonRepository
                     $q->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
-
-                $q->where($expr);
+                if (!empty($expr) && $expr->count() > 0) {
+                    $q->where($expr);
+                }
 
                 $results = $q->execute()->fetchAll();
 
@@ -1188,6 +1190,8 @@ class LeadListRepository extends CommonRepository
 
             // Wrap in a andX for other functions to append
             $expr = $q->expr()->andX($orX);
+        } else {
+            $expr = $groupExpr;
         }
 
         return $expr;
