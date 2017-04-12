@@ -12,6 +12,8 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\HttpFoundation;
 
@@ -811,12 +813,12 @@ class ReportController extends FormController
             $response->headers->set('Expires', 0);
             $response->headers->set('Cache-Control', 'must-revalidate');
             $response->headers->set('Pragma', 'public');
-        }else{
+        } else {
             if ($format === 'xlsx') {
                 $options['ignoreGraphData'] = true;
             }
             $reportData = $model->getReportData($entity, null, $options);
-            $response = $model->exportResults($format, $entity, $reportData, null, null);
+            $response = $model->exportResults($format, $entity, $reportData);
         }
 
         return $response;

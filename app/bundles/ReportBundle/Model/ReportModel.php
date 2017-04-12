@@ -363,7 +363,7 @@ class ReportModel extends FormModel
      *
      * @throws \Exception
      */
-public function exportResults($format, $report, $reportData, $handle, $page)
+    public function exportResults($format, $report, $reportData, $handle = null, $page = null)
     {
         $formatter = $this->formatterHelper;
         $date      = (new DateTimeHelper())->toLocalString();
@@ -372,23 +372,26 @@ public function exportResults($format, $report, $reportData, $handle, $page)
         switch ($format) {
             case 'csv':
                 //build the data rows
-                foreach ($reportData['data'] as $count => $data) {
-                    $row = [];
-                    foreach ($data as $k => $v) {
-                        if ($count === 0) {
-                            //set the header
-                            $header[] = $k;
+                if(is_null($handle)){
+                    $response = new StreamedResponse(
+                        function () use ($reportData, $report, $formatter) {
+                            $handle = fopen('php://output', 'r+');
+                            $header = [];
+                            $this->exportCSV($formatter,$report, $reportData, $handle, 0);
+                            fclose($handle);
                         }
-
-                        $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
-                    }
-
-                    if ($page === 1 && $count === 0) {
-                        fputcsv($handle, $header);
-                    }
-                    fputcsv($handle, $row);
+                    );
+                    $response->headers->set('Content-Type', 'application/force-download');
+                    $response->headers->set('Content-Type', 'application/octet-stream');
+                    $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
+                    $response->headers->set('Expires', 0);
+                    $response->headers->set('Cache-Control', 'must-revalidate');
+                    $response->headers->set('Pragma', 'public');
+                    return $response;
+                } else {
+                    $this->exportCSV($formatter,$report, $reportData, $handle, $page);
+                    return;
                 }
-                return;
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
@@ -697,5 +700,25 @@ public function exportResults($format, $report, $reportData, $handle, $page)
         }
 
         return $options;
+    }
+
+    private function exportCSV($formatter,$report, $reportData, $handle, $page){
+        foreach ($reportData['data'] as $count => $data) {
+            $row = [];
+            foreach ($data as $k => $v) {
+                if ($count === 0) {
+                    //set the header
+                    $header[] = $k;
+                }
+
+                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+            }
+
+            if ($page === 1 && $count === 0) {
+                fputcsv($handle, $header);
+            }
+            fputcsv($handle, $row);
+            unset($row, $reportData['data'][$count]);
+        }
     }
 }
