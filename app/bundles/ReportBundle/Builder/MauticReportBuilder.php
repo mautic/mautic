@@ -224,7 +224,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build GROUP BY
         if ($groupByOptions = $this->entity->getGroupBy()) {
             foreach ($groupByOptions as $groupBy) {
-                $queryBuilder->addGroupBy($groupBy);
+                $column = '';
+                if (isset($options['columns'][$groupBy])) {
+                    $fieldOptions = $options['columns'][$groupBy];
+                    $column .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
+                }
+                $queryBuilder->addGroupBy($column);
             }
         }
         // Build LIMIT clause

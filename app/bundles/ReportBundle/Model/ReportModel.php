@@ -285,7 +285,7 @@ class ReportModel extends FormModel
      *
      * @return \stdClass ['choices' => [], 'choiceHtml' => '', definitions => []]
      */
-    public function getColumnList($context)
+    public function getColumnList($context, $isGroupBy = false)
     {
         $tableData           = $this->getTableData($context);
         $columns             = isset($tableData['columns']) ? $tableData['columns'] : [];
@@ -295,6 +295,9 @@ class ReportModel extends FormModel
         $return->definitions = [];
 
         foreach ($columns as $column => $data) {
+            if ($isGroupBy && ($column == 'unsubscribed' || $column == 'unsubscribed_ratio')) {
+                continue;
+            }
             if (isset($data['label'])) {
                 $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
                 $return->choices[$column]     = $data['label'];

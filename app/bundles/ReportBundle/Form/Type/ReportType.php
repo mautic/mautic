@@ -133,6 +133,7 @@ class ReportType extends AbstractType
                 }
 
                 $columns           = $model->getColumnList($source);
+                $groupByColumns    = $model->getColumnList($source, true);
                 $filters           = $model->getFilterList($source);
                 $filterDefinitions = htmlspecialchars(json_encode($filters->definitions), ENT_QUOTES, 'UTF-8');
                 $operatorHtml      = htmlspecialchars(json_encode($filters->operatorHtml), ENT_QUOTES, 'UTF-8');
@@ -168,7 +169,7 @@ class ReportType extends AbstractType
                     'groupBy',
                     'choice',
                     [
-                        'choices'    => $columns->choices,
+                        'choices'    => $groupByColumns->choices,
                         'label'      => false,
                         'label_attr' => ['class' => 'control-label'],
                         'required'   => false,
@@ -215,7 +216,7 @@ class ReportType extends AbstractType
                         'type'    => 'aggregator',
                         'label'   => false,
                         'options' => [
-                            'columnList' => $columns->choices,
+                            'columnList' => $groupByColumns->choices,
                             'required'   => false,
                         ],
                         'allow_add'    => true,
