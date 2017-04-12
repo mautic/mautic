@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Model;
 
-use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 
 /**
@@ -19,7 +18,6 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
  */
 class IteratorExportDataModel implements \Iterator
 {
-
     private $position;
     private $model;
     private $args;
@@ -31,53 +29,59 @@ class IteratorExportDataModel implements \Iterator
 
     /**
      * IteratorExportDataModel constructor.
-     *
      */
     public function __construct(AbstractCommonModel $model, $args, callable $callback)
     {
-        $this->model = $model;
-        $this->args = $args;
-        $this->callback = $callback;
-        $this->position = 0;
-        $this->total = 0;
-        $this->page = 1;
+        $this->model       = $model;
+        $this->args        = $args;
+        $this->callback    = $callback;
+        $this->position    = 0;
+        $this->total       = 0;
+        $this->page        = 1;
         $this->totalResult = 0;
+        $this->data        = 0;
     }
 
     /**
-     * Return the current element
+     * Return the current element.
+     *
      * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     *
+     * @return mixed Can return any type
+     *
      * @since 5.0.0
      */
     public function current()
     {
-        if($this->position === $this->totalResult) {
-            $data = new DataExporterHelper();
-            $this->data = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
-            $this->total = $this->total + count($this->data);
-            $this->totalResult = count($this->data);
-            $this->position = 0;
-            ++$this->page;
-        }
         return $this->data[$this->position];
     }
 
     /**
-     * Move forward to next element
+     * Move forward to next element.
+     *
      * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
      * @since 5.0.0
      */
     public function next()
     {
         ++$this->position;
+        if ($this->position === $this->totalResult) {
+            $data              = new DataExporterHelper();
+            $this->data        = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
+            $this->total       = $this->total + count($this->data);
+            $this->totalResult = count($this->data);
+            $this->position    = 0;
+            ++$this->page;
+        }
     }
 
     /**
-     * Return the key of the current element
+     * Return the key of the current element.
+     *
      * @link http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     *
+     * @return mixed scalar on success, or null on failure
+     *
      * @since 5.0.0
      */
     public function key()
@@ -86,25 +90,36 @@ class IteratorExportDataModel implements \Iterator
     }
 
     /**
-     * Checks if current position is valid
+     * Checks if current position is valid.
+     *
      * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
+     *
+     * @return bool The return value will be casted to boolean and then evaluated.
+     *              Returns true on success or false on failure
+     *
      * @since 5.0.0
      */
     public function valid()
     {
-        return $this->position <= $this->totalResult;
+        if ($this->position <= $this->totalResult && !is_null($this->data)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
-     * Rewind the Iterator to the first element
+     * Rewind the Iterator to the first element.
+     *
      * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
      * @since 5.0.0
      */
     public function rewind()
     {
-        $this->position = 0;
+        $data              = new DataExporterHelper();
+        $this->data        = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
+        $this->total       = $this->total + count($this->data);
+        $this->totalResult = count($this->data);
+        $this->position    = 0;
     }
 }
