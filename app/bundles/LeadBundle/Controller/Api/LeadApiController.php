@@ -59,7 +59,12 @@ class LeadApiController extends CommonApiController
         $existingLeads = $this->getExistingLeads();
         if (!empty($existingLeads)) {
             $entity = $this->model->getEntity($id);
-            $this->model->mergeLeads($existingLeads[0], $entity, false);
+            if($existingLeads[0]->getId() == $entity->getId()) {
+                array_shift($existingLeads);
+            }
+            if(isset($existingLeads[0])) {
+                $this->model->mergeLeads($existingLeads[0], $entity, false);
+            }
         }
         return parent::editEntityAction($id);
     }
