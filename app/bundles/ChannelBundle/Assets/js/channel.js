@@ -9,8 +9,8 @@ Mautic.toggleChannelFormDisplay = function (el, channel) {
     Mautic.toggleTabPublished(el);
 
     if (mQuery(el).val() === "1" && mQuery(el).prop('checked')) {
-        mQuery('.message_channel_properties_' + channel).removeClass('hide')
+        mQuery(el).closest('.tab-pane').find('.message_channel_properties_' + channel).removeClass('hide')
     } else {
-        mQuery('.message_channel_properties_' + channel).addClass('hide');
+        mQuery(el).closest('.tab-pane').find('.message_channel_properties_' + channel).addClass('hide');
     }
 };

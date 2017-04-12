@@ -354,7 +354,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         }
 
                         $columnValue = ":$paramName";
-                        switch ($filterDefinitions[$filter['column']]['type']) {
+                        $type        = $filterDefinitions[$filter['column']]['type'];
+                        if (isset($filterDefinitions[$filter['column']]['formula'])) {
+                            $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
+                        }
+
+                        switch ($type) {
                             case 'bool':
                             case 'boolean':
                                 if ((int) $filter['value'] > 1) {
@@ -378,9 +383,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
 
-                        $filterExpr->add(
-                            $expr->{$exprFunction}($filter['column'], $columnValue)
-                        );
+                    $filterExpr->add(
+                        $expr->{$exprFunction}($filter['column'], $columnValue)
+                    );
                 }
             }
         }

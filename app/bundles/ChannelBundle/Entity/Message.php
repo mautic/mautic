@@ -262,6 +262,7 @@ class Message extends FormEntity
     public function addChannel(Channel $channel)
     {
         if (!$this->channels->contains($channel)) {
+            $channel->setMessage($this);
             $this->isChanged('channels', $channel);
 
             $this->channels[$channel->getChannel()] = $channel;

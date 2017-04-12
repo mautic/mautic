@@ -481,10 +481,10 @@ class NotificationController extends FormController
                 $passthrough = array_merge(
                     $passthrough,
                     [
-                        'updateSelect'      => $form['updateSelect']->getData(),
-                        'notificationId'    => $entity->getId(),
-                        'notificationTitle' => $entity->getName(),
-                        'notificationLang'  => $entity->getLanguage(),
+                        'updateSelect' => $form['updateSelect']->getData(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }

@@ -85,6 +85,24 @@ return [
                 'controller' => 'MauticCoreBundle:Api\FileApi:delete',
                 'method'     => 'DELETE',
             ],
+            'mautic_core_api_theme_list' => [
+                'path'       => '/themes',
+                'controller' => 'MauticCoreBundle:Api\ThemeApi:list',
+            ],
+            'mautic_core_api_theme_get' => [
+                'path'       => '/themes/{theme}',
+                'controller' => 'MauticCoreBundle:Api\ThemeApi:get',
+            ],
+            'mautic_core_api_theme_create' => [
+                'path'       => '/themes/new',
+                'controller' => 'MauticCoreBundle:Api\ThemeApi:new',
+                'method'     => 'POST',
+            ],
+            'mautic_core_api_theme_delete' => [
+                'path'       => '/themes/{theme}/delete',
+                'controller' => 'MauticCoreBundle:Api\ThemeApi:delete',
+                'method'     => 'DELETE',
+            ],
             'mautic_core_api_stats' => [
                'path'       => '/stats/{table}',
                'controller' => 'MauticCoreBundle:Api\StatsApi:list',
@@ -265,6 +283,34 @@ return [
             'mautic.form.type.slot.button' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
                 'alias' => 'slot_button',
+            ],
+            'mautic.form.type.slot.image' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
+                'alias' => 'slot_image',
+            ],
+            'mautic.form.type.slot.separator' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
+                'alias' => 'slot_separator',
+            ],
+            'mautic.form.type.slot.imagecard' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
+                'alias' => 'slot_imagecard',
+            ],
+            'mautic.form.type.slot.imagecaption' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCaptionType',
+                'alias' => 'slot_imagecaption',
+            ],
+            'mautic.form.type.slot.socialshare' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialShareType',
+                'alias' => 'slot_socialshare',
+            ],
+            'mautic.form.type.slot.socialfollow' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
+                'alias' => 'slot_socialfollow',
+            ],
+            'mautic.form.type.slot.codemode' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotCodeModeType',
+                'alias' => 'slot_codemode',
             ],
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
@@ -576,6 +622,7 @@ return [
                 'arguments' => [
                     'mautic.helper.paths',
                     'mautic.helper.templating',
+                    'translator',
                 ],
                 'methodCalls' => [
                     'setDefaultTheme' => [
@@ -837,6 +884,7 @@ return [
         'cookie_secure'             => null,
         'cookie_httponly'           => false,
         'do_not_track_ips'          => [],
+        'do_not_track_bots'         => ['MSNBOT', 'msnbot-media', 'bingbot', 'Googlebot', 'Google Web Preview', 'Mediapartners-Google', 'Baiduspider', 'Ezooms', 'YahooSeeker', 'Slurp', 'AltaVista', 'AVSearch', 'Mercator', 'Scooter', 'InfoSeek', 'Ultraseek', 'Lycos', 'Wget', 'YandexBot', 'Java/1.4.1_04', 'SiteBot', 'Exabot', 'AhrefsBot', 'MJ12bot', 'NetSeer crawler', 'TurnitinBot', 'magpie-crawler', 'Nutch Crawler', 'CMS Crawler', 'rogerbot', 'Domnutch', 'ssearch_bot', 'XoviBot', 'digincore', 'fr-crawler', 'SeznamBot', 'Seznam screenshot-generator', 'Facebot', 'facebookexternalhit'],
         'do_not_track_internal_ips' => [],
         'link_shortener_url'        => null,
         'cached_data_timeout'       => 10,

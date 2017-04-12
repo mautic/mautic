@@ -117,11 +117,7 @@ trait CustomFieldEntityTrait
             // Fixed custom field so use the setter
             $setter = 'set'.ucfirst($property);
 
-            return $this->$setter($value);
-        }
-
-        if (method_exists($this, 'isAnonymous') && $this->wasAnonymous == null) {
-            $this->wasAnonymous = $this->isAnonymous();
+            $this->$setter($value);
         }
 
         if (null == $oldValue) {

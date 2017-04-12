@@ -279,6 +279,13 @@ trait CustomFieldRepositoryTrait
         // Includes prefix
         $table  = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $fields = $entity->getUpdatedFields();
+        if (method_exists($entity, 'getChanges')) {
+            $changes = $entity->getChanges();
+
+            // remove the fields that are part of changes as they were already saved via a setter
+            $fields = array_diff_key($fields, $changes);
+        }
+
         if (!empty($fields)) {
             $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }
@@ -313,7 +320,7 @@ trait CustomFieldRepositoryTrait
         $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed')
            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
            ->where('f.is_published = :published')
-           ->where($fq->expr()->eq('object', ':object'))
+           ->andWhere($fq->expr()->eq('object', ':object'))
            ->setParameter('published', true, 'boolean')
            ->setParameter('object', $object);
         $results = $fq->execute()->fetchAll();

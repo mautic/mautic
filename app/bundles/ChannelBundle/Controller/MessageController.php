@@ -11,8 +11,11 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
+use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\Form;
 
 /**
@@ -20,6 +23,8 @@ use Symfony\Component\Form\Form;
  */
 class MessageController extends AbstractStandardFormController
 {
+    use EntityContactsTrait;
+
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -74,8 +79,7 @@ class MessageController extends AbstractStandardFormController
      */
     public function viewAction($objectId)
     {
-        return $this->delegateRedirect($this->generateUrl('mautic_message_index'));
-        //return $this->viewStandard($objectId);
+        return $this->viewStandard($objectId, 'message', 'channel');
     }
 
     /**
@@ -101,24 +105,76 @@ class MessageController extends AbstractStandardFormController
                     ],
                     'listItemTemplate'  => 'MauticChannelBundle:Message:list_item.html.php',
                     'enableCloneButton' => true,
-                    'nameAction'        => 'edit',
                 ];
 
                 break;
             case 'view':
+                $message = $args['viewParameters']['item'];
+
+                // Init the date range filter form
+                $returnUrl = $this->generateUrl(
+                    'mautic_message_action',
+                    [
+                        'objectAction' => 'view',
+                        'objectId'     => $message->getId(),
+                    ]
+                );
+
+                list($dateFrom, $dateTo) = $this->getViewDateRange($message->getId(), $returnUrl, 'local', $dateRangeForm);
+                $chart                   = new LineChart(null, $dateFrom, $dateTo);
+
+                /** @var Channel[] $channels */
+                $channels        = $model->getChannels();
+                $messageChannels = $message->getChannels();
+                $chart->setDataset(
+                    $this->get('translator')->trans('mautic.core.all'),
+                    $model->getLeadStatsPost($message->getId(), $dateFrom, $dateTo)
+                );
+
+                $messagedLeads = [
+                    'all' => $this->forward(
+                        'MauticChannelBundle:Message:contacts',
+                        [
+                            'objectId'   => $message->getId(),
+                            'page'       => $this->get('session')->get('mautic.'.$this->getSessionBase('all').'.contact.page', 1),
+                            'ignoreAjax' => true,
+                            'channel'    => 'all',
+                        ]
+                    )->getContent(),
+                ];
+
+                foreach ($messageChannels as $channel) {
+                    if ($channel->isEnabled() && isset($channels[$channel->getChannel()])) {
+                        $chart->setDataset(
+                            $channels[$channel->getChannel()]['label'],
+                            $model->getLeadStatsPost($message->getId(), $dateFrom, $dateTo, $channel->getChannel())
+                        );
+
+                        $messagedLeads[$channel->getChannel()] = $this->forward(
+                            'MauticChannelBundle:Message:contacts',
+                            [
+                                'objectId' => $message->getId(),
+                                'page'     => $this->get('session')->get(
+                                    'mautic.'.$this->getSessionBase($channel->getChannel()).'.contact.page',
+                                    1
+                                ),
+                                'ignoreAjax' => true,
+                                'channel'    => $channel->getChannel(),
+                            ]
+                        )->getContent();
+                    }
+                }
+
                 $viewParameters = [
-                    'channels'        => $model->getChannels(),
-                    'channelContents' => $model->getMessageChannels($args['viewParameters']['item']->getId()),
+                    'channels'        => $channels,
+                    'channelContents' => $model->getMessageChannels($message->getId()),
+                    'dateRangeForm'   => $dateRangeForm->createView(),
+                    'eventCounts'     => $chart->render(),
+                    'messagedLeads'   => $messagedLeads,
                 ];
                 break;
             case 'new':
             case 'edit':
-                // Check to see if this is a popup
-                if (isset($form['updateSelect'])) {
-                    $this->template = false;
-                } else {
-                    $this->template = true;
-                }
                 $viewParameters = [
                     'channels' => $model->getChannels(),
                 ];
@@ -127,24 +183,6 @@ class MessageController extends AbstractStandardFormController
         }
 
         $args['viewParameters'] = array_merge($args['viewParameters'], $viewParameters);
-
-        return $args;
-    }
-
-    /**
-     * @param array $args
-     * @param       $action
-     *
-     * @return array
-     */
-    protected function getPostActionRedirectArguments(array $args, $action)
-    {
-        switch ($action) {
-            default:
-                $args['contentTemplate'] = $this->getControllerBase().':index';
-                $args['returnUrl']       = $this->generateUrl($this->getIndexRoute());
-                break;
-        }
 
         return $args;
     }
@@ -212,12 +250,14 @@ class MessageController extends AbstractStandardFormController
         return 'message';
     }
 
-    /**
-     * {@inheritdoc}
+    /***
+     * @param null $objectId
+     *
+     * @return string
      */
-    protected function getSessionBase()
+    protected function getSessionBase($objectId = null)
     {
-        return 'message';
+        return 'message'.(($objectId) ? '.'.$objectId : '');
     }
 
     /**
@@ -226,5 +266,63 @@ class MessageController extends AbstractStandardFormController
     protected function getTranslationBase()
     {
         return 'mautic.channel.message';
+    }
+
+    /**
+     * @param     $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function contactsAction($objectId, $channel, $page = 1)
+    {
+        $filter = [];
+        if ('all' !== $channel) {
+            $returnUrl = $this->generateUrl(
+                'mautic_message_action',
+                [
+                    'objectAction' => 'view',
+                    'objectId'     => $objectId,
+                ]
+            );
+            list($dateFrom, $dateTo) = $this->getViewDateRange($objectId, $returnUrl, 'UTC');
+
+            $filter = [
+                'channel' => $channel,
+                [
+                    'col'  => 'entity.date_triggered',
+                    'expr' => 'between',
+                    'val'  => [
+                        $dateFrom->format('Y-m-d H:i:s'),
+                        $dateTo->format('Y-m-d H:i:s'),
+                    ],
+                ],
+            ];
+        }
+
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'channel:messages:view',
+            'message.'.$channel,
+            'campaign_lead_event_log',
+            $channel,
+            null,
+            $filter,
+            [
+                [
+                    'type'       => 'join',
+                    'from_alias' => 'entity',
+                    'table'      => 'campaign_events',
+                    'alias'      => 'event',
+                    'condition'  => "entity.event_id = event.id and event.channel = 'channel.message' and event.channel_id = ".(int) $objectId,
+                ],
+            ],
+            null,
+            [
+                'channel' => ($channel) ? $channel : 'all',
+            ],
+            '.message-'.$channel
+        );
     }
 }

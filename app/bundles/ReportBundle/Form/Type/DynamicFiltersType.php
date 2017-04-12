@@ -47,9 +47,9 @@ class DynamicFiltersType extends AbstractType
                     $args['choices_as_values'] = true;
                     $args['choices']           = [
                         [
-                            'mautic.core.form.no'    => false,
-                            'mautic.core.form.yes'   => true,
-                            'mautic.core.form.reset' => '',
+                            'mautic.core.form.no'      => false,
+                            'mautic.core.form.yes'     => true,
+                            'mautic.core.filter.clear' => '',
                         ],
                     ];
 

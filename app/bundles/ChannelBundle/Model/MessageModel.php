@@ -63,15 +63,17 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
      */
     public function saveEntity($entity, $unlock = true)
     {
+        $isNew = $entity->isNew();
+
         parent::saveEntity($entity, $unlock);
 
-        // Persist channels to update changes
-        $channels = $entity->getChannels();
-        if ($channels->count()) {
+        if (!$isNew) {
+            // Update the channels
+            $channels = $entity->getChannels();
             foreach ($channels as $channel) {
-                $this->em->persist($channel);
+                $channel->setMessage($entity);
             }
-            $this->em->flush();
+            $this->getRepository()->saveEntities($channels);
         }
     }
 
@@ -212,6 +214,73 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     public function getChannelMessageByChannelId($channelId)
     {
         return $this->getRepository()->getChannelMessageByChannelId($channelId);
+    }
+
+    /**
+     * @param      $messageId
+     * @param null $dateFrom
+     * @param null $dateTo
+     * @param null $channel
+     *
+     * @return array
+     */
+    public function getLeadStatsPost($messageId, $dateFrom = null, $dateTo = null, $channel = null)
+    {
+        $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
+
+        return $eventLog->getChartQuery(
+            [
+                'type'       => 'message.send',
+                'dateFrom'   => $dateFrom,
+                'dateTo'     => $dateTo,
+                'channel'    => 'channel.message',
+                'channelId'  => $messageId,
+                'logChannel' => $channel,
+            ]
+        );
+    }
+
+    /**
+     * @param      $messageId
+     * @param null $dateFrom
+     * @param null $dateTo
+     *
+     * @return mixed
+     */
+    public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)
+    {
+        $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();
+
+        return $eventLog->getEventLogs(['type' => 'message.send', 'dateFrom' => $dateFrom, 'dateTo' => $dateTo, 'channel' => 'message', 'channelId' => $messageId]);
+    }
+
+    /**
+     * Get the channel name from the database.
+     *
+     * @param int    $id
+     * @param string $entityName
+     * @param string $nameColumn
+     *
+     * @return string|null
+     */
+    public function getChannelName($id, $entityName, $nameColumn = 'name')
+    {
+        if (!$id || !$entityName || !$nameColumn) {
+            return null;
+        }
+
+        $repo = $this->em->getRepository($entityName);
+        $qb   = $repo->createQueryBuilder('e')
+            ->select('e.'.$nameColumn)
+            ->where('e.id = :id')
+            ->setParameter('id', (int) $id);
+        $result = $qb->getQuery()->getOneOrNullResult();
+
+        if (isset($result[$nameColumn])) {
+            return $result[$nameColumn];
+        }
+
+        return null;
     }
 
     /**

@@ -107,6 +107,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $zipcode;
 
     /**
+     * @var string
+     */
+    private $timezone;
+
+    /**
      * @var
      */
     private $country;
@@ -189,13 +194,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      * @var string
      */
     private $preferredProfileImage;
-
-    /**
-     * Changed to true if the lead was anonymous before updating fields.
-     *
-     * @var null
-     */
-    private $wasAnonymous = null;
 
     /**
      * @var bool
@@ -410,6 +408,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 'city',
                 'state',
                 'zipcode',
+                'timezone',
                 'country',
             ],
             FieldModel::$coreFields
@@ -443,6 +442,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     'city',
                     'state',
                     'zipcode',
+                    'timezone',
                     'country',
                 ]
             )
@@ -515,7 +515,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
                 }
             }
-        } elseif ($prop == 'frequencyRule') {
+        } elseif ($prop == 'frequencyRules') {
             if (!isset($this->changes['frequencyRules'])) {
                 $this->changes['frequencyRules'] = [];
             }
@@ -535,6 +535,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
+        } elseif ($prop == 'points' && $current != $val) {
+            $this->changes['points'] = [$current, $val];
         } else {
             parent::isChanged($prop, $val);
         }
@@ -658,26 +660,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getName($lastFirst = false)
     {
-        if (isset($this->updatedFields['firstname'])) {
-            $firstName = $this->updatedFields['firstname'];
-        } else {
-            $firstName = (isset($this->fields['core']['firstname']['value'])) ? $this->fields['core']['firstname']['value'] : '';
-        }
-
-        if (isset($this->updatedFields['lastname'])) {
-            $lastName = $this->updatedFields['lastname'];
-        } else {
-            $lastName = (isset($this->fields['core']['lastname']['value'])) ? $this->fields['core']['lastname']['value'] : '';
-        }
+        $firstName = $this->getFirstname();
+        $lastName  = $this->getLastname();
 
         $fullName = '';
-        if ($lastFirst && !empty($firstName) && !empty($lastName)) {
+        if ($lastFirst && $firstName && $lastName) {
             $fullName = $lastName.', '.$firstName;
-        } elseif (!empty($firstName) && !empty($lastName)) {
+        } elseif ($firstName && $lastName) {
             $fullName = $firstName.' '.$lastName;
-        } elseif (!empty($firstName)) {
+        } elseif ($firstName) {
             $fullName = $firstName;
-        } elseif (!empty($lastName)) {
+        } elseif ($lastName) {
             $fullName = $lastName;
         }
 
@@ -713,14 +706,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         if ($name = $this->getName($lastFirst)) {
             return $name;
-        } elseif (!empty($this->fields['core']['company']['value'])) {
-            return $this->fields['core']['company']['value'];
-        } elseif (!empty($this->fields['core']['email']['value'])) {
-            return $this->fields['core']['email']['value'];
-        } elseif (count($ips = $this->getIpAddresses())) {
-            return $ips->first()->getIpAddress();
+        } elseif ($this->getCompany()) {
+            return $this->getCompany();
+        } elseif ($this->getEmail()) {
+            return $this->getEmail();
         } elseif ($socialIdentity = $this->getFirstSocialIdentity()) {
             return $socialIdentity;
+        } elseif (count($ips = $this->getIpAddresses())) {
+            return $ips->first()->getIpAddress();
         } else {
             return 'mautic.lead.lead.anonymous';
         }
@@ -733,8 +726,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getSecondaryIdentifier()
     {
-        if (!empty($this->fields['core']['company']['value'])) {
-            return $this->fields['core']['company']['value'];
+        if (!$this->getCompany()) {
+            return $this->getCompany();
         }
 
         return '';
@@ -749,16 +742,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         $location = '';
 
-        if (!empty($this->fields['core']['city']['value'])) {
-            $location .= $this->fields['core']['city']['value'].', ';
+        if ($this->getCity()) {
+            $location .= $this->getCity().', ';
         }
 
-        if (!empty($this->fields['core']['state']['value'])) {
-            $location .= $this->fields['core']['state']['value'].', ';
+        if ($this->getState()) {
+            $location .= $this->getState().', ';
         }
 
-        if (!empty($this->fields['core']['country']['value'])) {
-            $location .= $this->fields['core']['country']['value'].', ';
+        if ($this->getCountry()) {
+            $location .= $this->getCountry().', ';
         }
 
         return rtrim($location, ', ');
@@ -790,7 +783,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 throw new \UnexpectedValueException('Invalid operator');
         }
 
-        $this->isChanged('points', $this->points, $oldPoints);
+        $this->isChanged('points', (int) $this->points, (int) $oldPoints);
 
         return $this;
     }
@@ -1031,7 +1024,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         }
         $this->changes['dnc_status'] = [$type, $doNotContact->getComments()];
 
-        $this->doNotContact[] = $doNotContact;
+        $this->doNotContact[$doNotContact->getChannel()] = $doNotContact;
 
         return $this;
     }
@@ -1122,20 +1115,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function isAnonymous()
     {
-        if (
-        $name = $this->getName()
-            || !empty($this->updatedFields['firstname'])
-            || !empty($this->updatedFields['lastname'])
-            || !empty($this->updatedFields['company'])
-            || !empty($this->updatedFields['email'])
-            || !empty($this->fields['core']['company']['value'])
-            || !empty($this->fields['core']['email']['value'])
-            || $socialIdentity = $this->getFirstSocialIdentity()
-        ) {
-            return false;
-        } else {
-            return true;
-        }
+        return !($this->getName()
+            || $this->getFirstname()
+            || $this->getLastname()
+            || $this->getCompany()
+            || $this->getEmail()
+            || $this->getFirstSocialIdentity()
+        );
     }
 
     /**
@@ -1169,7 +1155,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param bool $newlyCreated
+     * @param bool $newlyCreated Created
      */
     public function setNewlyCreated($newlyCreated)
     {
@@ -1213,6 +1199,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setDateIdentified($dateIdentified)
     {
+        $this->isChanged('dateIdentified', $dateIdentified);
         $this->dateIdentified = $dateIdentified;
     }
 
@@ -1372,7 +1359,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function removeFrequencyRule(FrequencyRule $frequencyRule)
     {
-        $this->isChanged('frequencyRules', $frequencyRule->getId());
+        $this->isChanged('frequencyRules', $frequencyRule->getId(), false);
         $this->frequencyRules->removeElement($frequencyRule);
     }
 
@@ -1383,7 +1370,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function addFrequencyRule(FrequencyRule $frequencyRule)
     {
-        $this->isChanged('frequencyRule', $frequencyRule);
+        $this->isChanged('frequencyRules', $frequencyRule, false);
         $this->frequencyRules[] = $frequencyRule;
     }
 
@@ -1417,12 +1404,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function checkDateIdentified()
     {
-        if ($this->dateIdentified == null && $this->wasAnonymous) {
-            //check the changes to see if the user is now known
-            if (!$this->isAnonymous()) {
-                $this->dateIdentified            = new \DateTime();
-                $this->changes['dateIdentified'] = ['', $this->dateIdentified];
-            }
+        if ($this->dateIdentified == null && $this->isAnonymous() === false) {
+            $this->dateIdentified            = new \DateTime();
+            $this->changes['dateIdentified'] = ['', $this->dateIdentified];
         }
     }
 
@@ -1461,6 +1445,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setTitle($title)
     {
+        $this->isChanged('title', $title);
         $this->title = $title;
 
         return $this;
@@ -1481,6 +1466,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setFirstname($firstname)
     {
+        $this->isChanged('firstname', $firstname);
         $this->firstname = $firstname;
 
         return $this;
@@ -1501,6 +1487,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setLastname($lastname)
     {
+        $this->isChanged('lastname', $lastname);
         $this->lastname = $lastname;
 
         return $this;
@@ -1521,6 +1508,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setPosition($position)
     {
+        $this->isChanged('position', $position);
         $this->position = $position;
 
         return $this;
@@ -1541,6 +1529,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setPhone($phone)
     {
+        $this->isChanged('phone', $phone);
         $this->phone = $phone;
 
         return $this;
@@ -1561,6 +1550,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setMobile($mobile)
     {
+        $this->isChanged('mobile', $mobile);
         $this->mobile = $mobile;
 
         return $this;
@@ -1581,6 +1571,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setAddress1($address1)
     {
+        $this->isChanged('address1', $address1);
         $this->address1 = $address1;
 
         return $this;
@@ -1601,6 +1592,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setAddress2($address2)
     {
+        $this->isChanged('address2', $address2);
         $this->address2 = $address2;
 
         return $this;
@@ -1621,6 +1613,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setCity($city)
     {
+        $this->isChanged('city', $city);
         $this->city = $city;
 
         return $this;
@@ -1641,6 +1634,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setState($state)
     {
+        $this->isChanged('state', $state);
         $this->state = $state;
 
         return $this;
@@ -1661,7 +1655,29 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setZipcode($zipcode)
     {
+        $this->isChanged('zipcode', $zipcode);
         $this->zipcode = $zipcode;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * @param string $timezone
+     *
+     * @return Lead
+     */
+    public function setTimezone($timezone)
+    {
+        $this->isChanged('timezone', $timezone);
+        $this->timezone = $timezone;
 
         return $this;
     }
@@ -1681,6 +1697,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setCountry($country)
     {
+        $this->isChanged('country', $country);
         $this->country = $country;
 
         return $this;
@@ -1701,6 +1718,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setCompany($company)
     {
+        $this->isChanged('company', $company);
         $this->company = $company;
 
         return $this;
@@ -1721,6 +1739,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function setEmail($email)
     {
+        $this->isChanged('email', $email);
         $this->email = $email;
 
         return $this;
@@ -1768,10 +1787,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public static function generateChannelRules(array $frequencyRules, array $dncRules)
     {
-        $rules = [];
+        $rules             = [];
+        $dncFrequencyRules = [];
         foreach ($frequencyRules as $rule) {
             if ($rule instanceof FrequencyRule) {
-                $rules[$rule->getChannel] = [
+                $ruleArray = [
                     'channel'           => $rule->getChannel(),
                     'pause_from_date'   => $rule->getPauseFromDate(),
                     'pause_to_date'     => $rule->getPauseToDate(),
@@ -1779,11 +1799,18 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                     'frequency_time'    => $rule->getFrequencyTime(),
                     'frequency_number'  => $rule->getFrequencyNumber(),
                 ];
+
+                if (array_key_exists($rule->getChannel(), $dncRules)) {
+                    $dncFrequencyRules[$rule->getChannel()] = $ruleArray;
+                } else {
+                    $rules[$rule->getChannel()] = $ruleArray;
+                }
             } else {
                 // Already an array
                 break;
             }
         }
+
         if (count($rules)) {
             $frequencyRules = $rules;
         }
@@ -1791,12 +1818,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         /* @var FrequencyRule $rule */
         usort(
             $frequencyRules,
-            function ($a, $b) use ($dncRules) {
-                if (in_array($a['channel'], $dncRules)) {
-                    // Channel in DNC so give lower preference
-                    return 1;
-                }
-
+            function ($a, $b) {
                 if ($a['pause_from_date'] && $a['pause_to_date']) {
                     $now = new \DateTime();
                     if ($now >= $a['pause_from_date'] && $now <= $a['pause_to_date']) {
@@ -1854,15 +1876,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             $rules[$rule['channel']] =
                 [
                     'frequency' => $rule,
-                    'dnc'       => array_key_exists($rule['channel'], $dncRules) ? $dncRules[$rule['channel']] : DoNotContact::IS_CONTACTABLE,
+                    'dnc'       => DoNotContact::IS_CONTACTABLE,
                 ];
-            unset($dncRules[$rule['channel']]);
         }
 
         if (count($dncRules)) {
             foreach ($dncRules as $channel => $reason) {
                 $rules[$channel] = [
-                    'frequency' => null,
+                    'frequency' => (isset($dncFrequencyRules[$channel])) ? $dncFrequencyRules[$channel] : null,
                     'dnc'       => $reason,
                 ];
             }

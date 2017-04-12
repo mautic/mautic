@@ -161,21 +161,8 @@ class CompanyController extends FormController
             )
         );
 
-        $fields = $this->getModel('lead.field')->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'f.object',
-                            'expr'   => 'eq',
-                            'value'  => 'company',
-                        ],
-                    ],
-                ],
-                'hydration_mode' => 'HYDRATE_ARRAY',
-            ]
-        );
-        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+        $fields = $this->getModel('lead.field')->getPublishedFieldArrays('company');
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
@@ -348,21 +335,8 @@ class CompanyController extends FormController
                 false
             );
 
-        $fields = $this->getModel('lead.field')->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'f.object',
-                            'expr'   => 'eq',
-                            'value'  => 'company',
-                        ],
-                    ],
-                ],
-                'hydration_mode' => 'HYDRATE_ARRAY',
-            ]
-        );
-        $form = $model->createForm(
+        $fields = $this->getModel('lead.field')->getPublishedFieldArrays('company');
+        $form   = $model->createForm(
             $entity,
             $this->get('form.factory'),
             $action,

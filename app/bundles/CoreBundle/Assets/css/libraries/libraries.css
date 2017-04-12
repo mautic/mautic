@@ -4651,11 +4651,11 @@ a.thumbnail.active {
 .alert > p + p {
   margin-top: 5px;
 }
-.alert-dismissable,
+.alert-dismissible,
 .alert-dismissible {
   padding-right: 35px;
 }
-.alert-dismissable .close,
+.alert-dismissible .close,
 .alert-dismissible .close {
   position: relative;
   top: -2px;
@@ -6357,6 +6357,58 @@ button.close {
   -ms-transform: rotate(-90deg);
   -o-transform: rotate(-90deg);
   transform: rotate(-90deg);
+}
+/* distance between stacked modals*/
+/* The first modal translateZ value*/
+.container {
+  margin: 5em auto;
+}
+.modal.in {
+  -webkit-perspective: 2000px;
+  -moz-perspective: 2000px;
+  -ms-perspective: 2000px;
+  -o-perspective: 2000px;
+  perspective: 2000px;
+}
+.modal.in .modal-dialog.aside {
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(-340px);
+  transform: scale(0.8) rotateY(45deg) translateZ(-340px);
+  -webkit-transform-style: preserve-3d;
+  -ms-transform-style: preserve-3d;
+  -o-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+.modal.in .modal-dialog.aside.aside-1 {
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
+  transform: scale(0.8) rotateY(45deg) translateZ(calc(-300px));
+}
+.modal.in .modal-dialog.aside.aside-2 {
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
+  transform: scale(0.8) rotateY(45deg) translateZ(calc(-260px));
+}
+.modal.in .modal-dialog.aside.aside-3 {
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
+  transform: scale(0.8) rotateY(45deg) translateZ(calc(-220px));
+}
+.modal.in .modal-dialog.aside.aside-4 {
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
+  transform: scale(0.8) rotateY(45deg) translateZ(calc(-180px));
+}
+.modal.in .modal-dialog.aside.aside-5 {
+  -webkit-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
+  -ms-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
+  -o-transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
+  transform: scale(0.8) rotateY(45deg) translateZ(calc(-140px));
 }
 /*!
  *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
@@ -15539,9 +15591,9 @@ span.CodeMirror-selectedtext {
   background: none;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -15581,7 +15633,6 @@ span.CodeMirror-selectedtext {
   outline: 0px solid transparent;
 }
 .fr-box.fr-basic .fr-element {
-  text-align: initial;
   color: #000000;
   padding: 10px;
   -webkit-box-sizing: border-box;
@@ -16314,7 +16365,10 @@ body.prevent-scroll.fr-mobile {
   -moz-transition: color 0.2s ease 0s;
   -ms-transition: color 0.2s ease 0s;
   -o-transition: color 0.2s ease 0s;
-  z-index: 1;
+  z-index: 3;
+  width: 100%;
+  display: block;
+  background: #ffffff;
 }
 .fr-popup .fr-input-line input.fr-not-empty:focus + label,
 .fr-popup .fr-input-line textarea.fr-not-empty:focus + label {
@@ -16736,9 +16790,9 @@ span.fr-sr-only {
   border: 0;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -16806,9 +16860,9 @@ span.fr-sr-only {
   display: none;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -16862,9 +16916,9 @@ span.fr-sr-only {
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 body.fr-fullscreen {
   overflow: hidden;
@@ -16889,9 +16943,9 @@ body.fr-fullscreen {
   bottom: 0 !important;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -16939,9 +16993,9 @@ body.fr-fullscreen {
   top: -16px;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -17089,6 +17143,90 @@ body.fr-fullscreen {
 .fr-video-size-layer .fr-video-group .fr-input-line + .fr-input-line {
   margin-left: 10px;
 }
+.fr-video-upload-layer {
+  border: dashed 2px #bdbdbd;
+  padding: 25px 0;
+  position: relative;
+  font-size: 14px;
+  letter-spacing: 1px;
+  line-height: 140%;
+  text-align: center;
+}
+.fr-video-upload-layer:hover {
+  background: #ebebeb;
+}
+.fr-video-upload-layer.fr-drop {
+  background: #ebebeb;
+  border-color: #1e88e5;
+}
+.fr-video-upload-layer .fr-form {
+  -webkit-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+.fr-video-upload-layer .fr-form input {
+  cursor: pointer;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  width: 500%;
+  height: 100%;
+  margin: 0px;
+  font-size: 400px;
+}
+.fr-video-progress-bar-layer > h3 {
+  font-size: 16px;
+  margin: 10px 0;
+  font-weight: normal;
+}
+.fr-video-progress-bar-layer > div.fr-action-buttons {
+  display: none;
+}
+.fr-video-progress-bar-layer > div.fr-loader {
+  background: #bcdbf7;
+  height: 10px;
+  width: 100%;
+  margin-top: 20px;
+  overflow: hidden;
+  position: relative;
+}
+.fr-video-progress-bar-layer > div.fr-loader span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: #1e88e5;
+  -webkit-transition: width 0.2s ease 0s;
+  -moz-transition: width 0.2s ease 0s;
+  -ms-transition: width 0.2s ease 0s;
+  -o-transition: width 0.2s ease 0s;
+}
+.fr-video-progress-bar-layer > div.fr-loader.fr-indeterminate span {
+  width: 30% !important;
+  position: absolute;
+  top: 0;
+  -webkit-animation: loading 2s linear infinite;
+  -moz-animation: loading 2s linear infinite;
+  -o-animation: loading 2s linear infinite;
+  animation: loading 2s linear infinite;
+}
+.fr-video-progress-bar-layer.fr-error > div.fr-loader {
+  display: none;
+}
+.fr-video-progress-bar-layer.fr-error > div.fr-action-buttons {
+  display: block;
+}
 .fr-video-overlay {
   position: fixed;
   top: 0;
@@ -17099,9 +17237,9 @@ body.fr-fullscreen {
   display: none;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -17224,9 +17362,9 @@ textarea.fr-code {
   background: #ebebeb;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -17278,9 +17416,9 @@ textarea.fr-code {
   background: #ebebeb;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -17535,9 +17673,9 @@ textarea.fr-code {
   }
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -17618,9 +17756,9 @@ textarea.fr-code {
   -o-transform: scale(1);
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -17895,9 +18033,9 @@ div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img {
   background: #ebebeb;
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -18032,9 +18170,9 @@ div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img {
   -o-transform: translate3d(100%, 0, 0);
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,
@@ -18191,9 +18329,9 @@ div.fr-modal-body div.fr-image-list div.fr-image-container .fr-insert-img {
   }
 }
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 .clearfix::after,
 .dl-horizontal dd::after,

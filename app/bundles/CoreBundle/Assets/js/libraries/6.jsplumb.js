@@ -2812,6 +2812,7 @@
                                 ret = _listeners[event][i].apply(this, [ value, originalEvent ]);
                             } catch (e) {
                                 root.jsPlumbUtil.log("jsPlumb: fire failed for event " + event + " : " + e);
+                                console.log(e);
                             }
                         }
                         i++;

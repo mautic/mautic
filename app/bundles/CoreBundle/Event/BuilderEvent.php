@@ -21,6 +21,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class BuilderEvent extends Event
 {
     protected $slotTypes            = [];
+    protected $sections             = [];
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
     protected $translator;
@@ -75,6 +76,43 @@ class BuilderEvent extends Event
         array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->slotTypes);
 
         return $this->slotTypes;
+    }
+
+    /**
+     * @param $key
+     * @param $header
+     * @param $icon
+     * @param $content
+     * @param $form
+     * @param $priority
+     */
+    public function addSection($key, $header, $icon, $content, $form, $priority = 0)
+    {
+        $this->sections[$key] = [
+            'header'   => $this->translator->trans($header),
+            'icon'     => $icon,
+            'content'  => $content,
+            'form'     => $form,
+            'priority' => $priority,
+        ];
+    }
+
+    /**
+     * Get slot types.
+     *
+     * @return array
+     */
+    public function getSections()
+    {
+        $sort = ['priority' => [], 'header' => []];
+        foreach ($this->sections as $k => $v) {
+            $sort['priority'][$k] = $v['priority'];
+            $sort['header'][$k]   = $v['header'];
+        }
+
+        array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->sections);
+
+        return $this->sections;
     }
 
     /**
@@ -179,17 +217,12 @@ class BuilderEvent extends Event
     }
 
     /**
-     * @param      $key
-     * @param      $value
-     * @param bool $allowVisualPlaceholder
+     * @param   $key
+     * @param   $value
      */
-    public function addToken($key, $value, $allowVisualPlaceholder = false)
+    public function addToken($key, $value)
     {
         $this->tokens[$key] = $value;
-
-        if ($allowVisualPlaceholder) {
-            $this->visualTokens[] = $key;
-        }
     }
 
     /**
@@ -303,7 +336,7 @@ class BuilderEvent extends Event
      * @param                    $tokens
      * @param string             $labelColumn
      * @param string             $valueColumn
-     * @param bool               $allowVisualPlaceholder If set to true, the description will be displayed in the editor instead of the raw token
+     * @param bool               $allowVisualPlaceholder @deprecated 2.6.0 to be removed in 3.0
      * @param bool               $convertToLinks         If true, the tokens will be converted to links
      */
     public function addTokensFromHelper(
@@ -357,13 +390,23 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Check if AB Test Winner Criteria has been requested.
+     * Check if Slot types has been requested.
      *
      * @return bool
      */
     public function slotTypesRequested()
     {
         return $this->getRequested('slotTypes');
+    }
+
+    /**
+     * Check if Sections has been requested.
+     *
+     * @return bool
+     */
+    public function sectionsRequested()
+    {
+        return $this->getRequested('sections');
     }
 
     /**

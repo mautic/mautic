@@ -18,6 +18,11 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class MessageQueueRepository extends CommonRepository
 {
+    /**
+     * @param $channel
+     * @param $channelId
+     * @param $leadId
+     */
     public function findMessage($channel, $channelId, $leadId)
     {
         $results = $this->createQueryBuilder('mq')
@@ -71,5 +76,39 @@ class MessageQueueRepository extends CommonRepository
         $results = $q->getQuery()->getResult();
 
         return $results;
+    }
+
+    /**
+     * @param            $channel
+     * @param array|null $ids
+     *
+     * @return bool|string
+     */
+    public function getQueuedChannelCount($channel, array $ids = null)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $expr = $q->expr()->andX(
+            $q->expr()->eq($this->getTableAlias().'.channel', ':channel'),
+            $q->expr()->neq($this->getTableAlias().'.status', ':status')
+        );
+
+        if (!empty($ids)) {
+            $expr->add(
+                $q->expr()->in($this->getTableAlias().'.channel_id', $ids)
+            );
+        }
+
+        return (int) $q->select('count(*)')
+            ->from(MAUTIC_TABLE_PREFIX.'message_queue', $this->getTableAlias())
+            ->where($expr)
+            ->setParameters(
+                [
+                    'channel' => $channel,
+                    'status'  => MessageQueue::STATUS_SENT,
+                ]
+            )
+            ->execute()
+            ->fetchColumn();
     }
 }

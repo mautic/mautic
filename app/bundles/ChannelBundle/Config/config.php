@@ -16,6 +16,10 @@ return [
                 'path'       => '/messages/{page}',
                 'controller' => 'MauticChannelBundle:Message:index',
             ],
+            'mautic_message_contacts' => [
+                'path'       => '/messages/contacts/{objectId}/{channel}/{page}',
+                'controller' => 'MauticChannelBundle:Message:contacts',
+            ],
             'mautic_message_action' => [
                 'path'       => '/messages/{objectAction}/{objectId}',
                 'controller' => 'MauticChannelBundle:Message:execute',
@@ -24,7 +28,7 @@ return [
         'api' => [
             'mautic_api_messagetandard' => [
                 'standard_entity' => true,
-                'name'            => 'message',
+                'name'            => 'messages',
                 'path'            => '/messages',
                 'controller'      => 'MauticChannelBundle:Api\MessageApi',
             ],
@@ -66,6 +70,12 @@ return [
                     'mautic.channel.model.message',
                     'mautic.campaign.model.campaign',
                     'mautic.campaign.model.event',
+                ],
+            ],
+            'mautic.channel.channelbundle.subscriber' => [
+                'class'     => 'Mautic\ChannelBundle\EventListener\MessageSubscriber',
+                'arguments' => [
+                    'mautic.core.model.auditlog',
                 ],
             ],
 
