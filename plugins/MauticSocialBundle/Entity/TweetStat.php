@@ -121,15 +121,16 @@ class TweetStat
         $builder->addLead(true, 'SET NULL');
 
         $builder->createField('handle', 'string')
-            ->columnName('handle')
             ->build();
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->nullable()
             ->build();
 
         $builder->createField('isFailed', 'boolean')
             ->columnName('is_failed')
+            ->nullable()
             ->build();
 
         $builder->createField('retryCount', 'integer')

@@ -166,14 +166,17 @@ class Tweet extends FormEntity
 
         $builder->createField('favoriteCount', 'integer')
             ->columnName('favorite_count')
+            ->nullable()
             ->build();
 
         $builder->createField('retweetCount', 'integer')
             ->columnName('retweet_count')
+            ->nullable()
             ->build();
 
         $builder->createField('language', 'string')
             ->columnName('lang')
+            ->nullable()
             ->build();
 
         $builder->createManyToOne('page', Page::class)
