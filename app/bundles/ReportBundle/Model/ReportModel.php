@@ -372,12 +372,12 @@ class ReportModel extends FormModel
         switch ($format) {
             case 'csv':
                 //build the data rows
-                if(is_null($handle)){
+                if (is_null($handle)) {
                     $response = new StreamedResponse(
                         function () use ($reportData, $report, $formatter) {
                             $handle = fopen('php://output', 'r+');
                             $header = [];
-                            $this->exportCSV($formatter,$report, $reportData, $handle, 0);
+                            $this->exportCSV($formatter, $report, $reportData, $handle, 0);
                             fclose($handle);
                         }
                     );
@@ -387,9 +387,11 @@ class ReportModel extends FormModel
                     $response->headers->set('Expires', 0);
                     $response->headers->set('Cache-Control', 'must-revalidate');
                     $response->headers->set('Pragma', 'public');
+
                     return $response;
                 } else {
-                    $this->exportCSV($formatter,$report, $reportData, $handle, $page);
+                    $this->exportCSV($formatter, $report, $reportData, $handle, $page);
+
                     return;
                 }
             case 'html':
@@ -432,7 +434,6 @@ class ReportModel extends FormModel
                                 if ($count === 0) {
                                     //write the column names row
                                     $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
-
                                 }
                                 //write the row
                                 $rowCount = $count + 2;
@@ -589,7 +590,7 @@ class ReportModel extends FormModel
                 // Build the options array to pass into the query
                 $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
                 if (!empty($options['limit'])) {
-                    $limit = $options['limit'];
+                    $limit      = $options['limit'];
                     $reportPage = $options['page'];
                 }
                 $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
@@ -702,7 +703,8 @@ class ReportModel extends FormModel
         return $options;
     }
 
-    private function exportCSV($formatter,$report, $reportData, $handle, $page){
+    private function exportCSV($formatter, $report, $reportData, $handle, $page)
+    {
         foreach ($reportData['data'] as $count => $data) {
             $row = [];
             foreach ($data as $k => $v) {
