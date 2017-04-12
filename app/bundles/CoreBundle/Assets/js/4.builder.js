@@ -1179,6 +1179,11 @@ Mautic.initSlotListeners = function() {
             } else if (toInsert === 'width') {
                 params.slot.find('video').attr('width', insertVal);
             }
+        } else if (fieldParam === 'separator-color') {
+            params.slot.find('hr').css('border-color', '#' + params.field.val());
+        } else if (fieldParam === 'separator-thickness') {
+            var sep_color = params.slot.attr('data-param-separator-color');
+            params.slot.find('hr').css('border', params.field.val() + 'px solid #'+ sep_color);
         }
 
         if (params.type == 'text') {

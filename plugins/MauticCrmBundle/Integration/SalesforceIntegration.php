@@ -315,8 +315,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $this->cache->set('leadFields'.$cacheSuffix, $salesFields[$sfObject]);
                             }
                         }
+
+                        asort($salesFields[$sfObject]);
                     }
-                    asort($salesFields[$sfObject]);
                 }
             }
         } catch (\Exception $e) {
