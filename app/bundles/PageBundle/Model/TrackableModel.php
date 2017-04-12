@@ -354,7 +354,7 @@ class TrackableModel extends AbstractCommonModel
         $firstPassReplace = $this->contentReplacements['first_pass'];
         foreach ($this->doNotTrack as $doNotTrack) {
             foreach ($firstPassSearch as $search) {
-                if (preg_match($doNotTrack, $search)) {
+                if (preg_match('/'.$doNotTrack.'/', $search)) {
                     $doNotReplace = true;
                 }
             }
