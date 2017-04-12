@@ -237,8 +237,9 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        $context = $event->getContext();
-        $qb      = $event->getQueryBuilder();
+        $context    = $event->getContext();
+        $qb         = $event->getQueryBuilder();
+        $hasGroupBy = $event->hasGroupBy();
 
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
@@ -248,10 +249,13 @@ class ReportSubscriber extends CommonSubscriber
         switch ($context) {
             case 'emails':
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
-                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
-                   ->groupBy('e.id');
+                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+
                 $event->addCategoryLeftJoin($qb, 'e');
 
+                if (!$hasGroupBy) {
+                    $qb->groupBy('e.id');
+                }
                 if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
                     $qbcut->select(
                         'COUNT(cut2.channel_id) AS trackable_count, SUM(cut2.hits) AS hits',

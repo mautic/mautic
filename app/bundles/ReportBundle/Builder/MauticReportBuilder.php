@@ -212,16 +212,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build GROUP BY
-        if (!empty($options['groupby'])) {
-            if (is_array($options['groupby'])) {
-                foreach ($options['groupby'] as $groupBy) {
-                    $queryBuilder->addGroupBy($groupBy);
-                }
-            } else {
-                $queryBuilder->groupBy($options['groupby']);
-            }
-        }
-        // Build GROUP BY
         if ($groupByOptions = $this->entity->getGroupBy()) {
             foreach ($groupByOptions as $groupBy) {
                 $column = '';
@@ -230,6 +220,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $column .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
                 }
                 $queryBuilder->addGroupBy($column);
+            }
+        } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
+            if (is_array($options['groupby'])) {
+                foreach ($options['groupby'] as $groupBy) {
+                    $queryBuilder->addGroupBy($groupBy);
+                }
+            } else {
+                $queryBuilder->groupBy($options['groupby']);
             }
         }
         // Build LIMIT clause
