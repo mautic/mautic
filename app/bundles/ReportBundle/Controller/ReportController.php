@@ -785,11 +785,11 @@ class ReportController extends FormController
         $fromDate = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));
         $toDate   = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
 
-        $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($entity->getName(), false, '-');
-        $options = array( 'dateFrom' => new \DateTime($fromDate),'dateTo' => new \DateTime($toDate));
+        $date    = (new DateTimeHelper())->toLocalString();
+        $name    = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
+        $options = ['dateFrom' => new \DateTime($fromDate), 'dateTo' => new \DateTime($toDate)];
 
-        if($format === 'csv') {
+        if ($format === 'csv') {
             $response = new HttpFoundation\StreamedResponse(
                 function () use ($model, $fromDate, $toDate, $entity, $format, $name, $options) {
                     $options['paginate'] = true;
@@ -798,10 +798,10 @@ class ReportController extends FormController
                     $reportData['totalResults'] = 10000;
                     $options['page'] = 1;
                     $handle = fopen('php://output', 'r+');
-                    while ($reportData['totalResults'] >= ($options['page'] - 1) *  $options['limit']) {
+                    while ($reportData['totalResults'] >= ($options['page'] - 1) * $options['limit']) {
                         $reportData = $model->getReportData($entity, null, $options);
                         $model->exportResults($format, $entity, $reportData, $handle, null, $options['page']);
-                        $options['page']++;
+                        ++$options['page'];
                     }
                     fclose($handle);
                 }
@@ -809,7 +809,7 @@ class ReportController extends FormController
 
             $response->headers->set('Content-Type', 'application/force-download');
             $response->headers->set('Content-Type', 'application/octet-stream');
-            $response->headers->set('Content-Disposition', 'attachment; filename="' . $name . '.'.$format.'"');
+            $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.'.$format.'"');
             $response->headers->set('Expires', 0);
             $response->headers->set('Cache-Control', 'must-revalidate');
             $response->headers->set('Pragma', 'public');
@@ -818,7 +818,7 @@ class ReportController extends FormController
                 $options['ignoreGraphData'] = true;
             }
             $reportData = $model->getReportData($entity, null, $options);
-            $response = $model->exportResults($format, $entity, $reportData);
+            $response   = $model->exportResults($format, $entity, $reportData);
         }
 
         return $response;
