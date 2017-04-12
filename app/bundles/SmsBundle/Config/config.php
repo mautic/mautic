@@ -151,8 +151,10 @@ return [
                     'access' => ['sms:smses:viewown', 'sms:smses:viewother'],
                     'parent' => 'mautic.core.channels',
                     'checks' => [
-                        'parameters' => [
-                            'sms_enabled' => true,
+                        'integration' => [
+                            'Twilio' => [
+                                'enabled' => true,
+                            ],
                         ],
                     ],
                     'priority' => 70,
