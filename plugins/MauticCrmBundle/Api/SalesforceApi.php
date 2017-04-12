@@ -100,26 +100,24 @@ class SalesforceApi extends CrmApi
      *
      * @return mixed
      */
-    public function createLead(array $data, $lead)
+    public function createLead(array $data)
     {
         $createdLeadData = [];
         $createLead      = true;
         $config          = $this->integration->mergeConfigToFeatureSettings([]);
-        //search for SF id in mautic records first to avoid making an API call
-        if (is_object($lead)) {
-            $sfLeadRecords = $this->integration->getSalesforceLeadId($lead);
-        }
         //if not found then go ahead and make an API call to find all the records with that email
 
         $queryUrl            = $this->integration->getQueryUrl();
         $sfRecord['records'] = [];
         //try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && array_search('Contact', $config['objects']) && isset($data['Contact']['Email'])) {
+            $sfObject    = 'Contact';
             $findContact = 'select Id from Contact where email = \''.$data['Contact']['Email'].'\'';
             $sfRecord    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
         }
 
         if (empty($sfRecord['records']) && isset($data['Lead']['Email'])) {
+            $sfObject = 'Lead';
             $findLead = 'select Id, ConvertedContactId from Lead where email = \''.$data['Lead']['Email'].'\'';
             $sfRecord = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
         }
@@ -128,8 +126,7 @@ class SalesforceApi extends CrmApi
         if (!empty($sfLeadRecords)) {
             foreach ($sfLeadRecords as $sfLeadRecord) {
                 $createLead = false;
-                $sfLeadId   = (isset($sfLeadRecord['integration_entity_id']) ? $sfLeadRecord['integration_entity_id'] : $sfLeadRecord['Id']);
-                $sfObject   = (isset($sfLeadRecord['integration_entity']) ? $sfLeadRecord['integration_entity'] : 'Lead');
+                $sfLeadId   = $sfLeadRecord['Id'];
                 //update the converted contact if found and not the Lead because it will error in SF
                 if (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) {
                     if (isset($config['objects']) && array_search('Contact', $config['objects'])) {

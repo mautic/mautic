@@ -588,7 +588,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $createdLeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+                $createdLeadData = $this->getApiHelper()->createLead($mappedData);
                 if (isset($createdLeadData['id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
                     $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
