@@ -114,15 +114,14 @@ class LeadDeviceRepository extends CommonRepository
         $sq->select('es.id as id, es.lead_id as lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
 
-        if ($fingerprint !== null) {
-            $sq->where(
-                $sq->expr()->eq('es.device_fingerprint', ':fingerprint')
-            )
-                ->setParameter('fingerprint', $fingerprint);
-        }
-        //get totals
-        $device = $sq->execute()->fetchAll();
+        $sq->where(
+            $sq->expr()->eq('es.device_fingerprint', ':fingerprint')
+        )
+            ->setParameter('fingerprint', $fingerprint);
 
-        return (!empty($device)) ? $device[0] : [];
+        //get the first match
+        $device = $sq->execute()->fetch();
+
+        return $device ? $device : null;
     }
 }
