@@ -50,11 +50,15 @@ class LeadApiController extends CommonApiController
     {
         $existingLeads = $this->getExistingLeads();
         if (!empty($existingLeads)) {
-            parent::editEntityAction($existingLeads[0]->getId());
+            return parent::editEntityAction($existingLeads[0]->getId());
         }
 
         return parent::newEntityAction();
     }
+
+    /**
+     * {@inheritdoc}
+     */
     public function editEntityAction($id)
     {
         $existingLeads = $this->getExistingLeads();
@@ -70,22 +74,32 @@ class LeadApiController extends CommonApiController
 
         return parent::editEntityAction($id);
     }
+
+    /**
+     * Get existing duplicated contacts based on unique fields and the request data.
+     *
+     * @return array
+     */
     protected function getExistingLeads()
     {
         // Check for an email to see if the lead already exists
         $parameters          = $this->request->request->all();
         $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
+
         foreach ($parameters as $k => $v) {
             if (array_key_exists($k, $uniqueLeadFields) && !empty($v)) {
                 $uniqueLeadFieldData[$k] = $v;
             }
         }
+
         if (count($uniqueLeadFieldData)) {
             return $this->get('doctrine.orm.entity_manager')->getRepository(
                 'MauticLeadBundle:Lead'
             )->getLeadsByUniqueFields($uniqueLeadFieldData, null, 1);
         }
+
+        return [];
     }
 
     /**
