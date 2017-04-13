@@ -8,11 +8,35 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-?>
 
-<div class="nav-overflow-tabs">
-    <ul class="bg-auto nav nav-tabs pr-md pl-md">
-        <?php foreach ($tabs as $tab): ?>
+$overflow = isset($overflow) ? 'nav-overflow-tabs' : '';
+if (!isset($verticalTabColWidth)) {
+    $verticalTabColWidth = 3;
+}
+$verticalContentColWidth = 12 - (int) $verticalTabColWidth;
+?>
+<?php if (!empty($vertical)): ?>
+<div class="box-layout">
+<?php endif; ?>
+<div class="tab-container <?php echo $overflow; ?><?php echo !empty($vertical) ? ' bg-auto height-auto col-xs-'.$verticalTabColWidth.' pr-0 bdr-r' : ''; ?>">
+    <?php if (!empty($button)): ?>
+    <div class="tab-button<?php echo (!empty($vertical)) ? ' tab-button-'.$vertical : ''; ?>">
+        <a href="javascript:void(0);"
+           role="tab"
+           class="btn btn-primary btn-lg btn-block btn-nospin"
+           id="<?php echo $button['id']; ?>"
+           style="border-radius: 0;"
+            <?php if (!empty($button['attr'])): echo $button['attr']; endif; ?>
+        >
+            <i class="fa fa-fw <?php echo $button['icon']; ?>"></i><?php echo $button['text']; ?>
+        </a>
+    <?php if (!empty($button['extra'])): echo $button['extra']; endif; ?>
+    </div>
+    <?php endif; ?>
+    <ul<?php echo (isset($deletable) && is_string($deletable)) ? ' data-delete-action="'.$deletable.'" ' : ''; ?>
+        <?php echo (isset($sortable) && is_string($sortable)) ? ' data-sort-action="'.$sortable.'" ' : ''; ?>
+            class="<?php echo (!empty($deletable)) ? 'nav-deletable ' : ''; ?>nav nav-tabs <?php echo (!empty($vertical)) ? 'tabs-'.$vertical.' pt-0 bdr-b-wdh-0  bdr-r-wdh-0' : 'tabs-horizontal bg-auto'; ?><?php echo !empty($sortable) ? ' sortable' : ''; ?>">
+        <?php foreach ($tabs as $tabKey => $tab): ?>
             <?php
             $class = (!empty($tab['class'])) ? ' '.$tab['class'] : '';
             if (isset($tab['attr']) && is_array($tab['attr'])) {
@@ -31,18 +55,18 @@
                 }
             }
             ?>
-            <li class="<?php if (!empty($tab['active'])): echo 'active'; endif; ?><?php echo $class; ?>"<?php echo $attr; ?>>
+            <li data-tab-id="<?php echo $tab['id']; ?>" class="<?php if (!empty($tab['active'])): echo 'active'; endif; ?><?php echo $class; ?>"<?php echo $attr; ?>>
                 <a href="#<?php echo $tab['id']; ?>" role="tab" data-toggle="tab" class="<?php echo $class; ?>">
-                    <?php echo $tab['name']; ?>
+                    <span><?php echo $tab['name']; ?></span>
                     <?php if (!empty($tab['icon'])): ?>
-                        <i class="fa <?php echo $tab['icon']; ?>"></i>
+                        <i class="fa fa-fw <?php echo $tab['icon']; ?>"></i>
                     <?php endif; ?>
                 </a>
             </li>
         <?php endforeach; ?>
     </ul>
 </div>
-<div class="tab-content pa-md">
+<div class="tab-content<?php echo !empty($vertical) ? ' col-xs-'.$verticalContentColWidth.' pl-0 pt-0 height-auto' : ' pa-md'; ?>">
     <?php foreach ($tabs as $tab): ?>
         <?php
         $containerClass = (!empty($tab['containerClass'])) ? ' '.$tab['containerClass'] : '';
@@ -59,4 +83,15 @@
             <?php echo $tab['content']; ?>
         </div>
     <?php endforeach; ?>
+
+    <?php if (!empty($noContentKey)): ?>
+    <div class="placeholder<?php echo empty($tabs) ? '' : ' hide'; ?>">
+        <div class="alert alert-warning">
+            <?php echo $view['translator']->trans($noContentKey); ?>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
+<?php if (!empty($vertical)): ?>
+</div>
+<?php endif; ?>

@@ -53,7 +53,7 @@ class ChannelSubscriber extends CommonSubscriber
     public function onAddChannel(ChannelEvent $event)
     {
         $integration = $this->helper->getIntegrationObject('Twitter');
-        if ($integration->getIntegrationSettings()->isPublished()) {
+        if ($integration && $integration->getIntegrationSettings()->isPublished()) {
             $event->addChannel(
                 'tweet',
                 [

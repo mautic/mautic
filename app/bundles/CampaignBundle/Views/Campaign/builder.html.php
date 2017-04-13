@@ -60,6 +60,7 @@
         'id'            => 'CampaignEventModal',
         'header'        => false,
         'footerButtons' => true,
+        'dismissible'   => false,
     ]
 );
 

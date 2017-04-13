@@ -194,7 +194,8 @@ class LeadSubscriber extends CommonSubscriber
                             'list' => $eventNamesWithAny,
                         ],
                         'operators' => [
-                            'include' => ['in', '!in'],
+                            'in'  => $event->getTranslator()->trans('mautic.core.operator.in'),
+                            '!in' => $event->getTranslator()->trans('mautic.core.operator.notin'),
                         ],
                     ]
                 );
@@ -210,7 +211,8 @@ class LeadSubscriber extends CommonSubscriber
                         'list' => $eventNamesWithAny,
                     ],
                     'operators' => [
-                        'include' => ['in', '!in'],
+                        'in'  => $event->getTranslator()->trans('mautic.core.operator.in'),
+                        '!in' => $event->getTranslator()->trans('mautic.core.operator.notin'),
                     ],
                 ]
             );
@@ -225,7 +227,7 @@ class LeadSubscriber extends CommonSubscriber
                         'list' => $eventNamesWithoutAny,
                     ],
                     'operators' => [
-                        'include' => ['in'],
+                        'in' => $event->getTranslator()->trans('mautic.core.operator.in'),
                     ],
                 ]
             );

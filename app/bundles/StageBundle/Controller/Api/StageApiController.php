@@ -57,19 +57,16 @@ class StageApiController extends CommonApiController
         }
 
         $contact = $this->checkLeadAccess($contactId, 'edit');
+
         if ($contact instanceof Response) {
             return $contact;
         }
 
-        // Does the lead exist and the user has permission to edit
-        $canEditContact = $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getOwner());
-        $canViewStage   = $this->security->isGranted('stage:stages:view');
-
-        if (!$canEditContact || !$canViewStage) {
+        if (!$this->security->isGranted('stage:stages:view')) {
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->addToStages($contact, $stage);
+        $this->getModel('lead')->addToStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
     }
@@ -92,20 +89,17 @@ class StageApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $leadModel = $this->getModel('lead');
-        $contact   = $leadModel->getEntity($contactId);
+        $contact = $this->checkLeadAccess($contactId, 'edit');
 
-        // Does the lead exist and the user has permission to edit
-        $canEditContact = $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getOwner());
-        $canViewStage   = $this->security->isGranted('stage:stages:view');
+        if ($contact instanceof Response) {
+            return $contact;
+        }
 
-        if ($contact == null) {
-            return $this->notFound();
-        } elseif (!$canEditContact || !$canViewStage) {
+        if (!$this->security->isGranted('stage:stages:view')) {
             return $this->accessDenied();
         }
 
-        $leadModel->removeFromStages($contact, $stage);
+        $this->getModel('lead')->removeFromStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
     }

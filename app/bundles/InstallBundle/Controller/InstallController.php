@@ -100,6 +100,10 @@ class InstallController extends CommonController
 
                         break;
                     case self::DOCTRINE_STEP:
+                        // password field does not retain configured defaults
+                        if (empty($formData->password) && !empty($params['db_password'])) {
+                            $formData->password = $params['db_password'];
+                        }
                         $dbParams = (array) $formData;
                         $this->validateDatabaseParams($form, $dbParams);
                         if (!$form->getErrors(true)->count()) {

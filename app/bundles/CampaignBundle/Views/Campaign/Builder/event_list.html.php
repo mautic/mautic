@@ -25,7 +25,13 @@
                         class="option_campaignEvent_<?php echo str_replace('.', '', $k); ?>"
                         data-href="<?php echo $view['router']->path(
                             'mautic_campaignevent_action',
-                            ['objectAction' => 'new', 'type' => $k, 'eventType' => $eventGroup, 'campaignId' => $campaignId, 'anchor' => '']
+                            [
+                                    'objectAction' => 'new',
+                                    'type'         => $k,
+                                    'eventType'    => $eventGroup,
+                                    'campaignId'   => $campaignId,
+                                    'anchor'       => '',
+                            ]
                         ); ?>"
                         data-target="#CampaignEventModal"
                         title="<?php echo $view->escape($e['description']); ?>"

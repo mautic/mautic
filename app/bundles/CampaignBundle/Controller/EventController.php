@@ -224,6 +224,7 @@ class EventController extends CommonFormController
         $success        = 0;
         $valid          = $cancelled          = false;
         $event          = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
+
         if ($method == 'POST') {
             $event['anchor']          = $this->request->request->get('campaignevent[anchor]', '', true);
             $event['anchorEventType'] = $this->request->request->get('campaignevent[anchorEventType]', '', true);

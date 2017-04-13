@@ -111,6 +111,14 @@ class CampaignModel extends CommonFormModel
     }
 
     /**
+     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
+     */
+    public function getCampaignLeadEventLogRepository()
+    {
+        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -250,7 +258,7 @@ class CampaignModel extends CommonFormModel
                     $event->setTempId($v);
                 }
 
-                if (in_array($f, ['id', 'order', 'parent'])) {
+                if (in_array($f, ['id', 'parent'])) {
                     continue;
                 }
 
@@ -336,6 +344,8 @@ class CampaignModel extends CommonFormModel
                 // Remove decision so that it doesn't affect execution
                 $events[$id]->setDecisionPath(null);
             }
+
+            $entity->addEvent($id, $events[$id]);
         }
 
         //set event order used when querying the events
@@ -461,29 +471,6 @@ class CampaignModel extends CommonFormModel
         }
 
         return $settings;
-    }
-
-    /**
-     * @param          $hierarchy
-     * @param          $events
-     * @param Campaign $entity
-     * @param string   $root
-     * @param int      $order
-     */
-    private function buildOrder($hierarchy, &$events, $entity, $root = 'null', $order = 1)
-    {
-        $count = count($hierarchy);
-
-        foreach ($hierarchy as $eventId => $parent) {
-            if ($parent == $root || $count === 1) {
-                $events[$eventId]->setOrder($order);
-                $entity->addEvent($eventId, $events[$eventId]);
-                unset($hierarchy[$eventId]);
-                if (count($hierarchy)) {
-                    $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
-                }
-            }
-        }
     }
 
     /**
@@ -1249,11 +1236,11 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of hits.
      *
-     * @param char     $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     * @param string   $dateFormat
-     * @param array    $filter
+     * @param char      $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
      *
      * @return array
      */
@@ -1295,5 +1282,32 @@ class CampaignModel extends CommonFormModel
         }
 
         return $chart->render();
+    }
+
+    /**
+     * @param          $hierarchy
+     * @param          $events
+     * @param Campaign $entity
+     * @param string   $root
+     * @param int      $order
+     */
+    protected function buildOrder($hierarchy, &$events, $entity, $root = 'null', $order = 1)
+    {
+        $count = count($hierarchy);
+        if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {
+            // no parents so leave order as is
+
+            return;
+        } else {
+            foreach ($hierarchy as $eventId => $parent) {
+                if ($parent == $root || $count === 1) {
+                    $events[$eventId]->setOrder($order);
+                    unset($hierarchy[$eventId]);
+                    if (count($hierarchy)) {
+                        $this->buildOrder($hierarchy, $events, $entity, $eventId, $order + 1);
+                    }
+                }
+            }
+        }
     }
 }

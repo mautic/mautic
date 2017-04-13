@@ -384,12 +384,7 @@ class LeadModel extends FormModel
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
-        $updatedFields       = $entity->getUpdatedFields();
         $company             = null;
-
-        if (isset($updatedFields['company'])) {
-            $companyFieldMatches['company'] = $updatedFields['company'];
-        }
 
         //check to see if we can glean information from ip address
         if (!$entity->imported && count($ips = $entity->getIpAddresses())) {
@@ -414,12 +409,13 @@ class LeadModel extends FormModel
             }
         }
 
-        if (!empty($companyFieldMatches)) {
-            list($company, $leadAdded) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+        $updatedFields = $entity->getUpdatedFields();
+        if (isset($updatedFields['company'])) {
+            $companyFieldMatches['company'] = $updatedFields['company'];
+            list($company, $leadAdded)      = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
-            unset($updatedFields['company']);
         }
 
         $this->setEntityDefaultValues($entity);
@@ -515,7 +511,7 @@ class LeadModel extends FormModel
         if ($bindWithForm) {
             // Cleanup the field values
             $form = $this->createForm(
-                $lead,
+                new Lead(), // use empty lead to prevent binding errors
                 $this->formFactory,
                 null,
                 ['fields' => $flatFields, 'csrf_protection' => false, 'allow_extra_fields' => true]
@@ -527,25 +523,21 @@ class LeadModel extends FormModel
             $this->prepareParametersFromRequest($form, $data, $lead);
             // Submit the data
             $form->submit($data);
-            // Use form processed data
-            $formData = [];
 
-            if (!$form->isValid()) {
-                if ($form->getErrors()->count()) {
-                    $this->logger->addDebug('LEAD: form validation failed with an error of '.(string) $form->getErrors());
-                }
-                foreach ($form as $field => $formField) {
-                    if (isset($data[$field]) && $formField->getErrors()->count()) {
+            if ($form->getErrors()->count()) {
+                $this->logger->addDebug('LEAD: form validation failed with an error of '.(string) $form->getErrors());
+            }
+            foreach ($form as $field => $formField) {
+                if (isset($data[$field])) {
+                    if ($formField->getErrors()->count()) {
                         $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.(string) $formField->getErrors());
                         // Don't save bad data
                         unset($data[$field]);
                     } else {
-                        $formData[$field] = $formField->getData();
+                        $data[$field] = $formField->getData();
                     }
                 }
             }
-
-            $data = $formData;
         }
 
         //update existing values
@@ -1149,6 +1141,8 @@ class LeadModel extends FormModel
      * @param array|Lead  $lead
      * @param array|Stage $stage
      * @param bool        $manuallyAdded
+     *
+     * @return $this
      */
     public function addToStages($lead, $stage, $manuallyAdded = true)
     {
@@ -1162,6 +1156,8 @@ class LeadModel extends FormModel
             $stage->getId().': '.$stage->getName(),
             $this->translator->trans('mautic.stage.event.added.batch')
         );
+
+        return $this;
     }
 
     /**
@@ -1170,6 +1166,8 @@ class LeadModel extends FormModel
      * @param      $lead
      * @param      $stage
      * @param bool $manuallyRemoved
+     *
+     * @return $this
      */
     public function removeFromStages($lead, $stage, $manuallyRemoved = true)
     {
@@ -1179,6 +1177,8 @@ class LeadModel extends FormModel
             $stage->getId().': '.$stage->getName(),
             $this->translator->trans('mautic.stage.event.removed.batch')
         );
+
+        return $this;
     }
 
     /**
@@ -1837,7 +1837,9 @@ class LeadModel extends FormModel
                             }
                             break;
                         case 'multiselect':
-                            if (!is_array($fieldData[$leadField['alias']])) {
+                            if (strpos($fieldData[$leadField['alias']], '|') !== false) {
+                                $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
+                            } else {
                                 $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
                             }
                             break;
@@ -2226,9 +2228,9 @@ class LeadModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) as quantity, t.country')
-          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-          ->groupBy('t.country')
-          ->where($q->expr()->isNotNull('t.country'));
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->groupBy('t.country')
+            ->where($q->expr()->isNotNull('t.country'));
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2265,12 +2267,12 @@ class LeadModel extends FormModel
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
-          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-          ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
-          ->where($q->expr()->isNotNull('t.owner_id'))
-          ->orderBy('leads', 'DESC')
-          ->groupBy('t.owner_id, u.first_name, u.last_name')
-          ->setMaxResults($limit);
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->join('t', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = t.owner_id')
+            ->where($q->expr()->isNotNull('t.owner_id'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.owner_id, u.first_name, u.last_name')
+            ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2295,12 +2297,12 @@ class LeadModel extends FormModel
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')
-          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-          ->where($q->expr()->isNotNull('t.created_by'))
-          ->andWhere($q->expr()->isNotNull('t.created_by_user'))
-          ->orderBy('leads', 'DESC')
-          ->groupBy('t.created_by, t.created_by_user')
-          ->setMaxResults($limit);
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->where($q->expr()->isNotNull('t.created_by'))
+            ->andWhere($q->expr()->isNotNull('t.created_by_user'))
+            ->orderBy('leads', 'DESC')
+            ->groupBy('t.created_by, t.created_by_user')
+            ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);
@@ -2330,8 +2332,8 @@ class LeadModel extends FormModel
 
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.firstname, t.lastname, t.email, t.date_added, t.date_modified')
-          ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
-          ->setMaxResults($limit);
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 't')
+            ->setMaxResults($limit);
 
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyFilters($q, $filters);

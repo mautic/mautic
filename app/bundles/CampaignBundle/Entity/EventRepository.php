@@ -293,7 +293,7 @@ class EventRepository extends CommonRepository
             return $count;
         }
 
-        $q->select('o')
+        $q->select('o, IDENTITY(o.lead) as lead_id, IDENTITY(o.event) AS event_id')
             ->orderBy('o.triggerDate', 'DESC');
 
         if ($limit) {
@@ -304,13 +304,13 @@ class EventRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
 
         // Organize by lead
-        $leads = [];
+        $logs = [];
         foreach ($results as $e) {
-            $leads[$e['lead_id']][$e['event_id']] = $e;
+            $logs[$e['lead_id']][$e['event_id']] = array_merge($e[0], ['lead_id' => $e['lead_id'], 'event_id' => $e['event_id']]);
         }
         unset($results);
 
-        return $leads;
+        return $logs;
     }
 
     /**
@@ -506,7 +506,7 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleting events from a campaign.
      *
-     * @param $campaignId
+     * @param $events
      */
     public function nullEventRelationships($events)
     {
@@ -536,6 +536,46 @@ class EventRepository extends CommonRepository
     public function getSearchCommands()
     {
         return $this->getStandardSearchCommands();
+    }
+
+    /**
+     * @param        $channel
+     * @param null   $campaignId
+     * @param string $eventType
+     */
+    public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')
+    {
+        $q = $this->getEntityManager()->createQueryBuilder();
+
+        $q->select('e')
+            ->from('MauticCampaignBundle:Event', 'e', 'e.id');
+
+        $expr = $q->expr()->andX();
+        if ($campaignId) {
+            $expr->add(
+                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
+            );
+
+            $q->orderBy('e.order');
+        }
+
+        $expr->add(
+            $q->expr()->eq('e.channel', ':channel')
+        );
+        $q->setParameter('channel', $channel);
+
+        if ($eventType) {
+            $expr->add(
+                $q->expr()->eq('e.eventType', ':eventType')
+            );
+            $q->setParameter('eventType', $eventType);
+        }
+
+        $q->where($expr);
+
+        $results = $q->getQuery()->getResult();
+
+        return $results;
     }
 
     /**

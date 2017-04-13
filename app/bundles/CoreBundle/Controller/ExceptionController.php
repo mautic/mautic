@@ -41,11 +41,10 @@ class ExceptionController extends CommonController
             }
 
             // Special handling for oauth and api urls
-            if ((strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false)
-                || strpos(
-                    $request->getUri(),
-                    '/api'
-                ) !== false
+            if (
+                (strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) ||
+                strpos($request->getUri(), '/api') !== false ||
+                (!defined('MAUTIC_AJAX_VIEW') && strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json') !== false)
             ) {
                 $dataArray = [
                     'errors' => [

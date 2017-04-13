@@ -394,10 +394,11 @@ var Mautic = {
         if (mQuery(target).length) {
             var hasBtn = mQuery(target).hasClass('btn');
             var hasIcon = mQuery(target).hasClass('fa');
+            var dontspin = mQuery(target).hasClass('btn-nospin');
 
             var i = (hasBtn && mQuery(target).find('i.fa').length) ? mQuery(target).find('i.fa') : target;
 
-            if ((hasBtn && mQuery(target).find('i.fa').length) || hasIcon) {
+            if (!dontspin && ((hasBtn && mQuery(target).find('i.fa').length) || hasIcon)) {
                 var el = (hasIcon) ? target : mQuery(target).find('i.fa').first();
                 var identifierClass = (new Date).getTime();
                 MauticVars.iconClasses[identifierClass] = mQuery(el).attr('class');
@@ -585,9 +586,10 @@ var Mautic = {
                     mQuery('.modal.in  .loading-placeholder').addClass('hide');
                 }
             } else if (inDevMode) {
-                if (response.error) {
-                    var error = response.error.code + ': ' + errorThrown + '; ' + response.error.exception;
-                    alert(error);
+                console.log(response);
+
+                if (response.errors && response.errors[0] && response.errors[0].message) {
+                    alert(response.errors[0].message);
                 }
             }
         }

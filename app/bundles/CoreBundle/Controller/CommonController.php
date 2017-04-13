@@ -23,7 +23,6 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +32,6 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
@@ -41,6 +39,8 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class CommonController extends Controller implements MauticController
 {
+    use FormThemeTrait;
+
     /**
      * @var MauticFactory
      */
@@ -295,6 +295,10 @@ class CommonController extends Controller implements MauticController
             }
         }
 
+        if (isset($args['passthroughVars']['closeModal'])) {
+            $args['passthroughVars']['updateMainContent'] = true;
+        }
+
         if (!$this->request->isXmlHttpRequest() || !empty($args['ignoreAjax'])) {
             $code = (isset($args['responseCode'])) ? $args['responseCode'] : 302;
 
@@ -321,6 +325,13 @@ class CommonController extends Controller implements MauticController
         $passthrough     = array_key_exists('passthroughVars', $args) ? $args['passthroughVars'] : [];
         $forward         = array_key_exists('forwardController', $args) ? $args['forwardController'] : false;
         $code            = array_key_exists('responseCode', $args) ? $args['responseCode'] : 200;
+
+        /*
+         * Return json response if this is a modal
+         */
+        if (!empty($passthrough['closeModal']) && empty($passthrough['updateModalContent']) && empty($passthrough['updateMainContent'])) {
+            return new JsonResponse($passthrough);
+        }
 
         //set the route to the returnUrl
         if (empty($passthrough['route']) && !empty($args['returnUrl'])) {
@@ -373,7 +384,10 @@ class CommonController extends Controller implements MauticController
                     $newContent = $newContentResponse->getContent();
                 }
             } else {
-                $newContent = $this->renderView($contentTemplate, $parameters);
+                $GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'] = 1; // for error handling
+                $newContent                           = $this->renderView($contentTemplate, $parameters);
+
+                unset($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER']);
             }
         }
 
@@ -573,61 +587,6 @@ class CommonController extends Controller implements MauticController
                 $session->set("$name.filters", $filters);
             }
         }
-    }
-
-    /**
-     * Sets a specific theme for the form.
-     *
-     * @param Form   $form
-     * @param string $template
-     * @param mixed  $themes
-     *
-     * @return \Symfony\Component\Form\FormView
-     */
-    protected function setFormTheme(Form $form, $template, $themes = null)
-    {
-        $formView = $form->createView();
-
-        // Extract form theme from options if applicable
-        $fieldThemes = [];
-        $findThemes  = function ($form, &$themes) use (&$findThemes) {
-            /** @var Form $field */
-            foreach ($form as $field) {
-                if ($theme = $field->getConfig()->getOption('default_theme')) {
-                    $themes[] = $theme;
-                }
-
-                if ($field->count()) {
-                    $findThemes($field, $themes);
-                }
-            }
-        };
-
-        $findThemes($form, $fieldThemes);
-        if (count($fieldThemes)) {
-            if (null === $themes) {
-                $themes = $fieldThemes;
-            } elseif (is_array($themes)) {
-                $themes = array_merge($fieldThemes, $themes);
-            } else {
-                $fieldThemes[] = $themes;
-                $themes        = $fieldThemes;
-            }
-            $themes = array_values(array_unique($themes));
-        }
-
-        if (empty($themes)) {
-            return $formView;
-        }
-
-        $templating = $this->container->get('mautic.helper.templating')->getTemplating();
-        if ($templating instanceof DelegatingEngine) {
-            $templating = $templating->getEngine($template);
-        }
-
-        $templating->get('form')->setTheme($formView, $themes);
-
-        return $formView;
     }
 
     /**

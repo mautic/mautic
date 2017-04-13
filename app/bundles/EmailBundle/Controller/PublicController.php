@@ -71,7 +71,7 @@ class PublicController extends CommonFormController
             $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
             // Check for html doc
-            if (strpos($content, '<html>') === false) {
+            if (strpos($content, '<html') === false) {
                 $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
             } elseif (strpos($content, '<head>') === false) {
                 $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);

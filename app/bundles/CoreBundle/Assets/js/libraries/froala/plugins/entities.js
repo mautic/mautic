@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -45,7 +45,7 @@
     var _map;
 
     // if &, then index should be 0
-    function _process(el) {
+    function _process (el) {
       var text = el.textContent;
       if (text.match(_reg_exp)) {
         var new_text = '';
@@ -53,6 +53,7 @@
           if (_map[text[j]]) new_text += _map[text[j]];
           else new_text += text[j];
         }
+
         el.textContent = new_text;
       }
     }

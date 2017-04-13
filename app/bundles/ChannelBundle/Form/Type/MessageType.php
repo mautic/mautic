@@ -56,11 +56,11 @@ class MessageType extends AbstractFormStandardType
         $channels        = $this->model->getChannels();
         $messageChannels = $message->getChannels();
 
-        foreach ($channels as $channelId => $channel) {
-            if (!isset($messageChannels[$channelId])) {
+        foreach ($channels as $channelType => $channel) {
+            if (!isset($messageChannels[$channelType])) {
                 $message->addChannel(
                     (new Channel())
-                        ->setChannel($channelId)
+                        ->setChannel($channelType)
                         ->setMessage($message)
                 );
             }

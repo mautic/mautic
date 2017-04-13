@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -52,7 +52,7 @@
     var max_height;
     var z_index;
     function _on () {
-      old_scroll = $(editor.o_win).scrollTop();
+      old_scroll = editor.helpers.scrollTop();
       editor.$box.toggleClass('fr-fullscreen');
       $('body').toggleClass('fr-fullscreen');
       $placeholder = $('<div style="display: none;"></div>');
