@@ -52,6 +52,7 @@ class LeadApiController extends CommonApiController
         if (!empty($existingLeads)) {
             parent::editEntityAction($existingLeads[0]->getId());
         }
+
         return parent::newEntityAction();
     }
     public function editEntityAction($id)
@@ -59,20 +60,21 @@ class LeadApiController extends CommonApiController
         $existingLeads = $this->getExistingLeads();
         if (!empty($existingLeads)) {
             $entity = $this->model->getEntity($id);
-            if($existingLeads[0]->getId() == $entity->getId()) {
+            if ($existingLeads[0]->getId() == $entity->getId()) {
                 array_shift($existingLeads);
             }
-            if(isset($existingLeads[0])) {
+            if (isset($existingLeads[0])) {
                 $this->model->mergeLeads($existingLeads[0], $entity, false);
             }
         }
+
         return parent::editEntityAction($id);
     }
     protected function getExistingLeads()
     {
         // Check for an email to see if the lead already exists
-        $parameters = $this->request->request->all();
-        $uniqueLeadFields = $this->getModel('lead.field')->getUniqueIdentiferFields();
+        $parameters          = $this->request->request->all();
+        $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
         foreach ($parameters as $k => $v) {
             if (array_key_exists($k, $uniqueLeadFields) && !empty($v)) {
@@ -82,7 +84,7 @@ class LeadApiController extends CommonApiController
         if (count($uniqueLeadFieldData)) {
             return $this->get('doctrine.orm.entity_manager')->getRepository(
                 'MauticLeadBundle:Lead'
-            )->getLeadsByUniqueFields($uniqueLeadFieldData);
+            )->getLeadsByUniqueFields($uniqueLeadFieldData, null, 1);
         }
     }
 

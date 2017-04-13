@@ -139,12 +139,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of lead entities.
      *
-     * @param      $uniqueFieldsWithData
-     * @param null $leadId
+     * @param     $uniqueFieldsWithData
+     * @param int $leadId
+     * @param int $limit
      *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
     {
         // get the list of IDs
         $idList = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
@@ -173,6 +174,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         )
             ->setParameter('ids', $ids)
             ->orderBy('l.dateAdded', 'DESC');
+
+        if ($limit) {
+            $q->setMaxResults($limit);
+        }
 
         $results = $q->getQuery()->getResult();
 
