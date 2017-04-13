@@ -219,7 +219,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $fieldOptions = $options['columns'][$groupBy];
                     $column .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
                 }
-                $queryBuilder->addGroupBy($column.'WITH ROLLUP');
+                $queryBuilder->addGroupBy($column.' WITH ROLLUP');
             }
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
             if (is_array($options['groupby'])) {
