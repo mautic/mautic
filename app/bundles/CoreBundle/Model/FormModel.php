@@ -67,7 +67,7 @@ class FormModel extends AbstractCommonModel
                 }
 
                 //is it checked out by the current user?
-                if (!empty($checkedOutBy) && ($checkedOutBy !== $this->factory->getUser()->getId())) {
+                if (!empty($checkedOutBy) && ($checkedOutBy !== $this->userHelper->getUser()->getId())) {
                     return true;
                 }
             }
