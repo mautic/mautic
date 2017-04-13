@@ -167,7 +167,10 @@ return [
                 ],
             ],
             'mautic.form.webhook.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber',
+                'class'       => 'Mautic\FormBundle\EventListener\WebhookSubscriber',
+                'methodCalls' => [
+                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
+                ],
             ],
             'mautic.form.dashboard.subscriber' => [
                 'class'     => 'Mautic\FormBundle\EventListener\DashboardSubscriber',

@@ -912,6 +912,18 @@ class CommonRepository extends EntityRepository
      */
     protected function addCatchAllWhereClause(&$qb, $filter)
     {
+        foreach (['name', 'title'] as $column) {
+            if ($this->getClassMetadata()->hasField($column)) {
+                return $this->addStandardCatchAllWhereClause(
+                    $qb,
+                    $filter,
+                    [
+                        $this->getTableAlias().'.'.$column,
+                    ]
+                );
+            }
+        }
+
         return [
             false,
             [],

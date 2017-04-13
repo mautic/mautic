@@ -192,11 +192,12 @@ class FilterType extends AbstractType
                     $displayAttr = array_merge(
                         $displayAttr,
                         [
-                            'class'       => 'form-control',
-                            'data-toggle' => 'field-lookup',
-                            'data-target' => $data['field'],
-                            'data-action' => 'lead:fieldList',
-                            'placeholder' => $translator->trans(
+                            'class'                => 'form-control',
+                            'data-toggle'          => 'field-lookup',
+                            'data-target'          => $data['field'],
+                            'data-action'          => 'lead:fieldList',
+                            'data-lookup-callback' => 'updateLookupListFilter',
+                            'placeholder'          => $translator->trans(
                                 'mautic.lead.list.form.filtervalue'
                             ),
                         ]

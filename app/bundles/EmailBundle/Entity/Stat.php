@@ -467,6 +467,9 @@ class Stat
         $this->retryCount = $retryCount;
     }
 
+    /**
+     * Increase the retry count.
+     */
     public function upRetryCount()
     {
         ++$this->retryCount;
