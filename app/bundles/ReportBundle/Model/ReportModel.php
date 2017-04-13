@@ -374,10 +374,9 @@ class ReportModel extends FormModel
                 //build the data rows
                 if (is_null($handle)) {
                     $response = new StreamedResponse(
-                        function () use ($reportData, $report, $formatter) {
+                        function () use ($reportData, $formatter) {
                             $handle = fopen('php://output', 'r+');
-                            $header = [];
-                            $this->exportCSV($formatter, $report, $reportData, $handle, 0);
+                            $this->exportCSV($formatter, $reportData, $handle, 0);
                             fclose($handle);
                         }
                     );
@@ -390,7 +389,7 @@ class ReportModel extends FormModel
 
                     return $response;
                 } else {
-                    $this->exportCSV($formatter, $report, $reportData, $handle, $page);
+                    $this->exportCSV($formatter, $reportData, $handle, $page);
 
                     return;
                 }
@@ -703,12 +702,12 @@ class ReportModel extends FormModel
         return $options;
     }
 
-    private function exportCSV($formatter, $report, $reportData, $handle, $page)
+    private function exportCSV($formatter, $reportData, $handle, $page)
     {
         foreach ($reportData['data'] as $count => $data) {
             $row = [];
             foreach ($data as $k => $v) {
-                if ($count === 0) {
+                if ($count == 0) {
                     //set the header
                     $header[] = $k;
                 }
@@ -716,7 +715,7 @@ class ReportModel extends FormModel
                 $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
             }
 
-            if ($page === 1 && $count === 0) {
+            if ($page == 1 && $count == 0) {
                 fputcsv($handle, $header);
             }
             fputcsv($handle, $row);

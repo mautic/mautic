@@ -800,7 +800,7 @@ class ReportController extends FormController
                     $handle = fopen('php://output', 'r+');
                     while ($reportData['totalResults'] >= ($options['page'] - 1) * $options['limit']) {
                         $reportData = $model->getReportData($entity, null, $options);
-                        $model->exportResults($format, $entity, $reportData, $handle, null, $options['page']);
+                        $model->exportResults($format, $entity, $reportData, $handle, $options['page']);
                         ++$options['page'];
                     }
                     fclose($handle);
