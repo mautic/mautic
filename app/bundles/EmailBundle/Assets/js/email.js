@@ -231,112 +231,141 @@ Mautic.initEmailDynamicContent = function() {
         mQuery('#addNewDynamicContent').on('click', function (e) {
             e.preventDefault();
 
-            var tabHolder               = mQuery('#dynamicContentTabs');
-            var filterHolder            = mQuery('#dynamicContentContainer');
-            var dynamicContentPrototype = mQuery('#dynamicContentPrototype').data('prototype');
-            var dynamicContentIndex     = tabHolder.find('li').length - 1;
-            var tabId                   = '#emailform_dynamicContent_' + dynamicContentIndex;
-            var tokenName               = 'Dynamic Content ' + (dynamicContentIndex + 1);
-            var newForm                 = dynamicContentPrototype.replace(/__name__/g, dynamicContentIndex);
-            var newTab                  = mQuery('<li><a role="tab" data-toggle="tab" href="' + tabId + '">' + tokenName + '</a></li>');
-
-
-            tabHolder.append(newTab);
-            filterHolder.append(newForm);
-
-            var itemContainer = mQuery(tabId);
-            var textarea      = itemContainer.find('.editor');
-            var firstInput    = itemContainer.find('input[type="text"]').first();
-
-            textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-                // Set custom buttons with separator between them.
-                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
-                heightMin: 100
-            }));
-
-            tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
-            newTab.find('a').tab('show');
-
-            firstInput.focus();
-
-            Mautic.updateDynamicContentDropdown();
-
-            Mautic.initDynamicContentItem(tabId);
+            Mautic.createNewDynamicContentItem();
         });
 
         Mautic.initDynamicContentItem();
     }
 };
 
-Mautic.initDynamicContentItem = function (tabId) {
-    var $el = mQuery('#dynamic-content-container');
+Mautic.createNewDynamicContentItem = function(jQueryVariant) {
+    // To support the parent.mQuery from the builder
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
 
-    if (typeof tabId != "undefined") {
+    var tabHolder               = mQuery('#dynamicContentTabs');
+    var filterHolder            = mQuery('#dynamicContentContainer');
+    var dynamicContentPrototype = mQuery('#dynamicContentPrototype').data('prototype');
+    var dynamicContentIndex     = tabHolder.find('li').length - 1;
+    while (mQuery('#emailform_dynamicContent_' + dynamicContentIndex).length > 0) {
+        dynamicContentIndex++; // prevent duplicate ids
+    }
+    var tabId                   = '#emailform_dynamicContent_' + dynamicContentIndex;
+    var tokenName               = 'Dynamic Content ' + (dynamicContentIndex + 1);
+    var newForm                 = dynamicContentPrototype.replace(/__name__/g, dynamicContentIndex);
+    var newTab                  = mQuery('<li><a role="tab" data-toggle="tab" href="' + tabId + '">' + tokenName + '</a></li>');
+
+    tabHolder.append(newTab);
+    filterHolder.append(newForm);
+
+    var itemContainer = mQuery(tabId);
+    var textarea      = itemContainer.find('.editor');
+    var firstInput    = itemContainer.find('input[type="text"]').first();
+
+    textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+        // Set custom buttons with separator between them.
+        toolbarSticky: false,
+        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+        heightMin: 100
+    }));
+
+    tabHolder.find('i').first().removeClass('fa-spinner fa-spin').addClass('fa-plus text-success');
+    newTab.find('a').tab('show');
+
+    firstInput.focus();
+
+    Mautic.updateDynamicContentDropdown();
+
+    Mautic.initDynamicContentItem(tabId, mQuery, tokenName);
+
+    return tabId;
+};
+
+Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
+    // To support the parent.mQuery from the builder
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
+
+    var $this                = mQuery(el);
+    var parentElement        = $this.parents('.panel');
+    var tabHolder            = parentElement.find('.nav');
+    var filterHolder         = parentElement.find('.tab-content');
+    var filterBlockPrototype = mQuery('#filterBlockPrototype');
+    var filterIndex          = filterHolder.find('.tab-pane').length - 1;
+    var dynamicContentIndex  = $this.attr('id').match(/\d+$/)[0];
+
+    var filterPrototype   = filterBlockPrototype.data('prototype');
+    var filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex ;
+    // prevent duplicate ids
+    while (mQuery(filterContainerId).length > 0) {
+        filterIndex++;
+        filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex ;
+    }
+    var newTab            = mQuery('<li><a role="tab" data-toggle="tab" href="' + filterContainerId + '">Variation ' + (filterIndex + 1) + '</a></li>');
+    var newForm           = filterPrototype.replace(/__name__/g, filterIndex)
+        .replace(/dynamicContent_0_filters/g, 'dynamicContent_' + dynamicContentIndex + '_filters')
+        .replace(/dynamicContent]\[0]\[filters/g, 'dynamicContent][' + dynamicContentIndex + '][filters');
+
+    tabHolder.append(newTab);
+    filterHolder.append(newForm);
+
+    var filterContainer  = mQuery(filterContainerId);
+    var availableFilters = filterContainer.find('select[data-mautic="available_filters"]');
+    var altTextarea      = filterContainer.find('.editor');
+    var removeButton     = filterContainer.find('.remove-item');
+
+    Mautic.activateChosenSelect(availableFilters, false, mQuery);
+
+    availableFilters.on('change', function() {
+        var $this = mQuery(this);
+
+        if ($this.val()) {
+            Mautic.addDynamicContentFilter($this.val(), mQuery);
+            $this.val('');
+            $this.trigger('chosen:updated');
+        }
+    });
+
+    altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
+        // Set custom buttons with separator between them.
+        toolbarSticky: false,
+        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+        heightMin: 100
+    }));
+
+    Mautic.initRemoveEvents(removeButton, mQuery);
+
+    newTab.find('a').tab('show');
+
+    return filterContainerId;
+};
+
+Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
+    // To support the parent.mQuery from the builder
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
+
+    var $el = mQuery('#dynamic-content-container');
+    if ($el.size() == 0){
+        mQuery = parent.mQuery;
+        $el = mQuery('#dynamic-content-container');
+    }
+
+    if (tabId || typeof tabId != "undefined") {
         $el = mQuery(tabId);
     }
 
     $el.find('.addNewDynamicContentFilter').on('click', function (e) {
         e.preventDefault();
 
-        var $this                = mQuery(this);
-        var parentElement        = $this.parents('.panel');
-        var tabHolder            = parentElement.find('.nav');
-        var filterHolder         = parentElement.find('.tab-content');
-        var filterBlockPrototype = mQuery('#filterBlockPrototype');
-        var filterIndex          = filterHolder.find('.tab-pane').length;
-        var dynamicContentIndex  = $this.data('index');
-
-        var filterPrototype   = filterBlockPrototype.data('prototype');
-        var filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex;
-        var newTab            = mQuery('<li><a role="tab" data-toggle="tab" href="' + filterContainerId + '">Variation ' + (filterIndex + 1) + '</a></li>');
-        var newForm           = filterPrototype.replace(/__name__/g, filterIndex)
-            .replace(/dynamicContent_0_filters/g, 'dynamicContent_' + dynamicContentIndex + '_filters')
-            .replace(/dynamicContent]\[0]\[filters/g, 'dynamicContent][' + dynamicContentIndex + '][filters');
-
-        tabHolder.append(newTab);
-        filterHolder.append(newForm);
-
-        var filterContainer  = mQuery(filterContainerId);
-        var availableFilters = filterContainer.find('select[data-mautic="available_filters"]');
-        var altTextarea      = filterContainer.find('.editor');
-        var removeButton     = filterContainer.find('.remove-item');
-
-        Mautic.activateChosenSelect(availableFilters);
-
-        availableFilters.on('change', function() {
-            var $this = mQuery(this);
-
-            if ($this.val()) {
-                Mautic.addDynamicContentFilter($this.val());
-                $this.val('');
-                $this.trigger('chosen:updated');
-            }
-        });
-
-        altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-            // Set custom buttons with separator between them.
-            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
-            heightMin: 100
-        }));
-
-        Mautic.initRemoveEvents(removeButton);
-
-        newTab.find('a').tab('show');
+        Mautic.createNewDynamicContentFilter(this);
     });
 
-    $el.find('.dynamic-content-token-name').on('input', function (e) {
-        var $this = mQuery(this);
-        var parentTab = $this.parents('.tab-pane');
-        var correspondingTabLink = mQuery('a[href="#' + parentTab.attr('id') + '"]');
-        var tabContainer = correspondingTabLink.parents('ul').first();
-        var correspondingTabLinkIndex = tabContainer.find('a[data-toggle="tab"]').index(correspondingTabLink);
+    if (typeof tokenName != 'undefined') {
+        $el.find('.dynamic-content-token-name').val(tokenName);
+    }
 
-        var tokenName = $this.val() || 'Dynamic Content ' + (correspondingTabLinkIndex + 1);
-
-        correspondingTabLink.text(tokenName);
-
-        Mautic.updateDynamicContentDropdown();
-    });
+    if ($el.find('.dynamic-content-token-name').val() == ''){
+        var dynamicContentIndex  = $el.attr('id').match(/\d+$/)[0];
+        $el.find('.dynamic-content-token-name').val('Dynamic Content ' + dynamicContentIndex);
+    }
 
     $el.find('a.remove-selected').on('click', function() {
         mQuery(this).closest('.panel').animate(
@@ -352,15 +381,13 @@ Mautic.initDynamicContentItem = function (tabId) {
         var $this = mQuery(this);
 
         if ($this.val()) {
-            Mautic.addDynamicContentFilter($this.val());
+            Mautic.addDynamicContentFilter($this.val(), mQuery);
             $this.val('');
             $this.trigger('chosen:updated');
         }
     });
 
-    Mautic.initRemoveEvents($el.find('.remove-item'));
-
-
+    Mautic.initRemoveEvents($el.find('.remove-item'), mQuery);
 };
 
 Mautic.updateDynamicContentDropdown = function () {
@@ -376,7 +403,8 @@ Mautic.updateDynamicContentDropdown = function () {
     mQuery('button[data-cmd="dynamicContent"]').next().find('ul').html(options.join(''));
 };
 
-Mautic.initRemoveEvents = function (elements) {
+Mautic.initRemoveEvents = function (elements, jQueryVariant) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
         elements.on('click', function() {
             mQuery(this).closest('.panel').animate(
@@ -390,7 +418,6 @@ Mautic.initRemoveEvents = function (elements) {
     } else {
         elements.on('click', function (e) {
             e.preventDefault();
-
             var $this         = mQuery(this);
             var parentElement = $this.parents('.tab-pane.dynamic-content');
 
@@ -403,17 +430,24 @@ Mautic.initRemoveEvents = function (elements) {
 
             parentElement.remove();
             tabLink.remove();
-            tabContainer.find('li').first().next().find('a').tab('show');
+            // if tabContainer is for variants, show the first one, if it is the DEC vertical list, show the second one
+            if (tabContainer.hasClass('tabs-left')) {
+                tabContainer.find('li').first().next().find('a').tab('show');
+            } else {
+                tabContainer.find('li').first().find('a').tab('show');
+            }
 
             Mautic.updateDynamicContentDropdown();
         });
     }
 };
 
-Mautic.addDynamicContentFilter = function (selectedFilter) {
+Mautic.addDynamicContentFilter = function (selectedFilter, jQueryVariant) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
+
     var dynamicContentItems  = mQuery('.tab-pane.dynamic-content');
     var activeDynamicContent = dynamicContentItems.filter(':visible');
-    var dynamicContentIndex  = dynamicContentItems.index(activeDynamicContent);
+    var dynamicContentIndex  = activeDynamicContent.attr('id').match(/\d+$/)[0]; //dynamicContentItems.index(activeDynamicContent);
 
     var dynamicContentFilterContainers      = activeDynamicContent.find('div[data-filter-container]');
     var activeDynamicContentFilterContainer = dynamicContentFilterContainers.filter(':visible');
@@ -486,7 +520,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
 
     activeDynamicContentFilterContainer.append(prototype);
 
-    Mautic.initRemoveEvents(activeDynamicContentFilterContainer.find("a.remove-selected"));
+    Mautic.initRemoveEvents(activeDynamicContentFilterContainer.find("a.remove-selected"), mQuery);
 
     var filter = '#' + filterIdBase + '_filter';
 
@@ -566,10 +600,11 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     });
 
     // Convert based on first option in list
-    Mautic.convertDynamicContentFilterInput('#' + filterIdBase + '_operator');
+    Mautic.convertDynamicContentFilterInput('#' + filterIdBase + '_operator', mQuery);
 };
 
-Mautic.convertDynamicContentFilterInput = function(el) {
+Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     var operator = mQuery(el).val();
     // Extract the filter number
     var regExp    = /emailform_dynamicContent_(\d+)_filters_(\d+)_filters_(\d+)_operator/;
@@ -643,7 +678,7 @@ Mautic.convertDynamicContentFilterInput = function(el) {
 
         filterEl.attr('data-placeholder', placeholder);
 
-        Mautic.activateChosenSelect(filterEl);
+        Mautic.activateChosenSelect(filterEl, false, mQuery);
     }
 };
 

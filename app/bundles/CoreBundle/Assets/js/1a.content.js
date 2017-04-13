@@ -808,7 +808,8 @@ Mautic.ajaxifyLink = function (el, event) {
  *
  * @param el
  */
-Mautic.activateChosenSelect = function(el, ignoreGlobal) {
+Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (mQuery(el).parents('.no-chosen').length && !ignoreGlobal) {
         // Globally ignored chosens because they are handled manually due to hidden elements, etc
         return;
