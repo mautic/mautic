@@ -715,7 +715,7 @@ class ReportModel extends FormModel
                 $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
             }
 
-            if ($page == 1 && $count == 0) {
+            if ($page === 1 && $count === 0) {
                 fputcsv($handle, $header);
             }
             fputcsv($handle, $row);
