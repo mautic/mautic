@@ -317,8 +317,9 @@ class LeadListRepository extends CommonRepository
 
                 if ($includesContactFields) {
                     $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, null, 'lead');
-                } else {
-                    $expr = $q->expr()->andX();
+                }
+                if (!$expr->count()) {
+                    $nonMembersOnly = true;
                 }
                 if ($includesCompanyFields) {
                     $this->listFiltersInnerJoinCompany = false;
@@ -375,7 +376,7 @@ class LeadListRepository extends CommonRepository
                     }
                 }
 
-                if ($newOnly) {
+                if ($newOnly && $expr->count()) {
                     if ($includesCompanyFields) {
                         $this->applyCompanyFieldFilters($q, $exprCompany);
                     }
@@ -401,17 +402,14 @@ class LeadListRepository extends CommonRepository
                         'll',
                         $listOnExpr
                     );
-                    if ($expr) {
-                        $expr->add($q->expr()->isNull('ll.lead_id'));
-                    } else {
-                        $expr = $q->expr()->andX($q->expr()->isNull('ll.lead_id'));
-                    }
-                    if ($batchExpr->count() and count($expr)) {
+
+                    $expr->add($q->expr()->isNull('ll.lead_id'));
+
+                    if ($batchExpr->count()) {
                         $expr->add($batchExpr);
                     }
-                    if (!empty($expr) && $expr->count() > 0) {
-                        $q->andWhere($expr);
-                    }
+
+                    $q->andWhere($expr);
                 } elseif ($nonMembersOnly) {
                     // Only leads that are part of the list that no longer match filters and have not been manually removed
                     $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
@@ -437,7 +435,7 @@ class LeadListRepository extends CommonRepository
                     $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                     $sq->select('l.id')
                         ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-                    if ($includesContactFields && $expr && $expr->count() > 0) {
+                    if ($includesContactFields and $expr->count()) {
                         $sq->andWhere($expr);
                     }
 
