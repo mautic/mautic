@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -148,8 +149,24 @@ class BuilderSubscriber extends CommonSubscriber
                 'Image',
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot',
+                'slot_image',
                 900
+            );
+            $event->addSlotType(
+                'imagecard',
+                'Image Card',
+                'id-card-o',
+                'MauticCoreBundle:Slots:imagecard.html.php',
+                'slot_imagecard',
+                870
+            );
+            $event->addSlotType(
+                'imagecaption',
+                'Image+Caption',
+                'image',
+                'MauticCoreBundle:Slots:imagecaption.html.php',
+                'slot_imagecaption',
+                850
             );
             $event->addSlotType(
                 'button',
@@ -160,12 +177,55 @@ class BuilderSubscriber extends CommonSubscriber
                 800
             );
             $event->addSlotType(
+                'socialfollow',
+                'Social Follow',
+                'twitter',
+                'MauticCoreBundle:Slots:socialfollow.html.php',
+                'slot_socialfollow',
+                600
+            );
+//            $event->addSlotType(
+//                'codemode',
+//                'Code Mode',
+//                'code',
+//                'MauticCoreBundle:Slots:codemode.html.php',
+//                'slot_codemode',
+//                500
+//            );
+            $event->addSlotType(
                 'separator',
                 'Separator',
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
-                'slot',
-                700
+                'slot_separator',
+                400
+            );
+        }
+
+        if ($event->sectionsRequested()) {
+            $event->addSection(
+                'one-column',
+                'One Column',
+                'file-text-o',
+                'MauticCoreBundle:Sections:one-column.html.php',
+                null,
+                1000
+            );
+            $event->addSection(
+                'two-column',
+                'Two Columns',
+                'columns',
+                'MauticCoreBundle:Sections:two-column.html.php',
+                null,
+                900
+            );
+            $event->addSection(
+                'three-column',
+                'Three Columns',
+                'th',
+                'MauticCoreBundle:Sections:three-column.html.php',
+                null,
+                800
             );
         }
     }
@@ -189,7 +249,7 @@ class BuilderSubscriber extends CommonSubscriber
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
         $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]), $unsubscribeText);
-        $event->addToken('{unsubscribe_text}', $unsubscribeText);
+        $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
 
         $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
 
@@ -198,7 +258,7 @@ class BuilderSubscriber extends CommonSubscriber
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
         $webviewText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]), $webviewText);
-        $event->addToken('{webview_text}', $webviewText);
+        $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
@@ -214,14 +274,14 @@ class BuilderSubscriber extends CommonSubscriber
             $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($lead['owner_id']);
             if ($owner && !empty($owner['signature'])) {
                 $fromName      = $owner['first_name'].' '.$owner['last_name'];
-                $signatureText = $owner['signature'];
+                $signatureText = EmojiHelper::toHtml($owner['signature']);
             }
         }
 
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
-        $event->addToken('{signature}', $signatureText);
+        $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
-        $event->addToken('{subject}', $event->getSubject());
+        $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
     }
 
     /**

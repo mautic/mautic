@@ -389,10 +389,11 @@ class ReportModel extends FormModel
                             }
 
                             if ($count === 0) {
-                                //write the row
+                                //write the column names row
                                 fputcsv($handle, $header);
                             }
 
+                            //write the row
                             fputcsv($handle, $row);
 
                             //free memory
@@ -447,13 +448,14 @@ class ReportModel extends FormModel
                                     $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
                                 }
 
-                                //write the row
                                 if ($count === 0) {
+                                    //write the column names row
                                     $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
-                                } else {
-                                    $rowCount = $count + 1;
-                                    $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
                                 }
+
+                                //write the row
+                                $rowCount = $count + 2;
+                                $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
 
                                 //free memory
                                 unset($row, $reportData['data'][$count]);

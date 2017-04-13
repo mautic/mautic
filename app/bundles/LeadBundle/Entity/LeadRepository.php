@@ -88,8 +88,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $col = 'l.'.$field;
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-                  ->select('l.id')
-                  ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         if ($field == 'email') {
             // Prevent emails from being case sensitive
@@ -108,7 +108,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             );
         } else {
             $q->where("$col = :search")
-              ->setParameter('search', $value);
+                ->setParameter('search', $value);
         }
 
         if ($ignoreId) {
@@ -302,8 +302,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $contactId = (int) $id['id'];
             } else {
                 $q->select('l, u, i')
-                ->leftJoin('l.ipAddresses', 'i')
-                ->leftJoin('l.owner', 'u');
+                    ->leftJoin('l.ipAddresses', 'i')
+                    ->leftJoin('l.owner', 'u');
                 $contactId = $id;
             }
             $q->andWhere($this->getTableAlias().'.id = '.(int) $contactId);
@@ -386,14 +386,15 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
         );
 
-        if (!empty($args['withPrimaryCompany']) || !empty($args['withChannelRules'])) {
+        $contactCount = isset($contacts['results']) ? count($contacts['results']) : count($contacts);
+        if ($contactCount && (!empty($args['withPrimaryCompany']) || !empty($args['withChannelRules']))) {
+            $withTotalCount = (array_key_exists('withTotalCount', $args) && $args['withTotalCount']);
+            /** @var Lead[] $tmpContacts */
+            $tmpContacts = ($withTotalCount) ? $contacts['results'] : $contacts;
+
             $withCompanies   = !empty($args['withPrimaryCompany']);
             $withPreferences = !empty($args['withChannelRules']);
-
-            $withTotalCount = array_key_exists('withTotalCount', $args);
-            /** @var Lead[] $tmpContacts */
-            $tmpContacts = ($withTotalCount && $args['withTotalCount']) ? $contacts['results'] : $contacts;
-            $contactIds  = array_keys($tmpContacts);
+            $contactIds      = array_keys($tmpContacts);
 
             if ($withCompanies) {
                 $companies = $this->getEntityManager()->getRepository('MauticLeadBundle:Company')->getCompaniesForContacts($contactIds);
@@ -445,7 +446,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 }
             }
 
-            if ($withTotalCount && $args['withTotalCount']) {
+            if ($withTotalCount) {
                 $contacts['results'] = $tmpContacts;
             } else {
                 $contacts = $tmpContacts;
@@ -689,13 +690,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 'list.alias', $likeExpr, $unique, ($filter->not) ? true : null,
+                    $this->generateFilterExpression($q, 'list.alias', $eqExpr, $unique, ($filter->not) ? true : null,
                         // orX for filter->not either manuall removed or is null
                         $q->expr()->$xExpr(
                             $q->expr()->$eqExpr('list_lead.manually_removed', 0)
                         )
                     )
                 );
+                $filter->strict  = true;
                 $returnParameter = true;
 
                 break;

@@ -182,11 +182,21 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $helper;
     }
 
+    /**
+     * @param \DateTime|null $startDate
+     * @param \DateTime|null $endDate
+     * @param                $leadId
+     *
+     * @return array
+     */
     public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
     {
         return [];
     }
 
+    /**
+     * @param array $params
+     */
     public function pushLeadActivity($params = [])
     {
     }
@@ -212,15 +222,23 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
-        $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
+        $matchedFields    = $this->populateMauticLeadData($data, $config, 'company');
+        $newMatchedFields = [];
 
-        if (!isset($matchedFields['companyname'])) {
-            if (isset($matchedFields['companywebsite'])) {
-                $matchedFields['companyname'] = $matchedFields['companywebsite'];
+        $fieldsToUpdateInMautic = isset($config['update_mautic_company']) ? array_keys($config['update_mautic_company'], 0) : [];
+        if (!empty($fieldsToUpdateInMautic)) {
+            $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
+            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        } else {
+            $newMatchedFields = $matchedFields;
+        }
+        if (!isset($newMatchedFields['companyname'])) {
+            if (isset($newMatchedFields['companywebsite'])) {
+                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
             }
         }
 
-        if (empty($matchedFields)) {
+        if (empty($newMatchedFields)) {
             return;
         }
 
@@ -234,6 +252,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
             $company = $existingCompany[2];
+        } else {
+            $matchedFields = $newMatchedFields; //change direction of fields only when updating an existing company
         }
         $companyModel->setFieldValues($company, $matchedFields, false, false);
         $companyModel->saveEntity($company, false);
@@ -296,6 +316,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $lead = array_shift($existingLeads);
             }
         }
+        //use direction of fields only when updating existing lead
+        $fieldsToUpdateInMautic = (isset($config['update_mautic']) && empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
+        if (!empty($fieldsToUpdateInMautic)) {
+            $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+            $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        }
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         if (!empty($socialCache)) {
@@ -341,7 +367,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array|mixed
      */
-    protected function getFormFieldsByObject($object)
+    protected function getFormFieldsByObject($object, $settings = [])
     {
         $settings['feature_settings']['objects'] = [$object => $object];
 
