@@ -42,6 +42,10 @@ class TrackableModelTest extends WebTestCase
             ->willReturn([]);
 
         $mockModel->expects($this->once())
+            ->method('getDoNotTrackList')
+            ->willReturn([]);
+
+        $mockModel->expects($this->once())
             ->method('extractTrackablesFromHtml')
             ->willReturn(
                 [
@@ -81,6 +85,10 @@ class TrackableModelTest extends WebTestCase
             ->setConstructorArgs([$mockRedirectModel])
             ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
+
+        $mockModel->expects($this->once())
+            ->method('getDoNotTrackList')
+            ->willReturn([]);
 
         $mockModel->expects($this->once())
             ->method('getEntitiesFromUrls')
@@ -389,7 +397,7 @@ class TrackableModelTest extends WebTestCase
 
         $mockModel->expects($this->once())
             ->method('getDoNotTrackList')
-            ->willReturn([]);
+            ->willReturn($doNotTrack);
 
         $entities = [];
         foreach ($urls as $k => $url) {
