@@ -362,9 +362,12 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
         $el.find('.dynamic-content-token-name').val(tokenName);
     }
 
-    if ($el.find('.dynamic-content-token-name').val() == ''){
-        var dynamicContentIndex  = $el.attr('id').match(/\d+$/)[0];
-        $el.find('.dynamic-content-token-name').val('Dynamic Content ' + dynamicContentIndex);
+    if ($el.find('.dynamic-content-token-name').val() == '') {
+        var dynamicContent = $el.attr('id').match(/\d+$/);
+        if (dynamicContent) {
+            var dynamicContentIndex  = dynamicContent[0];
+            $el.find('.dynamic-content-token-name').val('Dynamic Content ' + dynamicContentIndex);
+        }
     }
 
     $el.find('a.remove-selected').on('click', function() {
