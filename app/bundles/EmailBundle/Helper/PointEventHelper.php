@@ -45,6 +45,8 @@ class PointEventHelper
      * @param               $event
      * @param Lead          $lead
      * @param MauticFactory $factory
+     *
+     * @return bool
      */
     public static function sendEmail($event, Lead $lead, MauticFactory $factory)
     {
