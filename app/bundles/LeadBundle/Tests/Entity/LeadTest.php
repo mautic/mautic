@@ -84,4 +84,18 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $channelRules = Lead::generateChannelRules($lead->getFrequencyRules()->toArray(), $lead->getDoNotContact()->toArray());
         $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
     }
+
+    public function testAdjustPoints()
+    {
+        $points = 501;
+        $lead   = new Lead();
+        $lead->adjustPoints($points);
+
+        $this->assertEquals([
+            'points' => [
+                0 => 0,
+                1 => $points,
+            ],
+        ], $lead->getChanges());
+    }
 }
