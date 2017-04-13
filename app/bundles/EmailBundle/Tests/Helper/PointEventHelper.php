@@ -43,8 +43,8 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $queueMode
-     *
+     * @param bool $published
+     * @param bool $success
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getMockMauticFactory($published = true, $success = true)
@@ -88,6 +88,8 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param bool $published
+     * @param bool $success
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getMockEmail($published = true, $success = true)
