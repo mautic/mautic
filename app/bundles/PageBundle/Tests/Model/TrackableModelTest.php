@@ -389,7 +389,7 @@ class TrackableModelTest extends WebTestCase
 
         $mockModel->expects($this->once())
             ->method('getDoNotTrackList')
-            ->willReturn($doNotTrack);
+            ->willReturn([]);
 
         $entities = [];
         foreach ($urls as $k => $url) {
