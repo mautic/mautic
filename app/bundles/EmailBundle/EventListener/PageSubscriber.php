@@ -81,6 +81,14 @@ class PageSubscriber extends CommonSubscriber
                     $this->emailModel->hitEmail($stat, $this->request);
                 }
             }
+
+            //click trigger condition
+            $this->campaignEventModel->triggerEvent(
+                'email.click',
+                $hit,
+                'email',
+                $email->getId()
+            );
         }
     }
 }
