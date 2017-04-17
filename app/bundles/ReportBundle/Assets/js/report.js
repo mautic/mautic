@@ -59,7 +59,6 @@ Mautic.addReportRow = function (elId) {
     prototypeHolder.append(output);
 
     var newColumnId = '#' + elId + '_' + index + '_column';
-    console.log(newColumnId);
     if (elId == 'report_filters') {
         if (typeof Mautic.reportPrototypeFilterOptions != 'undefined') {
             // Update the column options if applicable
@@ -258,8 +257,8 @@ Mautic.checkSelectedGroupBy = function () {
         mQuery('#aggregators-button').prop('disabled', false);
     } else {
         existingAggregators.each(function() {
-            var containerId = mQuery(this).attr('id').replace('_function', '');
-            Mautic.removeReportRow(containerId);
+            var containerId = mQuery(this).attr('id').replace('_column', '');
+            Mautic.removeReportRow(containerId + '_container');
         });
         mQuery('#aggregators-button').prop('disabled', true);
     }
