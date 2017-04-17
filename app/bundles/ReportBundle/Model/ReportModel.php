@@ -555,6 +555,11 @@ class ReportModel extends FormModel
         // Prepare the query builder
         $tableDetails = $this->getTableData($entity->getSource());
 
+        $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
+
+        foreach ($aggregatorColumns as $aggregatorColumn) {
+            $selectedColumns[] = $aggregatorColumn['column'];
+        }
         // Build a reference for column to data column (without table prefix)
         $dataColumns = [];
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {

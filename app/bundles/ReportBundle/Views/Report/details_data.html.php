@@ -22,7 +22,7 @@ $groupByCount    = count($groupBy);
 $startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
 ?>
 
-<?php if (!empty($columnOrder)): ?>
+<?php if (!empty($columnOrder) || !empty($aggregatorOrder)): ?>
 <!-- table section -->
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <div class="page-list">
@@ -35,12 +35,11 @@ $startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 
                     if ($aggregatorCount) :
                         foreach ($aggregatorOrder as $aggregator): ?>
                             <?php
-                            $columnName = explode('.', $aggregator['column']);
-                            $columnName = isset($columnName[1]) ? $columnName[1] : $columnName[0];
+                            $columnName = isset($columns[$aggregator['column']]['alias']) ? $columns[$aggregator['column']]['label'] : '';
                             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                                 'sessionVar' => 'report.'.$report->getId(),
                                 'orderBy'    => $aggregator['function'],
-                                'text'       => $aggregator['function'].' '.strtoupper($columnName),
+                                'text'       => $aggregator['function'].' '.$columnName,
                                 'dataToggle' => '',
                                 'target'     => '.report-content',
                             ]);
@@ -85,8 +84,8 @@ $startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 
                                 foreach ($aggregatorOrder as $aggregator): ?>
                                         <td>
                                             <?php
-                                                if (isset($row[$aggregator['function']])) {
-                                                    echo $view['formatter']->_($row[$aggregator['function']], 'text');
+                                                if (isset($row[$aggregator['function'].' '.$aggregator['column']])) {
+                                                    echo $view['formatter']->_($row[$aggregator['function'].' '.$aggregator['column']], 'text');
                                                 }
                                             ?>
                                         </td>

@@ -214,13 +214,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build GROUP BY
         if ($groupByOptions = $this->entity->getGroupBy()) {
             foreach ($groupByOptions as $groupBy) {
-                $column = '';
                 if (isset($options['columns'][$groupBy])) {
                     $fieldOptions = $options['columns'][$groupBy];
-                    $column .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
+                    $columns[]    = (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
                 }
-                $queryBuilder->addGroupBy($column.' WITH ROLLUP');
             }
+            $groupByColumns = implode(',', $columns);
+            $queryBuilder->addGroupBy($groupByColumns.' WITH ROLLUP');
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
             if (is_array($options['groupby'])) {
                 foreach ($options['groupby'] as $groupBy) {
@@ -289,7 +289,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $column .= (isset($fieldOptions['formula'])) ? $aggregator['function'].'('.$fieldOptions['formula'].')' : $aggregator['function'].'('.$aggregator['column'].')';
                 }
 
-                $formula = $column." as '".$aggregator['function']."'";
+                $formula = $column." as '".$aggregator['function'].' '.$aggregator['column']."'";
                 $queryBuilder->addSelect($formula);
             }
         }
