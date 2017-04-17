@@ -85,6 +85,24 @@ return [
                 'controller' => 'MauticCoreBundle:Api\FileApi:delete',
                 'method'     => 'DELETE',
             ],
+            'mautic_core_api_theme_list' => [
+                'path'       => '/themes',
+                'controller' => 'MauticCoreBundle:Api\ThemeApi:list',
+            ],
+            'mautic_core_api_theme_get' => [
+                'path'       => '/themes/{theme}',
+                'controller' => 'MauticCoreBundle:Api\ThemeApi:get',
+            ],
+            'mautic_core_api_theme_create' => [
+                'path'       => '/themes/new',
+                'controller' => 'MauticCoreBundle:Api\ThemeApi:new',
+                'method'     => 'POST',
+            ],
+            'mautic_core_api_theme_delete' => [
+                'path'       => '/themes/{theme}/delete',
+                'controller' => 'MauticCoreBundle:Api\ThemeApi:delete',
+                'method'     => 'DELETE',
+            ],
             'mautic_core_api_stats' => [
                'path'       => '/stats/{table}',
                'controller' => 'MauticCoreBundle:Api\StatsApi:list',
@@ -269,6 +287,10 @@ return [
             'mautic.form.type.slot.image' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
                 'alias' => 'slot_image',
+            ],
+            'mautic.form.type.slot.separator' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSeparatorType',
+                'alias' => 'slot_separator',
             ],
             'mautic.form.type.slot.imagecard' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageCardType',
@@ -600,6 +622,7 @@ return [
                 'arguments' => [
                     'mautic.helper.paths',
                     'mautic.helper.templating',
+                    'translator',
                 ],
                 'methodCalls' => [
                     'setDefaultTheme' => [

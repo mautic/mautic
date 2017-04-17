@@ -689,7 +689,7 @@ class AjaxController extends CommonController
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
-        $model->clearNotification($id);
+        $model->clearNotification($id, 200);
 
         return $this->sendJsonResponse(['success' => 1]);
     }

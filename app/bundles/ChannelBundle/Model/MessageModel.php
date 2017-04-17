@@ -58,6 +58,26 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Message $entity
+     * @param bool    $unlock
+     */
+    public function saveEntity($entity, $unlock = true)
+    {
+        $isNew = $entity->isNew();
+
+        parent::saveEntity($entity, $unlock);
+
+        if (!$isNew) {
+            // Update the channels
+            $channels = $entity->getChannels();
+            foreach ($channels as $channel) {
+                $channel->setMessage($entity);
+            }
+            $this->getRepository()->saveEntities($channels);
+        }
+    }
+
+    /**
      * @return string
      */
     public function getPermissionBase()
@@ -220,6 +240,13 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
         );
     }
 
+    /**
+     * @param      $messageId
+     * @param null $dateFrom
+     * @param null $dateTo
+     *
+     * @return mixed
+     */
     public function getMarketingMessagesEventLogs($messageId, $dateFrom = null, $dateTo = null)
     {
         $eventLog = $this->campaignModel->getCampaignLeadEventLogRepository();

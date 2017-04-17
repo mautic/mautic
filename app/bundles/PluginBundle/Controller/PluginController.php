@@ -148,22 +148,7 @@ class PluginController extends FormController
             $activeTab = $this->request->get('activeTab');
         }
 
-        $session = $this->get('session');
-        $limit   = $session->get('mautic.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start   = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-        //set what page currently on so that we can return here after form submission/cancellation
-        if ($activeTab == 'leadFieldsContainer') {
-            $session->set('mautic.plugin.lead.start', $start);
-            $session->set('mautic.plugin.lead.page', $page);
-        }
-        if ($activeTab == 'companyFieldsContainer') {
-            $session->set('mautic.plugin.company.start', $start);
-            $session->set('mautic.plugin.company.lead.page', $page);
-        }
-
+        $session   = $this->get('session');
         $authorize = $this->request->request->get('integration_details[in_auth]', false, true);
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
@@ -173,6 +158,21 @@ class PluginController extends FormController
         // Verify that the requested integration exists
         if (empty($integrationObject)) {
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
+        }
+
+        $limit = $session->get('mautic.plugin.'.$name.'.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+        //set what page currently on so that we can return here after form submission/cancellation
+        if ($activeTab == 'leadFieldsContainer') {
+            $session->set('mautic.plugin.'.$name.'.lead.start', $start);
+            $session->set('mautic.plugin.'.$name.'.lead.page', $page);
+        }
+        if ($activeTab == 'companyFieldsContainer') {
+            $session->set('mautic.plugin.'.$name.'.company.start', $start);
+            $session->set('mautic.plugin.'.$name.'.company.lead.page', $page);
         }
 
         /** @var PluginModel $pluginModel */
@@ -238,6 +238,10 @@ class PluginController extends FormController
                             if (isset($newIntegrationFields['Contact'])) {
                                 $leadNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['Contact']);
                             }
+
+                            if (!isset($currentFeatureSettings['leadFields'])) {
+                                $currentFeatureSettings['leadFields'] = [];
+                            }
                             $removeLeadFields = array_diff_key($currentFeatureSettings['leadFields'], $leadNewIntegrationFields);
 
                             foreach ($removeLeadFields as $key => $removeLeadField) {
@@ -247,10 +251,14 @@ class PluginController extends FormController
                                 }
                             }
 
+                            if (!isset($currentFeatureSettings['companyFields'])) {
+                                $currentFeatureSettings['companyFields'] = [];
+                            }
                             if (isset($newIntegrationFields['company'])) {
                                 $companyNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['company']);
                                 $removeCompanyFields         = array_diff_key($currentFeatureSettings['companyFields'], $companyNewIntegrationFields);
                             }
+
                             foreach ($removeCompanyFields as $key => $removeCompanyField) {
                                 unset($currentFeatureSettings['companyFields'][$key]);
                                 if (isset($currentFeatureSettings['update_mautic_company'])) {
@@ -322,7 +330,7 @@ class PluginController extends FormController
                 }
             }
 
-            if (($cancelled || $valid) && !$authorize) {
+            if (($cancelled || ($valid && !$this->isFormApplied($form))) && !$authorize) {
                 // Close the modal and return back to the list view
                 return new JsonResponse(
                     [

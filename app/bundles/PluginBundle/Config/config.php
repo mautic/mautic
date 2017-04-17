@@ -80,6 +80,12 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.plugin.leadbundle.subscriber' => [
+                'class'     => 'Mautic\PluginBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.plugin.model.plugin',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.integration.details' => [

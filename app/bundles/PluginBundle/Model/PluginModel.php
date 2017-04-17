@@ -44,6 +44,11 @@ class PluginModel extends FormModel
         return $this->em->getRepository('MauticPluginBundle:Plugin');
     }
 
+    public function getIntegrationEntityRepository()
+    {
+        return $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+    }
+
     /**
      * {@inheritdoc}
      */
