@@ -286,7 +286,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $column = '';
                 if (isset($options['columns'][$aggregator['column']])) {
                     $fieldOptions = $options['columns'][$aggregator['column']];
-                    $column .= (isset($fieldOptions['formula'])) ? $aggregator['function'].'('.$fieldOptions['formula'].')' : $aggregator['function'].'('.$aggregator['column'].')';
+                    $column .= (isset($fieldOptions['formula'])) ? $aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].')' : $aggregator['function'].'(DISTINCT '.$aggregator['column'].')';
                 }
 
                 $formula = $column." as '".$aggregator['function'].' '.$aggregator['column']."'";
