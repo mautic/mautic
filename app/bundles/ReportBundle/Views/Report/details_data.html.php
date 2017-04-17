@@ -17,6 +17,8 @@ $columnOrder     = $report->getColumns();
 $graphOrder      = $report->getGraphs();
 $aggregatorOrder = $report->getAggregators();
 $aggregatorCount = count($aggregatorOrder);
+$groupBy         = $report->getGroupBy();
+$groupByCount    = count($groupBy);
 $startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
 ?>
 
@@ -68,9 +70,17 @@ $startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 
                 <tbody>
                 <?php if ($dataCount): ?>
                     <?php foreach ($data as $row): ?>
-                        <tr>
-                            <td><?php echo $startCount; ?></td>
+                        <tr <?php if ($groupByCount && $startCount == $dataCount) :
+                echo 'class="cm-strong"'; endif; ?>>
+                            <td><?php
+                                if ($groupByCount && $startCount == $dataCount) :
+                                    echo $view['translator']->trans('mautic.report.report.groupby.totals');
+                                else:
+                                    echo $startCount;
+                                endif;
+                                 ?></td>
                             <?php
+
                             if ($aggregatorCount) :
                                 foreach ($aggregatorOrder as $aggregator): ?>
                                         <td>
