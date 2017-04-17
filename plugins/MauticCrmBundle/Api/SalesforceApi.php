@@ -53,6 +53,7 @@ class SalesforceApi extends CrmApi
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
+            $notificactionModel->addNotification(implode(', ', $response['errors']), 'Salesforce', false, $this->integration->getName().':');
             throw new ApiErrorException(implode(', ', $response['errors']));
         } elseif (is_array($response)) {
             $errors = [];
