@@ -52,12 +52,12 @@ class Version20170401000000 extends AbstractMauticMigration
      */
     public function postUp(Schema $schema)
     {
-        $em = $this->factory->getEntityManager();
+
         /** @var EmailModel $emailModel */
         $emailModel = $this->container->get('mautic.email.model.email');
-        /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $em->getRepository('MauticEmailBundle:Stat');
-        $logger   = $this->container->get('monolog.logger.mautic');
+        $statRepo   = $emailModel->getStatRepository();
+
+        $logger = $this->container->get('monolog.logger.mautic');
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $qb */
         $qb = $this->connection->createQueryBuilder();
@@ -71,9 +71,9 @@ class Version20170401000000 extends AbstractMauticMigration
             ->andWhere('es.lead_id IS NOT NULL')
             ->andWhere('ph.lead_id = es.lead_id');
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->execute();
 
-        foreach ($results as $res) {
+        while (($res = $results->fetch()) !== false) {
             /** @var \Mautic\EmailBundle\Entity\Stat $stat */
             $stat    = $statRepo->find($res['statId']);
             $dateHit = $res['hit'];
@@ -91,9 +91,8 @@ class Version20170401000000 extends AbstractMauticMigration
             $stat->setDateClicked($dateHit);
             $stat->setIsClicked(true);
 
-            $em->persist($stat);
-            $em->flush($stat);
-            $em->clear();
+            $statRepo->saveEntity($stat, true);
+
             $logger->debug('Email id: '.$email->getId().', lead_id : '.$lead->getId().' counted as clicked');
         }
     }
