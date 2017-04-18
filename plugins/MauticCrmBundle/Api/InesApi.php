@@ -221,17 +221,24 @@ class InesApi extends CrmApi
 	 * Optimisé pour enchaîner les appels si nécessaire
 	 *
 	 * @param 	Mautic\LeadBundle\Entity\Lead	$lead
-     * @param   bool    $addLeadWhenUpdating    Indique s'il faut créer chez INES un webLead dans le cas d'une mise à jour
+     * @param   bool    $syncTriggeredFromPushLead    Indique si la synchro provient d'une action "push lead to integration"
 	 *
 	 * @return 	bool	Succès ou échec de l'opération
 	 */
-	public function syncLeadToInes(Lead $lead, $addLeadWhenUpdating = false)
+	public function syncLeadToInes(Lead $lead, $syncTriggeredFromPushLead = false)
 	{
 		$leadId = $lead->getId();
 		$leadPoints = $lead->getPoints();
         $leadDesaboFlag = empty($lead->getDoNotContact()->toArray()) ? 0 : 1;
 		$company = $this->integration->getLeadMainCompany($leadId, false);
         $dontSyncToInes = $this->integration->getDontSyncFlag($lead);
+
+        if ($syncTriggeredFromPushLead) {
+            $addLeadDescription = "Lead Automation - ".$this->integration->getLastTimelineEvent($lead);
+        }
+        else {
+            $addLeadDescription = "Lead Automation";
+        }
 
 		if ( !isset($company['companyname']) || empty($company['companyname']) || $dontSyncToInes) {
 			return false;
@@ -364,7 +371,8 @@ class InesApi extends CrmApi
 					$internalContactRef,
 					$internalCompanyRef,
 					$datas['client']['Contacts']['ContactInfoAuto'][0]['PrimaryMailAddress'],
-					$inesConfig['LeadRef']
+					$inesConfig['LeadRef'],
+                    $addLeadDescription
 				);
 			}
 		}
@@ -455,14 +463,15 @@ class InesApi extends CrmApi
 
             // Si demandé, on ajoute un webLead dans INES
             // (utile lorsqu'un contact est mis à jour puis poussé vers INES via une action ATMT)
-            if ($addLeadWhenUpdating) {
+            if ($syncTriggeredFromPushLead) {
                 $inesConfig = $this->getInesSyncConfig();
     			if (isset($inesConfig['LeadRef']) && $inesConfig['LeadRef'] >= 0) {
     				$this->addLeadToInesContact(
     					$internalContactRef,
     					$internalCompanyRef,
                         $clientWithContact['contact']['PrimaryMailAddress'],
-    					$inesConfig['LeadRef']
+    					$inesConfig['LeadRef'],
+                        $addLeadDescription
     				);
     			}
             }
@@ -537,7 +546,7 @@ class InesApi extends CrmApi
 	 *
 	 * @return 	bool
 	 */
-	public function addLeadToInesContact($internalContactRef, $internalCompanyRef, $email, $leadRef)
+	public function addLeadToInesContact($internalContactRef, $internalCompanyRef, $email, $leadRef, $description)
 	{
         try {
     		$response = $this->request('ws/wsAutomationsync.asmx', 'AddLead', array(
@@ -545,7 +554,7 @@ class InesApi extends CrmApi
     				'ClRef' => $internalCompanyRef,
     				'CtRef' => $internalContactRef,
     				'MailExpe' => $email,
-    				'DescriptionCourte' => "Lead créé par Automation",
+    				'DescriptionCourte' => $description,
     				'ReclaDescDetail' => '',
     				'FileRef' => $leadRef,
     				'CriticiteRef' => 0,

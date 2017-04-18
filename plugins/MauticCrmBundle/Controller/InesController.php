@@ -8,6 +8,7 @@
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 
 /**
@@ -20,7 +21,8 @@ class InesController extends FormController
     {
 		// TESTS & DEBUG
 		// $inesIntegration = $this->factory->getHelper('integration')->getIntegrationObject('Ines');
-		// $leadRepo = $this->factory->getModel('lead.lead')->getRepository();
+		// $leadModel = $this->factory->getModel('lead.lead');
+        // $leadRepo = $leadModel->getRepository();
 		// $inesIntegration->getApiHelper()->syncLeadToInes($leadRepo->getEntity(18));
 		// die();
 

@@ -262,15 +262,15 @@ class InesIntegration extends CrmAbstractIntegration
 	 */
 	public function getWebServiceCurrentSessionID()
 	{
-		return $this->factory->getSession()->get('ines_session_id');
+        return $this->getCache()->get('ines_session_id');
 	}
 	public function setWebServiceCurrentSessionID($sessionID)
 	{
-		$this->factory->getSession()->set('ines_session_id', $sessionID);
+		$this->getCache()->set('ines_session_id', $sessionID);
 	}
 	public function unsetWebServiceCurrentSessionID()
 	{
-		$this->factory->getSession()->set('ines_session_id', null);
+		$this->getCache()->delete('ines_session_id');
 	}
 
 
@@ -279,15 +279,15 @@ class InesIntegration extends CrmAbstractIntegration
 	 */
 	public function getCurrentSyncConfig()
 	{
-		return $this->factory->getSession()->get('ines_sync_config');
+		return $this->getCache()->get('ines_sync_config');
 	}
 	public function setCurrentSyncConfig($syncConfig)
 	{
-		$this->factory->getSession()->set('ines_sync_config', $syncConfig);
+		$this->getCache()->set('ines_sync_config', $syncConfig);
 	}
 	public function unsetCurrentSyncConfig()
 	{
-		$this->factory->getSession()->set('ines_sync_config', null);
+		$this->getCache()->delete('ines_sync_config');
 	}
 
 
@@ -877,6 +877,30 @@ class InesIntegration extends CrmAbstractIntegration
 	}
 
 
+    /**
+     * Retourne le dernier événement écrit dans la timeline d'un lead
+     *
+     * @param   Lead    $lead
+     *
+     * @return  string
+     */
+    public function getLastTimelineEvent(Lead $lead)
+    {
+        $leadModel = $this->factory->getModel('lead.lead');
+
+        $leadEngagements = $leadModel->getEngagements($lead, $filters = [], null, 1, $limit = 1);
+
+        if (is_array($leadEngagements['events'])) {
+            $lastTimelineEvent = $leadEngagements['events'][0];
+            $eventDescription = $this->factory->getTranslator()->trans($lastTimelineEvent['event']);
+            $eventDescription .= ' - '.$lastTimelineEvent['eventLabel']['label'];
+        } else {
+            $eventDescription = '';
+        }
+
+        return $eventDescription;
+    }
+
 
     /**
      * Crée ou met à jour, dans ATMT, les custom fiels dont l'utilisteur peut avoir besoin pour le mapping
@@ -1058,7 +1082,7 @@ class InesIntegration extends CrmAbstractIntegration
         // Sauvegarde de tous les appels aux WS INES
         if (in_array(
             $method,
-            ['authenticationWs', 'GetSyncInfo', 'GetTypeContactList', 'GetTypeClientList', 'GetOriginList', 'GetUserInfoFromUserRef', 'GetUserInfoFromRHRef', 'GetContact', 'GetClient']
+            [/*'authenticationWs', 'GetSyncInfo',*/ 'GetTypeContactList', 'GetTypeClientList', 'GetOriginList', 'GetUserInfoFromUserRef', 'GetUserInfoFromRHRef']
         )) {
             return;
         }
