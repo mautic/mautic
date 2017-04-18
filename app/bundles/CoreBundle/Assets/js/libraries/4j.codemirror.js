@@ -3586,7 +3586,10 @@
     }
     if (clickInGutter(cm, e)) return;
     var start = posFromMouse(cm, e);
-    window.focus();
+
+    if (typeof Mautic != 'undefined' && Mautic.codeMode != true) {
+        window.focus();
+    }
 
     switch (e_button(e)) {
     case 1:
