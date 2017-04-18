@@ -220,7 +220,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
             }
             $groupByColumns = implode(',', $columns);
-            $queryBuilder->addGroupBy($groupByColumns.' WITH ROLLUP');
+            $queryBuilder->addGroupBy($groupByColumns);
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
             if (is_array($options['groupby'])) {
                 foreach ($options['groupby'] as $groupBy) {
@@ -288,8 +288,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $fieldOptions = $options['columns'][$aggregator['column']];
                     if ($aggregator['function'] == 'AVG') {
                         $field = (isset($fieldOptions['formula'])) ? 'ROUND('.$aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].'))' : 'ROUND('.$aggregator['function'].'(DISTINCT '.$aggregator['column'].'))';
-                    } elseif (strstr($fieldOptions['label'], 'ratio')) {
-                        $field = (isset($fieldOptions['formula'])) ? 'CONCAT('.$aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].'), "%")' : 'CONCAT('.$aggregator['function'].'(DISTINCT '.$aggregator['column'].'), "%")';
                     } else {
                         $field = (isset($fieldOptions['formula'])) ? $aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].')' : $aggregator['function'].'(DISTINCT '.$aggregator['column'].')';
                     }
