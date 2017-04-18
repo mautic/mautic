@@ -295,7 +295,7 @@ class ReportModel extends FormModel
         $return->definitions = [];
 
         foreach ($columns as $column => $data) {
-            if ($isGroupBy && ($column == 'unsubscribed' || $column == 'unsubscribed_ratio')) {
+            if ($isGroupBy && ($column == 'unsubscribed' || $column == 'unsubscribed_ratio' || $column == 'unique_ratio')) {
                 continue;
             }
             if (isset($data['label'])) {
