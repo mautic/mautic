@@ -23,6 +23,7 @@ $startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 
 function getTotal($a, $f, $t, $allrows, $ac)
 {
     switch ($f) {
+        case 'COUNT':
         case 'SUM':
             return (int) $t + (int) $a;
         case 'AVG':
