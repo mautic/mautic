@@ -8,7 +8,6 @@
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
 
 
 /**
