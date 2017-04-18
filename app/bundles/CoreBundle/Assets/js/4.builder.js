@@ -1010,6 +1010,22 @@ Mautic.initSlotListeners = function() {
                 });
             });
 
+            // initialize code mode slots
+            if ('codemode' === type) {
+                Mautic.codeMode = true;
+                var element = focusForm.find('#slot_codemode_content')[0];
+                if (element) {
+                    Mautic.builderCodeMirror = CodeMirror.fromTextArea(element, {
+                        lineNumbers: true,
+                        mode: 'htmlmixed',
+                        extraKeys: {"Ctrl-Space": "autocomplete"},
+                        lineWrapping: true,
+                    });
+                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
+                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
+                }
+            }
+
             focusForm.find('textarea.editor').each(function() {
                 var theEditor = this;
                 var slotHtml = parent.mQuery('<div/>').html(clickedSlot.html());
