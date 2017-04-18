@@ -1106,9 +1106,6 @@ Mautic.initSlotListeners = function() {
                 slotHtml.find('[data-slot-toolbar]').remove();
 
                 var buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
-                if (focusType == 'dynamicContent') {
-                    buttons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
-                }
 
                 var builderEl = parent.mQuery('.builder');
 

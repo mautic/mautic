@@ -517,7 +517,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
 
             if (textarea.hasClass('editor-dynamic-content')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
+                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
             }
 
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {

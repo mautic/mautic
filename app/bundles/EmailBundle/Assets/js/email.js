@@ -264,7 +264,7 @@ Mautic.createNewDynamicContentItem = function(jQueryVariant) {
     textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
         // Set custom buttons with separator between them.
         toolbarSticky: false,
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'],
         heightMin: 100
     }));
 
@@ -327,7 +327,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
         // Set custom buttons with separator between them.
         toolbarSticky: false,
-        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+        toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'],
         heightMin: 100
     }));
 
