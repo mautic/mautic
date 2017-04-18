@@ -103,6 +103,9 @@ class EmailSubscriber extends CommonSubscriber
             if (CitrixHelper::isAuthorized('Goto'.$p)) {
                 $activeProducts[]          = $p;
                 $tokens['{'.$p.'_button}'] = $this->translator->trans('plugin.citrix.token.'.$p.'_button');
+                if ('webinar' === $p) {
+                    $tokens['{'.$p.'_link}'] = $this->translator->trans('plugin.citrix.token.'.$p.'_link');
+                }
             }
         }
         if (0 === count($activeProducts)) {
@@ -171,6 +174,7 @@ class EmailSubscriber extends CommonSubscriber
 
                 if ('webinar' == $product) {
                     $params['productText'] = $this->translator->trans('plugin.citrix.token.join_webinar');
+                    $params['productLink'] = 'https://www.gotomeeting.com/webinar';
                 }
 
                 // trigger event to replace the links in the tokens
@@ -187,6 +191,7 @@ class EmailSubscriber extends CommonSubscriber
                     $params
                 );
                 $content = str_replace('{'.$product.'_button}', $button, $content);
+                $content = str_replace('{'.$product.'_link}', $params['productLink'], $content);
             } else {
                 // remove the token
                 $content = str_replace('{'.$product.'_button}', '', $content);
