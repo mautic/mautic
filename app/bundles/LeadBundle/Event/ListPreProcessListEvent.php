@@ -48,4 +48,24 @@ class ListPreProcessListEvent extends CommonEvent
     {
         $this->list = $list;
     }
+
+    /**
+     * @return bool
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+    /**
+     * @param $result
+     *
+     * @return $this
+     */
+    public function setResult($result)
+    {
+        $this->result = $result;
+
+        return $this;
+    }
 }

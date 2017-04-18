@@ -109,6 +109,6 @@ class LeadListSubscriber extends CommonSubscriber
             }
         }
 
-        return $success;
+        return $event->setResult($success);
     }
 }
