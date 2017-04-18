@@ -26,8 +26,7 @@ class IntegrationCampaignsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!empty($options['campaignContactStatus'])) {
-            $builder->add(
+        $builder->add(
                 'campaign_member_status',
                 'choice',
                 [
@@ -38,8 +37,8 @@ class IntegrationCampaignsType extends AbstractType
                     'required' => false,
                 ]
             );
-        }
     }
+
     /**
      * {@inheritdoc}
      */

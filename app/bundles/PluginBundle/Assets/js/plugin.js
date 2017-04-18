@@ -213,10 +213,9 @@ Mautic.getIntegrationConfig = function (el, settings) {
     if (typeof settings == 'undefined') {
         settings = {};
     }
-
     settings.name = mQuery(el).attr('name');
     var data = {integration: mQuery(el).val(), settings: settings};
-
+    mQuery('.integration-campaigns-status').html('');
     mQuery('.integration-config-container').html('');
 
     Mautic.ajaxActionRequest('plugin:getIntegrationConfig', data,
@@ -234,18 +233,17 @@ Mautic.getIntegrationConfig = function (el, settings) {
 
 };
 
-Mautic.getIntegrationCampaignStatus = function (el, settings) {
+Mautic.getIntegrationCampaignStatus = function (el) {
     Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
 
     var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val()};
     if(typeof mQuery('#campaignevent_properties_integration').val() == 'undefined') {
         data = {integration:mQuery('#formaction_properties_integration').val(),campaign: mQuery(el).val()};
     }
-
-    mQuery('.integration-campaigns-status').html('');
-
+    mQuery('.integration-campaigns-status').removeClass('hide');
     Mautic.ajaxActionRequest('plugin:getIntegrationCampaignStatus', data,
         function (response) {
+
             if (response.success) {
                 mQuery('.integration-campaigns-status').append(response.html);
                 Mautic.onPageLoad('.integration-campaigns-status', response);

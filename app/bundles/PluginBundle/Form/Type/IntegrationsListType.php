@@ -118,17 +118,17 @@ class IntegrationsListType extends AbstractType
                     'data'        => (isset($data['config'])) ? $data['config'] : [],
                 ]
             );
-
+            $hideClass = (isset($data['campaign_member_status'])) ? '' : ' hide';
             $form->add(
                 'campaign_member_status',
                 'integration_campaign_status',
                 [
                     'label' => false,
                     'attr'  => [
-                        'class' => 'integration-campaigns-status',
+                        'class' => 'integration-campaigns-status'.$hideClass,
                     ],
                     'campaignContactStatus' => $statusChoices,
-                    'data'                  => (isset($data['campaignMemberStatus'])) ? $data['campaignMemberStatus'] : [],
+                    'data'                  => (isset($data['campaign_member_status'])) ? $data['campaign_member_status'] : [],
                 ]
             );
         };
