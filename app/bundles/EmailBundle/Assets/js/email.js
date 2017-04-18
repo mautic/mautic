@@ -250,7 +250,7 @@ Mautic.initEmailDynamicContent = function() {
 
             textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
                 // Set custom buttons with separator between them.
-                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+                toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', '|', 'html'],
                 heightMin: 100
             }));
 
@@ -315,7 +315,7 @@ Mautic.initDynamicContentItem = function (tabId) {
 
         altTextarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
             // Set custom buttons with separator between them.
-            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage'],
+            toolbarButtons: ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'orderedList', 'unorderedList', 'quote', 'clearFormatting', 'insertLink', 'insertImage', '|', 'html'],
             heightMin: 100
         }));
 
