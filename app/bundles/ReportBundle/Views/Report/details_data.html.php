@@ -26,8 +26,8 @@ function getTotal($a, $f, $t, $allrows, $ac)
         case 'SUM':
             return (int) $t + (int) $a;
         case 'AVG':
-            return ($ac == $allrows) ? ((int) $t + (int) $a) / (int) $allrows : (int) $t + (int) $a;
-        case 'MAX' :
+            return ($ac == $allrows) ? round(((int) $t + (int) $a) / (int) $allrows, 2) : (int) $t + (int) $a;
+        case 'MAX':
             return ((int) $a >= (int) $t) ? (int) $a : (int) $t;
         case 'MIN':
             return ((int) $a <= (int) $t) ? (int) $a : (int) $t;
