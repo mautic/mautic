@@ -414,7 +414,7 @@ class ThemeHelper
             throw new \Exception($this->getExtractError($archive));
         } else {
             $containsConfig    = false;
-            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff', 'eot', 'woff'];
+            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff', 'ico', 'icns', 'eot', 'woff'];
             $allowedFiles      = [];
             for ($i = 0; $i < $zipper->numFiles; ++$i) {
                 $entry     = $zipper->getNameIndex($i);
