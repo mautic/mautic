@@ -286,7 +286,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $column = '';
                 if (isset($options['columns'][$aggregator['column']])) {
                     $fieldOptions = $options['columns'][$aggregator['column']];
-                    $column .= (isset($fieldOptions['formula'])) ? $aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].')' : $aggregator['function'].'(DISTINCT '.$aggregator['column'].')';
+                    if ($aggregator['function'] == 'AVG') {
+                        $field = (isset($fieldOptions['formula'])) ? 'ROUND('.$aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].'))' : 'ROUND('.$aggregator['function'].'(DISTINCT '.$aggregator['column'].'))';
+                    } elseif (strstr($fieldOptions['label'], 'ratio')) {
+                        $field = (isset($fieldOptions['formula'])) ? 'CONCAT('.$aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].'), "%")' : 'CONCAT('.$aggregator['function'].'(DISTINCT '.$aggregator['column'].'), "%")';
+                    } else {
+                        $field = (isset($fieldOptions['formula'])) ? $aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].')' : $aggregator['function'].'(DISTINCT '.$aggregator['column'].')';
+                    }
+                    $column .= $field;
                 }
 
                 $formula = $column." as '".$aggregator['function'].' '.$aggregator['column']."'";
