@@ -101,7 +101,7 @@ class LeadListSubscriber extends CommonSubscriber
             if (method_exists($integrationObject, 'getCampaignMembers')) {
                 foreach ($list['filters'] as $filter) {
                     if ($filter['field'] == 'integration_campaigns') {
-                        if ($integrationObject->getCampaignMembers($filter['filter'])) {
+                        if ($integrationObject->getCampaignMembers($filter['filter'], [])) {
                             $success = true;
                         }
                     }

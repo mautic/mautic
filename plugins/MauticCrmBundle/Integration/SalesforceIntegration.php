@@ -1243,7 +1243,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function getCampaignMembers($campaignId, $settings)
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $existingLeads     = $existingContacts     = [];
+        $persistEntities   = $contactList   = $leadList   = $existingLeads   = $existingContacts   = [];
 
         try {
             $campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId);
@@ -1285,7 +1285,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $listOfLeads = '"'.$listOfLeads.'"';
             $leads       = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', null, null, null, false, 0, 0, $listOfLeads);
 
-            $listOfContacts = implode('", "', $contactList);
+            $listOfContacts = implode('", "', array_keys($contactList));
             $listOfContacts = '"'.$listOfContacts.'"';
             $contacts       = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', null, null, null, false, 0, 0, $listOfContacts);
 
@@ -1305,31 +1305,31 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $allCampaignMembers = array_merge(array_values($existingLeads), array_values($existingContacts));
             //Leads
             $leadsToFetch = array_diff_key($leadList, $existingLeads);
+            $mixedFields  = $this->getIntegrationSettings()->getFeatureSettings();
+            $executed     = 0;
             if (!empty($leadsToFetch)) {
                 $listOfLeadsToFetch = implode("','", array_keys($leadsToFetch));
                 $listOfLeadsToFetch = "'".$listOfLeadsToFetch."'";
 
-                $mixedFields = $this->getIntegrationSettings()->getFeatureSettings();
-                $fields      = $this->getMixedLeadFields($mixedFields, 'Lead');
-                $fields[]    = 'Id';
-                $fields      = implode(', ', array_unique($fields));
-                $leadQuery   = 'SELECT '.$fields.' from Lead where Id in ('.$listOfLeadsToFetch.')';
-                $executed    = 0;
-                $this->getLeads([], $leadQuery, $executed, [], 'Contact');
+                $fields    = $this->getMixedLeadFields($mixedFields, 'Lead');
+                $fields[]  = 'Id';
+                $fields    = implode(', ', array_unique($fields));
+                $leadQuery = 'SELECT '.$fields.' from Lead where Id in ('.$listOfLeadsToFetch.')';
+
+                $this->getLeads([], $leadQuery, $executed, [], 'Lead');
 
                 $allCampaignMembers = array_merge($allCampaignMembers, array_keys($leadsToFetch));
             }
             //Contacts
             $contactsToFetch = array_diff_key($contactList, $existingContacts);
             if (!empty($contactsToFetch)) {
-                $listOfContactsToFetch = implode(',', $contactsToFetch);
+                $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
                 $listOfContactsToFetch = "'".$listOfContactsToFetch."'";
-
-                $fields       = $this->getMixedLeadFields($mixedFields, 'Contact');
-                $fields[]     = 'Id';
-                $fields       = implode(', ', array_unique($fields));
-                $contactQuery = 'SELECT '.$fields.' from Contact where Id in ('.$listOfContactsToFetch.')';
-                $this->getLeads([], $contactQuery);
+                $fields                = $this->getMixedLeadFields($mixedFields, 'Contact');
+                $fields[]              = 'Id';
+                $fields                = implode(', ', array_unique($fields));
+                $contactQuery          = 'SELECT '.$fields.' from Contact where Id in ('.$listOfContactsToFetch.')';
+                $this->getLeads([], $contactQuery, $executed, [], 'Contact');
                 $allCampaignMembers = array_merge($allCampaignMembers, array_keys($contactsToFetch));
             }
             if (!empty($allCampaignMembers)) {
