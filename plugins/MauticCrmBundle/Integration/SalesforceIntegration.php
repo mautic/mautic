@@ -1286,4 +1286,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         return $this->factory->getModel('core.notification');
     }
+
+    /**
+     * @param \Exception $e
+     */
+    public function logIntegrationError(\Exception $e)
+    {
+        $logger = $this->factory->getLogger();
+        if ('dev' == MAUTIC_ENV) {
+            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
+            $this->getNotificationModel()->addNotification($e, $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':');
+        } else {
+            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+            $this->getNotificationModel()->addNotification($e->getMessage(), $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':');
+        }
+    }
 }
