@@ -69,17 +69,14 @@ $startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 
                 <tbody>
                 <?php if ($dataCount): ?>
                     <?php foreach ($data as $row): ?>
-                        <tr <?php if ($groupByCount && $startCount == $dataCount) :
-                echo 'class="cm-strong"'; endif; ?>>
-                            <td><?php
-                                if ($groupByCount && $startCount == $dataCount) :
-                                    echo $view['translator']->trans('mautic.report.report.groupby.totals');
-                                else:
-                                    echo $startCount;
-                                endif;
-                                 ?></td>
+                        <?php if ($groupByCount && $startCount == $dataCount) : ?>
+                        <tr class="cm-strong">
+                            <td><?php echo $view['translator']->trans('mautic.report.report.groupby.totals'); ?></td>
+                            <?php else: ?>
+                        <tr>
+                            <td><?php echo $startCount; ?></td>
+                        <?php endif; ?>
                             <?php
-
                             if ($aggregatorCount) :
                                 foreach ($aggregatorOrder as $aggregator): ?>
                                         <td>
