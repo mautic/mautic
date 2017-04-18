@@ -37,7 +37,8 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 
     <div class="mf-bar-collapse"></div>
 </div>
-<?php if ($props['bar']['allow_hide']): ?>
+<?php
+if ($props['bar']['allow_hide']): ?>
     <div class="mf-copy-to-parent mf-bar-collapser mf-bar-collapser-<?php echo $props['bar']['placement']; ?> mf-bar-collapser-<?php echo $props['bar']['size']; ?><?php if ($props['bar']['sticky']) {
                     echo ' mf-bar-collapser-sticky';
                 } ?> mf-bar-collapser-<?php echo $focus['id']; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>; color: #<?php echo $props['colors']['text']; ?>;">
