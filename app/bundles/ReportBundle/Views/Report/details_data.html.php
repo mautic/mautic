@@ -146,21 +146,23 @@ function getTotal($a, $f, $t, $allrows, $ac)
                 <td><?php echo $view['translator']->trans('mautic.report.report.groupby.totals'); ?></td>
                 <?php
                 $index = 0;
-              foreach ($columnOrder as $key): ?>
+                foreach ($columnOrder as $key): ?>
                     <td>&nbsp;</td>
                 <?php endforeach;
-                foreach ($aggregatorOrder as $aggregator): ?>
-                    <td>
-                        <?php
-                        if (isset($total[$index])) :
-                            echo $view['formatter']->_($total[$index], 'text');
-                        endif;
-                        ?>
+                if ($aggregatorCount) :
+                    foreach ($aggregatorOrder as $aggregator): ?>
+                        <td>
+                            <?php
+                            if (isset($total[$index])) :
+                                echo $view['formatter']->_($total[$index], 'text');
+                            endif;
+                            ?>
 
-                    </td>
-                    <?php
-                    ++$index;
-                endforeach; ?>
+                        </td>
+                        <?php
+                        ++$index;
+                    endforeach;
+                endif; ?>
                 </tbody>
             </table>
         </div>
