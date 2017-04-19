@@ -20,3 +20,6 @@
 #report_columns_chosen {
 	width: 100% !important;
 }
+#ms-report_groupBy ul{
+	height: 115px;
+}

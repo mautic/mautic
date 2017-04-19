@@ -69,6 +69,46 @@ final class SocialEvents
     const MONITOR_POST_PROCESS = 'mautic.monitor_post_process';
 
     /**
+     * The mautic.tweet_pre_save event is dispatched right before a tweet is persisted.
+     *
+     * The event listener receives a
+     * MauticPlugin\MauticSocialBundle\Event\SocialEvent instance.
+     *
+     * @var string
+     */
+    const TWEET_PRE_SAVE = 'mautic.tweet_pre_save';
+
+    /**
+     * The mautic.tweet_post_save event is dispatched right after a tweet is persisted.
+     *
+     * The event listener receives a
+     * MauticPlugin\MauticSocialBundle\Event\SocialEvent instance.
+     *
+     * @var string
+     */
+    const TWEET_POST_SAVE = 'mautic.tweet_post_save';
+
+    /**
+     * The mautic.tweet_pre_delete event is dispatched before a tweet item is deleted.
+     *
+     * The event listener receives a
+     * MauticPlugin\MauticSocialBundle\Event\SocialEvent instance.
+     *
+     * @var string
+     */
+    const TWEET_PRE_DELETE = 'mautic.tweet_pre_delete';
+
+    /**
+     * The mautic.tweet_post_delete event is dispatched after a tweet is deleted.
+     *
+     * The event listener receives a
+     * MauticPlugin\MauticSocialBundle\Event\SocialEvent instance.
+     *
+     * @var string
+     */
+    const TWEET_POST_DELETE = 'mautic.tweet_post_delete';
+
+    /**
      * The mautic.social.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
