@@ -862,10 +862,10 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'source':
                 case 'url_title':
-                    $operand = in_array($func, ['eq', 'like', 'regexp' ,'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
+                    $operand = in_array($func, ['eq', 'like', 'regexp', 'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
 
                     $column = $details['field'];
-                    if($column == 'hit_url'){
+                    if ($column == 'hit_url') {
                         $column = 'url';
                     }
                     $subqb = $this->_em->getConnection()
@@ -914,10 +914,10 @@ class LeadListRepository extends CommonRepository
                     break;
                 case 'hit_url_date':
                 case 'lead_email_read_date':
-                    $operand = ($func == 'between' || in_array($func, ['eq', 'gt', 'lt', 'gte', 'lte'])) ? 'EXISTS' : 'NOT EXISTS';
-                    $table = 'page_hits';
-                    $column = 'date_hit';
-                   if ($details['field'] == 'lead_email_read_date') {
+                    $operand = (in_array($func, ['eq', 'gt', 'lt', 'gte', 'lte', 'between'])) ? 'EXISTS' : 'NOT EXISTS';
+                    $table   = 'page_hits';
+                    $column  = 'date_hit';
+                    if ($details['field'] == 'lead_email_read_date') {
                         $column = 'date_read';
                         $table  = 'email_stats';
                     }
@@ -937,12 +937,12 @@ class LeadListRepository extends CommonRepository
                         case 'between':
                         case 'notBetween':
                             // Filter should be saved with double || to separate options
-                            $parameter2    = $this->generateRandomParameterName();
+                            $parameter2              = $this->generateRandomParameterName();
                             $parameters[$parameter]  = $details['filter'][0];
                             $parameters[$parameter2] = $details['filter'][1];
                             $exprParameter2          = ":$parameter2";
                             $ignoreAutoFilter        = true;
-                            $field = $column;
+                            $field                   = $column;
                             if ($func == 'between') {
                                 $subqb->where($q->expr()
                                     ->andX(
@@ -979,12 +979,12 @@ class LeadListRepository extends CommonRepository
                 case 'redirect_id':
                 case 'notification':
                     $operand = ($func == 'eq') ? 'EXISTS' : 'NOT EXISTS';
-                    $column = $details['field'];
-                    $table = 'page_hits';
-                    $select = 'id';
+                    $column  = $details['field'];
+                    $table   = 'page_hits';
+                    $select  = 'id';
 
-                    if($details['field'] == 'notification'){
-                        $table = 'push_ids';
+                    if ($details['field'] == 'notification') {
+                        $table  = 'push_ids';
                         $column = 'id';
                     }
 
@@ -993,12 +993,12 @@ class LeadListRepository extends CommonRepository
                         ->select($select)
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
-                    if($details['filter'] == 1){
+                    if ($details['filter'] == 1) {
                         $subqb->where($q->expr()
                             ->andX($q->expr()
                                 ->isNotNull($alias.'.'.$column),  $q->expr()
                                 ->eq($alias.'.lead_id', 'l.id')));
-                    }else{
+                    } else {
                         $subqb->where($q->expr()
                             ->andX($q->expr()
                                 ->isNull($alias.'.'.$column),  $q->expr()
@@ -1013,9 +1013,9 @@ class LeadListRepository extends CommonRepository
                     break;
                 case 'sessions':
                     $operand = 'EXISTS';
-                    $column = $details['field'];
-                    $table = 'page_hits';
-                    $select = 'COUNT(id)';
+                    $column  = $details['field'];
+                    $table   = 'page_hits';
+                    $select  = 'COUNT(id)';
 
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
@@ -1028,7 +1028,6 @@ class LeadListRepository extends CommonRepository
                         ->select($alias2.'.id')
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias2);
 
-
                     $subqb2->where($q->expr()
                         ->andX(
                             $q->expr()->eq($alias2.'.lead_id', 'l.id'),
@@ -1039,8 +1038,8 @@ class LeadListRepository extends CommonRepository
                     $parameters[$parameter] = $details['filter'];
                     $subqb->where($q->expr()
                         ->andX($q->expr()
-                            ->eq($alias.'.lead_id', 'l.id'),$q->expr()
-                            ->isNull($alias.'.email_id'),$q->expr()
+                            ->eq($alias.'.lead_id', 'l.id'), $q->expr()
+                            ->isNull($alias.'.email_id'), $q->expr()
                             ->isNull($alias.'.redirect_id'),
                             sprintf('%s (%s)', 'NOT EXISTS', $subqb2->getSQL())));
 
@@ -1071,11 +1070,11 @@ class LeadListRepository extends CommonRepository
                 case 'hit_url_count':
                 case 'lead_email_read_count':
                     $operand = 'EXISTS';
-                    $column = $details['field'];
-                    $table = 'page_hits';
-                    $select = 'COUNT(id)';
+                    $column  = $details['field'];
+                    $table   = 'page_hits';
+                    $select  = 'COUNT(id)';
                     if ($details['field'] == 'lead_email_read_count') {
-                        $table = 'email_stats';
+                        $table  = 'email_stats';
                         $select = 'SUM(open_count)';
                     }
                     $subqb = $this->_em->getConnection()
