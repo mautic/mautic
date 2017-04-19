@@ -1187,9 +1187,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function processCompositeResponse($response, array $salesforceIdMapping = [])
     {
-        $created = 0;
-        $updated = 0;
-
+        $created   = 0;
+        $updated   = 0;
+        $reference = '';
         if (is_array($response)) {
             $persistEntities = [];
             foreach ($response as $item) {
@@ -1204,7 +1204,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 if (isset($item['body'][0]['errorCode'])) {
-                    $this->logIntegrationError(new \Exception($item['body'][0]['message']));
+                    $this->logIntegrationError(new \Exception($item['body'][0]['message'].'-'.$reference));
 
                     if ($integrationEntityId) {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
@@ -1295,10 +1295,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $logger = $this->factory->getLogger();
         if ('dev' == MAUTIC_ENV) {
             $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
-            $this->getNotificationModel()->addNotification($e, $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':');
+            $this->getNotificationModel()->addNotification($e, $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
         } else {
             $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
-            $this->getNotificationModel()->addNotification($e->getMessage(), $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':');
+            $this->getNotificationModel()->addNotification($e->getMessage(), $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
         }
     }
 }
