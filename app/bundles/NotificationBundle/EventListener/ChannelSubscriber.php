@@ -80,7 +80,9 @@ class ChannelSubscriber extends CommonSubscriber
             );
         }
 
-        if (!empty($this->params['notification_enabled'])) {
+        $supportedFeatures = $integration->getSupportedFeatures();
+
+        if (in_array('mobile', $supportedFeatures)) {
             $event->addChannel(
                 'mobile_notification',
                 [

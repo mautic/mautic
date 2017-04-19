@@ -128,7 +128,7 @@ class OneSignalApi extends AbstractNotificationApi
                     $data['subtitle'] = ['en' => $value];
                     break;
                 case 'ios_sound':
-                    $data['ios_sound'] = $value;
+                    $data['ios_sound'] = $value ?: 'default';
                     break;
                 case 'ios_badges':
                     $data['ios_badgeType'] = $value;

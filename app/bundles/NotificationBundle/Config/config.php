@@ -40,6 +40,16 @@ return [
                     'mautic.asset.helper.token',
                 ],
             ],
+//            Left out until 2.9
+//            'mautic.notification.subscriber.form' => [
+//                'class'     => \Mautic\NotificationBundle\EventListener\FormSubscriber::class,
+//                'arguments' => [
+//                    'mautic.helper.integration',
+//                    'mautic.lead.model.lead',
+//                    'mautic.notification.model.notification',
+//                    'mautic.notification.api',
+//                ],
+//            ],
             'mautic.notification.subscriber.channel' => [
                 'class'     => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
                 'arguments' => [
