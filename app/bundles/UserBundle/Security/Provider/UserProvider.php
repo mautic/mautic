@@ -92,6 +92,8 @@ class UserProvider implements UserProviderInterface
             ->select('u, r')
             ->leftJoin('u.role', 'r')
             ->where('u.username = :username OR u.email = :username')
+            ->andWhere('u.isPublished = :true')
+            ->setParameter('true', true, 'boolean')
             ->setParameter('username', $username);
 
         if (func_num_args() > 1 && $email = func_get_arg(1)) {

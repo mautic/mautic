@@ -363,7 +363,7 @@ class ReportModel extends FormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, $report, $reportData)
+    public function exportResults($format, $report, $reportData, $handle = null, $page = null)
     {
         $formatter = $this->formatterHelper;
         $date      = (new DateTimeHelper())->toLocalString();
@@ -371,47 +371,28 @@ class ReportModel extends FormModel
 
         switch ($format) {
             case 'csv':
-                $response = new StreamedResponse(
-                    function () use ($reportData, $report, $formatter) {
-                        $handle = fopen('php://output', 'r+');
-                        $header = [];
-
-                        //build the data rows
-                        foreach ($reportData['data'] as $count => $data) {
-                            $row = [];
-                            foreach ($data as $k => $v) {
-                                if ($count === 0) {
-                                    //set the header
-                                    $header[] = $k;
-                                }
-
-                                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
-                            }
-
-                            if ($count === 0) {
-                                //write the column names row
-                                fputcsv($handle, $header);
-                            }
-
-                            //write the row
-                            fputcsv($handle, $row);
-
-                            //free memory
-                            unset($row, $reportData['data'][$count]);
+                //build the data rows
+                if (is_null($handle)) {
+                    $response = new StreamedResponse(
+                        function () use ($reportData, $formatter) {
+                            $handle = fopen('php://output', 'r+');
+                            $this->exportCSV($formatter, $reportData, $handle, 0);
+                            fclose($handle);
                         }
+                    );
+                    $response->headers->set('Content-Type', 'application/force-download');
+                    $response->headers->set('Content-Type', 'application/octet-stream');
+                    $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
+                    $response->headers->set('Expires', 0);
+                    $response->headers->set('Cache-Control', 'must-revalidate');
+                    $response->headers->set('Pragma', 'public');
 
-                        fclose($handle);
-                    }
-                );
+                    return $response;
+                } else {
+                    $this->exportCSV($formatter, $reportData, $handle, $page);
 
-                $response->headers->set('Content-Type', 'application/force-download');
-                $response->headers->set('Content-Type', 'application/octet-stream');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', 0);
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
-
-                return $response;
+                    return;
+                }
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
@@ -427,6 +408,7 @@ class ReportModel extends FormModel
                 )->getContent();
 
                 return new Response($content);
+
             case 'xlsx':
                 if (class_exists('PHPExcel')) {
                     $response = new StreamedResponse(
@@ -452,11 +434,9 @@ class ReportModel extends FormModel
                                     //write the column names row
                                     $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
                                 }
-
                                 //write the row
                                 $rowCount = $count + 2;
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-
                                 //free memory
                                 unset($row, $reportData['data'][$count]);
                             }
@@ -478,6 +458,7 @@ class ReportModel extends FormModel
                     return $response;
                 }
                 throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+
             default:
                 return new Response();
         }
@@ -607,6 +588,10 @@ class ReportModel extends FormModel
             if ($paginate) {
                 // Build the options array to pass into the query
                 $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                if (!empty($options['limit'])) {
+                    $limit      = $options['limit'];
+                    $reportPage = $options['page'];
+                }
                 $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
                 if ($start < 0) {
                     $start = 0;
@@ -715,5 +700,26 @@ class ReportModel extends FormModel
         }
 
         return $options;
+    }
+
+    private function exportCSV($formatter, $reportData, $handle, $page)
+    {
+        foreach ($reportData['data'] as $count => $data) {
+            $row = [];
+            foreach ($data as $k => $v) {
+                if ($count == 0) {
+                    //set the header
+                    $header[] = $k;
+                }
+
+                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+            }
+
+            if ($page === 1 && $count === 0) {
+                fputcsv($handle, $header);
+            }
+            fputcsv($handle, $row);
+            unset($row, $reportData['data'][$count]);
+        }
     }
 }

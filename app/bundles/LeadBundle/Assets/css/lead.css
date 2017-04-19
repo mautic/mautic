@@ -234,3 +234,13 @@ ul.tag-cloud li {
 .panel-companies .primary {
     color: #fdb933;
 }
+.building::before {
+    content: "\f1ad";
+    font-family: "FontAwesome";
+    padding-right: 3px;
+}
+.user::before {
+    content: "\f007";
+    font-family: "FontAwesome";
+    padding-right: 3px;
+}

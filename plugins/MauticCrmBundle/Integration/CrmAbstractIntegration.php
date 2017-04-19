@@ -55,7 +55,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return ['push_lead', 'get_leads', 'push_leads'];
+        return ['push_lead', 'get_leads'];
     }
 
     /**
@@ -222,12 +222,16 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
-        $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
+        $matchedFields    = $this->populateMauticLeadData($data, $config, 'company');
+        $newMatchedFields = [];
 
         $fieldsToUpdateInMautic = isset($config['update_mautic_company']) ? array_keys($config['update_mautic_company'], 0) : [];
-        $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
-        $newMatchedFields       = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
-
+        if (!empty($fieldsToUpdateInMautic)) {
+            $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
+            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        } else {
+            $newMatchedFields = $matchedFields;
+        }
         if (!isset($newMatchedFields['companyname'])) {
             if (isset($newMatchedFields['companywebsite'])) {
                 $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
@@ -313,9 +317,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
         //use direction of fields only when updating existing lead
-        $fieldsToUpdateInMautic = (isset($config['update_mautic']) and !empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
-        $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
-        $matchedFields          = array_filter(array_diff_key($matchedFields, array_flip($fieldsToUpdateInMautic)));
+        $fieldsToUpdateInMautic = (isset($config['update_mautic']) && empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
+        if (!empty($fieldsToUpdateInMautic)) {
+            $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+            $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        }
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         if (!empty($socialCache)) {
