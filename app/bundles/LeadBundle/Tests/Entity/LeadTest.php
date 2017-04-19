@@ -87,15 +87,53 @@ class LeadTest extends \PHPUnit_Framework_TestCase
 
     public function testAdjustPoints()
     {
-        $points = 501;
-        $lead   = new Lead();
-        $lead->adjustPoints($points);
+        // new lead
+        $this->adjustPointsTest(5, $this->getLeadChangedArray(0, 5), new Lead());
+        $this->adjustPointsTest(5, $this->getLeadChangedArray(0, 5), new Lead(), 'plus');
+        $this->adjustPointsTest(5, $this->getLeadChangedArray(0, -5), new Lead(), 'minus');
+        $this->adjustPointsTest(5, [], new Lead(), 'times');
+        $this->adjustPointsTest(5, [], new Lead(), 'divide');
 
-        $this->assertEquals([
+        // existing lead
+        $lead = new Lead();
+        $lead->setPoints(5);
+
+        $this->adjustPointsTest(5, $this->getLeadChangedArray(5, 10), $lead);
+        $this->adjustPointsTest(5, $this->getLeadChangedArray(10, 15), $lead);
+        $this->adjustPointsTest(10, $this->getLeadChangedArray(15, 150), $lead, 'times');
+        $this->adjustPointsTest(10, $this->getLeadChangedArray(150, 15), $lead, 'divide');
+    }
+
+    /**
+     * @param $points
+     * @param $expected
+     * @param Lead $lead
+     * @param bool $operator
+     */
+    private function adjustPointsTest($points, $expected, Lead $lead, $operator = false)
+    {
+        if ($operator) {
+            $lead->adjustPoints($points, $operator);
+        } else {
+            $lead->adjustPoints($points);
+        }
+
+        $this->assertEquals($expected, $lead->getChanges());
+    }
+
+    /**
+     * @param int $oldValue
+     * @param int $newValue
+     *
+     * @return array
+     */
+    private function getLeadChangedArray($oldValue = 0, $newValue = 0)
+    {
+        return [
             'points' => [
-                0 => 0,
-                1 => $points,
+                0 => $oldValue,
+                1 => $newValue,
             ],
-        ], $lead->getChanges());
+        ];
     }
 }
