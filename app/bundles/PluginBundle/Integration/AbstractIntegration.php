@@ -23,6 +23,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class AbstractIntegration.
@@ -1395,8 +1396,10 @@ abstract class AbstractIntegration
 
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);
+            $leadId = $lead->getId();
         } else {
             $fields = $lead;
+            $leadId = $lead['id'];
         }
 
         $leadFields      = $config['leadFields'];
@@ -1414,6 +1417,11 @@ abstract class AbstractIntegration
             }
 
             if (isset($leadFields[$integrationKey])) {
+                if ($leadFields[$integrationKey] == 'mauticContactTimelineLink') {
+                    $this->pushContactLink  = true;
+                    $mauticContactLinkField = $integrationKey;
+                    continue;
+                }
                 $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
                     $matched[$matchIntegrationKey] = $fields[$mauticKey]['value'];
@@ -1423,6 +1431,13 @@ abstract class AbstractIntegration
             if (!empty($field['required']) && empty($matched[$matchIntegrationKey])) {
                 $matched[$matchIntegrationKey] = $unknown;
             }
+        }
+        if ($this->pushContactLink) {
+            $matched[$mauticContactLinkField] = $this->factory->getRouter()->generate(
+                'mautic_plugin_timeline_view',
+                ['integration' => $this->getName(), 'leadId' => $leadId],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
         }
 
         return $matched;

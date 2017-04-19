@@ -14,7 +14,6 @@ namespace MauticPlugin\MauticCitrixBundle\Command;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
-use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,9 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class SyncCommand extends ModeratedCommand
 {
-    /** @var CitrixModel */
-    protected $citrixModel;
-
     /**
      * {@inheritdoc}
      *

@@ -48,9 +48,42 @@ class LeadApiController extends CommonApiController
      */
     public function newEntityAction()
     {
-        // Check for an email to see if the lead already exists
-        $parameters = $this->request->request->all();
+        $existingLeads = $this->getExistingLeads();
+        if (!empty($existingLeads)) {
+            return parent::editEntityAction($existingLeads[0]->getId());
+        }
 
+        return parent::newEntityAction();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function editEntityAction($id)
+    {
+        $existingLeads = $this->getExistingLeads();
+        if (!empty($existingLeads)) {
+            $entity = $this->model->getEntity($id);
+            if ($existingLeads[0]->getId() == $entity->getId()) {
+                array_shift($existingLeads);
+            }
+            if (isset($existingLeads[0])) {
+                $this->model->mergeLeads($existingLeads[0], $entity, false);
+            }
+        }
+
+        return parent::editEntityAction($id);
+    }
+
+    /**
+     * Get existing duplicated contacts based on unique fields and the request data.
+     *
+     * @return array
+     */
+    protected function getExistingLeads()
+    {
+        // Check for an email to see if the lead already exists
+        $parameters          = $this->request->request->all();
         $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
 
@@ -61,18 +94,12 @@ class LeadApiController extends CommonApiController
         }
 
         if (count($uniqueLeadFieldData)) {
-            if (count($uniqueLeadFieldData)) {
-                $existingLeads = $this->get('doctrine.orm.entity_manager')->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueLeadFieldData);
-
-                if (!empty($existingLeads)) {
-                    // Lead found so edit rather than create a new one
-
-                    return $this->editEntityAction($existingLeads[0]->getId());
-                }
-            }
+            return $this->get('doctrine.orm.entity_manager')->getRepository(
+                'MauticLeadBundle:Lead'
+            )->getLeadsByUniqueFields($uniqueLeadFieldData, null, 1);
         }
 
-        return parent::newEntityAction();
+        return [];
     }
 
     /**

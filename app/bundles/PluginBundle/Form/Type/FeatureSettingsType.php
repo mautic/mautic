@@ -128,6 +128,13 @@ class FeatureSettingsType extends AbstractType
 
             $enableDataPriority = !empty($formSettings['enable_data_priority']);
 
+            $leadFields['-1'] = '';
+
+            $leadFields['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
+
+            $leadFields['-1'] = '';
+            $extraPage        = ($totalFields % $limit > 0 && $totalFields % $limit < ($limit / 2)) ? 1 : 0;
+
             $form->add(
                 'leadFields',
                 'integration_fields',

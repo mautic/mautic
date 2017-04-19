@@ -75,6 +75,12 @@ class DoNotContactRepository extends CommonRepository
             if (true === $listId) {
                 $q->addSelect('cs.leadlist_id')
                     ->groupBy('cs.leadlist_id');
+            } elseif (is_array($listId)) {
+                $q->andWhere(
+                    $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
+                )
+                    ->addSelect('cs.leadlist_id')
+                    ->groupBy('cs.leadlist_id');
             } else {
                 $q->andWhere('cs.leadlist_id = :list_id')
                     ->setParameter('list_id', $listId);
@@ -87,7 +93,7 @@ class DoNotContactRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        if (true === $listId) {
+        if (true === $listId || is_array($listId)) {
             // Return list group of counts
             $byList = [];
             foreach ($results as $result) {

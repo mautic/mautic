@@ -40,6 +40,14 @@ Mautic.formOnLoad = function (container) {
             }
         });
 
+        mQuery('#available_fields').change(function (e) {
+            mQuery(this).find('option:selected');
+            Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+            // Reset the dropdown
+            mQuery(this).val('');
+            mQuery(this).trigger('chosen:updated');
+        });
+
         Mautic.initFormFieldButtons();
     }
 
@@ -189,7 +197,6 @@ Mautic.formFieldOnLoad = function (container, response) {
         //initialize ajax'd modals
         mQuery(fieldContainer).find("[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
-            console.log(this);
             Mautic.ajaxifyModal(this, event);
         });
 
