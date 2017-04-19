@@ -23,7 +23,6 @@ use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
-use Mautic\EmailBundle\Exception\IsAnonymousException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -80,11 +79,16 @@ class PageModel extends FormModel
     protected $pageTrackableModel;
 
     /**
+     * @var DateTimeHelper
+     */
+    protected $dateTimeHelper;
+
+    /**
      * PageModel constructor.
      *
-     * @param LeadModel $leadModel
-     * @param FieldModel $leadFieldModel
-     * @param RedirectModel $pageRedirectModel
+     * @param LeadModel      $leadModel
+     * @param FieldModel     $leadFieldModel
+     * @param RedirectModel  $pageRedirectModel
      * @param TrackableModel $pageTrackableModel
      */
     public function __construct(
@@ -386,14 +390,17 @@ class PageModel extends FormModel
     }
 
     /**
-     * Generates a basic page hit that can later be fleshed out asynchronously
+     * Generates a basic page hit that can later be fleshed out asynchronously.
+     *
      * @param $page
-     * @param Request $request
+     * @param Request   $request
      * @param IpAddress $ipAddress
-     * @param string $code
+     * @param string    $code
      * @param Lead|null $lead
-     * @param array $query
+     * @param array     $query
+     *
      * @return array
+     *
      * @throws \Exception
      */
     public function generateHit(
@@ -403,8 +410,7 @@ class PageModel extends FormModel
         $code = '200',
         Lead $lead = null,
         $query = []
-    )
-    {
+    ) {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
             return null;
@@ -512,9 +518,11 @@ class PageModel extends FormModel
 
     /**
      * @param Hit $hit
+     *
      * @return array|mixed
      */
-    protected function generateClickThrough(Hit $hit) {
+    protected function generateClickThrough(Hit $hit)
+    {
         $query = $hit->getQuery();
 
         // Check for any clickthrough info
@@ -535,7 +543,7 @@ class PageModel extends FormModel
      * @param Hit|null $hit
      * @param $page
      * @param Request $request
-     * @param bool $trackingNewlyGenerated
+     * @param bool    $trackingNewlyGenerated
      *
      * @throws \Exception
      */
@@ -553,17 +561,17 @@ class PageModel extends FormModel
 
             if ($page instanceof Page) {
                 $pageRepo = $this->em->getRepository('MauticPageBundle:Page');
-                $page = $pageRepo->find($page->getId());
+                $page     = $pageRepo->find($page->getId());
             } elseif ($page instanceof Redirect) {
                 $redirectRepo = $this->em->getRepository('MauticPageBundle:Redirect');
-                $page = $redirectRepo->find($page->getId());
+                $page         = $redirectRepo->find($page->getId());
             }
         }
 
-        $lead = $hit->getLead();
+        $lead  = $hit->getLead();
         $query = $hit->getQuery() ? $hit->getQuery() : [];
 
-        $isUnique = $trackingNewlyGenerated;
+        $isUnique   = $trackingNewlyGenerated;
         $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
