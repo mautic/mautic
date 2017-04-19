@@ -239,7 +239,6 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
         settings = {};
     }
     settings.name = mQuery('#campaignevent_properties_integration').attr('name');
-    console.log(settings);
     var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
     if(typeof mQuery('#campaignevent_properties_integration').val() == 'undefined') {
         data = {integration:mQuery('#formaction_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
