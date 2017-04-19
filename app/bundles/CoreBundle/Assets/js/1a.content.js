@@ -604,6 +604,31 @@ Mautic.onPageLoad = function (container, response, inModal) {
         contentSpecific = mauticContent;
     }
 
+    if (response && response.sidebar) {
+        var sidebarContent = mQuery('.app-sidebar.sidebar-left');
+        var newSidebar     = mQuery(response.sidebar);
+        var nav            = sidebarContent.find('li');
+
+        if (nav.length) {
+            var openNavIndex;
+
+            nav.each(function(i, el) {
+                var $el = mQuery(el);
+
+                if ($el.hasClass('open')) {
+                    openNavIndex = i;
+                }
+            });
+
+            var openNav = mQuery(newSidebar.find('li')[openNavIndex]);
+
+            openNav.addClass('open');
+            openNav.find('ul').removeClass('collapse');
+        }
+
+        sidebarContent.html(newSidebar);
+    }
+
     if (container == '#app-content' || container == 'body') {
         //register global keyboard shortcuts
         Mautic.bindGlobalKeyboardShortcuts();
