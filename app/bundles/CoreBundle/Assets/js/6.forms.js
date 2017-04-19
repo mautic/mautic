@@ -398,7 +398,7 @@ Mautic.updateEntitySelect = function (response) {
 
         if (mQueryParent(el).prop('disabled')) {
             mQueryParent(el).prop('disabled', false);
-                var emptyOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
+            var emptyOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
         } else {
             if (mQueryParent(el + ' option[value=""]').length) {
                 emptyOption = mQueryParent(el + ' option[value=""]').clone();
@@ -417,7 +417,7 @@ Mautic.updateEntitySelect = function (response) {
             var optgroup = el + ' optgroup[label="'+response.group+'"]';
             if (mQueryParent(optgroup).length) {
                 // update option when new option equal with option item in group.
-                    var firstOptionGroups = mQueryParent(optgroup);
+                var firstOptionGroups = mQueryParent(optgroup);
                 var isUpdateOption = false;
                 firstOptionGroups.each(function () {
                     var firstOptions = mQuery(this).children();
@@ -432,7 +432,7 @@ Mautic.updateEntitySelect = function (response) {
 
                 if (!isUpdateOption) {
                     //the optgroup exist so append to it
-                        mQueryParent(optgroup).append(newOption);
+                    mQueryParent(optgroup).append(newOption);
                 }
             } else {
                 //create the optgroup
@@ -575,10 +575,11 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                 'id': valueField.attr('id'),
                 'name': valueField.attr('name'),
                 'autocomplete': valueField.attr('autocomplete'),
-                'value': valueField.attr('value')
+                'value': valueField.val()
             };
 
             if (mQuery('#'+fieldPrefix+'value_chosen').length) {
+                valueFieldAttrs['value'] = '';
                 valueField.chosen('destroy');
             }
 
@@ -600,6 +601,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                         newValueField.append(Mautic.createOption(value, optgroup));
                     }
                 });
+                newValueField.val(valueFieldAttrs['value']);
                 valueField.replaceWith(newValueField);
 
                 Mautic.activateChosenSelect(newValueField);
@@ -613,6 +615,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     .attr('value', valueFieldAttrs['value']);
 
                 if (response.disabled) {
+                    newValueField.attr('value', '');
                     newValueField.prop('disabled', true);
                 }
 
@@ -635,7 +638,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     'id': operatorField.attr('id'),
                     'name': operatorField.attr('name'),
                     'autocomplete': operatorField.attr('autocomplete'),
-                    'value': operatorField.attr('value')
+                    'value': operatorField.val()
                 };
 
                 var newOperatorField = mQuery('<select/>')
@@ -648,6 +651,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                 mQuery.each(response.operators, function(optionKey, optionVal) {
                     newOperatorField.append(Mautic.createOption(optionKey, optionVal));
                 });
+                newOperatorField.val(operatorField.val());
                 operatorField.replaceWith(newOperatorField);
                 Mautic.activateChosenSelect(newOperatorField);
             }

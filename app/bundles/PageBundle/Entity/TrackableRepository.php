@@ -148,7 +148,7 @@ class TrackableRepository extends CommonRepository
     public function getCount($channel, $channelIds, $listId, ChartQuery $chartQuery = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('count(DISTINCT(cut.redirect_id)) as click_count')
+            ->select('count(ph.id) as click_count')
             ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut')
             ->leftJoin('cut', MAUTIC_TABLE_PREFIX.'page_hits', 'ph', 'ph.redirect_id = cut.redirect_id');
 
@@ -160,7 +160,7 @@ class TrackableRepository extends CommonRepository
             if (!is_array($channelIds)) {
                 $channelIds = [(int) $channelIds];
             }
-            $q->where(
+            $q->andWhere(
                 $q->expr()->in('cut.channel_id', $channelIds)
             );
         }
@@ -170,6 +170,12 @@ class TrackableRepository extends CommonRepository
 
             if (true === $listId) {
                 $q->addSelect('cs.leadlist_id')
+                    ->groupBy('cs.leadlist_id');
+            } elseif (is_array($listId)) {
+                $q->andWhere(
+                    $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
+                )
+                    ->addSelect('cs.leadlist_id')
                     ->groupBy('cs.leadlist_id');
             } else {
                 $q->andWhere('cs.leadlist_id = :list_id')
@@ -183,7 +189,7 @@ class TrackableRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        if (true === $listId) {
+        if (true === $listId || is_array($listId)) {
             // Return array of results
             $byList = [];
             foreach ($results as $result) {

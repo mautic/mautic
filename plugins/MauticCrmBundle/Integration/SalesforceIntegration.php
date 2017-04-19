@@ -392,6 +392,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $dataObject[$key.$newName] = $item;
                     }
                 }
+
                 if (isset($dataObject) && $dataObject) {
                     if ($object == 'Lead' or $object == 'Contact') {
                         // Set owner so that it maps if configured to do so
@@ -576,17 +577,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInSf = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $leadFields         = array_diff_key($leadFields, array_flip($fieldsToUpdateInSf));
 
-        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object]);
-
+        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]);
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
-        if (empty($mappedData[$object])) {
+        if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
+            $contactFields         = $this->cleanSalesForceData($config, $fields, 'Contact');
+            $mappedData['Contact'] = $this->populateLeadData($lead, ['leadFields' => $contactFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']]]);
+            $this->amendLeadDataBeforePush($mappedData['Contact']);
+        }
+        if (empty($mappedData)) {
             return false;
         }
 
         try {
             if ($this->isAuthorized()) {
-                $createdLeadData = $this->getApiHelper()->createLead($mappedData[$object], $lead);
+                $createdLeadData = $this->getApiHelper()->createLead($mappedData);
                 if (isset($createdLeadData['id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
                     $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
@@ -950,6 +955,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticData            = $leadsToUpdate            = $fields            = [];
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $checkEmailsInSF       = [];
+        $sfContact             = [];
 
         if (!empty($config['leadFields'])) {
             $fields = implode(', l.', $config['leadFields']);
@@ -992,7 +998,39 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $findLead = 'select Id, ConvertedContactId, Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
                 .'\')';
             $queryUrl = $this->getQueryUrl();
-            $sfLead   = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+
+            if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
+                $findContact = 'select Id, Email, IsDeleted from Contact where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+                    .'\')';
+                $sfContact = $this->getApiHelper()->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+            }
+
+            $sfLead = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            //process Contacts in SF first
+            if (isset($sfContact['records']) && !empty($sfContact['records'])) {
+                $sfContactRecords = $sfContact['records'];
+                foreach ($sfContactRecords as $sfContactRecord) {
+                    $key = mb_strtolower($sfContactRecord['Email']);
+                    if (isset($checkEmailsInSF[$key])) {
+                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = $sfContactRecord['Id'];
+
+                        if (empty($sfContactRecord['IsDeleted'])) {
+                            $this->buildCompositeBody(
+                                $mauticData,
+                                $availableFields,
+                                $contactSfFields,
+                                'Contact',
+                                $checkEmailsInSF[$key],
+                                $sfContactRecord['Id']
+                            );
+                        } else {
+                            // @todo - Salesforce doesn't seem to be returning deleted contacts by default
+                            $deletedSFLeads[] = $sfContactRecord['Id'];
+                        }
+                        unset($checkEmailsInSF[$key]);
+                    } // Otherwise a duplicate in Salesforce and has already been processed
+                }
+            }
             if ($sfLeadRecords = $sfLead['records']) {
                 foreach ($sfLeadRecords as $sfLeadRecord) {
                     $key = mb_strtolower($sfLeadRecord['Email']);
@@ -1003,23 +1041,35 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             : $sfLeadRecord['Id'];
 
                         if (empty($sfLeadRecord['IsDeleted'])) {
-                            $this->buildCompositeBody(
-                                $mauticData,
-                                $availableFields,
-                                $isConverted ? $contactSfFields : $leadSfFields,
-                                $isConverted ? 'Contact' : 'Lead',
-                                $checkEmailsInSF[$key],
-                                $isConverted ? $sfLeadRecord['ConvertedContactId'] : $sfLeadRecord['Id']
-                            );
+                            if ($isConverted && isset($config['objects']) && array_search('Contact', $config['objects'])) {
+                                $this->buildCompositeBody(
+                                    $mauticData,
+                                    $availableFields,
+                                    $contactSfFields,
+                                    'Contact',
+                                    $checkEmailsInSF[$key],
+                                    $sfLeadRecord['ConvertedContactId']
+                                );
+                                unset($checkEmailsInSF[$key]);
+                            } elseif (isset($sfLeadRecord['Id']) && !$isConverted) {
+                                $this->buildCompositeBody(
+                                    $mauticData,
+                                    $availableFields,
+                                    $leadSfFields,
+                                    'Lead',
+                                    $checkEmailsInSF[$key],
+                                    $sfLeadRecord['Id']
+                                );
+                                unset($checkEmailsInSF[$key]);
+                            }
                         } else {
                             // @todo - Salesforce doesn't seem to be returning deleted contacts by default
                             $deletedSFLeads[] = $sfLeadRecord['Id'];
                             if (!empty($sfLeadRecord['ConvertedContactId'])) {
                                 $deletedSFLeads[] = $sfLeadRecord['ConvertedContactId'];
                             }
+                            unset($checkEmailsInSF[$key]);
                         }
-
-                        unset($checkEmailsInSF[$key]);
                     } // Otherwise a duplicate in Salesforce and has already been processed
                 }
             }
@@ -1062,15 +1112,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getSalesforceLeadId($lead)
     {
+        $config = $this->mergeConfigToFeatureSettings([]);
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $result                = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'Lead', $lead->getId());
-        if (empty($result)) {
-            //try searching for lead as this has been changed before in updated done to the plugin
-            $result = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'lead', $lead->getId());
-        }
 
-        return $result;
+        if (isset($config['objects'])) {
+            //try searching for lead as this has been changed before in updated done to the plugin
+            if (array_search('Contact', $config['objects'])) {
+                $resultContact = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', $lead->getId());
+
+                if ($resultContact) {
+                    return $resultContact;
+                }
+            }
+        }
+        $resultLead = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', $lead->getId());
+
+        return $resultLead;
     }
 
     /**
@@ -1132,9 +1190,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function processCompositeResponse($response, array $salesforceIdMapping = [])
     {
-        $created = 0;
-        $updated = 0;
-
+        $created   = 0;
+        $updated   = 0;
+        $reference = '';
         if (is_array($response)) {
             $persistEntities = [];
             foreach ($response as $item) {
@@ -1152,7 +1210,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 if (isset($item['body'][0]['errorCode'])) {
-                    $this->logIntegrationError(new \Exception($item['body'][0]['message']));
+                    $this->logIntegrationError(new \Exception($item['body'][0]['message'].'-'.$reference));
 
                     if ($integrationEntityId && $object !== 'CampaignMember') {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
@@ -1236,6 +1294,26 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return [$updated, $created];
+    }
+
+    public function getNotificationModel()
+    {
+        return $this->factory->getModel('core.notification');
+    }
+
+    /**
+     * @param \Exception $e
+     */
+    public function logIntegrationError(\Exception $e)
+    {
+        $logger = $this->factory->getLogger();
+        if ('dev' == MAUTIC_ENV) {
+            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
+            $this->getNotificationModel()->addNotification($e, $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
+        } else {
+            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+            $this->getNotificationModel()->addNotification($e->getMessage(), $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
+        }
     }
 
     public function getCampaigns()
