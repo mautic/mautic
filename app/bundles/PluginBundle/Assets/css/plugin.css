@@ -26,3 +26,24 @@
     margin: 0 auto;
     float: none;
 }
+
+.placeholder
+{
+    position: relative;
+}
+
+.placeholder::after
+{
+    position: absolute;
+    right: 3px;
+    top: 19px;
+    content: attr(data-placeholder);
+    pointer-events: none;
+    opacity: 0.3;
+    font-size: 9px
+}
+
+.integration-fields{
+    font-size: 12px;
+    padding-left: 7px;
+}

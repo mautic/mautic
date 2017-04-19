@@ -88,7 +88,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                     <?php
                                     foreach ($fields as $object => $field):
                                         $header = $object;
-                                        $icon   = ($object == 'company') ? 'fa-building' : 'fa-user';
+                                        $icon   = ($object == 'company') ? 'building' : 'user';
                                     ?>
                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                         <?php foreach ($field as $value => $params):
@@ -105,8 +105,8 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                     data-field-list="<?php echo $view->escape($list); ?>"
                                                     data-field-callback="<?php echo $callback; ?>"
                                                     data-field-operators="<?php echo $operators; ?>"
-                                                    class="segment-filter fa <?php echo $icon; ?>">
-                                                <?php echo $view['translator']->trans($params['label']); ?>
+                                                    class="segment-filter <?php echo $icon; ?>">
+                                                    <?php echo $view['translator']->trans($params['label']); ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </optgroup>

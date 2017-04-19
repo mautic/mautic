@@ -230,4 +230,54 @@ class AjaxController extends CommonAjaxController
 
         return $this->sendJsonResponse($dataArray);
     }
+
+    protected function matchFieldsAction(Request $request)
+    {
+        $integration       = $request->request->get('integration');
+        $integration_field = $request->request->get('integrationField');
+        $mautic_field      = $request->request->get('mauticField');
+        $update_mautic     = $request->request->get('updateMautic');
+        $object            = $request->request->get('object');
+
+        $helper             = $this->factory->getHelper('integration');
+        $integration_object = $helper->getIntegrationObject($integration);
+        $entity             = $integration_object->getIntegrationSettings();
+        $featureSettings    = $entity->getFeatureSettings();
+
+        $doNotMatchField = ($mautic_field === '-1');
+        if ($object == 'lead') {
+            $fields       = 'leadFields';
+            $updateFields = 'update_mautic';
+        } else {
+            $fields       = 'companyFields';
+            $updateFields = 'update_mautic_company';
+        }
+        $newFeatureSettings = [];
+        if ($doNotMatchField) {
+            if (isset($featureSettings[$updateFields]) && array_key_exists($integration_field, $featureSettings[$updateFields])) {
+                unset($featureSettings[$updateFields][$integration_field]);
+            }
+            if (isset($featureSettings[$fields]) && array_key_exists($integration_field, $featureSettings[$fields])) {
+                unset($featureSettings[$fields][$integration_field]);
+            }
+            $dataArray = ['success' => 0];
+        } else {
+            $newFeatureSettings[$integration_field] = $update_mautic;
+            if (isset($featureSettings[$updateFields])) {
+                $featureSettings[$updateFields] = array_merge($featureSettings[$updateFields], $newFeatureSettings);
+            }
+            $newFeatureSettings[$integration_field] = $mautic_field;
+            if (isset($featureSettings[$fields])) {
+                $featureSettings[$fields] = array_merge($featureSettings[$fields], $newFeatureSettings);
+            }
+
+            $dataArray = ['success' => 1];
+        }
+
+        $entity->setFeatureSettings($featureSettings);
+
+        $this->getModel('plugin')->saveFeatureSettings($entity);
+
+        return $this->sendJsonResponse($dataArray);
+    }
 }

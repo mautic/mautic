@@ -332,6 +332,25 @@ class ReportBuilderEvent extends AbstractReportEvent
         ];
     }
 
+    /**
+     * Add campaign columns joined by the campaign lead event log table.
+     *
+     * @return array
+     */
+    public function getCampaignByChannelColumns()
+    {
+        return [
+            'clel.campaign_id' => [
+                'label' => 'mautic.campaign.campaign.id',
+                'type'  => 'string',
+            ],
+            'cmp.name' => [
+                'label' => 'mautic.campaign.campaign',
+                'type'  => 'string',
+            ],
+        ];
+    }
+
     public function getChannelColumns()
     {
         $channelColumns = [
