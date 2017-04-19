@@ -18,7 +18,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\SmsBundle\Model\SmsModel;
 
 /**
- * Class CalendarSubscriber.
+ * Class MessageQueueSubscriber.
  */
 class MessageQueueSubscriber extends CommonSubscriber
 {
