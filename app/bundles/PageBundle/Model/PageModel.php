@@ -547,7 +547,7 @@ class PageModel extends FormModel
      *
      * @throws \Exception
      */
-    public function hitPage(Hit $hit, $page, Request $request, $trackingNewlyGenerated)
+    public function hitPage($hit, $page, Request $request, $trackingNewlyGenerated)
     {
         // Don't skew results with user hits
         if (null == $hit || !$this->security->isAnonymous()) {
