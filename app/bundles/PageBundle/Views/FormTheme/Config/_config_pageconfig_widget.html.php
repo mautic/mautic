@@ -16,7 +16,7 @@
     </div>
     <div class="panel-body">
         <?php foreach ($form->children as $name => $f): ?>
-            <?php if ('track_contact_by_ip' == $name) {
+            <?php if ('track_contact_by_ip' == $name && 'track_by_fingerprint' == $name) {
     continue;
 } ?>
             <div class="row">
@@ -30,6 +30,7 @@
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.pagetracking'); ?></h3>
     </div>
     <div class="panel-body">
+        <div class="form-group">
     <p><?php echo $view['translator']->trans('mautic.config.tab.pagetracking.info'); ?></p>
 <pre>&lt;script&gt;
     (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
@@ -39,9 +40,13 @@
 
     mt('send', 'pageview');
 &lt;/script&gt;</pre>
+        </div>
         <div class="row">
             <div class="col-md-6">
                 <?php echo $view['form']->row($form['track_contact_by_ip']); ?>
+            </div>
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form->children['track_by_fingerprint']); ?>
             </div>
         </div>
     </div>
