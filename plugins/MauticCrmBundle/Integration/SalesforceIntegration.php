@@ -1425,11 +1425,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $url    = '/services/data/v38.0/sobjects/'.$object;
         if ($existingCampaignMember) {
             foreach ($existingCampaignMember as $member) {
-                $integrationEntity        = $integrationEntityRepo->getEntity($member['id']);
-                $referenceId              = $integrationEntity->getId();
-                $campaignMemberInternal   = $integrationEntity->getInternal();
-                $objectId                 = $campaignMemberInternal['Id'];
-                $body['LastModifiedDate'] = new \DateTime();
+                $integrationEntity      = $integrationEntityRepo->getEntity($member['id']);
+                $referenceId            = $integrationEntity->getId();
+                $campaignMemberInternal = $integrationEntity->getInternal();
+                $objectId               = $campaignMemberInternal['Id'];
                 unset($body['CampaignId']);
             }
         }

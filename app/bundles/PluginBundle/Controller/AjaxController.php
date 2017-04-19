@@ -244,6 +244,7 @@ class AjaxController extends CommonAjaxController
     {
         $integration = $request->request->get('integration');
         $campaign    = $request->request->get('campaign');
+        $settings    = $request->request->get('settings');
         $dataArray   = ['success' => 0];
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
@@ -275,6 +276,18 @@ class AjaxController extends CommonAjaxController
                         'integration' => $object,
                     ],
                 ])->getContent();
+
+                $prefix = str_replace('[integration]', '[campaign_member_status][campaign_member_status]', $settings['name']);
+
+                $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
+
+                if (substr($idPrefix, -1) == '_') {
+                    $idPrefix = substr($idPrefix, 0, -1);
+                }
+
+                $html = preg_replace('/integration_campaign_status_campaign_member_status\[(.*?)\]/', $prefix.'[$1]', $html);
+                $html = str_replace('integration_campaign_status_campaign_member_status', $idPrefix, $html);
+                $html = str_replace('integration_campaign_status[campaign_member_status]', $prefix, $html);
 
                 $dataArray['success'] = 1;
                 $dataArray['html']    = $html;

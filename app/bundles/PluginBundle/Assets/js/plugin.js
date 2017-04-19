@@ -233,13 +233,18 @@ Mautic.getIntegrationConfig = function (el, settings) {
 
 };
 
-Mautic.getIntegrationCampaignStatus = function (el) {
+Mautic.getIntegrationCampaignStatus = function (el, settings) {
     Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
-
-    var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val()};
-    if(typeof mQuery('#campaignevent_properties_integration').val() == 'undefined') {
-        data = {integration:mQuery('#formaction_properties_integration').val(),campaign: mQuery(el).val()};
+    if (typeof settings == 'undefined') {
+        settings = {};
     }
+    settings.name = mQuery('#campaignevent_properties_integration').attr('name');
+    console.log(settings);
+    var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
+    if(typeof mQuery('#campaignevent_properties_integration').val() == 'undefined') {
+        data = {integration:mQuery('#formaction_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
+    }
+    mQuery('.integration-campaigns-status').html('');
     mQuery('.integration-campaigns-status').removeClass('hide');
     Mautic.ajaxActionRequest('plugin:getIntegrationCampaignStatus', data,
         function (response) {
