@@ -208,6 +208,10 @@ return [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldTextType',
                 'alias' => 'formfield_text',
             ],
+            'mautic.form.type.field_propertyhtml' => [
+                'class' => 'Mautic\FormBundle\Form\Type\FormFieldHTMLType',
+                'alias' => 'formfield_html',
+            ],
             'mautic.form.type.field_propertyplaceholder' => [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldPlaceholderType',
                 'alias' => 'formfield_placeholder',
