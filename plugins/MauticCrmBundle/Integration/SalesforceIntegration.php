@@ -1428,19 +1428,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $integrationEntity      = $integrationEntityRepo->getEntity($member['id']);
                 $referenceId            = $integrationEntity->getId();
                 $campaignMemberInternal = $integrationEntity->getInternal();
-                $objectId               = $campaignMemberInternal['Id'];
-                unset($body['CampaignId']);
+                if (!empty($campaignMemberInternal)) {
+                    $objectId = $campaignMemberInternal['Id'];
+                    unset($body['CampaignId']);
+                }
             }
         }
         $existingLeadIntegrationIds = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'lead', $lead->getId());
-
+        $noContactFound             = true;
         if ($existingLeadIntegrationIds and empty($existingCampaignMember)) {
             foreach ($existingLeadIntegrationIds as $existingLead) {
                 if ($existingLead['integration_entity'] == 'Contact') {
                     $body['ContactId'] = $existingLead['integration_entity_id'];
+                    $noContactFound    = false;
                     break;
                 } elseif ($existingLead['integration_entity'] == 'Lead') {
                     $body['LeadId'] = $existingLead['integration_entity_id'];
+                    $noContactFound = false;
                     break;
                 }
             }
@@ -1449,11 +1453,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $body['LeadId']        = $integration_entity_id;
         }
 
+        if ($noContactFound) {
+            $integration_entity_id = $this->pushLead($lead);
+            $body['LeadId']        = $integration_entity_id;
+        }
+
         if ($objectId) {
             $url .= '/'.$objectId;
             $salesforceIdMapping = [$integrationCampaignId];
+            $campaignMappingId   = '-'.$integrationCampaignId;
         }
-        $id              = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.(!empty($referenceId) ? '-'.$referenceId : '').'-'.$integrationCampaignId;
+        $id              = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.(!empty($referenceId) ? '-'.$referenceId : '').$campaignMappingId;
         $mauticData[$id] = [
             'method'      => ($objectId) ? 'PATCH' : 'POST',
             'url'         => $url,
