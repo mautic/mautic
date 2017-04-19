@@ -318,7 +318,7 @@ class LeadListRepository extends CommonRepository
                 if ($includesContactFields) {
                     $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, null, 'lead');
                 }
-                if (!$expr->count()) {
+                if (empty($expr) || !$expr->count()) {
                     $nonMembersOnly = true;
                 }
                 if ($includesCompanyFields) {
@@ -376,7 +376,7 @@ class LeadListRepository extends CommonRepository
                     }
                 }
 
-                if ($newOnly && $expr->count()) {
+                if ($newOnly && !empty($expr) && $expr->count()) {
                     if ($includesCompanyFields) {
                         $this->applyCompanyFieldFilters($q, $exprCompany);
                     }
@@ -435,7 +435,7 @@ class LeadListRepository extends CommonRepository
                     $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                     $sq->select('l.id')
                         ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-                    if ($includesContactFields and $expr->count()) {
+                    if ($includesContactFields && !empty($expr) && $expr->count()) {
                         $sq->andWhere($expr);
                     }
 
