@@ -13,6 +13,7 @@ namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -41,49 +42,71 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function getIntegrationLeadFieldsAction(Request $request)
+    protected function getIntegrationFieldsAction(Request $request)
     {
         $integration = $request->request->get('integration');
         $settings    = $request->request->get('settings');
+        $page        = $request->request->get('page');
 
         $dataArray = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
-            $helper = $this->factory->getHelper('integration');
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
-            $object = $helper->getIntegrationObject($integration);
+            $helper = $this->get('mautic.helper.integration');
+            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+            $integrationObject = $helper->getIntegrationObject($integration);
 
-            if ($object) {
-                $integrationFields = $object->getFormLeadFields($settings);
+            if ($integrationObject) {
+                if (!$object = $request->attributes->get('object')) {
+                    $object = (isset($settings['object'])) ? $settings['object'] : 'lead';
+                }
+
+                $isLead            = ('lead' === $object);
+                $integrationFields = ($isLead)
+                    ? $integrationObject->getFormLeadFields($settings)
+                    : $integrationObject->getFormCompanyFields(
+                        $settings
+                    );
 
                 if (!empty($integrationFields)) {
+                    $session = $this->get('session');
+                    $session->set('mautic.plugin.'.$integration.'.'.$object.'.page', $page);
+
+                    /** @var PluginModel $pluginModel */
+                    $pluginModel = $this->getModel('plugin');
+
                     // Get a list of custom form fields
-                    $leadFields                            = $this->getModel('plugin')->getLeadFields();
-                    list($specialInstructions, $alertType) = $object->getFormNotes('leadfield_match');
-                    $defaults                              = $object->getIntegrationSettings()->getFeatureSettings();
-                    $data                                  = isset($defaults['leadFields']) ? $defaults['leadFields'] : [];
+                    $mauticFields    = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
+                    $featureSettings = $integrationObject->getIntegrationSettings()->getFeatureSettings();
+                    $formType        = $isLead ? 'integration_fields' : 'integration_company_fields';
+                    $form            = $this->createForm(
+                        $formType,
+                        isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
+                        [
+                            'mautic_fields'      => $mauticFields,
+                            'integration_fields' => $integrationFields,
+                            'csrf_protection'    => false,
+                            'integration_object' => $integrationObject,
+                            'integration'        => $integration,
+                            'page'               => $page,
+                            'limit'              => $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'),
+                        ]
+                    );
 
-                    $form = $this->createForm('integration_fields', $data, [
-                        'lead_fields'          => $leadFields,
-                        'integration_fields'   => $integrationFields,
-                        'csrf_protection'      => false,
-                        'special_instructions' => $specialInstructions,
-                        'alert_type'           => $alertType,
-                    ]);
-
-                    $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
-
-                    $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
-                        'form'      => $form,
-                        'function'  => 'row',
-                        'variables' => [
-                            'integration' => $object,
-                        ],
-                    ])->getContent();
+                    $html = $this->render(
+                        'MauticCoreBundle:Helper:blank_form.html.php',
+                        [
+                            'form' => $this->setFormTheme(
+                                $form,
+                                'MauticCoreBundle:Helper:blank_form.html.php',
+                                'MauticPluginBundle:FormTheme\Integration'
+                            ),
+                            'function' => 'row',
+                        ]
+                    )->getContent();
 
                     if (!isset($settings['prefix'])) {
-                        $prefix = 'integration_details[featureSettings][leadFields]';
+                        $prefix = 'integration_details[featureSettings]['.$object.'Fields]';
                     } else {
                         $prefix = $settings['prefix'];
                     }
@@ -93,8 +116,8 @@ class AjaxController extends CommonAjaxController
                         $idPrefix = substr($idPrefix, 0, -1);
                     }
 
-                    $html = preg_replace('/integration_fields\[(.*?)\]/', $prefix.'[$1]', $html);
-                    $html = str_replace('integration_fields', $idPrefix, $html);
+                    $html = preg_replace('/'.$formType.'\[(.*?)\]/', $prefix.'[$1]', $html);
+                    $html = str_replace($formType, $idPrefix, $html);
 
                     $dataArray['success'] = 1;
                     $dataArray['html']    = $html;
@@ -108,72 +131,31 @@ class AjaxController extends CommonAjaxController
     /**
      * Get the HTML for list of fields.
      *
+     * @deprecated 2.8.0 to be removed in 3.0
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getIntegrationLeadFieldsAction(Request $request)
+    {
+        $request->attributes->set('object', 'lead');
+
+        return $this->getIntegrationFieldsAction($request);
+    }
+
+    /**
+     * Get the HTML for list of fields.
+     *
+     * @deprecated 2.8.0 to be removed in 3.0
+     *
      * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function getIntegrationCompanyFieldsAction(Request $request)
     {
-        $integration = $request->request->get('integration');
-        $settings    = $request->request->get('settings');
+        $request->attributes->set('object', 'company');
 
-        $dataArray = ['success' => 0];
-
-        if (!empty($integration) && !empty($settings)) {
-            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
-            $helper = $this->get('mautic.helper.integration');
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
-            $object = $helper->getIntegrationObject($integration);
-
-            if ($object) {
-                $integrationFields = $object->getCompanyLeadFields($settings);
-
-                if (!empty($integrationFields)) {
-                    // Get a list of custom form fields
-                    $defaults                              = $object->getIntegrationSettings()->getFeatureSettings();
-                    $companyFields                         = $this->getModel('plugin')->getCompanyFields($defaults);
-                    list($specialInstructions, $alertType) = $object->getFormNotes('companyfield_match');
-                    $data                                  = isset($defaults['companyFields']) ? $defaults['companyFields'] : [];
-
-                    $form = $this->createForm('integration_company_fields', $data, [
-                        'company_fields'             => $companyFields,
-                        'integration_company_fields' => $integrationFields,
-                        'csrf_protection'            => false,
-                        'special_instructions'       => $specialInstructions,
-                        'alert_type'                 => $alertType,
-                    ]);
-
-                    $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
-
-                    $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
-                        'form'      => $form,
-                        'function'  => 'row',
-                        'variables' => [
-                            'integration' => $object,
-                        ],
-                    ])->getContent();
-
-                    if (!isset($settings['prefix'])) {
-                        $prefix = 'integration_details[featureSettings][companyFields]';
-                    } else {
-                        $prefix = $settings['prefix'];
-                    }
-
-                    $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
-                    if (substr($idPrefix, -1) == '_') {
-                        $idPrefix = substr($idPrefix, 0, -1);
-                    }
-
-                    $html = preg_replace('/integration_fields\[(.*?)\]/', $prefix.'[$1]', $html);
-                    $html = str_replace('integration_fields', $idPrefix, $html);
-
-                    $dataArray['success'] = 1;
-                    $dataArray['html']    = $html;
-                }
-            }
-        }
-
-        return $this->sendJsonResponse($dataArray);
+        return $this->getIntegrationFieldsAction($request);
     }
 
     /**
@@ -231,6 +213,11 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
+    /**
+     * @param Request $request
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
     protected function matchFieldsAction(Request $request)
     {
         $integration       = $request->request->get('integration');
