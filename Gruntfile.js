@@ -17,6 +17,7 @@ module.exports = function (grunt) {
         mautic: {
             // configurable paths
             bundleAssets: 'app/bundles/**/Assets/css',
+            pluginAssets: 'plugins/**/Assets/css',
             rootAssets: 'media/css'
         },
 
@@ -31,7 +32,7 @@ module.exports = function (grunt) {
         // Compiles less files in bundle's Assets/css root and single level directory to CSS
         less: {
             files: {
-                src: ['<%= mautic.bundleAssets %>/*.less', '<%= mautic.bundleAssets %>/*/*.less', '<%= mautic.bundleAssets %>/../builder/*.less'],
+                src: ['<%= mautic.bundleAssets %>/*.less', '<%= mautic.pluginAssets %>/*.less', '<%= mautic.bundleAssets %>/*/*.less', '<%= mautic.bundleAssets %>/../builder/*.less'],
                 expand: true,
                 rename: function (dest, src) {
                     return dest + src.replace('.less', '.css')
