@@ -317,8 +317,9 @@ class LeadListRepository extends CommonRepository
 
                 if ($includesContactFields) {
                     $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, null, 'lead');
-                } else {
-                    $expr = $q->expr()->andX();
+                }
+                if (empty($expr) || !$expr->count()) {
+                    $nonMembersOnly = true;
                 }
                 if ($includesCompanyFields) {
                     $this->listFiltersInnerJoinCompany = false;
@@ -375,7 +376,7 @@ class LeadListRepository extends CommonRepository
                     }
                 }
 
-                if ($newOnly) {
+                if ($newOnly && !empty($expr) && $expr->count()) {
                     if ($includesCompanyFields) {
                         $this->applyCompanyFieldFilters($q, $exprCompany);
                     }
@@ -401,6 +402,7 @@ class LeadListRepository extends CommonRepository
                         'll',
                         $listOnExpr
                     );
+
                     $expr->add($q->expr()->isNull('ll.lead_id'));
 
                     if ($batchExpr->count()) {
@@ -433,8 +435,7 @@ class LeadListRepository extends CommonRepository
                     $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                     $sq->select('l.id')
                         ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
-                    if ($includesContactFields) {
+                    if ($includesContactFields && !empty($expr) && $expr->count()) {
                         $sq->andWhere($expr);
                     }
 
@@ -449,8 +450,9 @@ class LeadListRepository extends CommonRepository
                     if ($batchExpr->count()) {
                         $mainExpr->add($batchExpr);
                     }
-
-                    $q->andWhere($mainExpr);
+                    if (!empty($mainExpr) && $mainExpr->count() > 0) {
+                        $q->andWhere($mainExpr);
+                    }
                 }
 
                 // Set limits if applied
@@ -509,8 +511,9 @@ class LeadListRepository extends CommonRepository
                     $q->setFirstResult($start)
                         ->setMaxResults($limit);
                 }
-
-                $q->where($expr);
+                if (!empty($expr) && $expr->count() > 0) {
+                    $q->where($expr);
+                }
 
                 $results = $q->execute()->fetchAll();
 
@@ -1325,7 +1328,6 @@ class LeadListRepository extends CommonRepository
                             $groupExpr->add(
                                 $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
                             );
-
                             $ignoreAutoFilter = true;
                             break;
 
@@ -1388,17 +1390,18 @@ class LeadListRepository extends CommonRepository
         if ($groupExpr->count()) {
             $groups[] = $groupExpr;
         }
-
         if (count($groups) === 1) {
             // Only one andX expression
             $expr = $groups[0];
-        } else {
+        } elseif (count($groups) > 1) {
             // Sets of expressions grouped by OR
             $orX = $q->expr()->orX();
             $orX->addMultiple($groups);
 
             // Wrap in a andX for other functions to append
             $expr = $q->expr()->andX($orX);
+        } else {
+            $expr = $groupExpr;
         }
 
         return $expr;
