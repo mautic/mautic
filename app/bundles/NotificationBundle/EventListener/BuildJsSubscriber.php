@@ -14,16 +14,14 @@ namespace Mautic\NotificationBundle\EventListener;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
-
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class BuildJsSubscriber.
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
-
     /**
      * @var NotificationHelper
      */
@@ -34,12 +32,10 @@ class BuildJsSubscriber extends CommonSubscriber
      *
      * @param NotificationHelper $notificationHelper
      */
-    public function __construct(
-        NotificationHelper $notificationHelper
-    ) {
+    public function __construct(NotificationHelper $notificationHelper)
+    {
         $this->notificationHelper = $notificationHelper;
     }
-
 
     /**
      * @return array
@@ -56,19 +52,19 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $subscribeUrl = $this->router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $subscribeUrl   = $this->router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $subscribeTitle = 'Subscribe To Notifications';
-        $width = 450;
-        $height = 450;
+        $width          = 450;
+        $height         = 450;
 
         $js = <<<JS
         
-       {$this->notificationHelper->getHeaderScript()}
+        {$this->notificationHelper->getHeaderScript()}
        
 MauticJS.notification = {
     init: function () {
         
-         {$this->notificationHelper->getScript()}
+        {$this->notificationHelper->getScript()}
          
         var subscribeButton = document.getElementById('mautic-notification-subscribe');
 
@@ -112,4 +108,4 @@ JS;
 
         $event->appendJs($js, 'Mautic Notification JS');
     }
-    }
+}
