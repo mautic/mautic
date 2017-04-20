@@ -1348,7 +1348,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             //Contacts
             $contactsToFetch = array_diff_key($contactList, $existingContacts);
             if (!empty($contactsToFetch)) {
-                $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
+                $listOfContactsToFetch = implode("','", array_keys($contactsToFetch));
                 $listOfContactsToFetch = "'".$listOfContactsToFetch."'";
                 $fields                = $this->getMixedLeadFields($mixedFields, 'Contact');
                 $fields[]              = 'Id';
