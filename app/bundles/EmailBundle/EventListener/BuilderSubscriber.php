@@ -278,15 +278,6 @@ class BuilderSubscriber extends CommonSubscriber
 
         $signatureText = $this->coreParametersHelper->getParameter('default_signature_text');
         $fromName      = $this->coreParametersHelper->getParameter('mailer_from_name');
-
-        if (!empty($lead['owner_id'])) {
-            $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($lead['owner_id']);
-            if ($owner && !empty($owner['signature'])) {
-                $fromName      = $owner['first_name'].' '.$owner['last_name'];
-                $signatureText = EmojiHelper::toHtml($owner['signature']);
-            }
-        }
-
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
         $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
