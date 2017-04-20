@@ -606,6 +606,9 @@ abstract class AbstractIntegration
             $headers    = $event->getHeaders();
             $parameters = $event->getParameters();
         }
+        if (isset($settings['batchSizeSF'])) {
+            $headers[] = 'Sforce-Query-Options: batchSize='.$settings['batchSizeSF'];
+        }
 
         if (!isset($settings['query'])) {
             $settings['query'] = [];

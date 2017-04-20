@@ -76,20 +76,23 @@ class AjaxController extends CommonAjaxController
                     $pluginModel = $this->getModel('plugin');
 
                     // Get a list of custom form fields
-                    $mauticFields    = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
-                    $featureSettings = $integrationObject->getIntegrationSettings()->getFeatureSettings();
-                    $formType        = $isLead ? 'integration_fields' : 'integration_company_fields';
-                    $form            = $this->createForm(
+                    $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
+                    $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
+                    $formSettings       = $integrationObject->getFormDisplaySettings();
+                    $enableDataPriority = !empty($formSettings['enable_data_priority']);
+                    $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
+                    $form               = $this->createForm(
                         $formType,
                         isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
                         [
-                            'mautic_fields'      => $mauticFields,
-                            'integration_fields' => $integrationFields,
-                            'csrf_protection'    => false,
-                            'integration_object' => $integrationObject,
-                            'integration'        => $integration,
-                            'page'               => $page,
-                            'limit'              => $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'),
+                            'mautic_fields'        => $mauticFields,
+                            'integration_fields'   => $integrationFields,
+                            'csrf_protection'      => false,
+                            'integration_object'   => $integrationObject,
+                            'enable_data_priority' => $enableDataPriority,
+                            'integration'          => $integration,
+                            'page'                 => $page,
+                            'limit'                => $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'),
                         ]
                     );
 
@@ -218,6 +221,49 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
+    protected function getIntegrationCampaignsAction(Request $request)
+    {
+        $integration = $request->request->get('integration');
+        $dataArray   = ['success' => 0];
+
+        if (!empty($integration)) {
+            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            $helper = $this->factory->getHelper('integration');
+            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            $object = $helper->getIntegrationObject($integration);
+            $data   = [];
+            if ($object) {
+                $campaigns = $object->getCampaigns();
+                if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+                    foreach ($campaigns['records'] as $campaign) {
+                        $data[$campaign['Id']] = $campaign['Name'];
+                    }
+                }
+                $form = $this->createForm('integration_campaigns', $data, [
+                    'integration'     => $integration,
+                    'campaigns'       => $data,
+                    'csrf_protection' => false,
+                ]);
+
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                    'form'      => $form,
+                    'function'  => 'row',
+                    'variables' => [
+                        'campaigns'   => $data,
+                        'integration' => $object,
+                    ],
+                ])->getContent();
+
+                $dataArray['success'] = 1;
+                $dataArray['html']    = $html;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
     protected function matchFieldsAction(Request $request)
     {
         $integration       = $request->request->get('integration');

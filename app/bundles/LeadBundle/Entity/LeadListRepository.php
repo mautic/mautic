@@ -1261,6 +1261,32 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
 
                     break;
+                case 'integration_campaigns':
+                    $operand = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
+                    //get integration campaign members here
+
+                    $subQb = $this->_em->getConnection()
+                        ->createQueryBuilder()
+                        ->select('null')
+                        ->from(MAUTIC_TABLE_PREFIX.'integration_entity', $alias);
+                    switch ($func) {
+                        case 'eq':
+                        case 'neq':
+                            $parameters[$parameter] = $details['filter'];
+                            $subQb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.internal_entity_id', 'l.id'),
+                                    $q->expr()->eq($alias.'.integration_entity_id', ":$parameter"),
+                                    $q->expr()->eq($alias.'.internal_entity', "'lead'"),
+                                    $q->expr()->eq($alias.'.integration_entity', "'CampaignMember'")
+                                )
+                            );
+                            break;
+                    }
+
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
+
+                    break;
                 default:
                     if (!$column) {
                         // Column no longer exists so continue

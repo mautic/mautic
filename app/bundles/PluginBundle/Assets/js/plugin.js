@@ -238,3 +238,24 @@ Mautic.getIntegrationConfig = function (el, settings) {
         }
     );
 };
+
+Mautic.getIntegrationCampaigns = function (el, settings) {
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    var data = {integration: mQuery(el).val()};
+
+    mQuery('.integration-campaigns').html('');
+
+    Mautic.ajaxActionRequest('plugin:getIntegrationCampaigns', data,
+        function (response) {
+            if (response.success) {
+                console.log(response.html);
+                mQuery('.integration-campaigns').html(response.html);
+                Mautic.onPageLoad('.integration-campaigns', response);
+            }
+
+            Mautic.integrationConfigOnLoad('.integration-campaigns');
+            Mautic.removeLabelLoadingIndicator();
+        }
+    );
+};

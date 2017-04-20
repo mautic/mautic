@@ -31,7 +31,7 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array
      */
-    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate = null, $endDate = null, $push = false, $start = 0, $limit = 0)
+    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate = null, $endDate = null, $push = false, $start = 0, $limit = 0, $integrationEntityIds = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('i.integration_entity_id, i.id, i.internal_entity_id, i.integration_entity')
@@ -71,6 +71,9 @@ class IntegrationEntityRepository extends CommonRepository
         }
         if ($limit) {
             $q->setMaxResults((int) $limit);
+        }
+        if ($integrationEntityIds) {
+            $q->andWhere('i.integration_entity_id in ('.$integrationEntityIds.')');
         }
 
         $results = $q->execute()->fetchAll();
