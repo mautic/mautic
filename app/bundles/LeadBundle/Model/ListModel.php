@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -711,6 +712,11 @@ class ListModel extends FormModel
         ];
 
         $localDateTime = $dtHelper->getLocalDateTime();
+
+        $this->dispatcher->dispatch(
+            LeadEvents::LIST_PRE_PROCESS_LIST,
+            new ListPreProcessListEvent($list, false)
+        );
 
         // Get a count of leads to add
         $newLeadsCount = $this->getLeadsByList(

@@ -220,6 +220,7 @@ Mautic.getIntegrationConfig = function (el, settings) {
     if (typeof settings == 'undefined') {
         settings = {};
     }
+
     settings.name = mQuery(el).attr('name');
     var data = {integration: mQuery(el).val(), settings: settings};
     mQuery('.integration-campaigns-status').html('');
@@ -261,6 +262,27 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
             }
 
             Mautic.integrationConfigOnLoad('.integration-campaigns-status');
+            Mautic.removeLabelLoadingIndicator();
+        }
+    );
+};
+
+Mautic.getIntegrationCampaigns = function (el, settings) {
+    Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
+
+    var data = {integration: mQuery(el).val()};
+
+    mQuery('.integration-campaigns').html('');
+
+    Mautic.ajaxActionRequest('plugin:getIntegrationCampaigns', data,
+        function (response) {
+            if (response.success) {
+                console.log(response.html);
+                mQuery('.integration-campaigns').html(response.html);
+                Mautic.onPageLoad('.integration-campaigns', response);
+            }
+
+            Mautic.integrationConfigOnLoad('.integration-campaigns');
             Mautic.removeLabelLoadingIndicator();
         }
     );

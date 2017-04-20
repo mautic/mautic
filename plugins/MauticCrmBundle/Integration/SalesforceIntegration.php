@@ -637,13 +637,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (!$query) {
             $query = $this->getFetchQuery($params);
         }
+
         try {
             if ($this->isAuthorized()) {
                 if ($object !== 'Activity' and $object !== 'company') {
                     $result = $this->getApiHelper()->getLeads($query, $object);
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                     if (isset($result['nextRecordsUrl'])) {
-                        $query = $result['nextRecordsUrl'];
+                        $query['nextUrl'] = $result['nextRecordsUrl'];
                         $this->getLeads($params, $query, $executed, $result['records'], $object);
                     }
                 }
@@ -678,8 +679,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $result = $this->getApiHelper()->getLeads($query, $salesForceObject);
                 $executed += $this->amendLeadDataBeforeMauticPopulate($result, $salesForceObject);
                 if (isset($result['nextRecordsUrl'])) {
-                    $query  = $result['nextRecordsUrl'];
-                    $result = null;
+                    $query['nextUrl'] = $result['nextRecordsUrl'];
+                    $result           = null;
                     $this->getCompanies($params, $query, $executed);
                 }
 
@@ -1260,6 +1261,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity->setInternalEntity('lead-error');
                         $integrationEntity->setInternal(['error' => $item['body'][0]['message']]);
                         $integrationEntity->setInternalEntityId($contactId);
+
                         $persistEntities[] = $integrationEntity;
                     }
                 } elseif (!empty($item['body']['success'])) {
@@ -1278,6 +1280,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         }
                         $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($contactId);
+
                         $persistEntities[] = $integrationEntity;
                     }
                     ++$created;
@@ -1325,26 +1328,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return [$updated, $created];
     }
 
-    public function getNotificationModel()
-    {
-        return $this->factory->getModel('core.notification');
-    }
-
-    /**
-     * @param \Exception $e
-     */
-    public function logIntegrationError(\Exception $e)
-    {
-        $logger = $this->factory->getLogger();
-        if ('dev' == MAUTIC_ENV) {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
-            $this->getNotificationModel()->addNotification($e, $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
-        } else {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
-            $this->getNotificationModel()->addNotification($e->getMessage(), $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
-        }
-    }
-
     public function getCampaigns()
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -1360,27 +1343,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $campaigns;
     }
-
-    public function getCampaignMemberStatus($campaignId)
-    {
-        $silenceExceptions    = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $campaignMemberStatus = [];
-        try {
-            $campaignMemberStatus = $this->getApiHelper()->getCampaignMemberStatus($campaignId);
-        } catch (\Exception $e) {
-            $this->logIntegrationError($e);
-            if (!$silenceExceptions) {
-                throw $e;
-            }
-        }
-
-        return $campaignMemberStatus;
-    }
-
     public function getCampaignMembers($campaignId, $settings)
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $existingLeads     = $existingContacts     = [];
+        $persistEntities   = $contactList   = $leadList   = $existingLeads   = $existingContacts   = [];
 
         try {
             $campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId);
@@ -1399,19 +1365,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $isDeleted   = ($campaignMember['IsDeleted']) ? true : false;
                 if ($contactType == 'Lead') {
                     $leadList[$contactId] = [
-                       'type'       => $contactType,
-                       'id'         => $contactId,
-                       'campaignId' => $campaignMember['CampaignId'],
-                       'isDeleted'  => $isDeleted,
-                   ];
+                        'type'       => $contactType,
+                        'id'         => $contactId,
+                        'campaignId' => $campaignMember['CampaignId'],
+                        'isDeleted'  => $isDeleted,
+                    ];
                 }
                 if ($contactType == 'Contact') {
                     $contactList[$contactId] = [
-                       'type'       => $contactType,
-                       'id'         => $contactId,
-                       'campaignId' => $campaignMember['CampaignId'],
-                       'isDeleted'  => $isDeleted,
-                   ];
+                        'type'       => $contactType,
+                        'id'         => $contactId,
+                        'campaignId' => $campaignMember['CampaignId'],
+                        'isDeleted'  => $isDeleted,
+                    ];
                 }
             }
 
@@ -1422,7 +1388,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $listOfLeads = '"'.$listOfLeads.'"';
             $leads       = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', null, null, null, false, 0, 0, $listOfLeads);
 
-            $listOfContacts = implode('", "', $contactList);
+            $listOfContacts = implode('", "', array_keys($contactList));
             $listOfContacts = '"'.$listOfContacts.'"';
             $contacts       = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Contact', 'lead', null, null, null, false, 0, 0, $listOfContacts);
 
@@ -1442,31 +1408,31 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $allCampaignMembers = array_merge(array_values($existingLeads), array_values($existingContacts));
             //Leads
             $leadsToFetch = array_diff_key($leadList, $existingLeads);
+            $mixedFields  = $this->getIntegrationSettings()->getFeatureSettings();
+            $executed     = 0;
             if (!empty($leadsToFetch)) {
                 $listOfLeadsToFetch = implode("','", array_keys($leadsToFetch));
                 $listOfLeadsToFetch = "'".$listOfLeadsToFetch."'";
 
-                $mixedFields = $this->getIntegrationSettings()->getFeatureSettings();
-                $fields      = $this->getMixedLeadFields($mixedFields, 'Lead');
-                $fields[]    = 'Id';
-                $fields      = implode(', ', array_unique($fields));
-                $leadQuery   = 'SELECT '.$fields.' from Lead where Id in ('.$listOfLeadsToFetch.')';
-                $executed    = 0;
-                $this->getLeads([], $leadQuery, $executed, [], 'Contact');
+                $fields    = $this->getMixedLeadFields($mixedFields, 'Lead');
+                $fields[]  = 'Id';
+                $fields    = implode(', ', array_unique($fields));
+                $leadQuery = 'SELECT '.$fields.' from Lead where Id in ('.$listOfLeadsToFetch.')';
+
+                $this->getLeads([], $leadQuery, $executed, [], 'Lead');
 
                 $allCampaignMembers = array_merge($allCampaignMembers, array_keys($leadsToFetch));
             }
             //Contacts
             $contactsToFetch = array_diff_key($contactList, $existingContacts);
             if (!empty($contactsToFetch)) {
-                $listOfContactsToFetch = implode(',', $contactsToFetch);
+                $listOfContactsToFetch = implode("','", array_keys($contactsToFetch));
                 $listOfContactsToFetch = "'".$listOfContactsToFetch."'";
-
-                $fields       = $this->getMixedLeadFields($mixedFields, 'Contact');
-                $fields[]     = 'Id';
-                $fields       = implode(', ', array_unique($fields));
-                $contactQuery = 'SELECT '.$fields.' from Contact where Id in ('.$listOfContactsToFetch.')';
-                $this->getLeads([], $contactQuery);
+                $fields                = $this->getMixedLeadFields($mixedFields, 'Contact');
+                $fields[]              = 'Id';
+                $fields                = implode(', ', array_unique($fields));
+                $contactQuery          = 'SELECT '.$fields.' from Contact where Id in ('.$listOfContactsToFetch.')';
+                $this->getLeads([], $contactQuery, $executed, [], 'Contact');
                 $allCampaignMembers = array_merge($allCampaignMembers, array_keys($contactsToFetch));
             }
             if (!empty($allCampaignMembers)) {
@@ -1512,6 +1478,42 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $fields;
+    }
+
+    public function getNotificationModel()
+    {
+        return $this->factory->getModel('core.notification');
+    }
+
+    /**
+     * @param \Exception $e
+     */
+    public function logIntegrationError(\Exception $e)
+    {
+        $logger = $this->factory->getLogger();
+        if ('dev' == MAUTIC_ENV) {
+            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
+            $this->getNotificationModel()->addNotification($e, $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
+        } else {
+            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+            $this->getNotificationModel()->addNotification($e->getMessage(), $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
+        }
+    }
+
+    public function getCampaignMemberStatus($campaignId)
+    {
+        $silenceExceptions    = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $campaignMemberStatus = [];
+        try {
+            $campaignMemberStatus = $this->getApiHelper()->getCampaignMemberStatus($campaignId);
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+            if (!$silenceExceptions) {
+                throw $e;
+            }
+        }
+
+        return $campaignMemberStatus;
     }
 
     public function pushLeadToCampaign(Lead $lead, $integrationCampaignId, $status)
