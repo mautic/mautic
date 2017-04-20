@@ -20,10 +20,10 @@ trait DynamicContentEntityTrait
      *
      * @var array
      */
-    private $defaultDynamicContent = [
+    public static $defaultDynamicContent = [
         [
-            'tokenName' => null,
-            'content'   => null,
+            'tokenName' => 'Dynamic Content 1',
+            'content'   => 'Default Dynamic Content',
             'filters'   => [
                 [
                     'content' => null,
@@ -64,7 +64,7 @@ trait DynamicContentEntityTrait
      */
     public function getDynamicContent()
     {
-        return (empty($this->dynamicContent)) ? $this->defaultDynamicContent : $this->dynamicContent;
+        return (empty($this->dynamicContent)) ? $this->getDefaultDynamicContent() : $this->dynamicContent;
     }
 
     /**
@@ -75,7 +75,7 @@ trait DynamicContentEntityTrait
     public function setDynamicContent($dynamicContent)
     {
         if (empty($dynamicContent)) {
-            $dynamicContent = $this->defaultDynamicContent;
+            $dynamicContent = $this->getDefaultDynamicContent();
         }
 
         $this->dynamicContent = $dynamicContent;
@@ -88,6 +88,6 @@ trait DynamicContentEntityTrait
      */
     public function getDefaultDynamicContent()
     {
-        return $this->defaultDynamicContent;
+        return self::$defaultDynamicContent;
     }
 }
