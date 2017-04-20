@@ -1521,28 +1521,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $all        = [];
         $createLead = false;
         $config     = $this->mergeConfigToFeatureSettings([]);
-        /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        //find campaignMember
-        $existingCampaignMember = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'CampaignMember', 'lead', $lead->getId(), null, null, null, false, 0, 0, "'".$integrationCampaignId."'");
 
-        $body = [
-            'Status' => $status,
-        ];
+        if ($status) {
+            $body = [
+                'Status' => $status,
+            ];
+        }
 
         $object = 'CampaignMember';
         $url    = '/services/data/v38.0/sobjects/'.$object;
-        if ($existingCampaignMember) {
-            foreach ($existingCampaignMember as $member) {
-                $integrationEntity      = $integrationEntityRepo->getEntity($member['id']);
-                $referenceId            = $integrationEntity->getId();
-                $campaignMemberInternal = $integrationEntity->getInternal();
-                if (!empty($campaignMemberInternal)) {
-                    $objectId = $campaignMemberInternal['Id'];
-                    //unset($body['CampaignId']);
-                }
-            }
-        }
 
         $queryUrl = $this->getQueryUrl();
 
@@ -1565,7 +1552,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
 
-            $sfObject     = 'Lead';
             $findLead     = 'select Id, ConvertedContactId from Lead where email = \''.$lead->getEmail().'\'';
             $sfRecordLead = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
             $existingBody = [];
