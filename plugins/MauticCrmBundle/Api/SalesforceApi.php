@@ -42,7 +42,7 @@ class SalesforceApi extends CrmApi
         if (!$object) {
             $object = $this->object;
         }
-
+        $notificactionModel = $this->integration->getNotificationModel();
         if (!$queryUrl) {
             $queryUrl   = $this->integration->getApiUrl();
             $requestUrl = sprintf($queryUrl.'/%s/%s', $object, $operation);
@@ -53,6 +53,7 @@ class SalesforceApi extends CrmApi
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
+            $notificactionModel->addNotification(implode(', ', $response['errors']), 'Salesforce', false, $this->integration->getName().':');
             throw new ApiErrorException(implode(', ', $response['errors']));
         } elseif (is_array($response)) {
             $errors = [];
@@ -67,6 +68,7 @@ class SalesforceApi extends CrmApi
                         }
                     }
                     $errors[] = $r['message'];
+                    $notificactionModel->addNotification($r['message'], 'Salesforce', false, $this->integration->getName().':');
                 }
             }
 
@@ -99,36 +101,48 @@ class SalesforceApi extends CrmApi
      *
      * @return mixed
      */
-    public function createLead(array $data, $lead)
+    public function createLead(array $data)
     {
         $createdLeadData = [];
-        //search for SF id in mautic records first to avoid making an API call
-        if (is_object($lead)) {
-            $sfLeadRecords = $this->integration->getSalesforceLeadId($lead);
-        }
+        $createLead      = true;
+        $config          = $this->integration->mergeConfigToFeatureSettings([]);
         //if not found then go ahead and make an API call to find all the records with that email
-        if (isset($data['Email']) && empty($sfLeadId)) {
-            $findLead = 'select Id, ConvertedContactId from Lead where email = \''.$data['Email'].'\'';
-            $queryUrl = $this->integration->getQueryUrl();
-            $sfLead   = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
 
-            $sfLeadRecords = $sfLead['records'];
+        $queryUrl            = $this->integration->getQueryUrl();
+        $sfRecord['records'] = [];
+        //try searching for lead as this has been changed before in updated done to the plugin
+        if (isset($config['objects']) && array_search('Contact', $config['objects']) && isset($data['Contact']['Email'])) {
+            $sfObject    = 'Contact';
+            $findContact = 'select Id from Contact where email = \''.$data['Contact']['Email'].'\'';
+            $sfRecord    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
         }
+
+        if (empty($sfRecord['records']) && isset($data['Lead']['Email'])) {
+            $sfObject = 'Lead';
+            $findLead = 'select Id, ConvertedContactId from Lead where email = \''.$data['Lead']['Email'].'\'';
+            $sfRecord = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+        }
+        $sfLeadRecords = $sfRecord['records'];
 
         if (!empty($sfLeadRecords)) {
             foreach ($sfLeadRecords as $sfLeadRecord) {
-                $sfLeadId = (isset($sfLeadRecord['integration_entity_id']) ? $sfLeadRecord['integration_entity_id'] : $sfLeadRecord['Id']);
-                $sfObject = (isset($sfLeadRecord['integration_entity']) ? $sfLeadRecord['integration_entity'] : 'Lead');
+                $createLead = false;
+                $sfLeadId   = $sfLeadRecord['Id'];
                 //update the converted contact if found and not the Lead because it will error in SF
                 if (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) {
-                    unset($data['Company']); //because this record is not in the Contact object
-                    $createdLeadData[] = $this->request('', $data, 'PATCH', false, 'Contact/'.$sfLeadRecord['ConvertedContactId']);
+                    if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
+                        $createdLeadData[] = $this->request('', $data['Contact'], 'PATCH', false, 'Contact/'.$sfLeadRecord['ConvertedContactId']);
+                    } elseif (count($sfLeadRecords) <= 1) {
+                        $createLead = true;
+                    }
                 } else {
-                    $createdLeadData[] = $this->request('', $data, 'PATCH', false, $sfObject.'/'.$sfLeadId);
+                    $createdLeadData[] = $this->request('', $data[$sfObject], 'PATCH', false, $sfObject.'/'.$sfLeadId);
                 }
             }
-        } else {
-            $createdLeadData = $this->request('', $data, 'POST', false, 'Lead');
+        }
+
+        if ($createLead && isset($data['Lead']['Email'])) {
+            $createdLeadData = $this->request('', $data['Lead'], 'POST', false, 'Lead');
         }
 
         //todo: check if push activities is selected in config
@@ -264,7 +278,16 @@ class SalesforceApi extends CrmApi
               $fields = array_keys(array_filter($fields['companyFields']));
                 break;
             default:
-                $fields = $this->integration->getMixedLeadFields($fields, $object);
+                $mixedFields = array_filter($fields['leadFields']);
+                $fields      = [];
+                foreach ($mixedFields as $sfField => $mField) {
+                    if (strpos($sfField, '__'.$object) !== false) {
+                        $fields[] = str_replace('__'.$object, '', $sfField);
+                    }
+                    if (strpos($sfField, '-'.$object) !== false) {
+                        $fields[] = str_replace('-'.$object, '', $sfField);
+                    }
+                }
         }
         $result = [];
         if (!empty($fields) and isset($query['start'])) {
@@ -320,6 +343,16 @@ class SalesforceApi extends CrmApi
         $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
         $queryUrl             = $this->integration->getQueryUrl();
         $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $queryUrl);
+
+        return $result;
+    }
+
+    public function getCampaignMemberStatus($campaignId)
+    {
+        $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
+        $queryUrl      = $this->integration->getQueryUrl();
+
+        $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
 
         return $result;
     }

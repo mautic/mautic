@@ -181,12 +181,21 @@ class AjaxController extends CommonAjaxController
             $object = $helper->getIntegrationObject($integration);
 
             if ($object) {
+                $data           = $statusData           = [];
                 $objectSettings = $object->getIntegrationSettings();
                 $defaults       = $objectSettings->getFeatureSettings();
-
+                if (method_exists($object, 'getCampaigns')) {
+                    $campaigns = $object->getCampaigns();
+                    if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+                        foreach ($campaigns['records'] as $campaign) {
+                            $data[$campaign['Id']] = $campaign['Name'];
+                        }
+                    }
+                }
                 $form = $this->createForm('integration_config', $defaults, [
                     'integration'     => $object,
                     'csrf_protection' => false,
+                    'campaigns'       => $data,
                 ]);
 
                 $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
@@ -207,6 +216,63 @@ class AjaxController extends CommonAjaxController
 
                 $html = preg_replace('/integration_config\[(.*?)\]/', $prefix.'[$1]', $html);
                 $html = str_replace('integration_config', $idPrefix, $html);
+
+                $dataArray['success'] = 1;
+                $dataArray['html']    = $html;
+            }
+        }
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    protected function getIntegrationCampaignStatusAction(Request $request)
+    {
+        $integration = $request->request->get('integration');
+        $campaign    = $request->request->get('campaign');
+        $settings    = $request->request->get('settings');
+        $dataArray   = ['success' => 0];
+        $statusData  = [];
+        if (!empty($integration) && !empty($campaign)) {
+            /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
+            $helper = $this->factory->getHelper('integration');
+            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            $object = $helper->getIntegrationObject($integration);
+
+            if ($object) {
+                if (method_exists($object, 'getCampaignMemberStatus')) {
+                    $campaignMemberStatus = $object->getCampaignMemberStatus($campaign);
+                    if (isset($campaignMemberStatus['records']) && !empty($campaignMemberStatus['records'])) {
+                        foreach ($campaignMemberStatus['records'] as $status) {
+                            $statusData[$status['Label']] = $status['Label'];
+                        }
+                    }
+                }
+                $form = $this->createForm('integration_campaign_status', $statusData, [
+                    'csrf_protection'       => false,
+                    'campaignContactStatus' => $statusData,
+                ]);
+
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                    'form'      => $form,
+                    'function'  => 'widget',
+                    'variables' => [
+                        'integration' => $object,
+                    ],
+                ])->getContent();
+
+                $prefix = str_replace('[integration]', '[campaign_member_status][campaign_member_status]', $settings['name']);
+
+                $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
+
+                if (substr($idPrefix, -1) == '_') {
+                    $idPrefix = substr($idPrefix, 0, -1);
+                }
+
+                $html = preg_replace('/integration_campaign_status_campaign_member_status\[(.*?)\]/', $prefix.'[$1]', $html);
+                $html = str_replace('integration_campaign_status_campaign_member_status', $idPrefix, $html);
+                $html = str_replace('integration_campaign_status[campaign_member_status]', $prefix, $html);
 
                 $dataArray['success'] = 1;
                 $dataArray['html']    = $html;
