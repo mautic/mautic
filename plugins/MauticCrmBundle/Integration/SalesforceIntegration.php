@@ -315,8 +315,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $this->cache->set('leadFields'.$cacheSuffix, $salesFields[$sfObject]);
                             }
                         }
-
-                        asort($salesFields[$sfObject]);
                     }
                 }
             }
@@ -402,7 +400,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $entity                = $this->getMauticLead($dataObject, true, null, null);
                         $mauticObjectReference = 'lead';
                     } elseif ($object == 'Account') {
-                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $entity                = $this->getMauticCompany($dataObject);
                         $mauticObjectReference = 'company';
                     } else {
                         $this->logIntegrationError(
