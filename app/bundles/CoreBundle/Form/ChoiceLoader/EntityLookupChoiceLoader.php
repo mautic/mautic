@@ -71,7 +71,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $this->translator   = $translator;
         $this->connection   = $connection;
         $this->options      = $options;
-        var_dump($options);
     }
 
     /**
