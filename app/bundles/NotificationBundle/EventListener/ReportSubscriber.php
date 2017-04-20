@@ -140,10 +140,6 @@ class ReportSubscriber extends CommonSubscriber
                         'label' => 'mautic.mobile_notifications.report.stat.date_read',
                         'type'  => 'datetime',
                     ],
-                    $statPrefix.'retry_count' => [
-                        'label' => 'mautic.mobile_notifications.report.stat.retry_count',
-                        'type'  => 'int',
-                    ],
                     $statPrefix.'source' => [
                         'label' => 'mautic.report.field.source',
                         'type'  => 'string',
@@ -248,10 +244,8 @@ class ReportSubscriber extends CommonSubscriber
             return;
         }
 
-        $graphs = $event->getRequestedGraphs();
-        $qb     = $event->getQueryBuilder();
-        var_dump($qb->getQueryParts());
-        die;
+        $graphs   = $event->getRequestedGraphs();
+        $qb       = $event->getQueryBuilder();
         $statRepo = $this->em->getRepository('MauticNotificationBundle:Stat');
 
         foreach ($graphs as $g) {
@@ -268,13 +262,10 @@ class ReportSubscriber extends CommonSubscriber
                     $sendQuery = clone $queryBuilder;
                     $readQuery = clone $origQuery;
 
-                    var_dump($sendQuery->getQueryParts()); die;
                     $readQuery->andWhere($qb->expr()->isNotNull('date_read'));
                     $chartQuery->applyDateFilters($readQuery, 'date_read', 'pns');
                     $chartQuery->modifyTimeDataQuery($sendQuery, 'date_sent', 'pns');
                     $chartQuery->modifyTimeDataQuery($readQuery, 'date_read', 'pns');
-
-                    var_dump($sendQuery->getQueryParts()); die;
 
                     $sends = $chartQuery->loadAndBuildTimeData($sendQuery);
                     $reads = $chartQuery->loadAndBuildTimeData($readQuery);
