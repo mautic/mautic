@@ -123,6 +123,10 @@ return [
                 'class' => 'Mautic\PluginBundle\Form\Type\IntegrationConfigType',
                 'alias' => 'integration_config',
             ],
+            'mautic.form.type.integration.campaign' => [
+                'class' => 'Mautic\PluginBundle\Form\Type\IntegrationCampaignsType',
+                'alias' => 'integration_campaign_status',
+            ],
         ],
         'other' => [
             'mautic.helper.integration' => [

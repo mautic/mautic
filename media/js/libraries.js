@@ -3089,7 +3089,8 @@ var coords=coordsChar(cm,x,y),line;if(forRect&&coords.xRel==1&&(line=getLine(cm.
 return coords;}
 function onMouseDown(e){var cm=this,display=cm.display;if(signalDOMEvent(cm,e)||display.activeTouch&&display.input.supportsTouch())return;display.shift=e.shiftKey;if(eventInWidget(display,e)){if(!webkit){display.scroller.draggable=false;setTimeout(function(){display.scroller.draggable=true;},100);}
 return;}
-if(clickInGutter(cm,e))return;var start=posFromMouse(cm,e);window.focus();switch(e_button(e)){case 1:if(cm.state.selectingText)
+if(clickInGutter(cm,e))return;var start=posFromMouse(cm,e);var codeMode=typeof Mautic!='undefined'&&Mautic.codeMode===true;if(!codeMode){window.focus();}
+switch(e_button(e)){case 1:if(cm.state.selectingText&&!codeMode)
 cm.state.selectingText(e);else if(start)
 leftButtonDown(cm,e,start);else if(e_target(e)==display.scroller)
 e_preventDefault(e);break;case 2:if(webkit)cm.state.lastMiddleDown=+new Date;if(start)extendSelection(cm.doc,start);setTimeout(function(){display.input.focus();},20);e_preventDefault(e);break;case 3:if(captureRightClick)onContextMenu(cm,e);else delayBlurEvent(cm);break;}}

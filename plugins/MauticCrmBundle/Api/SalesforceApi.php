@@ -278,7 +278,16 @@ class SalesforceApi extends CrmApi
               $fields = array_keys(array_filter($fields['companyFields']));
                 break;
             default:
-                $fields = $this->integration->getMixedLeadFields($fields, $object);
+                $mixedFields = array_filter($fields['leadFields']);
+                $fields      = [];
+                foreach ($mixedFields as $sfField => $mField) {
+                    if (strpos($sfField, '__'.$object) !== false) {
+                        $fields[] = str_replace('__'.$object, '', $sfField);
+                    }
+                    if (strpos($sfField, '-'.$object) !== false) {
+                        $fields[] = str_replace('-'.$object, '', $sfField);
+                    }
+                }
         }
         $result = [];
         if (!empty($fields) and isset($query['start'])) {
@@ -334,6 +343,16 @@ class SalesforceApi extends CrmApi
         $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
         $queryUrl             = $this->integration->getQueryUrl();
         $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $queryUrl);
+
+        return $result;
+    }
+
+    public function getCampaignMemberStatus($campaignId)
+    {
+        $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
+        $queryUrl      = $this->integration->getQueryUrl();
+
+        $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
 
         return $result;
     }
