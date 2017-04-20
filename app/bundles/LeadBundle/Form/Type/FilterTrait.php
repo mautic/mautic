@@ -277,7 +277,7 @@ trait FilterTrait
             [
                 'label'          => false,
                 'attr'           => $displayAttr,
-                'data'           => $data['display'],
+                'data'           => (isset($data['display'])) ? $data['display'] : '',
                 'error_bubbling' => false,
             ]
         );
