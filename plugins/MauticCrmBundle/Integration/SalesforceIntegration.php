@@ -403,7 +403,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $entity                = $this->getMauticLead($dataObject, true, null, null);
                         $mauticObjectReference = 'lead';
                     } elseif ($object == 'Account') {
-                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $entity                = $this->getMauticCompany($dataObject);
                         $mauticObjectReference = 'company';
                     } else {
                         $this->logIntegrationError(
@@ -632,13 +632,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (!$query) {
             $query = $this->getFetchQuery($params);
         }
+
         try {
             if ($this->isAuthorized()) {
                 if ($object !== 'Activity' and $object !== 'company') {
                     $result = $this->getApiHelper()->getLeads($query, $object);
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                     if (isset($result['nextRecordsUrl'])) {
-                        $query = $result['nextRecordsUrl'];
+                        $query['nextUrl'] = $result['nextRecordsUrl'];
                         $this->getLeads($params, $query, $executed, $result['records'], $object);
                     }
                 }
@@ -673,8 +674,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $result = $this->getApiHelper()->getLeads($query, $salesForceObject);
                 $executed += $this->amendLeadDataBeforeMauticPopulate($result, $salesForceObject);
                 if (isset($result['nextRecordsUrl'])) {
-                    $query  = $result['nextRecordsUrl'];
-                    $result = null;
+                    $query['nextUrl'] = $result['nextRecordsUrl'];
+                    $result           = null;
                     $this->getCompanies($params, $query, $executed);
                 }
 
