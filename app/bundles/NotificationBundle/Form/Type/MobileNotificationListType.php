@@ -34,7 +34,7 @@ class MobileNotificationListType extends AbstractType
                 'model_lookup_method' => 'getLookupResults',
                 'lookup_arguments'    => function (Options $options) {
                     return [
-                        'type'    => 'notification',
+                        'type'    => 'mobile_notification',
                         'filter'  => '$data',
                         'limit'   => 0,
                         'start'   => 0,
@@ -63,7 +63,7 @@ class MobileNotificationListType extends AbstractType
      */
     public function getName()
     {
-        return 'notification_list';
+        return 'mobilenotification_list';
     }
 
     /**

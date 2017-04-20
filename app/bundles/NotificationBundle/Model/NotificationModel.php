@@ -338,6 +338,23 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 ksort($results);
 
                 break;
+            case 'mobile_notification':
+                $entities = $this->getRepository()->getMobileNotificationList(
+                    $filter,
+                    $limit,
+                    $start,
+                    $this->security->isGranted($this->getPermissionBase().':viewother'),
+                    isset($options['notification_type']) ? $options['notification_type'] : null
+                );
+
+                foreach ($entities as $entity) {
+                    $results[$entity['language']][$entity['id']] = $entity['name'];
+                }
+
+                //sort by language
+                ksort($results);
+
+                break;
         }
 
         return $results;

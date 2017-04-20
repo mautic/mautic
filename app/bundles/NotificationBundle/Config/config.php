@@ -105,7 +105,7 @@ return [
             ],
             'mautic.form.type.mobilenotification_list' => [
                 'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationListType::class,
-                'alias' => 'mmobilenotification_list',
+                'alias' => 'mobilenotification_list',
             ],
         ],
         'helpers' => [

@@ -41,7 +41,7 @@ class MobileNotificationSendType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('notification', 'notification_list', [
+        $builder->add('notification', 'mobilenotification_list', [
             'label'      => 'mautic.notification.send.selectnotifications',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
