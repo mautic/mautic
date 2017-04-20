@@ -1532,6 +1532,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $body = [
                 'Status' => $status,
             ];
+        } else {
+            $body = ['Status' => ''];
         }
 
         $object = 'CampaignMember';
