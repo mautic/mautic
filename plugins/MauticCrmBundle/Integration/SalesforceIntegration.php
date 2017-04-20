@@ -1216,7 +1216,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $object = 'CampaignMember';
                 }
                 if (isset($item['body'][0]['errorCode'])) {
-                    $this->logIntegrationError(new \Exception($item['body'][0]['message'].'-'.$reference));
+                    $this->logIntegrationError(new \Exception($item['body'][0]['message'].'-'.$item['referenceId']));
 
                     if ($integrationEntityId && $object !== 'CampaignMember') {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
@@ -1496,6 +1496,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticData = $salesforceIdMapping = [];
         $objectId   = null;
         $all        = [];
+        $createLead = false;
         $config     = $this->mergeConfigToFeatureSettings([]);
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
@@ -1503,8 +1504,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $existingCampaignMember = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'CampaignMember', 'lead', $lead->getId(), null, null, null, false, 0, 0, "'".$integrationCampaignId."'");
 
         $body = [
-            'CampaignId' => $integrationCampaignId,
-            'Status'     => $status,
+            'Status' => $status,
         ];
 
         $object = 'CampaignMember';
@@ -1516,52 +1516,77 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $campaignMemberInternal = $integrationEntity->getInternal();
                 if (!empty($campaignMemberInternal)) {
                     $objectId = $campaignMemberInternal['Id'];
-                    unset($body['CampaignId']);
+                    //unset($body['CampaignId']);
                 }
             }
         }
-        $existingLeadIntegrationIds = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', null, 'lead', $lead->getId());
-        $queryUrl                   = $this->getQueryUrl();
-        if ($existingLeadIntegrationIds and empty($existingCampaignMember)) {
-            $sfLeadRecords = [];
-            if (isset($config['objects']) && array_search('Contact', $config['objects']) && !empty($lead->getEmail())) {
+
+        $queryUrl = $this->getQueryUrl();
+
+        $sfLeadRecords = [];
+        $allIds        = [];
+        if (!empty($lead->getEmail())) {
+            if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
                 $sfObject        = 'Contact';
                 $findContact     = 'select Id from Contact where email = \''.$lead->getEmail().'\'';
                 $sfRecordContact = $this->getApiHelper()->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
                 if (!empty($sfRecordContact['records'])) {
                     $sfLeadRecords = $sfRecordContact['records'];
                 }
-            }
-            if (!empty($lead->getEmail())) {
-                $sfObject     = 'Lead';
-                $findLead     = 'select Id, ConvertedContactId from Lead where email = \''.$lead->getEmail().'\'';
-                $sfRecordLead = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
-                if (!empty($sfRecordLead['records'])) {
-                    $sfLeadRecords = array_merge($sfLeadRecords, $sfRecordLead['records']);
+                foreach ($sfRecordContact['records'] as $sfLeadRecord) {
+                    $sfLeadId            = $sfLeadRecord['Id'];
+                    $allIds[]            = $sfLeadRecord['Id'];
+                    $type                = 'ContactId';
+                    $existingBody[$type] = $sfLeadId;
+                    $all[]               = array_merge($body, $existingBody);
                 }
             }
-            if (!empty($sfLeadRecords)) {
-                foreach ($sfLeadRecords as $sfLeadRecord) {
-                    $createLead = false;
-                    $sfLeadId   = $sfLeadRecord['Id'];
+
+            $sfObject     = 'Lead';
+            $findLead     = 'select Id, ConvertedContactId from Lead where email = \''.$lead->getEmail().'\'';
+            $sfRecordLead = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            $existingBody = [];
+            if (!empty($sfRecordLead['records'])) {
+                $sfLeadRecords = array_merge($sfLeadRecords, $sfRecordLead['records']);
+                foreach ($sfRecordLead['records'] as $sfLeadRecord) {
+                    $sfLeadId = $sfLeadRecord['Id'];
+                    $allIds[] = $sfLeadRecord['Id'];
                     //update the converted contact if found and not the Lead because it will error in SF
                     if (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) {
-                        if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
-                            $existingBody['ContactId'] = $sfLeadRecord['ConvertedContactId'];
-                        } elseif (count($sfLeadRecords) <= 1) {
+                        if (count($sfLeadRecords) <= 1) {
                             $createLead = true;
+                            continue;
+                        } else {
+                            continue;
                         }
-                    } else {
-                        $type                = ($sfObject == 'Contact') ? 'ContactId' : 'LeadId';
-                        $existingBody[$type] = $sfLeadId;
                     }
-                    $all[] = array_merge($body, $existingBody);
+                    $type                = 'LeadId';
+                    $existingBody[$type] = $sfLeadId;
+                    $all[]               = array_merge($body, $existingBody);
                 }
             }
-        } elseif (empty($existingCampaignMember)) {
-            $integration_entity_id = $this->pushLead($lead);
-            $body['LeadId']        = $integration_entity_id;
-            $all[]                 = $body;
+
+            if (!empty($sfLeadRecords)) {
+                $findCampaignMembers         = "Select Id, ContactId, LeadId from CampaignMember where CampaignId = '".$integrationCampaignId."' and ContactId in ('".implode("','", $allIds)."')";
+                $findCampaignLeadMembers     = "Select Id, ContactId, LeadId from CampaignMember where CampaignId = '".$integrationCampaignId."' and LeadId in ('".implode("','", $allIds)."')";
+                $existingCampaignMemberLeads = $this->getApiHelper()->request('query', ['q' => $findCampaignLeadMembers], 'GET', false, null, $queryUrl);
+                $existingCampaignMember      = $this->getApiHelper()->request('query', ['q' => $findCampaignMembers], 'GET', false, null, $queryUrl);
+                $contactIds                  = [];
+                $leadIds                     = [];
+                $existingFoundRecords        = array_merge($existingCampaignMember['records'], $existingCampaignMemberLeads['records']);
+                if (!empty($existingFoundRecords)) {
+                    foreach ($existingFoundRecords as $campaignMember) {
+                        if (!empty($campaignMember['ContactId'])) {
+                            $contactIds[$campaignMember['Id']] = $campaignMember['ContactId'];
+                        }
+                        if (!empty($campaignMember['LeadId'])) {
+                            $leadIds[$campaignMember['Id']] = $campaignMember['LeadId'];
+                        }
+                    }
+                }
+            } else {
+                $createLead = true;
+            }
         }
 
         if ($createLead) {
@@ -1570,22 +1595,41 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $all[]                 = $body;
         }
 
-        if ($objectId) {
-            $url .= '/'.$objectId;
-            $salesforceIdMapping = [$integrationCampaignId];
-        }
+        $salesforceIdMapping = [$integrationCampaignId];
 
         foreach ($all as $key => $b) {
             $campaignMappingId = '-'.$integrationCampaignId;
-            $id                = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$key.(!empty($referenceId) ? '-'.$referenceId : '').$campaignMappingId;
-            $mauticData[$id]   = [
-                'method'      => ($objectId) ? 'PATCH' : 'POST',
-                'url'         => $url,
-                'referenceId' => $id,
-                'body'        => $b,
-        ];
+            if (isset($b['ContactId']) and $memberId = array_search($b['ContactId'], $contactIds)) {
+                $id       = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$b['ContactId'].(!empty($referenceId) ? '-'.$referenceId : '').$campaignMappingId;
+                $patchurl = $url.'/'.$memberId;
+                unset($b['ContactId']);
+                $mauticData[$id] = [
+                    'method'      => 'PATCH',
+                    'url'         => $patchurl,
+                    'referenceId' => $id,
+                    'body'        => $b,
+                ];
+            } elseif (isset($b['LeadId']) and $memberId = array_search($b['LeadId'], $leadIds)) {
+                $id       = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$b['LeadId'].(!empty($referenceId) ? '-'.$referenceId : '').$campaignMappingId;
+                $patchurl = $url.'/'.$memberId;
+                unset($b['LeadId']);
+                $mauticData[$id] = [
+                    'method'      => 'PATCH',
+                    'url'         => $patchurl,
+                    'referenceId' => $id,
+                    'body'        => $b,
+                ];
+            } else {
+                $id              = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMemberNew'.(!empty($referenceId) ? '-'.$referenceId : '').$campaignMappingId;
+                $b               = array_merge($b, ['CampaignId' => $integrationCampaignId]);
+                $mauticData[$id] = [
+                    'method'      => 'POST',
+                    'url'         => $url,
+                    'referenceId' => $id,
+                    'body'        => $b,
+                ];
+            }
         }
-
         $request['allOrNone']        = 'false';
         $request['compositeRequest'] = array_values($mauticData);
 
