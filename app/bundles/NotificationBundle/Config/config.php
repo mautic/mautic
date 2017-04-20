@@ -98,6 +98,15 @@ return [
                 'class' => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
                 'alias' => 'notification_list',
             ],
+            'mautic.form.type.mobilenotificationsend_list' => [
+                'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationSendType::class,
+                'arguments' => 'router',
+                'alias'     => 'mobilenotificationsend_list',
+            ],
+            'mautic.form.type.mobilenotification_list' => [
+                'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationListType::class,
+                'alias' => 'mmobilenotification_list',
+            ],
         ],
         'helpers' => [
             'mautic.helper.notification' => [

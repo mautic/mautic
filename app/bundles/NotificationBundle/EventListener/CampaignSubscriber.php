@@ -20,6 +20,8 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
+use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
+use Mautic\NotificationBundle\Form\Type\NotificationSendType;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -101,7 +103,7 @@ class CampaignSubscriber extends CommonSubscriber
                     'label'            => 'mautic.notification.campaign.send_mobile_notification',
                     'description'      => 'mautic.notification.campaign.send_mobile_notification.tooltip',
                     'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'         => 'notificationsend_list',
+                    'formType'         => NotificationSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                     'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
                     'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
@@ -117,7 +119,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'label'            => 'mautic.notification.campaign.send_notification',
                 'description'      => 'mautic.notification.campaign.send_notification.tooltip',
                 'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                'formType'         => 'notificationsend_list',
+                'formType'         => MobileNotificationSendType::class,
                 'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                 'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
                 'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
