@@ -1549,6 +1549,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $sfLeadRecords = [];
         $allIds        = [];
+        $contactIds    = [];
+        $leadIds       = [];
+
         if (!empty($lead->getEmail())) {
             if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
                 $sfObject        = 'Contact';
@@ -1594,8 +1597,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $findCampaignLeadMembers     = "Select Id, ContactId, LeadId from CampaignMember where CampaignId = '".$integrationCampaignId."' and LeadId in ('".implode("','", $allIds)."')";
                 $existingCampaignMemberLeads = $this->getApiHelper()->request('query', ['q' => $findCampaignLeadMembers], 'GET', false, null, $queryUrl);
                 $existingCampaignMember      = $this->getApiHelper()->request('query', ['q' => $findCampaignMembers], 'GET', false, null, $queryUrl);
-                $contactIds                  = [];
-                $leadIds                     = [];
                 $existingFoundRecords        = array_merge($existingCampaignMember['records'], $existingCampaignMemberLeads['records']);
                 if (!empty($existingFoundRecords)) {
                     foreach ($existingFoundRecords as $campaignMember) {
