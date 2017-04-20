@@ -160,12 +160,17 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             // Build choice list in case of different formats
             $choices = $this->fetchChoices($modelName, $data);
 
+            if ($choices) {
+                $this->formatChoices($choices);
+            }
+
             if ($includeNew && !empty($data)) {
                 // Fetch some extra choices
                 $extraChoices = $this->fetchChoices($modelName);
 
                 // Test if grouped
                 if ($extraChoices) {
+                    $this->formatChoices($extraChoices);
                     foreach ($extraChoices as $k => $v) {
                         if (is_array($v)) {
                             if (!isset($choices[$k])) {
@@ -179,10 +184,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
                     }
                 }
                 unset($extraChoices);
-            }
-
-            if (!empty($choices)) {
-                $this->formatChoices($choices);
             }
 
             $this->choices[$modelName] = $choices;

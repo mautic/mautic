@@ -33,6 +33,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead'];
+    }
+
+    /**
      * Get the array key for clientId.
      *
      * @return string
@@ -200,6 +208,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     }
+
+                    $this->cache->set('leadFields', $sugarFields);
                 }
             } else {
                 throw new ApiErrorException($this->authorzationError);
@@ -211,8 +221,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
-
-        $this->cache->set('leadFields', $sugarFields);
 
         return $sugarFields;
     }

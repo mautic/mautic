@@ -13,6 +13,7 @@ namespace Mautic\ReportBundle\Event;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -58,17 +59,28 @@ class ReportBuilderEvent extends AbstractReportEvent
     private $graphArray = [];
 
     /**
+     * List of published array of lead fields.
+     *
+     * @var array
+     */
+    private $leadFields = [];
+
+    private $reportHelper;
+
+    /**
      * ReportBuilderEvent constructor.
      *
      * @param TranslatorInterface $translator
      * @param ChannelListHelper   $channelListHelper
      * @param string              $context
      */
-    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context = '')
+    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper)
     {
         $this->context           = $context;
         $this->translator        = $translator;
         $this->channelListHelper = $channelListHelper;
+        $this->leadFields        = $leadFields;
+        $this->reportHelper      = $reportHelper;
     }
 
     /**
@@ -230,66 +242,15 @@ class ReportBuilderEvent extends AbstractReportEvent
      */
     public function getLeadColumns($prefix = 'l.')
     {
-        return [
-            $prefix.'id' => [
-                'label' => 'mautic.report.field.lead.id',
-                'type'  => 'int',
-                'alias' => 'contact_id',
-            ],
-            $prefix.'title' => [
-                'label' => 'mautic.report.field.lead.title',
-                'type'  => 'string',
-                'alias' => 'contact_title',
-            ],
-            $prefix.'firstname' => [
-                'label' => 'mautic.report.field.lead.firstname',
-                'type'  => 'string',
-            ],
-            $prefix.'lastname' => [
-                'label' => 'mautic.report.field.lead.lastname',
-                'type'  => 'string',
-            ],
-            $prefix.'email' => [
-                'label' => 'mautic.report.field.lead.email',
-                'type'  => 'string',
-            ],
-            $prefix.'company' => [
-                'label' => 'mautic.report.field.lead.company',
-                'type'  => 'string',
-            ],
-            $prefix.'position' => [
-                'label' => 'mautic.report.field.lead.position',
-                'type'  => 'string',
-            ],
-            $prefix.'phone' => [
-                'label' => 'mautic.report.field.lead.phone',
-                'type'  => 'string',
-            ],
-            $prefix.'mobile' => [
-                'label' => 'mautic.report.field.lead.mobile',
-                'type'  => 'string',
-            ],
-            $prefix.'address1' => [
-                'label' => 'mautic.report.field.lead.address1',
-                'type'  => 'string',
-            ],
-            $prefix.'address2' => [
-                'label' => 'mautic.report.field.lead.address2',
-                'type'  => 'string',
-            ],
-            $prefix.'country' => [
-                'label' => 'mautic.report.field.lead.country',
-                'type'  => 'string',
-            ],
-            $prefix.'city' => [
-                'label' => 'mautic.report.field.lead.city',
-                'type'  => 'string',
-            ],
-            $prefix.'state' => [
-                'label' => 'mautic.report.field.lead.zipcode',
-                'type'  => 'string',
-            ],
-        ];
+        foreach ($this->leadFields as $fieldArray) {
+            $fields[$prefix.$fieldArray['alias']] = [
+                'label' => $this->translator->trans('mautic.report.field.lead.label', ['%field%' => $fieldArray['label']]),
+                'type'  => $this->reportHelper->getReportBuilderFieldType($fieldArray['type']),
+                'alias' => $fieldArray['alias'],
+            ];
+        }
+
+        return $fields;
     }
 
     /**
@@ -328,6 +289,25 @@ class ReportBuilderEvent extends AbstractReportEvent
                 'label' => 'mautic.report.field.category_name',
                 'type'  => 'string',
                 'alias' => 'category_title',
+            ],
+        ];
+    }
+
+    /**
+     * Add campaign columns joined by the campaign lead event log table.
+     *
+     * @return array
+     */
+    public function getCampaignByChannelColumns()
+    {
+        return [
+            'clel.campaign_id' => [
+                'label' => 'mautic.campaign.campaign.id',
+                'type'  => 'string',
+            ],
+            'cmp.name' => [
+                'label' => 'mautic.campaign.campaign',
+                'type'  => 'string',
             ],
         ];
     }

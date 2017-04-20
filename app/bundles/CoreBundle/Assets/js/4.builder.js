@@ -1010,6 +1010,22 @@ Mautic.initSlotListeners = function() {
                 });
             });
 
+            // initialize code mode slots
+            if ('codemode' === type) {
+                Mautic.codeMode = true;
+                var element = focusForm.find('#slot_codemode_content')[0];
+                if (element) {
+                    Mautic.builderCodeMirror = CodeMirror.fromTextArea(element, {
+                        lineNumbers: true,
+                        mode: 'htmlmixed',
+                        extraKeys: {"Ctrl-Space": "autocomplete"},
+                        lineWrapping: true,
+                    });
+                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
+                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
+                }
+            }
+
             focusForm.find('textarea.editor').each(function() {
                 var theEditor = this;
                 var slotHtml = parent.mQuery('<div/>').html(clickedSlot.html());
@@ -1092,9 +1108,9 @@ Mautic.initSlotListeners = function() {
         } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {
-            params.slot.find('a').attr('href', params.field.val());
+            params.slot.find('a').eq(0).attr('href', params.field.val());
         } else if (fieldParam === 'link-text') {
-            params.slot.find('a').text(params.field.val());
+            params.slot.find('a').eq(0).text(params.field.val());
         } else if (fieldParam === 'float') {
             var values = ['left', 'center', 'right'];
             params.slot.find('a').parent().attr('align', values[params.field.val()]);
@@ -1132,10 +1148,11 @@ Mautic.initSlotListeners = function() {
                 params.slot.find('img').closest('div').css('text-align', values[params.field.val()]);
             }
         } else if (fieldParam === 'button-size') {
+            var bg_clr = params.slot.attr('data-param-background-color');
             var values = [
-                {padding: '10px 13px', fontSize: '14px'},
-                {padding: '15px 20px', fontSize: '20px'},
-                {padding: '22px 30px', fontSize: '30px'}
+                {borderWidth: '10px 20px', padding: '0', fontSize: '14px', borderColor : bg_clr, borderStyle: 'solid'},
+                {borderWidth: '20px 23px', padding: '0', fontSize: '20px', borderColor : bg_clr, borderStyle: 'solid'},
+                {borderWidth: '25px 40px', padding: '0', fontSize: '30px', borderColor : bg_clr, borderStyle: 'solid'}
             ];
             params.slot.find('a').css(values[params.field.val()]);
         } else if (fieldParam === 'caption-color') {
@@ -1146,6 +1163,7 @@ Mautic.initSlotListeners = function() {
             } else {
                 params.slot.find('a').css(fieldParam, '#' + params.field.val());
                 params.slot.find('a').attr('background', '#' + params.field.val());
+                params.slot.find('a').css('border-color', '#' + params.field.val());
             }
         } else if (fieldParam === 'color') {
             if ('imagecard' === type) {
