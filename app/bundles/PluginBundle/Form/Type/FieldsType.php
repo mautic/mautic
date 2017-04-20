@@ -30,7 +30,7 @@ class FieldsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['lead_fields']);
+        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['mautic_fields'], '', $options['limit'], $options['start']);
     }
 
     /**
@@ -38,16 +38,7 @@ class FieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_fields', 'lead_fields']);
-        $resolver->setDefined(['update_mautic']);
-        $resolver->setDefaults(
-            [
-                'special_instructions' => '',
-                'alert_type'           => '',
-                'allow_extra_fields'   => true,
-                'enable_data_priority' => false,
-            ]
-        );
+        $this->configureFieldOptions($resolver, 'lead');
     }
 
     /**
@@ -63,7 +54,6 @@ class FieldsType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['specialInstructions'] = $options['special_instructions'];
-        $view->vars['alertType']           = $options['alert_type'];
+        $this->buildFieldView($view,  $options, 'lead');
     }
 }

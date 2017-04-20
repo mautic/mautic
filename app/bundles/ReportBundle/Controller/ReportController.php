@@ -12,6 +12,8 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\HttpFoundation;
 
@@ -783,14 +785,42 @@ class ReportController extends FormController
         $fromDate = $session->get('mautic.report.date.from', (new \DateTime('-30 days'))->format('Y-m-d'));
         $toDate   = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
 
-        $dynamicFilters = $session->get('mautic.report.'.$objectId.'.filters', []);
+        $date    = (new DateTimeHelper())->toLocalString();
+        $name    = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
+        $options = ['dateFrom' => new \DateTime($fromDate), 'dateTo' => new \DateTime($toDate)];
 
-        $reportData = $model->getReportData($entity, null, [
-            'dateFrom'       => new \DateTime($fromDate),
-            'dateTo'         => new \DateTime($toDate),
-            'dynamicFilters' => $dynamicFilters,
-        ]);
+        if ($format === 'csv') {
+            $response = new HttpFoundation\StreamedResponse(
+                function () use ($model, $fromDate, $toDate, $entity, $format, $name, $options) {
+                    $options['paginate'] = true;
+                    $options['ignoreGraphData'] = true;
+                    $options['limit'] =
+                    $reportData['totalResults'] = 10000;
+                    $options['page'] = 1;
+                    $handle = fopen('php://output', 'r+');
+                    while ($reportData['totalResults'] >= ($options['page'] - 1) * $options['limit']) {
+                        $reportData = $model->getReportData($entity, null, $options);
+                        $model->exportResults($format, $entity, $reportData, $handle, $options['page']);
+                        ++$options['page'];
+                    }
+                    fclose($handle);
+                }
+            );
 
-        return $model->exportResults($format, $entity, $reportData);
+            $response->headers->set('Content-Type', 'application/force-download');
+            $response->headers->set('Content-Type', 'application/octet-stream');
+            $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.'.$format.'"');
+            $response->headers->set('Expires', 0);
+            $response->headers->set('Cache-Control', 'must-revalidate');
+            $response->headers->set('Pragma', 'public');
+        } else {
+            if ($format === 'xlsx') {
+                $options['ignoreGraphData'] = true;
+            }
+            $reportData = $model->getReportData($entity, null, $options);
+            $response   = $model->exportResults($format, $entity, $reportData);
+        }
+
+        return $response;
     }
 }

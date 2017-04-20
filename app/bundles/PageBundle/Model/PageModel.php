@@ -55,6 +55,11 @@ class PageModel extends FormModel
     protected $catInUrl;
 
     /**
+     * @var bool
+     */
+    protected $trackByFingerprint;
+
+    /**
      * @var CookieHelper
      */
     protected $cookieHelper;
@@ -117,6 +122,14 @@ class PageModel extends FormModel
     public function setCatInUrl($catInUrl)
     {
         $this->catInUrl = $catInUrl;
+    }
+
+    /**
+     * @param $trackByFingerprint
+     */
+    public function setTrackByFingerprint($trackByFingerprint)
+    {
+        $this->trackByFingerprint = $trackByFingerprint;
     }
 
     /**
@@ -453,7 +466,7 @@ class PageModel extends FormModel
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
+            $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
         }
 
         if ($lead && !$lead->getId()) {
@@ -857,8 +870,8 @@ class PageModel extends FormModel
         }
 
         if ($flag == 'unique' || $flag == 'total_and_unique') {
-            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
-            $q->groupBy('t.lead_id, t.date_hit');
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter, 'distinct(t.lead_id)');
+            $q->groupBy('DATE_FORMAT(t.date_hit, \'%Y-%m-%d\')');
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);

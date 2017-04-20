@@ -668,7 +668,7 @@ class FormModel extends CommonFormModel
             $customComponents['validators'] = $event->getValidators();
 
             // Generate a list of fields that are not persisted to the database by default
-            $notPersist = ['button', 'captcha', 'freetext', 'pagebreak'];
+            $notPersist = ['button', 'captcha', 'freetext', 'freehtml', 'pagebreak'];
             foreach ($customComponents['fields'] as $type => $field) {
                 if (isset($field['builderOptions']) && isset($field['builderOptions']['addSaveResult']) && false === $field['builderOptions']['addSaveResult']) {
                     $notPersist[] = $type;

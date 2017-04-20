@@ -13,7 +13,8 @@ $prodName = (isset($product)) ? $product : 'product';
 $link     = (isset($productLink)) ? $productLink : '#';
 $text     = (isset($productText)) ? $productText : 'Start GoTo'.ucfirst($prodName);
 ?>
-<a href="<?php echo $link; ?>" target="_blank" style="font-size: 16px; color: #ffffff; text-decoration: none; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; padding: 12px 18px; background-color: #4e5e9e; display: inline-block;">
+<link rel="stylesheet" href="<?php echo $view['assets']->getUrl('plugins/MauticCitrixBundle/Assets/css/citrix.css'); ?>" type="text/css"/>
+<a class="citrix-start-button" href="<?php echo $link; ?>" target="_blank">
     <?php echo $text; ?>
 </a>
 <div style="clear:both"></div>
