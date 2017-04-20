@@ -76,20 +76,23 @@ class AjaxController extends CommonAjaxController
                     $pluginModel = $this->getModel('plugin');
 
                     // Get a list of custom form fields
-                    $mauticFields    = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
-                    $featureSettings = $integrationObject->getIntegrationSettings()->getFeatureSettings();
-                    $formType        = $isLead ? 'integration_fields' : 'integration_company_fields';
-                    $form            = $this->createForm(
+                    $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
+                    $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
+                    $formSettings       = $integrationObject->getFormDisplaySettings();
+                    $enableDataPriority = !empty($formSettings['enable_data_priority']);
+                    $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
+                    $form               = $this->createForm(
                         $formType,
                         isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
                         [
-                            'mautic_fields'      => $mauticFields,
-                            'integration_fields' => $integrationFields,
-                            'csrf_protection'    => false,
-                            'integration_object' => $integrationObject,
-                            'integration'        => $integration,
-                            'page'               => $page,
-                            'limit'              => $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'),
+                            'mautic_fields'        => $mauticFields,
+                            'integration_fields'   => $integrationFields,
+                            'csrf_protection'      => false,
+                            'integration_object'   => $integrationObject,
+                            'enable_data_priority' => $enableDataPriority,
+                            'integration'          => $integration,
+                            'page'                 => $page,
+                            'limit'                => $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'),
                         ]
                     );
 

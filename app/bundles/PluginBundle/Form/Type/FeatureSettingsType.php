@@ -133,7 +133,6 @@ class FeatureSettingsType extends AbstractType
             $leadFields['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
 
             $leadFields['-1'] = '';
-            $extraPage        = ($totalFields % $limit > 0 && $totalFields % $limit < ($limit / 2)) ? 1 : 0;
 
             $form->add(
                 'leadFields',
