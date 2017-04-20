@@ -24,6 +24,7 @@ use Mautic\UserBundle\Entity\User;
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
+    protected $pushContactLink = false;
 
     /**
      * @param Integration $settings
@@ -202,16 +203,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Create or update existing Mautic lead from the integration's profile data.
+     * @param $data
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param array|null  $socialCache
-     * @param mixed||null $identifiers
-     *
-     * @return Lead
+     * @return Company|void
      */
-    public function getMauticCompany($data, $persist = true, $identifiers = null)
+    public function getMauticCompany($data)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -222,9 +218,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
-        $matchedFields    = $this->populateMauticLeadData($data, $config, 'company');
-        $newMatchedFields = [];
-
+        $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
         $fieldsToUpdateInMautic = isset($config['update_mautic_company']) ? array_keys($config['update_mautic_company'], 0) : [];
         if (!empty($fieldsToUpdateInMautic)) {
             $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
@@ -247,14 +241,14 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $companyModel = $this->factory->getModel('lead.company');
 
         // Default to new company
-        $company = new Company();
-
+        $company         = new Company();
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
             $company = $existingCompany[2];
         } else {
             $matchedFields = $newMatchedFields; //change direction of fields only when updating an existing company
         }
+
         $companyModel->setFieldValues($company, $matchedFields, false, false);
         $companyModel->saveEntity($company, false);
 
@@ -304,6 +298,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             //return if uniqueIdentifiers have no data set to avoid duplicating leads.
             return;
         }
+
         // Default to new lead
         $lead = new Lead();
         $lead->setNewlyCreated(true);
@@ -316,6 +311,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $lead = array_shift($existingLeads);
             }
         }
+
         //use direction of fields only when updating existing lead
         $fieldsToUpdateInMautic = (isset($config['update_mautic']) && empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
         if (!empty($fieldsToUpdateInMautic)) {

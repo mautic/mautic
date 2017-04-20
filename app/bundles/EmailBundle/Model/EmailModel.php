@@ -1814,8 +1814,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             if (isset($filter['email_id'])) {
                 if (is_array($filter['email_id'])) {
-                    $q->andWhere('t.email_id IN(:email_id)');
-                    $q->setParameter('email_id', implode(',', $filter['email_id']));
+                    $q->andWhere($q->expr()->in('t.email_id', $filter['email_id']));
                 } else {
                     $q->andWhere('t.email_id = :email_id');
                     $q->setParameter('email_id', $filter['email_id']);

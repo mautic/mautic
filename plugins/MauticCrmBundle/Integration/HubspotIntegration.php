@@ -166,8 +166,6 @@ class HubspotIntegration extends CrmAbstractIntegration
             }
         }
 
-        $this->cache->set('leadFields', $hubsFields);
-
         return $hubsFields;
     }
 

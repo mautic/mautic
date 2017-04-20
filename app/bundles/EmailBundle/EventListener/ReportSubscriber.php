@@ -158,7 +158,8 @@ class ReportSubscriber extends CommonSubscriber
             $columns = array_merge(
                 $columns,
                 $event->getStandardColumns($prefix, [], 'mautic_email_action'),
-                $event->getCategoryColumns()
+                $event->getCategoryColumns(),
+                $event->getCampaignByChannelColumns()
             );
             $data = [
                 'display_name' => 'mautic.email.emails',
@@ -218,7 +219,12 @@ class ReportSubscriber extends CommonSubscriber
 
                 $data = [
                     'display_name' => 'mautic.email.stats.report.table',
-                    'columns'      => array_merge($columns, $statColumns, $event->getLeadColumns(), $event->getIpColumn()),
+                    'columns'      => array_merge(
+                        $columns,
+                        $statColumns,
+                        $event->getLeadColumns(),
+                        $event->getIpColumn()
+                    ),
                 ];
                 $event->addTable('email.stats', $data, 'emails');
 
@@ -241,8 +247,9 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        $context = $event->getContext();
-        $qb      = $event->getQueryBuilder();
+        $context    = $event->getContext();
+        $qb         = $event->getQueryBuilder();
+        $hasGroupBy = $event->hasGroupBy();
 
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
@@ -252,10 +259,13 @@ class ReportSubscriber extends CommonSubscriber
         switch ($context) {
             case 'emails':
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
-                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
-                   ->groupBy('e.id');
+                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+
                 $event->addCategoryLeftJoin($qb, 'e');
 
+                if (!$hasGroupBy) {
+                    $qb->groupBy('e.id');
+                }
                 if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
                     $qbcut->select(
                         'COUNT(cut2.channel_id) AS trackable_count, SUM(cut2.hits) AS hits',
@@ -276,6 +286,9 @@ class ReportSubscriber extends CommonSubscriber
                         'e.id = dnc.channel_id and dnc.channel=\'email\' and dnc.reason='.DoNotContact::UNSUBSCRIBED
                     );
                 }
+
+                $event->addCampaignByChannelJoin($qb, 'e', 'email');
+
                 break;
             case 'email.stats':
                 $qb->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -309,6 +322,8 @@ class ReportSubscriber extends CommonSubscriber
                         'e.id = dnc.channel_id AND dnc.channel=\'email\' AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' AND es.lead_id = dnc.lead_id'
                     );
                 }
+
+                $event->addCampaignByChannelJoin($qb, 'e', 'email');
 
                 break;
         }

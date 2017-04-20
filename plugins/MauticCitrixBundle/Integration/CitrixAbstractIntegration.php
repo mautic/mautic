@@ -107,7 +107,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getApiUrl()
     {
-        return 'https://api.citrixonline.com';
+        return 'https://api.getgo.com';
     }
 
     /**
