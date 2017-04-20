@@ -1553,7 +1553,7 @@ Mautic.convertDynamicContentSlotsToTokens = function (builderHtml) {
     if (dynConSlots.length) {
         dynConSlots.each(function(i) {
             var $this    = mQuery(this);
-            if ($this.parents('[data-slot]').length == 0) return; // prevent affecting standalone DEC slots
+            // if ($this.parents('[data-slot]').length == 0) return; // prevent affecting standalone DEC slots
             var dynConId = $this.attr('data-param-dec-id');
 
             dynConId = '#emailform_dynamicContent_'+dynConId;
