@@ -1521,6 +1521,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $all        = [];
         $createLead = false;
         $config     = $this->mergeConfigToFeatureSettings([]);
+        /** @var IntegrationEntityRepository $integrationEntityRepo */
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        //find campaignMember
+        $existingCampaignMember = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'CampaignMember', 'lead', $lead->getId(), null, null, null, false, 0, 0, "'".$integrationCampaignId."'");
 
         if ($status) {
             $body = [
@@ -1530,6 +1534,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $object = 'CampaignMember';
         $url    = '/services/data/v38.0/sobjects/'.$object;
+        if ($existingCampaignMember) {
+            foreach ($existingCampaignMember as $member) {
+                $integrationEntity      = $integrationEntityRepo->getEntity($member['id']);
+                $referenceId            = $integrationEntity->getId();
+                $campaignMemberInternal = $integrationEntity->getInternal();
+                $internalLeadId         = $integrationEntity->getInternalEntityId();
+            }
+        }
 
         $queryUrl = $this->getQueryUrl();
 
@@ -1604,13 +1616,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $all[]                 = $body;
         }
 
-        $salesforceIdMapping = [$integrationCampaignId];
-
         foreach ($all as $key => $b) {
             $campaignMappingId = '-'.$integrationCampaignId;
             if (isset($b['ContactId']) and $memberId = array_search($b['ContactId'], $contactIds)) {
-                $id       = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$b['ContactId'].(!empty($referenceId) ? '-'.$referenceId : '').$campaignMappingId;
-                $patchurl = $url.'/'.$memberId;
+                $id                  = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$b['ContactId'].(!empty($referenceId && $internalLeadId == $lead->getId()) ? '-'.$referenceId : '').$campaignMappingId;
+                $salesforceIdMapping = [$integrationCampaignId];
+                $patchurl            = $url.'/'.$memberId;
                 unset($b['ContactId']);
                 $mauticData[$id] = [
                     'method'      => 'PATCH',
@@ -1619,8 +1630,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'body'        => $b,
                 ];
             } elseif (isset($b['LeadId']) and $memberId = array_search($b['LeadId'], $leadIds)) {
-                $id       = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$b['LeadId'].(!empty($referenceId) ? '-'.$referenceId : '').$campaignMappingId;
-                $patchurl = $url.'/'.$memberId;
+                $id                  = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$b['LeadId'].(!empty($referenceId && $internalLeadId == $lead->getId()) ? '-'.$referenceId : '').$campaignMappingId;
+                $salesforceIdMapping = [$integrationCampaignId];
+                $patchurl            = $url.'/'.$memberId;
                 unset($b['LeadId']);
                 $mauticData[$id] = [
                     'method'      => 'PATCH',
@@ -1629,9 +1641,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'body'        => $b,
                 ];
             } else {
-                $id              = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMemberNew'.(!empty($referenceId) ? '-'.$referenceId : '').$campaignMappingId;
-                $b               = array_merge($b, ['CampaignId' => $integrationCampaignId]);
-                $mauticData[$id] = [
+                $id                  = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMemberNew-null'.$campaignMappingId;
+                $salesforceIdMapping = [];
+                $b                   = array_merge($b, ['CampaignId' => $integrationCampaignId]);
+                $mauticData[$id]     = [
                     'method'      => 'POST',
                     'url'         => $url,
                     'referenceId' => $id,
@@ -1641,7 +1654,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
         $request['allOrNone']        = 'false';
         $request['compositeRequest'] = array_values($mauticData);
-
         /** @var SalesforceApi $apiHelper */
         $apiHelper = $this->getApiHelper();
         if (!empty($request)) {
