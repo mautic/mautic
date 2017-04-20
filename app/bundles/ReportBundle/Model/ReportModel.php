@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -26,6 +27,7 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
@@ -66,6 +68,16 @@ class ReportModel extends FormModel
     protected $session;
 
     /**
+     * @var FieldModel
+     */
+    protected $fieldModel;
+
+    /**
+     * @var ReportHelper
+     */
+    protected $reportHelper;
+
+    /**
      * ReportModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -77,12 +89,16 @@ class ReportModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         FormatterHelper $formatterHelper,
         TemplatingHelper $templatingHelper,
-        ChannelListHelper $channelListHelper
+        ChannelListHelper $channelListHelper,
+        FieldModel $fieldModel,
+        ReportHelper $reportHelper
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->getParameter('default_pagelimit');
         $this->formatterHelper   = $formatterHelper;
         $this->templatingHelper  = $templatingHelper;
         $this->channelListHelper = $channelListHelper;
+        $this->fieldModel        = $fieldModel;
+        $this->reportHelper      = $reportHelper;
     }
 
     /**
@@ -209,7 +225,8 @@ class ReportModel extends FormModel
             } else {
                 //build them
                 $eventContext = ($context == 'all') ? '' : $context;
-                $event        = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext);
+
+                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
                 $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
 
                 $tables = $event->getTables();
@@ -268,7 +285,7 @@ class ReportModel extends FormModel
      *
      * @return \stdClass ['choices' => [], 'choiceHtml' => '', definitions => []]
      */
-    public function getColumnList($context)
+    public function getColumnList($context, $isGroupBy = false)
     {
         $tableData           = $this->getTableData($context);
         $columns             = isset($tableData['columns']) ? $tableData['columns'] : [];
@@ -278,6 +295,9 @@ class ReportModel extends FormModel
         $return->definitions = [];
 
         foreach ($columns as $column => $data) {
+            if ($isGroupBy && ($column == 'unsubscribed' || $column == 'unsubscribed_ratio' || $column == 'unique_ratio')) {
+                continue;
+            }
             if (isset($data['label'])) {
                 $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
                 $return->choices[$column]     = $data['label'];
@@ -516,6 +536,11 @@ class ReportModel extends FormModel
         // Prepare the query builder
         $tableDetails = $this->getTableData($entity->getSource());
 
+        $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
+
+        foreach ($aggregatorColumns as $aggregatorColumn) {
+            $selectedColumns[] = $aggregatorColumn['column'];
+        }
         // Build a reference for column to data column (without table prefix)
         $dataColumns = [];
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
@@ -585,7 +610,7 @@ class ReportModel extends FormModel
         }
 
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
-            if ($paginate) {
+            if ($paginate && !$entity->getGroupBy()) {
                 // Build the options array to pass into the query
                 $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
                 if (!empty($options['limit'])) {
@@ -628,7 +653,7 @@ class ReportModel extends FormModel
                 $queryTime .= 'ms';
             }
 
-            if (!$paginate) {
+            if (!$paginate || $entity->getGroupBy()) {
                 $totalResults = count($data);
             }
 

@@ -1829,7 +1829,9 @@ class EventModel extends CommonFormModel
                     'lead'            => $lead,
                     'systemTriggered' => $systemTriggered,
                     'config'          => $event['properties'],
-                ], true, $log
+                ],
+                true,
+                $log
             );
 
             $eventName = array_key_exists('eventName', $settings) ? $settings['eventName'] : null;

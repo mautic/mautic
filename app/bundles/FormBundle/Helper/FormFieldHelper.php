@@ -57,6 +57,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             ],
         ],
         'freetext' => [],
+        'freehtml' => [],
         'hidden'   => [],
         'number'   => [
             'filter' => 'float',

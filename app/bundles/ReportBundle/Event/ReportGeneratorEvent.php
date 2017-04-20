@@ -410,6 +410,21 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Check if the report has a groupBy columns selected.
+     *
+     *
+     * @return bool
+     */
+    public function hasGroupBy()
+    {
+        if (!empty($this->getReport()->getGroupBy())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function createParameterName()

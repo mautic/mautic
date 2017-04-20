@@ -316,8 +316,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $this->cache->set('leadFields'.$cacheSuffix, $salesFields[$sfObject]);
                             }
                         }
-
-                        asort($salesFields[$sfObject]);
                     }
                 }
             }
@@ -404,7 +402,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $entity                = $this->getMauticLead($dataObject, true, null, null);
                         $mauticObjectReference = 'lead';
                     } elseif ($object == 'Account') {
-                        $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $entity                = $this->getMauticCompany($dataObject);
                         $mauticObjectReference = 'company';
                     } else {
                         $this->logIntegrationError(
@@ -958,6 +956,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData            = $leadsToUpdate            = $fields            = [];
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $leadFields            = $config['leadFields'];
         $checkEmailsInSF       = [];
         $sfContact             = [];
 
@@ -965,6 +964,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $fields = implode(', l.', $config['leadFields']);
             $fields = 'l.'.$fields;
             $result = 0;
+            if ($mauticContactLinkField = array_search('mauticContactTimelineLink', $config['leadFields'])) {
+                $this->pushContactLink = true;
+                unset($leadFields[$mauticContactLinkField]);
+            }
+            $fields          = implode(', l.', $leadFields);
+            $fields          = 'l.'.$fields;
+            $result          = 0;
+            $checkEmailsInSF = [];
 
             $leadSfFieldsToCreate = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
             $leadSfFields         = array_diff_key($leadSfFieldsToCreate, array_flip($fieldsToUpdateInSf));
@@ -973,15 +980,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $contactSfFields = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
             $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
 
-            //update lead/contact records
             $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
         }
         foreach ($leadsToUpdate as $lead) {
+            if ($this->pushContactLink) {
+                $link = $this->factory->getRouter()->generate(
+                    'mautic_plugin_timeline_view',
+                    ['integration' => 'Salesforce', 'leadId' => $lead['internal_entity_id']],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+                $lead['mauticContactTimelineLink'] = $link;
+            }
             if (isset($lead['email']) && !empty($lead['email'])) {
                 $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
             }
         }
 
+        $checkEmailsInSF = [];
         // Only get the max limit
         if ($limit) {
             $limit -= count($leadsToUpdate);
@@ -990,6 +1005,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (null === $limit || $limit && !empty($fields)) {
             $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
             foreach ($leadsToCreate as $lead) {
+                if ($this->pushContactLink) {
+                    $link = $this->factory->getRouter()->generate(
+                        'mautic_plugin_timeline_view',
+                        ['integration' => 'Salesforce', 'leadId' => $lead['internal_entity_id']],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    );
+                    $lead['mauticContactTimelineLink'] = $link;
+                }
                 if (isset($lead['email'])) {
                     $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
                 }

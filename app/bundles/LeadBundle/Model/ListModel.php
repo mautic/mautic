@@ -1227,7 +1227,7 @@ class ListModel extends FormModel
     public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $filters = [])
     {
         $q = $this->em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name')
+        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
             ->orderBy('leads', 'DESC')
