@@ -37,7 +37,6 @@ class Version20170410210055 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE '.$this->prefix.'push_ids ADD mobile TINYINT(1) NOT NULL;');
         $this->addSql('ALTER TABLE '.$this->prefix."push_notification_stats ADD date_read DATETIME NOT NULL COMMENT '(DC2Type:datetime)';");
     }
 }
