@@ -257,6 +257,13 @@ trait FilterTrait
                 ]
             );
         } else {
+            if (isset($customOptions['constraints']) && is_array($customOptions['constraints'])) {
+                foreach ($customOptions['constraints'] as $i => $constraint) {
+                    if (get_class($constraint) === 'NotBlank') {
+                        array_splice($customOptions['constraints'], $i, 1);
+                    }
+                }
+            }
             $form->add(
                 'filter',
                 $type,

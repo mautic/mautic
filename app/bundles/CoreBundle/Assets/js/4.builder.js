@@ -1134,7 +1134,7 @@ Mautic.initSlotListeners = function() {
                 }
 
                 parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
-                    var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
+                    var slotHtml = mQuery('<div/>').append(editor.html.get());
                     // replace DEC with content from the first editor
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
