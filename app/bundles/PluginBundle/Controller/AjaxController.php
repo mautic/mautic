@@ -342,8 +342,7 @@ class AjaxController extends CommonAjaxController
         $integration_object = $helper->getIntegrationObject($integration);
         $entity             = $integration_object->getIntegrationSettings();
         $featureSettings    = $entity->getFeatureSettings();
-
-        $doNotMatchField = ($mautic_field === '-1');
+        $doNotMatchField    = ($mautic_field === '-1');
         if ($object == 'lead') {
             $fields       = 'leadFields';
             $updateFields = 'update_mautic';
@@ -369,10 +368,12 @@ class AjaxController extends CommonAjaxController
             if (isset($featureSettings[$fields])) {
                 $featureSettings[$fields] = array_merge($featureSettings[$fields], $newFeatureSettings);
             }
+            if (empty($featureSettings[$fields])) {
+                $featureSettings[$fields] = $newFeatureSettings;
+            }
 
             $dataArray = ['success' => 1];
         }
-
         $entity->setFeatureSettings($featureSettings);
 
         $this->getModel('plugin')->saveFeatureSettings($entity);
