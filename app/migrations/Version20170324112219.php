@@ -50,6 +50,7 @@ class Version20170324112219 extends AbstractMauticMigration
     {
         $this->suppressNoSQLStatementError();
 
+        $integrationRepo      = $this->container->get('doctrine.orm.entity_manager')->getRepository(Integration::class);
         $coreParametersHelper = $this->container->get('mautic.helper.core_parameters');
         $twilioKeySettings    = [
             'username' => $coreParametersHelper->getParameter('sms_username'),
@@ -83,28 +84,32 @@ class Version20170324112219 extends AbstractMauticMigration
             $osFeatureSettings['features'][] = 'welcome_notification_enabled';
         }
 
-        $twilioIntegration = new Integration();
-        $twilioIntegration->setName('Twilio');
-        $twilioIntegration->setIsPublished($coreParametersHelper->getParameter('sms_enabled'));
-        $twilioIntegration->setApiKeys([]);
-        $twilioIntegration->setFeatureSettings($twilioFeatureSettings);
-        $twilioIntegration->setSupportedFeatures([]);
+        if (!empty($twilioKeySettings['username'])) {
+            $twilioIntegration = new Integration();
+            $twilioIntegration->setName('Twilio');
+            $twilioIntegration->setIsPublished($coreParametersHelper->getParameter('sms_enabled'));
+            $twilioIntegration->setApiKeys([]);
+            $twilioIntegration->setFeatureSettings($twilioFeatureSettings);
+            $twilioIntegration->setSupportedFeatures([]);
 
-        $twilInt = new TwilioIntegration($this->container->get('mautic.factory'));
-        $twilInt->encryptAndSetApiKeys($twilioKeySettings, $twilioIntegration);
+            $twilInt = new TwilioIntegration($this->container->get('mautic.factory'));
+            $twilInt->encryptAndSetApiKeys($twilioKeySettings, $twilioIntegration);
 
-        $oneSignalIntegration = new Integration();
-        $oneSignalIntegration->setName('OneSignal');
-        $oneSignalIntegration->setIsPublished($coreParametersHelper->getParameter('notification_enabled'));
-        $oneSignalIntegration->setApiKeys([]);
-        $oneSignalIntegration->setFeatureSettings($osFeatureSettings);
-        $oneSignalIntegration->setSupportedFeatures([]);
+            $integrationRepo->saveEntities([$twilioIntegration]);
+        }
 
-        $osInt = new OneSignalIntegration($this->container->get('mautic.factory'));
-        $osInt->encryptAndSetApiKeys($oneSignalKeySettings, $oneSignalIntegration);
+        if (!empty($oneSignalKeySettings['rest_api_key'])) {
+            $oneSignalIntegration = new Integration();
+            $oneSignalIntegration->setName('OneSignal');
+            $oneSignalIntegration->setIsPublished($coreParametersHelper->getParameter('notification_enabled'));
+            $oneSignalIntegration->setApiKeys([]);
+            $oneSignalIntegration->setFeatureSettings($osFeatureSettings);
+            $oneSignalIntegration->setSupportedFeatures([]);
 
-        $integrationRepo = $this->container->get('doctrine.orm.entity_manager')->getRepository(Integration::class);
+            $osInt = new OneSignalIntegration($this->container->get('mautic.factory'));
+            $osInt->encryptAndSetApiKeys($oneSignalKeySettings, $oneSignalIntegration);
 
-        $integrationRepo->saveEntities([$twilioIntegration, $oneSignalIntegration]);
+            $integrationRepo->saveEntities([$oneSignalIntegration]);
+        }
     }
 }

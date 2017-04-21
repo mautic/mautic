@@ -147,15 +147,73 @@ class TokenSubscriber extends CommonSubscriber
                 continue;
             }
 
+            /*
+             * If we are checking the first filter in a group
+             * assume that the group will not match.
+             */
+            if ($groups[$groupNum] === null) {
+                $groups[$groupNum] = false;
+            }
+
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
             $filterVal = $data['filter'];
 
+            switch ($data['type']) {
+                case 'boolean':
+                    if ($leadVal !== null) {
+                        $leadVal = (bool) $leadVal;
+                    }
+
+                    if ($filterVal !== null) {
+                        $filterVal = (bool) $filterVal;
+                    }
+                    break;
+                case 'date':
+                    if (!$leadVal instanceof \DateTime) {
+                        $leadVal = new \DateTime($leadVal);
+                    }
+
+                    if (!$filterVal instanceof \DateTime) {
+                        $filterVal = new \DateTime($filterVal);
+                    }
+                    break;
+                case 'datetime':
+                case 'time':
+                    $leadValCount   = substr_count($leadVal, ':');
+                    $filterValCount = substr_count($filterVal, ':');
+
+                    if ($leadValCount === 2 && $filterValCount === 1) {
+                        $filterVal .= ':00';
+                    }
+                    break;
+                case 'multiselect':
+                    if (!is_array($leadVal)) {
+                        $leadVal = explode('|', $leadVal);
+                    }
+
+                    if (!is_array($filterVal)) {
+                        $filterVal = explode('|', $filterVal);
+                    }
+                    break;
+                case 'number':
+                    $leadVal   = (int) $leadVal;
+                    $filterVal = (int) $filterVal;
+                    break;
+                case 'select':
+                default:
+                    if (is_numeric($leadVal)) {
+                        $leadVal   = (int) $leadVal;
+                        $filterVal = (int) $filterVal;
+                    }
+                    break;
+            }
+
             switch ($data['operator']) {
                 case '=':
-                    $groups[$groupNum] = $leadVal === $filterVal;
+                    $groups[$groupNum] = $leadVal == $filterVal;
                     break;
                 case '!=':
-                    $groups[$groupNum] = $leadVal !== $filterVal;
+                    $groups[$groupNum] = $leadVal != $filterVal;
                     break;
                 case 'gt':
                     $groups[$groupNum] = $leadVal > $filterVal;
@@ -182,10 +240,26 @@ class TokenSubscriber extends CommonSubscriber
                     $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
                     break;
                 case 'in':
-                    $groups[$groupNum] = in_array($leadVal, $filterVal) !== false;
+                    foreach ($leadVal as $k => $v) {
+                        if (in_array($v, $filterVal)) {
+                            $groups[$groupNum] = true;
+                            // Break once we find a match
+                            break;
+                        }
+                    }
                     break;
                 case '!in':
-                    $groups[$groupNum] = in_array($leadVal, $filterVal) === false;
+                    $leadValNotMatched = true;
+
+                    foreach ($leadVal as $k => $v) {
+                        if (in_array($v, $filterVal)) {
+                            $leadValNotMatched = false;
+                            // Break once we find a match
+                            break;
+                        }
+                    }
+
+                    $groups[$groupNum] = $leadValNotMatched;
                     break;
                 case 'regexp':
                     $groups[$groupNum] = preg_match('/'.$filterVal.'/i', $leadVal) === 1;

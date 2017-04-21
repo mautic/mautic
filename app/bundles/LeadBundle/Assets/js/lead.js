@@ -242,13 +242,20 @@ Mautic.leadlistOnLoad = function(container) {
 };
 
 Mautic.convertLeadFilterInput = function(el) {
+    var prefix = 'leadlist';
+
+    var parent = mQuery(el).parents('.dynamic-content-filter');
+    if (parent) {
+        prefix = parent.attr('id');
+    }
+
     var operator = mQuery(el).val();
 
     // Extract the filter number
-    var regExp    = /leadlist_filters_(\d+)_operator/;
+    var regExp    = /_filters_(\d+)_operator/;
     var matches   = regExp.exec(mQuery(el).attr('id'));
     var filterNum = matches[1];
-    var filterId  = '#leadlist_filters_' + filterNum + '_filter';
+    var filterId  = '#' + prefix + '_filters_' + filterNum + '_filter';
 
     // Reset has-error
     if (mQuery(filterId).parent().hasClass('has-error')) {
@@ -257,7 +264,7 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 
     var disabled = (operator == 'empty' || operator == '!empty');
-    mQuery(filterId+', #leadlist_filters_' + filterNum + '_display').prop('disabled', disabled);
+    mQuery(filterId+', #' + prefix + '_filters_' + filterNum + '_display').prop('disabled', disabled);
 
     if (disabled) {
         mQuery(filterId).val('');
