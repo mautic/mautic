@@ -41,7 +41,7 @@ final class EmailEvents
      * The mautic.email_on_send event is dispatched when an email is sent.
      *
      * The event listener receives a
-     * Mautic\EmailBundle\Event\EmailEvent instance.
+     * Mautic\EmailBundle\Event\EmailSendEvent instance.
      *
      * @var string
      */
