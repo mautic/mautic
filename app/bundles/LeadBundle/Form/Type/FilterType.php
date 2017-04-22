@@ -115,6 +115,17 @@ class FilterType extends AbstractType
                     $customOptions['multiple'] = true;
                     $type                      = 'choice';
                     break;
+                case 'device_type':
+                    if (!isset($data['filter'])) {
+                        $data['filter'] = [];
+                    } elseif (!is_array($data['filter'])) {
+                        $data['filter'] = [$data['filter']];
+                    }
+
+                    $customOptions['choices']  = $options['deviceTypes'];
+                    $customOptions['multiple'] = true;
+                    $type                      = 'choice';
+                    break;
                 case 'tags':
                     if (!isset($data['filter'])) {
                         $data['filter'] = [];
@@ -368,6 +379,7 @@ class FilterType extends AbstractType
                 'regions',
                 'fields',
                 'lists',
+                'deviceTypes',
                 'emails',
                 'tags',
                 'stage',

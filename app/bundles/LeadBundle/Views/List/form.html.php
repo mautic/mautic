@@ -28,6 +28,7 @@ $templates = [
     'timezones'      => 'timezone-template',
     'select'         => 'select-template',
     'lists'          => 'leadlist-template',
+    'deviceTypes'    => 'device_type-template',
     'emails'         => 'lead_email_received-template',
     'tags'           => 'tags-template',
     'stage'          => 'stage-template',

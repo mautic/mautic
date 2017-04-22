@@ -28,6 +28,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 
 /**
  * Class ListType.
@@ -41,6 +42,7 @@ class ListType extends AbstractType
     private $regionChoices     = [];
     private $listChoices       = [];
     private $emailChoices      = [];
+    private $deviceTypesChoices      = [];
     private $tagChoices        = [];
     private $stageChoices      = [];
     private $localeChoices     = [];
@@ -104,6 +106,8 @@ class ListType extends AbstractType
         foreach ($categories as $category) {
             $this->categoriesChoices[$category['id']] = $category['title'];
         }
+
+        $this->deviceTypesChoices = DeviceParser::getAvailableDeviceTypeNames();
     }
 
     /**
@@ -176,6 +180,7 @@ class ListType extends AbstractType
                         'fields'         => $this->fieldChoices,
                         'lists'          => $this->listChoices,
                         'emails'         => $this->emailChoices,
+                        'deviceTypes'        => $this->deviceTypesChoices,
                         'tags'           => $this->tagChoices,
                         'stage'          => $this->stageChoices,
                         'locales'        => $this->localeChoices,
@@ -220,6 +225,7 @@ class ListType extends AbstractType
         $view->vars['timezones']      = $this->timezoneChoices;
         $view->vars['lists']          = $this->listChoices;
         $view->vars['emails']         = $this->emailChoices;
+        $view->vars['deviceTypes']    = $this->deviceTypesChoices;
         $view->vars['tags']           = $this->tagChoices;
         $view->vars['stage']          = $this->stageChoices;
         $view->vars['locales']        = $this->localeChoices;

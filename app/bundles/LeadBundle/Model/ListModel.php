@@ -312,6 +312,14 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
+            'device_type' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.device_type'),
+                'properties' => [
+                    'type' => 'device_type',
+                ],
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
+            ],
             'dnc_bounced' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
                 'properties' => [

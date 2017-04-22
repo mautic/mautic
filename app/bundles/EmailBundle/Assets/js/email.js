@@ -427,7 +427,7 @@ Mautic.addDynamicContentFilter = function (selectedFilter) {
     var prototype   = mQuery('#filterSelectPrototype').data('prototype');
     var fieldObject = selectedOption.data('field-object');
     var fieldType   = selectedOption.data('field-type');
-    var isSpecial   = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
+    var isSpecial   = (mQuery.inArray(fieldType, ['leadlist', 'device_type', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
 
     // Update the prototype settings
     prototype = prototype.replace(/__name__/g, filterNum)
