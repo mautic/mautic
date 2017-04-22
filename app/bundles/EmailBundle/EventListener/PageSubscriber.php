@@ -11,10 +11,12 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
+use Mautic\CampaignBundle\Model\EventModel;
 
 /**
  * Class PageSubscriber.
@@ -27,13 +29,21 @@ class PageSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
      * PageSubscriber constructor.
      *
      * @param EmailModel $emailModel
+     * @param EventModel $campaignEventModel
+     *
      */
-    public function __construct(EmailModel $emailModel)
+    public function __construct(EmailModel $emailModel, EventModel $campaignEventModel)
     {
         $this->emailModel = $emailModel;
+        $this->campaignEventModel    = $campaignEventModel;
     }
 
     /**
@@ -57,6 +67,9 @@ class PageSubscriber extends CommonSubscriber
         $redirect = $hit->getRedirect();
 
         if ($redirect && $email = $hit->getEmail()) {
+
+            //click trigger condition
+            $this->campaignEventModel->triggerEvent('email.click', $hit, 'email', $email->getId());
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();
 
@@ -82,13 +95,6 @@ class PageSubscriber extends CommonSubscriber
                 }
             }
 
-            //click trigger condition
-            $this->campaignEventModel->triggerEvent(
-                'email.click',
-                $hit,
-                'email',
-                $email->getId()
-            );
         }
     }
 }
