@@ -29,7 +29,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
-
+use DeviceDetector\Parser\OperatingSystem;
 /**
  * Class ListType.
  */
@@ -43,6 +43,8 @@ class ListType extends AbstractType
     private $listChoices       = [];
     private $emailChoices      = [];
     private $deviceTypesChoices      = [];
+    private $deviceBrandsChoices      = [];
+    private $deviceOsChoices      = [];
     private $tagChoices        = [];
     private $stageChoices      = [];
     private $localeChoices     = [];
@@ -108,6 +110,8 @@ class ListType extends AbstractType
         }
 
         $this->deviceTypesChoices = DeviceParser::getAvailableDeviceTypeNames();
+        $this->deviceBrandsChoices = DeviceParser::$deviceBrands;
+        $this->deviceOsChoices = array_keys(OperatingSystem::getAvailableOperatingSystemFamilies());
     }
 
     /**
@@ -181,6 +185,8 @@ class ListType extends AbstractType
                         'lists'          => $this->listChoices,
                         'emails'         => $this->emailChoices,
                         'deviceTypes'        => $this->deviceTypesChoices,
+                        'deviceBrands'        => $this->deviceBrandsChoices,
+                        'deviceOs'        => $this->deviceOsChoices,
                         'tags'           => $this->tagChoices,
                         'stage'          => $this->stageChoices,
                         'locales'        => $this->localeChoices,
@@ -226,6 +232,8 @@ class ListType extends AbstractType
         $view->vars['lists']          = $this->listChoices;
         $view->vars['emails']         = $this->emailChoices;
         $view->vars['deviceTypes']    = $this->deviceTypesChoices;
+        $view->vars['deviceBrands']    = $this->deviceBrandsChoices;
+        $view->vars['deviceOs']    = $this->deviceOsChoices;
         $view->vars['tags']           = $this->tagChoices;
         $view->vars['stage']          = $this->stageChoices;
         $view->vars['locales']        = $this->localeChoices;
