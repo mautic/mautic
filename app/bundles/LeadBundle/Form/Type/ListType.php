@@ -108,10 +108,9 @@ class ListType extends AbstractType
         foreach ($categories as $category) {
             $this->categoriesChoices[$category['id']] = $category['title'];
         }
-
-        $this->deviceTypesChoices = DeviceParser::getAvailableDeviceTypeNames();
+        $this->deviceTypesChoices = array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames()));
         $this->deviceBrandsChoices = DeviceParser::$deviceBrands;
-        $this->deviceOsChoices = array_keys(OperatingSystem::getAvailableOperatingSystemFamilies());
+        $this->deviceOsChoices = array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()));
     }
 
     /**
@@ -186,7 +185,7 @@ class ListType extends AbstractType
                         'emails'         => $this->emailChoices,
                         'deviceTypes'    => $this->deviceTypesChoices,
                         'deviceBrands'   => $this->deviceBrandsChoices,
-                        'deviceOs'        => $this->deviceOsChoices,
+                        'deviceOs'       => $this->deviceOsChoices,
                         'tags'           => $this->tagChoices,
                         'stage'          => $this->stageChoices,
                         'locales'        => $this->localeChoices,
