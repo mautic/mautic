@@ -231,8 +231,8 @@ class ListType extends AbstractType
         $view->vars['lists']          = $this->listChoices;
         $view->vars['emails']         = $this->emailChoices;
         $view->vars['deviceTypes']    = $this->deviceTypesChoices;
-        $view->vars['deviceBrands']    = $this->deviceBrandsChoices;
-        $view->vars['deviceOs']    = $this->deviceOsChoices;
+        $view->vars['deviceBrands']   = $this->deviceBrandsChoices;
+        $view->vars['deviceOs']       = $this->deviceOsChoices;
         $view->vars['tags']           = $this->tagChoices;
         $view->vars['stage']          = $this->stageChoices;
         $view->vars['locales']        = $this->localeChoices;
