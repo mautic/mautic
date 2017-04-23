@@ -242,13 +242,20 @@ Mautic.leadlistOnLoad = function(container) {
 };
 
 Mautic.convertLeadFilterInput = function(el) {
+    var prefix = 'leadlist';
+
+    var parent = mQuery(el).parents('.dynamic-content-filter');
+    if (parent) {
+        prefix = parent.attr('id');
+    }
+
     var operator = mQuery(el).val();
 
     // Extract the filter number
-    var regExp    = /leadlist_filters_(\d+)_operator/;
+    var regExp    = /_filters_(\d+)_operator/;
     var matches   = regExp.exec(mQuery(el).attr('id'));
     var filterNum = matches[1];
-    var filterId  = '#leadlist_filters_' + filterNum + '_filter';
+    var filterId  = '#' + prefix + '_filters_' + filterNum + '_filter';
 
     // Reset has-error
     if (mQuery(filterId).parent().hasClass('has-error')) {
@@ -257,7 +264,7 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 
     var disabled = (operator == 'empty' || operator == '!empty');
-    mQuery(filterId+', #leadlist_filters_' + filterNum + '_display').prop('disabled', disabled);
+    mQuery(filterId+', #' + prefix + '_filters_' + filterNum + '_display').prop('disabled', disabled);
 
     if (disabled) {
         mQuery(filterId).val('');
@@ -339,7 +346,7 @@ Mautic.addLeadListFilter = function (elId) {
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
     var fieldObject = mQuery(filterId).data('field-object');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'device_type',  'device_brand',  'device_os', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale', 'globalcategory']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'device_type',  'device_brand', 'device_os', 'lead_email_received', 'lead_email_sent', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale', 'globalcategory']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
