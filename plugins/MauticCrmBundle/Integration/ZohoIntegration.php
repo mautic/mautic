@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 
 /**
  * Class ZohoIntegration.
@@ -26,6 +27,14 @@ class ZohoIntegration extends CrmAbstractIntegration
     public function getName()
     {
         return 'Zoho';
+    }
+
+    /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead'];
     }
 
     /**
@@ -139,7 +148,11 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
+     * @param array $settings
+     *
+     * @return array|bool
+     *
+     * @throws ApiErrorException
      */
     public function getAvailableLeadFields($settings = [])
     {
@@ -149,6 +162,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $zohoFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+
         try {
             if ($this->isAuthorized()) {
                 $leadObject = $this->getApiHelper()->getLeadFields();
@@ -168,8 +182,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                             continue;
                         }
 
-                        $key              = InputHelper::alphanum(InputHelper::transliterate($field['dv']));
-                        $zohoFields[$key] = [
+                        $zohoFields[$this->getFieldKey($field['dv'])] = [
                             'type'     => 'string',
                             'label'    => $field['label'],
                             'dv'       => $field['dv'],
@@ -177,18 +190,23 @@ class ZohoIntegration extends CrmAbstractIntegration
                         ];
                     }
                 }
+
+                $this->cache->set('leadFields', $zohoFields);
             }
-        } catch (ErrorException $exception) {
+        } catch (ApiErrorException $exception) {
             $this->logIntegrationError($exception);
 
             if (!$silenceExceptions) {
+                if (strpos($exception->getMessage(), 'Invalid Ticket Id') !== false) {
+                    // Use a bit more friendly message
+                    $exception = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthorize.');
+                }
+
                 throw $exception;
             }
 
             return false;
         }
-
-        $this->cache->set('leadFields', $zohoFields);
 
         return $zohoFields;
     }
@@ -199,16 +217,14 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param $key
      * @param $field
      *
-     * @return mixed
+     * @return array
      */
     public function convertLeadFieldKey($key, $field)
     {
-        return $field['dv'];
+        return [$this->getFieldKey($field['dv']), $field['dv']];
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param $lead
      * @param $config
      *
@@ -227,5 +243,15 @@ class ZohoIntegration extends CrmAbstractIntegration
         $xmlData .= '</Leads>';
 
         return $xmlData;
+    }
+
+    /**
+     * @param $dv
+     *
+     * @return string
+     */
+    protected function getFieldKey($dv)
+    {
+        return InputHelper::alphanum(InputHelper::transliterate($dv));
     }
 }
