@@ -1026,24 +1026,49 @@ class LeadListRepository extends CommonRepository
                 case 'stage':
                     $operand = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
 
+                    // A note here that SQL EXISTS is being used for the eq and neq cases.
+                    // I think this code might be inefficient since the sub-query is rerun
+                    // for every row in the outer query's table. This might have to be refactored later on
+                    // if performance is desired.
+
                     $subQb = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select('null')
                         ->from(MAUTIC_TABLE_PREFIX.'stages', $alias);
+
                     switch ($func) {
+                        case 'empty':
+                            $groupExpr->add(
+                               $q->expr()->isNull('l.stage_id')
+                            );
+                            break;
+                        case 'notEmpty':
+                            $groupExpr->add(
+                               $q->expr()->isNotNull('l.stage_id')
+                            );
+                            break;
                         case 'eq':
-                        case 'neq':
-                            $parameters[$parameter] = $details['filter'];
                             $subQb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.id', 'l.stage_id'),
                                     $q->expr()->eq($alias.'.id', ":$parameter")
                                 )
                             );
+                            $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
+
+                            break;
+                        case 'neq':
+                            $parameters[$parameter] = $details['filter'];
+
+                            $subQb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.id', 'l.stage_id'),
+                                    $q->expr()->neq($alias.'.id', ":$parameter")
+                                )
+                            );
+                            $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
                             break;
                     }
-
-                    $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
 
                     break;
                 default:
