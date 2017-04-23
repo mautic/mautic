@@ -63,6 +63,14 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add('track_by_fingerprint', 'yesno_button_group', [
+            'label' => 'mautic.page.config.form.track.by.fingerprint',
+            'data'  => (bool) $options['data']['track_by_fingerprint'],
+            'attr'  => [
+                'tooltip' => 'mautic.page.config.form.track.by.fingerprint.tooltip',
+            ],
+        ]);
     }
 
     /**

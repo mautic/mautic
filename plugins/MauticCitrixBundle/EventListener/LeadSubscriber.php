@@ -135,8 +135,10 @@ class LeadSubscriber extends CommonSubscriber
                             'eventType'  => $timelineEventTypeLabel,
                             'timestamp'  => $citrixEvent->getEventDate(),
                             'extra'      => [
-                                'eventName' => $citrixEvent->getEventName(),
+                                'eventName' => $citrixEvent->getEventNameOnly(),
+                                'eventId'   => $citrixEvent->getEventId(),
                                 'eventDesc' => $citrixEvent->getEventDesc(),
+                                'joinUrl'   => $citrixEvent->getJoinUrl(),
                             ],
                             'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.php',
                         ]

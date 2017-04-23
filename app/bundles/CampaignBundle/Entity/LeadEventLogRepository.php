@@ -92,8 +92,8 @@ class LeadEventLogRepository extends CommonRepository
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
                       ->where('ll.lead_id = '.(int) $leadId)
-                      ->andWhere('e.event_type = :eventType')
-                      ->setParameter('eventType', 'action');
+                      ->andWhere('e.event_type != :eventType')
+                      ->setParameter('eventType', 'decision');
 
         if (isset($options['scheduledState'])) {
             if ($options['scheduledState']) {
@@ -176,8 +176,14 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (isset($options['eventType'])) {
-            $query->andwhere('e.event_type = :eventType')
-                ->setParameter('eventType', $options['eventType']);
+            if (is_array($options['eventType'])) {
+                $query->andWhere(
+                    $query->expr()->in('e.event_type', array_map([$query->expr(), 'literal'], $options['eventType']))
+                );
+            } else {
+                $query->andwhere('e.event_type = :eventTypes')
+                    ->setParameter('eventTypes', $options['eventType']);
+            }
         }
 
         if (isset($options['limit'])) {
