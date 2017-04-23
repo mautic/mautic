@@ -1286,7 +1286,7 @@ class LeadListRepository extends CommonRepository
                     }
 
                     $subExpr->add(
-                        $subQb->expr()->in(sprintf('%s.%s', $alias, $column), $subQb->expr()->in(sprintf('%s.%s', $alias, $column), "'".implode("','", $details['filter'])."'"))
+                        $subQb->expr()->in(sprintf('%s.%s', $alias, $column),  "'".implode("','", $details['filter'])."'")
                     );
 
                     $subQb->select('null')
@@ -1296,7 +1296,6 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(
                         sprintf('%s (%s)', $func, $subQb->getSQL())
                     );
-
                     break;
                 case 'stage':
                     $operand = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
