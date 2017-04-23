@@ -78,6 +78,39 @@ trait FilterTrait
                 $customOptions['choice_translation_domain'] = false;
                 $type                                       = 'choice';
                 break;
+            case 'device_type':
+                if (!isset($data['filter'])) {
+                    $data['filter'] = [];
+                } elseif (!is_array($data['filter'])) {
+                    $data['filter'] = [$data['filter']];
+                }
+
+                $customOptions['choices']  = $options['deviceTypes'];
+                $customOptions['multiple'] = true;
+                $type                      = 'choice';
+                break;
+            case 'device_brand':
+                if (!isset($data['filter'])) {
+                    $data['filter'] = [];
+                } elseif (!is_array($data['filter'])) {
+                    $data['filter'] = [$data['filter']];
+                }
+
+                $customOptions['choices']  = $options['deviceBrands'];
+                $customOptions['multiple'] = true;
+                $type                      = 'choice';
+                break;
+            case 'device_os':
+                if (!isset($data['filter'])) {
+                    $data['filter'] = [];
+                } elseif (!is_array($data['filter'])) {
+                    $data['filter'] = [$data['filter']];
+                }
+
+                $customOptions['choices']  = $options['deviceOs'];
+                $customOptions['multiple'] = true;
+                $type                      = 'choice';
+                break;
             case 'tags':
                 if (!isset($data['filter'])) {
                     $data['filter'] = [];
