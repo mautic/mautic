@@ -232,7 +232,7 @@ trait FilterTrait
 
         if (in_array($data['operator'], ['empty', '!empty'])) {
             $attr['disabled'] = 'disabled';
-        } else {
+        } elseif ($data['operator']) {
             $customOptions['constraints'] = [
                 new NotBlank(
                     [
