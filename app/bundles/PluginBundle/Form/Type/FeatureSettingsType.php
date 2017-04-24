@@ -132,8 +132,6 @@ class FeatureSettingsType extends AbstractType
 
             $leadFields['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
 
-            $leadFields['-1'] = '';
-
             $form->add(
                 'leadFields',
                 'integration_fields',

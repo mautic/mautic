@@ -57,8 +57,12 @@ class LeadListSubscriber extends CommonSubscriber
     public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event)
     {
         $integration = $this->helper->getIntegrationObject('Salesforce');
-        $choices     = [];
-        $campaigns   = $integration->getCampaigns();
+        if (!$integration || !$integration->getIntegrationSettings()->isPublished()) {
+            return;
+        }
+
+        $choices   = [];
+        $campaigns = $integration->getCampaigns();
         if (isset($campaigns['records']) && !empty($campaigns['records'])) {
             foreach ($campaigns['records'] as $campaign) {
                 $choices[$campaign['Id']] = $campaign['Name'];
