@@ -425,6 +425,16 @@ final class LeadEvents
     const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
 
     /**
+     * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFilteringEvent instance.
+     *
+     * @var string
+     */
+    const LIST_PRE_PROCESS_LIST = 'mautic.list_pre_process_list';
+
+    /**
      * The mautic.remove_do_no_contact event is dispatched when a new submission is fired.
      *
      * The event listener receives a Mautic\FormBundle\Event\SubmissionEvent instance.

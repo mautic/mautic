@@ -56,6 +56,10 @@ class FieldApiController extends CommonApiController
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
         $parameters['object'] = $this->fieldObject;
+        // Workaround for mispelled isUniqueIdentifer.
+        if (isset($parameters['isUniqueIdentifier'])) {
+            $parameters['isUniqueIdentifer'] = $parameters['isUniqueIdentifier'];
+        }
 
         return $parameters;
     }

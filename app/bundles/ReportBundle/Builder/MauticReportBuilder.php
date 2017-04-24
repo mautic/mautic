@@ -212,7 +212,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build GROUP BY
-        if (!empty($options['groupby'])) {
+        if ($groupByOptions = $this->entity->getGroupBy()) {
+            foreach ($groupByOptions as $groupBy) {
+                if (isset($options['columns'][$groupBy])) {
+                    $fieldOptions = $options['columns'][$groupBy];
+                    $columns[]    = (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
+                }
+            }
+            $groupByColumns = implode(',', $columns);
+            $queryBuilder->addGroupBy($groupByColumns);
+        } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
             if (is_array($options['groupby'])) {
                 foreach ($options['groupby'] as $groupBy) {
                     $queryBuilder->addGroupBy($groupBy);
@@ -221,7 +230,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $queryBuilder->groupBy($options['groupby']);
             }
         }
-
         // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
@@ -271,6 +279,25 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         $queryBuilder->addSelect(implode(', ', $selectColumns));
+        // Add Aggregators
+        $aggregators = $this->entity->getAggregators();
+        if ($aggregators && $groupByOptions) {
+            foreach ($aggregators as $aggregator) {
+                $column = '';
+                if (isset($options['columns'][$aggregator['column']])) {
+                    $fieldOptions = $options['columns'][$aggregator['column']];
+                    if ($aggregator['function'] == 'AVG') {
+                        $field = (isset($fieldOptions['formula'])) ? 'ROUND('.$aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].'))' : 'ROUND('.$aggregator['function'].'(DISTINCT '.$aggregator['column'].'))';
+                    } else {
+                        $field = (isset($fieldOptions['formula'])) ? $aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].')' : $aggregator['function'].'(DISTINCT '.$aggregator['column'].')';
+                    }
+                    $column .= $field;
+                }
+
+                $formula = $column." as '".$aggregator['function'].' '.$aggregator['column']."'";
+                $queryBuilder->addSelect($formula);
+            }
+        }
 
         return $queryBuilder;
     }
@@ -335,7 +362,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         }
 
                         $columnValue = ":$paramName";
-                        switch ($filterDefinitions[$filter['column']]['type']) {
+                        $type        = $filterDefinitions[$filter['column']]['type'];
+                        if (isset($filterDefinitions[$filter['column']]['formula'])) {
+                            $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
+                        }
+
+                        switch ($type) {
                             case 'bool':
                             case 'boolean':
                                 if ((int) $filter['value'] > 1) {
@@ -359,9 +391,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
 
-                        $filterExpr->add(
-                            $expr->{$exprFunction}($filter['column'], $columnValue)
-                        );
+                    $filterExpr->add(
+                        $expr->{$exprFunction}($filter['column'], $columnValue)
+                    );
                 }
             }
         }

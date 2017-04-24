@@ -68,7 +68,13 @@ class ReportSubscriber extends CommonSubscriber
                 ],
             ];
 
-            $columns = array_merge($columns, $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'), $event->getCategoryColumns());
+            $columns = array_merge(
+                $columns,
+                $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'),
+                $event->getCategoryColumns(),
+                $event->getCampaignByChannelColumns()
+            );
+
             $event->addTable(
                 'assets',
                 [
@@ -107,7 +113,12 @@ class ReportSubscriber extends CommonSubscriber
                     'asset.downloads',
                     [
                         'display_name' => 'mautic.asset.report.downloads.table',
-                        'columns'      => array_merge($columns, $downloadColumns, $event->getLeadColumns(), $event->getIpColumn()),
+                        'columns'      => array_merge(
+                            $columns,
+                            $downloadColumns,
+                            $event->getLeadColumns(),
+                            $event->getIpColumn()
+                        ),
                     ],
                     'assets'
                 );
@@ -135,6 +146,7 @@ class ReportSubscriber extends CommonSubscriber
         if ($context == 'assets') {
             $queryBuilder->from(MAUTIC_TABLE_PREFIX.'assets', 'a');
             $event->addCategoryLeftJoin($queryBuilder, 'a');
+            $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
         } elseif ($context == 'asset.downloads') {
             $event->applyDateFilters($queryBuilder, 'date_download', 'ad');
 
@@ -143,6 +155,7 @@ class ReportSubscriber extends CommonSubscriber
             $event->addCategoryLeftJoin($queryBuilder, 'a');
             $event->addLeadLeftJoin($queryBuilder, 'ad');
             $event->addIpAddressLeftJoin($queryBuilder, 'ad');
+            $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
         }
 
         $event->setQueryBuilder($queryBuilder);

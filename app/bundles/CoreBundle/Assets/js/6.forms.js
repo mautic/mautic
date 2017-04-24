@@ -398,7 +398,7 @@ Mautic.updateEntitySelect = function (response) {
 
         if (mQueryParent(el).prop('disabled')) {
             mQueryParent(el).prop('disabled', false);
-                var emptyOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
+            var emptyOption = mQuery('<option value="">' + mauticLang.chosenChooseOne + '</option>');
         } else {
             if (mQueryParent(el + ' option[value=""]').length) {
                 emptyOption = mQueryParent(el + ' option[value=""]').clone();
@@ -417,7 +417,7 @@ Mautic.updateEntitySelect = function (response) {
             var optgroup = el + ' optgroup[label="'+response.group+'"]';
             if (mQueryParent(optgroup).length) {
                 // update option when new option equal with option item in group.
-                    var firstOptionGroups = mQueryParent(optgroup);
+                var firstOptionGroups = mQueryParent(optgroup);
                 var isUpdateOption = false;
                 firstOptionGroups.each(function () {
                     var firstOptions = mQuery(this).children();
@@ -432,7 +432,7 @@ Mautic.updateEntitySelect = function (response) {
 
                 if (!isUpdateOption) {
                     //the optgroup exist so append to it
-                        mQueryParent(optgroup).append(newOption);
+                    mQueryParent(optgroup).append(newOption);
                 }
             } else {
                 //create the optgroup
@@ -535,6 +535,17 @@ Mautic.removeFormListOption = function (el) {
 };
 
 /**
+ * Creates a select option element with a name and label
+ * @param value
+ * @param label
+ */
+Mautic.createOption = function (value, label) {
+    return mQuery('<option/>')
+        .attr('value', value)
+        .text(label);
+}
+
+/**
  * Updates operator select and value input format based on selected field and operator
  *
  * @param field
@@ -564,26 +575,33 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                 'id': valueField.attr('id'),
                 'name': valueField.attr('name'),
                 'autocomplete': valueField.attr('autocomplete'),
-                'value': valueField.attr('value')
+                'value': valueField.val()
             };
 
             if (mQuery('#'+fieldPrefix+'value_chosen').length) {
-                mQuery('#'+fieldPrefix+'value').chosen('destroy');
+                valueFieldAttrs['value'] = '';
+                valueField.chosen('destroy');
             }
 
-            if (!mQuery.isEmptyObject(response.options)) {
+            if (!mQuery.isEmptyObject(response.options) && response.fieldType !== 'number') {
                 var newValueField = mQuery('<select/>')
                     .attr('class', valueFieldAttrs['class'])
                     .attr('id', valueFieldAttrs['id'])
                     .attr('name', valueFieldAttrs['name'])
                     .attr('autocomplete', valueFieldAttrs['autocomplete'])
                     .attr('value', valueFieldAttrs['value']);
-                mQuery.each(response.options, function(optionKey, optionVal) {
-                    var option = mQuery("<option/>")
-                        .attr('value', optionKey)
-                        .text(optionVal);
-                    newValueField.append(option);
+                mQuery.each(response.options, function(value, optgroup) {
+                    if (typeof optgroup === 'object') {
+                        var optgroupEl = mQuery('<optgroup/>').attr('label', value);
+                        mQuery.each(optgroup, function(optVal, label) {
+                            optgroupEl.append(Mautic.createOption(optVal, label))
+                        });
+                        newValueField.append(optgroupEl);
+                    } else {
+                        newValueField.append(Mautic.createOption(value, optgroup));
+                    }
                 });
+                newValueField.val(valueFieldAttrs['value']);
                 valueField.replaceWith(newValueField);
 
                 Mautic.activateChosenSelect(newValueField);
@@ -597,6 +615,7 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     .attr('value', valueFieldAttrs['value']);
 
                 if (response.disabled) {
+                    newValueField.attr('value', '');
                     newValueField.prop('disabled', true);
                 }
 
@@ -608,17 +627,18 @@ Mautic.updateFieldOperatorValue = function(field, action) {
             }
 
             if (!mQuery.isEmptyObject(response.operators)) {
+                var operatorField = mQuery('#'+fieldPrefix+'operator');
+
                 if (mQuery('#'+fieldPrefix+'operator_chosen').length) {
-                    mQuery('#'+fieldPrefix+'operator').chosen('destroy');
+                    operatorField.chosen('destroy');
                 }
 
-                var operatorField = mQuery('#'+fieldPrefix+'operator');
                 var operatorFieldAttrs = {
                     'class': operatorField.attr('class'),
                     'id': operatorField.attr('id'),
                     'name': operatorField.attr('name'),
                     'autocomplete': operatorField.attr('autocomplete'),
-                    'value': operatorField.attr('value')
+                    'value': operatorField.val()
                 };
 
                 var newOperatorField = mQuery('<select/>')
@@ -629,11 +649,9 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     .attr('value', operatorFieldAttrs['value'])
                     .attr('onchange', 'Mautic.updateLeadFieldValues(this)');
                 mQuery.each(response.operators, function(optionKey, optionVal) {
-                    var option = mQuery("<option/>")
-                        .attr('value', optionKey)
-                        .text(optionVal);
-                    newOperatorField.append(option);
+                    newOperatorField.append(Mautic.createOption(optionKey, optionVal));
                 });
+                newOperatorField.val(operatorField.val());
                 operatorField.replaceWith(newOperatorField);
                 Mautic.activateChosenSelect(newOperatorField);
             }
