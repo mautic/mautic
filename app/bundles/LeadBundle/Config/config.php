@@ -502,6 +502,10 @@ return [
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'campaignevent_lead_field_value',
             ],
+            'mautic.form.type.campaignevent_lead_device' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType',
+                'alias'     => 'campaignevent_lead_device',
+            ],
             'mautic.form.type.lead_fields' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
                 'arguments' => ['mautic.factory'],

@@ -154,6 +154,14 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('lead.field_value', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.device',
+            'description' => 'mautic.lead.lead.events.device_descr',
+            'formType'    => 'campaignevent_lead_device',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('lead.device', $trigger);
     }
 
     /**
