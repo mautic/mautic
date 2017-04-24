@@ -54,7 +54,7 @@ class FormModel extends AbstractCommonModel
                 $checkedOutBy = $entity->getCheckedOutBy();
                 $maxLockTime  = $this->coreParametersHelper->getParameter('max_entity_lock_time', 0);
 
-                if ($maxLockTime !== 0 && is_numeric($maxLockTime)) {
+                if ($maxLockTime != 0 && is_numeric($maxLockTime)) {
                     $lockValidityDate = clone $checkedOut;
                     $lockValidityDate->add(new \DateInterval('PT'.$maxLockTime.'S'));
                 } else {
