@@ -36,19 +36,19 @@ use DeviceDetector\Parser\OperatingSystem;
 class ListType extends AbstractType
 {
     private $translator;
-    private $fieldChoices      = [];
-    private $timezoneChoices   = [];
-    private $countryChoices    = [];
-    private $regionChoices     = [];
-    private $listChoices       = [];
-    private $emailChoices      = [];
-    private $deviceTypesChoices      = [];
-    private $deviceBrandsChoices      = [];
+    private $fieldChoices         = [];
+    private $timezoneChoices      = [];
+    private $countryChoices       = [];
+    private $regionChoices        = [];
+    private $listChoices          = [];
+    private $emailChoices         = [];
+    private $deviceTypesChoices   = [];
+    private $deviceBrandsChoices  = [];
     private $deviceOsChoices      = [];
-    private $tagChoices        = [];
-    private $stageChoices      = [];
-    private $localeChoices     = [];
-    private $categoriesChoices = [];
+    private $tagChoices           = [];
+    private $stageChoices         = [];
+    private $localeChoices        = [];
+    private $categoriesChoices    = [];
 
     /**
      * ListType constructor.
