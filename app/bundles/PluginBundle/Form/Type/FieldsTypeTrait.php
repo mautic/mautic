@@ -47,7 +47,6 @@ trait FieldsTypeTrait
                 $optionalFields = [];
                 $group = [];
                 $fieldData = $event->getData();
-
                 // First loop to build options
                 foreach ($integrationFields as $field => $details) {
                     $groupName = '0default';
@@ -111,15 +110,14 @@ trait FieldsTypeTrait
                 }
 
                 // Ensure that fields aren't hidden
-                if ($start > count($fields)) {
+                if ($start > count($fields) || $options['page'] == 0) {
                     $start = 0;
                 }
-                $paginatedFields = array_slice($fields, $start, $limit);
 
+                $paginatedFields = array_slice($fields, $start, $limit);
                 foreach ($paginatedFields as $field => $details) {
                     $matched = isset($fieldData[$field]);
                     $required = (int) !empty($integrationFields[$field]['required']);
-
                     ++$index;
                     $form->add(
                         'label_'.$index,
