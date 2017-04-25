@@ -130,7 +130,7 @@ return [
                 'route'     => 'mautic_themes_index',
                 'iconClass' => 'fa-newspaper-o',
                 'id'        => 'mautic_themes_index',
-                'access'    => 'admin',
+                'access'    => 'core:themes:view',
             ],
         ],
         'extra' => [
@@ -315,6 +315,10 @@ return [
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
                 'alias' => 'theme_upload',
+            ],
+            'mautic.form.type.slot.dynamiccontent' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotDynamicContentType',
+                'alias' => 'slot_dynamiccontent',
             ],
             'mautic.form.type.dynamic_content_filter' => [
                 'class' => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,

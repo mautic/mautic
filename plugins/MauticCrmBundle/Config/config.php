@@ -32,4 +32,15 @@ return [
             ],
         ],
     ],
+    'services' => [
+        'events' => [
+            'mautic.integration.leadbundle.subscriber' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\LeadListSubscriber',
+                'arguments' => [
+                    'mautic.helper.integration',
+                    'mautic.lead.model.list',
+                ],
+            ],
+        ],
+    ],
 ];

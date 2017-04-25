@@ -49,6 +49,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'checkboxgrp' => [],
         'country'     => [],
         'date'        => [],
+        'datetime'    => [],
         'email'       => [
             'filter'      => 'email',
             'constraints' => [
@@ -56,6 +57,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
             ],
         ],
         'freetext' => [],
+        'freehtml' => [],
         'hidden'   => [],
         'number'   => [
             'filter' => 'float',
