@@ -8,65 +8,94 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'sms');
-$view['slots']->set('headerTitle', $sms->getName());
-
+if (!$isEmbedded) {
+    $view->extend('MauticCoreBundle:Default:content.html.php');
+    $view['slots']->set('mauticContent', 'sms');
+    $view['slots']->set('headerTitle', $sms->getName());
+}
 $smsType = $sms->getSmsType();
 if (empty($smsType)) {
     $smsType = 'template';
 }
 
 $customButtons = [];
+if (!$isEmbedded) {
+    $view['slots']->set(
+        'actions',
+        $view->render(
+            'MauticCoreBundle:Helper:page_actions.html.php',
+            [
+                'item'            => $sms,
+                'customButtons'   => (isset($customButtons)) ? $customButtons : [],
+                'templateButtons' => [
+                    'edit' => $view['security']->hasEntityAccess(
+                        $permissions['sms:smses:editown'],
+                        $permissions['sms:smses:editother'],
+                        $sms->getCreatedBy()
+                    ),
+                    'clone'  => $permissions['sms:smses:create'],
+                    'delete' => $view['security']->hasEntityAccess(
+                        $permissions['sms:smses:deleteown'],
+                        $permissions['sms:smses:deleteother'],
+                        $sms->getCreatedBy()
+                    ),
+                    'close' => $view['security']->hasEntityAccess(
+                        $permissions['sms:smses:viewown'],
+                        $permissions['sms:smses:viewother'],
+                        $sms->getCreatedBy()
+                    ),
+                ],
+                'routeBase' => 'sms',
+            ]
+        )
+    );
 
-$view['slots']->set(
-    'actions',
-    $view->render(
-        'MauticCoreBundle:Helper:page_actions.html.php',
-        [
-            'item'            => $sms,
-            'customButtons'   => (isset($customButtons)) ? $customButtons : [],
-            'templateButtons' => [
-                'edit' => $view['security']->hasEntityAccess(
-                    $permissions['sms:smses:editown'],
-                    $permissions['sms:smses:editother'],
-                    $sms->getCreatedBy()
-                ),
-                'clone'  => $permissions['sms:smses:create'],
-                'delete' => $view['security']->hasEntityAccess(
-                    $permissions['sms:smses:deleteown'],
-                    $permissions['sms:smses:deleteother'],
-                    $sms->getCreatedBy()
-                ),
-                'close' => $view['security']->hasEntityAccess(
-                    $permissions['sms:smses:viewown'],
-                    $permissions['sms:smses:viewother'],
-                    $sms->getCreatedBy()
-                ),
-            ],
-            'routeBase' => 'sms',
-        ]
-    )
-);
-$view['slots']->set(
+    $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $sms])
 );
+}
 ?>
 
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
     <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto bg-dark-xs">
+        <div class="bg-auto">
+            <!-- page detail header -->
             <!-- sms detail collapseable toggler -->
+            <div class="pr-md pl-md pt-lg pb-lg">
+                <div class="box-layout">
+                    <div class="col-xs-10">
+                        <div class="text-white dark-sm mb-0"><?php echo $sms->getDescription(); ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="collapse" id="sms-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-bordered table-striped mb-0">
+                            <tbody>
+                            <?php echo $view->render(
+                                'MauticCoreBundle:Helper:details.html.php',
+                                ['entity' => $sms]
+                            ); ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!--/ sms detail collapseable toggler -->
+        <div class="bg-auto bg-dark-xs">
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.details'); ?>">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#sms-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#sms-details">
+                        <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?>
+                    </a>
                 </span>
             </div>
-            <!--/ sms detail collapseable toggler -->
-
             <!-- some stats -->
             <div class="pa-md">
                 <div class="row">

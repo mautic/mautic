@@ -75,7 +75,8 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'delete' => $security->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
+                                    'edit'   => $view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy()),
+                                    'delete' => $view['security']->hasEntityAccess(true, $permissions['lead:lists:deleteother'], $item->getCreatedBy()),
                                 ],
                                 'routeBase' => 'segment',
                                 'langVar'   => 'lead.list',
@@ -104,7 +105,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 ['item' => $item, 'model' => 'lead.list']
                             ); ?>
-                            <?php if ($security->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
+                            <?php if ($view['security']->hasEntityAccess(true, $permissions['lead:lists:editother'], $item->getCreatedBy())) : ?>
                                 <a href="<?php echo $view['router']->path(
                                     'mautic_segment_action',
                                     ['objectAction' => 'edit', 'objectId' => $item->getId()]

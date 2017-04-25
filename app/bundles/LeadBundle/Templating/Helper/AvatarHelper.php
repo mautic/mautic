@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Templating\Helper\Helper;
 
@@ -90,12 +91,9 @@ class AvatarHelper extends Helper
      */
     public function getDefaultAvatar($absolute = false)
     {
-        return $this->factory->getHelper('template.assets')->getUrl(
-            $this->factory->getSystemPath('assets').'/images/avatar.png',
-            null,
-            null,
-            $absolute
-        );
+        $img = $this->factory->getSystemPath('assets').'/images/avatar.png';
+
+        return UrlHelper::rel2abs($this->factory->getHelper('template.assets')->getUrl($img));
     }
 
     /**

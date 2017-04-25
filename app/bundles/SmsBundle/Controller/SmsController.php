@@ -58,15 +58,6 @@ class SmsController extends FormController
 
         $session = $this->get('session');
 
-        $listFilters = [
-            'filters' => [
-                'multiple' => true,
-            ],
-        ];
-
-        // Reset available groups
-        $listFilters['filters']['groups'] = [];
-
         //set limits
         $limit = $session->get('mautic.sms.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
@@ -75,90 +66,17 @@ class SmsController extends FormController
         }
 
         $search = $this->request->get('search', $session->get('mautic.sms.filter', ''));
-        $session->set('mautic.email.filter', $search);
+        $session->set('mautic.sms.filter', $search);
 
         $filter = ['string' => $search];
 
         if (!$permissions['sms:smses:viewother']) {
             $filter['force'][] =
-                ['column' => 'e.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
-
-        //retrieve a list of categories
-        $listFilters['filters']['groups']['mautic.core.filter.categories'] = [
-            'options' => $this->getModel('category')->getLookupResults('email', '', 0),
-            'prefix'  => 'category',
-        ];
-
-        //retrieve a list of Lead Lists
-        $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => $this->getModel('lead.list')->getUserLists(),
-            'prefix'  => 'list',
-        ];
-
-        //retrieve a list of themes
-        $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $this->factory->getInstalledThemes('email'),
-            'prefix'  => 'theme',
-        ];
-
-        $currentFilters = $session->get('mautic.sms.list_filters', []);
-        $updatedFilters = $this->request->get('filters', false);
-
-        if ($updatedFilters) {
-            // Filters have been updated
-
-            // Parse the selected values
-            $newFilters     = [];
-            $updatedFilters = json_decode($updatedFilters, true);
-
-            if ($updatedFilters) {
-                foreach ($updatedFilters as $updatedFilter) {
-                    list($clmn, $fltr) = explode(':', $updatedFilter);
-
-                    $newFilters[$clmn][] = $fltr;
-                }
-
-                $currentFilters = $newFilters;
-            } else {
-                $currentFilters = [];
-            }
-        }
-        $session->set('mautic.sms.list_filters', $currentFilters);
-
-        if (!empty($currentFilters)) {
-            $listIds = $catIds = [];
-            foreach ($currentFilters as $type => $typeFilters) {
-                switch ($type) {
-                    case 'list':
-                        $key = 'lists';
-                        break;
-                    case 'category':
-                        $key = 'categories';
-                        break;
-                }
-
-                $listFilters['filters']['groups']['mautic.core.filter.'.$key]['values'] = $typeFilters;
-
-                foreach ($typeFilters as $fltr) {
-                    switch ($type) {
-                        case 'list':
-                            $listIds[] = (int) $fltr;
-                            break;
-                        case 'category':
-                            $catIds[] = (int) $fltr;
-                            break;
-                    }
-                }
-            }
-
-            if (!empty($listIds)) {
-                $filter['force'][] = ['column' => 'l.id', 'expr' => 'in', 'value' => $listIds];
-            }
-
-            if (!empty($catIds)) {
-                $filter['force'][] = ['column' => 'c.id', 'expr' => 'in', 'value' => $catIds];
-            }
+                [
+                    'column' => 'e.createdBy',
+                    'expr'   => 'eq',
+                    'value'  => $this->user->getId(),
+                ];
         }
 
         $orderBy    = $session->get('mautic.sms.orderby', 'e.name');
@@ -199,7 +117,6 @@ class SmsController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
-                'filters'     => $listFilters,
                 'items'       => $smss,
                 'totalItems'  => $count,
                 'page'        => $page,
@@ -290,6 +207,7 @@ class SmsController extends FormController
                 'sms'         => $sms,
                 'trackables'  => $trackableLinks,
                 'logs'        => $logs,
+                'isEmbedded'  => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                 'permissions' => $security->isGranted([
                     'sms:smses:viewown',
                     'sms:smses:viewother',
@@ -567,9 +485,9 @@ class SmsController extends FormController
                     $passthrough,
                     [
                         'updateSelect' => $form['updateSelect']->getData(),
-                        'smsId'        => $entity->getId(),
-                        'smsName'      => $entity->getName(),
-                        'smsLang'      => $entity->getLanguage(),
+                        'id'           => $entity->getId(),
+                        'name'         => $entity->getName(),
+                        'group'        => $entity->getLanguage(),
                     ]
                 );
             }

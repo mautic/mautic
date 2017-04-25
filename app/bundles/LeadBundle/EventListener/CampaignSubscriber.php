@@ -69,6 +69,7 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionUpdateTags', 3],
                 ['onCampaignTriggerActionAddToCompany', 4],
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
+                ['onCampaignTriggerActionDeleteContact', 6],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -130,6 +131,20 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.scorecontactscompanies', $action);
+
+        $trigger = [
+            'label'                  => 'mautic.lead.lead.events.delete',
+            'description'            => 'mautic.lead.lead.events.delete_descr',
+            'eventName'              => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'connectionRestrictions' => [
+                'target' => [
+                    'decision'  => ['none'],
+                    'action'    => ['none'],
+                    'condition' => ['none'],
+                ],
+            ],
+        ];
+        $event->addAction('lead.deletecontact', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.field_value',
@@ -257,8 +272,6 @@ class CampaignSubscriber extends CommonSubscriber
         if (!empty($company)) {
             $somethingHappened = $this->leadModel->addToCompany($lead, $company);
         }
-
-        return $event->setResult($somethingHappened);
     }
 
     /**
@@ -270,15 +283,28 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $score             = $event->getConfig()['score'];
-        $lead              = $event->getLead();
-        $somethingHappened = false;
+        $score = $event->getConfig()['score'];
+        $lead  = $event->getLead();
 
-        if (!empty($score)) {
-            $somethingHappened = $this->leadModel->scoreContactsCompany($lead, $score);
+        if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
+            return $event->setFailed('mautic.lead.no_company');
+        } else {
+            return $event->setResult(true);
+        }
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerActionDeleteContact(CampaignExecutionEvent $event)
+    {
+        if (!$event->checkContext('lead.deletecontact')) {
+            return;
         }
 
-        return $event->setResult($somethingHappened);
+        $this->leadModel->deleteEntity($event->getLead());
+
+        return $event->setResult(true);
     }
 
     /**
@@ -293,7 +319,8 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if ($event->getConfig()['operator'] === 'date') {
-            $triggerDate = new \DateTime();
+            // Set the date in system timezone since this is triggered by cron
+            $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));
             $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
             if (strpos($event->getConfig()['value'], '+P') !== false) { //add date

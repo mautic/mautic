@@ -33,6 +33,9 @@ return [
             ],
             'mautic.core.js.subscriber' => [
                 'class' => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber',
+                'arguments' => [
+                    'mautic.helper.notification',
+                ],
             ],
             'mautic.notification.notificationbundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\NotificationSubscriber',
@@ -42,6 +45,9 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
                 ],
+            ],
+            'mautic.notification.subscriber.channel' => [
+                'class' => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
             ],
             'mautic.notification.stats.subscriber' => [
                 'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
@@ -66,16 +72,21 @@ return [
                 'alias'     => 'notificationsend_list',
             ],
             'mautic.form.type.notification_list' => [
-                'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'notification_list',
+                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
+                'alias' => 'notification_list',
             ],
         ],
         'helpers' => [
             'mautic.helper.notification' => [
                 'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',
-                'arguments' => 'mautic.factory',
                 'alias'     => 'notification_helper',
+                'arguments' => [
+                    'mautic.factory',
+                    'templating.helper.assets',
+                    'mautic.helper.core_parameters',
+                    'router',
+                    'request_stack',
+                ],
             ],
         ],
         'other' => [
@@ -172,10 +183,12 @@ return [
     'parameters' => [
         'notification_enabled'              => false,
         'notification_landing_page_enabled' => true,
+        'notification_tracking_page_enabled' => false,
         'notification_app_id'               => null,
         'notification_rest_api_key'         => null,
         'notification_safari_web_id'        => null,
         'gcm_sender_id'                     => '482941778795',
+        'notification_subdomain_name'       => null,
         'welcomenotification_enabled'       => true,
     ],
 ];

@@ -55,20 +55,32 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $pageTrackingUrl = str_replace(
+        $pageTrackingUrl = $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        // Determine if this is https
+        $parts           = parse_url($pageTrackingUrl);
+        $scheme          = $parts['scheme'];
+        $pageTrackingUrl = str_replace(['http://', 'https://'], '', $pageTrackingUrl);
+
+        $pageTrackingCORSUrl = str_replace(
             ['http://', 'https://'],
             '',
-            $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL)
+            $this->router->generate('mautic_page_tracker_cors', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
-
-        $contactIdUrl = $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $contactIdUrl = str_replace(
+            ['http://', 'https://'],
+            '',
+            $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
 
         $js = <<<JS
 (function(m, l, n, d) {
-    m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingUrl}';
+    m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingUrl}';
+    m.pageTrackingCORSUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingCORSUrl}';
+    m.contactIdUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$contactIdUrl}';
     m.fingerprint = null;
     m.fingerprintComponents = null;
-
+    m.fingerprintIsLoading = false;
+    
     m.addFingerprint = function(params) {
         for (var componentId in m.fingerprintComponents) {
             var component = m.fingerprintComponents[componentId];
@@ -87,10 +99,36 @@ class BuildJsSubscriber extends CommonSubscriber
             }
         }
         params.fingerprint = m.fingerprint;
+        
+        return params;
     }
 
+    m.deliverPageEvent = function(event, params) {
+        if (!m.firstDeliveryMade && params['counter'] > 0) {
+            // Wait for the first delivery to complete so that the tracking information is set
+            setTimeout(function () {
+                m.deliverPageEvent(event, params);
+            }, 5);
+            
+            return;
+        }
+        
+        if (m.fingerprintComponents) {
+            params = m.addFingerprint(params);
+        }
+        
+        MauticJS.makeCORSRequest('POST', m.pageTrackingCORSUrl, params, 
+        function(response) {
+            MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': event, 'params': params, 'response': response});
+        },
+        function() {
+            // CORS failed so load an image
+            m.buildTrackingImage(event, params);
+            m.firstDeliveryMade = true;
+        });
+    }
+    
     m.buildTrackingImage = function(pageview, params) {
-        m.addFingerprint(params);
         delete m.trackingPixel;
         m.trackingPixel = new Image();
 
@@ -103,42 +141,77 @@ class BuildJsSubscriber extends CommonSubscriber
                 }
             }
         }
+        
+        m.trackingPixel.onload = function(e) {
+            MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': pageview, 'params': params, 'image': true});
+        };
 
         m.trackingPixel.src = m.pageTrackingUrl + '?' + m.serialize(params);
     }
 
+    m.pageViewCounter = 0;
     m.sendPageview = function(pageview) {
+        var queue = [];
 
         if (!pageview) {
             if (typeof m.getInput === 'function') {
-                var pageview = m.getInput('send', 'pageview');
+                queue = m.getInput('send', 'pageview');
             } else {
                 return false;
             }
+        } else {
+            queue.push(pageview);
         }
 
-        var params = {
-            page_title: d.title,
-            page_language: n.language,
-            page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
-            page_url: l.href
-        };
+        if (queue) {
+            for (var i=0; i<queue.length; i++) {
+                var event = queue[i];
 
-        // Merge user defined tracking pixel parameters.
-        if (typeof pageview[2] === 'object') {
-            for (var attr in pageview[2]) {
-                params[attr] = pageview[2][attr];
+                var params = {
+                    page_title: d.title,
+                    page_language: n.language,
+                    page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
+                    page_url: l.href,
+                    counter: m.pageViewCounter
+                };
+                
+                params = MauticJS.appendTrackedContact(params);
+                
+                // Merge user defined tracking pixel parameters.
+                if (typeof event[2] === 'object') {
+                    for (var attr in event[2]) {
+                        params[attr] = event[2][attr];
+                    }
+                }
+
+                m.handleFingerprintInit(event, params);
+                
+                m.pageViewCounter++;
             }
         }
+    }
 
-        if (!m.fingerprint) {
+    m.handleFingerprintInit = function(event, params) {
+        if (m.fingerprintComponents) {
+            // Already loaded
+            m.deliverPageEvent(event, params);
+        } else if (!m.fingerprint && m.fingerprintIsLoading === false) {
+            m.fingerprintIsLoading = true;
             new Fingerprint2().get(function(result, components) {
+                m.fingerprintIsLoading = false;
                 m.fingerprint = result;
                 m.fingerprintComponents = components;
-                m.buildTrackingImage(pageview, params);
+                m.deliverPageEvent(event, params);
             });
+        } else if (m.fingerprintIsLoading === true) {
+            var fingerprintLoop = window.setInterval(function() {
+                if (m.fingerprintIsLoading === false) {
+                    m.deliverPageEvent(event, params);
+                    clearInterval(fingerprintLoop);
+                }
+            }, 5);
         } else {
-            m.buildTrackingImage(pageview, params);
+            m.deliverPageEvent(event, params);
         }
     }
 
@@ -149,30 +222,25 @@ class BuildJsSubscriber extends CommonSubscriber
     document.addEventListener('eventAddedToMauticQueue', function(e) {
         m.sendPageview(e.detail);
     });
-
 })(MauticJS, location, navigator, document);
-
-MauticJS.getTrackedContact = function () {
-    var url = '$contactIdUrl';
-    MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
-        if (response.id) {
-            document.cookie = "mtc_id="+response.id+";";
-        }
-    });
-};
-
-MauticJS.pixelLoaded(MauticJS.getTrackedContact);
 JS;
 
         $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 
+    /**
+     * @param BuildJsEvent $event
+     */
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
         $formSubmitUrl   = $this->router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
         $jQueryUrl       = $this->assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
+
+        $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
+        $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
+        $jQueryUrl       = str_replace('/index_dev.php', '', $jQueryUrl);
 
         $mediaElementJs = <<<'JS'
 /*!
@@ -208,8 +276,13 @@ JS;
         $js = <<<JS
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
-    
+    if (MauticJS.videoElements.length) {
+        MauticJS.videoElements = Array.prototype.filter.call(MauticJS.videoElements, function(videoElements){
+            return null !== videoElements.attributes.getNamedItem('data-form-id');
+        });
+    }
     if (! MauticJS.videoElements.length) {
+        MauticJS.videoElements = null;
         return;
     }
 

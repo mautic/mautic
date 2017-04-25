@@ -102,33 +102,4 @@ class SmsHelper
 
         return $this->leadModel->addDncForLead($lead, 'sms', null, DoNotContact::UNSUBSCRIBED);
     }
-
-    public function applyFrequencyRules(Lead $lead)
-    {
-        $frequencyRule = $lead->getFrequencyRules();
-        $statRepo      = $this->smsModel->getStatRepository();
-        $now           = new \DateTime();
-        $channels      = $frequencyRule['channels'];
-
-        $frequencyTime = $frequencyNumber = null;
-
-        if (!empty($frequencyRule) && in_array('sms', $channels, true)) {
-            $frequencyTime   = new \DateInterval('P'.$frequencyRule['frequency_time']);
-            $frequencyNumber = $frequencyRule['frequency_number'];
-        } elseif ($this->smsFrequencyNumber > 0) {
-            $frequencyTime   = new \DateInterval('P'.$frequencyRule['sms_frequency_time']);
-            $frequencyNumber = $this->smsFrequencyNumber;
-        }
-
-        $now->sub($frequencyTime);
-        $sentQuery = $statRepo->getLeadStats($lead->getId(), ['fromDate' => $now]);
-
-        if (!empty($sentQuery) && count($sentQuery) < $frequencyNumber) {
-            return true;
-        } elseif (empty($sentQuery)) {
-            return true;
-        }
-
-        return false;
-    }
 }

@@ -14,6 +14,7 @@ namespace Mautic\AssetBundle\Controller;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AssetController.
@@ -238,6 +239,28 @@ class AssetController extends FormController
 
         if ($activeAsset === null || !$this->get('mautic.security')->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $activeAsset->getCreatedBy())) {
             return $this->modalAccessDenied();
+        }
+
+        $download = $this->request->query->get('download', 0);
+        $stream   = $this->request->query->get('stream', 0);
+
+        if ('1' === $download || '1' === $stream) {
+            try {
+                //set the uploadDir
+                $activeAsset->setUploadDir($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+                $contents = $activeAsset->getFileContents();
+            } catch (\Exception $e) {
+                return $this->notFound();
+            }
+
+            $response = new Response();
+            $response->headers->set('Content-Type', $activeAsset->getFileMimeType());
+            if ('1' === $download) {
+                $response->headers->set('Content-Disposition', 'attachment;filename="'.$activeAsset->getOriginalFileName());
+            }
+            $response->setContent($contents);
+
+            return $response;
         }
 
         return $this->delegateView([

@@ -73,20 +73,25 @@ class CampaignSubscriber extends CommonSubscriber
         $config = $event->getConfig();
         $lead   = $event->getLead();
 
-        $integration = (!empty($config['integration'])) ? $config['integration'] : null;
-        $feature     = (empty($integration)) ? 'push_lead' : null;
+        $integration             = (!empty($config['integration'])) ? $config['integration'] : null;
+        $integrationCampaign     = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
+        $integrationMemberStatus = (!empty($config['campaign_member_status']['campaign_member_status'])) ? $config['campaign_member_status']['campaign_member_status'] : null;
+        $feature                 = (!empty($integration) && empty($integrationCampaign)) ? 'push_lead' : 'push_to_campaign';
 
-        $services = $this->integrationHelper->getIntegrationObjects($integration, $feature);
+        $services = $this->integrationHelper->getIntegrationObjects($integration);
         $success  = false;
-
         foreach ($services as $name => $s) {
             $settings = $s->getIntegrationSettings();
             if (!$settings->isPublished()) {
                 continue;
             }
-
-            if (method_exists($s, 'pushLead')) {
+            if (method_exists($s, 'pushLead') && $feature == 'push_lead') {
                 if ($s->pushLead($lead, $config)) {
+                    $success = true;
+                }
+            }
+            if (method_exists($s, 'pushLeadToCampaign') && $feature == 'push_to_campaign') {
+                if ($s->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
                     $success = true;
                 }
             }

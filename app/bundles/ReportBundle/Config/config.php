@@ -118,6 +118,17 @@ return [
                 'alias'     => 'report_widget',
                 'arguments' => 'mautic.report.model.report',
             ],
+            'mautic.form.type.aggregator' => [
+                'class'     => 'Mautic\ReportBundle\Form\Type\AggregatorType',
+                'alias'     => 'aggregator',
+                'arguments' => 'translator',
+            ],
+        ],
+        'helpers' => [
+            'mautic.report.helper.report' => [
+                'class' => \Mautic\ReportBundle\Helper\ReportHelper::class,
+                'alias' => 'report',
+            ],
         ],
         'models' => [
             'mautic.report.model.report' => [
@@ -126,6 +137,9 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.template.formatter',
                     'mautic.helper.templating',
+                    'mautic.channel.helper.channel_list',
+                    'mautic.lead.model.field',
+                    'mautic.report.helper.report',
                 ],
             ],
         ],

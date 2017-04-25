@@ -120,6 +120,17 @@ class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
             return $origin;
         }
 
+        // Check the domains using shell wildcard patterns
+        $validCorsDomainFilter = function ($validCorsDomain) use ($origin) {
+            return fnmatch($validCorsDomain, $origin, FNM_CASEFOLD);
+        };
+        if (array_filter($this->validCORSDomains, $validCorsDomainFilter)) {
+            $this->requestOriginIsValid = true;
+            $this->corsHeaders['Vary']  = 'Origin';
+
+            return $origin;
+        }
+
         $this->requestOriginIsValid = false;
 
         return null;
