@@ -256,9 +256,11 @@ MauticJS.setTrackedContact = function(response) {
             
         // Set the id in local storage in case cookies are only allowed for sites visited and Mautic is on a different domain
         // than the current page
-        if (window.localStorage) {
+        try {
             localStorage.setItem('mtc_id', response.id);
             localStorage.setItem('mtc_sid', response.sid);
+        } catch (e) {
+            console.warn('Browser does not allow storing in local storage');
         }
     }
 };
@@ -362,17 +364,19 @@ if (typeof window[window.MauticTrackingObject] !== 'undefined') {
     MauticJS.inputQueue = MauticJS.input.q;
 
     // Dispatch the queue event when an event is added to the queue
-    Object.defineProperty(MauticJS.inputQueue, 'push', {
-        configurable: false,
-        enumerable: false,
-        writable: false,
-        value: function () {
-            for (var i = 0, n = this.length, l = arguments.length; i < l; i++, n++) {
-                MauticJS.dispatchEvent('eventAddedToMauticQueue', arguments[i]);
+    if (!MauticJS.inputQueue.hasOwnProperty('push')) {
+        Object.defineProperty(MauticJS.inputQueue, 'push', {
+            configurable: false,
+            enumerable: false,
+            writable: false,
+            value: function () {
+                for (var i = 0, n = this.length, l = arguments.length; i < l; i++, n++) {
+                    MauticJS.dispatchEvent('eventAddedToMauticQueue', arguments[i]);
+                }
+                return n;
             }
-            return n;
-        }
-    });
+        });
+    }
 
     MauticJS.getInput = function(task, type) {
         var matches = [];

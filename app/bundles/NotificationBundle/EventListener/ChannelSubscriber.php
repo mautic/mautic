@@ -49,9 +49,10 @@ class ChannelSubscriber extends CommonSubscriber
                             'form.submit',
                         ],
                         'lookupFormType' => 'notification_list',
+                        'repository'     => 'MauticNotificationBundle:Notification',
                     ],
                     ReportModel::CHANNEL_FEATURE => [
-                        'table' => 'push_notification_stats',
+                        'table' => 'push_notifications',
                     ],
                 ]
             );

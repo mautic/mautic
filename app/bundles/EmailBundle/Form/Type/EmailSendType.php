@@ -48,7 +48,7 @@ class EmailSendType extends AbstractType
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.choose.emails_descr',
-                    'onchange' => 'Mautic.disabledEmailAction()',
+                    'onchange' => 'Mautic.disabledEmailAction(window, this)',
                 ],
                 'multiple'    => false,
                 'required'    => true,
@@ -122,7 +122,7 @@ class EmailSendType extends AbstractType
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlEdit.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']),
                         'icon'     => 'fa fa-edit',
                     ],
@@ -139,7 +139,7 @@ class EmailSendType extends AbstractType
                 [
                     'attr' => [
                         'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'"}))',
+                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardEmailUrl({"windowUrl": "'.$windowUrlPreview.'","origin":"#'.$options['update_select'].'"}))',
                         'disabled' => !isset($options['data']['email']),
                         'icon'     => 'fa fa-external-link',
                     ],

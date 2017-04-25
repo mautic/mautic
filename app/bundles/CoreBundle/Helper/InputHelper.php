@@ -59,7 +59,6 @@ class InputHelper
                 'ilayer',
                 'layer',
                 'object',
-                'xml',
             ];
 
             self::$htmlFilter->attrBlacklist = [
@@ -392,6 +391,14 @@ class InputHelper
             // Special handling for conditional blocks
             $value = preg_replace("/<!--\[if(.*?)\]>(.*?)<!\[endif\]-->/is", '<mcondition><mif>$1</mif>$2</mcondition>', $value, -1, $conditionsFound);
 
+            // Slecial handling for XML tags used in Outlook optimized emails <o:*/> and <w:/>
+            $value = preg_replace_callback(
+                "/<\/*[o|w|v]:[^>]*>/is",
+                function ($matches) {
+                    return '<mencoded>'.htmlspecialchars($matches[0]).'</mencoded>';
+                },
+                $value, -1, $needsDecoding);
+
             // Special handling for HTML comments
             $value = str_replace(['<!--', '-->'], ['<mcomment>', '</mcomment>'], $value, $commentCount);
 
@@ -399,7 +406,7 @@ class InputHelper
 
             // Was a doctype found?
             if ($doctypeFound) {
-                $value = "$doctype[0]\n$value";
+                $value = "$doctype[0]$value";
             }
 
             if ($cdataCount) {
@@ -414,6 +421,13 @@ class InputHelper
             if ($commentCount) {
                 $value = str_replace(['<mcomment>', '</mcomment>'], ['<!--', '-->'], $value);
             }
+
+            $value = preg_replace_callback(
+                "/<mencoded>(.*?)<\/mencoded>/is",
+                function ($matches) {
+                    return htmlspecialchars_decode($matches[1]);
+                },
+                $value);
         }
 
         return $value;

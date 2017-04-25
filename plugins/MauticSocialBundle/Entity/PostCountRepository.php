@@ -46,19 +46,13 @@ class PostCountRepository extends CommonRepository
         $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $dateFrom, $dateTo);
 
         // Load points for selected period
-        $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('cl.post_count, cl.post_date')
-            ->from(MAUTIC_TABLE_PREFIX.'monitor_post_count', 'cl')
-            ->orderBy('cl.post_date', 'ASC');
-
+        $q = $chartQuery->prepareTimeDataQuery(MAUTIC_TABLE_PREFIX.'monitor_post_count', 'post_date', $options);
         if (isset($options['monitor_id'])) {
-            $q->andwhere($q->expr()->eq('cl.monitor_id', (int) $options['monitor_id']));
+            $q->andwhere($q->expr()->eq('t.monitor_id', (int) $options['monitor_id']));
         }
 
-        $chartQuery->applyDateFilters($q, 'post_date', 'cl');
+        $data = $chartQuery->loadAndBuildTimeData($q);
 
-        $postCount = $q->execute()->fetchAll();
-
-        return $postCount;
+        return $data;
     }
 }

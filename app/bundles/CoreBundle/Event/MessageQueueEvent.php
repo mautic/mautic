@@ -11,7 +11,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-@trigger_error('Mautic\CoreBundle\Event\MessageQueueEvent was deprecated in 2.4 and to be removed in 3.0 Use \Mautic\ChannelBundle\Event\MessageQueueEvent instead', E_DEPRECATED);
+@trigger_error('Mautic\CoreBundle\Event\MessageQueueEvent was deprecated in 2.4 and to be removed in 3.0 Use \Mautic\ChannelBundle\Event\MessageQueueEvent instead', E_USER_DEPRECATED);
 
 /**
  * Class MessageQueueEvent.

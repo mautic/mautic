@@ -167,7 +167,10 @@ return [
                 ],
             ],
             'mautic.form.webhook.subscriber' => [
-                'class' => 'Mautic\FormBundle\EventListener\WebhookSubscriber',
+                'class'       => 'Mautic\FormBundle\EventListener\WebhookSubscriber',
+                'methodCalls' => [
+                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
+                ],
             ],
             'mautic.form.dashboard.subscriber' => [
                 'class'     => 'Mautic\FormBundle\EventListener\DashboardSubscriber',
@@ -204,6 +207,10 @@ return [
             'mautic.form.type.field_propertytext' => [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldTextType',
                 'alias' => 'formfield_text',
+            ],
+            'mautic.form.type.field_propertyhtml' => [
+                'class' => 'Mautic\FormBundle\Form\Type\FormFieldHTMLType',
+                'alias' => 'formfield_html',
             ],
             'mautic.form.type.field_propertyplaceholder' => [
                 'class' => 'Mautic\FormBundle\Form\Type\FormFieldPlaceholderType',

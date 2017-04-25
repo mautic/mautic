@@ -83,8 +83,14 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
 
         mQuery('body').removeClass('noscroll');
 
+        var response = {};
+        if (Mautic.modalMauticContent) {
+            response.mauticContent = Mautic.modalMauticContent;
+            delete Mautic.modalMauticContent;
+        }
+
         //unload
-        Mautic.onPageUnload(target);
+        Mautic.onPageUnload(target, response);
 
         Mautic.resetModal(target);
     });
@@ -229,23 +235,23 @@ Mautic.processModalContent = function (response, target) {
 
         //activate content specific stuff
         Mautic.onPageLoad(target, response, true);
-
+        Mautic.modalMauticContent = false;
         if (response.closeModal) {
             mQuery('body').removeClass('noscroll');
             mQuery(target).modal('hide');
 
+            if (response.mauticContent) {
+                if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
+                    Mautic[response.mauticContent + "OnLoad"](target, response);
+                }
+            }
+
             if (!response.updateModalContent) {
                 Mautic.onPageUnload(target, response);
             }
-
-            if (response.mauticContent) {
-                if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
-                    if (typeof Mautic.loadedContent[response.mauticContent] == 'undefined') {
-                        Mautic.loadedContent[response.mauticContent] = true;
-                        Mautic[response.mauticContent + "OnLoad"](target, response);
-                    }
-                }
-            }
+        } else {
+            // Note for the hidden event
+            Mautic.modalMauticContent = response.mauticContent ? response.mauticContent : false;
         }
     }
 };
@@ -391,7 +397,7 @@ Mautic.showModal = function(target) {
         var activeModal = mQuery('.modal.in .modal-dialog:not(:has(.aside))').parents('.modal').last(),
             targetModal  = mQuery(target);
 
-        if (activeModal.length) {
+        if (activeModal.length && activeModal.attr('id') !== targetModal.attr('id')) {
             targetModal.attr('data-previous-modal', '#'+activeModal.attr('id'));
             activeModal.find('.modal-dialog').addClass('aside');
             var stackedDialogCount = mQuery('.modal.in .modal-dialog.aside').length;

@@ -517,7 +517,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
 
             if (textarea.hasClass('editor-dynamic-content')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
+                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
             }
 
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
@@ -617,11 +617,9 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-        if (typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-            if (typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
-                Mautic.loadedContent[contentSpecific] = true;
-                Mautic[contentSpecific + "OnLoad"](container, response);
-            }
+        if (typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
+            Mautic.loadedContent[contentSpecific] = true;
+            Mautic[contentSpecific + "OnLoad"](container, response);
         }
     }
 
@@ -735,7 +733,7 @@ Mautic.onPageUnload = function (container, response) {
             Mautic[contentSpecific + "OnUnload"](container, response);
         }
 
-        if (typeof (Mautic.loadedContent[contentSpecific])) {
+        if (typeof Mautic.loadedContent[contentSpecific] !== 'undefined') {
             delete Mautic.loadedContent[contentSpecific];
         }
     }
@@ -810,7 +808,8 @@ Mautic.ajaxifyLink = function (el, event) {
  *
  * @param el
  */
-Mautic.activateChosenSelect = function(el, ignoreGlobal) {
+Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (mQuery(el).parents('.no-chosen').length && !ignoreGlobal) {
         // Globally ignored chosens because they are handled manually due to hidden elements, etc
         return;
@@ -891,9 +890,9 @@ Mautic.activateChosenSelect = function(el, ignoreGlobal) {
  * @param options
  */
 Mautic.activateFieldTypeahead = function (field, target, options, action) {
-    if (options) {
+    if (options && typeof options === 'String') {
         var keys = values = [];
-        //check to see if there is a key/value split
+
         options = options.split('||');
         if (options.length == 2) {
             keys = options[1].split('|');
@@ -915,15 +914,18 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
         });
     }
 
-    mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
+    var callback = function (event, datum) {
         if (mQuery("#" + field).length && datum["value"]) {
             mQuery("#" + field).val(datum["value"]);
+
+            var lookupCallback = mQuery('#' + field).data("lookup-callback");
+            if (lookupCallback && typeof Mautic[lookupCallback] == 'function') {
+                Mautic[lookupCallback](field, datum);
+            }
         }
-    }).on('typeahead:autocompleted', function (event, datum) {
-        if (mQuery("#" + field).length && datum["value"]) {
-            mQuery("#" + field).val(datum["value"]);
-        }
-    });
+    };
+
+    mQuery(fieldTypeahead).on('typeahead:selected', callback).on('typeahead:autocompleted', callback);
 };
 
 /**
@@ -1346,7 +1348,7 @@ Mautic.activateListFilterSelect = function(el) {
  * Converts an input to a color picker
  * @param el
  */
-Mautic.activateColorPicker = function(el) {
+Mautic.activateColorPicker = function(el, options) {
     var pickerOptions = mQuery(el).data('color-options');
     if (!pickerOptions) {
         pickerOptions = {
@@ -1355,6 +1357,10 @@ Mautic.activateColorPicker = function(el) {
                 mQuery(el).trigger('change.minicolors', hex);
             }
         };
+    }
+
+    if (typeof options == 'object') {
+        pickerOptions = mQuery.extend(pickerOptions, options);
     }
 
     mQuery(el).minicolors(pickerOptions);
