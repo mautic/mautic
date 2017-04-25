@@ -197,8 +197,8 @@ class LeadController extends FormController
         );
     }
 
-    /*
-     * Quick form controller route and view
+    /**
+     * @return JsonResponse|Response
      */
     public function quickAddAction()
     {

@@ -947,24 +947,36 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param string $identifier
+     * @param      $identifier
+     * @param bool $enabled
+     * @param bool $mobile
      *
      * @return $this
      */
-    public function addPushIDEntry($identifier)
+    public function addPushIDEntry($identifier, $enabled = true, $mobile = false)
     {
+        $entity = new PushID();
+
         /** @var PushID $id */
         foreach ($this->pushIds as $id) {
             if ($id->getPushID() === $identifier) {
-                return $this;
+                if ($id->isEnabled() === $enabled) {
+                    return $this;
+                } else {
+                    $entity = $id;
+                    $this->removePushID($id);
+                }
             }
         }
 
-        $entity = new PushID();
         $entity->setPushID($identifier);
         $entity->setLead($this);
+        $entity->setEnabled($enabled);
+        $entity->setMobile($mobile);
 
         $this->addPushID($entity);
+
+        $this->isChanged('pushIds', $this->pushIds);
 
         return $this;
     }

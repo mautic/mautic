@@ -9,6 +9,7 @@ Mautic.reportOnLoad = function (container) {
     if (mQuery('div[id=report_filters]').length) {
         mQuery('div[id=report_filters]').attr('data-index', mQuery('#report_filters > div').length + 1);
         mQuery('div[id=report_tableOrder]').attr('data-index', mQuery('#report_tableOrder > div').length + 1);
+        mQuery('div[id=report_aggregators]').attr('data-index', mQuery('#report_aggregators > div').length + 1);
 
         if (mQuery('.filter-columns').length) {
             mQuery('.filter-columns').each(function () {
@@ -28,7 +29,7 @@ Mautic.reportOnLoad = function (container) {
             })
         })
     }
-
+    Mautic.checkSelectedGroupBy();
     Mautic.initDateRangePicker();
 };
 
@@ -58,7 +59,6 @@ Mautic.addReportRow = function (elId) {
     prototypeHolder.append(output);
 
     var newColumnId = '#' + elId + '_' + index + '_column';
-
     if (elId == 'report_filters') {
         if (typeof Mautic.reportPrototypeFilterOptions != 'undefined') {
             // Update the column options if applicable
@@ -192,6 +192,9 @@ Mautic.updateReportSourceData = function (context) {
             mQuery('#report_columns').html(response.columns);
             mQuery('#report_columns').multiSelect('refresh');
 
+            mQuery('#report_groupBy').html(response.columns);
+            mQuery('#report_groupBy').multiSelect('refresh');
+
             // Remove any filters, they're no longer valid with different column lists
             mQuery('#report_filters').find('div').remove().end();
 
@@ -206,6 +209,9 @@ Mautic.updateReportSourceData = function (context) {
 
             // Reset index
             mQuery('#report_tableOrder').data('index', 0);
+            mQuery('#report_aggregators').find('div').remove().end();
+            // Reset index
+            mQuery('#report_aggregators').data('index', 0);
 
             // Update filter list
             Mautic.reportPrototypeFilterDefinitions = response.filterDefinitions;
@@ -241,5 +247,19 @@ Mautic.checkReportCondition = function (selector) {
         mQuery('#' + valueInput).prop('disabled', true);
     } else {
         mQuery('#' + valueInput).prop('disabled', false);
+    }
+};
+
+Mautic.checkSelectedGroupBy = function () {
+    var selectedOption = mQuery("select[name='report[groupBy][]'] option:selected").length;
+    var existingAggregators = mQuery("select[name*='report[aggregators]']");
+    if (selectedOption > 0) {
+        mQuery('#aggregators-button').prop('disabled', false);
+    } else {
+        existingAggregators.each(function() {
+            var containerId = mQuery(this).attr('id').replace('_column', '');
+            Mautic.removeReportRow(containerId + '_container');
+        });
+        mQuery('#aggregators-button').prop('disabled', true);
     }
 };

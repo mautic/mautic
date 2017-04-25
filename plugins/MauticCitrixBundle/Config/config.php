@@ -55,7 +55,10 @@ return [
                 ],
             ],
             'mautic.citrix.emailbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber',
+                'class'     => 'MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber',
+                'arguments' => [
+                    'mautic.citrix.model.citrix',
+                ],
             ],
         ],
         'forms' => [
