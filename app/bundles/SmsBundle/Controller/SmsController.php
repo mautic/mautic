@@ -114,6 +114,8 @@ class SmsController extends FormController
         }
         $session->set('mautic.sms.page', $page);
 
+        $integration = $this->get('mautic.helper.integration')->getIntegrationObject('Twilio');
+
         return $this->delegateView([
             'viewParameters' => [
                 'searchValue' => $search,
@@ -125,7 +127,7 @@ class SmsController extends FormController
                 'permissions' => $permissions,
                 'model'       => $model,
                 'security'    => $this->get('mautic.security'),
-                'configured'  => $this->coreParametersHelper->getParameter('sms_enabled'),
+                'configured'  => ($integration && $integration->getIntegrationSettings()->getIsPublished()),
             ],
             'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
             'passthroughVars' => [

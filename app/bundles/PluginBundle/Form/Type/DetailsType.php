@@ -118,6 +118,8 @@ class DetailsType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+
+        $options['integration_object']->modifyForm($builder, $options);
     }
 
     /**

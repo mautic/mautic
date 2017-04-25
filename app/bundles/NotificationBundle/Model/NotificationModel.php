@@ -129,7 +129,9 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        return $formFactory->create('notification', $entity, $options);
+        $type = strpos($action, 'mobile_') !== false ? 'mobile_notification' : 'notification';
+
+        return $formFactory->create($type, $entity, $options);
     }
 
     /**
@@ -154,14 +156,16 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      * @param Notification $notification
      * @param Lead         $lead
      * @param string       $source
+     * @param int          $sourceId
      */
-    public function createStatEntry(Notification $notification, Lead $lead, $source = null)
+    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null)
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
         $stat->setNotification($notification);
         $stat->setSource($source);
+        $stat->setSourceId($sourceId);
 
         $this->getStatRepository()->saveEntity($stat);
     }
@@ -319,6 +323,23 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         switch ($type) {
             case 'notification':
                 $entities = $this->getRepository()->getNotificationList(
+                    $filter,
+                    $limit,
+                    $start,
+                    $this->security->isGranted($this->getPermissionBase().':viewother'),
+                    isset($options['notification_type']) ? $options['notification_type'] : null
+                );
+
+                foreach ($entities as $entity) {
+                    $results[$entity['language']][$entity['id']] = $entity['name'];
+                }
+
+                //sort by language
+                ksort($results);
+
+                break;
+            case 'mobile_notification':
+                $entities = $this->getRepository()->getMobileNotificationList(
                     $filter,
                     $limit,
                     $start,
