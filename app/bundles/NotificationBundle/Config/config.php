@@ -119,6 +119,7 @@ return [
                     'mautic.factory',
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.integration',
                     'router',
                     'request_stack',
                 ],

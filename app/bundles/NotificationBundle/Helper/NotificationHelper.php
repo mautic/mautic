@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -26,6 +27,11 @@ class NotificationHelper
      * @var MauticFactory
      */
     protected $factory;
+
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
 
     /**
      * @var CoreParametersHelper
@@ -48,17 +54,21 @@ class NotificationHelper
     protected $request;
 
     /**
-     * PageSubscriber constructor.
+     * NotificationHelper constructor.
      *
+     * @param MauticFactory        $factory
      * @param AssetsHelper         $assetsHelper
      * @param CoreParametersHelper $coreParametersHelper
+     * @param IntegrationHelper    $integrationHelper
      * @param Router               $router
+     * @param RequestStack         $requestStack
      */
-    public function __construct(MauticFactory $factory, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, Router $router, RequestStack $requestStack)
+    public function __construct(MauticFactory $factory, AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper, IntegrationHelper $integrationHelper, Router $router, RequestStack $requestStack)
     {
         $this->factory              = $factory;
         $this->assetsHelper         = $assetsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->integrationHelper    = $integrationHelper;
         $this->router               = $router;
         $this->request              = $requestStack;
     }
@@ -92,10 +102,21 @@ class NotificationHelper
     public function getScript()
     {
         if ($this->hasScript()) {
-            $appId                      = $this->coreParametersHelper->getParameter('notification_app_id');
-            $safariWebId                = $this->coreParametersHelper->getParameter('notification_safari_web_id');
-            $welcomenotificationEnabled = $this->coreParametersHelper->getParameter('welcomenotification_enabled');
-            $notificationSubdomainName  = $this->coreParametersHelper->getParameter('notification_subdomain_name');
+            $integration = $this->integrationHelper->getIntegrationObject('Twilio');
+
+            if ($integration === false) {
+                return;
+            }
+
+            $settings        = $integration->getIntegrationSettings();
+            $keys            = $integration->getDecryptedApiKeys();
+            $supported       = $settings->getSupportedFeatures();
+            $featureSettings = $settings->getFeatureSettings();
+
+            $appId                      = $keys['app_id'];
+            $safariWebId                = $keys['safari_web_id'];
+            $welcomenotificationEnabled = in_array('welcome_notification_enabled', $supported);
+            $notificationSubdomainName  = $featureSettings['subdomain_name'];
             $leadAssociationUrl         = $this->router->generate(
                 'mautic_subscribe_notification',
                 [],
@@ -201,13 +222,16 @@ JS;
             $landingPage = false;
         }
 
-        // disable on Landing pages
-        if ($landingPage == true && !$this->coreParametersHelper->getParameter('notification_landing_page_enabled')) {
+        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
+
+        if ($integration === false) {
             return false;
         }
 
-        // disable on tracking pages
-        if ($landingPage == false && !$this->coreParametersHelper->getParameter('notification_tracking_page_enabled')) {
+        $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
+
+        // disable on Landing pages
+        if ($landingPage == true && !in_array('landing_page_enabled', $supportedFeatures)) {
             return false;
         }
 

@@ -14,6 +14,7 @@ namespace Mautic\NotificationBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -94,6 +95,18 @@ class OneSignalIntegration extends AbstractIntegration
     {
         if ($formArea == 'features') {
             /* @var FormBuilder $builder */
+            $builder->add(
+                'subdomain_name',
+                TextType::class,
+                [
+                    'label'    => 'mautic.notification.form.subdomain_name.label',
+                    'required' => false,
+                    'attr'     => [
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
+
             $builder->add(
                 'platforms',
                 ChoiceType::class,
