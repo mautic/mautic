@@ -200,6 +200,15 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_separator',
                 400
             );
+
+            $event->addSlotType(
+                'dynamicContent',
+                'Dynamic Content',
+                'tag',
+                'MauticCoreBundle:Slots:dynamiccontent.html.php',
+                'slot_dynamiccontent',
+                300
+            );
         }
 
         if ($event->sectionsRequested()) {

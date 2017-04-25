@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -322,7 +323,7 @@ class ListModel extends FormModel
             'lead_email_read_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators' => $this->getOperatorsForFieldType(
+                'operators'  => $this->getOperatorsForFieldType(
                     [
                         'include' => [
                             '=',
@@ -334,12 +335,12 @@ class ListModel extends FormModel
                         ],
                     ]
                 ),
-                'object'     => 'lead',
+                'object' => 'lead',
             ],
             'lead_email_read_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.lead_email_read_count'),
                 'properties' => ['type' => 'number'],
-                'operators' => $this->getOperatorsForFieldType(
+                'operators'  => $this->getOperatorsForFieldType(
                     [
                         'include' => [
                             '=',
@@ -350,7 +351,7 @@ class ListModel extends FormModel
                         ],
                     ]
                 ),
-                'object'     => 'lead',
+                'object' => 'lead',
             ],
             'tags' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.tags'),
@@ -430,7 +431,7 @@ class ListModel extends FormModel
             'hit_url_date' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_date'),
                 'properties' => ['type' => 'datetime'],
-                'operators' => $this->getOperatorsForFieldType(
+                'operators'  => $this->getOperatorsForFieldType(
                     [
                         'include' => [
                             '=',
@@ -442,12 +443,12 @@ class ListModel extends FormModel
                         ],
                     ]
                 ),
-                'object'     => 'lead',
+                'object' => 'lead',
             ],
             'hit_url_count' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.visited_url_count'),
                 'properties' => ['type' => 'number'],
-                'operators' => $this->getOperatorsForFieldType(
+                'operators'  => $this->getOperatorsForFieldType(
                     [
                         'include' => [
                             '=',
@@ -458,12 +459,12 @@ class ListModel extends FormModel
                         ],
                     ]
                 ),
-                'object'     => 'lead',
+                'object' => 'lead',
             ],
             'sessions' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.session'),
                 'properties' => ['type' => 'number'],
-                'operators' => $this->getOperatorsForFieldType(
+                'operators'  => $this->getOperatorsForFieldType(
                     [
                         'include' => [
                             '=',
@@ -474,7 +475,7 @@ class ListModel extends FormModel
                         ],
                     ]
                 ),
-                'object'     => 'lead',
+                'object' => 'lead',
             ],
             'referer' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.referer'),
@@ -543,7 +544,7 @@ class ListModel extends FormModel
                     ],
                 ],
                 'operators' => $this->getOperatorsForFieldType('bool'),
-                'object' => 'lead',
+                'object'    => 'lead',
             ],
             'page_id' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.page_id'),
@@ -711,6 +712,11 @@ class ListModel extends FormModel
         ];
 
         $localDateTime = $dtHelper->getLocalDateTime();
+
+        $this->dispatcher->dispatch(
+            LeadEvents::LIST_PRE_PROCESS_LIST,
+            new ListPreProcessListEvent($list, false)
+        );
 
         // Get a count of leads to add
         $newLeadsCount = $this->getLeadsByList(
@@ -1227,7 +1233,7 @@ class ListModel extends FormModel
     public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, $filters = [])
     {
         $q = $this->em->getConnection()->createQueryBuilder();
-        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name')
+        $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 't')
             ->join('t', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = t.leadlist_id')
             ->orderBy('leads', 'DESC')

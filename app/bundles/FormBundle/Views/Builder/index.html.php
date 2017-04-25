@@ -74,9 +74,9 @@ $formId = $form['sessionId']->vars['data'];
                                                                 'mautic_formfield_action',
                                                                 [
                                                                     'objectAction' => 'new',
-                                                                    'type' => $fieldType,
-                                                                    'tmpl' => 'field',
-                                                                    'formId' => $formId,
+                                                                    'type'         => $fieldType,
+                                                                    'tmpl'         => 'field',
+                                                                    'formId'       => $formId,
                                                                 ]
                                                             ); ?>">     <?php echo $field; ?></option>
 
