@@ -85,20 +85,12 @@ return [
                 'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
                 'arguments' => [
                     'mautic.page.model.trackable',
-                    'mautic.twilio.service',
+                    'mautic.helper.sms',
                     'mautic.helper.phone_number',
-                    '%mautic.sms_sending_phone_number%',
+                    'mautic.helper.integration',
                     'monolog.logger.mautic',
                 ],
                 'alias' => 'sms_api',
-            ],
-            'mautic.twilio.service' => [
-                'class'     => 'Services_Twilio',
-                'arguments' => [
-                    '%mautic.sms_username%',
-                    '%mautic.sms_password%',
-                ],
-                'alias' => 'twilio_service',
             ],
         ],
         'models' => [
