@@ -17,7 +17,6 @@ use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\SmsBundle\Helper\SmsHelper;
 use Monolog\Logger;
 
 class TwilioApi extends AbstractSmsApi
@@ -41,14 +40,12 @@ class TwilioApi extends AbstractSmsApi
      * TwilioApi constructor.
      *
      * @param TrackableModel    $pageTrackableModel
-     * @param SmsHelper         $smsHelper
      * @param PhoneNumberHelper $phoneNumberHelper
      * @param IntegrationHelper $integrationHelper
      * @param Logger            $logger
      */
-    public function __construct(TrackableModel $pageTrackableModel, SmsHelper $smsHelper, PhoneNumberHelper $phoneNumberHelper, IntegrationHelper $integrationHelper, Logger $logger)
+    public function __construct(TrackableModel $pageTrackableModel, PhoneNumberHelper $phoneNumberHelper, IntegrationHelper $integrationHelper, Logger $logger)
     {
-        $this->client = $smsHelper->getClient();
         $this->logger = $logger;
 
         $integration = $integrationHelper->getIntegrationObject('Twilio');
@@ -56,6 +53,10 @@ class TwilioApi extends AbstractSmsApi
         if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $this->sendingPhoneNumber = $integration->getIntegrationSettings()->getFeatureSettings()['sending_phone_number'];
         }
+
+        $keys = $integration->getDecryptedApiKeys();
+
+        $this->client = new \Services_Twilio($keys['username'], $keys['password']);
 
         parent::__construct($pageTrackableModel);
     }

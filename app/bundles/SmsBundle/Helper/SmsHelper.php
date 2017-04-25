@@ -47,11 +47,6 @@ class SmsHelper
     protected $integrationHelper;
 
     /**
-     * @var \Services_Twilio
-     */
-    protected $client;
-
-    /**
      * SmsHelper constructor.
      *
      * @param EntityManager     $em
@@ -70,24 +65,6 @@ class SmsHelper
         $integration              = $integrationHelper->getIntegrationObject('Twilio');
         $settings                 = $integration->getIntegrationSettings()->getFeatureSettings();
         $this->smsFrequencyNumber = $settings['frequency_number'];
-    }
-
-    /**
-     * @return \Services_Twilio
-     */
-    public function getClient()
-    {
-        if (is_null($this->client)) {
-            $integration = $this->integrationHelper->getIntegrationObject('Twilio');
-            $keys        = $integration->getDecryptedApiKeys();
-
-            $sid   = $keys['username'];
-            $token = $keys['password'];
-
-            $this->client = new \Services_Twilio($sid, $token);
-        }
-
-        return $this->client;
     }
 
     public function unsubscribe($number)
