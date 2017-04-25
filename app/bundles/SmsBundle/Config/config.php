@@ -85,7 +85,6 @@ return [
                 'class'     => 'Mautic\SmsBundle\Api\TwilioApi',
                 'arguments' => [
                     'mautic.page.model.trackable',
-                    'mautic.helper.sms',
                     'mautic.helper.phone_number',
                     'mautic.helper.integration',
                     'monolog.logger.mautic',
