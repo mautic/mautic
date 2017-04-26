@@ -111,7 +111,7 @@ class Notification extends FormEntity
     /**
      * @var bool
      */
-    private $mobile;
+    private $mobile = false;
 
     /**
      * @var array
