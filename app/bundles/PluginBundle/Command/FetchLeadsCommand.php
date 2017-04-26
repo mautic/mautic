@@ -49,6 +49,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 'Set end date for updated values.'
             )
             ->addOption(
+                '--fetch-all',
+                null,
+                InputOption::VALUE_NONE,
+                'Get all CRM contacts whatever the date is. Should be used at instance initialization only'
+            )
+            ->addOption(
                 '--time-interval',
                 '-a',
                 InputOption::VALUE_OPTIONAL,
@@ -90,6 +96,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
         if (!$endDate) {
             $endDate = date('c');
         }
+
+        if ($input->getOption('fetch-all')) {
+            $interval  = '43199000 minutes';
+            $startDate = date('c', strtotime('-'.$interval));
+            $endDate   = date('c');
+        }
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $container->get('mautic.helper.integration');
@@ -105,17 +117,28 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $params['start'] = $startDate;
             $params['end']   = $endDate;
             $params['limit'] = $limit;
+
             if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
-                    if (strtotime($startDate) > strtotime('-30 days')) {
-                        if (in_array('Lead', $config['objects'])) {
-                            $processed = intval($integrationObject->getLeads($params, null, $leads, [], 'Lead'));
+                    if (strtotime($startDate) > strtotime('-30 days') || $input->getOption('fetch-all')) {
+
+                        //Handle case when integration object are named "Contacts" and "Leads"
+                        $lead_object_name = 'Lead';
+                        if (in_array('Leads', $config['objects'])) {
+                            $lead_object_name = 'Leads';
                         }
-                        if (in_array('Contact', $config['objects'])) {
-                            $processed += intval($integrationObject->getLeads($params, null, $contacts, [], 'Contact'));
+                        $contact_object_name = 'Contact';
+                        if (in_array('Contacts', $config['objects'])) {
+                            $contact_object_name = 'Contacts';
                         }
 
+                        if (in_array($lead_object_name, $config['objects'])) {
+                            $processed = intval($integrationObject->getLeads($params, null, $leads, [], $lead_object_name));
+                        }
+                        if (in_array($contact_object_name, $config['objects'])) {
+                            $processed += intval($integrationObject->getLeads($params, null, $contacts, [], $contact_object_name));
+                        }
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
@@ -128,7 +151,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']) && in_array('company', $config['objects'])) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
 
-                if (strtotime($startDate) > strtotime('-30 days')) {
+                if (strtotime($startDate) > strtotime('-30 days') || $input->getOption('fetch-all')) {
                     $processed = intval($integrationObject->getCompanies($params));
 
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
