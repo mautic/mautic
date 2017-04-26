@@ -96,6 +96,7 @@ $hasFeatureErrors =
 <div class="tab-content pa-md bg-white">
     <div class="tab-pane fade <?php if (isset($activeTab) && $activeTab == 'details-container'): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
+        <?php echo $view['form']->rowIfExists($form, 'virtual'); ?>
         <?php echo $view['form']->row($form['apiKeys']); ?>
         <?php if (isset($formNotes['authorization'])): ?>
             <div class="alert alert-<?php echo $formNotes['authorization']['type']; ?>">

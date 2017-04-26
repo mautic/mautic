@@ -3587,6 +3587,7 @@
     if (clickInGutter(cm, e)) return;
     var start = posFromMouse(cm, e);
     var codeMode = typeof Mautic != 'undefined' && Mautic.codeMode === true;
+
     if (!codeMode) {
       window.focus();
     }
