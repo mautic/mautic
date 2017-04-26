@@ -13,7 +13,9 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -962,6 +964,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $leadFields            = $config['leadFields'];
         $checkEmailsInSF       = [];
         $sfContact             = [];
+        $leadsToSync           = [];
 
         if (!empty($config['leadFields'])) {
             $fields = implode(', l.', $config['leadFields']);
@@ -1023,7 +1026,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $deletedSFLeads      = [];
         $salesforceIdMapping = [];
         if ($checkEmailsInSF) {
-            $findLead = 'select Id, ConvertedContactId, Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+            $findLead = 'select Id, Company, ConvertedContactId, Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
                 .'\')';
             $queryUrl = $this->getQueryUrl();
 
@@ -1060,8 +1063,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
             if ($sfLeadRecords = $sfLead['records']) {
+                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+                $leadModel    = $this->factory->getModel('lead');
+                $companyModel = $this->factory->getModel('lead.company');
                 foreach ($sfLeadRecords as $sfLeadRecord) {
-                    $key = mb_strtolower($sfLeadRecord['Email']);
+                    $updateLead = false;
+                    $key        = mb_strtolower($sfLeadRecord['Email']);
                     if (isset($checkEmailsInSF[$key])) {
                         $isConverted = (isset($sfLeadRecord['ConvertedContactId'])
                             && $sfLeadRecord['ConvertedContactId'] != null);
@@ -1076,18 +1083,28 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     $contactSfFields,
                                     'Contact',
                                     $checkEmailsInSF[$key],
-                                    $sfLeadRecord['ConvertedContactId']
+                                    $sfLeadRecord['ConvertedContactId'],
+                                    $sfLeadRecord
                                 );
                                 unset($checkEmailsInSF[$key]);
                             } elseif (isset($sfLeadRecord['Id']) && !$isConverted) {
-                                $this->buildCompositeBody(
+                                $updateLead = $this->buildCompositeBody(
                                     $mauticData,
                                     $availableFields,
                                     $leadSfFields,
                                     'Lead',
                                     $checkEmailsInSF[$key],
-                                    $sfLeadRecord['Id']
+                                    $sfLeadRecord['Id'],
+                                    $sfLeadRecord
                                 );
+                                if ($updateLead) {
+                                    $leadEntity = $leadModel->getEntity($checkEmailsInSF[$key]['internal_entity_id']);
+                                    $company    = IdentifyCompanyHelper::identifyLeadsCompany(['company' => $sfLeadRecord['Company']], null, $companyModel);
+                                    if ($company[2] && !empty($company[2])) {
+                                        $companyModel->addLeadToCompany($company[2], $leadEntity);
+                                        $leadsToSync[] = $leadEntity;
+                                    }
+                                }
                                 unset($checkEmailsInSF[$key]);
                             }
                         } else {
@@ -1127,6 +1144,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $apiHelper = $this->getApiHelper();
         if (!empty($request)) {
             $result = $apiHelper->syncMauticToSalesforce($request);
+        }
+        if (!empty($leadsToSync)) {
+            $leadModel->saveEntities($leadsToSync);
+            $this->em->clear('Mautic\LeadBundle\Entity\LeadEntity');
         }
 
         return $this->processCompositeResponse($result['compositeResponse'], $salesforceIdMapping);
@@ -1177,9 +1198,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param      $lead
      * @param null $objectId
      */
-    protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSfUpdate, $object, $lead, $objectId = null)
+    protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSfUpdate, $object, $lead, $objectId = null, $sfRecord = null)
     {
-        $body = [];
+        $body       = [];
+        $updateLead = false;
         if (isset($lead['email']) && !empty($lead['email'])) {
             //use a composite patch here that can update and create (one query) every 200 records
             foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
@@ -1189,7 +1211,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 if ($required && empty($body[$sfField])) {
-                    $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+                    if (isset($sfRecord[$sfField])) {
+                        $body[$sfField] = $sfRecord[$sfField];
+                        if ($sfField == 'Company') {
+                            $updateLead = true;
+                        }
+                    } else {
+                        $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+                    }
                 }
             }
 
@@ -1207,6 +1236,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 ];
             }
         }
+
+        return $updateLead;
     }
 
     /**
