@@ -53,7 +53,7 @@ Installing from source is only recommended if you are comfortable using the comm
 #### Mautic requirements
 
 1. See [Mautic requirements](https://www.mautic.org/download/requirements).
-2. PHP modules: 
+2. PHP modules:
 	- required: `zip`, `xml`, `mcrypt`, `imap`, `mailparse`
 	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
 	- recommended for development: `xdebug`
@@ -92,16 +92,16 @@ Your schema should now be up-to-date with the source.
 
 # Usage
 
-Learning how to use marketing automation can be challenging. The first step is to understand what marketing automation is and how it can help your business be more successful. This quick usage outline is not meant to be comprehensive but will outline a few key areas of Mautic and how to use each of them.  
+Learning how to use marketing automation can be challenging. The first step is to understand what marketing automation is and how it can help your business be more successful. This quick usage outline is not meant to be comprehensive but will outline a few key areas of Mautic and how to use each of them.
 
 *You can find more detailed information at <a href="https://docs.mautic.org">https://docs.mautic.org</a>*
 
 ### 1. Monitoring
 
-The act of monitoring website traffic and visitors is often the first step in a marketing automation system. This step involves collecting details and information about each visitor to your website.  
+The act of monitoring website traffic and visitors is often the first step in a marketing automation system. This step involves collecting details and information about each visitor to your website.
 
 #### Visitor Types
-There are two types of visitor, **anonymous** and **known**.  
+There are two types of visitor, **anonymous** and **known**.
 
 **Anonymous visitors** are all visitors which browse to your website. These visitors are monitored and certain key pieces of information are collected. This information includes:
 
@@ -145,14 +145,14 @@ There are several ways to connect with your leads. The three most common are **e
 
 ### 3. Automating
 
-One of Mautic's main purposes is to enable automation of specific tasks. The task of connecting with leads is one such area where automation becomes increasingly valuable. Mautic allows you to define specific times, events, or actions when a connection should be triggered. Here is an example of an automation process.  
+One of Mautic's main purposes is to enable automation of specific tasks. The task of connecting with leads is one such area where automation becomes increasingly valuable. Mautic allows you to define specific times, events, or actions when a connection should be triggered. Here is an example of an automation process.
 
 **Example**
-A visitor fills out a call-to-action form on your landing page. This form collects their email address and automatically moves them from an **anonymous** to a **known** visitor. As a known visitor they are now added as a new lead to a specific campaign. This campaign will send the new lead an email you have pre-defined. You can then define additional actions to be taken based on the lead's response to your email.  
+A visitor fills out a call-to-action form on your landing page. This form collects their email address and automatically moves them from an **anonymous** to a **known** visitor. As a known visitor they are now added as a new lead to a specific campaign. This campaign will send the new lead an email you have pre-defined. You can then define additional actions to be taken based on the lead's response to your email.
 
-This example demonstrates several uses of automation. First, the visitor is *automatically* moved from anonymous to known status. Second, the visitor is *automatically* added to a particular campaign. Lastly the visitor is sent an email *automatically* as a new lead.  
+This example demonstrates several uses of automation. First, the visitor is *automatically* moved from anonymous to known status. Second, the visitor is *automatically* added to a particular campaign. Lastly the visitor is sent an email *automatically* as a new lead.
 
-There are many more ways in which automation can be used throughout Mautic to improve efficiency and reduce the time you spend connecting with your leads. As mentioned earlier, refer to [https://docs.mautic.org](https://docs.mautic.org) for more details.  
+There are many more ways in which automation can be used throughout Mautic to improve efficiency and reduce the time you spend connecting with your leads. As mentioned earlier, refer to [https://docs.mautic.org](https://docs.mautic.org) for more details.
 
 ## Customizing - Plugins, Themes
 
@@ -168,7 +168,7 @@ Read more about API and webhooks in the [Mautic Developer Docummentation](https:
 
 ## Translations
 
-One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for the translation by the community at [Transifex](https://www.transifex.com/mautic/mautic/dashboard) and if you are interested you can add more languages, or help to translate the current ones.  
+One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for the translation by the community at [Transifex](https://www.transifex.com/mautic/mautic/dashboard) and if you are interested you can add more languages, or help to translate the current ones.
 
 ## How to test a pull request
 
@@ -207,7 +207,7 @@ Every change to Mautic core happens via PRs. Every PR must have 2 successful tes
 
 ## Unit Tests
 
-The unit tests can be executed in the Mautic root directory with `phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles` command.
+The unit tests can be executed in the Mautic root directory with `composer test` command.
 
 # FAQ and Contact Information
 Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.

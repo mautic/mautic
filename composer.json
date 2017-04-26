@@ -134,7 +134,8 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "cp ./build/hooks/pre-commit ./.git/hooks/pre-commit"
-        ]
+        ],
+        "test": "phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles"
     },
     "config": {
         "bin-dir": "bin"
