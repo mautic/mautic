@@ -626,8 +626,9 @@ class EventModel extends CommonFormModel
                         ++$totalEventCount;
 
                         $event['campaign'] = [
-                            'id'   => $campaign->getId(),
-                            'name' => $campaign->getName(),
+                            'id'        => $campaign->getId(),
+                            'name'      => $campaign->getName(),
+                            'createdBy' => $campaign->getCreatedBy(),
                         ];
 
                         $decisionEvent = [
@@ -769,8 +770,7 @@ class EventModel extends CommonFormModel
     ) {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $campaignId   = $campaign->getId();
-        $campaignName = $campaign->getName();
+        $campaignId = $campaign->getId();
 
         $this->logger->debug('CAMPAIGN: Triggering scheduled events');
 
@@ -903,8 +903,9 @@ class EventModel extends CommonFormModel
 
                     // Set campaign ID
                     $event['campaign'] = [
-                        'id'   => $campaignId,
-                        'name' => $campaignName,
+                        'id'        => $campaign->getId(),
+                        'name'      => $campaign->getName(),
+                        'createdBy' => $campaign->getCreatedBy(),
                     ];
 
                     // Execute event
@@ -1011,8 +1012,6 @@ class EventModel extends CommonFormModel
         $this->logger->debug('CAMPAIGN: Triggering negative events');
 
         $campaignId   = $campaign->getId();
-        $campaignName = $campaign->getName();
-
         $repo         = $this->getRepository();
         $campaignRepo = $this->getCampaignRepository();
         $logRepo      = $this->getLeadEventLogRepository();
@@ -1262,8 +1261,9 @@ class EventModel extends CommonFormModel
                                 // Set event
                                 $event             = $events[$id];
                                 $event['campaign'] = [
-                                    'id'   => $campaignId,
-                                    'name' => $campaignName,
+                                    'id'        => $campaign->getId(),
+                                    'name'      => $campaign->getName(),
+                                    'createdBy' => $campaign->getCreatedBy(),
                                 ];
 
                                 // Set lead in case this is triggered by the system
@@ -1542,9 +1542,11 @@ class EventModel extends CommonFormModel
         }
 
         // Set campaign ID
+
         $event['campaign'] = [
-            'id'   => $campaign->getId(),
-            'name' => $campaign->getName(),
+            'id'        => $campaign->getId(),
+            'name'      => $campaign->getName(),
+            'createdBy' => $campaign->getCreatedBy(),
         ];
 
         // Ensure properties is an array
