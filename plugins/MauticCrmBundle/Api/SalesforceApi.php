@@ -131,13 +131,16 @@ class SalesforceApi extends CrmApi
                 //update the converted contact if found and not the Lead because it will error in SF
                 if (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) {
                     if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
-                        $createdLeadData[] = $this->request('', $data['Contact'], 'PATCH', false, 'Contact/'.$sfLeadRecord['ConvertedContactId']);
+                        $this->request('', $data['Contact'], 'PATCH', false, 'Contact/'.$sfLeadRecord['ConvertedContactId']);
                     } elseif (count($sfLeadRecords) <= 1) {
                         $createLead = true;
                     }
                 } else {
-                    $createdLeadData[] = $this->request('', $data[$sfObject], 'PATCH', false, $sfObject.'/'.$sfLeadId);
+                    $this->request('', $data[$sfObject], 'PATCH', false, $sfObject.'/'.$sfLeadId);
                 }
+
+                $createdLeadData       = $data[$sfObject];
+                $createdLeadData['id'] = $sfLeadId;
             }
         }
 
@@ -146,7 +149,6 @@ class SalesforceApi extends CrmApi
         }
 
         //todo: check if push activities is selected in config
-
         return $createdLeadData;
     }
 
@@ -328,6 +330,9 @@ class SalesforceApi extends CrmApi
         return $organizationCreatedDate;
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getCampaigns()
     {
         $campaignQuery = 'Select Id, Name from Campaign where isDeleted = false';
@@ -338,6 +343,11 @@ class SalesforceApi extends CrmApi
         return $result;
     }
 
+    /**
+     * @param $campaignId
+     *
+     * @return mixed|string
+     */
     public function getCampaignMembers($campaignId)
     {
         $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
@@ -347,6 +357,11 @@ class SalesforceApi extends CrmApi
         return $result;
     }
 
+    /**
+     * @param $campaignId
+     *
+     * @return mixed|string
+     */
     public function getCampaignMemberStatus($campaignId)
     {
         $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
