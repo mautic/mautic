@@ -302,9 +302,9 @@ mQuery(target).modal('show');};;MauticVars.liveCache=new Array();MauticVars.last
 return null;};Mautic.getEntityId=function(){return(mQuery('input#entityId').length)?mQuery('input#entityId').val():0;};Mautic.reorderTableData=function(name,orderby,tmpl,target,baseUrl){if(typeof baseUrl=='undefined'){baseUrl=window.location.pathname;}
 if(baseUrl.indexOf('tmpl')==-1){baseUrl=baseUrl+"?tmpl="+tmpl}
 var route=baseUrl+"&name="+name+"&orderby="+encodeURIComponent(orderby);Mautic.loadContent(route,'','POST',target);};Mautic.filterTableData=function(name,filterby,filterValue,tmpl,target,baseUrl){if(typeof baseUrl=='undefined'){baseUrl=window.location.pathname;}
-if(typeof filterValue==='object'){filterValue=mQuery(filterValue).val();}
 if(baseUrl.indexOf('tmpl')==-1){baseUrl=baseUrl+"?tmpl="+tmpl}
-var route=baseUrl+"&name="+name+"&filterby="+encodeURIComponent(filterby)+"&value="+encodeURIComponent(filterValue)
+var route='';if(typeof filterValue==='object'&&filterValue.getAttribute('multiple')!=''){var filValueData='';var filtAr=mQuery(filterValue).val();for(var property in filtAr){filValueData+='&value[]='+encodeURIComponent(filtAr[property]);}
+route=baseUrl+"&name="+name+"&filterby="+encodeURIComponent(filterby)+filValueData+"&filterType=in";}else{route=baseUrl+"&name="+name+"&filterby="+encodeURIComponent(filterby)+"&value="+encodeURIComponent(filterValue)}
 Mautic.loadContent(route,'','POST',target);};Mautic.limitTableData=function(name,limit,tmpl,target,baseUrl){if(typeof baseUrl=='undefined'){baseUrl=window.location.pathname;}
 if(baseUrl.indexOf('tmpl')==-1){baseUrl=baseUrl+"?tmpl="+tmpl}
 var route=baseUrl+"&name="+name+"&limit="+limit;Mautic.loadContent(route,'','POST',target);};Mautic.filterList=function(e,elId,route,target,liveCacheVar,action,overlayEnabled,overlayTarget){if(typeof liveCacheVar=='undefined'){liveCacheVar="liveCache";}

@@ -634,9 +634,7 @@ class ReportController extends FormController
         $filterSettings    = [];
 
         foreach ($dynamicFilters as $filter) {
-            $definition                                                                  = $filterDefinitions->definitions[$filter['column']];
-            $filValue                                                                    = ($definition['type'] == 'multiselect') ? explode(',', $filter['value']) : $filter['value'];
-            $filterSettings[$filterDefinitions->definitions[$filter['column']]['alias']] = $filValue;
+            $filterSettings[$filterDefinitions->definitions[$filter['column']]['alias']] = $filter['value'];
         }
 
         $dynamicFilterForm = $this->get('form.factory')->create(
