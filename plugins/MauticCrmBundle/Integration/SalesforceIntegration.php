@@ -1245,20 +1245,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function processCompositeResponse($response, array $salesforceIdMapping = [])
     {
-        $created   = 0;
-        $updated   = 0;
-        $reference = '';
+        $created = 0;
+        $updated = 0;
         if (is_array($response)) {
             $persistEntities = [];
             foreach ($response as $item) {
-                $contactId = $integrationEntityId = null;
+                $contactId = $integrationEntityId = $campaignId = null;
                 $object    = 'Lead';
                 if (!empty($item['referenceId'])) {
                     $reference = explode('-', $item['referenceId']);
                     if (3 === count($reference)) {
                         list($contactId, $object, $integrationEntityId) = $reference;
-                    }
-                    if (4 === count($reference)) {
+                    } elseif (4 === count($reference)) {
                         list($contactId, $object, $integrationEntityId, $campaignId) = $reference;
                     } else {
                         list($contactId, $object) = $reference;

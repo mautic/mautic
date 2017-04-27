@@ -127,9 +127,12 @@ class SalesforceApi extends CrmApi
         if (!empty($sfLeadRecords)) {
             $createLead = false;
             foreach ($sfLeadRecords as $sfLeadRecord) {
-                $sfLeadId          = $sfLeadRecord['Id'];
-                $createdLeadData[] = $this->request('', $data[$sfObject], 'PATCH', false, $sfObject.'/'.$sfLeadId);
+                $sfLeadId = $sfLeadRecord['Id'];
+                $this->request('', $data[$sfObject], 'PATCH', false, $sfObject.'/'.$sfLeadId);
             }
+
+            $createdLeadData       = $data[$sfObject];
+            $createdLeadData['id'] = $sfLeadId;
         }
 
         if ($createLead && isset($data['Lead']['Email'])) {
@@ -137,7 +140,6 @@ class SalesforceApi extends CrmApi
         }
 
         //todo: check if push activities is selected in config
-
         return $createdLeadData;
     }
 
@@ -288,6 +290,9 @@ class SalesforceApi extends CrmApi
         return $organizationCreatedDate;
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getCampaigns()
     {
         $campaignQuery = 'Select Id, Name from Campaign where isDeleted = false';
@@ -298,6 +303,11 @@ class SalesforceApi extends CrmApi
         return $result;
     }
 
+    /**
+     * @param $campaignId
+     *
+     * @return mixed|string
+     */
     public function getCampaignMembers($campaignId)
     {
         $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
@@ -307,6 +317,11 @@ class SalesforceApi extends CrmApi
         return $result;
     }
 
+    /**
+     * @param $campaignId
+     *
+     * @return mixed|string
+     */
     public function getCampaignMemberStatus($campaignId)
     {
         $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
