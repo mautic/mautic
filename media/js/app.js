@@ -302,6 +302,7 @@ mQuery(target).modal('show');};;MauticVars.liveCache=new Array();MauticVars.last
 return null;};Mautic.getEntityId=function(){return(mQuery('input#entityId').length)?mQuery('input#entityId').val():0;};Mautic.reorderTableData=function(name,orderby,tmpl,target,baseUrl){if(typeof baseUrl=='undefined'){baseUrl=window.location.pathname;}
 if(baseUrl.indexOf('tmpl')==-1){baseUrl=baseUrl+"?tmpl="+tmpl}
 var route=baseUrl+"&name="+name+"&orderby="+encodeURIComponent(orderby);Mautic.loadContent(route,'','POST',target);};Mautic.filterTableData=function(name,filterby,filterValue,tmpl,target,baseUrl){if(typeof baseUrl=='undefined'){baseUrl=window.location.pathname;}
+if(typeof filterValue==='object'){filterValue=mQuery(filterValue).val();}
 if(baseUrl.indexOf('tmpl')==-1){baseUrl=baseUrl+"?tmpl="+tmpl}
 var route=baseUrl+"&name="+name+"&filterby="+encodeURIComponent(filterby)+"&value="+encodeURIComponent(filterValue)
 Mautic.loadContent(route,'','POST',target);};Mautic.limitTableData=function(name,limit,tmpl,target,baseUrl){if(typeof baseUrl=='undefined'){baseUrl=window.location.pathname;}
