@@ -58,7 +58,9 @@ Mautic.filterTableData = function (name, filterby, filterValue, tmpl, target, ba
     if (typeof baseUrl == 'undefined') {
         baseUrl = window.location.pathname;
     }
-
+    if(typeof filterValue === 'object'){
+        filterValue = mQuery(filterValue).val();
+    }
     if (baseUrl.indexOf('tmpl') == -1) {
         baseUrl = baseUrl + "?tmpl=" + tmpl
     }
