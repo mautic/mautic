@@ -1807,15 +1807,60 @@ abstract class AbstractIntegration
     }
 
     /**
+     * @return \Mautic\CoreBundle\Model\NotificationModel
+     */
+    public function getNotificationModel()
+    {
+        return $this->factory->getModel('core.notification');
+    }
+
+    /**
      * @param \Exception $e
      */
     public function logIntegrationError(\Exception $e)
     {
         $logger = $this->factory->getLogger();
+        $users  = $this->em->getRepository('MauticUserBundle:User')->getEntities(
+            [
+                'filter' => [
+                    'force' => [
+                        [
+                            'column' => 'r.isAdmin',
+                            'expr'   => 'eq',
+                            'value'  => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
         if ('dev' == MAUTIC_ENV) {
             $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
+            foreach ($users as $u) {
+                $user = $u;
+                $this->getNotificationModel()->addNotification(
+                    $e,
+                    $this->getName(),
+                    false,
+                    'INTEGRATION ERROR: '.$this->getName().':',
+                    null,
+                    null,
+                    $user
+                );
+            }
         } else {
             $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+            foreach ($users as $u) {
+                $user = $u;
+                $this->getNotificationModel()->addNotification(
+                    $e->getMessage(),
+                    $this->getName(),
+                    false,
+                    'INTEGRATION ERROR: '.$this->getName().':',
+                    null,
+                    null,
+                    $user
+                );
+            }
         }
     }
 
