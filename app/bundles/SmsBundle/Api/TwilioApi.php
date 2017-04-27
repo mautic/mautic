@@ -52,11 +52,11 @@ class TwilioApi extends AbstractSmsApi
 
         if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $this->sendingPhoneNumber = $integration->getIntegrationSettings()->getFeatureSettings()['sending_phone_number'];
+
+            $keys = $integration->getDecryptedApiKeys();
+
+            $this->client = new \Services_Twilio($keys['username'], $keys['password']);
         }
-
-        $keys = $integration->getDecryptedApiKeys();
-
-        $this->client = new \Services_Twilio($keys['username'], $keys['password']);
 
         parent::__construct($pageTrackableModel);
     }

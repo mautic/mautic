@@ -971,10 +971,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->pushContactLink = true;
                 unset($leadFields[$mauticContactLinkField]);
             }
-            $fields          = implode(', l.', $leadFields);
-            $fields          = 'l.'.$fields;
-            $result          = 0;
-            $checkEmailsInSF = [];
+            $fields = implode(', l.', $leadFields);
+            $fields = 'l.'.$fields;
+            $result = 0;
 
             $leadSfFieldsToCreate = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
             $leadSfFields         = array_diff_key($leadSfFieldsToCreate, array_flip($fieldsToUpdateInSf));
@@ -999,7 +998,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
         }
 
-        $checkEmailsInSF = [];
         // Only get the max limit
         if ($limit) {
             $limit -= count($leadsToUpdate);
@@ -1122,7 +1120,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 );
             }
         }
-
         $request['allOrNone']        = 'false';
         $request['compositeRequest'] = array_values($mauticData);
 
@@ -1227,6 +1224,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $persistEntities = [];
             foreach ($response as $item) {
                 $contactId = $integrationEntityId = null;
+                $object    = 'Lead';
                 if (!empty($item['referenceId'])) {
                     $reference = explode('-', $item['referenceId']);
                     if (3 === count($reference)) {
