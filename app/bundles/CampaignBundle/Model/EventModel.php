@@ -1704,31 +1704,7 @@ class EventModel extends CommonFormModel
                     $repo->deleteEntity($log);
                 }
 
-                // Notify the lead owner if there is one otherwise campaign creator that there was a failure
-                if (!$owner = $lead->getOwner()) {
-                    $ownerId = $campaign->getCreatedBy();
-                    $owner   = $this->userModel->getEntity($ownerId);
-                }
-
-                if ($owner && $owner->getId()) {
-                    $this->notificationModel->addNotification(
-                        $campaign->getName().' / '.$event['name'],
-                        'error',
-                        false,
-                        $this->translator->trans(
-                            'mautic.campaign.event.failed',
-                            [
-                                '%contact%' => '<a href="'.$this->router->generate(
-                                        'mautic_contact_action',
-                                        ['objectAction' => 'view', 'objectId' => $lead->getId()]
-                                    ).'" data-toggle="ajax">'.$lead->getPrimaryIdentifier().'</a>',
-                            ]
-                        ),
-                        null,
-                        null,
-                        $owner
-                    );
-                }
+                $this->notifyOfFailure($lead, $campaign->getCreatedBy(), $campaign->getName().' / '.$event['name']);
 
                 $this->logger->debug($debug);
             } else {
@@ -2092,6 +2068,40 @@ class EventModel extends CommonFormModel
         $chart->setDataset($this->translator->trans('mautic.campaign.triggered.events'), $data);
 
         return $chart->render();
+    }
+
+    /**
+     * @param Lead $lead
+     * @param      $campaignCreatedBy
+     * @param      $header
+     */
+    public function notifyOfFailure(Lead $lead, $campaignCreatedBy, $header)
+    {
+        // Notify the lead owner if there is one otherwise campaign creator that there was a failure
+        if (!$owner = $lead->getOwner()) {
+            $ownerId = (int) $campaignCreatedBy;
+            $owner   = $this->userModel->getEntity($ownerId);
+        }
+
+        if ($owner && $owner->getId()) {
+            $this->notificationModel->addNotification(
+                $header,
+                'error',
+                false,
+                $this->translator->trans(
+                    'mautic.campaign.event.failed',
+                    [
+                        '%contact%' => '<a href="'.$this->router->generate(
+                                'mautic_contact_action',
+                                ['objectAction' => 'view', 'objectId' => $lead->getId()]
+                            ).'" data-toggle="ajax">'.$lead->getPrimaryIdentifier().'</a>',
+                    ]
+                ),
+                null,
+                null,
+                $owner
+            );
+        }
     }
 
     /**
