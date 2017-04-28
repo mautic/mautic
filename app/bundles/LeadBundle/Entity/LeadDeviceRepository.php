@@ -61,7 +61,7 @@ class LeadDeviceRepository extends CommonRepository
         if (!empty($statIds)) {
             $inIds = (!is_array($statIds)) ? [(int) $statIds] : $statIds;
 
-            $sq->where(
+            $sq->andWhere(
                 $sq->expr()->in('es.id', $inIds)
             );
         }
@@ -71,7 +71,7 @@ class LeadDeviceRepository extends CommonRepository
                 $deviceNames[] = $deviceNames;
             }
             foreach ($deviceNames as $key => $deviceName) {
-                $sq->where(
+                $sq->andWhere(
                     $sq->expr()->eq('es.device', ':device'.$key)
                 )
                     ->setParameter('device'.$key, $deviceName);
@@ -83,7 +83,7 @@ class LeadDeviceRepository extends CommonRepository
                 $deviceBrands[] = $deviceBrands;
             }
             foreach ($deviceBrands as $key => $deviceBrand) {
-                $sq->where(
+                $sq->andWhere(
                     $sq->expr()->eq('es.device_brand', ':deviceBrand'.$key)
                 )
                     ->setParameter('deviceBrand'.$key, $deviceBrand);
@@ -95,7 +95,7 @@ class LeadDeviceRepository extends CommonRepository
                 $deviceModels[] = $deviceModels;
             }
             foreach ($deviceModels as $key => $deviceModel) {
-                $sq->where(
+                $sq->andWhere(
                     $sq->expr()->eq('es.device_model', ':deviceModel'.$key)
                 )
                     ->setParameter('deviceModel'.$key, $deviceModel);
@@ -108,15 +108,15 @@ class LeadDeviceRepository extends CommonRepository
                 $deviceOss[] = $deviceOss;
             }
             foreach ($deviceOss as $key => $deviceOs) {
-                $sq->where(
-                    $sq->expr()->eq('es.device_os', ':deviceOs'.$key)
+                $sq->andWhere(
+                    $sq->expr()->eq('es.device_os_name', ':deviceOs'.$key)
                 )
                     ->setParameter('deviceOs'.$key, $deviceOs);
             }
         }
 
         if ($lead !== null) {
-            $sq->where(
+            $sq->andWhere(
                 $sq->expr()->eq('es.lead_id', $lead->getId())
             );
         }
