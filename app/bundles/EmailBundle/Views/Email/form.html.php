@@ -126,24 +126,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
 
                         <fieldset>
                             <legend><?php echo $view['translator']->trans('mautic.email.utm_tags');?></legend>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <?php echo $view['form']->row($form['utmSource']); ?>
-                            </div>
-                            <div class="col-md-6">
-                                <?php echo $view['form']->row($form['utmMedium']); ?>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <?php echo $view['form']->row($form['utmName']); ?>
-                            </div>
-
-                            <div class="col-md-6">
-                                <?php echo $view['form']->row($form['utmContent']); ?>
-                            </div>
-                        </div>
+                            <?php echo $view['form']->row($form['utmTags']); ?>
                         </fieldset>
                         <br>
                         <fieldset>

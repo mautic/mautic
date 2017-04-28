@@ -85,26 +85,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var string
      */
-    private $utmSource;
-
-    /**
-     * @var string
-     */
-    private $utmMedium;
-
-    /**
-     * @var string
-     */
-    private $utmName;
-
-    /**
-     * @var string
-     */
-    private $utmContent;
-
-    /**
-     * @var string
-     */
     private $template;
 
     /**
@@ -465,6 +445,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'utmTags',
                     'customHtml',
                     'plainText',
                     'template',
@@ -618,7 +599,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setUtmTags($utmTags)
     {
-        $this->isChanged('content', $utmTags);
+        $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
 
         return $this;
@@ -785,69 +766,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getUtmSource()
-    {
-        return $this->utmSource;
-    }
-
-    /**
-     * @param string $utmSource
-     */
-    public function setUtmSource($utmSource)
-    {
-        $this->utmSource = $utmSource;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUtmMedium()
-    {
-        return $this->utmMedium;
-    }
-
-    /**
-     * @param string $utmMedium
-     */
-    public function setUtmMedium($utmMedium)
-    {
-        $this->utmMedium = $utmMedium;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUtmName()
-    {
-        return $this->utmName;
-    }
-
-    /**
-     * @param string $utmName
-     */
-    public function setUtmName($utmName)
-    {
-        $this->utmName = $utmName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUtmContent()
-    {
-        return $this->utmContent;
-    }
-
-    /**
-     * @param string $utmContent
-     */
-    public function setUtmContent($utmContent)
-    {
-        $this->utmContent = $utmContent;
-    }
 
     /**
      * @return mixed
