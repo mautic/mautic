@@ -43,6 +43,7 @@ class CampaignEventLeadDeviceType extends AbstractType
                 'attr'        => [
                     'class'   => 'form-control'
                 ],
+                'required'    => false,
             ]
         );
 
@@ -57,6 +58,7 @@ class CampaignEventLeadDeviceType extends AbstractType
                 'attr'        => [
                     'class'   => 'form-control'
                 ],
+                'required'    => false,
             ]
         );
 
@@ -71,6 +73,7 @@ class CampaignEventLeadDeviceType extends AbstractType
                 'attr'        => [
                     'class'   => 'form-control'
                 ],
+                'required'    => false,
             ]
         );
 
