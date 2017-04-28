@@ -310,6 +310,7 @@ class EventModel extends CommonFormModel
 
         $this->triggeredResponses = [];
         $logs                     = [];
+
         foreach ($events as $campaignId => $campaignEvents) {
             if (empty($campaigns[$campaignId])) {
                 $this->logger->debug('CAMPAIGN: Campaign entity for ID# '.$campaignId.' not found');
@@ -385,11 +386,11 @@ class EventModel extends CommonFormModel
                         } elseif ($child['eventType'] == 'decision') {
                             //hit a triggering type event so move on
                             $this->logger->debug('CAMPAIGN: ID# '.$child['id'].' is a decision');
-
                             continue;
                         } elseif ($child['decisionPath'] == 'no') {
                             // non-action paths should not be processed by this because the contact already took action in order to get here
                             $childrenTriggered = true;
+                            $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' has a decision path of no');
                         } else {
                             $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' is being processed');
                         }

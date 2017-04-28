@@ -169,7 +169,8 @@ class EmailSubscriber extends CommonSubscriber
         foreach ($products as $product) {
             if (CitrixHelper::isAuthorized('Goto'.$product)) {
                 $params = [
-                    'product' => $product,
+                    'product'     => $product,
+                    'productLink' => '',
                 ];
 
                 if ('webinar' == $product) {
