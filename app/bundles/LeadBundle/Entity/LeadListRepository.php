@@ -1024,8 +1024,6 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 case 'stage':
-                    $operand = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
-
                     // A note here that SQL EXISTS is being used for the eq and neq cases.
                     // I think this code might be inefficient since the sub-query is rerun
                     // for every row in the outer query's table. This might have to be refactored later on
@@ -1048,8 +1046,16 @@ class LeadListRepository extends CommonRepository
                             );
                             break;
                         case 'eq':
-                            // Fall through to neq and let the $operand parameter
-                            // do the switching in this case.
+                            $parameters[$parameter] = $details['filter'];
+
+                            $subQb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.id', 'l.stage_id'),
+                                    $q->expr()->eq($alias.'.id', ":$parameter")
+                                )
+                            );
+                            $groupExpr->add(sprintf('EXISTS (%s)', $subQb->getSQL()));
+                            break;
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
 
@@ -1059,7 +1065,7 @@ class LeadListRepository extends CommonRepository
                                     $q->expr()->eq($alias.'.id', ":$parameter")
                                 )
                             );
-                            $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
+                            $groupExpr->add(sprintf('NOT EXISTS (%s)', $subQb->getSQL()));
                             break;
                     }
 
