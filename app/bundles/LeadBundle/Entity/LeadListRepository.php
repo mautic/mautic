@@ -1048,22 +1048,15 @@ class LeadListRepository extends CommonRepository
                             );
                             break;
                         case 'eq':
-                            $subQb->where(
-                                $q->expr()->andX(
-                                    $q->expr()->eq($alias.'.id', 'l.stage_id'),
-                                    $q->expr()->eq($alias.'.id', ":$parameter")
-                                )
-                            );
-                            $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
-
-                            break;
+                            // Fall through to neq and let the $operand parameter
+                            // do the switching in this case.
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
 
                             $subQb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.id', 'l.stage_id'),
-                                    $q->expr()->neq($alias.'.id', ":$parameter")
+                                    $q->expr()->eq($alias.'.id', ":$parameter")
                                 )
                             );
                             $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
