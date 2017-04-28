@@ -47,13 +47,13 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * @param      $lead
-     * @param null $deviceName
-     * @param null $deviceBrand
-     * @param null $deviceModel
+     * @param null $deviceNames
+     * @param null $deviceBrands
+     * @param null $deviceModels
      *
      * @return array
      */
-    public function getDevice($lead, $deviceName = null, $deviceBrand = null, $deviceModel = null)
+    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('es.id as id, es.device as device, es.device_fingerprint')
@@ -66,25 +66,53 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        if ($deviceName !== null) {
-            $sq->where(
-                $sq->expr()->eq('es.device', ':device')
-            )
-                ->setParameter('device', $deviceName);
+        if ($deviceNames !== null) {
+            if(!is_array($deviceNames)){
+                $deviceNames[] = $deviceNames;
+            }
+            foreach ($deviceNames as $key => $deviceName) {
+                $sq->where(
+                    $sq->expr()->eq('es.device', ':device'.$key)
+                )
+                    ->setParameter('device'.$key, $deviceName);
+            }
         }
 
-        if ($deviceBrand !== null) {
-            $sq->where(
-                $sq->expr()->eq('es.device_brand', ':deviceBrand')
-            )
-                ->setParameter('deviceBrand', $deviceBrand);
+        if ($deviceBrands !== null) {
+            if (!is_array($deviceBrands)) {
+                $deviceBrands[] = $deviceBrands;
+            }
+            foreach ($deviceBrands as $key => $deviceBrand) {
+                $sq->where(
+                    $sq->expr()->eq('es.device_brand', ':deviceBrand'.$key)
+                )
+                    ->setParameter('deviceBrand'.$key, $deviceBrand);
+            }
         }
 
-        if ($deviceModel !== null) {
-            $sq->where(
-                $sq->expr()->eq('es.device_model', ':deviceModel')
-            )
-                ->setParameter('deviceModel', $deviceModel);
+        if ($deviceModels !== null) {
+            if (!is_array($deviceModels)) {
+                $deviceModels[] = $deviceModels;
+            }
+            foreach ($deviceModels as $key => $deviceModel) {
+                $sq->where(
+                    $sq->expr()->eq('es.device_model', ':deviceModel'.$key)
+                )
+                    ->setParameter('deviceModel'.$key, $deviceModel);
+            }
+        }
+
+
+        if ($deviceOss !== null) {
+            if (!is_array($deviceOss)) {
+                $deviceOss[] = $deviceOss;
+            }
+            foreach ($deviceOss as $key => $deviceOs) {
+                $sq->where(
+                    $sq->expr()->eq('es.device_os', ':deviceOs'.$key)
+                )
+                    ->setParameter('deviceOs'.$key, $deviceOs);
+            }
         }
 
         if ($lead !== null) {

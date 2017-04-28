@@ -39,18 +39,41 @@ class CampaignEventLeadDeviceType extends AbstractType
                 'label'       => 'mautic.lead.campaign.event.device_type',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => true,
-                'choices'    => array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())),
+                'choices'     => array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())),
                 'attr'        => [
-                    'class'    => 'form-control'
-                ],
-                'required'    => true,
-                'constraints' => [
-                    new NotBlank(
-                        ['message' => 'mautic.core.value.required']
-                    ),
+                    'class'   => 'form-control'
                 ],
             ]
         );
+
+        $builder->add(
+            'device_brand',
+            'choice',
+            [
+                'label'       => 'mautic.lead.campaign.event.device_brand',
+                'label_attr'  => ['class' => 'control-label'],
+                'multiple'    => true,
+                'choices'     =>  DeviceParser::$deviceBrands,
+                'attr'        => [
+                    'class'   => 'form-control'
+                ],
+            ]
+        );
+
+        $builder->add(
+            'device_os',
+            'choice',
+            [
+                'label'       => 'mautic.lead.campaign.event.device_os',
+                'label_attr'  => ['class' => 'control-label'],
+                'multiple'    => true,
+                'choices'     => array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())),
+                'attr'        => [
+                    'class'   => 'form-control'
+                ],
+            ]
+        );
+
     }
 
     /**
