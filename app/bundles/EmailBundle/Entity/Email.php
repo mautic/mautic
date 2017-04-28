@@ -113,6 +113,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $content = [];
 
     /**
+     * @var array
+     */
+    private $utmTags = [];
+
+    /**
      * @var string
      */
     private $plainText;
@@ -272,6 +277,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
 
         $builder->createField('content', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTags', 'array')
+            ->columnName('utm_tags')
             ->nullable()
             ->build();
 
@@ -591,6 +601,25 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $this->isChanged('content', $content);
         $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
+    }
+
+    /**
+     * @param array $utmTags
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('content', $utmTags);
+        $this->utmTags = $utmTags;
 
         return $this;
     }
