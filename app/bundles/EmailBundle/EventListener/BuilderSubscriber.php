@@ -303,7 +303,7 @@ class BuilderSubscriber extends CommonSubscriber
             $email = $this->emailModel->getEntity($emailId);
         }
 
-        $utmTags = $email->getUtmTags();
+        $utmTags = $email->getUtmTagsForUrl();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
