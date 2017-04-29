@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 
 /**
  * Class CampaignSubscriber.
@@ -42,17 +43,23 @@ class CampaignSubscriber extends CommonSubscriber
     protected $leadFieldModel;
 
     /**
+     * @var ListModel
+     */
+    protected $listModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel      $leadModel
      * @param FieldModel     $leadFieldModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, LeadModel $leadModel, FieldModel $leadFieldModel, ListModel $listModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->leadModel      = $leadModel;
         $this->leadFieldModel = $leadFieldModel;
+        $this->listModel      = $listModel;
     }
 
     /**
@@ -156,7 +163,7 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addCondition('lead.field_value', $trigger);
 
         $trigger = [
-            'label'       => 'mautic.lead.lead.events.tags_value',
+            'label'       => 'mautic.lead.lead.events.tags',
             'description' => 'mautic.lead.lead.events.tags_descr',
             'formType'    => 'campaignevent_lead_tags',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
@@ -164,7 +171,7 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addCondition('lead.tags', $trigger);
 
         $trigger = [
-            'label'       => 'mautic.lead.lead.events.segments_value',
+            'label'       => 'mautic.lead.lead.events.segments',
             'description' => 'mautic.lead.lead.events.segments_descr',
             'formType'    => 'campaignevent_lead_segments',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
@@ -335,34 +342,47 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
 
-        if ($event->getConfig()['operator'] === 'date') {
-            // Set the date in system timezone since this is triggered by cron
-            $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));
-            $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
+        if ($event->checkContext('lead.tags')) {
 
-            if (strpos($event->getConfig()['value'], '+P') !== false) { //add date
-                $triggerDate->add(new \DateInterval($interval)); //add the today date with interval
-                $result = $this->compareDateValue($lead, $event, $triggerDate);
-            } elseif (strpos($event->getConfig()['value'], '-P') !== false) { //subtract date
-                $triggerDate->sub(new \DateInterval($interval)); //subtract the today date with interval
-                $result = $this->compareDateValue($lead, $event, $triggerDate);
-            } elseif ($event->getConfig()['value'] === 'anniversary') {
-                /**
-                 * note: currently mautic campaign only one time execution
-                 * ( to integrate with: recursive campaign (future)).
-                 */
-                $result = $this->leadFieldModel->getRepository()->compareDateMonthValue(
-                        $lead->getId(), $event->getConfig()['field'], $triggerDate);
+            $tagRepo = $this->leadModel->getTagRepository();
+            $result = $tagRepo->checkLeadByTags($lead, $event->getConfig()['tags']);
+
+        } elseif ($event->checkContext('lead.segments')) {
+
+            $listRepo = $this->listModel->getRepository();
+            $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
+
+        } elseif ($event->checkContext('lead.field_value')) {
+
+            if ($event->getConfig()['operator'] === 'date') {
+                // Set the date in system timezone since this is triggered by cron
+                $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));
+                $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
+
+                if (strpos($event->getConfig()['value'], '+P') !== false) { //add date
+                    $triggerDate->add(new \DateInterval($interval)); //add the today date with interval
+                    $result = $this->compareDateValue($lead, $event, $triggerDate);
+                } elseif (strpos($event->getConfig()['value'], '-P') !== false) { //subtract date
+                    $triggerDate->sub(new \DateInterval($interval)); //subtract the today date with interval
+                    $result = $this->compareDateValue($lead, $event, $triggerDate);
+                } elseif ($event->getConfig()['value'] === 'anniversary') {
+                    /**
+                     * note: currently mautic campaign only one time execution
+                     * ( to integrate with: recursive campaign (future)).
+                     */
+                    $result = $this->leadFieldModel->getRepository()->compareDateMonthValue(
+                            $lead->getId(), $event->getConfig()['field'], $triggerDate);
+                }
+            } else {
+                $operators = $this->leadModel->getFilterExpressionFunctions();
+
+                $result = $this->leadFieldModel->getRepository()->compareValue(
+                        $lead->getId(),
+                        $event->getConfig()['field'],
+                        $event->getConfig()['value'],
+                        $operators[$event->getConfig()['operator']]['expr']
+                );
             }
-        } else {
-            $operators = $this->leadModel->getFilterExpressionFunctions();
-
-            $result = $this->leadFieldModel->getRepository()->compareValue(
-                    $lead->getId(),
-                    $event->getConfig()['field'],
-                    $event->getConfig()['value'],
-                    $operators[$event->getConfig()['operator']]['expr']
-            );
         }
 
         return $event->setResult($result);

@@ -25,11 +25,11 @@ class CampaignEventLeadSegmentsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'lead_lists',
+            'segments',
             'leadlist_choices',
             [
                 'global_only' => true,
-                'label'       => 'mautic.lead.form.list',
+                'label'       => 'mautic.lead.lead.lists',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => true,
                 'required'    => false,

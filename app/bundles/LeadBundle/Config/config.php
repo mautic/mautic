@@ -306,6 +306,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
+                    'mautic.lead.model.list',
                 ],
             ],
             'mautic.lead.reportbundle.subscriber' => [
