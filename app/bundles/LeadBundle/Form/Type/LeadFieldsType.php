@@ -45,7 +45,7 @@ class LeadFieldsType extends AbstractType
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
                 }
 
-                return D;
+                return $fieldList;
             },
             'global_only' => false,
             'required'    => false,
