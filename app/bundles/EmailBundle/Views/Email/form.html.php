@@ -123,10 +123,20 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                         </div>
                         <br>
                         <br>
-
                         <fieldset>
                             <legend><?php echo $view['translator']->trans('mautic.email.utm_tags');?></legend>
-                            <?php echo $view['form']->row($form['utmTags']); ?>
+                            <div class="row">
+                                <?php
+                                foreach ($form['utmTags'] as $i => $utmTag) {
+                                    ?>
+                                    <div class="form-group col-md-6">
+                                        <?php echo $view['form']->label($utmTag); ?>
+                                        <?php echo $view['form']->widget($utmTag); ?>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
                         </fieldset>
                         <br>
                         <fieldset>

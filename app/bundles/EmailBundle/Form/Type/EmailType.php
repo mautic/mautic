@@ -167,6 +167,7 @@ class EmailType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.utm_tags.tooltip',
                 ],
                 'required' => false,
             ]
