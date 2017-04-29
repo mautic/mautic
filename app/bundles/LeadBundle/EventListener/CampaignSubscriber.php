@@ -154,6 +154,23 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('lead.field_value', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.tags_value',
+            'description' => 'mautic.lead.lead.events.tags_descr',
+            'formType'    => 'campaignevent_lead_tags',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('lead.tags', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.segments_value',
+            'description' => 'mautic.lead.lead.events.segments_descr',
+            'formType'    => 'campaignevent_lead_segments',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+        $event->addCondition('lead.segments', $trigger);
+
     }
 
     /**

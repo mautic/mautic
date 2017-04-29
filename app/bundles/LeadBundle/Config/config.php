@@ -502,6 +502,15 @@ return [
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'campaignevent_lead_field_value',
             ],
+            'mautic.form.type.campaignevent_lead_tags' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType',
+                'arguments' => ['translator'],
+                'alias'     => 'campaignevent_lead_tags',
+            ],
+            'mautic.form.type.campaignevent_lead_segments' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType',
+                'alias'     => 'campaignevent_lead_segments',
+            ],
             'mautic.form.type.lead_fields' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\LeadFieldsType',
                 'arguments' => ['mautic.factory'],
