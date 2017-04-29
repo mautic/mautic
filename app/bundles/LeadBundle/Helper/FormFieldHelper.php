@@ -54,6 +54,18 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 ],
             ],
         ],
+        'notifications' => [
+            'properties' => [
+                'yes' => [
+                    'required'  => true,
+                    'error_msg' => 'mautic.lead.field.boolean.yesmissing',
+                ],
+                'no' => [
+                    'required'  => true,
+                    'error_msg' => 'mautic.lead.field.boolean.nomissing',
+                ],
+            ],
+        ],
         'lookup' => [
             'properties' => [
                 'list' => [],
@@ -257,6 +269,20 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
         $options = array_merge($options, $beforeDaysOptions);
 
+        return $options;
+    }
+
+    /**
+     * Get Boolean field choices.
+     *
+     * @return array
+     */
+    public function getBooleanChoices()
+    {
+        $options = [
+            0 => $this->translator->trans('mautic.core.form.no'),
+            1 => $this->translator->trans('mautic.core.form.yes'),
+        ];
         return $options;
     }
 }

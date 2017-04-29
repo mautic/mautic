@@ -766,11 +766,17 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['success' => 0, 'options' => null, 'operators' => null, 'disabled' => false];
         $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
 
-        if ($leadField) {
-            $options       = null;
-            $leadFieldType = $leadField->getType();
+        if($alias == 'notifications'){
+            $leadFieldType = 'boolean';
+        }
 
-            $properties = $leadField->getProperties();
+        if ($leadField || $leadFieldType) {
+            $options       = null;
+            if(!$leadFieldType) {
+                $leadFieldType = $leadField->getType();
+                $properties = $leadField->getProperties();
+            }
+
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = FormFieldHelper::parseList($properties['list']);
@@ -780,6 +786,10 @@ class AjaxController extends CommonAjaxController
                     0 => $properties['no'],
                     1 => $properties['yes'],
                 ];
+            } elseif ($leadFieldType == 'boolean') {
+                $fieldHelper = new FormFieldHelper();
+                $fieldHelper->setTranslator($this->factory->getTranslator());
+                $options = $fieldHelper->getBooleanChoices();
             } else {
                 switch ($leadFieldType) {
                     case 'country':
