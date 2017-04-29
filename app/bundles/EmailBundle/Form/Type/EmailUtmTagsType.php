@@ -47,8 +47,6 @@ class EmailUtmTagsType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    //  'preaddon' => 'fa fa-user',
-                    //   'tooltip'  => 'mautic.email.from_name.tooltip',
                 ],
                 'required' => false,
             ]
@@ -62,8 +60,6 @@ class EmailUtmTagsType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    //  'preaddon' => 'fa fa-user',
-                    // 'tooltip'  => 'mautic.email.from_name.tooltip',
                 ],
                 'required' => false,
             ]
@@ -77,8 +73,6 @@ class EmailUtmTagsType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    //  'preaddon' => 'fa fa-user',
-                    //      'tooltip'  => 'mautic.email.from_name.tooltip',
                 ],
                 'required' => false,
             ]
@@ -92,8 +86,6 @@ class EmailUtmTagsType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
-                    //  'preaddon' => 'fa fa-user',
-                    //      'tooltip'  => 'mautic.email.from_name.tooltip',
                 ],
                 'required' => false,
             ]
