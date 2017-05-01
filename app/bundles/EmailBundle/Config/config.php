@@ -413,5 +413,6 @@ return [
         'show_contact_segments'               => false,
         'mailer_mailjet_sandbox'              => false,
         'mailer_mailjet_sandbox_default_mail' => null,
+
     ],
 ];
