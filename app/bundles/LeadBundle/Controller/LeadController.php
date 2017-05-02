@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -429,6 +430,19 @@ class LeadController extends FormController
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
+                    }
+
+
+                    $modelCompany = $this->getModel('lead.company');
+                    $companyItems = [];
+                    foreach ($companies as $compId) {
+                        $_company = $modelCompany->getEntity($compId);
+                        $companyItems[] = json_encode(array('id' => $compId, 'name' => $_company->getName()));
+
+                    }
+
+                    if (!empty($companyItems)) {
+                        $data['company'] = implode(',', $companyItems);
                     }
 
                     $model->setFieldValues($lead, $data, true);
