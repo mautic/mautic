@@ -766,15 +766,15 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['success' => 0, 'options' => null, 'operators' => null, 'disabled' => false];
         $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
 
-        if ($alias == 'notifications'){
+        if ($alias == 'notifications') {
             $leadFieldType = 'boolean';
         }
 
         if ($leadField || $leadFieldType) {
-            $options       = null;
-            if(!$leadFieldType) {
+            $options = null;
+            if (!$leadFieldType) {
                 $leadFieldType = $leadField->getType();
-                $properties = $leadField->getProperties();
+                $properties    = $leadField->getProperties();
             }
 
             if (!empty($properties['list'])) {
