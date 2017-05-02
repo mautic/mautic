@@ -869,10 +869,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 && $dataObject['email1__Leads'] != '' && in_array($dataObject['email1__Leads'], $sugarRejectedLeads)) {
                     continue; //Lead email is already in Sugar Contacts. Do not carry on
                 }
-                $itemLastDate = $itemDateModified;
-                if ($itemDateEntered > $itemLastDate) {
-                    $itemLastDate = $itemDateEntered;
-                }
+                //$itemLastDate = $itemDateModified;
+                //if ($itemDateEntered > $itemLastDate) {
+                //    $itemLastDate = $itemDateEntered;
+                //}
 
                 if (isset($dataObject) && $dataObject && !empty($dataObject)) {
                     if ($object == 'Leads' or $object == 'Contacts') {
@@ -1289,7 +1289,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         // Create any left over
         if ($checkEmailsInSugar) {
             foreach ($checkEmailsInSugar as $lead) {
-                if ($lead['integration_entity'] == 'Contacts') {
+                if (isset($lead['integration_entity']) && $lead['integration_entity'] == 'Contacts') {
                     //TODO : check emails
                     $this->buildCompositeBody(
                         $mauticData,

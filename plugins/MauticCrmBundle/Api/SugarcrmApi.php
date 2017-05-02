@@ -413,7 +413,7 @@ class SugarcrmApi extends CrmApi
                     }
                     if ($type == 'BYID') {
                         $res[$fields['id']] = $fields['email1'];
-                    } else {
+                    } elseif (isset($fields['email1'])) {
                         $res[$fields['email1']] = $fields['id'];
                     }
                 }
