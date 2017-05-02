@@ -15,4 +15,4 @@ before_script:
 script:
   - phpunit
   - IFS=$'\n'; COMMIT_SCA_FILES=($(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")); unset IFS
-  - bin/php-cs-fixer fix --config=.php_cs -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection "${COMMIT_SCA_FILES[@]}"
+  - bin/php-cs-fixer fix  -v --dry-run "${COMMIT_SCA_FILES[@]}"
