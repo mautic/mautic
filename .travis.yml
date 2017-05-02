@@ -12,5 +12,5 @@ before_script:
   - composer install
 
 script:
-  - phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles
+  - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles
   - bin/php-cs-fixer fix -v --dry-run
