@@ -306,15 +306,14 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if (count($uniqueLeadFieldData)) {
             $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
-
             if (!empty($existingLeads)) {
-                $lead = array_shift($existingLeads);
+                $lead          = array_shift($existingLeads);
+                $existingLeads = true;
             }
         }
 
-        //use direction of fields only when updating existing lead
-        $fieldsToUpdateInMautic = (isset($config['update_mautic']) && empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
-        if (!empty($fieldsToUpdateInMautic)) {
+        $fieldsToUpdateInMautic = (isset($config['update_mautic']) && !empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
+        if (!empty($fieldsToUpdateInMautic) && !empty($existingLeads)) {
             $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
         }

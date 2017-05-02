@@ -981,9 +981,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $leadSfFieldsToCreate = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
             $leadSfFields         = array_diff_key($leadSfFieldsToCreate, array_flip($fieldsToUpdateInSf));
             $contactSfFields      = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
-
-            $contactSfFields = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
-            $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
+            $contactSfFields      = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
+            $availableFields      = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
 
             $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
         }
@@ -1026,12 +1025,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $deletedSFLeads      = [];
         $salesforceIdMapping = [];
         if ($checkEmailsInSF) {
-            $findLead = 'select Id, Company, ConvertedContactId, Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
-                .'\')';
+            $findLead = 'select Id, Company, LastName, Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+                .'\') and ConvertedContactId = NULL';
             $queryUrl = $this->getQueryUrl();
 
             if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
-                $findContact = 'select Id, Email, IsDeleted from Contact where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+                $findContact = 'select Id, Email, LastName,  IsDeleted from Contact where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
                     .'\')';
                 $sfContact = $this->getApiHelper()->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
             }
@@ -1052,7 +1051,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $contactSfFields,
                                 'Contact',
                                 $checkEmailsInSF[$key],
-                                $sfContactRecord['Id']
+                                $sfContactRecord['Id'],
+                                $sfContactRecord
                             );
                         } else {
                             // @todo - Salesforce doesn't seem to be returning deleted contacts by default
@@ -1070,24 +1070,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $updateLead = false;
                     $key        = mb_strtolower($sfLeadRecord['Email']);
                     if (isset($checkEmailsInSF[$key])) {
-                        $isConverted = (isset($sfLeadRecord['ConvertedContactId'])
-                            && $sfLeadRecord['ConvertedContactId'] != null);
-                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = ($isConverted) ? $sfLeadRecord['ConvertedContactId']
-                            : $sfLeadRecord['Id'];
+                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = $sfLeadRecord['Id'];
 
                         if (empty($sfLeadRecord['IsDeleted'])) {
-                            if ($isConverted && isset($config['objects']) && array_search('Contact', $config['objects'])) {
-                                $this->buildCompositeBody(
-                                    $mauticData,
-                                    $availableFields,
-                                    $contactSfFields,
-                                    'Contact',
-                                    $checkEmailsInSF[$key],
-                                    $sfLeadRecord['ConvertedContactId'],
-                                    $sfLeadRecord
-                                );
-                                unset($checkEmailsInSF[$key]);
-                            } elseif (isset($sfLeadRecord['Id']) && !$isConverted) {
+                            if (isset($sfLeadRecord['Id'])) {
                                 $updateLead = $this->buildCompositeBody(
                                     $mauticData,
                                     $availableFields,
@@ -1099,21 +1085,28 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 );
                                 if ($updateLead) {
                                     $leadEntity = $leadModel->getEntity($checkEmailsInSF[$key]['internal_entity_id']);
-                                    $company    = IdentifyCompanyHelper::identifyLeadsCompany(['company' => $sfLeadRecord['Company']], null, $companyModel);
-                                    if ($company[2] && !empty($company[2])) {
-                                        $companyModel->addLeadToCompany($company[2], $leadEntity);
-                                        $leadsToSync[] = $leadEntity;
-                                    }
                                 }
                                 unset($checkEmailsInSF[$key]);
                             }
                         } else {
                             // @todo - Salesforce doesn't seem to be returning deleted contacts by default
                             $deletedSFLeads[] = $sfLeadRecord['Id'];
-                            if (!empty($sfLeadRecord['ConvertedContactId'])) {
-                                $deletedSFLeads[] = $sfLeadRecord['ConvertedContactId'];
-                            }
                             unset($checkEmailsInSF[$key]);
+                        }
+                        if ($updateLead) {
+                            $syncLead = false;
+                            if (!empty($sfLeadRecord['LastName'])) {
+                                $leadEntity->setLastname($sfLeadRecord['LastName']);
+                                $syncLead = true;
+                            }
+                            $company = IdentifyCompanyHelper::identifyLeadsCompany(['company' => $sfLeadRecord['Company']], null, $companyModel);
+                            if ($company[2] && !empty($company[2])) {
+                                $companyModel->addLeadToCompany($company[2], $leadEntity);
+                                $syncLead = true;
+                            }
+                            if ($syncLead == true) {
+                                $leadsToSync[] = $leadEntity;
+                            }
                         }
                     } // Otherwise a duplicate in Salesforce and has already been processed
                 }
@@ -1209,11 +1202,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (isset($lead[$mauticField])) {
                     $body[$sfField] = $lead[$mauticField];
                 }
-
                 if ($required && empty($body[$sfField])) {
                     if (isset($sfRecord[$sfField])) {
                         $body[$sfField] = $sfRecord[$sfField];
-                        if ($sfField == 'Company') {
+                        if ($sfField == 'Company' || $sfField == 'LastName') {
                             $updateLead = true;
                         }
                     } else {
@@ -1278,7 +1270,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity->setLastSyncDate(new \DateTime());
 
                         $persistEntities[] = $integrationEntity;
-                    } elseif ($campaignId) {
+                    } elseif (isset($campaignId)) {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $campaignId);
                         $integrationEntity->setLastSyncDate(new \DateTime());
 
@@ -1448,7 +1440,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $fields    = $this->getMixedLeadFields($mixedFields, 'Lead');
                 $fields[]  = 'Id';
                 $fields    = implode(', ', array_unique($fields));
-                $leadQuery = 'SELECT '.$fields.' from Lead where Id in ('.$listOfLeadsToFetch.')';
+                $leadQuery = 'SELECT '.$fields.' from Lead where Id in ('.$listOfLeadsToFetch.') and ConvertedContactId = NULL';
 
                 $this->getLeads([], $leadQuery, $executed, [], 'Lead');
 
@@ -1602,23 +1594,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
 
-            $findLead     = 'select Id, ConvertedContactId from Lead where email = \''.$lead->getEmail().'\'';
+            $findLead     = 'select Id from Lead where email = \''.$lead->getEmail().'\' and ConvertedContactId = NULL';
             $sfRecordLead = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
             $existingBody = [];
             if (!empty($sfRecordLead['records'])) {
                 $sfLeadRecords = array_merge($sfLeadRecords, $sfRecordLead['records']);
                 foreach ($sfRecordLead['records'] as $sfLeadRecord) {
-                    $sfLeadId = $sfLeadRecord['Id'];
-                    $allIds[] = $sfLeadRecord['Id'];
-                    //update the converted contact if found and not the Lead because it will error in SF
-                    if (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) {
-                        if (count($sfLeadRecords) <= 1) {
-                            $createLead = true;
-                            continue;
-                        } else {
-                            continue;
-                        }
-                    }
+                    $sfLeadId            = $sfLeadRecord['Id'];
+                    $allIds[]            = $sfLeadRecord['Id'];
                     $type                = 'LeadId';
                     $existingBody[$type] = $sfLeadId;
                     $all[]               = array_merge($body, $existingBody);
