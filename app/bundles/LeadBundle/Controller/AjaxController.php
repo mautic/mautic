@@ -770,7 +770,7 @@ class AjaxController extends CommonAjaxController
             $leadFieldType = 'boolean';
         }
 
-        if($leadField || $leadFieldType) {
+        if ($leadField || $leadFieldType) {
             $options       = null;
             if(!$leadFieldType) {
                 $leadFieldType = $leadField->getType();
