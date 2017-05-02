@@ -87,7 +87,7 @@ class TrackableModel extends AbstractCommonModel
      * @param Trackable  $trackable
      * @param array      $clickthrough
      * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
-      @param array      $utmTags
+     * @param array      $utmTags
      *
      * @return string
      */

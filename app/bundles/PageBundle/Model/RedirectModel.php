@@ -76,8 +76,8 @@ class RedirectModel extends FormModel
         );
 
         if (!empty($utmTags)) {
-            $query = parse_url($url, PHP_URL_QUERY);
-            $urlString = http_build_query($utmTags, '', '&');;
+            $query     = parse_url($url, PHP_URL_QUERY);
+            $urlString = http_build_query($utmTags, '', '&');
             if ($query) {
                 $url .= '&'.$urlString;
             } else {

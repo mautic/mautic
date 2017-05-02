@@ -11,34 +11,20 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
-use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
-use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class EmailUtmTagsType.
  */
 class EmailUtmTagsType extends AbstractType
 {
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder->add(
             'utmSource',
             'text',
@@ -46,7 +32,7 @@ class EmailUtmTagsType extends AbstractType
                 'label'      => 'mautic.email.campaign_source',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required' => false,
             ]
@@ -59,7 +45,7 @@ class EmailUtmTagsType extends AbstractType
                 'label'      => 'mautic.email.campaign_medium',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required' => false,
             ]
@@ -72,7 +58,7 @@ class EmailUtmTagsType extends AbstractType
                 'label'      => 'mautic.email.campaign_name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required' => false,
             ]
@@ -81,17 +67,16 @@ class EmailUtmTagsType extends AbstractType
         $builder->add(
             'utmContent',
             'text',
-            [
+                [
                 'label'      => 'mautic.email.campaign_content',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
+                    'class' => 'form-control',
                 ],
                 'required' => false,
             ]
         );
     }
-
 
     /**
      * @return string

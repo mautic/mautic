@@ -2,31 +2,31 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
+use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20170429092049 extends AbstractMigration
+class Version20170429092049 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
+     *
+     * @throws SkipMigrationException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    public function up(Schema $schema)
+    public function preUp(Schema $schema)
     {
-        $columns = $schema->getTable($this->prefix.'emails')->getColumns();
-
-        if (array_key_exists('utm_tags', $columns)) {
+        if ($schema->getTable($this->prefix.'emails')->hasColumn('utm_tags')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
-
     }
 
     /**
      * @param Schema $schema
      */
-    public function down(Schema $schema)
+    public function up(Schema $schema)
     {
         $this->addSql("ALTER TABLE {$this->prefix}emails ADD utm_tags LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
     }
