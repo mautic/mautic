@@ -11,6 +11,9 @@ php:
 before_script:
   - composer install
 
+  # turn off XDebug
+  - phpenv config-rm xdebug.ini || return
+
 script:
   - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles
   - bin/php-cs-fixer fix -v --dry-run
