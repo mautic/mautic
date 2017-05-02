@@ -1,10 +1,10 @@
 <?php
 
 $finder = Symfony\CS\Finder\DefaultFinder::create()
-    ->in(__DIR__.'/app')
-    ->exclude(__DIR__.'/app/cache')
-    ->exclude(__DIR__.'/app/logs')
-    ->exclude(__DIR__.'/app/Resources')
+    ->in(__DIR__.'/app/bundles')
+    ->in(__DIR__.'/app/config')
+    ->in(__DIR__.'/app/middlewares')
+    ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins');
 
 return Symfony\CS\Config\Config::create()

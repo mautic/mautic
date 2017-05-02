@@ -8,12 +8,16 @@ php:
   - 5.6
   - 7.0
 
-before_script:
-  - composer install
-
+before_install:
   # turn off XDebug
   - phpenv config-rm xdebug.ini || return
 
+  # install dependencies in parallel
+  - travis_retry composer global require hirak/prestissimo
+
+install:
+  - composer install
+
 script:
   - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles
-  - bin/php-cs-fixer fix -v --dry-run
+  - bin/php-cs-fixer fix -v --dry-run --diff
