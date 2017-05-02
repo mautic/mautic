@@ -411,9 +411,8 @@ class LeadModel extends FormModel
 
         $updatedFields = $entity->getUpdatedFields();
         if (isset($updatedFields['company'])) {
-            foreach ($updatedFields['company'] as $companyInfo) {
-                $_company = json_decode($companyInfo, true);
-                $companyFieldMatches['company'] = $_company['id'];
+            foreach (json_decode($updatedFields['company'], true) as $companyInfo) {
+                $companyFieldMatches['company'] = $companyInfo['name'];
                 list($company, $leadAdded)      = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
                 if ($leadAdded) {
                     $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);

@@ -437,12 +437,12 @@ class LeadController extends FormController
                     $companyItems = [];
                     foreach ($companies as $compId) {
                         $_company = $modelCompany->getEntity($compId);
-                        $companyItems[] = json_encode(array('id' => $compId, 'name' => $_company->getName()));
+                        $companyItems[] = array('id' => $compId, 'name' => $_company->getName());
 
                     }
 
                     if (!empty($companyItems)) {
-                        $data['company'] = implode(',', $companyItems);
+                        $data['company'] = json_encode($companyItems);
                     }
 
                     $model->setFieldValues($lead, $data, true);
