@@ -8,13 +8,11 @@ php:
   - 5.6
   - 7.0
 
-matrix:
-  allow_failures:
-    - php: 7.0
-
 before_script:
   - composer install
   - cd app
 
 script:
   - phpunit
+  - IFS=$'\n'; COMMIT_SCA_FILES=($(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")); unset IFS
+  - bin/php-cs-fixer fix --config=.php_cs -v --dry-run --stop-on-violation --using-cache=no --path-mode=intersection "${COMMIT_SCA_FILES[@]}"
