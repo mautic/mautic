@@ -10,9 +10,8 @@ php:
 
 before_script:
   - composer install
-  - cd app
 
 script:
-  - phpunit
+  - app/phpunit
   - IFS=$'\n'; COMMIT_SCA_FILES=($(git diff --name-only --diff-filter=ACMRTUXB "${TRAVIS_COMMIT_RANGE}")); unset IFS
   - bin/php-cs-fixer fix  -v --dry-run "${COMMIT_SCA_FILES[@]}"
