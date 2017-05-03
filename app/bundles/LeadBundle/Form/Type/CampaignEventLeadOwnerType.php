@@ -15,7 +15,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignEventLeadSegmentsType.
+ * Class CampaignEventLeadOwnerType.
  */
 class CampaignEventLeadOwnerType extends AbstractType
 {
