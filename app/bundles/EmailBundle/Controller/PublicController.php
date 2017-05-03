@@ -167,6 +167,11 @@ class PublicController extends CommonFormController
                 $leadModel->setCurrentLead($lead);
             }
 
+            // Set lead lang
+            if ($lead->getPreferredLocale()) {
+                $translator->setLocale($lead->getPreferredLocale());
+            }
+
             if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
                 $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
