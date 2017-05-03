@@ -166,7 +166,6 @@ class PublicController extends CommonFormController
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
             }
-
             // Set lead lang
             if ($lead->getPreferredLocale()) {
                 $translator->setLocale($lead->getPreferredLocale());
@@ -290,6 +289,11 @@ class PublicController extends CommonFormController
                 $leadModel->setCurrentLead($lead);
             }
 
+            // Set lead lang
+            if ($lead->getPreferredLocale()) {
+                $this->translator->setLocale($lead->getPreferredLocale());
+            }
+
             $model->removeDoNotContact($stat->getEmailAddress());
 
             $message = $this->coreParametersHelper->getParameter('resubscribe_message');
@@ -297,8 +301,8 @@ class PublicController extends CommonFormController
                 $message = $this->translator->trans(
                     'mautic.email.resubscribed.success',
                     [
-                        '%unsubscribedUrl%' => '|URL|',
-                        '%email%'           => '|EMAIL|',
+                        '%unsubscribeUrl%' => '|URL|',
+                        '%email%'          => '|EMAIL|',
                     ]
                 );
             }
