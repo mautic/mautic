@@ -39,6 +39,10 @@ class SalesforceApi extends CrmApi
      */
     public function request($operation, $elementData = [], $method = 'GET', $retry = false, $object = null, $queryUrl = null)
     {
+        $settings = [];
+        if ($method == 'PATCH') {
+            $settings['headers'] = 'Sforce-Auto-Assign: FALSE';
+        }
         if (!$object) {
             $object = $this->object;
         }
@@ -49,8 +53,8 @@ class SalesforceApi extends CrmApi
         } else {
             $requestUrl = sprintf($queryUrl.'/%s', $operation);
         }
-
-        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
+        $settings = array_merge($settings, $this->requestSettings);
+        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
 
         if (!empty($response['errors'])) {
             $notificactionModel->addNotification(implode(', ', $response['errors']), 'Salesforce', false, $this->integration->getName().':');
