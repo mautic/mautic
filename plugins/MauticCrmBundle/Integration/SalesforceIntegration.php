@@ -1192,7 +1192,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 if ($required && empty($body[$sfField])) {
-                    //    $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+                    $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
                 }
             }
 
