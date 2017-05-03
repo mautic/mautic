@@ -28,8 +28,6 @@ class InesSyncLogModel extends FormModel
 
 
     /**
-     * Retourne une entité ou en crée une nouvelle si pas d'ID fourni
-     *
      * @param $id
      *
      * @return null|object
@@ -67,7 +65,7 @@ class InesSyncLogModel extends FormModel
 
 
 	/**
-	 * Supprime des enregistrements répondant à une liste de critères
+     * Deletes records that match a list of criteria
 	 *
 	 * @param 	array 	$filters
 	 */
@@ -85,7 +83,7 @@ class InesSyncLogModel extends FormModel
 
 
 	/**
-	 * Retourne la liste des X leads en attente de synchro
+	 * Returns X pending leads waiting for sync
 	 *
 	 * @param 	$action 	string 	'UPDATE' | 'DELETE'
 	 * @param 	$limit 		int
@@ -107,7 +105,7 @@ class InesSyncLogModel extends FormModel
 
 
 	/**
-	 * Vérifie si la file d'attente est vide
+	 * Checks whether the queue is empty or not
 	 *
 	 * @param 	$action 	string 	'UPDATE' | 'DELETE'
 	 *
@@ -120,9 +118,9 @@ class InesSyncLogModel extends FormModel
 		);
 	}
 
-	
+
 	/**
-	 * Retourne l'historique de la file d'attente, par date de mise à jour décroissante
+	 * Returns queue history, by decreasing update date
 	 *
 	 * @param 	$limit 		int
 	 *
@@ -141,10 +139,8 @@ class InesSyncLogModel extends FormModel
 
 	private function _createTableIfNotExists()
 	{
-		// Récupération du nom de la table associée à l'entité
 		$tableName = $this->em->getClassMetadata('MauticCrmBundle:InesSyncLog')->getTableName();
 
-		// Vérification de son existence en DB
 		$schemaManager = $this->em->getConnection()->getSchemaManager();
 
 		if ( !$schemaManager->tablesExist(array($tableName)) === true) {

@@ -31,8 +31,8 @@ class LeadSubscriber extends CommonSubscriber
 
 
 	/**
-	 * Si le mode "INES full-sync" est activé :
-     * Ajoute un lead en file d'attente des leads à synchroniser avec INES
+	 * If the "INES full-sync" mode is enabled :
+     * Enqueue a lead in sync queue
      *
      * @param Events\LeadEvent $event
      */
@@ -48,7 +48,7 @@ class LeadSubscriber extends CommonSubscriber
 
 
 	/**
-	 * Lorsque la société d'un lead change, on ré-initialise les clés INES
+	 * Reset INES keys if the company of a lead changes
 	 */
 	public function onLeadCompanyChange($event)
 	{
@@ -60,8 +60,8 @@ class LeadSubscriber extends CommonSubscriber
 
 
 	/**
-	 * Si le mode "INES full-sync" est activé :
-	 * Ajoute un lead en file d'attente des leads à SUPPRIMER avec INES
+	 * If the "INES full-sync" mode is enabled :
+	 * Enqueue a lead in the delete queue
 	 *
 	 * @param Events\LeadEvent $event
 	 */

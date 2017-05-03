@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 class InesIntegration extends CrmAbstractIntegration
 {
 	/**
-	 * Array	Mapping retourné par l'intégration, mémorisé en attribut pour limiter les appels
+	 * Array   Mapping returned by integration
 	 */
 	protected $mapping = false;
 
@@ -28,8 +28,6 @@ class InesIntegration extends CrmAbstractIntegration
 
 
     /**
-     * Nom de l'intégration (doit correspondre au nom du fichier et de la classe)
-     *
      * @return string
      */
     public function getName()
@@ -39,8 +37,6 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Message affiché en tête de l'onglet de config
-	 *
 	 * @return string
 	 */
 	public function getDescription()
@@ -51,7 +47,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * L'intégration supporte la fonction "push lead to integration"
+	 * Integration supports "push lead to integration" action
 	 *
 	 * return 	array(string)
 	 */
@@ -62,8 +58,8 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Liste des champs nécessaires à la configuration du compte INES, pour accéder aux Web-Services
-	 * Les champs dans le formulaire de config, leur hydratation et sauvegarde sont gérés automatiquement
+	 * List of fields needed to configure the INES connexion
+     * The fields in the config form, their hydration and save are handled automatically
 	 *
 	 * @return array
 	 */
@@ -78,7 +74,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Indique quels champs de la config du plugin doivent être en INPUT de type PASSWORD
+	 * Indicates which fields of the plugin config must be INPUT of type PASSWORD
 	 *
 	 * @return array
 	 */
@@ -91,7 +87,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-     * Ajoute des champs dans les formulaires "config" et "features" du plugin
+     * Adds fields in the "config" and "features" forms of the plugin
 	 *
 	 * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
      * @param array                                             $data
@@ -99,15 +95,15 @@ class InesIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-		// Tant que l'utilisateur navigue entre les onglets de config, il est préférable de ne pas conserver
-		// la config en provenance du WS INES : si elle est modifiée chez INES on doit le savoir tout de suite.
-		// Par exemple l'ajout d'un custom field.
+        // As long as the user navigates between the config tabs, it is preferable not to keep
+        // the config from the INES WS: if it is modified at INES we must know it right away.
+        // For example, adding a custom field.
 		$this->unsetCurrentSyncConfig();
 
 		// Onglet Enabled/Auth
 		if ($formArea == 'keys') {
 
-			// Ajout d'un bouton pour tester la connexion
+			// Add a button to check auth
 			$builder->add('check_api_button', 'standalone_button', array(
 				'label' => 'mautic.ines.form.check.btn',
 				'attr'     => array(
@@ -138,10 +134,10 @@ class InesIntegration extends CrmAbstractIntegration
 			));
 		}
 
-		// Onglet Features
+		// Features tab
 		else if ($formArea == 'features') {
 
-			// Case à cocher : synchro complète ?
+			// checkbox : full sync mode ?
 			$builder->add(
                 'full_sync',
                 'choice',
@@ -158,7 +154,7 @@ class InesIntegration extends CrmAbstractIntegration
                 ]
             );
 
-			// Bouton : afficher le journal de bord
+			// Button : open sync log
 			$logsUrl = $this->factory->getRouter()->generate('ines_logs');
 			$builder->add('goto_logs_button', 'standalone_button', array(
 				'label' => 'mautic.ines.form.gotologs.btn',
@@ -170,7 +166,7 @@ class InesIntegration extends CrmAbstractIntegration
 			));
 
 
-			// Liste des champs disponibles chez INES et disponibles pour l'option "champ écrasable"
+			// List of fields available at INES and available for the "eraseble field" option
 			try {
 				if ($this->isAuthorized()) {
 					$inesFields = $this->getApiHelper()->getLeadFields();
@@ -204,7 +200,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Vérifie s'il existe un ID de session INES, ou, dans le cas contraire, si les codes d'accès aux WS sont valides
+	 * Checks if there is an INES session ID, or, if not, whether the WS access codes are valid or not
 	 *
 	 * @return bool
 	 */
@@ -219,7 +215,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Indique si le mode synchro complète est coché ou non dans la config du plugin
+	 * Indicates whether full sync mode is checked or not in the plugin config
 	 *
 	 * @return bool
 	 */
@@ -227,7 +223,7 @@ class InesIntegration extends CrmAbstractIntegration
 	{
 		$settings = $this->getIntegrationSettings();
 
-		// Si l'intégration est désactivée, on ne doit rien synchroniser
+		// If the integration is deactivated, nothing should be synchronized
 		if ( $settings->getIsPublished() === false) {
 			return false;
 		}
@@ -239,8 +235,8 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Vérifie si les codes d'accès aux web-services sont valides
-	 * La session INES est supprimée au préalable si elle existe
+     * Checks if the access codes to the web services are valid
+     * The INES session is deleted first if it exists
 	 *
 	 * @return bool
 	 */
@@ -258,7 +254,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Respectivement : lit, écrit et supprime l'ID de session temporaire nécessaire aux appels aux web-services INES
+	 * Respectively: reads, writes and clean WS session ID in cache
 	 */
 	public function getWebServiceCurrentSessionID()
 	{
@@ -275,7 +271,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Respectivement : lit, écrit et supprime en session PHP la config de la synchro définie chez INES
+	 * Respectively: reads, writes and clean INES sync config in cache
 	 */
 	public function getCurrentSyncConfig()
 	{
@@ -292,7 +288,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Prépare le formulaire de mapping des champs
+	 * Prepare field mapping form
 	 *
 	 * @return 	array
 	 * @throws 	\Exception
@@ -306,10 +302,10 @@ class InesIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $leadFields = $this->getApiHelper()->getLeadFields();
 
-                // Préparation des champs du formulaire
+                // Preparing Form Fields
 				foreach($leadFields as $field) {
 
-					// Les champs dont le mapping est imposé en interne sont exclus du formulaire de mapping
+					// Fields whose mapping is imposed internally are excluded from the mapping form
 					if ($field['autoMapping'] !== false) {
 						continue;
 					}
@@ -338,8 +334,8 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Retourne le mapping brut, issu du formulaire de mapping, sous forme d'un tableau associatif : ines_key => atmt_key
-	 * Ne prend pas en compte les champs mappé automatiquement
+     * Returns the raw mapping from the mapping form as an associative array: ines_key => atmt_key
+     * Automatically mapped fields are not included
 	 *
 	 * @return 	array
 	 */
@@ -357,7 +353,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Retourne l'identifiant du champ Automation contenant le flag "ne pas synchroniser"
+	 * Returns the identifier of the Automation field containing the "do not synchronize" flag
 	 *
 	 * @return string
 	 */
@@ -372,17 +368,16 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Vérifie si un contact a le flag "ne pas synchroniser" levé
+	 * Checks whether a contact has the "do not sync" flag raised
 	 *
 	 * @param 	Mautic\LeadBundle\Entity\Lead	$lead
 	 * @return 	bool
 	 */
 	public function getDontSyncFlag(Lead $lead)
 	{
-		// Clé du champ don't sync
 		$dontSyncAtmtKey = $this->getDontSyncAtmtKey();
 
-		// Parcours des champs du contact, à la recherche du champ "don't sync"
+		// Search "don't sync" field
 		$fields = $lead->getProfileFields();
 		foreach($fields as $key => $value) {
 			if ($key == $dontSyncAtmtKey) {
@@ -390,13 +385,13 @@ class InesIntegration extends CrmAbstractIntegration
 			}
 		}
 
-		// Si le champ n'est pas trouvé, par défaut on refuse la synchro
+		// If not found, don't sync
 		return true;
 	}
 
 
 	/**
-	 * Retourne la liste des champs non écrasables
+	 * Retourn the list of non-erasable fields
 	 *
 	 * @param 	string 	$filterByConcept	contact | client
 	 * @return 	array
@@ -406,12 +401,12 @@ class InesIntegration extends CrmAbstractIntegration
 		$featureSettings = $this->getIntegrationSettings()->getFeatureSettings();
 		$fields = isset($featureSettings['not_ecrasable_fields']) ? $featureSettings['not_ecrasable_fields'] : array();
 
-		// Retour brut, sous la forme concept_fieldKey
+		// Gross return, syntax : concept_fieldKey
 		if ($filterByConcept === false) {
 			return $fields;
 		}
 
-		// Retour filtré et sans préfixe
+		// Return filtered and without prefix
 		$conceptLength = strlen($filterByConcept);
 		foreach($fields as $f => $field) {
 			if (substr($field, 0, $conceptLength) == $filterByConcept) {
@@ -423,33 +418,33 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Retourne le mapping complet, avec tous les détails connus sur chaque champ
+	 * Returns full mapping, with all known details about each field
 	 *
 	 * @return 	array
 	 */
 	public function getMapping()
 	{
-		// Si déjà généré dans le même runtime, le retourne immédiatement
+        // If already generated in the same runtime, return it immediately
 		if ($this->mapping !== false) {
 			return $this->mapping;
 		}
 
 		$mappedFields = array();
 
-		// Liste de tous les champs INES disponibles
+		// List of all available INES fields
 		$leadFields = $this->getApiHelper()->getLeadFields();
 
-		// Liste des champs non écrasables ? (sous la forme : concept_inesKey)
-		// 1 : ceux cochés dans le formulaire par l'utilisateur
+		// Non erasable fields ? (syntax : concept_inesKey)
+		// 1 : Those checked in the form by the user
 		$notEcrasableFields = $this->getNotEcrasableFields();
-		// 2 : les champs exclus du formulaire
+		// 2 : Fields excluded from the form
 		foreach($leadFields as $field) {
 			if ($field['excludeFromEcrasableConfig']) {
 				$notEcrasableFields[] = $field['concept'].'_'.$field['inesKey'];
 			}
 		}
 
-		// Liste des champs custom
+		// Custom fields
 		$customFields = array();
 		foreach($leadFields as $field) {
 			if ($field['isCustomField']) {
@@ -457,7 +452,7 @@ class InesIntegration extends CrmAbstractIntegration
 			}
 		}
 
-		// Lecture et enrichissement des champs auto-mappés
+		// Auto-mapped fields
 		foreach($leadFields as $field) {
 
 			if ($field['autoMapping'] !== false) {
@@ -474,7 +469,7 @@ class InesIntegration extends CrmAbstractIntegration
 			}
 		}
 
-		// Lecture et enrichissement des champs mappés dans le formulaire, par l'utilisateur
+		// Field mapped by user
 		$rawMapping = $this->getRawMapping();
 		foreach($rawMapping as $internalKey => $atmtKey) {
 
@@ -489,7 +484,7 @@ class InesIntegration extends CrmAbstractIntegration
 			);
 		}
 
-		// Mémorisation en cas d'appel dans la même runtime
+		// Storing result in case of a call in the same runtime
 		$this->mapping = $mappedFields;
 
 		return $mappedFields;
@@ -497,11 +492,11 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Mémorise les clés INES de contact et de société (=client) dans les champs d'un lead (définis par le mapping)
+	 * Save INES contact and client keys (= company) in the dedicated fields of a lead (defined by the mapping)
 	 *
 	 * @param 	Mautic\LeadBundle\Entity\Lead	$lead
-	 * @param 	int 							$internalCompanyRef 	Clé INES d'une société
-	 * @param 	int 							$internalContactRef 	Clé INES d'un contact
+	 * @param 	int 							$internalCompanyRef 	INES client ID
+	 * @param 	int 							$internalContactRef 	INES contact ID
 	 *
 	 * @return 	Mautic\LeadBundle\Entity\Lead
 	 */
@@ -509,7 +504,7 @@ class InesIntegration extends CrmAbstractIntegration
 	{
 		$fieldsToUpdate = array();
 
-		// Recherche des champs ATMT choisis pour mémoriser ces clés
+		// Search for dedicated ATMT fields to store these keys
 		$mapping = $this->getMapping();
 		foreach($mapping as $mappingItem) {
 
@@ -521,7 +516,7 @@ class InesIntegration extends CrmAbstractIntegration
 			}
 		}
 
-		// Enregistrement des champs du lead
+		// Save lead fields
 		$model = $this->factory->getModel('lead.lead');
 		$model->setFieldValues($lead, $fieldsToUpdate, true);
 		$model->saveEntity($lead);
@@ -531,7 +526,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
     /**
-     * Retourne les clés INES de contact et de société mémorisées dans un lead ATMT
+     * Returns INES contact and client keys saved in an ATMT lead
      *
      * @param 	Mautic\LeadBundle\Entity\Lead 	$lead
      *
@@ -539,13 +534,12 @@ class InesIntegration extends CrmAbstractIntegration
      */
     public function getInesKeys(Lead $lead)
     {
-        // Champs du lead
         $fields = $lead->getProfileFields();
 
-        // Champs ATMT contenant les clés INES
+        // ATMT fields containing the INES keys
         $atmtFieldsKeys = $this->getApiHelper()->getAtmtFieldsKeysFromInesFieldsKeys(['InternalContactRef', 'InternalCompanyRef']);
 
-        // Recherche des valeurs pour les 2 champs (contactRef et clientRef) s'ils sont définis
+        // Values for these 2 fields (contactRef and clientRef) if they are defined
         $contactRef = false;
         if (isset($atmtFieldsKeys['InternalContactRef'])) {
             $inesContactAtmtKey = $atmtFieldsKeys['InternalContactRef'];
@@ -567,21 +561,21 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Requêtes SOAP d'un webservice
-	 * Si la requête doit contenir un entête, le spécifier dans $settings['soapHeader']
+	 * SOAP request
+	 * If the request must contain a header, fill $settings['soapHeader']
 	 *
-	 * @param 	string 	$url 			URL complète de la requête SOAP
-	 * @param 	array 	$parameters 	Paramètres à transmettre à la méthode $method
-	 * @param 	string 	$method 		Méthode à appeler sur l'objet SOAP
-	 * @param 	array 	$settings 		Configuration de la requête
+	 * @param 	string 	$url 			Full URL of the SOAP request
+	 * @param 	array 	$parameters 	Arguments to pass to $method
+	 * @param 	string 	$method 		SOAP method
+	 * @param 	array 	$settings 		Request settings
 	 *
-	 * @return 	Object (réponse de l'API)
+	 * @return 	Object
 	 */
 	public function makeRequest($url, $parameters = array(), $method = '', $settings = array())
 	{
 		$client = new \SoapClient($url);
 
-		// Header SOAP, si demandé
+		// SOAP Header
 		$soapHeader = isset($settings['soapHeader']) ? $settings['soapHeader'] : false;
 		if ($soapHeader !== false) {
 			$client->__setSoapHeaders(
@@ -589,23 +583,20 @@ class InesIntegration extends CrmAbstractIntegration
 			);
 		}
 
-
-		// Appel d'une méthode du web-service, avec ou sans paramètres
-        $this->wsLog($method, $parameters);
+		// Web-service call, with or without args
 		if ( !empty($parameters)) {
 			$response = $client->$method($parameters);
 		}
 		else {
 			$response = $client->$method();
 		}
-        $this->wsLog($method, $parameters, true);
 
 		return $response;
 	}
 
 
 	/**
-	 * Ajout d'un lead à la file d'attente des leads à synchroniser, s'il n'y est pas déjà
+	 * Enqueue a lead in sync queue, if not already enqueued
 	 *
 	 * @param 	Mautic\LeadBundle\Entity\Lead	$lead
 	 * @param 	string 							$action 	'UPDATE' | 'DELETE'
@@ -618,31 +609,29 @@ class InesIntegration extends CrmAbstractIntegration
 		$company = $this->getLeadMainCompany($leadId);
 		$dontSyncToInes = $this->getDontSyncFlag($lead);
 
-		// Le lead ne doit pas être anonyme
+		// The lead must not be anonymous
 		if ( !empty($lead->getEmail()) && !empty($company) && !$dontSyncToInes) {
 
-			// L'intégration doit être en mode 'full sync'
+			// 'full sync' mode required
 			if ($this->isFullSync()) {
 
-				// Si le lead existe déjà en file d'attente, on le supprime
-				// Permet d'éviter les mises à jour multiple.
-				// Et considère la dernière action comme prioritaire sur les autres.
+                // If the lead already exists in the queue, it is deleted
+                // Avoid multiple updates.
+                // Considers the last action to be priority over others.
 				$this->dequeuePendingLead($lead->getId());
 
-				// Ajout d'une entrée dans la table "ines_sync_log"
-
+				// Insert line into table "ines_sync_log"
 				$inesSyncLogModel = $this->factory->getModel('crm.ines_sync_log');
 				$entity = $inesSyncLogModel->getEntity();
 
 				$company = $this->getLeadMainCompany($lead->getId());
 
-                // La référence à mémoriser dépent de l'action
                 if ($action == 'UPDATE') {
-                    // ID du lead ATMT si update
+                    // If UPDATE : reference = ATMT contact ID
                     $refId = $lead->getId();
                 }
                 else {
-                    // ID chez INES si delete
+                    // If DELETE : reference = INES contact ref
                     list($contactRef, $clientRef) = $this->getInesKeys($lead);
                     $refId = $contactRef;
                 }
@@ -662,7 +651,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Retire un lead de la file d'attente des leads à synchroniser
+	 * Dequeue pending lead from sync queue
 	 *
 	 * @param 	int		$leadId
 	 */
@@ -679,25 +668,24 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Ajoute dans la file d'attente un lot de leads qui n'ont jamais été synchronisés,
-	 * à condition que la file d'attente soit vide.
-	 * Permet de gérer automatiquement et progressivement la 1ère synchro lors de la mise en service du mode full-sync
+	 * Adds in the queue a batch of leads that have never been synchronized, only if the queue is empty.
+     * Allows to automatically and progressively manage the 1st sync when the full-sync mode is enable.
 	 *
-	 * @param 	$limit 	Nombre maximum de leads à ajouter à la file d'attente
+	 * @param 	$limit
 	 *
-	 * @return 	$enqueuedCounter 	Nombre de leads ajoutés à la file d'attente
+	 * @return 	$enqueuedCounter 	Number of leads added
 	 */
 	public function firstSyncCheckAndEnqueue($limit = 100)
 	{
 		$inesSyncLogModel = $this->factory->getModel('crm.ines_sync_log');
 		$leadModel = $this->factory->getModel('lead.lead');
 
-		// Si la file d'attente n'est pas vide, on ne fait rien
+		// If the queue is not empty, nothing is done
 		if ( !$inesSyncLogModel->havePendingEntities('UPDATE')) {
 			return 0;
 		}
 
-		// Recherche des clés ATMT contenant les clés INES de contact et client
+		// Search for ATMT keys containing INES contact and client keys
 		$atmtFieldsKeys = $this->getApiHelper()->getAtmtFieldsKeysFromInesFieldsKeys(
 			['InternalContactRef', 'InternalCompanyRef']
 		);
@@ -709,7 +697,7 @@ class InesIntegration extends CrmAbstractIntegration
 			return 0;
 		}
 
-		// Recherche des leads ayant une société ET un email ET les clés INES non renseignées
+		// Search for leads with a company AND an email AND INES keys not filled in
 		$items = $this->factory->getEntityManager()
 			 ->getConnection()
 			 ->createQueryBuilder()
@@ -731,7 +719,7 @@ class InesIntegration extends CrmAbstractIntegration
 			 ->execute()
 			 ->fetchAll();
 
-		// Ajout des leads trouvés à la file d'attente
+		// Enqueue leads found
 		$enqueuedCounter = 0;
 		if ($items) {
 			foreach($items as $item) {
@@ -748,7 +736,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Synchronise un lot de leads présents en file d'attente
+	 * Synchronizes a batch of leads from sync queue
 	 *
 	 * @param 	int 	$numberToProcess
 	 */
@@ -761,34 +749,34 @@ class InesIntegration extends CrmAbstractIntegration
 		$apiHelper = $this->getApiHelper();
 		$leadModel = $this->factory->getModel('lead.lead');
 
-		// ETAPE 1 : UPDATE lot de leads à SYNCHRONISER
+		// STEP 1 : UPDATE a batch of leads
 		$inesSyncLogModel = $this->factory->getModel('crm.ines_sync_log');
 		$pendingItems = $inesSyncLogModel->getPendingEntities('UPDATE', $numberToProcess);
 
 		foreach($pendingItems as $item) {
 
-			// Lead courant ?
+			// Current lead ?
 			$leadId = $item->getLeadId();
 			$lead = $leadModel->getEntity($leadId);
 
- 			// S'il est trouvé, synchronisation
+ 			// Sync if found
 			if ($lead && $lead->getId() == $leadId) {
 
 				$syncOk = $apiHelper->syncLeadToInes($lead);
 
 				$itemCounter = $item->getCounter();
 
-				// Synchronisation OK
+				// Sync OK
 				if ($syncOk) {
 					$updatedCounter++;
 					$itemStatus = 'DONE';
 					$itemCounter++;
 
-					// Dans le cas de la synchro d'un nouveau lead, l'écriture des clés INES contact et client dans le lead
-					// déclenchent un ajout intempestif du lead à la file d'attente. D'où ce nettoyage :
+                    // In the case of the sync of a new lead, the writing of INES keys contact and client in the lead
+                    // trigger an inadvertent addition of the lead to the queue. Hence this cleaning:
 					$this->dequeuePendingLead($lead->getId());
 				}
-				// Synchronisation ECHOUÉE
+				// Sync FAILED
 				else {
 					$failedUpdatedCounter++;
 					$itemCounter++;
@@ -797,19 +785,19 @@ class InesIntegration extends CrmAbstractIntegration
 					}
 				}
 
-				// Mise à jour de l'enregistrement en DB
+				// Update DB
 				$item->setCounter($itemCounter);
 				$item->setStatus($itemStatus);
 				$inesSyncLogModel->saveEntity($item);
 			}
-			// S'il n'est pas trouvé : status FAILED
+			// If not found : FAILED
 			else {
 				$item->setStatus('FAILED');
 				$inesSyncLogModel->saveEntity($item);
 			}
 		}
 
-		// ETAPE 2 : DELETE : lot de leads à SUPPRIMER
+		// STEP 2 : DELETE a batch of leads
 		$pendingDeletingItems = $inesSyncLogModel->getPendingEntities('DELETE', $numberToProcess);
         foreach($pendingDeletingItems as $item) {
 
@@ -848,9 +836,9 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Retourne le nom de la société principale (= 1ère de la liste) liée à un contact.
-	 * Ou une chaîne vide si n'existe pas.
-	 * Si $onlyName vaut false, retourne l'ensemble des champs de cette companie, ou false.
+     * Returns the name of the main company (= 1st in the list) linked to a contact.
+     * Or an empty string if it does not exist.
+     * If $onlyName is set to false, returns all fields in that company, or false.
 	 *
 	 * @param 	int 	$leadId
 	 * @param 	bool 	$onlyName
@@ -878,7 +866,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
     /**
-     * Retourne le dernier événement écrit dans la timeline d'un lead
+     * Returns the last event written in the timeline of a lead
      *
      * @param   Lead    $lead
      *
@@ -903,9 +891,9 @@ class InesIntegration extends CrmAbstractIntegration
 
 
     /**
-     * Crée ou met à jour, dans ATMT, les custom fiels dont l'utilisteur peut avoir besoin pour le mapping
-     * Chaque champ a un type (int, bool, list, ...) et une configuration (liste de valeurs, etc.)
-     * La config de certains champs est fixe, et pour d'autres elle est lue via un WS INES
+     * Creates or updates, in ATMT, the custom fiels that the user may need for mapping
+     * Each field has a type (int, bool, list, ...) and a configuration (list of values, etc.)
+     * The config of certain fields is fixed, and for others it is read via a WS INES
      *
      * @return  void
      */
@@ -916,7 +904,7 @@ class InesIntegration extends CrmAbstractIntegration
 
         $this->log('Check ATMT custom fields');
 
-        // Liste des champs qui doivent exister dans ATMT et que l'on doit vérifier
+        // List of fields that must exist in ATMT and must be checked
         $fieldsToCheck = array();
         $inesFields = $this->getApiHelper()->getLeadFields();
         foreach($inesFields as $inesField) {
@@ -930,22 +918,22 @@ class InesIntegration extends CrmAbstractIntegration
             }
         }
 
-        // On crée également le champ "Don't sync to INES"
+        // Also create the field "Do not sync to INES"
         $fieldsToCheck[] = [
             'name' => "Stop Synchro INES",
             'type' => 'boolean',
             'alias' => $this->stopSyncAtmtKey,
         ];
 
-        // Vérification de chaque champ
+        // Check each field
         foreach($fieldsToCheck as $fieldToCheck) {
 
             $alias = $fieldToCheck['alias'];
             $type = isset($fieldToCheck['type']) ? $fieldToCheck['type'] : 'text';
             $defaultValue = null;
 
-            // Préparation de la config du champ
-            // (ne sera utile qu'en cas de création ou de mise à jour)
+            // Preparing the field config
+            // (will only be useful if creating or updating)
             if ($type == 'number') {
                 $properties = [
                     'roundmode' => 4,
@@ -960,13 +948,13 @@ class InesIntegration extends CrmAbstractIntegration
             }
             else if ($type == 'select') {
 
-                // (Clés / Valeurs) possibles pour le champ
+                // Possible (Keys / Values) for field
                 $properties = ['list' => []];
                 foreach($fieldToCheck['values'] as $value => $label) {
                     $properties['list'][] = ['label' => $label, 'value' => $value];
                 }
 
-                // Si demandé, première valeur = valeur par défaut
+                // If requested, first value of the list = default value
                 if (isset($fieldToCheck['firstValueAsDefault']) && $fieldToCheck['firstValueAsDefault']) {
                     $keys = array_keys($fieldToCheck['values']);
                     $defaultValue = $keys[0];
@@ -977,11 +965,11 @@ class InesIntegration extends CrmAbstractIntegration
             }
 
 
-            // Le champ existe-t-il ?
+            // Does the field exist?
             $searchResult = $repo->findByAlias($alias);
             if (empty($searchResult)) {
 
-                // Le champ n'existe pas : CREATE
+                // The field does not exist: CREATE
 
                 $this->log('Create custom field : '.$alias);
 
@@ -996,7 +984,6 @@ class InesIntegration extends CrmAbstractIntegration
                     $fieldEntity->setDefaultValue($defaultValue);
                 }
 
-                // Création effective du champ
                 try {
                     $model->saveEntity($fieldEntity);
                 } catch (\Exception $e) {
@@ -1004,25 +991,25 @@ class InesIntegration extends CrmAbstractIntegration
                 }
             }
             else {
-                // Le champ existe : sa config est-elle correcte ?
+                // The field exists: is its config correct?
                 $fieldEntity = $searchResult[0];
                 $currentProperties = $fieldEntity->getProperties();
 
                 $updateNeeded = false;
 
-                // Le type de champ doit concorder
+                // The field type must match
                 if ($fieldEntity->getType() != $type) {
                     $updateNeeded = true;
                 }
                 else if ($type =='select') {
 
-                    // La liste des valeurs possibles doit concorder
+                    // The list of possible values must match
                     if ( !isset($currentProperties['list']) || !is_array($currentProperties['list'])) {
                         $updateNeeded = true;
                     }
                     else {
-                        // Comparaison des couples (clé / valeur) existants et souhaités
-                        // S'il y a une erreur, on doit mettre à jour le champ
+                        // Comparison of existing and desired torques (key / value)
+                        // If there is an error, the field must be updated
                         $tmpValues = $fieldToCheck['values'];
                         foreach($currentProperties['list'] as $pair) {
                             if (array_key_exists($pair['value'], $tmpValues) && $tmpValues[$pair['value']] == $pair['label'] ) {
@@ -1059,7 +1046,7 @@ class InesIntegration extends CrmAbstractIntegration
 
 
 	/**
-	 * Pour le DEBUG : écrit une ligne dans le log de Mautic
+	 * Writes a line in the log of Mautic
 	 *
 	 * @param 	Object 	$object
 	 */
@@ -1069,51 +1056,4 @@ class InesIntegration extends CrmAbstractIntegration
 		$this->factory->getLogger()->log('info', 'INES LOG : '.$linearObject);
 	}
 
-
-    /**
-     * Pour le DEBUG des WS : écrit une ligne dans le log INES à la racine de l'intégration
-     *
-     * @param 	string   $method
-     * @param 	array    $parameters
-     */
-    public function wsLog($method, $parameters, $isAfterCall = false)
-    {
-        ////// @TODO : Commenter les lignes ci-dessous, qui servent uniquement pour le debug
-        // Sauvegarde de tous les appels aux WS INES
-        if (in_array(
-            $method,
-            [/*'authenticationWs', 'GetSyncInfo',*/ 'GetTypeContactList', 'GetTypeClientList', 'GetOriginList', 'GetUserInfoFromUserRef', 'GetUserInfoFromRHRef']
-        )) {
-            return;
-        }
-
-        $log_file = __DIR__.'/../ines.log';
-        if (file_exists($log_file)) {
-            $lines = explode(PHP_EOL, file_get_contents($log_file));
-        }
-        else {
-            $lines = [];
-        }
-
-        if ( !$isAfterCall) {
-            $line = [
-                'time' => date('H:i:s'),
-                'method' => $method,
-                'parameters' => $parameters
-            ];
-        }
-        else {
-            $line = ['comment' => $method.' OK'];
-        }
-
-        $lines[] = json_encode($line);
-
-        $maxNbLines = 200;
-        if (count($lines) > $maxNbLines) {
-            $lines = array_slice($lines, count($lines) - $maxNbLines);
-        }
-
-        file_put_contents($log_file, implode(PHP_EOL, $lines));
-        //////////
-    }
 }

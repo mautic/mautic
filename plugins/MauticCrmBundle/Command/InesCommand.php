@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Commande CLI : Synchronisation des leads ATMT vers INES CRM
+ * Commande CLI : Synchronizing ATMT leads to INES CRM
  *
  * php app/console crm:ines [--number-of-leads-to-process=]
  *
@@ -40,41 +40,40 @@ class InesCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-		// Combien de leads max à synchroniser ?
-		// Par défaut : 10
+		// By default : sync 10 contacts
 		$options = $input->getOptions();
 		$numberToProcess = $options['number-of-leads-to-process'] ? $options['number-of-leads-to-process'] : 10;
 
-		// L'intégration INES doit-être active, en mode full-sync, et configurée pour communiquer avec les WS INES
+		// INES integration must be active, in full-sync mode, and linked with INES WS
 
 		$this->factory = $this->getContainer()->get('mautic.factory');
 		$inesIntegration = $this->factory->getHelper('integration')->getIntegrationObject('Ines');
 
 		if ( !$inesIntegration->isFullSync()) {
-			$output->writeln("L'intégration INES doit être active et en mode full-sync.");
+			$output->writeln("The INES integration must be active and in full-sync mode.");
 			return 0;
 		}
 
 		if ( !$inesIntegration->isAuthorized()) {
-			$output->writeln("ECHEC CRONJOB : connexion aux web-services INES impossible.");
+			$output->writeln("CRONJOB FAILED: can't connect to INES.");
 			return 1;
 		}
 
 
-		// Les WS fonctionnent : on peut lancer la synchro
+		// WS works : start the sync
 		list($nbUpdated, $nbFailedUpdated, $nbDeleted, $nbFailedDeleted) = $inesIntegration->syncPendingLeadsToInes($numberToProcess);
 
 		$s = ($nbUpdated > 1) ? 's' : '';
-		$output->writeln($nbUpdated.' lead'.$s.' synchronisé'.$s.' sur un total de '.($nbUpdated + $nbFailedUpdated).'.');
+		$output->writeln($nbUpdated.' lead'.$s.' updated of '.($nbUpdated + $nbFailedUpdated).'.');
 
 		$s = ($nbDeleted > 1) ? 's' : '';
-		$output->writeln($nbDeleted.' lead'.$s.' supprimés'.$s.' sur un total de '.($nbDeleted + $nbFailedDeleted).'.');
+		$output->writeln($nbDeleted.' lead'.$s.' deleted of '.($nbDeleted + $nbFailedDeleted).'.');
 
 
-		// Si la file d'attente est vide, on tente de l'alimenter avec un lot de leads qui n'ont jamais été synchronisés
+		// If the queue is empty, try to feed it with a batch of leads that have never been synchronized
 		$nbEnqueued = $inesIntegration->firstSyncCheckAndEnqueue();
 		$s = ($nbEnqueued > 1) ? 's' : '';
-		$output->writeln($nbEnqueued.' lead'.$s." ajouté".$s." à la file d'attente (1ère synchro)");
+		$output->writeln($nbEnqueued.' lead'.$s." enqueued (1st sync)");
 
 		return 0;
     }

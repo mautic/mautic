@@ -15,16 +15,13 @@ use Mautic\CoreBundle\Controller\FormController;
  */
 class InesController extends FormController
 {
-	// Page qui affiche la file d'attente des leads à synchroniser / supprimer avec INES
+	/**
+     * Page : INES sync log for full-sync mode
+     *
+     * @return string
+     */
     public function logsAction()
     {
-		// TESTS & DEBUG
-		// $inesIntegration = $this->factory->getHelper('integration')->getIntegrationObject('Ines');
-		// $leadModel = $this->factory->getModel('lead.lead');
-        // $leadRepo = $leadModel->getRepository();
-		// $inesIntegration->getApiHelper()->syncLeadToInes($leadRepo->getEntity(18));
-		// die();
-
 		$inesSyncLogModel = $this->factory->getModel('crm.ines_sync_log');
 
 		$limit = 200;
@@ -38,32 +35,4 @@ class InesController extends FormController
 		));
     }
 
-
-    // TODO : commenter cette méthode, utilisée pour le debug
-    public function debugAction()
-    {
-        $log_file = __DIR__.'/../ines.log';
-        if (file_exists($log_file)) {
-            $lines = explode(PHP_EOL, file_get_contents($log_file));
-        }
-        else {
-            echo 'Log non trouvé';
-            die();
-        }
-        $lines = array_reverse($lines);
-        foreach($lines as $line) {
-            $datas = json_decode($line, true);
-            if (isset($datas['method'])) {
-                echo '<h3>'.$datas['time'].' '.$datas['method'].'</h3>';
-                echo '<pre>';
-                var_dump($datas['parameters']);
-                echo '</pre>';
-                echo '<hr/>';
-            }
-            else {
-                echo '<p>'.$datas['comment'].'</p>';
-            }
-        }
-        die();
-    }
 }

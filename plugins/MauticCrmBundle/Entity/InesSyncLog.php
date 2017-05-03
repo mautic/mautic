@@ -59,7 +59,7 @@ class InesSyncLog
     private $status;
 
 	/**
-     * @var int		Nombre de tentatives
+     * @var int		Sync counter
      */
     private $counter;
 
@@ -89,10 +89,6 @@ class InesSyncLog
 		$builder->addNamedField('counter', 'integer', 'counter');
     }
 
-
-	/**
-	 * Constructeur : fixe les valeurs par défaut de l'entité
-	 */
 	public function __construct()
 	{
 		$this->action = 'UPDATE';
