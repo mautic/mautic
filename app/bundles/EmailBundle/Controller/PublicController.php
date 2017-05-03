@@ -195,7 +195,6 @@ class PublicController extends CommonFormController
                     ],
                     $message
                 );
-                $message = '<h2>'.$message.'</h2>';
             } elseif ($lead) {
                 $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
 
