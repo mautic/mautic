@@ -34,15 +34,15 @@ class PublicController extends CommonController
 
         if ($focus) {
             if (!$focus->isPublished()) {
-                return new Response('');
+                return new Response('', 200, ['Content-Type' => 'application/javascript']);
             }
 
             $content  = (MAUTIC_ENV == 'dev') ? $model->generateJavascript($focus, false, true) : $model->getContent($focus);
-            $response = new Response($content);
+            $response = new Response($content, 200, ['Content-Type' => 'application/javascript']);
 
             return $response;
         } else {
-            return new Response('');
+            return new Response('', 200, ['Content-Type' => 'application/javascript']);
         }
     }
 
@@ -58,7 +58,7 @@ class PublicController extends CommonController
             $focus = $model->getEntity($id);
 
             if ($focus && $focus->isPublished()) {
-                $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request);
+                $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $this->getModel('lead')->getCurrentLead());
             }
         }
 

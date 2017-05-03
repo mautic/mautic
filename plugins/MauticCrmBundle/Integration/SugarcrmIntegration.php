@@ -33,6 +33,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead'];
+    }
+
+    /**
      * Get the array key for clientId.
      *
      * @return string
@@ -165,6 +173,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
+            return $fields;
+        }
+
         $sugarFields       = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
@@ -196,6 +208,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     }
+
+                    $this->cache->set('leadFields', $sugarFields);
                 }
             } else {
                 throw new ApiErrorException($this->authorzationError);

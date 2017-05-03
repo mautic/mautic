@@ -221,6 +221,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
             $fieldValues = $fields;
         }
+
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
@@ -361,7 +362,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         if (!empty($persistCompany)) {
-            $this->leadFieldModel->getRepository()->saveEntities($persistCompany);
+            $this->getCompanyLeadRepository()->saveEntities($persistCompany);
         }
 
         // Clear CompanyLead entities from Doctrine memory
@@ -558,7 +559,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     );
                 }
 
-                $results = $this->em->getRepository('MauticLeadBundle:Company')->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
+                $results = $this->getRepository()->getAjaxSimpleList($composite, ['filterVar' => $filterVal.'%'], $column);
+
                 break;
         }
 

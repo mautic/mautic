@@ -56,14 +56,18 @@ class CampaignBuilderEvent extends Event
      * @param string $key      a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
      * @param array  $decision can contain the following keys:
      *                         $decision = [
-     *                         'label'              => (required) what to display in the list
-     *                         'eventName'          => (required) The event name to fire when this event is triggered.
-     *                         'description'        => (optional) short description of event
-     *                         'formType'           => (optional) name of the form type SERVICE for the action
-     *                         'formTypeOptions'    => (optional) array of options to pass to the formType service
-     *                         'formTheme'          => (optional) form theme
-     *                         'associatedActions'  => (optional) Array of action types to limit what this decision can be associated with
-     *                         'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
+     *                         'label'                   => (required) what to display in the list
+     *                         'eventName'               => (required) The event name to fire when this event is triggered.
+     *                         'description'             => (optional) short description of event
+     *                         'formType'                => (optional) name of the form type SERVICE for the action
+     *                         'formTypeOptions'         => (optional) array of options to pass to the formType service
+     *                         'formTheme'               => (optional) form theme
+     *                         'connectionRestrictions'  => (optional) Array of events to restrict this event to. Implicit events
+     *                         [
+     *                         'anchor' => [], // array of anchors this event should _not_ be allowed to connect to in the format of eventType.anchorName, e.g. decision.no
+     *                         'source' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to connect into this event
+     *                         'target' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to flow from this event
+     *                         ]
      *                         ]
      */
     public function addDecision($key, array $decision)
@@ -134,16 +138,22 @@ class CampaignBuilderEvent extends Event
     /**
      * Add an lead condition to the list of available conditions.
      *
-     * @param string $key       a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
-     * @param array  $condition can contain the following keys:
-     *                          $condition = [
-     *                          'label'           => (required) what to display in the list
-     *                          'eventName'       => (required) The event name to fire when this event is triggered.
-     *                          'description'     => (optional) short description of event
-     *                          'formType'        => (optional) name of the form type SERVICE for the action
-     *                          'formTypeOptions' => (optional) array of options to pass to the formType service
-     *                          'formTheme'       => (optional) form theme
-     *                          ]
+     * @param string $key   a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param array  $event can contain the following keys:
+     *                      $condition = [
+     *                      'label'                   => (required) what to display in the list
+     *                      'eventName'               => (required) The event name to fire when this event is triggered.
+     *                      'description'             => (optional) short description of event
+     *                      'formType'                => (optional) name of the form type SERVICE for the action
+     *                      'formTypeOptions'         => (optional) array of options to pass to the formType service
+     *                      'formTheme'               => (optional) form theme
+     *                      'connectionRestrictions'  => (optional) Array of events to restrict this event to. Implicit events
+     *                      [
+     *                      'anchor' => [], // array of anchors this event should _not_ be allowed to connect to in the format of eventType.anchorName, e.g. decision.no
+     *                      'source' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to connect into this event
+     *                      'target' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to flow from this event
+     *                      ]
+     *                      ]
      */
     public function addCondition($key, array $event)
     {
@@ -223,8 +233,12 @@ class CampaignBuilderEvent extends Event
      *                       'formTypeOptions'     => (optional) array of options to pass to the formType service
      *                       'formTheme'           => (optional) form theme
      *                       'timelineTemplate'    => (optional) custom template for the lead timeline
-     *                       'associatedDecisions' => (optional) Array of decision types to limit what this action can be associated with
-     *                       'anchorRestrictions'  => (optional) Array of event anchors this event should not be allowed to connect to
+     *                       'connectionRestrictions'  => (optional) Array of events to restrict this event to. Implicit events
+     *                       [
+     *                       'anchor' => [], // array of anchors this event should _not_ be allowed to connect to in the format of eventType.anchorName, e.g. decision.no
+     *                       'source' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to connect into this event
+     *                       'target' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to flow from this event
+     *                       ]
      *                       ]
      */
     public function addAction($key, array $action)

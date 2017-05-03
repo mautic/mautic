@@ -161,9 +161,47 @@ class CitrixEvent
     /**
      * @return string
      */
+    public function getEventNameOnly()
+    {
+        $eventName = $this->eventName;
+
+        return substr($eventName, 0, strpos($eventName, '_#'));
+    }
+
+    /**
+     * @return string
+     */
+    public function getEventId()
+    {
+        $eventName = $this->eventName;
+
+        return substr($eventName, strpos($eventName, '_#') + 2);
+    }
+
+    /**
+     * @return string
+     */
     public function getEventDesc()
     {
-        return $this->eventDesc;
+        $pos = strpos($this->eventDesc, '_!');
+        if (false === $pos) {
+            return $this->eventDesc;
+        }
+
+        return substr($this->eventDesc, 0, $pos);
+    }
+
+    /**
+     * @return string
+     */
+    public function getJoinUrl()
+    {
+        $pos = strpos($this->eventDesc, '_!');
+        if (false === $pos) {
+            return '';
+        }
+
+        return substr($this->eventDesc, $pos + 2);
     }
 
     /**

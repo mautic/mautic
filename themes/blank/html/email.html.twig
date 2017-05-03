@@ -1,15 +1,30 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>{subject}</title>
+        <style type="text/css" media="only screen and (max-width: 480px)">
+            /* Mobile styles */
+            @media only screen and (max-width: 480px) {
+
+                [class="w320"] {
+                    width: 320px !important;
+                }
+
+                [class="mobile-block"] {
+                    width: 100% !important;
+                    display: block !important;
+                }
+            }
+        </style>
     </head>
     <body style="margin:0">
-        <div data-section-wrapper>
+        <div data-section-wrapper="1">
             <center>
-                <table data-section style="width: 600;" width="600" cellpadding="0" cellspacing="0">
+                <table data-section="1" style="width: 600;" width="600" cellpadding="0" cellspacing="0">
                     <tbody>
                         <tr>
                             <td>
-                                <div data-slot-container style="min-height: 30px">
+                                <div data-slot-container="1" style="min-height: 30px">
                                     <div data-slot="text">
                                         <br>
                                         <h2>Hello there!</h2>

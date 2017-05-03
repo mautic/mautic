@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -138,7 +138,7 @@
       qiTagAlign = ($quick_insert.outerHeight() - $tag.outerHeight()) / 2;
 
       if (editor.opts.iframe) {
-        qiTop += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+        qiTop += editor.$iframe.offset().top - editor.helpers.scrollTop();
       }
 
       // Reposition QI helper if visible.
