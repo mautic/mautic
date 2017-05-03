@@ -1335,11 +1335,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $result                = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', null, 'Lead', $lead->getId());
-        if (empty($result)) {
-            //try searching for lead as this has been changed before in updated done to the plugin
-            $result = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
-        }
+        //try searching for lead as this has been changed before in updated done to the plugin
+        $result = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
 
         return $result;
     }

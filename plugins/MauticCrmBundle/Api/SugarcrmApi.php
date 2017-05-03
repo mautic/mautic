@@ -39,8 +39,7 @@ class SugarcrmApi extends CrmApi
             }
 
             $sessionParams = array_merge($sessionParams, $data);
-
-            $parameters = [
+            $parameters    = [
                 'method'        => $sMethod,
                 'input_type'    => 'JSON',
                 'response_type' => 'JSON',
@@ -117,15 +116,13 @@ class SugarcrmApi extends CrmApi
         if (is_object($lead)) {
             $sugarLeadRecords = $this->integration->getSugarLeadId($lead);
         }
-
         if ($tokenData['version'] == '6') {
 
             //if not found then go ahead and make an API call to find all the records with that email
-            if (isset($data['Email']) && empty($sugarLeadRecords)) {
-                $sLeads           = $this->getLeads(['email' => $data['Email'], 'offset' => 0, 'max_results' => 1000], 'Leads');
-                $sugarLeadRecords = $sLead['entry_list'];
+            if (isset($fields['email1']) && empty($sugarLeadRecords)) {
+                $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
+                $sugarLeadRecords = $sLeads['entry_list'];
             }
-
             $leadFields = [];
             foreach ($fields as $name => $value) {
                 if ($name != 'id') {
@@ -146,7 +143,7 @@ class SugarcrmApi extends CrmApi
                     $sugarObject = (isset($sLeadRecord['integration_entity']) ? $sLeadRecord['integration_entity'] : 'Leads');
                     //update the converted contact if found and not the Lead
                     if (isset($sLeadRecord['contact_id']) && $sLeadRecord['contact_id'] != null && $sLeadRecord['contact_id'] != '') {
-                        unset($data['Company']); //because this record is not in the Contact object
+                        unset($fields['Company']); //because this record is not in the Contact object
                         $localParams['name_value_list'][] = ['name' => 'id', 'value' => $sLeadRecord['contact_id']];
                         $createdLeadData[]                = $this->request('set_entry', $localParams, 'POST', 'Contacts');
                     } else {
@@ -155,12 +152,12 @@ class SugarcrmApi extends CrmApi
                     }
                 }
             } else {
-                $createdLeadData = $this->request('set_entry', $parameters, 'POST');
+                $createdLeadData = $this->request('set_entry', $parameters, 'POST', 'Leads');
             }
 
             //$createdLeadData[] = $this->request('set_entry', $parameters, 'POST');
         } else {
-            $createdLeadData[] = $this->request('Leads', $fields, 'POST');
+            $createdLeadData[] = $this->request('set_entry', $fields, 'POST', 'Leads');
         }
 
         return $createdLeadData;
@@ -209,7 +206,7 @@ class SugarcrmApi extends CrmApi
 
             return $response;
         } else {
-            return $this->request('Leads', $fields, 'POST');
+            return false;
         }
     }
 
