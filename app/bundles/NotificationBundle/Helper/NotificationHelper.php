@@ -104,7 +104,7 @@ class NotificationHelper
         if ($this->hasScript()) {
             $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-            if (!$integration) {
+            if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
                 return;
             }
 
@@ -224,7 +224,7 @@ JS;
 
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if (!$integration) {
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return false;
         }
 
