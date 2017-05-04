@@ -117,6 +117,10 @@ trait FieldsTypeTrait
                 }
 
                 $paginatedFields = array_slice($fields, $start, $limit);
+                $fieldsName = 'leadFields';
+                if ($fieldObject) {
+                    $fieldsName = $fieldObject.'Fields';
+                }
                 foreach ($paginatedFields as $field => $details) {
                     $matched = isset($fieldData['leadFields'][$field]);
                     $required = (int) (!empty($integrationFields[$field]['required']) || $choices[$field] == 'Email');
@@ -140,10 +144,9 @@ trait FieldsTypeTrait
                     );
                     if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
                         $updateName = 'update_mautic';
-                        $fieldsName = 'leadFields';
+
                         if ($fieldObject) {
                             $updateName .= '_'.$fieldObject;
-                            $fieldsName = $fieldObject.'Fields';
                         }
                         $form->add(
                             $updateName.$index,
