@@ -43,7 +43,7 @@ if ($cancelled) {
                 <?php echo $view['translator']->trans('mautic.campaign.event.cancelled.time', ['%date%' => $dateSpan, '%event%' => $event['eventLabel']]); ?>
             </span>
         </span>
-        <?php if ($view['security']->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())): ?>
+        <?php if ($lead && $view['security']->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())): ?>
         <span class="form-buttons btn-group btn-group-xs mb-3" role="group" aria-label="Field options">
             <button type="button" class="btn btn-default btn-edit btn-nospin" onclick="Mautic.updateScheduledCampaignEvent(<?php echo $item['event_id']; ?>, <?php echo $lead->getId(); ?>)" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.campaign.event.reschedule'); ?>">
                 <i class="fa fa-clock-o text-primary"></i>

@@ -1596,7 +1596,7 @@ class MailHelper
     protected function logError($error, $context = null)
     {
         if ($error instanceof \Exception) {
-            $error = $error->getMessage();
+            $error = ('dev' === MAUTIC_ENV) ? (string) $error : $error->getMessage();
 
             $this->fatal = true;
         }
