@@ -1025,12 +1025,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $deletedSFLeads      = [];
         $salesforceIdMapping = [];
         if ($checkEmailsInSF) {
-            $findLead = 'select Id, Company, LastName, Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+            $required = $this->getRequiredFields($availableFields['Lead']);
+            $required = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
+            $required = implode(',', $required).',';
+            $findLead = 'select Id, '.$required.' Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
                 .'\') and ConvertedContactId = NULL';
             $queryUrl = $this->getQueryUrl();
 
             if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
-                $findContact = 'select Id, Email, LastName,  IsDeleted from Contact where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+                $required    = $this->getRequiredFields($availableFields['Contact']);
+                $required    = $this->cleanSalesForceData($config, array_keys($required), 'Contact');
+                $required    = implode(',', $required).',';
+                $findContact = 'select Id, '.$required.' Email, IsDeleted from Contact where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
                     .'\')';
                 $sfContact = $this->getApiHelper()->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
             }
@@ -1071,7 +1077,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $key        = mb_strtolower($sfLeadRecord['Email']);
                     if (isset($checkEmailsInSF[$key])) {
                         $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = $sfLeadRecord['Id'];
-
                         if (empty($sfLeadRecord['IsDeleted'])) {
                             if (isset($sfLeadRecord['Id'])) {
                                 $updateLead = $this->buildCompositeBody(
