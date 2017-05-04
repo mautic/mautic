@@ -1441,7 +1441,7 @@ abstract class AbstractIntegration
                 }
                 $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                    $matched[$matchIntegrationKey] = $fields[$mauticKey]['value'];
+                    $matched[$matchIntegrationKey] = $this->cleanPushData($fields[$mauticKey]['value']);
                 }
             }
 
@@ -1495,7 +1495,7 @@ abstract class AbstractIntegration
             if (isset($companyFields[$key])) {
                 $mauticKey = $companyFields[$key];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey])) {
-                    $matched[$integrationKey] = $fields[$mauticKey];
+                    $matched[$integrationKey] = $this->cleanPushData($fields[$mauticKey]);
                 }
             }
 
@@ -1979,5 +1979,13 @@ abstract class AbstractIntegration
         }
 
         return $identifier;
+    }
+
+    /**
+     * @param $value
+     */
+    protected function cleanPushData($value)
+    {
+        return strip_tags(html_entity_decode($value, ENT_QUOTES));
     }
 }
