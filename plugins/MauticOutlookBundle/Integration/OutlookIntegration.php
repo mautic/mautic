@@ -44,4 +44,14 @@ class OutlookIntegration extends AbstractIntegration
             'secret' => 'mautic.integration.outlook.secret',
         ];
     }
+
+    /**
+     * Allows integration to set a custom form template.
+     *
+     * @return string
+     */
+    public function getFormTemplate()
+    {
+        return 'MauticOutlookBundle:Integration:form.html.php';
+    }
 }
