@@ -851,7 +851,7 @@ class LeadModel extends FormModel
      *
      * @return array|Lead|null
      */
-    public function getContactFromRequest($queryFields = [])
+    public function getContactFromRequest($queryFields = [], $trackByFingerprint = false)
     {
         $lead = null;
 
@@ -917,6 +917,15 @@ class LeadModel extends FormModel
                     // Merge with existing lead or use the one found
                     $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
                 }
+            }
+        }
+
+        // Search for lead by fingerprint
+        if (empty($lead) && !empty($queryFields['fingerprint']) && $trackByFingerprint) {
+            $deviceRepo = $this->getDeviceRepository();
+            $device     = $deviceRepo->getDeviceByFingerprint($queryFields['fingerprint']);
+            if ($device) {
+                $lead = $this->getEntity($device['lead_id']);
             }
         }
 
@@ -1828,7 +1837,9 @@ class LeadModel extends FormModel
                             }
                             break;
                         case 'multiselect':
-                            if (!is_array($fieldData[$leadField['alias']])) {
+                            if (strpos($fieldData[$leadField['alias']], '|') !== false) {
+                                $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
+                            } else {
                                 $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
                             }
                             break;

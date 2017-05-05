@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -197,8 +198,8 @@ class LeadController extends FormController
         );
     }
 
-    /*
-     * Quick form controller route and view
+    /**
+     * @return JsonResponse|Response
      */
     public function quickAddAction()
     {
@@ -2308,8 +2309,8 @@ class LeadController extends FormController
             return $contact->getProfileFields();
         };
 
-        $toExport = $this->getDataForExport($model, $args, $resultsCallback);
+        $iterator = new IteratorExportDataModel($model, $args, $resultsCallback);
 
-        return $this->exportResultsAs($toExport, $dataType, 'contacts');
+        return $this->exportResultsAs($iterator, $dataType, 'contacts');
     }
 }

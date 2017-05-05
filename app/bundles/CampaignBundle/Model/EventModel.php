@@ -390,6 +390,7 @@ class EventModel extends CommonFormModel
                         } elseif ($child['decisionPath'] == 'no') {
                             // non-action paths should not be processed by this because the contact already took action in order to get here
                             $childrenTriggered = true;
+                            $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' has a decision path of no');
                         } else {
                             $this->logger->debug('CAMPAIGN: '.ucfirst($child['eventType']).' ID# '.$child['id'].' is being processed');
                         }
@@ -626,8 +627,9 @@ class EventModel extends CommonFormModel
                         ++$totalEventCount;
 
                         $event['campaign'] = [
-                            'id'   => $campaign->getId(),
-                            'name' => $campaign->getName(),
+                            'id'        => $campaign->getId(),
+                            'name'      => $campaign->getName(),
+                            'createdBy' => $campaign->getCreatedBy(),
                         ];
 
                         $decisionEvent = [
@@ -769,8 +771,7 @@ class EventModel extends CommonFormModel
     ) {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
-        $campaignId   = $campaign->getId();
-        $campaignName = $campaign->getName();
+        $campaignId = $campaign->getId();
 
         $this->logger->debug('CAMPAIGN: Triggering scheduled events');
 
@@ -903,8 +904,9 @@ class EventModel extends CommonFormModel
 
                     // Set campaign ID
                     $event['campaign'] = [
-                        'id'   => $campaignId,
-                        'name' => $campaignName,
+                        'id'        => $campaign->getId(),
+                        'name'      => $campaign->getName(),
+                        'createdBy' => $campaign->getCreatedBy(),
                     ];
 
                     // Execute event
@@ -1011,8 +1013,6 @@ class EventModel extends CommonFormModel
         $this->logger->debug('CAMPAIGN: Triggering negative events');
 
         $campaignId   = $campaign->getId();
-        $campaignName = $campaign->getName();
-
         $repo         = $this->getRepository();
         $campaignRepo = $this->getCampaignRepository();
         $logRepo      = $this->getLeadEventLogRepository();
@@ -1262,8 +1262,9 @@ class EventModel extends CommonFormModel
                                 // Set event
                                 $event             = $events[$id];
                                 $event['campaign'] = [
-                                    'id'   => $campaignId,
-                                    'name' => $campaignName,
+                                    'id'        => $campaign->getId(),
+                                    'name'      => $campaign->getName(),
+                                    'createdBy' => $campaign->getCreatedBy(),
                                 ];
 
                                 // Set lead in case this is triggered by the system
@@ -1542,9 +1543,11 @@ class EventModel extends CommonFormModel
         }
 
         // Set campaign ID
+
         $event['campaign'] = [
-            'id'   => $campaign->getId(),
-            'name' => $campaign->getName(),
+            'id'        => $campaign->getId(),
+            'name'      => $campaign->getName(),
+            'createdBy' => $campaign->getCreatedBy(),
         ];
 
         // Ensure properties is an array
@@ -1648,6 +1651,17 @@ class EventModel extends CommonFormModel
             //trigger the action
             $response = $this->invokeEventCallback($event, $thisEventSettings, $lead, null, true, $log);
 
+            // Check if the lead wasn't deleted during the event callback
+            if (null === $lead->getId() && $response === true) {
+                ++$executedEventCount;
+
+                $this->logger->debug(
+                    'CAMPAIGN: Contact was deleted while executing '.ucfirst($event['eventType']).' ID# '.$event['id']
+                );
+
+                return true;
+            }
+
             $eventTriggered = false;
             if ($response instanceof LeadEventLog) {
                 // Listener handled the event and returned a log entry
@@ -1691,31 +1705,7 @@ class EventModel extends CommonFormModel
                     $repo->deleteEntity($log);
                 }
 
-                // Notify the lead owner if there is one otherwise campaign creator that there was a failure
-                if (!$owner = $lead->getOwner()) {
-                    $ownerId = $campaign->getCreatedBy();
-                    $owner   = $this->userModel->getEntity($ownerId);
-                }
-
-                if ($owner && $owner->getId()) {
-                    $this->notificationModel->addNotification(
-                        $campaign->getName().' / '.$event['name'],
-                        'error',
-                        false,
-                        $this->translator->trans(
-                            'mautic.campaign.event.failed',
-                            [
-                                '%contact%' => '<a href="'.$this->router->generate(
-                                        'mautic_contact_action',
-                                        ['objectAction' => 'view', 'objectId' => $lead->getId()]
-                                    ).'" data-toggle="ajax">'.$lead->getPrimaryIdentifier().'</a>',
-                            ]
-                        ),
-                        null,
-                        null,
-                        $owner
-                    );
-                }
+                $this->notifyOfFailure($lead, $campaign->getCreatedBy(), $campaign->getName().' / '.$event['name']);
 
                 $this->logger->debug($debug);
             } else {
@@ -1818,7 +1808,9 @@ class EventModel extends CommonFormModel
                     'lead'            => $lead,
                     'systemTriggered' => $systemTriggered,
                     'config'          => $event['properties'],
-                ], true, $log
+                ],
+                true,
+                $log
             );
 
             $eventName = array_key_exists('eventName', $settings) ? $settings['eventName'] : null;
@@ -2077,6 +2069,40 @@ class EventModel extends CommonFormModel
         $chart->setDataset($this->translator->trans('mautic.campaign.triggered.events'), $data);
 
         return $chart->render();
+    }
+
+    /**
+     * @param Lead $lead
+     * @param      $campaignCreatedBy
+     * @param      $header
+     */
+    public function notifyOfFailure(Lead $lead, $campaignCreatedBy, $header)
+    {
+        // Notify the lead owner if there is one otherwise campaign creator that there was a failure
+        if (!$owner = $lead->getOwner()) {
+            $ownerId = (int) $campaignCreatedBy;
+            $owner   = $this->userModel->getEntity($ownerId);
+        }
+
+        if ($owner && $owner->getId()) {
+            $this->notificationModel->addNotification(
+                $header,
+                'error',
+                false,
+                $this->translator->trans(
+                    'mautic.campaign.event.failed',
+                    [
+                        '%contact%' => '<a href="'.$this->router->generate(
+                                'mautic_contact_action',
+                                ['objectAction' => 'view', 'objectId' => $lead->getId()]
+                            ).'" data-toggle="ajax">'.$lead->getPrimaryIdentifier().'</a>',
+                    ]
+                ),
+                null,
+                null,
+                $owner
+            );
+        }
     }
 
     /**

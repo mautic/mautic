@@ -29,6 +29,14 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead'];
+    }
+
+    /**
      * @return string
      */
     public function getDisplayName()
@@ -190,6 +198,8 @@ class VtigerIntegration extends CrmAbstractIntegration
                         'required' => $fieldInfo['mandatory'],
                     ];
                 }
+
+                $this->cache->set('leadFields', $vtigerFields);
             }
         } catch (ErrorException $exception) {
             $this->logIntegrationError($exception);
@@ -200,8 +210,6 @@ class VtigerIntegration extends CrmAbstractIntegration
 
             return false;
         }
-
-        $this->cache->set('leadFields', $vtigerFields);
 
         return $vtigerFields;
     }

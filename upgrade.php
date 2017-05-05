@@ -12,7 +12,7 @@ ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
 define('MAUTIC_MINIMUM_PHP', '5.6.19');
-define('MAUTIC_MAXIMUM_PHP', '7.1.999');
+define('MAUTIC_MAXIMUM_PHP', '7.0.999');
 
 // Are we running the minimum version?
 if (version_compare(PHP_VERSION, MAUTIC_MINIMUM_PHP, 'lt')) {

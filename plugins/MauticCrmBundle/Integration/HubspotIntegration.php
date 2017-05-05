@@ -99,7 +99,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        return $this->getFormFieldsByObject('company');
+        return $this->getFormFieldsByObject('company', $settings);
     }
 
     /**
@@ -109,7 +109,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        return $this->getFormFieldsByObject('contacts');
+        return $this->getFormFieldsByObject('contacts', $settings);
     }
 
     /**
@@ -165,8 +165,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
-
-        $this->cache->set('leadFields', $hubsFields);
 
         return $hubsFields;
     }

@@ -108,4 +108,13 @@ final class PluginEvents
      * @var string
      */
     const PLUGIN_ON_INTEGRATION_FORM_DISPLAY = 'mautic.plugin_on_integration_form_display';
+
+    /**
+     * The mautic.plugin_on_integration_form_build event is dispatched when building an integration's config form.
+     *
+     * The event listener receives a Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent instance.
+     *
+     * @var string
+     */
+    const PLUGIN_ON_INTEGRATION_FORM_BUILD = 'mautic.plugin_on_integration_form_build';
 }

@@ -15,24 +15,24 @@ return [
             'mautic.notification.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
-                    'mautic.helper.core_parameters',
+                    'mautic.helper.integration',
                     'mautic.lead.model.lead',
                     'mautic.notification.model.notification',
                     'mautic.notification.api',
                 ],
             ],
-            'mautic.notification.configbundle.subscriber' => [
-                'class' => 'Mautic\NotificationBundle\EventListener\ConfigSubscriber',
-            ],
             'mautic.notification.pagebundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
-                    'mautic.helper.core_parameters',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.core.js.subscriber' => [
-                'class' => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber',
+                'class'     => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber',
+                'arguments' => [
+                    'mautic.helper.notification',
+                ],
             ],
             'mautic.notification.notificationbundle.subscriber' => [
                 'class'     => 'Mautic\NotificationBundle\EventListener\NotificationSubscriber',
@@ -43,8 +43,21 @@ return [
                     'mautic.asset.helper.token',
                 ],
             ],
+//            Left out until 2.9
+//            'mautic.notification.subscriber.form' => [
+//                'class'     => \Mautic\NotificationBundle\EventListener\FormSubscriber::class,
+//                'arguments' => [
+//                    'mautic.helper.integration',
+//                    'mautic.lead.model.lead',
+//                    'mautic.notification.model.notification',
+//                    'mautic.notification.api',
+//                ],
+//            ],
             'mautic.notification.subscriber.channel' => [
-                'class' => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
+                'class'     => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
             ],
             'mautic.notification.stats.subscriber' => [
                 'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
@@ -52,12 +65,28 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.notification.mobile_notification.report.subscriber' => [
+                'class'     => \Mautic\NotificationBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [
-                'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'notification',
+                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
+                'alias' => 'notification',
+            ],
+            'mautic.form.type.mobile.notification' => [
+                'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationType::class,
+                'alias' => 'mobile_notification',
+            ],
+            'mautic.form.type.mobile.notification_details' => [
+                'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
+                'alias' => 'mobile_notification_details',
             ],
             'mautic.form.type.notificationconfig' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
@@ -72,12 +101,28 @@ return [
                 'class' => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
                 'alias' => 'notification_list',
             ],
+            'mautic.form.type.mobilenotificationsend_list' => [
+                'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationSendType::class,
+                'arguments' => 'router',
+                'alias'     => 'mobilenotificationsend_list',
+            ],
+            'mautic.form.type.mobilenotification_list' => [
+                'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationListType::class,
+                'alias' => 'mobilenotification_list',
+            ],
         ],
         'helpers' => [
             'mautic.helper.notification' => [
                 'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',
-                'arguments' => 'mautic.factory',
                 'alias'     => 'notification_helper',
+                'arguments' => [
+                    'mautic.factory',
+                    'templating.helper.assets',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.integration',
+                    'router',
+                    'request_stack',
+                ],
             ],
         ],
         'other' => [
@@ -86,6 +131,8 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.http.connector',
+                    'mautic.page.model.trackable',
+                    'mautic.helper.integration',
                 ],
                 'alias' => 'notification_api',
             ],
@@ -112,6 +159,18 @@ return [
             'mautic_notification_contacts' => [
                 'path'       => '/notifications/view/{objectId}/contact/{page}',
                 'controller' => 'MauticNotificationBundle:Notification:contacts',
+            ],
+            'mautic_mobile_notification_index' => [
+                'path'       => '/mobile_notifications/{page}',
+                'controller' => 'MauticNotificationBundle:MobileNotification:index',
+            ],
+            'mautic_mobile_notification_action' => [
+                'path'       => '/mobile_notifications/{objectAction}/{objectId}',
+                'controller' => 'MauticNotificationBundle:MobileNotification:execute',
+            ],
+            'mautic_mobile_notification_contacts' => [
+                'path'       => '/mobile_notifications/view/{objectId}/contact/{page}',
+                'controller' => 'MauticNotificationBundle:MobileNotification:contacts',
             ],
         ],
         'public' => [
@@ -141,6 +200,10 @@ return [
                 'path'       => '/manifest.json',
                 'controller' => 'MauticNotificationBundle:Js:manifest',
             ],
+            'mautic_app_notification' => [
+                'path'       => '/notification/appcallback',
+                'controller' => 'MauticNotificationBundle:AppCallback:index',
+            ],
         ],
         'api' => [
             'mautic_api_notificationsstandard' => [
@@ -158,12 +221,30 @@ return [
                     'route'  => 'mautic_notification_index',
                     'access' => ['notification:notifications:viewown', 'notification:notifications:viewother'],
                     'checks' => [
-                        'parameters' => [
-                            'notification_enabled' => true,
+                        'integration' => [
+                            'OneSignal' => [
+                                'enabled' => true,
+                            ],
                         ],
                     ],
                     'parent'   => 'mautic.core.channels',
                     'priority' => 80,
+                ],
+                'mautic.notification.mobile_notifications' => [
+                    'route'  => 'mautic_mobile_notification_index',
+                    'access' => ['notification:mobile_notifications:viewown', 'notification:mobile_notifications:viewother'],
+                    'checks' => [
+                        'integration' => [
+                            'OneSignal' => [
+                                'enabled'  => true,
+                                'features' => [
+                                    'mobile',
+                                ],
+                            ],
+                        ],
+                    ],
+                    'parent'   => 'mautic.core.channels',
+                    'priority' => 65,
                 ],
             ],
         ],
@@ -172,12 +253,14 @@ return [
     //    'notification' => null
     //],
     'parameters' => [
-        'notification_enabled'              => false,
-        'notification_landing_page_enabled' => true,
-        'notification_app_id'               => null,
-        'notification_rest_api_key'         => null,
-        'notification_safari_web_id'        => null,
-        'gcm_sender_id'                     => '482941778795',
-        'welcomenotification_enabled'       => true,
+        'notification_enabled'               => false,
+        'notification_landing_page_enabled'  => true,
+        'notification_tracking_page_enabled' => false,
+        'notification_app_id'                => null,
+        'notification_rest_api_key'          => null,
+        'notification_safari_web_id'         => null,
+        'gcm_sender_id'                      => '482941778795',
+        'notification_subdomain_name'        => null,
+        'welcomenotification_enabled'        => true,
     ],
 ];
