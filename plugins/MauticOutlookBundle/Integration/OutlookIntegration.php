@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
@@ -46,12 +47,23 @@ class OutlookIntegration extends AbstractIntegration
     }
 
     /**
-     * Allows integration to set a custom form template.
+     * {@inheritdoc}
+     *
+     * @param $section
      *
      * @return string
      */
-    public function getFormTemplate()
+    public function getFormNotes($section)
     {
-        return 'MauticOutlookBundle:Integration:form.html.php';
+        if ('custom' === $section) {
+            return [
+                'template' => 'MauticOutlookBundle:Integration:form.html.php',
+                'parameters' => [
+                    'mauticUrl' => UrlHelper::rel2abs('/index.php')
+                ]
+            ];
+        }
+
+        return parent::getFormNotes($section);
     }
 }

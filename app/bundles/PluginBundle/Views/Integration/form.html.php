@@ -120,6 +120,17 @@ $hasFeatureErrors =
                 </div>
             </div>
         <?php endif; ?>
+        <?php if (isset($formNotes['custom'])):
+             if (is_array($formNotes['custom'])):
+                $template = $formNotes['custom']['template'];
+                $params   = isset($formNotes['custom']['parameters']) ? $formNotes['custom']['parameters'] : [];
+
+                echo $this->render($template, $params);
+             else:
+                echo $formNotes['custom'];
+             endif;
+        endif;
+        ?>
     </div>
 
     <?php if ($hasSupportedFeatures || $hasFeatureSettings): ?>
