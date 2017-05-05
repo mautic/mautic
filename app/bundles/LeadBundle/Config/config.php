@@ -532,6 +532,7 @@ return [
                     'mautic.category.model.category',
                     'mautic.helper.user',
                     'mautic.campaign.model.campaign',
+                    'mautic.asset.model.asset',
                 ],
                 'alias' => 'leadlist',
             ],
