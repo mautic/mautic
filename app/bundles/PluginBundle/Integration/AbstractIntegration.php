@@ -759,8 +759,8 @@ abstract class AbstractIntegration
         }
     }
 
-    /*
-     * Method to prepare the request parameters. Builds array of headers and parameters
+    /**
+     * Method to prepare the request parameters. Builds array of headers and parameters.
      *
      * @return array
      */
@@ -1306,6 +1306,9 @@ abstract class AbstractIntegration
         $submittedObjects       = (isset($featureSettings['objects'])) ? $featureSettings['objects'] : [];
         $missingRequiredFields  = [];
 
+        // add special case in order to prevent it from being removed
+        $mauticLeadFields['mauticContactTimelineLink'] = '';
+
         //make sure now non-existent aren't saved
         $settings = [
             'ignore_field_cache' => false,
@@ -1385,7 +1388,7 @@ abstract class AbstractIntegration
     {
         $requiredFields = [];
         foreach ($fields as $field => $details) {
-            if (is_array($details) && !empty($details['required']) || (isset($details['optionLabel']) && $details['optionLabel'] == 'Email')) {
+            if (is_array($details) && !empty($details['required']) || 'email' === $field || (isset($details['optionLabel']) && strtolower($details['optionLabel']) == 'email')) {
                 $requiredFields[$field] = $field;
             }
         }
