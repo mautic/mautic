@@ -1260,7 +1260,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
                         $integrationEntity->setLastSyncDate(new \DateTime());
                         $persistEntities[] = $integrationEntity;
-                    } elseif ($campaignId) {
+                    } elseif (isset($campaignId) and $campaignId != null) {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $campaignId);
                         $integrationEntity->setLastSyncDate(new \DateTime());
 

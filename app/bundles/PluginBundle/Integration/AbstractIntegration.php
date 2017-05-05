@@ -1870,11 +1870,11 @@ abstract class AbstractIntegration
 
             if ($contactId) {
                 $contactLink = $this->factory->getRouter()->generate('mautic_contact_action', [
-                    'objectAction' => 'view', 'objectId' => $contact->getId(),
+                    'objectAction' => 'view', 'objectId' => $contactId,
                 ],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
-                $errorMessage .= " <a href=\"$contactLink\'>$contactName</a>";
+                $errorMessage .= ' <a href="'.$contactLink.'">'.$contactName.'</a>';
             }
 
             // Prevent a flood of the same messages
