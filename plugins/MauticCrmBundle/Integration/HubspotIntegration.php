@@ -486,4 +486,13 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         return $lead;
     }
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    public function getDataPriority()
+    {
+        return true;
+    }
 }
