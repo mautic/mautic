@@ -1948,6 +1948,20 @@ abstract class AbstractIntegration
     }
 
     /**
+     * @param $contactId
+     *
+     * @return string
+     */
+    public function getContactTimelineLink($contactId)
+    {
+        return $this->factory->getRouter()->generate(
+            'mautic_plugin_timeline_view',
+            ['integration' => $this->getName(), 'leadId' => $contactId],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+    }
+
+    /**
      * @param       $eventName
      * @param array $keys
      *
