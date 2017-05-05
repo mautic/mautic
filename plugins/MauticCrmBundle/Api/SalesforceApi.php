@@ -116,7 +116,7 @@ class SalesforceApi extends CrmApi
 
         if (empty($sfRecord['records']) && isset($data['Lead']['Email'])) {
             $sfObject = 'Lead';
-            $findLead = 'select Id from Lead where email = \''.$data['Lead']['Email'].'\' and ConvertedContactId IS NULL';
+            $findLead = 'select Id from Lead where email = \''.$data['Lead']['Email'].'\' and ConvertedContactId = NULL';
             $sfRecord = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
         }
         $sfLeadRecords = $sfRecord['records'];
