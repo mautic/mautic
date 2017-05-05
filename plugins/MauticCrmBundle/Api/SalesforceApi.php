@@ -42,7 +42,6 @@ class SalesforceApi extends CrmApi
         if (!$object) {
             $object = $this->object;
         }
-        $notificactionModel = $this->integration->getNotificationModel();
         if (!$queryUrl) {
             $queryUrl   = $this->integration->getApiUrl();
             $requestUrl = sprintf($queryUrl.'/%s/%s', $object, $operation);
@@ -53,7 +52,6 @@ class SalesforceApi extends CrmApi
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
 
         if (!empty($response['errors'])) {
-            $notificactionModel->addNotification(implode(', ', $response['errors']), 'Salesforce', false, $this->integration->getName().':');
             throw new ApiErrorException(implode(', ', $response['errors']));
         } elseif (is_array($response)) {
             $errors = [];
@@ -68,7 +66,6 @@ class SalesforceApi extends CrmApi
                         }
                     }
                     $errors[] = $r['message'];
-                    $notificactionModel->addNotification($r['message'], 'Salesforce', false, $this->integration->getName().':');
                 }
             }
 
