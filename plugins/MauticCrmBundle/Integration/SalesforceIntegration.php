@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -573,18 +574,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $fields = array_keys($config['leadFields']);
 
-        $leadFields         = $this->cleanSalesForceData($config, $fields, $object);
-        $fieldsToUpdateInSf = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
-        $leadFields         = array_diff_key($leadFields, array_flip($fieldsToUpdateInSf));
-
-        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]);
+        $leadFields          = $this->cleanSalesForceData($config, $fields, $object);
+        $fieldsToUpdateInSf  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $leadFields          = array_diff_key($leadFields, array_flip($fieldsToUpdateInSf));
+        $mappedData[$object] = $this->populateLeadData(
+            $lead,
+            ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]
+        );
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
         if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
             $contactFields         = $this->cleanSalesForceData($config, $fields, 'Contact');
-            $mappedData['Contact'] = $this->populateLeadData($lead, ['leadFields' => $contactFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']]]);
+            $mappedData['Contact'] = $this->populateLeadData(
+                $lead,
+                ['leadFields' => $contactFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']]]
+            );
             $this->amendLeadDataBeforePush($mappedData['Contact']);
-            $object = 'Contact';
         }
         if (empty($mappedData)) {
             return false;
@@ -620,6 +625,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 return true;
             }
         } catch (\Exception $e) {
+            if ($e instanceof ApiErrorException) {
+                $e->setContact($lead);
+            }
+
             $this->logIntegrationError($e);
         }
 
@@ -1215,6 +1224,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $created   = 0;
         $updated   = 0;
         $reference = '';
+        $leadLink  = '';
         if (is_array($response)) {
             $persistEntities = [];
             foreach ($response as $item) {
@@ -1235,14 +1245,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $object = 'CampaignMember';
                 }
                 if (isset($item['body'][0]['errorCode'])) {
-                    $this->logIntegrationError(new \Exception($item['body'][0]['message'].'-'.$item['referenceId']));
+                    $exception = new ApiErrorException($item['body'][0]['message']);
+                    if ($object == 'Contact' || $object = 'Lead') {
+                        $exception->setContactId($contactId);
+                    }
+                    $this->logIntegrationError($exception);
 
                     if ($integrationEntityId && $object !== 'CampaignMember') {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
                         $integrationEntity->setLastSyncDate(new \DateTime());
-
                         $persistEntities[] = $integrationEntity;
-                    } elseif ($campaignId) {
+                    } elseif (isset($campaignId) and $campaignId != null) {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $campaignId);
                         $integrationEntity->setLastSyncDate(new \DateTime());
 
@@ -1283,7 +1296,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     // Record was updated
                     if ($integrationEntityId) {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
-                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        if (is_object($integrationEntity)) {
+                            $integrationEntity->setLastSyncDate(new \DateTime());
+                        } else {
+                            unset($integrationEntity);
+                        }
                     } else {
                         // Found in Salesforce so create a new record for it
                         $integrationEntity = new IntegrationEntity();
@@ -1295,8 +1312,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($contactId);
                     }
-
-                    $persistEntities[] = $integrationEntity;
+                    if ($integrationEntity->getIntegrationEntityId()) {
+                        $persistEntities[] = $integrationEntity;
+                    }
                     ++$updated;
                 } else {
                     $error = 'http status code '.$item['httpStatusCode'];
@@ -1309,7 +1327,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             break;
                     }
 
-                    $this->logIntegrationError(new \Exception($error.' ('.$item['referenceId'].')'));
+                    $exception = new ApiErrorException($error);
+                    if (!empty($item['referenceId']) && ($object == 'Contact' || $object = 'Lead')) {
+                        $exception->setContactId($item['referenceId']);
+                    }
+                    $this->logIntegrationError($exception);
                 }
             }
 
@@ -1323,6 +1345,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return [$updated, $created];
     }
 
+    /**
+     * @return array
+     *
+     * @throws \Exception
+     */
     public function getCampaigns()
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -1338,6 +1365,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $campaigns;
     }
+
+    /**
+     * @param $campaignId
+     * @param $settings
+     *
+     * @throws \Exception
+     */
     public function getCampaignMembers($campaignId, $settings)
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -1459,6 +1493,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param $fields
+     * @param $object
+     *
+     * @return array
+     */
     public function getMixedLeadFields($fields, $object)
     {
         $mixedFields = array_filter($fields['leadFields']);
@@ -1475,26 +1515,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $fields;
     }
 
-    public function getNotificationModel()
-    {
-        return $this->factory->getModel('core.notification');
-    }
-
     /**
-     * @param \Exception $e
+     * @param $campaignId
+     *
+     * @return array
+     *
+     * @throws \Exception
      */
-    public function logIntegrationError(\Exception $e)
-    {
-        $logger = $this->factory->getLogger();
-        if ('dev' == MAUTIC_ENV) {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
-            $this->getNotificationModel()->addNotification($e, $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
-        } else {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
-            $this->getNotificationModel()->addNotification($e->getMessage(), $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $this->factory->getUser());
-        }
-    }
-
     public function getCampaignMemberStatus($campaignId)
     {
         $silenceExceptions    = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -1511,6 +1538,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $campaignMemberStatus;
     }
 
+    /**
+     * @param Lead $lead
+     * @param      $integrationCampaignId
+     * @param      $status
+     *
+     * @return array
+     */
     public function pushLeadToCampaign(Lead $lead, $integrationCampaignId, $status)
     {
         $mauticData = $salesforceIdMapping = [];

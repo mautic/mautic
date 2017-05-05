@@ -840,7 +840,6 @@ Mautic.cloneFocusForm = function(decId, removeFroala) {
     // reattach DEC
     if (typeof Mautic.activeDEC !== 'undefined') {
         var element = Mautic.activeDEC.detach();
-        element.hide();
         Mautic.activeDECParent.append(element);
     }
     var focusForm = parent.mQuery('#emailform_dynamicContent_' + decId);
@@ -850,7 +849,6 @@ Mautic.cloneFocusForm = function(decId, removeFroala) {
     // remove delete default button
     focusForm.find('.tab-pane:first').find('.remove-item').hide();
     var element =focusForm.detach();
-    element.show();
     Mautic.activeDEC = element;
     return element;
 };
@@ -888,7 +886,6 @@ Mautic.removeAddVariantButton = function() {
     // reattach DEC
     if (typeof Mautic.activeDEC !== 'undefined') {
         var element = Mautic.activeDEC.detach();
-        element.hide();
         Mautic.activeDECParent.append(element);
     }
 };
