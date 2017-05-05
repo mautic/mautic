@@ -1342,6 +1342,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return [$updated, $created];
     }
 
+    /**
+     * @return array
+     *
+     * @throws \Exception
+     */
     public function getCampaigns()
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -1357,6 +1362,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $campaigns;
     }
+
+    /**
+     * @param $campaignId
+     * @param $settings
+     *
+     * @throws \Exception
+     */
     public function getCampaignMembers($campaignId, $settings)
     {
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -1478,6 +1490,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param $fields
+     * @param $object
+     *
+     * @return array
+     */
     public function getMixedLeadFields($fields, $object)
     {
         $mixedFields = array_filter($fields['leadFields']);
@@ -1494,44 +1512,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $fields;
     }
 
-    public function getNotificationModel()
-    {
-        return $this->factory->getModel('core.notification');
-    }
-
     /**
-     * @param \Exception $e
+     * @param $campaignId
+     *
+     * @return array
+     *
+     * @throws \Exception
      */
-    public function logIntegrationError(\Exception $e)
-    {
-        $logger = $this->factory->getLogger();
-        $users  = $this->em->getRepository('MauticUserBundle:User')->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'r.isAdmin',
-                            'expr'   => 'eq',
-                            'value'  => true,
-                        ],
-                    ],
-                ],
-            ]);
-        if ('dev' == MAUTIC_ENV) {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
-            foreach ($users as $u) {
-                $user = $u;
-                $this->getNotificationModel()->addNotification($e, $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $user);
-            }
-        } else {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
-            foreach ($users as $u) {
-                $user = $u;
-                $this->getNotificationModel()->addNotification($e->getMessage(), $this->getName(), false, 'INTEGRATION ERROR: '.$this->getName().':', null, null, $user);
-            }
-        }
-    }
-
     public function getCampaignMemberStatus($campaignId)
     {
         $silenceExceptions    = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
@@ -1548,6 +1535,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $campaignMemberStatus;
     }
 
+    /**
+     * @param Lead $lead
+     * @param      $integrationCampaignId
+     * @param      $status
+     *
+     * @return array
+     */
     public function pushLeadToCampaign(Lead $lead, $integrationCampaignId, $status)
     {
         $mauticData = $salesforceIdMapping = [];
