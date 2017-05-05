@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Translation\Translator;
 
 trait BuilderControllerTrait
 {
@@ -24,6 +25,7 @@ trait BuilderControllerTrait
         $assetsHelper = $this->get('templating.helper.assets');
         /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
         $routerHelper = $this->get('templating.helper.router');
+        $translator   = $this->get('templating.helper.translator');
 
         $assetsHelper
             ->setContext(AssetsHelper::CONTEXT_BUILDER)
@@ -31,7 +33,7 @@ trait BuilderControllerTrait
             ->addScriptDeclaration("var mauticAjaxUrl     = '".$routerHelper->generate('mautic_core_ajax')."';")
             ->addScriptDeclaration("var mauticBaseUrl     = '".$routerHelper->generate('mautic_base_index')."';")
             ->addScriptDeclaration("var mauticAssetPrefix = '".$assetsHelper->getAssetPrefix(true)."';")
-            ->addScriptDeclaration("var mauticLang        = '".str_replace("'", "\\'", $this->get('templating.helper.translator')->getJsLang())."';")
+            ->addScriptDeclaration('var mauticLang        = '.$translator->getJsLang().';')
             ->addCustomDeclaration($assetsHelper->getSystemScripts(true, true))
             ->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
 
