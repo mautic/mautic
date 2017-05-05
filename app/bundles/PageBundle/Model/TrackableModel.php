@@ -355,7 +355,7 @@ class TrackableModel extends AbstractCommonModel
         foreach ($this->doNotTrack as $doNotTrack) {
             foreach ($firstPassSearch as $key => $search) {
                 if (preg_match('~'.$doNotTrack.'~i', $search)) {
-                    unset($firstPassSearch[$key]);
+                    unset($firstPassSearch[$key], $firstPassReplace[$key]);
                 }
             }
         }
@@ -367,20 +367,34 @@ class TrackableModel extends AbstractCommonModel
         if ('html' == $type) {
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
-                $content = preg_replace(
-                    '~<a(.*?) href=(["\'])'.$search.'(.*?)\\2(.*?)>~i',
-                    '<a$1 href=$2'.$replace.'$3$2$4>',
-                    $content
-                );
+                foreach ($this->doNotTrack as $doNotTrack) {
+                    if (preg_match('~'.$doNotTrack.'~i', $search)) {
+                        $doNotReplace = true;
+                    }
+                }
+                if (!$doNotReplace) {
+                    $content = preg_replace(
+                        '~<a(.*?) href=(["\'])'.preg_quote($search, '~').'(.*?)\\2(.*?)>~i',
+                        '<a$1 href=$2'.$replace.'$3$2$4>',
+                        $content
+                    );
+                }
             }
         } else {
             // For text, just do a simple search/replace
             $secondPassSearch  = array_keys($this->contentReplacements['second_pass']);
             $secondPassReplace = $this->contentReplacements['second_pass'];
-            $content           = str_ireplace($secondPassSearch, $secondPassReplace, $content);
+            foreach ($this->doNotTrack as $doNotTrack) {
+                foreach ($secondPassSearch as $key => $search) {
+                    if (preg_match('~'.$doNotTrack.'~i', $search)) {
+                        unset($secondPassSearch[$key], $secondPassReplace[$key]);
+                    }
+                }
+            }
+            $content = str_ireplace($secondPassSearch, $secondPassReplace, $content);
         }
 
-        unset($firstSearch, $firstReplace, $secondSearch, $secondSearch);
+        unset($firstPassSearch, $firstPassReplace, $secondPassSearch, $secondPassReplace);
 
         return $content;
     }

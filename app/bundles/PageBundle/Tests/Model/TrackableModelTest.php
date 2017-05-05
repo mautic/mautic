@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Test;
 
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TrackableModelTest extends WebTestCase
@@ -240,6 +241,53 @@ class TrackableModelTest extends WebTestCase
     }
 
     /**
+     * @testdox Test that a token used in place of a URL is not parsed
+     *
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testTokenizedHostWithQueryIsIgnored()
+    {
+        $url   = 'http://{contactfield=foo}.com?foo=bar';
+        $model = $this->getModel($url, 'http://{contactfield=foo}.com?foo=bar');
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [
+                '{contactfield=foo}' => '',
+            ],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables, $content);
+    }
+
+    /**
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testTokenizedHostWithTokenizedQueryIsIgnored()
+    {
+        $url   = 'http://{contactfield=foo}.com?foo={contactfield=bar}';
+        $model = $this->getModel($url, 'http://{contactfield=foo}.com?foo={contactfield=bar}');
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [
+                '{contactfield=foo}' => '',
+                '{contactfield=bar}' => '',
+            ],
+            'email',
+            1
+        );
+
+        $this->assertCount(0, $trackables, $content);
+    }
+
+    /**
      * @testdox Test that tokens that are supposed to be ignored are
      *
      * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
@@ -373,7 +421,7 @@ class TrackableModelTest extends WebTestCase
      * @param null  $tokenUrls
      * @param array $doNotTrack
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return TrackableModel
      */
     protected function getModel($urls, $tokenUrls = null, $doNotTrack = [])
     {
@@ -385,6 +433,19 @@ class TrackableModelTest extends WebTestCase
         } elseif (!is_array($tokenUrls)) {
             $tokenUrls = [$tokenUrls];
         }
+
+        // Add default DoNotTrack
+        $doNotTrack = array_merge(
+            $doNotTrack,
+            [
+                '{webview_url}',
+                '{unsubscribe_url}',
+                '{trackable=(.*?)}',
+                // Ignore lead fields as URL hosts for tracking since each is unique
+                '[^=]{leadfield=(.*?)}',
+                '[^=]{contactfield=(.*?)}',
+            ]
+        );
 
         $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->disableOriginalConstructor()
