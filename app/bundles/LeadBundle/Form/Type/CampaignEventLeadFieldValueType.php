@@ -45,6 +45,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
                 'with_tags'   => true,
+                'with_segments'   => true,
                 'empty_value' => 'mautic.core.select',
                 'attr'        => [
                     'class'    => 'form-control',
@@ -75,13 +76,20 @@ class CampaignEventLeadFieldValueType extends AbstractType
             $fieldType   = null;
             $operator    = '=';
 
+            if ($data['field'] == 'notifications') {
+                $fieldType = 'boolean';
+            }
+
             if (isset($data['field'])) {
+
                 $field    = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
                 $operator = $data['operator'];
 
-                if ($field) {
-                    $properties = $field->getProperties();
-                    $fieldType  = $field->getType();
+                if ($field || $fieldType) {
+                    if(!$fieldType) {
+                        $properties = $field->getProperties();
+                        $fieldType = $field->getType();
+                    }
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
                         $fieldValues = FormFieldHelper::parseList($properties['list']);
@@ -91,6 +99,10 @@ class CampaignEventLeadFieldValueType extends AbstractType
                             0 => $properties['no'],
                             1 => $properties['yes'],
                         ];
+                    } elseif ($fieldType == 'boolean') {
+                        $fieldHelper = new FormFieldHelper();
+                        $fieldHelper->setTranslator($this->factory->getTranslator());
+                        $fieldValues = $fieldHelper->getBooleanChoices();
                     } else {
                         switch ($fieldType) {
                             case 'country':

@@ -136,27 +136,66 @@ class LeadFieldRepository extends CommonRepository
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        if ($field === 'tags') {
-            // Special reserved tags field
-            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
-                ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
+        if (in_array($field, ['tags', 'segments'])) {
+
+            if ($field == 'tags') {
+                $tableX = 'lead_tags_xref';
+                $tableL = 'lead_tags';
+                $fieldId = 'tag_id';
+                $fieldValue = 'tag';
+            } elseif ($field == 'segments') {
+                $tableX = 'lead_lists_leads';
+                $tableL = 'lead_lists';
+                $fieldId = 'leadlist_id';
+                $fieldValue = 'name';
+            }
+
+            $q->join('l', MAUTIC_TABLE_PREFIX.$tableX, 'x', 'l.id = x.lead_id')
+                ->join('x', MAUTIC_TABLE_PREFIX.$tableL, 't', 'x.'.$fieldId.' = t.id')
                 ->where(
                     $q->expr()->andX(
-                        $q->expr()->eq('l.id', ':lead'),
-                        $q->expr()->eq('t.tag', ':value')
+                        $q->expr()->eq('l.id', ':lead')
+
                     )
                 )
-                ->setParameter('lead', (int) $lead)
+                ->setParameter('lead', (int)$lead)
                 ->setParameter('value', $value);
 
+            if ($operatorExpr === 'regexp' || $operatorExpr === 'notRegexp') {
+                if ($operatorExpr === 'regexp') {
+                    $where = 't.'.$fieldValue.' REGEXP  :value';
+                } else {
+                    $where = 't.'.$fieldValue.' NOT REGEXP  :value';
+                }
+                $q->expr()->andX($where);
+            } else {
+                $q->expr()->andX($q->expr()->eq('t.'.$fieldValue, ':value'));
+            }
             $result = $q->execute()->fetch();
 
-            if (($operatorExpr === 'eq') || ($operatorExpr === 'like')) {
+            if (in_array($operatorExpr, ['eq', 'regexp'])) {
                 return !empty($result['id']);
-            } elseif (($operatorExpr === 'neq') || ($operatorExpr === 'notLike')) {
-                return empty($result['id']);
             } else {
-                return false;
+                if (in_array($operatorExpr, ['neq', 'notRegexp'])) {
+                    return empty($result['id']);
+                } else {
+                    return false;
+                }
+            }
+        } elseif ($field === 'notifications') {
+            // Special reserved tags field
+            $q->join('l', MAUTIC_TABLE_PREFIX.'push_ids', 'x', 'l.id = x.lead_id')
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead')
+                    )
+                )
+                ->setParameter('lead', (int)$lead);
+            $result = $q->execute()->fetch();
+            if ($value) {
+                return !empty($result['id']);
+            } else {
+                return empty($result['id']);
             }
         } else {
             // Standard field

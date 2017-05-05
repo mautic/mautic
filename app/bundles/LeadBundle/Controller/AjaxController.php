@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -29,6 +30,7 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     use AjaxLookupControllerTrait;
+    use OperatorListTrait;
 
     /**
      * @param Request $request
@@ -766,11 +768,18 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['success' => 0, 'options' => null, 'operators' => null, 'disabled' => false];
         $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
 
-        if ($leadField) {
-            $options       = null;
-            $leadFieldType = $leadField->getType();
+        $leadFieldType  = null;
 
-            $properties = $leadField->getProperties();
+        if ($alias == 'notifications') {
+            $leadFieldType = 'boolean';
+        }
+
+        if ($leadField ||  $leadFieldType) {
+            $options       = null;
+            if (!$leadFieldType) {
+                $leadFieldType = $leadField->getType();
+                $properties = $leadField->getProperties();
+            }
             if (!empty($properties['list'])) {
                 // Lookup/Select options
                 $options = FormFieldHelper::parseList($properties['list']);
@@ -780,6 +789,11 @@ class AjaxController extends CommonAjaxController
                     0 => $properties['no'],
                     1 => $properties['yes'],
                 ];
+            } elseif ($leadFieldType == 'boolean') {
+                // Boolean options
+                $fieldHelper = new FormFieldHelper();
+                $fieldHelper->setTranslator($this->get('translator'));
+                $options = $fieldHelper->getBooleanChoices();
             } else {
                 switch ($leadFieldType) {
                     case 'country':
@@ -809,27 +823,28 @@ class AjaxController extends CommonAjaxController
 
             $dataArray['fieldType'] = $leadFieldType;
             $dataArray['options']   = $options;
-
-            if ('field' === $changed) {
-                $dataArray['operators'] = $this->getModel('lead')->getOperatorsForFieldType($leadFieldType, ['date']);
-                foreach ($dataArray['operators'] as $value => $label) {
-                    $dataArray['operators'][$value] = $this->get('translator')->trans($label);
-                }
-
-                reset($dataArray['operators']);
-                $operator = key($dataArray['operators']);
-            }
-
-            $disabled = false;
-            switch ($operator) {
-                case 'empty':
-                case '!empty':
-                    $disabled = true;
-                    break;
-            }
-            $dataArray['disabled'] = $disabled;
         }
 
+        if (in_array($alias, ['tags', 'segments'])) {
+            $leadFieldType = [
+                'include' => [
+                    '=',
+                    '!=',
+                    'regexp',
+                    '!regexp',
+                ],
+            ];
+        }
+        if ('field' === $changed) {
+            $dataArray['operators'] = $this->getModel('lead')->getOperatorsForFieldType($leadFieldType, ['date']);
+            foreach ($dataArray['operators'] as $value => $label) {
+                $dataArray['operators'][$value] = $this->get('translator')->trans($label);
+            }
+            reset($dataArray['operators']);
+            $operator = key($dataArray['operators']);
+        }
+
+        $dataArray['disabled'] = in_array($operator, ['empty', '!empty']);
         $dataArray['success'] = 1;
 
         return $this->sendJsonResponse($dataArray);

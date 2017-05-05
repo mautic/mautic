@@ -44,12 +44,16 @@ class LeadFieldsType extends AbstractType
                 if ($options['with_tags']) {
                     $fieldList['Core']['tags'] = 'mautic.lead.field.tags';
                 }
-
+                if ($options['with_segments']) {
+                    $fieldList['Core']['segments'] = 'mautic.lead.field.segments';
+                }
+                $fieldList['Core']['notifications'] = 'mautic.lead.field.notifications';
                 return $fieldList;
             },
-            'global_only' => false,
-            'required'    => false,
-            'with_tags'   => false,
+            'global_only'     => false,
+            'required'        => false,
+            'with_tags'       => false,
+            'with_segments'   => false,
         ]);
     }
 
