@@ -485,6 +485,45 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'mailer_mailjet_sandbox',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.mailer.mailjet.sandbox',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":["mautic.transport.mailjet"]}',
+                ],
+                'data'     => empty($options['data']['mailer_mailjet_sandbox']) ? false : true,
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_mailjet_sandbox_default_mail',
+            'text',
+            [
+                'label'      => 'mautic.email.config.mailer.mailjet.sandbox.mail',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.mailjet.sandbox.mail',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":["mautic.transport.mailjet"]}',
+                    'data-hide-on' => '{"config_emailconfig_mailer_mailjet_sandbox_0":"checked"}',
+                ],
+                'constraints' => [
+                    new Email(
+                        [
+                            'message' => 'mautic.core.email.required',
+                        ]
+                    ),
+                ],
+                'required' => false,
+            ]
+        );
+
         $spoolConditions = '{"config_emailconfig_mailer_spool_type":["memory"]}';
 
         $builder->add(
@@ -634,7 +673,8 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control frequency',
                 ],
-            ]);
+            ]
+        );
         $builder->add(
             'show_contact_segments',
             'yesno_button_group',

@@ -13,9 +13,9 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class EmailRepository.
@@ -24,6 +24,8 @@ class EmailRepository extends CommonRepository
 {
     /**
      * Get an array of do not email emails.
+     *
+     * @param array $leadIds
      *
      * @return array
      */
@@ -187,9 +189,22 @@ class EmailRepository extends CommonRepository
         $dncQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $dncQb->expr()->eq('dnc.lead_id', 'l.id')
-            )
-            ->andWhere('dnc.channel = "email"');
+                $dncQb->expr()->andX(
+                    $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
+                    $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
+                )
+            );
+
+        // Do not include contacts where the message is pending in the message queue
+        $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $mqQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq');
+
+        $messageExpr = $mqQb->expr()->andX(
+            $mqQb->expr()->eq('mq.lead_id', 'l.id'),
+            $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('email')),
+            $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT))
+        );
 
         // Do not include leads that have already been emailed
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -207,12 +222,19 @@ class EmailRepository extends CommonRepository
             $statExpr->add(
                 $statQb->expr()->in('stat.email_id', $variantIds)
             );
+            $messageExpr->add(
+                $mqQb->expr()->in('mq.channel_id', $variantIds)
+            );
         } else {
             $statExpr->add(
                 $statQb->expr()->eq('stat.email_id', (int) $emailId)
             );
+            $messageExpr->add(
+                $mqQb->expr()->eq('mq.channel_id', (int) $emailId)
+            );
         }
         $statQb->where($statExpr);
+        $mqQb->where($messageExpr);
 
         // Only include those who belong to the associated lead lists
         if (null === $listIds) {
@@ -242,7 +264,6 @@ class EmailRepository extends CommonRepository
         if ($countOnly) {
             // distinct with an inner join seems faster
             $q->select('count(distinct(l.id)) as count');
-
             $q->innerJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll',
                 $q->expr()->andX(
                     $q->expr()->in('ll.leadlist_id', $listIds),
@@ -269,6 +290,7 @@ class EmailRepository extends CommonRepository
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
         // Has an email
@@ -316,8 +338,14 @@ class EmailRepository extends CommonRepository
         $q->select('partial e.{id, subject, name, language}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('e.name', ':search'))
-                ->setParameter('search', "{$search}%");
+            if (is_array($search)) {
+                $search = array_map('intval', $search);
+                $q->andWhere($q->expr()->in('e.id', ':search'))
+                    ->setParameter('search', $search);
+            } else {
+                $q->andWhere($q->expr()->like('e.name', ':search'))
+                    ->setParameter('search', "%{$search}%");
+            }
         }
 
         if (!$viewOther) {
@@ -385,34 +413,16 @@ class EmailRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause(&$q, $filter)
     {
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq('e.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->isNull('e.category'),
-                    $q->expr()->eq('e.category', $q->expr()->literal(''))
-                );
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr           = $q->expr()->like('c.alias', ":$unique");
-                $filter->strict = true;
-                break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
                 $langUnique      = $this->generateRandomParameterName();
                 $langValue       = $filter->string.'_%';
@@ -424,6 +434,7 @@ class EmailRepository extends CommonRepository
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
+                $returnParameter = true;
                 break;
         }
 
@@ -433,9 +444,7 @@ class EmailRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif (!$returnParameter) {
-            $parameters = [];
-        } else {
+        } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
@@ -448,7 +457,7 @@ class EmailRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
@@ -456,6 +465,8 @@ class EmailRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
@@ -479,7 +490,7 @@ class EmailRepository extends CommonRepository
     /**
      * Resets variant_start_date, variant_read_count, variant_sent_count.
      *
-     * @param $variantParentId
+     * @param $relatedIds
      * @param $date
      */
     public function resetVariants($relatedIds, $date)

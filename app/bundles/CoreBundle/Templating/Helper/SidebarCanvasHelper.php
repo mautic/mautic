@@ -13,7 +13,8 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\SidebarCanvasEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 /**
@@ -21,24 +22,39 @@ use Symfony\Component\Templating\Helper\Helper;
  */
 class SidebarCanvasHelper extends Helper
 {
-    private $canvases = ['left', 'main', 'right'];
-    private $content  = [];
+    /**
+     * @var array
+     */
+    protected $canvases = ['left', 'main', 'right'];
 
     /**
-     * @param MauticFactory $factory
+     * @var array
      */
-    public function __construct(MauticFactory $factory)
+    protected $content = [];
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
+     * SidebarCanvasHelper constructor.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
-        $this->factory = $factory;
+        $this->dispatcher = $dispatcher;
     }
 
-    public function renderCanvasContent($templating)
+    /**
+     * @param PhpEngine $templating
+     */
+    public function renderCanvasContent(PhpEngine $templating)
     {
-        $dispatcher = $this->factory->getDispatcher();
-
-        if ($dispatcher->hasListeners(CoreEvents::BUILD_CANVAS_CONTENT)) {
+        if ($this->dispatcher->hasListeners(CoreEvents::BUILD_CANVAS_CONTENT)) {
             $event = new SidebarCanvasEvent($templating);
-            $dispatcher->dispatch(CoreEvents::BUILD_CANVAS_CONTENT, $event);
+            $this->dispatcher->dispatch(CoreEvents::BUILD_CANVAS_CONTENT, $event);
             $this->content = $event->getCanvasContent();
         }
 

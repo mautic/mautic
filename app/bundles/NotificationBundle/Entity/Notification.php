@@ -64,6 +64,11 @@ class Notification extends FormEntity
     private $message;
 
     /**
+     * @var string
+     */
+    private $button;
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -102,6 +107,16 @@ class Notification extends FormEntity
      * @var string
      */
     private $notificationType = 'template';
+
+    /**
+     * @var bool
+     */
+    private $mobile = false;
+
+    /**
+     * @var array
+     */
+    private $mobileSettings;
 
     public function __clone()
     {
@@ -156,6 +171,10 @@ class Notification extends FormEntity
         $builder->createField('message', 'text')
             ->build();
 
+        $builder->createField('button', 'text')
+            ->nullable()
+            ->build();
+
         $builder->createField('notificationType', 'text')
             ->columnName('notification_type')
             ->nullable()
@@ -187,6 +206,10 @@ class Notification extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('mobile', 'boolean')->build();
+
+        $builder->createField('mobileSettings', 'array')->build();
     }
 
     /**
@@ -252,6 +275,7 @@ class Notification extends FormEntity
                     'url',
                     'language',
                     'category',
+                    'button',
                 ]
             )
             ->addProperties(
@@ -369,6 +393,23 @@ class Notification extends FormEntity
     {
         $this->isChanged('heading', $heading);
         $this->heading = $heading;
+    }
+
+    /**
+     * @return string
+     */
+    public function getButton()
+    {
+        return $this->button;
+    }
+
+    /**
+     * @param string $heading
+     */
+    public function setButton($button)
+    {
+        $this->isChanged('button', $button);
+        $this->button = $button;
     }
 
     /**
@@ -563,5 +604,45 @@ class Notification extends FormEntity
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMobileSettings()
+    {
+        return $this->mobileSettings;
+    }
+
+    /**
+     * @param array $mobileSettings
+     *
+     * @return $this
+     */
+    public function setMobileSettings(array $mobileSettings)
+    {
+        $this->mobileSettings = $mobileSettings;
+
+        return $this;
     }
 }

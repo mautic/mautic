@@ -5514,9 +5514,13 @@
     var rnumnonpx = new RegExp("^(" + pnum + ")(?!px)[a-z%]+$", "i");
 
     var getStyles = function (elem) {
-        return elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+        // prevent Uncaught error: call to getComputedStyle on undefined
+        if (elem.ownerDocument && elem.ownerDocument.defaultView)
+            return elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+        else if (window.getComputedStyle)
+            return getComputedStyle(elem, null);
+        return {};
     };
-
 
     function curCSS(elem, name, computed) {
         var width, minWidth, maxWidth, ret,
@@ -5617,8 +5621,11 @@
             docElem.appendChild(container);
 
             var divStyle = window.getComputedStyle(div, null);
-            pixelPositionVal = divStyle.top !== "1%";
-            boxSizingReliableVal = divStyle.width === "4px";
+            // fix for Uncaught TypeError: Cannot read property 'top' of undefined
+            if (divStyle) {
+                pixelPositionVal = divStyle.top !== "1%";
+                boxSizingReliableVal = divStyle.width === "4px";
+            }
 
             docElem.removeChild(container);
         }

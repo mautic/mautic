@@ -13,21 +13,30 @@ namespace Mautic\PluginBundle\Integration;
 
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class AbstractIntegration.
  */
 abstract class AbstractIntegration
 {
+    /**
+     * @var bool
+     */
+    protected $coreIntegration = false;
+
     /**
      * @var MauticFactory
      */
@@ -46,17 +55,51 @@ abstract class AbstractIntegration
     /**
      * @var array Decrypted keys
      */
-    protected $keys;
+    protected $keys = [];
+
+    /**
+     * @var CacheStorageHelper
+     */
+    protected $cache;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
+
+    /**
+     * Used for notifications.
+     *
+     * @var array|null
+     */
+    protected $adminUsers;
+
+    /**
+     * @var
+     */
+    protected $notifications = [];
 
     /**
      * @param MauticFactory $factory
+     *
+     * @todo divorce from MauticFactory
      */
     public function __construct(MauticFactory $factory)
     {
         $this->factory    = $factory;
         $this->dispatcher = $factory->getDispatcher();
+        $this->cache      = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+        $this->em         = $factory->getEntityManager();
 
         $this->init();
+    }
+
+    /**
+     * @return CacheStorageHelper
+     */
+    public function getCache()
+    {
+        return $this->cache;
     }
 
     /**
@@ -72,6 +115,14 @@ abstract class AbstractIntegration
      */
     public function init()
     {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCoreIntegration()
+    {
+        return $this->coreIntegration;
     }
 
     /**
@@ -143,6 +194,15 @@ abstract class AbstractIntegration
      */
     abstract public function getAuthenticationType();
 
+    /**
+     * Get if data priority is enabled in the integration or not default is false.
+     *
+     * @return string
+     */
+    public function getDataPriority()
+    {
+        return false;
+    }
     /**
      * Get a list of supported features for this integration.
      *
@@ -572,6 +632,9 @@ abstract class AbstractIntegration
 
             $headers    = $event->getHeaders();
             $parameters = $event->getParameters();
+        }
+        if (isset($settings['batchSizeSF'])) {
+            $headers[] = 'Sforce-Query-Options: batchSize='.$settings['batchSizeSF'];
         }
 
         if (!isset($settings['query'])) {
@@ -1231,7 +1294,116 @@ abstract class AbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if (empty($settings['ignore_field_cache'])) {
+            $cacheSuffix = (isset($settings['cache_suffix'])) ? $settings['cache_suffix'] : '';
+            if ($fields = $this->cache->get('leadFields'.$cacheSuffix)) {
+                return $fields;
+            }
+        }
+
         return [];
+    }
+
+    /**
+     * @param Integration $entity
+     * @param array       $mauticLeadFields
+     * @param array       $mauticCompanyFields
+     *
+     * @return array
+     */
+    public function cleanUpFields(Integration $entity, array $mauticLeadFields, array $mauticCompanyFields)
+    {
+        $featureSettings        = $entity->getFeatureSettings();
+        $submittedFields        = (isset($featureSettings['leadFields'])) ? $featureSettings['leadFields'] : [];
+        $submittedCompanyFields = (isset($featureSettings['companyFields'])) ? $featureSettings['companyFields'] : [];
+        $submittedObjects       = (isset($featureSettings['objects'])) ? $featureSettings['objects'] : [];
+        $missingRequiredFields  = [];
+
+        //make sure now non-existent aren't saved
+        $settings = [
+            'ignore_field_cache' => false,
+        ];
+        $settings['feature_settings']['objects'] = $submittedObjects;
+        $availableIntegrationFields              = $this->getAvailableLeadFields($settings);
+        $leadFields                              = [];
+
+        /**
+         * @param $mappedFields
+         * @param $integrationFields
+         * @param $mauticFields
+         * @param $fieldType
+         */
+        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings) {
+            $updateKey    = ('companyFields' === $fieldType) ? 'update_mautic_company' : 'update_mautic';
+            $removeFields = array_keys(array_diff_key($mappedFields, $integrationFields));
+
+            // Find all the mapped fields that no longer exist in Mautic
+            if ($nonExistentFields = array_diff($mappedFields, array_keys($mauticFields))) {
+                // Remove those fields
+                $removeFields = array_merge($removeFields, array_keys($nonExistentFields));
+            }
+
+            foreach ($removeFields as $field) {
+                unset($mappedFields[$field]);
+
+                if (isset($featureSettings[$updateKey])) {
+                    unset($featureSettings[$updateKey][$field]);
+                }
+            }
+
+            // Check if required fields are missing
+            $required = $this->getRequiredFields($integrationFields);
+            if (array_diff_key($required, $mappedFields)) {
+                $missingRequiredFields[$fieldType] = true;
+            }
+        };
+
+        if ($submittedObjects) {
+            if (in_array('company', $submittedObjects)) {
+                // special handling for company fields
+                if (isset($availableIntegrationFields['company'])) {
+                    $cleanup($submittedCompanyFields, $availableIntegrationFields['company'], $mauticCompanyFields, 'companyFields');
+                    $featureSettings['companyFields'] = $submittedCompanyFields;
+                    unset($availableIntegrationFields['company']);
+                }
+            }
+
+            // Rest of the objects are merged and assumed to be leadFields
+            foreach ($submittedObjects as $object) {
+                if (isset($availableIntegrationFields[$object])) {
+                    $leadFields = array_merge($leadFields, $availableIntegrationFields[$object]);
+                }
+            }
+        } else {
+            // Cleanup assuming there are no objects as keys
+            $leadFields = $availableIntegrationFields;
+        }
+
+        if (!empty($leadFields)) {
+            $cleanup($submittedFields, $leadFields, $mauticLeadFields, 'leadFields');
+            $featureSettings['leadFields'] = $submittedFields;
+        }
+
+        $entity->setFeatureSettings($featureSettings);
+
+        return $missingRequiredFields;
+    }
+
+    /**
+     * @param array $fields
+     *
+     * @return array
+     */
+    public function getRequiredFields(array $fields)
+    {
+        $requiredFields = [];
+        foreach ($fields as $field => $details) {
+            if (is_array($details) && !empty($details['required'])) {
+                $requiredFields[$field] = $field;
+            }
+        }
+
+        return $requiredFields;
     }
 
     /**
@@ -1254,22 +1426,89 @@ abstract class AbstractIntegration
 
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);
+            $leadId = $lead->getId();
         } else {
             $fields = $lead;
+            $leadId = $lead['id'];
         }
 
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
+        if (isset($config['object'])) {
+            $availableFields = $availableFields[$config['object']];
+        }
+        $unknown = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+        $matched = [];
+
+        foreach ($availableFields as $key => $field) {
+            $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
+            if (is_array($integrationKey)) {
+                list($integrationKey, $matchIntegrationKey) = $integrationKey;
+            }
+
+            if (isset($leadFields[$integrationKey])) {
+                if ($leadFields[$integrationKey] == 'mauticContactTimelineLink') {
+                    $this->pushContactLink  = true;
+                    $mauticContactLinkField = $integrationKey;
+                    continue;
+                }
+                $mauticKey = $leadFields[$integrationKey];
+                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
+                    $matched[$matchIntegrationKey] = $fields[$mauticKey]['value'];
+                }
+            }
+
+            if (!empty($field['required']) && empty($matched[$matchIntegrationKey])) {
+                $matched[$matchIntegrationKey] = $unknown;
+            }
+        }
+        if ($this->pushContactLink) {
+            $matched[$mauticContactLinkField] = $this->factory->getRouter()->generate(
+                'mautic_plugin_timeline_view',
+                ['integration' => $this->getName(), 'leadId' => $leadId],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+        }
+
+        return $matched;
+    }
+
+    /**
+     * Match lead data with integration fields.
+     *
+     * @param $lead
+     * @param $config
+     *
+     * @return array
+     */
+    public function populateCompanyData($lead, $config = [])
+    {
+        if (!isset($config['companyFields'])) {
+            $config = $this->mergeConfigToFeatureSettings($config);
+
+            if (empty($config['companyFields'])) {
+                return [];
+            }
+        }
+
+        if ($lead instanceof Lead) {
+            $fields = $lead->getPrimaryCompany();
+        } else {
+            $fields = $lead['primaryCompany'];
+        }
+
+        $companyFields   = $config['companyFields'];
+        $availableFields = $this->getAvailableLeadFields($config)['company'];
         $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
         $matched         = [];
 
         foreach ($availableFields as $key => $field) {
             $integrationKey = $this->convertLeadFieldKey($key, $field);
 
-            if (isset($leadFields[$key])) {
-                $mauticKey = $leadFields[$key];
-                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                    $matched[$integrationKey] = $fields[$mauticKey]['value'];
+            if (isset($companyFields[$key])) {
+                $mauticKey = $companyFields[$key];
+                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey])) {
+                    $matched[$integrationKey] = $fields[$mauticKey];
                 }
             }
 
@@ -1581,16 +1820,83 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param \Exception $e
+     * @return \Mautic\CoreBundle\Model\NotificationModel
      */
-    public function logIntegrationError(\Exception $e)
+    public function getNotificationModel()
+    {
+        return $this->factory->getModel('core.notification');
+    }
+
+    /**
+     * @param \Exception $e
+     * @param null       $contact
+     */
+    public function logIntegrationError(\Exception $e, Lead $contact = null)
     {
         $logger = $this->factory->getLogger();
-        if ('dev' == MAUTIC_ENV) {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
-        } else {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+
+        if ($e instanceof ApiErrorException) {
+            if (null === $this->adminUsers) {
+                $this->adminUsers = $this->em->getRepository('MauticUserBundle:User')->getEntities(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
+                                    'column' => 'r.isAdmin',
+                                    'expr'   => 'eq',
+                                    'value'  => true,
+                                ],
+                            ],
+                        ],
+                    ]
+                );
+            }
+
+            $errorMessage = ('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage();
+            $errorHeader  = $this->getTranslator()->trans(
+                'mautic.integration.error',
+                [
+                    '%name%' => $this->getName(),
+                ]
+            );
+
+            if ($contact || $contact = $e->getContact()) {
+                // Append a link to the contact
+                $contactId   = $contact->getId();
+                $contactName = $contact->getPrimaryIdentifier();
+            } elseif ($contactId = $e->getContactId()) {
+                $contactName = $this->getTranslator()->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
+            }
+
+            if ($contactId) {
+                $contactLink = $this->factory->getRouter()->generate('mautic_contact_action', [
+                    'objectAction' => 'view', 'objectId' => $contactId,
+                ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+                $errorMessage .= ' <a href="'.$contactLink.'">'.$contactName.'</a>';
+            }
+
+            // Prevent a flood of the same messages
+            $messageHash = md5($errorMessage);
+            if (!array_key_exists($messageHash, $this->notifications)) {
+                foreach ($this->adminUsers as $user) {
+                    $this->getNotificationModel()->addNotification(
+                        $errorHeader,
+                        $this->getName(),
+                        false,
+                        $errorMessage,
+                        'text-danger fa-exclamation-circle',
+                        null,
+                        $user
+                    );
+                }
+
+                $this->notifications[$messageHash] = true;
+            }
         }
+
+        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$errorMessage);
     }
 
     /**
@@ -1625,13 +1931,26 @@ abstract class AbstractIntegration
     }
 
     /**
+     * @param FormBuilder $builder
+     * @param array       $options
+     */
+    public function modifyForm($builder, $options)
+    {
+        $this->dispatcher->dispatch(
+            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD,
+            new PluginIntegrationFormBuildEvent($this, $builder, $options)
+        );
+    }
+
+    /**
      * Returns settings for the integration form.
      *
      * @return array
      */
     public function getFormSettings()
     {
-        $type = $this->getAuthenticationType();
+        $type               = $this->getAuthenticationType();
+        $enableDataPriority = $this->getDataPriority();
         switch ($type) {
             case 'oauth1a':
             case 'oauth2':
@@ -1646,9 +1965,13 @@ abstract class AbstractIntegration
             'requires_callback'      => $callback,
             'requires_authorization' => $authorization,
             'default_features'       => [],
+            'enable_data_priority'   => $enableDataPriority,
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getFormDisplaySettings()
     {
         /** @var PluginIntegrationFormDisplayEvent $event */

@@ -24,31 +24,13 @@ class FormApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('form');
         $this->entityClass      = 'Mautic\FormBundle\Entity\Form';
         $this->entityNameOne    = 'form';
         $this->entityNameMulti  = 'forms';
-        $this->permissionBase   = 'form:forms';
         $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails'];
-    }
 
-    /**
-     * Obtains a list of forms.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function getEntitiesAction()
-    {
-        if (!$this->security->isGranted('form:forms:viewother')) {
-            $this->listFilters = [
-                'column' => 'f.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->user->getId(),
-            ];
-        }
-
-        return parent::getEntitiesAction();
+        parent::initialize($event);
     }
 
     /**

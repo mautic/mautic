@@ -11,8 +11,9 @@
 
 namespace Mautic\CoreBundle\Templating\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DateHelper extends Helper
 {
@@ -32,20 +33,25 @@ class DateHelper extends Helper
     protected $translator;
 
     /**
-     * @param MauticFactory $factory
+     * DateHelper constructor.
+     *
+     * @param                     $dateFullFormat
+     * @param                     $dateShortFormat
+     * @param                     $dateOnlyFormat
+     * @param                     $timeOnlyFormat
+     * @param TranslatorInterface $translator
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct($dateFullFormat, $dateShortFormat, $dateOnlyFormat, $timeOnlyFormat, TranslatorInterface $translator)
     {
         $this->formats = [
-            'datetime' => $factory->getParameter('date_format_full'),
-            'short'    => $factory->getParameter('date_format_short'),
-            'date'     => $factory->getParameter('date_format_dateonly'),
-            'time'     => $factory->getParameter('date_format_timeonly'),
+            'datetime' => $dateFullFormat,
+            'short'    => $dateShortFormat,
+            'date'     => $dateOnlyFormat,
+            'time'     => $timeOnlyFormat,
         ];
 
-        $this->helper = $factory->getDate();
-
-        $this->translator = $factory->getTranslator();
+        $this->helper     = new DateTimeHelper(null, null, 'local');
+        $this->translator = $translator;
     }
 
     /**

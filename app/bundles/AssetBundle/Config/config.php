@@ -12,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_asset_buildertoken_index' => [
-                'path'       => '/asset/buildertokens/{page}',
-                'controller' => 'MauticAssetBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_asset_index' => [
                 'path'       => '/assets/{page}',
                 'controller' => 'MauticAssetBundle:Asset:index',

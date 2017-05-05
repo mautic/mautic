@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -841,7 +842,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return mixed
+     * @return PersistentCollection
      */
     public function getLists()
     {
@@ -1053,6 +1054,20 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
                 $content = str_replace($url, $newUrl, $content);
             }
+        }
+    }
+
+    /**
+     * Calculate Read Percentage for each Email.
+     *
+     * @return int
+     */
+    public function getReadPercentage($includevariants = false)
+    {
+        if ($this->getSentCount($includevariants) > 0) {
+            return round($this->getReadCount($includevariants) / ($this->getSentCount($includevariants)) * 100, 2);
+        } else {
+            return 0;
         }
     }
 }

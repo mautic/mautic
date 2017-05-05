@@ -34,6 +34,13 @@ return [
                 'method'     => 'POST',
             ],
             'mautic_api_sendcontactemail' => [
+                'path'       => '/emails/{id}/contact/{leadId}/send',
+                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
+                'method'     => 'POST',
+            ],
+
+            // @deprecated 2.6.0 to be removed in 3.0
+            'bc_mautic_api_sendcontactemail' => [
                 'path'       => '/emails/{id}/send/contact/{leadId}',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
                 'method'     => 'POST',
@@ -116,14 +123,17 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
-                    'mautic.core.model.messagequeue',
+                    'mautic.channel.model.queue',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\FormSubscriber',
             ],
             'mautic.email.reportbundle.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\ReportSubscriber',
+                'class'     => 'Mautic\EmailBundle\EventListener\ReportSubscriber',
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
+                ],
             ],
             'mautic.email.leadbundle.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\LeadSubscriber',
@@ -145,7 +155,10 @@ return [
                 ],
             ],
             'mautic.email.webhook.subscriber' => [
-                'class' => 'Mautic\EmailBundle\EventListener\WebhookSubscriber',
+                'class'       => 'Mautic\EmailBundle\EventListener\WebhookSubscriber',
+                'methodCalls' => [
+                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
+                ],
             ],
             'mautic.email.configbundle.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\ConfigSubscriber',
@@ -203,9 +216,8 @@ return [
                 'alias'     => 'emailvariant',
             ],
             'mautic.form.type.email_list' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\EmailListType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'email_list',
+                'class' => 'Mautic\EmailBundle\Form\Type\EmailListType',
+                'alias' => 'email_list',
             ],
             'mautic.form.type.emailopen_list' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailOpenType',
@@ -298,7 +310,14 @@ return [
             'mautic.transport.mailjet' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MailjetTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
-                'methodCalls'  => [
+                'arguments'    => [
+                    '',
+                    '',
+                    '',
+                    '%mautic.mailer_mailjet_sandbox%',
+                    '%mautic.mailer_mailjet_sandbox_default_mail%',
+                ],
+                'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
@@ -351,47 +370,49 @@ return [
                     'mautic.lead.model.company',
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
-                    'mautic.helper.core_parameters',
-                    'mautic.core.model.messagequeue',
+                    'mautic.channel.model.queue',
                 ],
             ],
         ],
     ],
     'parameters' => [
-        'mailer_api_key'                  => null, // Api key from mail delivery provider.
-        'mailer_from_name'                => 'Mautic',
-        'mailer_from_email'               => 'email@yoursite.com',
-        'mailer_return_path'              => null,
-        'mailer_transport'                => 'mail',
-        'mailer_append_tracking_pixel'    => true,
-        'mailer_convert_embed_images'     => false,
-        'mailer_host'                     => '',
-        'mailer_port'                     => null,
-        'mailer_user'                     => null,
-        'mailer_password'                 => null,
-        'mailer_encryption'               => null, //tls or ssl,
-        'mailer_auth_mode'                => null, //plain, login or cram-md5
-        'mailer_amazon_region'            => 'email-smtp.us-east-1.amazonaws.com',
-        'mailer_spool_type'               => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'               => '%kernel.root_dir%/spool',
-        'mailer_spool_msg_limit'          => null,
-        'mailer_spool_time_limit'         => null,
-        'mailer_spool_recover_timeout'    => 900,
-        'mailer_spool_clear_timeout'      => 1800,
-        'unsubscribe_text'                => null,
-        'webview_text'                    => null,
-        'unsubscribe_message'             => null,
-        'resubscribe_message'             => null,
-        'monitored_email'                 => [],
-        'mailer_is_owner'                 => false,
-        'default_signature_text'          => null,
-        'email_frequency_number'          => null,
-        'email_frequency_time'            => null,
-        'show_contact_preferences'        => false,
-        'show_contact_frequency'          => false,
-        'show_contact_pause_dates'        => false,
-        'show_contact_preferred_channels' => false,
-        'show_contact_categories'         => false,
-        'show_contact_segments'           => false,
+        'mailer_api_key'                      => null, // Api key from mail delivery provider.
+        'mailer_from_name'                    => 'Mautic',
+        'mailer_from_email'                   => 'email@yoursite.com',
+        'mailer_return_path'                  => null,
+        'mailer_transport'                    => 'mail',
+        'mailer_append_tracking_pixel'        => true,
+        'mailer_convert_embed_images'         => false,
+        'mailer_host'                         => '',
+        'mailer_port'                         => null,
+        'mailer_user'                         => null,
+        'mailer_password'                     => null,
+        'mailer_encryption'                   => null, //tls or ssl,
+        'mailer_auth_mode'                    => null, //plain, login or cram-md5
+        'mailer_amazon_region'                => 'email-smtp.us-east-1.amazonaws.com',
+        'mailer_spool_type'                   => 'memory', //memory = immediate; file = queue
+        'mailer_spool_path'                   => '%kernel.root_dir%/spool',
+        'mailer_spool_msg_limit'              => null,
+        'mailer_spool_time_limit'             => null,
+        'mailer_spool_recover_timeout'        => 900,
+        'mailer_spool_clear_timeout'          => 1800,
+        'unsubscribe_text'                    => null,
+        'webview_text'                        => null,
+        'unsubscribe_message'                 => null,
+        'resubscribe_message'                 => null,
+        'monitored_email'                     => [],
+        'mailer_is_owner'                     => false,
+        'default_signature_text'              => null,
+        'email_frequency_number'              => null,
+        'email_frequency_time'                => null,
+        'show_contact_preferences'            => false,
+        'show_contact_frequency'              => false,
+        'show_contact_pause_dates'            => false,
+        'show_contact_preferred_channels'     => false,
+        'show_contact_categories'             => false,
+        'show_contact_segments'               => false,
+        'mailer_mailjet_sandbox'              => false,
+        'mailer_mailjet_sandbox_default_mail' => null,
+
     ],
 ];

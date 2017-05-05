@@ -11,7 +11,6 @@
 
 namespace Mautic\NotificationBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
@@ -23,20 +22,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class NotificationType extends AbstractType
 {
-    private $translator;
-    private $em;
-    private $request;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-        $this->request    = $factory->getRequest();
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -99,6 +84,20 @@ class NotificationType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.notification.form.url.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'button',
+            'text',
+            [
+                'label'      => 'mautic.notification.form.button',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.notification.form.button.tooltip',
                 ],
                 'required' => false,
             ]

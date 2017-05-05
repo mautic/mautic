@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   // Extend defaults.
   $.extend($.FE.DEFAULTS, {
@@ -48,7 +48,7 @@
      * Get the char number.
      */
     function count () {
-      return editor.$el.text().length;
+      return editor.el.textContent.length;
     }
 
     /**
@@ -127,7 +127,7 @@
 
       editor.events.on('keydown', _checkCharNumber, true);
       editor.events.on('paste.afterCleanup', _checkCharNumberOnPaste);
-      editor.events.on('keyup contentChanged', function () {
+      editor.events.on('keyup contentChanged input', function () {
         editor.events.trigger('charCounter.update');
       });
 

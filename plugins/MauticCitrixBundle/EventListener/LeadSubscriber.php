@@ -135,8 +135,10 @@ class LeadSubscriber extends CommonSubscriber
                             'eventType'  => $timelineEventTypeLabel,
                             'timestamp'  => $citrixEvent->getEventDate(),
                             'extra'      => [
-                                'eventName' => $citrixEvent->getEventName(),
+                                'eventName' => $citrixEvent->getEventNameOnly(),
+                                'eventId'   => $citrixEvent->getEventId(),
                                 'eventDesc' => $citrixEvent->getEventDesc(),
+                                'joinUrl'   => $citrixEvent->getJoinUrl(),
                             ],
                             'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.php',
                         ]
@@ -194,7 +196,8 @@ class LeadSubscriber extends CommonSubscriber
                             'list' => $eventNamesWithAny,
                         ],
                         'operators' => [
-                            'include' => ['in', '!in'],
+                            'in'  => $event->getTranslator()->trans('mautic.core.operator.in'),
+                            '!in' => $event->getTranslator()->trans('mautic.core.operator.notin'),
                         ],
                     ]
                 );
@@ -210,7 +213,8 @@ class LeadSubscriber extends CommonSubscriber
                         'list' => $eventNamesWithAny,
                     ],
                     'operators' => [
-                        'include' => ['in', '!in'],
+                        'in'  => $event->getTranslator()->trans('mautic.core.operator.in'),
+                        '!in' => $event->getTranslator()->trans('mautic.core.operator.notin'),
                     ],
                 ]
             );
@@ -225,7 +229,7 @@ class LeadSubscriber extends CommonSubscriber
                         'list' => $eventNamesWithoutAny,
                     ],
                     'operators' => [
-                        'include' => ['in'],
+                        'in' => $event->getTranslator()->trans('mautic.core.operator.in'),
                     ],
                 ]
             );

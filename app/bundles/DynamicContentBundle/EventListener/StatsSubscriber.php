@@ -26,7 +26,12 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        // ??? Attempted to call an undefined method named "loadMetadata" of class "Mautic\DynamicContentBundle\Entity\StatRepository". ???
-        // $this->repositories[] = $em->getRepository('MauticDynamicContentBundle:StatRepository');
+        $this->addContactRestrictedRepositories(
+            $em,
+            [
+                'MauticDynamicContentBundle:Stat',
+                'MauticDynamicContentBundle:DynamicContentLeadData',
+            ]
+        );
     }
 }

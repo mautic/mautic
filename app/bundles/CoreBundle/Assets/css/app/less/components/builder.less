@@ -1,5 +1,5 @@
 
-.builder {
+.builder, .builder-slot {
   position: relative;
 
   [data-token] {
@@ -41,7 +41,7 @@
   top: 0;
   bottom: 0;
   right: 0;
-  width: 300px;
+  width: 525px;
   height: 100%;
   padding: 15px;
   background-color: #d5d4d4;
@@ -56,7 +56,7 @@
   position: fixed;
   left: 0;
   top: 0;
-  right: 300px;
+  right: 525px;
   height: 100%;
 }
 
@@ -77,6 +77,48 @@
 .builder-panel .panel a.btn {
   white-space: normal;
 }
+
+/********** SLOT ************/
+
+.builder-active-slot {
+  background-color: #fff;
+  z-index: 1030;
+}
+
+.builder-panel-slot {
+  width: 50%;
+  padding: 15px;
+  background-color: #d5d4d4;
+  overflow-y: auto;
+
+  .btn-close-builder {
+    width: 100%;
+  }
+}
+
+.builder-content-slot {
+  left: 50%;
+  width: 50%;
+}
+
+.code-mode {
+  .builder-panel-slot {
+    width: 50%;
+  }
+  .builder-content-slot {
+    width: 50%;
+  }
+  .btn-close-builder {
+    width: 150px;
+    float: right;
+  }
+}
+
+.builder-panel-slot .panel a.btn {
+  white-space: normal;
+}
+
+/************* END SLOT ******************/
 
 .ui-draggable-iframeFix {
   z-index: 9999 !important;

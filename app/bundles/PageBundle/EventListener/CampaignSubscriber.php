@@ -69,10 +69,12 @@ class CampaignSubscriber extends CommonSubscriber
     {
         //Add trigger
         $pageHitTrigger = [
-            'label'       => 'mautic.page.campaign.event.pagehit',
-            'description' => 'mautic.page.campaign.event.pagehit_descr',
-            'formType'    => 'campaignevent_pagehit',
-            'eventName'   => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+            'label'          => 'mautic.page.campaign.event.pagehit',
+            'description'    => 'mautic.page.campaign.event.pagehit_descr',
+            'formType'       => 'campaignevent_pagehit',
+            'eventName'      => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+            'channel'        => 'page',
+            'channelIdField' => 'pages',
         ];
         $event->addDecision('page.pagehit', $pageHitTrigger);
     }
@@ -121,7 +123,7 @@ class CampaignSubscriber extends CommonSubscriber
             $pageHitId = 0;
         }
 
-        $limitToPages = $config['pages'];
+        $limitToPages = (isset($config['pages'])) ? $config['pages'] : [];
 
         $urlMatches = [];
 
@@ -151,7 +153,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         // **Page hit is true if:**
         // 1. no landing page is set and no URL rule is set
-        $applyToAny = (empty($config['url']) && empty($limitToPages));
+        $applyToAny = (empty($config['url']) && empty($config['referer']) && empty($limitToPages));
 
         // 2. some landing pages are set and page ID match
         $langingPageIsHit = (!empty($limitToPages) && in_array($pageHitId, $limitToPages));

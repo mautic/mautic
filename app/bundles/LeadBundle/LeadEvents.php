@@ -425,13 +425,14 @@ final class LeadEvents
     const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
 
     /**
-     * The mautic.add_channel event registers communication channels.
+     * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
      *
-     * The event listener receives a Mautic\LeadBundle\Event\ChannelEvent instance.
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFilteringEvent instance.
      *
      * @var string
      */
-    const ADD_CHANNEL = 'mautic.add_channel';
+    const LIST_PRE_PROCESS_LIST = 'mautic.list_pre_process_list';
 
     /**
      * The mautic.remove_do_no_contact event is dispatched when a new submission is fired.
@@ -441,4 +442,15 @@ final class LeadEvents
      * @var string
      */
     const FORM_SUBMIT_REMOVE_DO_NO_CONTACT = 'mautic.form_submit_remove_do_no_contact';
+
+    /**
+     * @deprecated - 2.4 to be removed in 3.0; use Mautic\ChannelBundle\ChannelEvents::ADD_CHANNEL
+     *
+     * The mautic.add_channel event registers communication channels.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ChannelEvent instance
+     *
+     * @var string
+     */
+    const ADD_CHANNEL = 'mautic.bc_add_channel';
 }
