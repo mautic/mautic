@@ -590,7 +590,7 @@ class TrackableModel extends AbstractCommonModel
     {
         // Ensure it's not in the do not track
         foreach ($this->doNotTrack as $notTrackable) {
-            if (preg_match('/'.preg_quote($notTrackable, '/').'/', $url)) {
+            if (preg_match('~'.$notTrackable.'~i', $url)) {
                 return true;
             }
         }
