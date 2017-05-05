@@ -241,6 +241,28 @@ class TrackableModelTest extends WebTestCase
     }
 
     /**
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testTokenizedHostWithSchemeIsIgnored()
+    {
+        $url   = '{contactfield=foo}';
+        $model = $this->getModel($url, '{contactfield=foo}');
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [
+                '{contactfield=foo}' => '',
+            ],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables, $content);
+    }
+
+    /**
      * @testdox Test that a token used in place of a URL is not parsed
      *
      * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
