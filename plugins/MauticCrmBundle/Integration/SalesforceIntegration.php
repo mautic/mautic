@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -573,21 +574,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $fields = array_keys($config['leadFields']);
 
-        $leadFields         = $this->cleanSalesForceData($config, $fields, $object);
-        $fieldsToUpdateInSf = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
-        $leadFields         = array_diff_key($leadFields, array_flip($fieldsToUpdateInSf));
-        $leadLink           = '<a href ="'.$this->factory->getRouter()->
-            generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
-            ).'">Mautic Contact '.$lead->getId().'</a>';
-        $mappedData[$object] = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]);
+        $leadFields          = $this->cleanSalesForceData($config, $fields, $object);
+        $fieldsToUpdateInSf  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $leadFields          = array_diff_key($leadFields, array_flip($fieldsToUpdateInSf));
+        $mappedData[$object] = $this->populateLeadData(
+            $lead,
+            ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]
+        );
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
         if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
             $contactFields         = $this->cleanSalesForceData($config, $fields, 'Contact');
-            $mappedData['Contact'] = $this->populateLeadData($lead, ['leadFields' => $contactFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']]]);
+            $mappedData['Contact'] = $this->populateLeadData(
+                $lead,
+                ['leadFields' => $contactFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']]]
+            );
             $this->amendLeadDataBeforePush($mappedData['Contact']);
-            $object = 'Contact';
         }
         if (empty($mappedData)) {
             return false;
@@ -623,7 +625,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 return true;
             }
         } catch (\Exception $e) {
-            $this->logIntegrationError($e, $leadLink);
+            if ($e instanceof ApiErrorException) {
+                $e->setContact($lead);
+            }
+
+            $this->logIntegrationError($e);
         }
 
         return false;
@@ -1244,13 +1250,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $object = 'CampaignMember';
                 }
                 if (isset($item['body'][0]['errorCode'])) {
+                    $exception = new ApiErrorException($item['body'][0]['message']);
                     if ($object == 'Contact' || $object = 'Lead') {
-                        $leadLink = '-'.'<a href ="'.$this->factory->getRouter()->
-                        generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId],
-                            UrlGeneratorInterface::ABSOLUTE_URL
-                        ).'">Contact '.$contactId.'</a>';
+                        $exception->setContactId($contactId);
                     }
-                    $this->logIntegrationError(new \Exception($item['body'][0]['message'].$leadLink));
+                    $this->logIntegrationError($exception);
 
                     if ($integrationEntityId && $object !== 'CampaignMember') {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
@@ -1328,7 +1332,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             break;
                     }
 
-                    $this->logIntegrationError(new \Exception($error.' ('.$item['referenceId'].')'));
+                    $exception = new ApiErrorException($error);
+                    if (!empty($item['referenceId']) && ($object == 'Contact' || $object = 'Lead')) {
+                        $exception->setContactId($item['referenceId']);
+                    }
+                    $this->logIntegrationError($exception);
                 }
             }
 

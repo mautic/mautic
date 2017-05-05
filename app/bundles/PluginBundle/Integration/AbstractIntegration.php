@@ -21,6 +21,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\Form\FormBuilder;
@@ -65,6 +66,18 @@ abstract class AbstractIntegration
      * @var \Doctrine\ORM\EntityManager
      */
     protected $em;
+
+    /**
+     * Used for notifications.
+     *
+     * @var array|null
+     */
+    protected $adminUsers;
+
+    /**
+     * @var
+     */
+    protected $notifications = [];
 
     /**
      * @param MauticFactory $factory
@@ -1816,52 +1829,74 @@ abstract class AbstractIntegration
 
     /**
      * @param \Exception $e
+     * @param null       $contact
      */
-    public function logIntegrationError(\Exception $e)
+    public function logIntegrationError(\Exception $e, Lead $contact = null)
     {
         $logger = $this->factory->getLogger();
-        $users  = $this->em->getRepository('MauticUserBundle:User')->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'r.isAdmin',
-                            'expr'   => 'eq',
-                            'value'  => true,
+
+        if ($e instanceof ApiErrorException) {
+            if (null === $this->adminUsers) {
+                $this->adminUsers = $this->em->getRepository('MauticUserBundle:User')->getEntities(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
+                                    'column' => 'r.isAdmin',
+                                    'expr'   => 'eq',
+                                    'value'  => true,
+                                ],
+                            ],
                         ],
-                    ],
-                ],
-            ]
-        );
-        if ('dev' == MAUTIC_ENV) {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
-            foreach ($users as $u) {
-                $user = $u;
-                $this->getNotificationModel()->addNotification(
-                    $e,
-                    $this->getName(),
-                    false,
-                    'INTEGRATION ERROR: '.$this->getName().':',
-                    null,
-                    null,
-                    $user
+                    ]
                 );
             }
-        } else {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
-            foreach ($users as $u) {
-                $user = $u;
-                $this->getNotificationModel()->addNotification(
-                    $e->getMessage(),
-                    $this->getName(),
-                    false,
-                    'INTEGRATION ERROR: '.$this->getName().':',
-                    null,
-                    null,
-                    $user
+
+            $errorMessage = ('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage();
+            $errorHeader  = $this->getTranslator()->trans(
+                'mautic.integration.error',
+                [
+                    '%name%' => $this->getName(),
+                ]
+            );
+
+            if ($contact || $contact = $e->getContact()) {
+                // Append a link to the contact
+                $contactId   = $contact->getId();
+                $contactName = $contact->getPrimaryIdentifier();
+            } elseif ($contactId = $e->getContactId()) {
+                $contactName = $this->getTranslator()->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
+            }
+
+            if ($contactId) {
+                $contactLink = $this->factory->getRouter()->generate('mautic_contact_action', [
+                    'objectAction' => 'view', 'objectId' => $contact->getId(),
+                ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
                 );
+                $errorMessage .= " <a href=\"$contactLink\'>$contactName</a>";
+            }
+
+            // Prevent a flood of the same messages
+            $messageHash = md5($errorMessage);
+            if (!array_key_exists($messageHash, $this->notifications)) {
+                foreach ($this->adminUsers as $user) {
+                    $this->getNotificationModel()->addNotification(
+                        $errorHeader,
+                        $this->getName(),
+                        false,
+                        $errorMessage,
+                        'text-danger fa-exclamation-circle',
+                        null,
+                        $user
+                    );
+                }
+
+                $this->notifications[$messageHash] = true;
             }
         }
+
+        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$errorMessage);
     }
 
     /**
