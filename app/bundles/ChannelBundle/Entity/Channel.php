@@ -34,6 +34,11 @@ class Channel extends CommonEntity
     private $channelId;
 
     /**
+     * @var string
+     */
+    private $channelName;
+
+    /**
      * @var Message
      */
     private $message;
@@ -47,13 +52,6 @@ class Channel extends CommonEntity
      * @var bool
      */
     private $isEnabled = false;
-
-    /**
-     * Channel constructor.
-     */
-    public function __construct()
-    {
-    }
 
     /**
      * @param ClassMetadata $metadata
@@ -95,6 +93,7 @@ class Channel extends CommonEntity
                     'id',
                     'channel',
                     'channelId',
+                    'channelName',
                     'isEnabled',
                 ]
             )
@@ -155,6 +154,26 @@ class Channel extends CommonEntity
         }
 
         $this->channelId = $channelId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getChannelName()
+    {
+        return $this->channelName;
+    }
+
+    /**
+     * @param string $channelName
+     *
+     * @return Channel
+     */
+    public function setChannelName($channelName)
+    {
+        $this->channelName = $channelName;
 
         return $this;
     }

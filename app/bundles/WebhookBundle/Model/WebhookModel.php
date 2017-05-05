@@ -145,11 +145,25 @@ class WebhookModel extends FormModel
     }
 
     /**
+     * @param $type
+     * @param $payload
+     * @param $groups
+     */
+    public function queueWebhooksByType($type, $payload, array $groups = [])
+    {
+        return $this->queueWebhooks(
+            $this->getEventWebooksByType($type),
+            $payload,
+            $groups
+        );
+    }
+
+    /**
      * @param       $webhookEvents
      * @param       $payload
      * @param array $serializationGroups
      */
-    public function QueueWebhooks($webhookEvents, $payload, array $serializationGroups = [])
+    public function queueWebhooks($webhookEvents, $payload, array $serializationGroups = [])
     {
         if (!count($webhookEvents) || !is_array($webhookEvents)) {
             return;
@@ -364,7 +378,7 @@ class WebhookModel extends FormModel
                 $payload[$type][] = $queuePayload;
 
                 $this->webhookQueueIdList[] = $queue->getId();
-                $this->em->clear($queue);
+                $this->em->clear('\Mautic\WebhookBundle\Entity\WebhookQueue');
             }
         }
 

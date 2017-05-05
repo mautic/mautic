@@ -564,6 +564,7 @@ class CitrixHelper
                     'firstname' => (isset($result['firstName'])) ? $result['firstName'] : '',
                     'lastname'  => (isset($result['lastName'])) ? $result['lastName'] : '',
                     'email'     => $result['email'],
+                    'joinUrl'   => (isset($result['joinUrl'])) ? $result['joinUrl'] : '',
                 ];
             }
 

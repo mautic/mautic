@@ -83,7 +83,7 @@ class ContactFrequencyType extends AbstractType
                 );
             }
 
-            if (!$options['public_view'] || $showContactFrequency) {
+            if (!$options['public_view'] || $showContactFrequency || $showContactPauseDates) {
                 foreach ($options['channels'] as $channel) {
                     $attr = (isset($options['data']['subscribed_channels']) && !in_array($channel, $options['data']['subscribed_channels']))
                         ? ['disabled' => 'disabled'] : [];
@@ -146,7 +146,6 @@ class ContactFrequencyType extends AbstractType
                         );
                         $type = 'date';
                     }
-
                     if (!$options['public_view'] || $showContactPauseDates) {
                         $builder->add(
                             'contact_pause_start_date_'.$channel,
@@ -174,35 +173,36 @@ class ContactFrequencyType extends AbstractType
                         );
                     }
                 }
-
-                if (!$options['public_view'] || $showContactSegments) {
-                    $builder->add(
-                        'lead_lists',
-                        'leadlist_choices',
-                        [
-                            'label'      => 'mautic.lead.form.list',
-                            'label_attr' => ['class' => 'control-label'],
-                            'multiple'   => true,
-                            'expanded'   => $options['public_view'],
-                            'required'   => false,
-                        ]
-                    );
-                }
-
-                if (!$options['public_view'] || $showContactCategories) {
-                    $builder->add(
-                        'global_categories',
-                        'leadcategory_choices',
-                        [
-                            'label'      => 'mautic.lead.form.categories',
-                            'label_attr' => ['class' => 'control-label'],
-                            'multiple'   => true,
-                            'expanded'   => $options['public_view'],
-                            'required'   => false,
-                        ]
-                    );
-                }
             }
+        }
+
+        if (!$options['public_view'] || $showContactSegments) {
+            $builder->add(
+                'lead_lists',
+                'leadlist_choices',
+                [
+                    'global_only' => true,
+                    'label'       => 'mautic.lead.form.list',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'multiple'    => true,
+                    'expanded'    => $options['public_view'],
+                    'required'    => false,
+                ]
+            );
+        }
+
+        if (!$options['public_view'] || $showContactCategories) {
+            $builder->add(
+                'global_categories',
+                'leadcategory_choices',
+                [
+                    'label'      => 'mautic.lead.form.categories',
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => true,
+                    'expanded'   => $options['public_view'],
+                    'required'   => false,
+                ]
+            );
         }
 
         $builder->add(
