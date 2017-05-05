@@ -104,7 +104,6 @@ class IntegrationEntityRepository extends CommonRepository
         $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
 
         $q->setMaxResults($limit);
-        echo $q->getSQL();
         $results = $q->execute()->fetchAll();
 
         return $results;
