@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -2307,9 +2308,10 @@ class LeadController extends FormController
         $resultsCallback = function ($contact) {
             return $contact->getProfileFields();
         };
+        
+        $iterator = new IteratorExportDataModel($model, $args, $resultsCallback);
 
-        $toExport = $this->getDataForExport($model, $args, $resultsCallback);
 
-        return $this->exportResultsAs($toExport, $dataType, 'contacts');
+        return $this->exportResultsAs($iterator, $dataType, 'contacts');
     }
 }
