@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -95,6 +96,7 @@ class LeadListSubscriber extends CommonSubscriber
         $integrationObjects = $this->helper->getIntegrationObjects();
         $list               = $event->getList();
         $success            = false;
+        $filters            = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
 
         foreach ($integrationObjects as $name => $integrationObject) {
             $settings = $integrationObject->getIntegrationSettings();
@@ -103,7 +105,7 @@ class LeadListSubscriber extends CommonSubscriber
             }
 
             if (method_exists($integrationObject, 'getCampaignMembers')) {
-                foreach ($list['filters'] as $filter) {
+                foreach ($filters as $filter) {
                     if ($filter['field'] == 'integration_campaigns') {
                         if ($integrationObject->getCampaignMembers($filter['filter'], [])) {
                             $success = true;
