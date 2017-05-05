@@ -117,7 +117,7 @@ class FeatureSettingsType extends AbstractType
                 $fields = $integrationCompanyFields = [];
             }
 
-            $enableDataPriority = !empty($formSettings['enable_data_priority']);
+            $enableDataPriority = $integrationObject->getDataPriority();
 
             $form->add(
                 'leadFields',

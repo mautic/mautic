@@ -376,13 +376,4 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             'requires_authorization' => true,
         ];
     }
-    /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function getDataPriority()
-    {
-        return true;
-    }
 }
