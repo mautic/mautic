@@ -13,10 +13,12 @@ namespace Mautic\CoreBundle\Controller;
 
 use Exporter\Handler;
 use Exporter\Source\ArraySourceIterator;
+use Exporter\Source\IteratorSourceIterator;
 use Exporter\Writer\CsvWriter;
 use Exporter\Writer\XlsWriter;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\UserBundle\Entity\User;
@@ -777,21 +779,27 @@ class CommonController extends Controller implements MauticController
      *
      * @return StreamedResponse
      */
-    public function exportResultsAs(array $toExport, $type, $filename)
+    public function exportResultsAs($toExport, $type, $filename)
     {
         if (!in_array($type, ['csv', 'xlsx'])) {
             throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
 
+        if ($toExport instanceof \Iterator) {
+            $sourceIterator = new IteratorSourceIterator($toExport);
+        } else {
+            $sourceIterator = new ArraySourceIterator($toExport);
+        }
+
         $dateFormat     = $this->coreParametersHelper->getParameter('date_format_dateonly');
         $dateFormat     = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $sourceIterator = new ArraySourceIterator($toExport);
         $writer         = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
         $contentType    = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
         $filename       = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
+        $handler        = Handler::create($sourceIterator, $writer);
 
-        return new StreamedResponse(function () use ($sourceIterator, $writer) {
-            Handler::create($sourceIterator, $writer)->export();
+        return new StreamedResponse(function () use ($handler, $sourceIterator, $writer) {
+            $handler->export();
         }, 200, ['Content-Type' => $contentType, 'Content-Disposition' => sprintf('attachment; filename=%s', $filename)]);
     }
 
@@ -803,49 +811,13 @@ class CommonController extends Controller implements MauticController
      * @param AbstractCommonModel $model
      * @param array               $args
      * @param callable|null       $resultsCallback
+     * @param integer|null        $start
      *
      * @return array
      */
-    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, $start = 0)
     {
-        $args['limit'] = $args['limit'] < 200 ? 200 : $args['limit'];
-        $args['start'] = 0;
-
-        $results    = $model->getEntities($args);
-        $count      = $results['count'];
-        $items      = $results['results'];
-        $iterations = ceil($count / $args['limit']);
-        $loop       = 1;
-
-        // Max of 50 iterations for 10K result export
-        if ($iterations > 50) {
-            $iterations = 50;
-        }
-
-        $toExport = [];
-
-        unset($args['withTotalCount']);
-
-        while ($loop <= $iterations) {
-            if (is_callable($resultsCallback)) {
-                foreach ($items as $item) {
-                    $toExport[] = $resultsCallback($item);
-                }
-            } else {
-                foreach ($items as $item) {
-                    $toExport[] = (array) $item;
-                }
-            }
-
-            $args['start'] = $loop * $args['limit'];
-
-            $items = $model->getEntities($args);
-
-            $this->getDoctrine()->getManager()->clear();
-
-            ++$loop;
-        }
-
-        return $toExport;
+        $data = new DataExporterHelper();
+        return $data->getDataForExport($start,$model,$args,$resultsCallback);
     }
 }
