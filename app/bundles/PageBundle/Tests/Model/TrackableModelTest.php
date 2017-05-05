@@ -307,7 +307,7 @@ class TrackableModelTest extends WebTestCase
             1
         );
 
-        $this->assertTrue((strpos($content, $url) == false), $content);
+        $this->assertTrue((strpos($content, $url) !== false), $content);
     }
 
     /**
