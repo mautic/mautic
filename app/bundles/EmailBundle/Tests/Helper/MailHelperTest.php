@@ -55,6 +55,14 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
     ];
 
     /**
+     *
+     */
+    public function setUp()
+    {
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+    }
+
+    /**
      * @expectedException \Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException
      */
     public function testQueueModeThrowsExceptionWhenBatchLimitHit()
@@ -80,6 +88,9 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mailer->enableQueue();
         $mailer->addTo('somebody@somewhere.com');
         $mailer->addTo('somebodyelse@somewhere.com');
+        $mailer->addTo('somebodyelse2@somewhere.com');
+        $mailer->addTo('somebodyelse3@somewhere.com');
+        $mailer->addTo('somebodyelse4@somewhere.com');
     }
 
     public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit()
@@ -195,6 +206,8 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mailer = new \Mautic\EmailBundle\Helper\MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->enableQueue();
 
+        $mailer->setSubject('Hello');
+
         foreach ($this->contacts as $contact) {
             $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
@@ -202,6 +215,8 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         }
 
         $mailer->flushQueue();
+
+        $this->assertEmpty($mailer->getErrors()['failures']);
 
         $fromAddresses = $transport->getFromAddresses();
         $metadatas     = $transport->getMetadatas();
