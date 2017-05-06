@@ -645,8 +645,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
-        $config = $this->mergeConfigToFeatureSettings([]);
-
         if (!$query) {
             $query = $this->getFetchQuery($params);
         }
@@ -679,8 +677,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getCompanies($params = [], $query = null, $executed = null)
     {
-        $executed = null;
-
         $salesForceObject = 'Account';
 
         if (empty($query)) {
@@ -1221,7 +1217,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
                 $required = !empty($availableFields[$object][$sfField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    $body[$sfField] = $lead[$mauticField];
+                    $body[$sfField] = $this->cleanPushData($lead[$mauticField]);
                 }
                 if ($required && empty($body[$sfField])) {
                     if (isset($sfRecord[$sfField])) {
