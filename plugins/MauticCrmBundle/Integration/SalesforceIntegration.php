@@ -1161,7 +1161,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
         if (!empty($leadsToSync)) {
             $leadModel->saveEntities($leadsToSync);
-            $this->em->clear('Mautic\LeadBundle\Entity\LeadEntity');
+            $this->em->clear(Lead::class);
         }
 
         return $this->processCompositeResponse($result['compositeResponse'], $salesforceIdMapping);
