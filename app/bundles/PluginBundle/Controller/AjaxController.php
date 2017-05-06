@@ -88,6 +88,7 @@ class AjaxController extends CommonAjaxController
                             'mautic_fields'        => $mauticFields,
                             'data'                 => $featureSettings,
                             'integration_fields'   => $integrationFields,
+                            'csrf_protection'      => false,
                             'integration_object'   => $integrationObject,
                             'enable_data_priority' => $enableDataPriority,
                             'integration'          => $integration,
