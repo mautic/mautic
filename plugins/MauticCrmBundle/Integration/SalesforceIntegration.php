@@ -1204,6 +1204,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'url'         => $url,
                     'referenceId' => $id,
                     'body'        => $body,
+                    'httpHeaders' => [
+                        'Sforce-Auto-Assign' => ($objectId) ? 'FALSE' : 'TRUE',
+                    ],
                 ];
             }
         }
@@ -1633,6 +1636,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'url'         => $patchurl,
                     'referenceId' => $id,
                     'body'        => $b,
+                    'httpHeaders' => [
+                        'Sforce-Auto-Assign' => 'FALSE',
+                    ],
                 ];
             } elseif (isset($b['LeadId']) and $memberId = array_search($b['LeadId'], $leadIds)) {
                 $id                  = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$b['LeadId'].(!empty($referenceId && $internalLeadId == $lead->getId()) ? '-'.$referenceId : '').$campaignMappingId;
@@ -1644,6 +1650,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'url'         => $patchurl,
                     'referenceId' => $id,
                     'body'        => $b,
+                    'httpHeaders' => [
+                        'Sforce-Auto-Assign' => 'FALSE',
+                    ],
                 ];
             } else {
                 $id                  = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMemberNew-null'.$campaignMappingId;
