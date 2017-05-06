@@ -319,14 +319,19 @@ class PluginController extends FormController
         $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
 
         $formNotes    = [];
-        $noteSections = ['authorization', 'features', 'feature_settings'];
+        $noteSections = ['authorization', 'features', 'feature_settings', 'custom'];
         foreach ($noteSections as $section) {
-            list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
-            if (!empty($specialInstructions)) {
-                $formNotes[$section] = [
-                    'note' => $specialInstructions,
-                    'type' => $alertType,
-                ];
+            if ('custom' === $section) {
+                $formNotes[$section] = $integrationObject->getFormNotes($section);
+            } else {
+                list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+
+                if (!empty($specialInstructions)) {
+                    $formNotes[$section] = [
+                        'note' => $specialInstructions,
+                        'type' => $alertType,
+                    ];
+                }
             }
         }
 

@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
@@ -43,5 +44,26 @@ class OutlookIntegration extends AbstractIntegration
         return [
             'secret' => 'mautic.integration.outlook.secret',
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $section
+     *
+     * @return string
+     */
+    public function getFormNotes($section)
+    {
+        if ('custom' === $section) {
+            return [
+                'template' => 'MauticOutlookBundle:Integration:form.html.php',
+                'parameters' => [
+                    'mauticUrl' => UrlHelper::rel2abs('/index.php')
+                ]
+            ];
+        }
+
+        return parent::getFormNotes($section);
     }
 }
