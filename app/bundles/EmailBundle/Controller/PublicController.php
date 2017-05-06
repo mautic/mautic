@@ -166,6 +166,10 @@ class PublicController extends CommonFormController
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
             }
+            // Set lead lang
+            if ($lead->getPreferredLocale()) {
+                $translator->setLocale($lead->getPreferredLocale());
+            }
 
             if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
                 $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
@@ -191,7 +195,6 @@ class PublicController extends CommonFormController
                     ],
                     $message
                 );
-                $message = '<h2>'.$message.'</h2>';
             } elseif ($lead) {
                 $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
 
@@ -285,6 +288,11 @@ class PublicController extends CommonFormController
                 $leadModel->setCurrentLead($lead);
             }
 
+            // Set lead lang
+            if ($lead->getPreferredLocale()) {
+                $this->translator->setLocale($lead->getPreferredLocale());
+            }
+
             $model->removeDoNotContact($stat->getEmailAddress());
 
             $message = $this->coreParametersHelper->getParameter('resubscribe_message');
@@ -292,8 +300,8 @@ class PublicController extends CommonFormController
                 $message = $this->translator->trans(
                     'mautic.email.resubscribed.success',
                     [
-                        '%unsubscribedUrl%' => '|URL|',
-                        '%email%'           => '|EMAIL|',
+                        '%unsubscribeUrl%' => '|URL|',
+                        '%email%'          => '|EMAIL|',
                     ]
                 );
             }

@@ -97,13 +97,13 @@ class IntegrationEntityRepository extends CommonRepository
         $q->where('i.integration = :integration')
             ->andWhere('i.internal_entity = :internalEntity')
             ->andWhere('i.integration_entity = "Lead" or i.integration_entity = "Contact"')
+            ->andWhere('(i.last_sync_date is not null and l.date_modified > i.last_sync_date) or (i.last_sync_date is null and l.date_modified > i.date_added) and l.email is not null')
             ->setParameter('integration', $integration)
             ->setParameter('internalEntity', $internalEntity);
 
-        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.date_modified > i.last_sync_date and l.date_identified is not null and l.email is not null');
+        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
 
         $q->setMaxResults($limit);
-
         $results = $q->execute()->fetchAll();
 
         return $results;

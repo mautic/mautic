@@ -290,6 +290,7 @@ class CampaignModel extends CommonFormModel
         }
 
         $relationships = [];
+
         if (isset($sessionConnections['connections'])) {
             foreach ($sessionConnections['connections'] as $connection) {
                 $source = $connection['sourceId'];
@@ -299,7 +300,12 @@ class CampaignModel extends CommonFormModel
                     // Only concerned with events and not sources
                     continue;
                 }
-                $sourceDecision = (!empty($connection['anchors'][0])) ? $connection['anchors'][0]['endpoint'] : null;
+
+                if (isset($connection['anchors']['source'])) {
+                    $sourceDecision = $connection['anchors']['source'];
+                } else {
+                    $sourceDecision = (!empty($connection['anchors'][0])) ? $connection['anchors'][0]['endpoint'] : null;
+                }
 
                 if ($sourceDecision == 'leadsource') {
                     // Lead source connection that does not matter

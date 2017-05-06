@@ -21,6 +21,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\Form\FormBuilder;
@@ -65,6 +66,18 @@ abstract class AbstractIntegration
      * @var \Doctrine\ORM\EntityManager
      */
     protected $em;
+
+    /**
+     * Used for notifications.
+     *
+     * @var array|null
+     */
+    protected $adminUsers;
+
+    /**
+     * @var
+     */
+    protected $notifications = [];
 
     /**
      * @param MauticFactory $factory
@@ -759,8 +772,8 @@ abstract class AbstractIntegration
         }
     }
 
-    /*
-     * Method to prepare the request parameters. Builds array of headers and parameters
+    /**
+     * Method to prepare the request parameters. Builds array of headers and parameters.
      *
      * @return array
      */
@@ -1306,6 +1319,9 @@ abstract class AbstractIntegration
         $submittedObjects       = (isset($featureSettings['objects'])) ? $featureSettings['objects'] : [];
         $missingRequiredFields  = [];
 
+        // add special case in order to prevent it from being removed
+        $mauticLeadFields['mauticContactTimelineLink'] = '';
+
         //make sure now non-existent aren't saved
         $settings = [
             'ignore_field_cache' => false,
@@ -1385,7 +1401,7 @@ abstract class AbstractIntegration
     {
         $requiredFields = [];
         foreach ($fields as $field => $details) {
-            if (is_array($details) && !empty($details['required'])) {
+            if ((is_array($details) && !empty($details['required'])) || 'email' === $field || (isset($details['optionLabel']) && strtolower($details['optionLabel']) == 'email')) {
                 $requiredFields[$field] = $field;
             }
         }
@@ -1807,16 +1823,83 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param \Exception $e
+     * @return \Mautic\CoreBundle\Model\NotificationModel
      */
-    public function logIntegrationError(\Exception $e)
+    public function getNotificationModel()
+    {
+        return $this->factory->getModel('core.notification');
+    }
+
+    /**
+     * @param \Exception $e
+     * @param null       $contact
+     */
+    public function logIntegrationError(\Exception $e, Lead $contact = null)
     {
         $logger = $this->factory->getLogger();
-        if ('dev' == MAUTIC_ENV) {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
-        } else {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+
+        if ($e instanceof ApiErrorException) {
+            if (null === $this->adminUsers) {
+                $this->adminUsers = $this->em->getRepository('MauticUserBundle:User')->getEntities(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
+                                    'column' => 'r.isAdmin',
+                                    'expr'   => 'eq',
+                                    'value'  => true,
+                                ],
+                            ],
+                        ],
+                    ]
+                );
+            }
+
+            $errorMessage = $e->getMessage();
+            $errorHeader  = $this->getTranslator()->trans(
+                'mautic.integration.error',
+                [
+                    '%name%' => $this->getName(),
+                ]
+            );
+
+            if ($contact || $contact = $e->getContact()) {
+                // Append a link to the contact
+                $contactId   = $contact->getId();
+                $contactName = $contact->getPrimaryIdentifier();
+            } elseif ($contactId = $e->getContactId()) {
+                $contactName = $this->getTranslator()->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
+            }
+
+            if ($contactId) {
+                $contactLink = $this->factory->getRouter()->generate('mautic_contact_action', [
+                    'objectAction' => 'view', 'objectId' => $contactId,
+                ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+                $errorMessage .= ' <a href="'.$contactLink.'">'.$contactName.'</a>';
+            }
+
+            // Prevent a flood of the same messages
+            $messageHash = md5($errorMessage);
+            if (!array_key_exists($messageHash, $this->notifications)) {
+                foreach ($this->adminUsers as $user) {
+                    $this->getNotificationModel()->addNotification(
+                        $errorHeader,
+                        $this->getName(),
+                        false,
+                        $errorMessage,
+                        'text-danger fa-exclamation-circle',
+                        null,
+                        $user
+                    );
+                }
+
+                $this->notifications[$messageHash] = true;
+            }
         }
+
+        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
     }
 
     /**
@@ -1942,6 +2025,20 @@ abstract class AbstractIntegration
     public function getPostAuthTemplate()
     {
         return null;
+    }
+
+    /**
+     * @param $contactId
+     *
+     * @return string
+     */
+    public function getContactTimelineLink($contactId)
+    {
+        return $this->factory->getRouter()->generate(
+            'mautic_plugin_timeline_view',
+            ['integration' => $this->getName(), 'leadId' => $contactId],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
     }
 
     /**

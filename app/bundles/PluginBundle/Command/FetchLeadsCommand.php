@@ -79,7 +79,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $endDate     = $input->getOption('end-date');
         $interval    = $input->getOption('time-interval');
         $limit       = $input->getOption('limit');
-        $leads       = $contacts       = 0;
+        $leads       = $contacts       = $processed       = 0;
 
         if (!$interval) {
             $interval = '15 minutes';
