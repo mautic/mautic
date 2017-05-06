@@ -1026,7 +1026,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $required = $this->getRequiredFields($availableFields['Lead']);
             $required = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
             $required = implode(',', array_keys($required)).',';
-            $findLead = 'select Id, '.$required.' Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode(
+            $findLead = 'select Id, '.$required.' IsDeleted from Lead where isDeleted = false and Email in (\''.implode(
                     "','",
                     array_keys($checkEmailsInSF)
                 )
@@ -1037,7 +1037,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $required    = $this->getRequiredFields($availableFields['Contact']);
                 $required    = $this->cleanSalesForceData($config, array_keys($required), 'Contact');
                 $required    = implode(',', $required).',';
-                $findContact = 'select Id, '.$required.' Email, IsDeleted from Contact where isDeleted = false and Email in (\''.implode(
+                $findContact = 'select Id, '.$required.' IsDeleted from Contact where isDeleted = false and Email in (\''.implode(
                         "','",
                         array_keys($checkEmailsInSF)
                     )
