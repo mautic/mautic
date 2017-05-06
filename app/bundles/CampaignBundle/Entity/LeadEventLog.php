@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -96,6 +97,11 @@ class LeadEventLog
     private $rotation = 1;
 
     /**
+     * @var FailedLeadEventLog
+     */
+    private $failedLog;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -152,9 +158,16 @@ class LeadEventLog
         $builder->createField('channel', 'string')
                 ->nullable()
                 ->build();
+
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
+
+        $builder->createOneToOne('failedLog', 'FailedLeadEventLog')
+            ->mappedBy('log')
+            ->fetchExtraLazy()
+            ->cascadeAll()
+            ->build();
     }
 
     /**
@@ -485,5 +498,39 @@ class LeadEventLog
         $this->rotation = (int) $rotation;
 
         return $this;
+    }
+
+    /**
+     * @return FailedLeadEventLog
+     */
+    public function getFailedLog()
+    {
+        return $this->failedLog;
+    }
+
+    /**
+     * @param null $log
+     */
+    public function setFailedLog($log = null)
+    {
+        $this->failedLog = $log;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFailed()
+    {
+        $log = $this->getFailedLog();
+
+        return !empty($log);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSuccess()
+    {
+        return !$this->isFailed();
     }
 }

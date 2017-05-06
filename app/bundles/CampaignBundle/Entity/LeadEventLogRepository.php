@@ -238,6 +238,17 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
+        // Exclude failed events
+        $failedSq = $this->_em->getConnection()->createQueryBuilder();
+        $failedSq->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
+            ->where(
+                $failedSq->expr()->eq('fe.log_id', 'o.id')
+            );
+        $expr->add(
+            sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
+        );
+
         $q->where($expr)
           ->setParameter('false', false, 'boolean')
           ->groupBy('o.event_id');

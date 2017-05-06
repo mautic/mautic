@@ -557,7 +557,6 @@ class CampaignRepository extends CommonRepository
 
         if (count($pendingEvents) > 0) {
             $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
             $sq->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
                 ->where(

@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
@@ -1705,10 +1706,24 @@ class EventModel extends CommonFormModel
                     $repo->deleteEntity($log);
                 }
 
+                $metadata = $log->getMetadata();
+                if (is_array($response)) {
+                    $metadata = array_merge($metadata, $response);
+                }
+
+                $reason = null;
+                if (isset($metadata['errors'])) {
+                    $reason = (is_array($metadata['errors'])) ? implode('<br />', $metadata['errors']) : $metadata['errors'];
+                } elseif (isset($metadata['reason'])) {
+                    $reason = $metadata['reason'];
+                }
+                $this->setEventStatus($log, false, $reason);
                 $this->notifyOfFailure($lead, $campaign->getCreatedBy(), $campaign->getName().' / '.$event['name']);
 
                 $this->logger->debug($debug);
             } else {
+                $this->setEventStatus($log, true);
+
                 ++$executedEventCount;
 
                 if ($response !== true) {
@@ -2039,6 +2054,31 @@ class EventModel extends CommonFormModel
         unset($event, $campaign, $lead);
 
         return $log;
+    }
+
+    /**
+     * @param LeadEventLog $log
+     * @param              $status
+     * @param null         $reason
+     */
+    public function setEventStatus(LeadEventLog $log, $status, $reason = null)
+    {
+        $failedLog = $log->getFailedLog();
+
+        if ($status) {
+            $this->em->getRepository('MauticCampaignBundle:FailedLeadEventLog')->deleteEntity($failedLog);
+            $log->setFailedLog(null);
+        } else {
+            if (!$failedLog) {
+                $failedLog = new FailedLeadEventLog();
+            }
+
+            $failedLog->setDateAdded()
+                ->setReason($reason)
+                ->setLog($log);
+
+            $this->em->persist($failedLog);
+        }
     }
 
     /**

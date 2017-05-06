@@ -168,8 +168,8 @@ class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param Campaign $campaign
-     * @param Campaign $oldCampaign
+     * @param $campaign
+     * @param $oldCampaign
      */
     protected function afterEntityClone($campaign, $oldCampaign)
     {
@@ -642,8 +642,7 @@ class CampaignController extends AbstractStandardFormController
                 $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
                 $events       = $this->getCampaignModel()->getEventRepository()->getCampaignEvents($entity->getId());
                 $leadCount    = $this->getCampaignModel()->getRepository()->getCampaignLeadCount($entity->getId());
-
-                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId(), true);
+                $campaignLogCounts = $eventLogRepo->getCampaignLogCounts($entity->getId());
                 $sortedEvents      = [
                     'decision'  => [],
                     'action'    => [],
