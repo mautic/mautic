@@ -1239,7 +1239,7 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 case 'stage':
-                    $operand = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
+                    $operand = ($func === 'eq') ? 'EXISTS' : 'NOT EXISTS';
 
                     $subQb = $this->_em->getConnection()
                         ->createQueryBuilder()

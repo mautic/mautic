@@ -968,21 +968,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $limit                 = $params['limit'];
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $mauticData            = $leadsToUpdate            = $fields            = [];
+        $mauticData            = $leadsToUpdate = $fields = [];
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $leadFields            = $config['leadFields'];
         $checkEmailsInSF       = [];
         $sfContact             = [];
         $leadsToSync           = [];
 
-        if (!empty($config['leadFields'])) {
-            $fields = implode(', l.', $config['leadFields']);
-            $fields = 'l.'.$fields;
-            $result = 0;
-            if ($mauticContactLinkField = array_search('mauticContactTimelineLink', $config['leadFields'])) {
-                $this->pushContactLink = true;
-                unset($leadFields[$mauticContactLinkField]);
-            }
+        if ($mauticContactLinkField = array_search('mauticContactTimelineLink', $leadFields)) {
+            $this->pushContactLink = true;
+            unset($leadFields[$mauticContactLinkField]);
+        }
+
+        if (!empty($leadFields)) {
             $fields = implode(', l.', $leadFields);
             $fields = 'l.'.$fields;
             $result = 0;
@@ -995,14 +993,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit);
         }
+
         foreach ($leadsToUpdate as $lead) {
             if ($this->pushContactLink) {
-                $link = $this->factory->getRouter()->generate(
-                    'mautic_plugin_timeline_view',
-                    ['integration' => 'Salesforce', 'leadId' => $lead['internal_entity_id']],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                );
-                $lead['mauticContactTimelineLink'] = $link;
+                $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
             }
             if (isset($lead['email']) && !empty($lead['email'])) {
                 $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
@@ -1018,12 +1012,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, $limit);
             foreach ($leadsToCreate as $lead) {
                 if ($this->pushContactLink) {
-                    $link = $this->factory->getRouter()->generate(
-                        'mautic_plugin_timeline_view',
-                        ['integration' => 'Salesforce', 'leadId' => $lead['internal_entity_id']],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    );
-                    $lead['mauticContactTimelineLink'] = $link;
+                    $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
                 }
                 if (isset($lead['email'])) {
                     $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
@@ -1037,7 +1026,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $required = $this->getRequiredFields($availableFields['Lead']);
             $required = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
             $required = implode(',', array_keys($required)).',';
-            $findLead = 'select Id, '.$required.' Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+            $findLead = 'select Id, '.$required.' Email, IsDeleted from Lead where isDeleted = false and Email in (\''.implode(
+                    "','",
+                    array_keys($checkEmailsInSF)
+                )
                 .'\') and ConvertedContactId = NULL';
             $queryUrl = $this->getQueryUrl();
 
@@ -1045,9 +1037,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $required    = $this->getRequiredFields($availableFields['Contact']);
                 $required    = $this->cleanSalesForceData($config, array_keys($required), 'Contact');
                 $required    = implode(',', $required).',';
-                $findContact = 'select Id, '.$required.' Email, IsDeleted from Contact where isDeleted = false and Email in (\''.implode("','", array_keys($checkEmailsInSF))
+                $findContact = 'select Id, '.$required.' Email, IsDeleted from Contact where isDeleted = false and Email in (\''.implode(
+                        "','",
+                        array_keys($checkEmailsInSF)
+                    )
                     .'\')';
-                $sfContact = $this->getApiHelper()->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+                $sfContact   = $this->getApiHelper()->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
             }
 
             $sfLead = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
@@ -1097,7 +1092,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $updateLead = false;
                     $key        = mb_strtolower($sfLeadRecord['Email']);
                     if (isset($checkEmailsInSF[$key])) {
-                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = $sfLeadRecord['Id'];
+                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] =  $sfLeadRecord['Id'];
                         if (empty($sfLeadRecord['IsDeleted'])) {
                             if (isset($sfLeadRecord['Id'])) {
                                 $updateLead = $this->buildCompositeBody(
