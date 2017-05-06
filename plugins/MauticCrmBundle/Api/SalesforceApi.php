@@ -52,7 +52,7 @@ class SalesforceApi extends CrmApi
 
         $settings = $this->requestSettings;
         if ($method == 'PATCH') {
-            $settings['headers'] = ['Sforce-Auto-Assign:' => 'FALSE'];
+            $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
