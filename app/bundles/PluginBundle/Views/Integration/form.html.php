@@ -120,7 +120,7 @@ $hasFeatureErrors =
                 </div>
             </div>
         <?php endif; ?>
-        <?php if (isset($formNotes['custom'])):
+        <?php if (isset($formNotes['custom']['template'])):
              if (is_array($formNotes['custom'])):
                 $template = $formNotes['custom']['template'];
                 $params   = isset($formNotes['custom']['parameters']) ? $formNotes['custom']['parameters'] : [];
