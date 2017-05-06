@@ -1401,7 +1401,7 @@ abstract class AbstractIntegration
     {
         $requiredFields = [];
         foreach ($fields as $field => $details) {
-            if (is_array($details) && !empty($details['required']) || 'email' === $field || (isset($details['optionLabel']) && strtolower($details['optionLabel']) == 'email')) {
+            if ((is_array($details) && !empty($details['required'])) || 'email' === $field || (isset($details['optionLabel']) && strtolower($details['optionLabel']) == 'email')) {
                 $requiredFields[$field] = $field;
             }
         }
