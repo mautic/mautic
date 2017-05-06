@@ -1401,7 +1401,7 @@ abstract class AbstractIntegration
     {
         $requiredFields = [];
         foreach ($fields as $field => $details) {
-            if (is_array($details) && !empty($details['required']) || 'email' === $field || (isset($details['optionLabel']) && strtolower($details['optionLabel']) == 'email')) {
+            if ((is_array($details) && !empty($details['required'])) || 'email' === $field || (isset($details['optionLabel']) && strtolower($details['optionLabel']) == 'email')) {
                 $requiredFields[$field] = $field;
             }
         }
@@ -1855,7 +1855,7 @@ abstract class AbstractIntegration
                 );
             }
 
-            $errorMessage = ('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage();
+            $errorMessage = $e->getMessage();
             $errorHeader  = $this->getTranslator()->trans(
                 'mautic.integration.error',
                 [
@@ -1899,7 +1899,7 @@ abstract class AbstractIntegration
             }
         }
 
-        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$errorMessage);
+        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
     }
 
     /**
