@@ -156,7 +156,7 @@ class EmailSubscriber extends CommonSubscriber
     {
         // Get content
         $content = $event->getContent();
-return;
+
         // Search and replace tokens
 
         $products = [
