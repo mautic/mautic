@@ -1782,7 +1782,9 @@ class EventModel extends CommonFormModel
                 $this->triggeredEvents[$event['id']][$decisionPath][] = $lead->getId();
             }
 
-            $logRepo->saveEntity($log);
+            if ($log) {
+                $logRepo->saveEntity($log);
+            }
         } else {
             //else do nothing
             $result = false;
@@ -2070,7 +2072,14 @@ class EventModel extends CommonFormModel
         $failedLog = $log->getFailedLog();
 
         if ($status) {
-            $log->setFailedLog(null);
+            if ($failedLog) {
+                $this->em->getRepository('MauticCampaignBundle:FailedLeadEventLog')->deleteEntity($failedLog);
+                $log->setFailedLog(null);
+            }
+
+            $metadata = $log->getMetadata();
+            unset($metadata['errors']);
+            $log->setMetadata($metadata);
         } else {
             if (!$failedLog) {
                 $failedLog = new FailedLeadEventLog();
