@@ -645,8 +645,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
-        $config = $this->mergeConfigToFeatureSettings([]);
-
         if (!$query) {
             $query = $this->getFetchQuery($params);
         }
@@ -679,8 +677,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getCompanies($params = [], $query = null, $executed = null)
     {
-        $executed = null;
-
         $salesForceObject = 'Account';
 
         if (empty($query)) {
@@ -775,7 +771,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $salesForceLeadData[$sfId]            = $leadActivity[$leadId];
                                 $salesForceLeadData[$sfId]['id']      = $ids['integration_entity_id'];
                                 $salesForceLeadData[$sfId]['leadId']  = $ids['internal_entity_id'];
-                                $salesForceLeadData[$sfId]['leadUrl'] = $this->factory->getRouter()->generate(
+                                $salesForceLeadData[$sfId]['leadUrl'] = $this->router->generate(
                                     'mautic_plugin_timeline_view',
                                     ['integration' => 'Salesforce', 'leadId' => $leadId],
                                     UrlGeneratorInterface::ABSOLUTE_URL
@@ -825,7 +821,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $options      = ['leadIds' => $leadIds, 'basic_select' => true, 'fromDate' => $startDate, 'toDate' => $endDate];
 
         /** @var LeadModel $leadModel */
-        $leadModel      = $this->factory->getModel('lead');
+        $leadModel      = $this->leadModel;
         $pointsRepo     = $leadModel->getPointLogRepository();
         $results        = $pointsRepo->getLeadTimelineEvents(null, $options);
         $pointChangeLog = [];
@@ -970,7 +966,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData            = $leadsToUpdate = $fields = [];
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
-        $leadFields            = $config['leadFields'];
+        $leadFields            = array_unique(array_values($config['leadFields']));
         $checkEmailsInSF       = [];
         $sfContact             = [];
         $leadsToSync           = [];
@@ -1047,7 +1043,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             $sfLead = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
             //process Contacts in SF first
-            $leadModel = $this->factory->getModel('lead');
+            $leadModel = $this->leadModel;
             if (isset($sfContact['records']) && !empty($sfContact['records'])) {
                 $sfContactRecords = $sfContact['records'];
                 foreach ($sfContactRecords as $sfContactRecord) {
@@ -1087,12 +1083,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
             if ($sfLeadRecords = $sfLead['records']) {
                 /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $companyModel = $this->factory->getModel('lead.company');
+                $companyModel = $this->companyModel;
                 foreach ($sfLeadRecords as $sfLeadRecord) {
                     $updateLead = false;
                     $key        = mb_strtolower($sfLeadRecord['Email']);
                     if (isset($checkEmailsInSF[$key])) {
-                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] =  $sfLeadRecord['Id'];
+                        $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = $sfLeadRecord['Id'];
                         if (empty($sfLeadRecord['IsDeleted'])) {
                             if (isset($sfLeadRecord['Id'])) {
                                 $updateLead = $this->buildCompositeBody(
@@ -1211,6 +1207,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param      $object
      * @param      $lead
      * @param null $objectId
+     * @param null $sfRecord
+     *
+     * @return bool
      */
     protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSfUpdate, $object, $lead, $objectId = null, $sfRecord = null)
     {
@@ -1221,7 +1220,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
                 $required = !empty($availableFields[$object][$sfField.'__'.$object]['required']);
                 if (isset($lead[$mauticField])) {
-                    $body[$sfField] = $lead[$mauticField];
+                    $body[$sfField] = $this->cleanPushData($lead[$mauticField]);
                 }
                 if ($required && empty($body[$sfField])) {
                     if (isset($sfRecord[$sfField])) {
@@ -1230,7 +1229,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $updateLead = true;
                         }
                     } else {
-                        $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+                        $body[$sfField] = $this->translator->trans('mautic.integration.form.lead.unknown');
                     }
                 }
             }
@@ -1246,6 +1245,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'url'         => $url,
                     'referenceId' => $id,
                     'body'        => $body,
+                    'httpHeaders' => [
+                        'Sforce-Auto-Assign' => ($objectId) ? 'FALSE' : 'TRUE',
+                    ],
                 ];
             }
         }
@@ -1692,6 +1694,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'url'         => $patchurl,
                     'referenceId' => $id,
                     'body'        => $b,
+                    'httpHeaders' => [
+                        'Sforce-Auto-Assign' => 'FALSE',
+                    ],
                 ];
             } elseif (isset($b['LeadId']) and $memberId = array_search($b['LeadId'], $leadIds)) {
                 $id                  = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMember'.$b['LeadId'].(!empty($referenceId && $internalLeadId == $lead->getId()) ? '-'.$referenceId : '').$campaignMappingId;
@@ -1703,6 +1708,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'url'         => $patchurl,
                     'referenceId' => $id,
                     'body'        => $b,
+                    'httpHeaders' => [
+                        'Sforce-Auto-Assign' => 'FALSE',
+                    ],
                 ];
             } else {
                 $id                  = (!empty($lead->getId()) ? $lead->getId() : '').'-CampaignMemberNew-null'.$campaignMappingId;
