@@ -172,7 +172,7 @@ abstract class AbstractIntegration
         $this->leadModel         = $factory->getModel('lead');
         $this->companyModel      = $factory->getModel('lead.company');
         $this->pathsHelper       = $factory->getHelper('paths');
-        $this->notificationModel = $factory->getModel('lead.company');
+        $this->notificationModel = $factory->getModel('core.notification');
         $this->fieldModel        = $factory->getModel('lead.field');
 
         $this->init();

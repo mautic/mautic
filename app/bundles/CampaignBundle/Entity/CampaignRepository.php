@@ -573,7 +573,7 @@ class CampaignRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        return $results[0]['lead_count'];
+        return (int) $results[0]['lead_count'];
     }
 
     /**

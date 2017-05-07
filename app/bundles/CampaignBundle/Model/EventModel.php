@@ -1698,7 +1698,6 @@ class EventModel extends CommonFormModel
                     if (is_array($response)) {
                         $log->setMetadata($response);
                     }
-                    $logRepo->saveEntity($log);
                     $debug .= ' thus placed on hold '.$this->scheduleTimeForFailedEvents;
                 } else {
                     // Remove
@@ -1749,8 +1748,6 @@ class EventModel extends CommonFormModel
                     $log->setMetadata($response);
                 }
 
-                $logRepo->saveEntity($log);
-
                 $this->logger->debug(
                     'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' successfully executed and logged with a response of '.var_export($response, true)
@@ -1765,6 +1762,11 @@ class EventModel extends CommonFormModel
                 if ('condition' === $event['eventType']) {
                     // Conditions will need child event processed
                     $decisionPath = ($response === true) ? 'yes' : 'no';
+
+                    if (!$response) {
+                        // Note that a condition took non action path so we can generate a visual stat
+                        $log->setNonActionPathTaken(true);
+                    }
                 } else {
                     // Actions will need to check if conditions are attached to it
                     $decisionPath = 'null';
@@ -1779,6 +1781,8 @@ class EventModel extends CommonFormModel
 
                 $this->triggeredEvents[$event['id']][$decisionPath][] = $lead->getId();
             }
+
+            $logRepo->saveEntity($log);
         } else {
             //else do nothing
             $result = false;
@@ -2066,7 +2070,6 @@ class EventModel extends CommonFormModel
         $failedLog = $log->getFailedLog();
 
         if ($status) {
-            $this->em->getRepository('MauticCampaignBundle:FailedLeadEventLog')->deleteEntity($failedLog);
             $log->setFailedLog(null);
         } else {
             if (!$failedLog) {

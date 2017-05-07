@@ -48,7 +48,7 @@ class FailedLeadEventLog
 
         $builder->createOneToOne('log', 'LeadEventLog')
             ->makePrimaryKey()
-            ->mappedBy('failedLog')
+            ->inversedBy('failedLog')
             ->addJoinColumn('log_id', 'id', false, false, 'CASCADE')
             ->build();
 
