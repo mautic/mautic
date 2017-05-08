@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
 /**
  * Class LeadEventLog.
@@ -33,7 +33,7 @@ class LeadEventLog
     private $event;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var LeadEntity
      */
     private $lead;
 
@@ -266,7 +266,7 @@ class LeadEventLog
     }
 
     /**
-     * @return Lead
+     * @return LeadEntity
      */
     public function getLead()
     {
@@ -274,11 +274,11 @@ class LeadEventLog
     }
 
     /**
-     * @param Lead $lead
+     * @param LeadEntity $lead
      *
      * @return $this
      */
-    public function setLead(Lead $lead)
+    public function setLead(LeadEntity $lead)
     {
         $this->lead = $lead;
 
