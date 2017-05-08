@@ -11,10 +11,11 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class LeadEventLog.
@@ -230,18 +231,22 @@ class LeadEventLog
     }
 
     /**
-     * @param \DateTime $dateTriggered
+     * @param \DateTime|null $dateTriggered
+     *
+     * @return $this
      */
-    public function setDateTriggered($dateTriggered)
+    public function setDateTriggered(\DateTime $dateTriggered = null)
     {
         $this->dateTriggered = $dateTriggered;
         if (null !== $dateTriggered) {
             $this->setIsScheduled(false);
         }
+
+        return $this;
     }
 
     /**
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {
@@ -249,15 +254,19 @@ class LeadEventLog
     }
 
     /**
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
+     * @param IpAddress $ipAddress
+     *
+     * @return $this
      */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return Lead
      */
     public function getLead()
     {
@@ -265,11 +274,11 @@ class LeadEventLog
     }
 
     /**
-     * @param $lead
+     * @param Lead $lead
      *
      * @return $this
      */
-    public function setLead($lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
 
@@ -343,11 +352,11 @@ class LeadEventLog
     }
 
     /**
-     * @param $triggerDate
+     * @param \DateTime $triggerDate
      *
      * @return $this
      */
-    public function setTriggerDate($triggerDate)
+    public function setTriggerDate(\DateTime $triggerDate = null)
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);
@@ -364,11 +373,11 @@ class LeadEventLog
     }
 
     /**
-     * @param $campaign
+     * @param Campaign $campaign
      *
      * @return $this
      */
-    public function setCampaign($campaign)
+    public function setCampaign(Campaign $campaign)
     {
         $this->campaign = $campaign;
 
@@ -509,11 +518,15 @@ class LeadEventLog
     }
 
     /**
-     * @param null $log
+     * @param FailedLeadEventLog $log
+     *
+     * return $this
      */
-    public function setFailedLog($log = null)
+    public function setFailedLog(FailedLeadEventLog $log = null)
     {
         $this->failedLog = $log;
+
+        return $this;
     }
 
     /**
