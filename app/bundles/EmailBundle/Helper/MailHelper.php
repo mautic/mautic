@@ -100,6 +100,11 @@ class MailHelper
     /**
      * @var bool
      */
+    protected $idHashState = true;
+
+    /**
+     * @var bool
+     */
     protected $appendTrackingPixel = false;
 
     /**
@@ -375,11 +380,12 @@ class MailHelper
                         $this->message->addMetadata(
                             $email,
                             [
-                                'leadId'  => (!empty($this->lead)) ? $this->lead['id'] : null,
-                                'emailId' => (!empty($this->email)) ? $this->email->getId() : null,
-                                'hashId'  => $this->idHash,
-                                'source'  => $this->source,
-                                'tokens'  => $tokens,
+                                'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+                                'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
+                                'hashId'      => $this->idHash,
+                                'hashIdState' => $this->idHashState,
+                                'source'      => $this->source,
+                                'tokens'      => $tokens,
                             ]
                         );
                     }
@@ -506,11 +512,12 @@ class MailHelper
 
                 $this->metadata[$fromKey]['contacts'][$email] =
                     [
-                        'leadId'  => (!empty($this->lead)) ? $this->lead['id'] : null,
-                        'emailId' => (!empty($this->email)) ? $this->email->getId() : null,
-                        'hashId'  => $this->idHash,
-                        'source'  => $this->source,
-                        'tokens'  => $tokens,
+                        'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+                        'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
+                        'hashId'      => $this->idHash,
+                        'hashIdState' => $this->idHashState,
+                        'source'      => $this->source,
+                        'tokens'      => $tokens,
                     ];
             }
 
@@ -611,6 +618,7 @@ class MailHelper
 
                 // Clear queued to recipients
                 $this->queuedRecipients = [];
+                $this->metadata         = [];
 
                 foreach ($resetEmailTypes as $type) {
                     $type = ucfirst($type);
@@ -639,6 +647,7 @@ class MailHelper
         $this->eventTokens  = $this->queuedRecipients  = $this->errors  = [];
         $this->lead         = $this->idHash         = $this->contentHash         = null;
         $this->internalSend = $this->fatal = false;
+        $this->idHashState  = true;
 
         $this->logger->clear();
 
@@ -1253,14 +1262,16 @@ class MailHelper
 
     /**
      * @param null $idHash
+     * @param bool $statToBeGenerated Pass false if a stat entry is not to be created
      */
-    public function setIdHash($idHash = null)
+    public function setIdHash($idHash = null, $statToBeGenerated = true)
     {
         if ($idHash === null) {
             $idHash = uniqid();
         }
 
-        $this->idHash = $idHash;
+        $this->idHash      = $idHash;
+        $this->idHashState = $statToBeGenerated;
 
         // Append pixel to body before send
         $this->appendTrackingPixel = true;
@@ -1585,7 +1596,7 @@ class MailHelper
     protected function logError($error, $context = null)
     {
         if ($error instanceof \Exception) {
-            $error = $error->getMessage();
+            $error = ('dev' === MAUTIC_ENV) ? (string) $error : $error->getMessage();
 
             $this->fatal = true;
         }

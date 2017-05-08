@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 class CitrixHelper
 {
@@ -165,7 +166,7 @@ class CitrixHelper
         try {
             // Check if integration is enabled
             if (!self::isAuthorized(self::listToIntegration($listType))) {
-                throw new \AuthenticationException('You are not authorized to view '.$listType);
+                throw new AuthenticationException('You are not authorized to view '.$listType);
             }
             $currentYear = date('Y');
             // TODO: the date range can be configured elsewhere

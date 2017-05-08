@@ -2308,9 +2308,8 @@ class LeadController extends FormController
         $resultsCallback = function ($contact) {
             return $contact->getProfileFields();
         };
-        
-        $iterator = new IteratorExportDataModel($model, $args, $resultsCallback);
 
+        $iterator = new IteratorExportDataModel($model, $args, $resultsCallback);
 
         return $this->exportResultsAs($iterator, $dataType, 'contacts');
     }

@@ -1485,7 +1485,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $errors = [];
         foreach ($users as $user) {
             $idHash = uniqid();
-            $mailer->setIdHash($idHash);
+            $mailer->setIdHash($idHash, $saveStat);
 
             if (!is_array($user)) {
                 $id   = $user;
@@ -2127,7 +2127,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $errors = [];
         foreach ($users as $user) {
             $idHash = uniqid();
-            $mailer->setIdHash($idHash);
+            $mailer->setIdHash($idHash, $saveStat);
 
             if (!is_array($user)) {
                 $id   = $user;
