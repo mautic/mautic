@@ -791,12 +791,12 @@ class CommonController extends Controller implements MauticController
             $sourceIterator = new ArraySourceIterator($toExport);
         }
 
-        $dateFormat     = $this->coreParametersHelper->getParameter('date_format_dateonly');
-        $dateFormat     = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
-        $writer         = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
-        $contentType    = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
-        $filename       = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
-        $handler        = Handler::create($sourceIterator, $writer);
+        $dateFormat  = $this->coreParametersHelper->getParameter('date_format_dateonly');
+        $dateFormat  = str_replace('--', '-', preg_replace('/[^a-zA-Z]/', '-', $dateFormat));
+        $writer      = $type === 'xlsx' ? new XlsWriter('php://output') : new CsvWriter('php://output');
+        $contentType = $type === 'xlsx' ? 'application/vnd.ms-excel' : 'text/csv';
+        $filename    = strtolower($filename.'_'.((new \DateTime())->format($dateFormat)).'.'.$type);
+        $handler     = Handler::create($sourceIterator, $writer);
 
         return new StreamedResponse(function () use ($handler, $sourceIterator, $writer) {
             $handler->export();
@@ -811,13 +811,14 @@ class CommonController extends Controller implements MauticController
      * @param AbstractCommonModel $model
      * @param array               $args
      * @param callable|null       $resultsCallback
-     * @param integer|null        $start
+     * @param int|null            $start
      *
      * @return array
      */
     protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, $start = 0)
     {
         $data = new DataExporterHelper();
-        return $data->getDataForExport($start,$model,$args,$resultsCallback);
+
+        return $data->getDataForExport($start, $model, $args, $resultsCallback);
     }
 }
