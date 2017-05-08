@@ -795,6 +795,8 @@ Mautic.initSlots = function(slotContainers) {
             mQuery('#builder-template-content', Mautic.parentDocument).attr('scrolling', 'yes');
             // check if it is initialized first to prevent error
             if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', true);
+            // this fixes an issue where after reopening the builder and trying to drag a slot, it leaves a clone behind
+            parent.mQuery('.ui-draggable-dragging').remove();
         }
     }).disableSelection();
 
@@ -1550,7 +1552,6 @@ Mautic.convertDynamicContentSlotsToTokens = function (builderHtml) {
     if (dynConSlots.length) {
         dynConSlots.each(function(i) {
             var $this    = mQuery(this);
-            // if ($this.parents('[data-slot]').length == 0) return; // prevent affecting standalone DEC slots
             var dynConId = $this.attr('data-param-dec-id');
 
             dynConId = '#emailform_dynamicContent_'+dynConId;
@@ -1558,6 +1559,11 @@ Mautic.convertDynamicContentSlotsToTokens = function (builderHtml) {
             var dynConTarget = mQuery(dynConId);
             var dynConName   = dynConTarget.find(dynConId+'_tokenName').val();
             var dynConToken  = '{dynamiccontent="'+dynConName+'"}';
+
+            // Add the dynamic content tokens
+            if (!Mautic.builderTokens.hasOwnProperty(dynConToken)) {
+                Mautic.builderTokens[dynConToken] = dynConName;
+            }
 
             builderHtml = builderHtml.replace(this.outerHTML, dynConToken);
 
