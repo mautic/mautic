@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
@@ -163,8 +164,8 @@ abstract class AbstractIntegration
         $this->dispatcher        = $factory->getDispatcher();
         $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
         $this->em                = $factory->getEntityManager();
-        $this->session           = (!defined('MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-        $this->request           = (!defined('MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
+        $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
+        $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
         $this->router            = $factory->getRouter();
         $this->translator        = $factory->getTranslator();
         $this->logger            = $factory->getLogger();
@@ -713,9 +714,6 @@ abstract class AbstractIntegration
             $headers    = $event->getHeaders();
             $parameters = $event->getParameters();
         }
-        if (isset($settings['batchSizeSF'])) {
-            $headers[] = 'Sforce-Query-Options: batchSize='.$settings['batchSizeSF'];
-        }
 
         if (!isset($settings['query'])) {
             $settings['query'] = [];
@@ -850,6 +848,33 @@ abstract class AbstractIntegration
 
             return $response;
         }
+    }
+
+    /**
+     * @param            $integrationEntity
+     * @param            $integrationEntityId
+     * @param            $internalEntity
+     * @param            $internalEntityId
+     * @param array|null $internal
+     * @param bool       $persist
+     */
+    public function createIntegrationEntity($integrationEntity, $integrationEntityId, $internalEntity, $internalEntityId, array $internal = null, $persist = true)
+    {
+        $entity = new IntegrationEntity();
+        $entity->setDateAdded(new \DateTime())
+            ->setLastSyncDate(new \DateTime())
+            ->setIntegration($this->getName())
+            ->setIntegrationEntity($integrationEntity)
+            ->setIntegrationEntityId($integrationEntityId)
+            ->setInternalEntity($internalEntity)
+            ->setInternal($internal)
+            ->setInternalEntityId($internalEntityId);
+
+        if ($persist) {
+            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntity($entity);
+        }
+
+        return $entity;
     }
 
     /**
@@ -1372,7 +1397,7 @@ abstract class AbstractIntegration
      */
     protected function getRefererUrl()
     {
-        return $this->request->getRequestUri();
+        return ($this->request) ? $this->request->getRequestUri() : null;
     }
 
     /**
@@ -1382,7 +1407,7 @@ abstract class AbstractIntegration
      */
     protected function getUserAgent()
     {
-        return $this->request->server->get('HTTP_USER_AGENT');
+        return ($this->request) ? $this->request->server->get('HTTP_USER_AGENT') : null;
     }
 
     /**
@@ -1995,10 +2020,10 @@ abstract class AbstractIntegration
             if (!array_key_exists($messageHash, $this->notifications)) {
                 foreach ($this->adminUsers as $user) {
                     $this->getNotificationModel()->addNotification(
-                        $errorHeader,
+                        $errorMessage,
                         $this->getName(),
                         false,
-                        $errorMessage,
+                        $errorHeader,
                         'text-danger fa-exclamation-circle',
                         null,
                         $user

@@ -49,7 +49,12 @@ class SalesforceApi extends CrmApi
             $requestUrl = sprintf($queryUrl.'/%s', $operation);
         }
 
-        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
+        $settings = $this->requestSettings;
+        if ($method == 'PATCH') {
+            $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
+        }
+
+        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
 
         if (!empty($response['errors'])) {
             throw new ApiErrorException(implode(', ', $response['errors']));
