@@ -1205,13 +1205,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $statEntities    = [];
         $statBatchCount  = 0;
         $emailSentCounts = [];
+        $badEmails     = [];
+        $errorMessages = [];
 
         // Setup the mailer
         $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
         $mailer->enableQueue();
 
         // Flushes the batch in case of using API mailers
-        $flushQueue = function ($reset = true) use (&$mailer, &$statEntities, &$saveEntities, &$deleteEntities, &$errors, &$emailSentCounts, $sendBatchMail) {
+        $flushQueue = function ($reset = true) use ($singleEmail, &$mailer, &$statEntities, &$saveEntities, &$deleteEntities, &$errors, &$errorMessages, &$emailSentCounts, $sendBatchMail) {
             if ($sendBatchMail) {
                 $flushResult = $mailer->flushQueue();
                 if (!$flushResult) {
@@ -1219,13 +1221,17 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                     // Check to see if failed recipients were stored by the transport
                     if (!empty($sendFailures['failures'])) {
+                        $failures = $sendFailures;
+                        unset($sendFailures['failures']);
+                        $error = implode("; ", $sendFailures);
+
                         // Prevent the stat from saving
-                        foreach ($sendFailures['failures'] as $failedEmail) {
+                        foreach ($failures as $failedEmail) {
                             /** @var Stat $stat */
                             $stat = $statEntities[$failedEmail];
                             // Add lead ID to list of failures
                             $errors[$stat->getLead()->getId()] = $failedEmail;
-
+                            $errorMessages[$stat->getLead()->getId()] = $error;
                             // Down sent counts
                             $emailId = $stat->getEmail()->getId();
                             ++$emailSentCounts[$emailId];
@@ -1235,6 +1241,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                             }
                             unset($statEntities[$failedEmail], $saveEntities[$failedEmail]);
                         }
+                    } elseif ($singleEmail) {
+                        $error                       = implode("; ", $sendFailures);
+                        $errorMessages[$singleEmail] = $error;
                     }
                 }
 
@@ -1296,8 +1305,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
         }
 
-        $badEmails     = [];
-        $errorMessages = [];
         foreach ($groupedContactsByEmail as $parentId => $translatedEmails) {
             $useSettings = $emailSettings[$parentId];
             foreach ($translatedEmails as $translatedId => $contacts) {
@@ -1357,8 +1364,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     //queue or send the message
-                    if (!$mailer->queue(true)) {
+                    list($queued, $queueErrors) = $mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+                    if (!$queued) {
                         $errors[$contact['id']] = $contact['email'];
+                        unset($queueErrors['failures']);
+
+                        $errorMessages[$contact['id']] = implode('; ', $queueErrors);
 
                         continue;
                     }

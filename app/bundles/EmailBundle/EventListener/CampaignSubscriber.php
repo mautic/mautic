@@ -197,6 +197,11 @@ class CampaignSubscriber extends CommonSubscriber
                         'result' => false,
                         'errors' => $errors,
                     ];
+                } elseif (true !== $emailSent) {
+                    $emailSent = [
+                        'result' => false,
+                        'errors' => $emailSent,
+                    ];
                 }
             } else {
                 return $event->setFailed('Email not found or published');

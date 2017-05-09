@@ -1097,11 +1097,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 break;
             }
 
-            $required    = $this->getRequiredFields($availableFields['Lead']);
-            $required    = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
-            $required    = implode(',', array_keys($required));
-            $fieldString = "'".implode("','", array_keys($checkEmailsInSF))."'";
-            $queryUrl    = $this->getQueryUrl();
+            $required        = $this->getRequiredFields($availableFields['Lead']);
+            $required        = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
+            $required        = implode(',', array_keys($required));
+            // Salesforce craps out with double quotes and unescaped single quotes
+            $checkEmailsInSF = array_map(function($email) { return str_replace("'", "\'", $email); }, $checkEmailsInSF);
+            $fieldString     = "'".implode("','", array_keys($checkEmailsInSF))."'";
+            $queryUrl        = $this->getQueryUrl();
 
             $findLead = 'select Id, '.$required.', ConvertedContactId from Lead where isDeleted = false and Email in ('.$fieldString.')';
             $sfLead   = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
