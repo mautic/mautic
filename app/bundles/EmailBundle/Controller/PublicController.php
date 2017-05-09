@@ -536,6 +536,7 @@ class PublicController extends CommonFormController
 
             return;
         }
+
         // get secret from plugin settings
         $integrationHelper = $this->get('mautic.helper.integration');
         $myIntegration     = $integrationHelper->getIntegrationObject($integration);
@@ -574,6 +575,10 @@ class PublicController extends CommonFormController
             return;
         }
 
+        if (MAUTIC_ENV === 'dev') {
+            $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
+        }
+
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
 
@@ -596,13 +601,13 @@ class PublicController extends CommonFormController
 
             $stat = $model->getEmailStatus($idHash);
 
-            $stat->setSource('email.client');
-
             // stat doesn't exist, create one
             if ($stat === null) {
                 $lead['email'] = $email; // needed for stat
-                $this->addStat($lead, $email, $query, $idHash);
+                $stat          = $this->addStat($lead, $email, $query, $idHash);
             }
+
+            $stat->setSource('email.client');
 
             if ($stat || $integration !== 'Outlook') { // Outlook requests the tracking gif on send
                 $model->hitEmail($idHash, $this->request); // add email event
@@ -631,6 +636,7 @@ class PublicController extends CommonFormController
     private function addStat($lead, $email, $query, $idHash)
     {
         if ($lead !== null) {
+            /** @var \Mautic\EmailBundle\Helper\MailHelper $mailer */
             $mailer = $this->get('mautic.helper.mailer');
 
             // To lead
@@ -651,8 +657,11 @@ class PublicController extends CommonFormController
 
             $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
             $mailer->setSubject($subject);
-            $mailer->createEmailStat();
+
+            return $mailer->createEmailStat();
         }
+
+        return null;
     }
 
     /**

@@ -27,6 +27,10 @@ class PointEventHelper
      */
     public static function validateEmail($eventDetails, $action)
     {
+        if (null === $eventDetails) {
+            return false;
+        }
+
         $emailId = $eventDetails->getId();
 
         if (isset($action['properties']['emails'])) {
