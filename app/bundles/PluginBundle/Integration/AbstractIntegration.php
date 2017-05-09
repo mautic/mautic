@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
@@ -86,10 +87,21 @@ abstract class AbstractIntegration
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->factory    = $factory;
-        $this->dispatcher = $factory->getDispatcher();
-        $this->cache      = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
-        $this->em         = $factory->getEntityManager();
+        $this->factory           = $factory;
+        $this->dispatcher        = $factory->getDispatcher();
+        $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+        $this->em                = $factory->getEntityManager();
+        $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
+        $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
+        $this->router            = $factory->getRouter();
+        $this->translator        = $factory->getTranslator();
+        $this->logger            = $factory->getLogger();
+        $this->encryptionHelper  = $factory->getHelper('encryption');
+        $this->leadModel         = $factory->getModel('lead');
+        $this->companyModel      = $factory->getModel('lead.company');
+        $this->pathsHelper       = $factory->getHelper('paths');
+        $this->notificationModel = $factory->getModel('core.notification');
+        $this->fieldModel        = $factory->getModel('lead.field');
 
         $this->init();
     }
@@ -770,6 +782,33 @@ abstract class AbstractIntegration
     }
 
     /**
+     * @param            $integrationEntity
+     * @param            $integrationEntityId
+     * @param            $internalEntity
+     * @param            $internalEntityId
+     * @param array|null $internal
+     * @param bool       $persist
+     */
+    public function createIntegrationEntity($integrationEntity, $integrationEntityId, $internalEntity, $internalEntityId, array $internal = null, $persist = true)
+    {
+        $entity = new IntegrationEntity();
+        $entity->setDateAdded(new \DateTime())
+            ->setLastSyncDate(new \DateTime())
+            ->setIntegration($this->getName())
+            ->setIntegrationEntity($integrationEntity)
+            ->setIntegrationEntityId($integrationEntityId)
+            ->setInternalEntity($internalEntity)
+            ->setInternal($internal)
+            ->setInternalEntityId($internalEntityId);
+
+        if ($persist) {
+            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntity($entity);
+        }
+
+        return $entity;
+    }
+
+    /**
      * Method to prepare the request parameters. Builds array of headers and parameters.
      *
      * @return array
@@ -1265,9 +1304,7 @@ abstract class AbstractIntegration
      */
     protected function getRefererUrl()
     {
-        $request = $this->factory->getRequest();
-
-        return $request->getRequestUri();
+        return ($this->request) ? $this->request->getRequestUri() : null;
     }
 
     /**
@@ -1277,9 +1314,7 @@ abstract class AbstractIntegration
      */
     protected function getUserAgent()
     {
-        $request = $this->factory->getRequest();
-
-        return $request->server->get('HTTP_USER_AGENT');
+        return ($this->request) ? $this->request->server->get('HTTP_USER_AGENT') : null;
     }
 
     /**
@@ -1882,10 +1917,10 @@ abstract class AbstractIntegration
             if (!array_key_exists($messageHash, $this->notifications)) {
                 foreach ($this->adminUsers as $user) {
                     $this->getNotificationModel()->addNotification(
-                        $errorHeader,
+                        $errorMessage,
                         $this->getName(),
                         false,
-                        $errorMessage,
+                        $errorHeader,
                         'text-danger fa-exclamation-circle',
                         null,
                         $user
