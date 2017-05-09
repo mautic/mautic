@@ -969,7 +969,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $leadFields            = $config['leadFields'];
         $leadsToSync           = [];
-        $totalUpdated          = $totalCreated = $totalErrors = 0;
+        $totalUpdated          = $totalCreated          = $totalErrors          = 0;
         $leadModel             = $this->leadModel;
         $companyModel          = $this->companyModel;
 
@@ -990,10 +990,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $contactSfFields      = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
         $availableFields      = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
 
-        $salesforceIdMapping  = [];
+        $salesforceIdMapping = [];
 
-        $originalLimit        = $limit;
-        $progress             = false;
+        $originalLimit = $limit;
+        $progress      = false;
 
         $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, false));
         $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Salesforce', $fields, false);
@@ -1001,8 +1001,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         if (defined('IN_MAUTIC_CONSOLE')) {
             // start with update
-            if ($totalToUpdate+$totalToCreate) {
-                $output   = new ConsoleOutput();
+            if ($totalToUpdate + $totalToCreate) {
+                $output = new ConsoleOutput();
                 $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
                 $progress = new ProgressBar($output, $totalCount);
             }
@@ -1014,7 +1014,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $isContact     = [];
 
         while ($totalCount > 0) {
-            $trackedContacts     = [
+            $trackedContacts = [
                 'Contact' => [],
                 'Lead'    => [],
             ];
@@ -1023,7 +1023,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $limit               = $originalLimit;
             $mauticData          = [];
             $checkEmailsInSF     = [];
-
             // Process
             if (!$noMoreUpdates) {
                 // Fetch them separately so we can determine
@@ -1038,34 +1037,33 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $fields, $limit, $sfObject, $salesforceIdMapping)[$sfObject];
                     }
                 }
+                $totalCount -= count($toUpdate);
 
-                foreach ($toUpdate as $object => $objectLeads) {
-                    $totalCount -= count($objectLeads);
-                    foreach ($objectLeads as $lead) {
-                        if ($this->pushContactLink) {
-                            $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
+                foreach ($toUpdate as $lead) {
+                    if ($this->pushContactLink) {
+                        $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
+                    }
+
+                    if (isset($lead['email']) && !empty($lead['email'])) {
+                        $key                                                = mb_strtolower($lead['email']);
+                        $trackedContacts[$lead['integration_entity']][$key] = $lead['id'];
+
+                        if ($progress) {
+                            $progress->advance();
                         }
-                        if (isset($lead['email']) && !empty($lead['email'])) {
-                            $key                                                = mb_strtolower($lead['email']);
-                            $trackedContacts[$lead['integration_entity']][$key] = $lead['id'];
 
-                            if ($progress) {
-                                $progress->advance();
-                            }
-
-                            if ('Contact' == $sfObject) {
-                                $isContact[$key]       = $lead['id'];
-                                $checkEmailsInSF[$key] = $lead;
-                            } elseif (isset($isContact[$key])) {
-                                // We already know this is a converted contact so just ignore it
-                                $integrationEntity     = $this->em->getReference(
-                                    'MauticPluginBundle:IntegrationEntity',
-                                    $lead['id']
-                                );
-                                $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
-                            } else {
-                                $checkEmailsInSF[$key] = $lead;
-                            }
+                        if ('Contact' == $sfObject) {
+                            $isContact[$key]       = $lead['id'];
+                            $checkEmailsInSF[$key] = $lead;
+                        } elseif (isset($isContact[$key])) {
+                            // We already know this is a converted contact so just ignore it
+                            $integrationEntity = $this->em->getReference(
+                                'MauticPluginBundle:IntegrationEntity',
+                                $lead['id']
+                            );
+                            $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
+                        } else {
+                            $checkEmailsInSF[$key] = $lead;
                         }
                     }
                 }
@@ -1124,7 +1122,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         }
 
                         $contactId                       = $checkEmailsInSF[$key]['internal_entity_id'];
-                        $salesforceIdMapping[$contactId] =  $sfLeadRecord['Id'];
+                        $salesforceIdMapping[$contactId] = $sfLeadRecord['Id'];
                         if (isset($sfLeadRecord['Id'])) {
                             if ($sfLeadRecord['ConvertedContactId']) {
                                 // This is a converted lead so ignore it
@@ -1395,8 +1393,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function processCompositeResponse($response, array &$salesforceIdMapping = [])
     {
-        $created   = 0;
-        $updated   = 0;
+        $created = 0;
+        $updated = 0;
 
         if (is_array($response)) {
             $persistEntities = [];
@@ -1440,10 +1438,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $internal = ['Id' => $item['body']['id']];
                         } else {
                             $integrationEntityId = $item['body']['id'];
-                            $internal = [];
+                            $internal            = [];
                         }
                         $salesforceIdMapping[$contactId] = $integrationEntityId;
-                        $persistEntities[] = $this->createIntegrationEntity($object, $integrationEntityId, 'lead', $contactId, $internal, false);
+                        $persistEntities[]               = $this->createIntegrationEntity($object, $integrationEntityId, 'lead', $contactId, $internal, false);
                     }
                     ++$created;
                 } elseif (204 === $item['httpStatusCode']) {
@@ -1488,7 +1486,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
                 unset($persistEntities);
                 $this->em->clear(IntegrationEntity::class);
-
             }
         }
 

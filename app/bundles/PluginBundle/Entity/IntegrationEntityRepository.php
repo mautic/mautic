@@ -112,11 +112,12 @@ class IntegrationEntityRepository extends CommonRepository
             if (!is_array($integrationEntity)) {
                 $integrationEntity = [$integrationEntity];
             }
-
+            $sub = $q->expr()->orX();
             foreach ($integrationEntity as $key => $entity) {
-                $q->andWhere('i.integration_entity = :entity'.$key)
-                    ->setParameter(':entity'.$key, $entity);
+                $sub->add($q->expr()->eq('i.integration_entity', ':entity'.$key));
+                $q->setParameter(':entity'.$key, $entity);
             }
+            $q->andWhere($sub);
         }
 
         $q->andWhere('i.internal_entity = :internalEntity')
@@ -143,7 +144,9 @@ class IntegrationEntityRepository extends CommonRepository
             );
 
         // Group by email to prevent duplicates from affecting this
-        $q->groupBy('i.integration_entity, i.internal_entity_id');
+        if (false === $limit and $integrationEntity) {
+            $q->groupBy('i.integration_entity');
+        }
 
         if ($limit) {
             $q->setMaxResults($limit);
@@ -160,7 +163,7 @@ class IntegrationEntityRepository extends CommonRepository
 
         foreach ($results as $result) {
             if ($integrationEntity) {
-                if ($limit) {
+                if (false === $limit) {
                     $leads[$result['integration_entity']] = (int) $result['total'];
                 } else {
                     $leads[$result['integration_entity']][$result['internal_entity_id']] = $result;
