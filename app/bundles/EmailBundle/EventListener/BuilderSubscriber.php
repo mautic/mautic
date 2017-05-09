@@ -83,7 +83,7 @@ class BuilderSubscriber extends CommonSubscriber
             EmailEvents::EMAIL_ON_DISPLAY => [
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
-                ['convertUrlsToTokens', -9999],
+                ['convertUrlsToTokens', -99999],
             ],
         ];
     }

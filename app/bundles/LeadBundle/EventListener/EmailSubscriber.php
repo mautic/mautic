@@ -81,8 +81,7 @@ class EmailSubscriber extends CommonSubscriber
         $content = $event->getSubject();
         $content .= $event->getContent();
         $content .= $event->getPlainText();
-        $lead = $event->getLead();
-
+        $lead      = $event->getLead();
         $tokenList = TokenHelper::findLeadTokens($content, $lead);
         if (count($tokenList)) {
             $event->addTokens($tokenList);

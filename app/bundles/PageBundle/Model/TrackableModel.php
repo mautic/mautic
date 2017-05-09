@@ -247,9 +247,9 @@ class TrackableModel extends AbstractCommonModel
                 // Editor may convert to HTML4
                 'mautic:disable-tracking=""' => '',
                 // HTML5
-                'mautic:disable-tracking' => '',
+                'mautic:disable-tracking'        => '',
+                'data-mautic-tracking="disable"' => '',
             ],
-            'first_pass'  => [],
             'second_pass' => [],
         ];
 
@@ -348,10 +348,18 @@ class TrackableModel extends AbstractCommonModel
             return '';
         }
 
+        $doNotReplace = false;
         // Simple search and replace to remove attributes, schema for tokens, and updating URL parameter order
         $firstPassSearch  = array_keys($this->contentReplacements['first_pass']);
         $firstPassReplace = $this->contentReplacements['first_pass'];
-        $content          = str_ireplace($firstPassSearch, $firstPassReplace, $content);
+        foreach ($this->doNotTrack as $doNotTrack) {
+            foreach ($firstPassSearch as $key => $search) {
+                if (preg_match('~'.$doNotTrack.'~i', $search)) {
+                    unset($firstPassSearch[$key], $firstPassReplace[$key]);
+                }
+            }
+        }
+        $content = str_ireplace($firstPassSearch, $firstPassReplace, $content);
 
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
         krsort($this->contentReplacements['second_pass']);
@@ -359,20 +367,34 @@ class TrackableModel extends AbstractCommonModel
         if ('html' == $type) {
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
-                $content = preg_replace(
-                    '/<a(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
-                    '<a$1 href=$2'.$replace.'$3$2$4>',
-                    $content
-                );
+                foreach ($this->doNotTrack as $doNotTrack) {
+                    if (preg_match('~'.$doNotTrack.'~i', $search)) {
+                        $doNotReplace = true;
+                    }
+                }
+                if (!$doNotReplace) {
+                    $content = preg_replace(
+                        '~<a(.*?) href=(["\'])'.preg_quote($search, '~').'(.*?)\\2(.*?)>~i',
+                        '<a$1 href=$2'.$replace.'$3$2$4>',
+                        $content
+                    );
+                }
             }
         } else {
             // For text, just do a simple search/replace
             $secondPassSearch  = array_keys($this->contentReplacements['second_pass']);
             $secondPassReplace = $this->contentReplacements['second_pass'];
-            $content           = str_ireplace($secondPassSearch, $secondPassReplace, $content);
+            foreach ($this->doNotTrack as $doNotTrack) {
+                foreach ($secondPassSearch as $key => $search) {
+                    if (preg_match('~'.$doNotTrack.'~i', $search)) {
+                        unset($secondPassSearch[$key], $secondPassReplace[$key]);
+                    }
+                }
+            }
+            $content = str_ireplace($secondPassSearch, $secondPassReplace, $content);
         }
 
-        unset($firstSearch, $firstReplace, $secondSearch, $secondSearch);
+        unset($firstPassSearch, $firstPassReplace, $secondPassSearch, $secondPassReplace);
 
         return $content;
     }
@@ -402,9 +424,8 @@ class TrackableModel extends AbstractCommonModel
             $url = $link->getAttribute('href');
 
             // Check for a do not track
-            if ($link->hasAttribute('mautic:disable-tracking')) {
+            if ($link->hasAttribute('data-mautic-tracking="disable"') || $link->hasAttribute('mautic:disable-tracking')) {
                 $this->doNotTrack[$url] = $url;
-
                 continue;
             }
 
@@ -567,9 +588,9 @@ class TrackableModel extends AbstractCommonModel
      */
     protected function isInDoNotTrack($url)
     {
-        // Ensure it's not in the do not track list
+        // Ensure it's not in the do not track
         foreach ($this->doNotTrack as $notTrackable) {
-            if (preg_match('/'.preg_quote($notTrackable, '/').'/', $url)) {
+            if (preg_match('~'.$notTrackable.'~i', $url)) {
                 return true;
             }
         }
