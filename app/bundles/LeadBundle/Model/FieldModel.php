@@ -374,46 +374,54 @@ class FieldModel extends FormModel
             $entity->setIsListable(false);
         }
 
-        $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-        $this->getRepository()->saveEntity($entity);
-        $this->dispatchEvent('post_save', $entity, $isNew, $event);
-
         $isUnique = $entity->getIsUniqueIdentifier();
 
-        if ($entity->getId()) {
             //create the field as its own column in the leads table
             $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
-            if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
-                $schemaDefinition = self::getSchemaDefinition($alias, $entity->getType(), $isUnique);
-                $leadsSchema->addColumn(
+        if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
+            $schemaDefinition = self::getSchemaDefinition($alias, $type, $isUnique);
+            $leadsSchema->addColumn(
                     $schemaDefinition
                 );
+
+            try {
                 $leadsSchema->executeChanges();
+                $isCreated = true;
+            } catch (\Exception $e) {
+                $this->logger->addWarning($e->getMessage());
+                $isCreated = false;
+                throw new \ErrorException('Too many field');
+            }
+
+            if ($isCreated === true) {
+                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
+                $this->getRepository()->saveEntity($entity);
+                $this->dispatchEvent('post_save', $entity, $isNew, $event);
+            }
 
                 // Update the unique_identifier_search index and add an index for this field
                 /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
                 $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
-                if ('string' == $schemaDefinition['type']) {
-                    try {
-                        $modifySchema->addIndex([$alias], $alias.'_search');
-                        $modifySchema->allowColumn($alias);
-                        if ($isUnique) {
-                            // Get list of current uniques
+            if ('string' == $schemaDefinition['type']) {
+                try {
+                    $modifySchema->addIndex([$alias], $alias.'_search');
+                    $modifySchema->allowColumn($alias);
+                    if ($isUnique) {
+                        // Get list of current uniques
                             $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
 
                             // Always use email
                             $indexColumns   = ['email'];
-                            $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                            $indexColumns[] = $alias;
+                        $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
+                        $indexColumns[] = $alias;
 
                             // Only use three to prevent max key length errors
                             $indexColumns = array_slice($indexColumns, 0, 3);
-                            $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
-                        }
-                        $modifySchema->executeChanges();
-                    } catch (\Exception $e) {
-                        $this->logger->addWarning($e->getMessage());
+                        $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
                     }
+                    $modifySchema->executeChanges();
+                } catch (\Exception $e) {
+                    $this->logger->addWarning($e->getMessage());
                 }
             }
         }

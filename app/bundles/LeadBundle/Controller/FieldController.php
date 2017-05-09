@@ -154,10 +154,22 @@ class FieldController extends FormController
                     }
 
                     if ($valid) {
+                        $flashed = false;
                         try {
                             //form is valid so process the data
                             $model->saveEntity($field);
-
+                        } catch (\ErrorException $ee) {
+                            $flashed = true;
+                            $this->addFlash('mautic.core.error.max.field');
+                        } catch (\Exception $e) {
+                            $form['alias']->addError(
+                                    new FormError(
+                                        $this->get('translator')->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
+                                    )
+                                );
+                            $valid = false;
+                        }
+                        if ($flashed === false) {
                             $this->addFlash(
                                 'mautic.core.notice.created',
                                 [
@@ -172,13 +184,6 @@ class FieldController extends FormController
                                     ),
                                 ]
                             );
-                        } catch (\Exception $e) {
-                            $form['alias']->addError(
-                                new FormError(
-                                    $this->get('translator')->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
-                                )
-                            );
-                            $valid = false;
                         }
                     }
                 }
