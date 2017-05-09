@@ -200,7 +200,7 @@ return [
             ],
             'mautic.form.type.campaignconfig' => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'translator',
                 'alias'     => 'campaignconfig',
             ],
         ],

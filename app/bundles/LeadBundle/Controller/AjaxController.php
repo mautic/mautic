@@ -120,7 +120,7 @@ class AjaxController extends CommonAjaxController
                             'id'    => $r['id'],
                         ];
                     }
-                } elseif ($leadField == 'hit_url') {
+                } elseif (in_array($leadField, ['hit_url', 'referer', 'url_title', 'source'])) {
                     $dataArray[] = [
                         'value' => '',
                     ];
@@ -824,7 +824,12 @@ class AjaxController extends CommonAjaxController
             switch ($operator) {
                 case 'empty':
                 case '!empty':
-                    $disabled = true;
+                    $disabled             = true;
+                    $dataArray['options'] = null;
+                    break;
+                case 'regexp':
+                case '!regexp':
+                    $dataArray['options'] = null;
                     break;
             }
             $dataArray['disabled'] = $disabled;

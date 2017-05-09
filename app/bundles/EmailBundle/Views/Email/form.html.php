@@ -68,7 +68,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                             <?php echo $view['translator']->trans('mautic.core.advanced'); ?>
                         </a>
                     </li>
-                    <li>
+                    <li id="dynamic-content-tab" <?php echo (!$isCodeMode) ? 'class="hidden"' : ''; ?>>
                         <a href="#dynamic-content-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?>
                         </a>

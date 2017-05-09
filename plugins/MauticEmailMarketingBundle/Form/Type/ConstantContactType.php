@@ -97,7 +97,7 @@ class ConstantContactType extends AbstractType
             $builder->add('leadFields', 'integration_fields', [
                 'label'                => 'mautic.integration.leadfield_matches',
                 'required'             => true,
-                'lead_fields'          => $leadFields,
+                'mautic_fields'        => $leadFields,
                 'data'                 => isset($options['data']['leadFields']) ? $options['data']['leadFields'] : [],
                 'integration_fields'   => $fields,
                 'special_instructions' => $specialInstructions,

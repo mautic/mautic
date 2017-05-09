@@ -31,10 +31,10 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array
      */
-    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate = null, $endDate = null, $push = false, $start = 0, $limit = 0)
+    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate = null, $endDate = null, $push = false, $start = 0, $limit = 0, $integrationEntityIds = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('i.integration_entity_id, i.id, i.internal_entity_id, i.integration_entity')
+            ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
 
         $q->where('i.integration = :integration')
@@ -72,6 +72,9 @@ class IntegrationEntityRepository extends CommonRepository
         if ($limit) {
             $q->setMaxResults((int) $limit);
         }
+        if ($integrationEntityIds) {
+            $q->andWhere('i.integration_entity_id in ('.$integrationEntityIds.')');
+        }
 
         $results = $q->execute()->fetchAll();
 
@@ -81,8 +84,6 @@ class IntegrationEntityRepository extends CommonRepository
     /**
      * @param $integration
      * @param $internalEntity
-     * @param null $startDate
-     * @param null $endDate
      * @param $leadFields
      *
      * @return array
@@ -95,13 +96,14 @@ class IntegrationEntityRepository extends CommonRepository
 
         $q->where('i.integration = :integration')
             ->andWhere('i.internal_entity = :internalEntity')
+            ->andWhere('i.integration_entity = "Lead" or i.integration_entity = "Contact"')
+            ->andWhere('(i.last_sync_date is not null and l.date_modified > i.last_sync_date) or (i.last_sync_date is null and l.date_modified > i.date_added) and l.email is not null')
             ->setParameter('integration', $integration)
             ->setParameter('internalEntity', $internalEntity);
 
-        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.date_modified > i.last_sync_date and l.date_identified is not null and l.email is not null');
+        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
 
         $q->setMaxResults($limit);
-
         $results = $q->execute()->fetchAll();
 
         return $results;
@@ -155,5 +157,25 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integration', $integration)
             ->setParameter('entity', $internalEntityType.'-deleted')
             ->execute();
+    }
+
+    /**
+     * @param $integration
+     * @param $internalEntity
+     * @param $leadId
+     *
+     * @return array
+     */
+    public function findLeadsToDelete($internalEntity, $leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity');
+
+        $q->where('internal_entity_id = :leadId')
+            ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
+            ->setParameter('leadId', $leadId)
+            ->setParameter('internalEntity', $internalEntity)
+        ->execute();
     }
 }
