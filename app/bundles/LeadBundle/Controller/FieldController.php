@@ -154,13 +154,12 @@ class FieldController extends FormController
                     }
 
                     if ($valid) {
-                        $flashed = false;
+                        $flashMessage = 'mautic.core.notice.created';
                         try {
                             //form is valid so process the data
                             $model->saveEntity($field);
                         } catch (\ErrorException $ee) {
-                            $flashed = true;
-                            $this->addFlash('mautic.core.error.max.field');
+                            $flashMessage = 'mautic.core.error.max.field';
                         } catch (\Exception $e) {
                             $form['alias']->addError(
                                     new FormError(
@@ -169,9 +168,8 @@ class FieldController extends FormController
                                 );
                             $valid = false;
                         }
-                        if ($flashed === false) {
-                            $this->addFlash(
-                                'mautic.core.notice.created',
+                        $this->addFlash(
+                                $flashMessage,
                                 [
                                     '%name%'      => $field->getLabel(),
                                     '%menu_link%' => 'mautic_contactfield_index',
@@ -184,7 +182,6 @@ class FieldController extends FormController
                                     ),
                                 ]
                             );
-                        }
                     }
                 }
             }

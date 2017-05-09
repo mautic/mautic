@@ -376,8 +376,8 @@ class FieldModel extends FormModel
 
         $isUnique = $entity->getIsUniqueIdentifier();
 
-            //create the field as its own column in the leads table
-            $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
+        //create the field as its own column in the leads table
+        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
         if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
             $schemaDefinition = self::getSchemaDefinition($alias, $type, $isUnique);
             $leadsSchema->addColumn(
@@ -399,9 +399,9 @@ class FieldModel extends FormModel
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
-                // Update the unique_identifier_search index and add an index for this field
-                /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-                $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
+            // Update the unique_identifier_search index and add an index for this field
+            /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+            $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
             if ('string' == $schemaDefinition['type']) {
                 try {
                     $modifySchema->addIndex([$alias], $alias.'_search');
@@ -411,9 +411,9 @@ class FieldModel extends FormModel
                             $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
 
                             // Always use email
-                            $indexColumns   = ['email'];
-                        $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                        $indexColumns[] = $alias;
+                            $indexColumns = ['email'];
+                        $indexColumns     = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
+                        $indexColumns[]   = $alias;
 
                             // Only use three to prevent max key length errors
                             $indexColumns = array_slice($indexColumns, 0, 3);
