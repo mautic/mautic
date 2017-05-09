@@ -56,6 +56,11 @@ class LeadEventLog
     private $isScheduled = false;
 
     /**
+     * @var bool
+     */
+    private $isQueued = false;
+
+    /**
      * @var null|\DateTime
      */
     private $triggerDate;
@@ -134,6 +139,10 @@ class LeadEventLog
 
         $builder->createField('isScheduled', 'boolean')
             ->columnName('is_scheduled')
+            ->build();
+
+        $builder->createField('isQueued', 'boolean')
+            ->columnName('is_queued')
             ->build();
 
         $builder->createField('triggerDate', 'datetime')
@@ -283,6 +292,26 @@ class LeadEventLog
         if (!$this->campaign) {
             $this->setCampaign($event->getCampaign());
         }
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsQueued()
+    {
+        return $this->isQueued;
+    }
+
+    /**
+     * @param bool $isQueued
+     *
+     * @return $this
+     */
+    public function setIsQueued($isQueued)
+    {
+        $this->isQueued = $isQueued;
 
         return $this;
     }

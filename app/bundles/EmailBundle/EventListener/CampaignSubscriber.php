@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Model\EventDailySendModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -49,6 +50,11 @@ class CampaignSubscriber extends CommonSubscriber
     protected $campaignEventModel;
 
     /**
+     * @var EventDailySendModel
+     */
+    protected $eventDailySendModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param LeadModel         $leadModel
@@ -56,12 +62,18 @@ class CampaignSubscriber extends CommonSubscriber
      * @param EventModel        $eventModel
      * @param MessageQueueModel $messageQueueModel
      */
-    public function __construct(LeadModel $leadModel, EmailModel $emailModel, EventModel $eventModel, MessageQueueModel $messageQueueModel)
-    {
-        $this->leadModel          = $leadModel;
-        $this->emailModel         = $emailModel;
-        $this->campaignEventModel = $eventModel;
-        $this->messageQueueModel  = $messageQueueModel;
+    public function __construct(
+        LeadModel $leadModel,
+        EmailModel $emailModel,
+        EventModel $eventModel,
+        MessageQueueModel $messageQueueModel,
+        EventDailySendModel $eventDailySendModel
+    ) {
+        $this->leadModel           = $leadModel;
+        $this->emailModel          = $emailModel;
+        $this->campaignEventModel  = $eventModel;
+        $this->messageQueueModel   = $messageQueueModel;
+        $this->eventDailySendModel = $eventDailySendModel;
     }
 
     /**
@@ -129,6 +141,8 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
@@ -149,6 +163,8 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
@@ -158,6 +174,7 @@ class CampaignSubscriber extends CommonSubscriber
         $leadCredentials['owner_id'] = (
             ($lead instanceof Lead) && ($owner = $lead->getOwner())
         ) ? $owner->getId() : 0;
+        $eventId = $event->getEvent()['id'];
 
         if (!empty($leadCredentials['email'])) {
             $config  = $event->getConfig();
@@ -166,7 +183,7 @@ class CampaignSubscriber extends CommonSubscriber
             $email   = $this->emailModel->getEntity($emailId);
             $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
             $options = [
-                'source'         => ['campaign.event', $event->getEvent()['id']],
+                'source'         => ['campaign.event', $eventId],
                 'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
                 'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
                 'email_type'     => $type,
@@ -176,6 +193,7 @@ class CampaignSubscriber extends CommonSubscriber
             $event->setChannel('email', $emailId);
 
             if ($email != null && $email->isPublished()) {
+
                 // Determine if this email is transactional/marketing
                 $stats = [];
                 if ('marketing' == $type) {
@@ -186,7 +204,11 @@ class CampaignSubscriber extends CommonSubscriber
                 }
 
                 if (empty($stats)) {
-                    $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                    $emailSent = $this->sendEmail($eventId, $email, $leadCredentials, $options);
+                }
+
+                if (isset($emailSent['queued']) && $emailSent['queued'] === 1) {
+                    return $event->setQueued($emailSent['queued']);
                 }
 
                 if (is_array($emailSent)) {
@@ -206,5 +228,34 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         return $event->setResult($emailSent);
+    }
+
+    /**
+     * @param int $eventId
+     * @param $email
+     * @param $leadCredentials
+     * @param array $options
+     *
+     * @return array|mixed
+     */
+    protected function sendEmail($eventId, $email, $leadCredentials, array $options)
+    {
+        $campaignEvent = $this->campaignEventModel->getEntity($eventId);
+        $currentDayLog = $this->eventDailySendModel->getCurrentDayLog($campaignEvent);
+
+        $isLimited = $campaignEvent->isLimited();
+        $canBeSend = $this->eventDailySendModel->canBeSend($campaignEvent, $currentDayLog);
+
+        if ($isLimited) {
+            if (!$canBeSend) {
+                return [
+                'queued' => 1,
+            ];
+            }
+
+            $this->eventDailySendModel->increaseSentCount($currentDayLog);
+        }
+
+        return $this->emailModel->sendEmail($email, $leadCredentials, $options);
     }
 }

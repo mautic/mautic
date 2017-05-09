@@ -169,6 +169,7 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
+        $this->addTimelineEvents($event, 'campaign.event.queued', $this->translator->trans('mautic.campaign.queued'));
         $this->addTimelineEvents($event, 'campaign.event', $this->translator->trans('mautic.campaign.triggered'));
         $this->addTimelineEvents($event, 'campaign.event.scheduled', $this->translator->trans('mautic.campaign.scheduled'));
     }
@@ -204,7 +205,8 @@ class LeadSubscriber extends CommonSubscriber
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
         $logRepository             = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
         $options                   = $event->getQueryOptions();
-        $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
+        $options['scheduledState'] = ('campaign.event.scheduled' === $eventTypeKey) ? true : false;
+        $options['queuedState']    = ('campaign.event.queued' === $eventTypeKey) ? true : false;
         $logs                      = $logRepository->getLeadLogs($lead->getId(), $options);
         $eventSettings             = $this->campaignModel->getEvents();
 
@@ -213,6 +215,10 @@ class LeadSubscriber extends CommonSubscriber
 
         if (!$event->isEngagementCount()) {
             foreach ($logs['results'] as $log) {
+                if (($log['isQueued'] == 1 && 'campaign.event' === $eventTypeKey) || ($log['isQueued'] == 0 && 'campaign.event.queued' === $eventTypeKey)) {
+                    continue;
+                }
+
                 $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
                     ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
 
