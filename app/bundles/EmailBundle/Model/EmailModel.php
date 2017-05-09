@@ -1136,6 +1136,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $messageQueue        = (isset($options['resend_message_queue'])) ? $options['resend_message_queue'] : null;
         $returnErrorMessages = (isset($options['return_errors'])) ? $options['return_errors'] : false;
         $channel             = (isset($options['channel'])) ? $options['channel'] : null;
+        $dncAsError          = (isset($options['dnc_as_error'])) ? $options['dnc_as_error'] : false;
+        $errors              = [];
+
         if (empty($channel)) {
             $channel = (isset($options['source'])) ? $options['source'] : null;
         }
@@ -1167,6 +1170,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             if (!empty($dnc)) {
                 foreach ($dnc as $removeMeId => $removeMeEmail) {
+                    if ($dncAsError) {
+                        $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
+                    }
                     unset($sendTo[$removeMeId]);
                     unset($leadIds[$removeMeId]);
                 }
@@ -1184,7 +1190,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         //no one to send to so bail or if marketing email from a campaign has been put in a queue
         if (empty($count)) {
-            return $singleEmail ? true : [];
+            if ($returnErrorMessages) {
+                return $singleEmail ? $errors[$singleEmail] : $errors;
+            }
+
+            return $singleEmail ? true : $errors;
         }
 
         // Hydrate contacts with company profile fields
@@ -1199,7 +1209,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         // Store stat entities
-        $errors          = [];
         $saveEntities    = [];
         $deleteEntities  = [];
         $statEntities    = [];
