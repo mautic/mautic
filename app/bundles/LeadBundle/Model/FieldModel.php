@@ -408,15 +408,15 @@ class FieldModel extends FormModel
                     $modifySchema->allowColumn($alias);
                     if ($isUnique) {
                         // Get list of current uniques
-                            $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
+                        $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
 
-                            // Always use email
-                            $indexColumns = ['email'];
-                        $indexColumns     = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                        $indexColumns[]   = $alias;
+                        // Always use email
+                        $indexColumns   = ['email'];
+                        $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
+                        $indexColumns[] = $alias;
 
-                            // Only use three to prevent max key length errors
-                            $indexColumns = array_slice($indexColumns, 0, 3);
+                        // Only use three to prevent max key length errors
+                        $indexColumns = array_slice($indexColumns, 0, 3);
                         $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
                     }
                     $modifySchema->executeChanges();
