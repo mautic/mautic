@@ -56,4 +56,34 @@ class ZohoApi extends CrmApi
 
         return $this->request('insertRecords', $parameters, 'POST');
     }
+
+    /**
+     * gets Hubspot contact.
+     *
+     * @param array $data
+     *
+     * @return mixed
+     */
+    public function getContacts($params = [])
+    {
+        return $this->request('getLeads', $params);
+    }
+
+    /**
+     * gets Hubspot company.
+     *
+     * @param array $data
+     *
+     * @return mixed
+     */
+    public function getCompanies($params, $id)
+    {
+        if ($id) {
+            $params['id'] = $id;
+
+            return $this->request('getCompany', $params);
+        }
+
+        return $this->request('getCompanies', $params);
+    }
 }
