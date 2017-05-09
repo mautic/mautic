@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticFullContactBundle\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FullContactIntegration extends AbstractIntegration
 {
@@ -96,20 +97,31 @@ class FullContactIntegration extends AbstractIntegration
         }
     }
 
-    /**
-     * Allows integration to set a custom form template.
-     *
-     * @return string
-     */
-    public function getFormTemplate()
-    {
-        return 'MauticFullContactBundle:Integration:form.html.php';
-    }
-
     public function shouldAutoUpdate()
     {
         $featureSettings = $this->getKeys();
 
         return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $section
+     *
+     * @return string
+     */
+    public function getFormNotes($section)
+    {
+        if ('custom' === $section) {
+            return [
+                'template'   => 'MauticFullContactBundle:Integration:form.html.php',
+                'parameters' => [
+                    'mauticUrl' => $this->factory->get('router')->generate('mautic_plugin_fullcontact_index', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                ],
+            ];
+        }
+
+        return parent::getFormNotes($section);
     }
 }
