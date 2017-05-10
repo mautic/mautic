@@ -65,7 +65,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $mailHelper->method('addTo')
             ->will($this->returnValue(true));
         $mailHelper->method('queue')
-            ->will($this->returnValue(true));
+            ->will($this->returnValue([true, []]));
         $mailHelper->method('setEmail')
             ->will($this->returnValue(true));
 
