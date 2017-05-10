@@ -475,17 +475,17 @@ class MailHelper
      * Otherwise, the message will be sent to the transport immediately.
      *
      * @param bool   $dispatchSendEvent
-     * @param string $immediateSendMessageHandling If tokenization is not supported by the mailer, this argument determines
-     *                                             what should happen to $this->message after the email send is attempted.
-     *                                             Options are:
-     *                                             RESET_TO           resets the to recipients and resets errors
-     *                                             FULL_RESET         creates a new MauticMessage instance and resets errors
-     *                                             DO_NOTHING         leaves the current errors array and MauticMessage instance intact
-     *                                             NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
+     * @param string $returnMode        What should happen post send/queue to $this->message after the email send is attempted.
+     *                  Options are:
+     *                  RESET_TO           resets the to recipients and resets errors
+     *                  FULL_RESET         creates a new MauticMessage instance and resets errors
+     *                  DO_NOTHING         leaves the current errors array and MauticMessage instance intact
+     *                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
+     *                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
      *
      * @return bool
      */
-    public function queue($dispatchSendEvent = false, $immediateSendMessageHandling = self::QUEUE_RESET_TO)
+    public function queue($dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
     {
         if ($this->tokenizationEnabled) {
 
@@ -530,7 +530,7 @@ class MailHelper
             $this->queuedRecipients = [];
 
             // Assume success
-            return true;
+            return (self::QUEUE_RETURN_ERRORS) ? [true, []] : true;
         } else {
             $success = $this->send($dispatchSendEvent);
 
@@ -538,7 +538,7 @@ class MailHelper
             $this->queuedRecipients = [];
 
             // Reset message
-            switch (ucwords($immediateSendMessageHandling)) {
+            switch (ucwords($returnMode)) {
                 case self::QUEUE_RESET_TO:
                     $this->message->setTo([]);
                     $this->clearErrors();

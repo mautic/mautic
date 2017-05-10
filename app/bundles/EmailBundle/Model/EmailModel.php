@@ -1377,7 +1377,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     if (!$queued) {
                         $errors[$contact['id']] = $contact['email'];
                         unset($queueErrors['failures']);
-
                         $errorMessages[$contact['id']] = implode('; ', $queueErrors);
 
                         continue;
