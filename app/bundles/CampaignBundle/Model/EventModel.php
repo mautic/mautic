@@ -1665,11 +1665,10 @@ class EventModel extends CommonFormModel
 
             $eventTriggered = false;
             if ($response instanceof LeadEventLog) {
-                // Listener handled the event and returned a log entry
-                $this->campaignModel->setChannelFromEventProperties($response, $event, $thisEventSettings);
+                $log = $response;
 
-                $repo->saveEntity($response);
-                $this->em->detach($response);
+                // Listener handled the event and returned a log entry
+                $this->campaignModel->setChannelFromEventProperties($log, $event, $thisEventSettings);
 
                 ++$executedEventCount;
 
@@ -1677,7 +1676,7 @@ class EventModel extends CommonFormModel
                     'CAMPAIGN: Listener handled event for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                 );
 
-                if (!$response->getIsScheduled()) {
+                if (!$log->getIsScheduled()) {
                     $eventTriggered = true;
                 }
             } elseif (($response === false || (is_array($response) && isset($response['result']) && false === $response['result']))
