@@ -773,7 +773,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $salesForceLeadData[$sfId]            = $leadActivity[$leadId];
                                 $salesForceLeadData[$sfId]['id']      = $ids['integration_entity_id'];
                                 $salesForceLeadData[$sfId]['leadId']  = $ids['internal_entity_id'];
-                                $salesForceLeadData[$sfId]['leadUrl'] = $this->factory->getRouter()->generate(
+                                $salesForceLeadData[$sfId]['leadUrl'] = $this->router->generate(
                                     'mautic_plugin_timeline_view',
                                     ['integration' => 'Salesforce', 'leadId' => $leadId],
                                     UrlGeneratorInterface::ABSOLUTE_URL
@@ -823,7 +823,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $options      = ['leadIds' => $leadIds, 'basic_select' => true, 'fromDate' => $startDate, 'toDate' => $endDate];
 
         /** @var LeadModel $leadModel */
-        $leadModel      = $this->factory->getModel('lead');
+        $leadModel      = $this->leadModel;
         $pointsRepo     = $leadModel->getPointLogRepository();
         $results        = $pointsRepo->getLeadTimelineEvents(null, $options);
         $pointChangeLog = [];
@@ -967,7 +967,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
-        $leadFields            = $config['leadFields'];
+        $leadFields            = array_unique(array_values($config['leadFields']));
         $leadsToSync           = [];
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
         $leadModel             = $this->leadModel;
@@ -1097,11 +1097,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 break;
             }
 
-            $required    = $this->getRequiredFields($availableFields['Lead']);
-            $required    = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
-            $required    = implode(',', array_keys($required));
-            $fieldString = "'".implode("','", array_keys($checkEmailsInSF))."'";
-            $queryUrl    = $this->getQueryUrl();
+            $required        = $this->getRequiredFields($availableFields['Lead']);
+            $required        = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
+            $required        = implode(',', array_keys($required));
+            // Salesforce craps out with double quotes and unescaped single quotes
+            $checkEmailsInSF = array_map(function($email) { return str_replace("'", "\'", $email); }, $checkEmailsInSF);
+            $fieldString     = "'".implode("','", array_keys($checkEmailsInSF))."'";
+            $queryUrl        = $this->getQueryUrl();
 
             $findLead = 'select Id, '.$required.', ConvertedContactId from Lead where isDeleted = false and Email in ('.$fieldString.')';
             $sfLead   = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
@@ -1340,6 +1342,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param      $object
      * @param      $lead
      * @param null $objectId
+     * @param null $sfRecord
+     *
+     * @return bool
      */
     protected function buildCompositeBody(&$mauticData, $availableFields, $fieldsToUpdateInSfUpdate, $object, $lead, $objectId = null, $sfRecord = null)
     {
@@ -1359,7 +1364,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $updateLead = true;
                         }
                     } else {
-                        $body[$sfField] = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+                        $body[$sfField] = $this->translator->trans('mautic.integration.form.lead.unknown');
                     }
                 }
             }

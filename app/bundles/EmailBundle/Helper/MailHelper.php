@@ -27,6 +27,11 @@ use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
  */
 class MailHelper
 {
+    const QUEUE_RESET_TO          = 'RESET_TO';
+    const QUEUE_FULL_RESET        = 'FULL_RESET';
+    const QUEUE_DO_NOTHING        = 'DO_NOTHING';
+    const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
+    const QUEUE_RETURN_ERRORS     = 'RETURN_ERRORS';
     /**
      * @var MauticFactory
      */
@@ -480,7 +485,7 @@ class MailHelper
      *
      * @return bool
      */
-    public function queue($dispatchSendEvent = false, $immediateSendMessageHandling = 'RESET_TO')
+    public function queue($dispatchSendEvent = false, $immediateSendMessageHandling = self::QUEUE_RESET_TO)
     {
         if ($this->tokenizationEnabled) {
 
@@ -534,23 +539,30 @@ class MailHelper
 
             // Reset message
             switch (ucwords($immediateSendMessageHandling)) {
-                case 'RESET_TO':
+                case self::QUEUE_RESET_TO:
                     $this->message->setTo([]);
                     $this->clearErrors();
                     break;
-                case 'NOTHING_IF_FAILED':
+                case self::QUEUE_NOTHING_IF_FAILED:
                     if ($success) {
                         $this->message->setTo([]);
                         $this->clearErrors();
                     }
 
                     break;
-                case 'FULL_RESET':
+                case self::QUEUE_FULL_RESET:
                     $this->message        = $this->getMessageInstance();
                     $this->attachedAssets = [];
                     $this->clearErrors();
                     break;
-                case 'DO_NOTHING':
+                case self::QUEUE_RETURN_ERRORS:
+                    $this->message->setTo([]);
+                    $errors = $this->getErrors();
+
+                    $this->clearErrors();
+
+                    return [$success, $errors];
+                case self::QUEUE_DO_NOTHING:
                 default:
                     // Nada
 
@@ -1596,9 +1608,15 @@ class MailHelper
     protected function logError($error, $context = null)
     {
         if ($error instanceof \Exception) {
-            $error = ('dev' === MAUTIC_ENV) ? (string) $error : $error->getMessage();
+            $errorMessage = $error->getMessage();
+            $error        = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
 
-            $this->fatal = true;
+            // Clean up the error message
+            $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
+
+            $this->fatal  = true;
+        } else {
+            $errorMessage = trim($error);
         }
 
         $logDump = $this->logger->dump();
@@ -1610,7 +1628,7 @@ class MailHelper
             $error .= " ($context)";
         }
 
-        $this->errors[] = $error;
+        $this->errors[] = $errorMessage;
 
         $this->logger->clear();
 
