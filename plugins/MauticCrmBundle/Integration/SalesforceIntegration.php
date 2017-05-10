@@ -1045,7 +1045,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
 
                     if (isset($lead['email']) && !empty($lead['email'])) {
-                        $key                                                = mb_strtolower($lead['email']);
+                        $key                                                = mb_strtolower($this->cleanPushData($lead['email']));
                         $trackedContacts[$lead['integration_entity']][$key] = $lead['id'];
 
                         if ($progress) {
@@ -1085,7 +1085,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
                     }
                     if (isset($lead['email'])) {
-                        $checkEmailsInSF[mb_strtolower($lead['email'])] = $lead;
+                        $checkEmailsInSF[mb_strtolower($this->cleanPushData($lead['email']))] = $lead;
                     } elseif ($progress) {
                         $progress->advance();
                     }
@@ -1097,13 +1097,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 break;
             }
 
-            $required        = $this->getRequiredFields($availableFields['Lead']);
-            $required        = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
-            $required        = implode(',', array_keys($required));
+            $required = $this->getRequiredFields($availableFields['Lead']);
+            $required = $this->cleanSalesForceData($config, array_keys($required), 'Lead');
+            $required = implode(',', array_keys($required));
             // Salesforce craps out with double quotes and unescaped single quotes
-            $checkEmailsInSF = array_map(function($email) { return str_replace("'", "\'", $email); }, $checkEmailsInSF);
-            $fieldString     = "'".implode("','", array_keys($checkEmailsInSF))."'";
-            $queryUrl        = $this->getQueryUrl();
+            $findEmailsInSF = array_map(function ($lead) {
+                return str_replace("'", "\'", $this->cleanPushData($lead['email']));
+            }, $checkEmailsInSF);
+
+            $fieldString = "'".implode("','", $findEmailsInSF)."'";
+            $queryUrl    = $this->getQueryUrl();
 
             $findLead = 'select Id, '.$required.', ConvertedContactId from Lead where isDeleted = false and Email in ('.$fieldString.')';
             $sfLead   = $this->getApiHelper()->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
@@ -1251,6 +1254,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
             // Create any left over
             if ($checkEmailsInSF) {
                 foreach ($checkEmailsInSF as $lead) {
+                    if (!empty($lead['integration_entity_id'])) {
+                        if ($this->buildCompositeBody(
+                            $mauticData,
+                            $availableFields,
+                            ('Contact' === $lead['integration_entity']) ? $contactSfFields : $leadSfFieldsToCreate,
+                            $lead['integration_entity'],
+                            $lead,
+                            $lead['integration_entity_id']
+                        )) {
+                            $this->logger->debug('SALESFORCE: Contact has existing ID so updating '.$lead['email']);
+                        }
+
+                        continue;
+                    }
+
                     if ($this->buildCompositeBody(
                         $mauticData,
                         $availableFields,
@@ -1276,7 +1294,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $request              = [];
             $request['allOrNone'] = 'false';
             $chunked              = array_chunk($mauticData, 25);
-
             foreach ($chunked as $chunk) {
                 // We can only submit 25 at a time
                 if ($chunk) {
@@ -1442,11 +1459,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         if ($object === 'CampaignMember') {
                             $internal = ['Id' => $item['body']['id']];
                         } else {
-                            $integrationEntityId = $item['body']['id'];
-                            $internal            = [];
+                            $internal = [];
                         }
-                        $salesforceIdMapping[$contactId] = $integrationEntityId;
-                        $persistEntities[]               = $this->createIntegrationEntity($object, $integrationEntityId, 'lead', $contactId, $internal, false);
+                        $salesforceIdMapping[$contactId] = $item['body']['id'];
+                        $persistEntities[]               = $this->createIntegrationEntity($object, $salesforceIdMapping[$contactId], 'lead', $contactId, $internal, false);
                     }
                     ++$created;
                 } elseif (204 === $item['httpStatusCode']) {
