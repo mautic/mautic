@@ -10,8 +10,6 @@ php:
   - 7.1
 
 before_script:
-  # Remove composer.lock on php < 7.0
-  - if [ "${TRAVIS_PHP_VERSION//./}" -eq "56" ]; then rm composer.lock; fi;
   - composer install
 
 script:
