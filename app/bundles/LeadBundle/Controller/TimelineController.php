@@ -120,7 +120,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:plugin_list.html.php',
+                'contentTemplate' => ('gmail' === strtolower($integration)) ? 'MauticLeadBundle:Timeline:plugin_list.html.php' : 'MauticLeadBundle:Timeline:plugin_table.html.php',
             ]
         );
     }
@@ -175,7 +175,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:plugin_list.html.php',
+                'contentTemplate' => ('gmail' === strtolower($integration)) ? 'MauticLeadBundle:Timeline:plugin_list.html.php' : 'MauticLeadBundle:Timeline:plugin_table.html.php',
             ]
         );
     }
