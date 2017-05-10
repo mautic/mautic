@@ -11,8 +11,7 @@ php:
 
 before_script:
   # Remove composer.lock on php < 7.0
-  - printenv
-  - if [ "${PHPENV_VERSION//./}" -lt "70000" ]; then rm composer.lock; fi;
+  - if [ "${TRAVIS_PHP_VERSION//./}" -eq "56" ]; then rm composer.lock; fi;
   - composer install
 
 script:
