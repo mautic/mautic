@@ -238,7 +238,7 @@ EOT
             $twitterLeads = [];
             foreach ($leads as $leadId => $lead) {
                 $fields                       = $lead->getFields();
-                $twitterHandle                = $fields[$handleFieldGroup][$handleField]['value'];
+                $twitterHandle                = strtolower($fields[$handleFieldGroup][$handleField]['value']);
                 $twitterLeads[$twitterHandle] = $lead;
             }
 
@@ -254,7 +254,7 @@ EOT
             // tweet timestamp
             $tweetTimestamp = $status['created_at'];
             $lastActive     = new \DateTime($tweetTimestamp);
-            $handle         = $status['user']['screen_name'];
+            $handle         = strtolower($status['user']['screen_name']);
 
             /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {
