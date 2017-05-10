@@ -1665,11 +1665,10 @@ class EventModel extends CommonFormModel
 
             $eventTriggered = false;
             if ($response instanceof LeadEventLog) {
-                // Listener handled the event and returned a log entry
-                $this->campaignModel->setChannelFromEventProperties($response, $event, $thisEventSettings);
+                $log = $response;
 
-                $repo->saveEntity($response);
-                $this->em->detach($response);
+                // Listener handled the event and returned a log entry
+                $this->campaignModel->setChannelFromEventProperties($log, $event, $thisEventSettings);
 
                 ++$executedEventCount;
 
@@ -1677,7 +1676,7 @@ class EventModel extends CommonFormModel
                     'CAMPAIGN: Listener handled event for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                 );
 
-                if (!$response->getIsScheduled()) {
+                if (!$log->getIsScheduled()) {
                     $eventTriggered = true;
                 }
             } elseif (($response === false || (is_array($response) && isset($response['result']) && false === $response['result']))
@@ -1699,26 +1698,27 @@ class EventModel extends CommonFormModel
                         $log->setMetadata($response);
                     }
                     $debug .= ' thus placed on hold '.$this->scheduleTimeForFailedEvents;
+
+                    $metadata = $log->getMetadata();
+                    if (is_array($response)) {
+                        $metadata = array_merge($metadata, $response);
+                    }
+
+                    $reason = null;
+                    if (isset($metadata['errors'])) {
+                        $reason = (is_array($metadata['errors'])) ? implode('<br />', $metadata['errors']) : $metadata['errors'];
+                    } elseif (isset($metadata['reason'])) {
+                        $reason = $metadata['reason'];
+                    }
+                    $this->setEventStatus($log, false, $reason);
                 } else {
                     // Remove
                     $debug .= ' thus deleted';
                     $repo->deleteEntity($log);
+                    unset($log);
                 }
 
-                $metadata = $log->getMetadata();
-                if (is_array($response)) {
-                    $metadata = array_merge($metadata, $response);
-                }
-
-                $reason = null;
-                if (isset($metadata['errors'])) {
-                    $reason = (is_array($metadata['errors'])) ? implode('<br />', $metadata['errors']) : $metadata['errors'];
-                } elseif (isset($metadata['reason'])) {
-                    $reason = $metadata['reason'];
-                }
-                $this->setEventStatus($log, false, $reason);
                 $this->notifyOfFailure($lead, $campaign->getCreatedBy(), $campaign->getName().' / '.$event['name']);
-
                 $this->logger->debug($debug);
             } else {
                 $this->setEventStatus($log, true);
