@@ -155,7 +155,6 @@ class FacebookIntegration extends SocialIntegration
     {
         return [
             'about'       => ['type' => 'string'],
-            'bio'         => ['type' => 'string'],
             'birthday'    => ['type' => 'string'],
             'email'       => ['type' => 'string'],
             'first_name'  => ['type' => 'string'],
