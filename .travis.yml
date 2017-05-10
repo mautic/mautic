@@ -10,6 +10,8 @@ php:
   - 7.1
 
 before_script:
+  # Remove composer.lock on php < 7.0
+  - if [ "${PHPENV_VERSION//./}" -lt "70000" ]; then rm composer.lock; fi;
   - composer install
 
 script:
