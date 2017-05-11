@@ -968,7 +968,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
-        $leadsToSync           = [];
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
         $leadModel             = $this->leadModel;
         $companyModel          = $this->companyModel;
@@ -1023,6 +1022,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $limit               = $originalLimit;
             $mauticData          = [];
             $checkEmailsInSF     = [];
+            $leadsToSync         = [];
             // Process
             if (!$noMoreUpdates) {
                 // Fetch them separately so we can determine
@@ -1284,6 +1284,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             if (!empty($leadsToSync)) {
                 $leadModel->saveEntities($leadsToSync);
+                unset($leadsToSync);
                 $this->em->clear(Lead::class);
             }
 
@@ -1294,6 +1295,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $request              = [];
             $request['allOrNone'] = 'false';
             $chunked              = array_chunk($mauticData, 25);
+
             foreach ($chunked as $chunk) {
                 // We can only submit 25 at a time
                 if ($chunk) {
@@ -1304,6 +1306,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $totalUpdated += (int) $updated;
                     $totalCreated += (int) $created;
                 }
+            }
+
+            if ($progress && $progress->getProgressPercent() >= 1) {
+                break;
             }
         }
 
