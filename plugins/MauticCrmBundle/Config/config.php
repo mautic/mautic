@@ -32,34 +32,34 @@ return [
             ],
         ],
 
-        /** Page : INES CRM sync log **/
-		'main' => [
-			'ines_logs' => [
-				'path' => '/ines/logs',
-				'controller' => 'MauticCrmBundle:Ines:logs'
-			]
-		],
+        /* Page : INES CRM sync log **/
+        'main' => [
+            'ines_logs' => [
+                'path'       => '/ines/logs',
+                'controller' => 'MauticCrmBundle:Ines:logs',
+            ],
+        ],
 
-		/** Adding an End-Point to the Mautic API to retrieve INES plugin mapping and config **/
-		'api' => [
-			'plugin_crm_bundle_ines_get_mapping_api' => [
-				'path' => '/ines/getMapping',
-				'controller' => 'MauticCrmBundle:Api:inesGetMapping',
-				'method' => 'GET'
-			]
-		],
+        /* Adding an End-Point to the Mautic API to retrieve INES plugin mapping and config **/
+        'api' => [
+            'plugin_crm_bundle_ines_get_mapping_api' => [
+                'path'       => '/ines/getMapping',
+                'controller' => 'MauticCrmBundle:Api:inesGetMapping',
+                'method'     => 'GET',
+            ],
+        ],
     ],
     'services' => [
-		'events' => [
+        'events' => [
             'mautic.crm.leadbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber'
-            ]
-		],
-		'models' =>  [
+                'class' => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber',
+            ],
+        ],
+        'models' => [
             'mautic.crm.model.ines_sync_log' => [
-                'class' => 'MauticPlugin\MauticCrmBundle\Model\InesSyncLogModel',
-				'arguments' => ['mautic.factory']
-            ]
-		]
-	]
+                'class'     => 'MauticPlugin\MauticCrmBundle\Model\InesSyncLogModel',
+                'arguments' => 'doctrine.orm.entity_manager',
+            ],
+        ],
+    ],
 ];
