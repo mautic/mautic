@@ -1301,7 +1301,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if ($chunk) {
                     $request['compositeRequest'] = $chunk;
                     $result                      = $apiHelper->syncMauticToSalesforce($request);
-
+                    $this->logger->debug('SALESFORCE: Sync Composite  '.var_export($request, true));
                     list($updated, $created) = $this->processCompositeResponse($result['compositeResponse'], $salesforceIdMapping);
                     $totalUpdated += (int) $updated;
                     $totalCreated += (int) $created;
