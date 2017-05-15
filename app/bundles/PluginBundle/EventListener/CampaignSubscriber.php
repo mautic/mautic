@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\PluginEvents;
 
 /**
@@ -80,21 +81,35 @@ class CampaignSubscriber extends CommonSubscriber
 
         $services = $this->integrationHelper->getIntegrationObjects($integration);
         $success  = false;
+        $errors   = [];
+
+        /**
+         * @var  $name
+         * @var  AbstractIntegration $s
+         */
         foreach ($services as $name => $s) {
             $settings = $s->getIntegrationSettings();
             if (!$settings->isPublished()) {
                 continue;
             }
             if (method_exists($s, 'pushLead') && $feature == 'push_lead') {
-                if ($s->pushLead($lead, $config)) {
+                if ($s->resetLastIntegrationError()->pushLead($lead, $config)) {
                     $success = true;
+                } elseif ($error = $s->getLastIntegrationError()) {
+                    $errors[] = $error;
                 }
             }
             if (method_exists($s, 'pushLeadToCampaign') && $feature == 'push_to_campaign') {
-                if ($s->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
+                if ($s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
                     $success = true;
+                } elseif ($error = $s->getLastIntegrationError()) {
+                    $errors[] = $error;
                 }
             }
+        }
+
+        if (count($errors)) {
+            $event->setFailed(implode("<br />", $errors));
         }
 
         return $event->setResult($success);

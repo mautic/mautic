@@ -7507,7 +7507,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/BazingaOAuthServerBundle.git",
-                "reference": "81834da2cddeb7f21873ae2da76fdccd1e530920"
+                "reference": "d4d2e94bb69c20ae4a5fc136c0fe40253368787e"
             },
             "require": {
                 "php": ">=5.3.3",

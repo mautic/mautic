@@ -16,6 +16,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\CampaignDecisionEvent;
@@ -1664,11 +1665,10 @@ class EventModel extends CommonFormModel
 
             $eventTriggered = false;
             if ($response instanceof LeadEventLog) {
-                // Listener handled the event and returned a log entry
-                $this->campaignModel->setChannelFromEventProperties($response, $event, $thisEventSettings);
+                $log = $response;
 
-                $repo->saveEntity($response);
-                $this->em->detach($response);
+                // Listener handled the event and returned a log entry
+                $this->campaignModel->setChannelFromEventProperties($log, $event, $thisEventSettings);
 
                 ++$executedEventCount;
 
@@ -1676,7 +1676,7 @@ class EventModel extends CommonFormModel
                     'CAMPAIGN: Listener handled event for '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                 );
 
-                if (!$response->getIsScheduled()) {
+                if (!$log->getIsScheduled()) {
                     $eventTriggered = true;
                 }
             } elseif (($response === false || (is_array($response) && isset($response['result']) && false === $response['result']))
@@ -1697,18 +1697,32 @@ class EventModel extends CommonFormModel
                     if (is_array($response)) {
                         $log->setMetadata($response);
                     }
-                    $logRepo->saveEntity($log);
                     $debug .= ' thus placed on hold '.$this->scheduleTimeForFailedEvents;
+
+                    $metadata = $log->getMetadata();
+                    if (is_array($response)) {
+                        $metadata = array_merge($metadata, $response);
+                    }
+
+                    $reason = null;
+                    if (isset($metadata['errors'])) {
+                        $reason = (is_array($metadata['errors'])) ? implode('<br />', $metadata['errors']) : $metadata['errors'];
+                    } elseif (isset($metadata['reason'])) {
+                        $reason = $metadata['reason'];
+                    }
+                    $this->setEventStatus($log, false, $reason);
                 } else {
                     // Remove
                     $debug .= ' thus deleted';
                     $repo->deleteEntity($log);
+                    unset($log);
                 }
 
                 $this->notifyOfFailure($lead, $campaign->getCreatedBy(), $campaign->getName().' / '.$event['name']);
-
                 $this->logger->debug($debug);
             } else {
+                $this->setEventStatus($log, true);
+
                 ++$executedEventCount;
 
                 if ($response !== true) {
@@ -1734,8 +1748,6 @@ class EventModel extends CommonFormModel
                     $log->setMetadata($response);
                 }
 
-                $logRepo->saveEntity($log);
-
                 $this->logger->debug(
                     'CAMPAIGN: '.ucfirst($event['eventType']).' ID# '.$event['id'].' for contact ID# '.$lead->getId()
                     .' successfully executed and logged with a response of '.var_export($response, true)
@@ -1750,6 +1762,11 @@ class EventModel extends CommonFormModel
                 if ('condition' === $event['eventType']) {
                     // Conditions will need child event processed
                     $decisionPath = ($response === true) ? 'yes' : 'no';
+
+                    if (!$response) {
+                        // Note that a condition took non action path so we can generate a visual stat
+                        $log->setNonActionPathTaken(true);
+                    }
                 } else {
                     // Actions will need to check if conditions are attached to it
                     $decisionPath = 'null';
@@ -1763,6 +1780,10 @@ class EventModel extends CommonFormModel
                 }
 
                 $this->triggeredEvents[$event['id']][$decisionPath][] = $lead->getId();
+            }
+
+            if ($log) {
+                $logRepo->saveEntity($log);
             }
         } else {
             //else do nothing
@@ -2039,6 +2060,37 @@ class EventModel extends CommonFormModel
         unset($event, $campaign, $lead);
 
         return $log;
+    }
+
+    /**
+     * @param LeadEventLog $log
+     * @param              $status
+     * @param null         $reason
+     */
+    public function setEventStatus(LeadEventLog $log, $status, $reason = null)
+    {
+        $failedLog = $log->getFailedLog();
+
+        if ($status) {
+            if ($failedLog) {
+                $this->em->getRepository('MauticCampaignBundle:FailedLeadEventLog')->deleteEntity($failedLog);
+                $log->setFailedLog(null);
+            }
+
+            $metadata = $log->getMetadata();
+            unset($metadata['errors']);
+            $log->setMetadata($metadata);
+        } else {
+            if (!$failedLog) {
+                $failedLog = new FailedLeadEventLog();
+            }
+
+            $failedLog->setDateAdded()
+                ->setReason($reason)
+                ->setLog($log);
+
+            $this->em->persist($failedLog);
+        }
     }
 
     /**

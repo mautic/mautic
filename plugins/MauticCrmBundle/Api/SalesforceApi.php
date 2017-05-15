@@ -115,13 +115,13 @@ class SalesforceApi extends CrmApi
         //try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && array_search('Contact', $config['objects']) && isset($data['Contact']['Email'])) {
             $sfObject    = 'Contact';
-            $findContact = 'select Id from Contact where email = \''.$data['Contact']['Email'].'\'';
+            $findContact = 'select Id from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
             $sfRecord    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
         }
 
         if (empty($sfRecord['records']) && isset($data['Lead']['Email'])) {
             $sfObject = 'Lead';
-            $findLead = 'select Id from Lead where email = \''.$data['Lead']['Email'].'\' and ConvertedContactId = NULL';
+            $findLead = 'select Id from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
             $sfRecord = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
         }
         $sfLeadRecords = $sfRecord['records'];
@@ -131,6 +131,7 @@ class SalesforceApi extends CrmApi
             foreach ($sfLeadRecords as $sfLeadRecord) {
                 $sfLeadId = $sfLeadRecord['Id'];
                 $this->request('', $data[$sfObject], 'PATCH', false, $sfObject.'/'.$sfLeadId);
+                $this->integration->getLogger()->debug('SALESFORCE: PATCH through trigger action '.$sfObject.' '.var_export($data[$sfObject], true));
             }
 
             $createdLeadData       = $data[$sfObject];
@@ -139,6 +140,7 @@ class SalesforceApi extends CrmApi
 
         if ($createLead && isset($data['Lead']['Email'])) {
             $createdLeadData = $this->request('', $data['Lead'], 'POST', false, 'Lead');
+            $this->integration->getLogger()->debug('SALESFORCE: POST through trigger action Lead '.var_export($data['Lead'], true));
         }
 
         //todo: check if push activities is selected in config
