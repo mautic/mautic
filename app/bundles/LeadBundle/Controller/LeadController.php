@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -1264,7 +1263,11 @@ class LeadController extends FormController
         ini_set('auto_detect_line_endings', true);
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model   = $this->getModel('lead');
+        $model = $this->getModel('lead');
+
+        /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
+        $importModel = $this->getModel('lead.import');
+
         $session = $this->get('session');
 
         if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
@@ -1491,6 +1494,7 @@ class LeadController extends FormController
                                         // Get the number of lines so we can track progress
                                         $file->seek(PHP_INT_MAX);
                                         $linecount = $file->key();
+                                        $session->set('mautic.lead.import.linecount', $linecount);
 
                                         if (!empty($headers) && is_array($headers)) {
                                             array_walk($headers, create_function('&$val', '$val = trim($val);'));
@@ -1569,17 +1573,23 @@ class LeadController extends FormController
                             $defaultOwner = ($owner) ? $owner->getId() : null;
 
                             if ($form->get('buttons')->get('apply')->isClicked()) {
-                                $importConfig = [
-                                    'source_dir'         => $fullPath,
-                                    'file_name'          => $fileName,
-                                    'original_file_name' => $session->get('mautic.lead.import.origfilename'),
-                                    'matched_fields'     => $matchedFields,
-                                    'default'            => [
-                                        'owner' => $defaultOwner,
-                                        'list'  => $list,
-                                        'tags'  => $tags,
-                                    ],
-                                ];
+                                $importEntity = $importModel->getEntity();
+                                $importEntity->setDir($fullPath)
+                                    ->setFile($fileName)
+                                    ->setOriginalFile($session->get('mautic.lead.import.origfilename'))
+                                    ->setLineCount($session->get('mautic.lead.import.linecount'))
+                                    ->setMatchedFields($matchedFields)
+                                    ->setParams(
+                                        [
+                                            'defaults' => [
+                                                'owner' => $defaultOwner,
+                                                'list'  => $list,
+                                                'tags'  => $tags,
+                                            ],
+                                        ]
+                                    );
+
+                                $importModel->saveEntity($importEntity);
 
                                 $model->createImportEvent($importConfig);
 
@@ -1669,8 +1679,10 @@ class LeadController extends FormController
             return $importDir;
         }
 
-        $tmpDir    = $this->get('mautic.helper.paths')->getSystemPath('tmp');
-        $importDir = $tmpDir.'/imports/'.(new DateTimeHelper())->toUtcString('YmdHis');
+        /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
+        $importModel = $this->getModel('lead.import');
+
+        $importDir = $importModel->getUniqueDir();
 
         // Set the dir path to session
         $session->set('mautic.lead.import.dir', $importDir);
@@ -1695,6 +1707,7 @@ class LeadController extends FormController
         $session->set('mautic.lead.import.inprogress', false);
         $session->set('mautic.lead.import.importfields', []);
         $session->set('mautic.lead.import.origfilename', null);
+        $session->set('mautic.lead.import.linecount', null);
 
         if ($removeCsv) {
             unlink($filepath);

@@ -621,6 +621,14 @@ return [
                     'session',
                 ],
             ],
+            'mautic.lead.model.import' => [
+                'class'     => Mautic\LeadBundle\Model\ImportModel::class,
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.helper.paths',
+                    'mautic.core.model.auditlog',
+                ],
+            ],
         ],
     ],
 ];

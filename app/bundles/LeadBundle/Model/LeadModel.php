@@ -1917,6 +1917,13 @@ class LeadModel extends FormModel
         return $merged;
     }
 
+    /**
+     * Creates record about import which should be imported in the background.
+     *
+     * @param array $importConfig
+     *
+     * @return LeadModel
+     */
     public function createImportEvent(array $importConfig)
     {
         $this->auditLogModel->writeToLog(
@@ -1929,6 +1936,18 @@ class LeadModel extends FormModel
                 'details'   => $importConfig,
             ]
         );
+
+        return $this;
+    }
+
+    /**
+     * Returns the oldest unprocessed import details.
+     *
+     * @return array
+     */
+    public function getImportToProcess()
+    {
+        return $this->auditLogModel->getLogForObject('import', 0, null, 1, 'core');
     }
 
     /**
