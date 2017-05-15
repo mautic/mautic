@@ -308,6 +308,9 @@ abstract class AbstractIntegration
 
     /**
      * Called on construct.
+     *
+     * @deprecated 2.8.2 To be removed in 3.0
+     *             Setup your integration in the class constructor instead
      */
     public function init()
     {
