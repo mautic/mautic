@@ -12,11 +12,13 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -1272,11 +1274,12 @@ class LeadController extends FormController
         // Move the file to cache and rename it
         $forceStop = $this->request->get('cancel', false);
         $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', 1);
-        $tmpDir    = $this->get('mautic.helper.paths')->getSystemPath('tmp');
-        $username  = $this->get('mautic.helper.user')->getUser()->getUsername();
-        $fileName  = $username.'_leadimport.csv';
-        $fullPath  = $tmpDir.'/'.$fileName;
-        $complete  = false;
+        $fileName  = 'import.csv';
+        $importDir = $this->getImportDirName();
+        $fullPath  = $importDir.'/'.$fileName;
+        $fs        = new Filesystem();
+
+        $complete = false;
         if (!file_exists($fullPath)) {
             // Force step one if the file doesn't exist
             $step = 1;
@@ -1295,7 +1298,6 @@ class LeadController extends FormController
                     $this->resetImport($fullPath);
                 }
 
-                $session->set('mautic.lead.import.headers', []);
                 $form = $this->get('form.factory')->create('lead_import', [], ['action' => $action]);
                 break;
             case 2:
@@ -1460,7 +1462,11 @@ class LeadController extends FormController
                                 $errorMessage    = null;
                                 $errorParameters = [];
                                 try {
-                                    $fileData->move($tmpDir, $fileName);
+                                    // Create the import dir recursively
+                                    $fs->mkdir($importDir, 0755);
+
+                                    $session->set('mautic.lead.import.origfilename', $fileData->getClientOriginalName());
+                                    $fileData->move($importDir, $fileName);
 
                                     $file = new \SplFileObject($fullPath);
 
@@ -1491,6 +1497,7 @@ class LeadController extends FormController
                                             $session->set('mautic.lead.import.headers', $headers);
                                             sort($headers);
                                             $headers = array_combine($headers, $headers);
+
                                             $session->set('mautic.lead.import.step', 2);
                                             $session->set('mautic.lead.import.importfields', $headers);
                                             $session->set('mautic.lead.import.progress', [0, $linecount]);
@@ -1560,11 +1567,36 @@ class LeadController extends FormController
                             );
                         } else {
                             $defaultOwner = ($owner) ? $owner->getId() : null;
-                            $session->set('mautic.lead.import.fields', $matchedFields);
-                            $session->set('mautic.lead.import.defaultowner', $defaultOwner);
-                            $session->set('mautic.lead.import.defaultlist', $list);
-                            $session->set('mautic.lead.import.defaulttags', $tags);
-                            $session->set('mautic.lead.import.step', 3);
+
+                            if ($form->get('buttons')->get('apply')->isClicked()) {
+                                $importConfig = [
+                                    'source_dir'         => $fullPath,
+                                    'file_name'          => $fileName,
+                                    'original_file_name' => $session->get('mautic.lead.import.origfilename'),
+                                    'matched_fields'     => $matchedFields,
+                                    'default'            => [
+                                        'owner' => $defaultOwner,
+                                        'list'  => $list,
+                                        'tags'  => $tags,
+                                    ],
+                                ];
+
+                                $model->createImportEvent($importConfig);
+
+                                try {
+                                    $this->addFlash('mautic.lead.batch.import.created');
+                                    $this->resetImport($fullPath, false);
+                                    $step = 1;
+                                } catch (Exception $e) {
+                                    $errorMessage = 'mautic.lead.import.filenotreadable';
+                                }
+                            } else {
+                                $session->set('mautic.lead.import.fields', $matchedFields);
+                                $session->set('mautic.lead.import.defaultowner', $defaultOwner);
+                                $session->set('mautic.lead.import.defaultlist', $list);
+                                $session->set('mautic.lead.import.defaulttags', $tags);
+                                $session->set('mautic.lead.import.step', 3);
+                            }
 
                             return $this->importAction(0, true);
                         }
@@ -1623,13 +1655,38 @@ class LeadController extends FormController
     }
 
     /**
+     * Generates unique import directory name inside the cache dir if not stored in the session.
+     * If it exists in the session, returns that one.
+     *
+     * @return string
+     */
+    protected function getImportDirName()
+    {
+        $session = $this->get('session');
+
+        // Return the dir path from session if exists
+        if ($importDir = $session->get('mautic.lead.import.dir')) {
+            return $importDir;
+        }
+
+        $tmpDir    = $this->get('mautic.helper.paths')->getSystemPath('tmp');
+        $importDir = $tmpDir.'/imports/'.(new DateTimeHelper())->toUtcString('YmdHis');
+
+        // Set the dir path to session
+        $session->set('mautic.lead.import.dir', $importDir);
+
+        return $importDir;
+    }
+
+    /**
      * @param $filepath
      */
-    private function resetImport($filepath)
+    private function resetImport($filepath, $removeCsv = true)
     {
         $session = $this->get('session');
         $session->set('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0]);
         $session->set('mautic.lead.import.headers', []);
+        $session->set('mautic.lead.import.dir', null);
         $session->set('mautic.lead.import.step', 1);
         $session->set('mautic.lead.import.progress', [0, 0]);
         $session->set('mautic.lead.import.fields', []);
@@ -1637,8 +1694,11 @@ class LeadController extends FormController
         $session->set('mautic.lead.import.defaultlist', null);
         $session->set('mautic.lead.import.inprogress', false);
         $session->set('mautic.lead.import.importfields', []);
+        $session->set('mautic.lead.import.origfilename', null);
 
-        unlink($filepath);
+        if ($removeCsv) {
+            unlink($filepath);
+        }
     }
 
     /**

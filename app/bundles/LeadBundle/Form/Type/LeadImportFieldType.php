@@ -245,7 +245,7 @@ class LeadImportFieldType extends AbstractType
             'buttons',
             'form_buttons',
             [
-                'apply_text'  => false,
+                'apply_text'  => 'mautic.lead.import.in.background',
                 'save_text'   => 'mautic.lead.import.start',
                 'save_class'  => 'btn btn-primary',
                 'save_icon'   => 'fa fa-user-plus',
