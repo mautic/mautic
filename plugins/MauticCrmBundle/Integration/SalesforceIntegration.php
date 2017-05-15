@@ -1062,6 +1062,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $lead['id']
                             );
                             $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
+                            $checkEmailsInSF[$key] = $lead;
                         } else {
                             $checkEmailsInSF[$key] = $lead;
                         }
@@ -1211,6 +1212,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $key = mb_strtolower($sfContactRecord['Email']);
                         if (isset($checkEmailsInSF[$key])) {
                             $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = $sfContactRecord['Id'];
+                            if ($checkEmailsInSF[$key]['integration_entity_id'] != $sfContactRecord['Id'] && $checkEmailsInSF[$key]['integration_entity'] == 'Lead') {
+                                $checkEmailsInSF[$key]['id'] = null;
+                            }
                             if ($this->buildCompositeBody(
                                 $mauticData,
                                 $availableFields,
