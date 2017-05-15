@@ -83,6 +83,11 @@ class Import extends FormEntity
     private $status;
 
     /**
+     * @var DateTime
+     */
+    private $dateEnded;
+
+    /**
      * @var string
      */
     private $object = 'lead';
@@ -110,8 +115,6 @@ class Import extends FormEntity
     {
         $this->status   = self::CREATED;
         $this->priority = self::LOW;
-
-        parent::__construct();
     }
 
     /**
@@ -121,7 +124,7 @@ class Import extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('imports')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\ImportRepository')
+            ->setCustomRepositoryClass(ImportRepository::class)
             ->addIndex(['object'], 'import_object')
             ->addIndex(['status'], 'import_status')
             ->addIndex(['priority'], 'import_priority')
@@ -129,10 +132,11 @@ class Import extends FormEntity
             ->addField('dir', Type::STRING)
             ->addField('file', Type::STRING)
             ->addNullableField('originalFile', Type::STRING, 'original_file')
-            ->addField('lineCount', Type::INTEGER, 'line_count')
-            ->addField('processedLineCount', Type::INTEGER, 'processed_line_count')
+            ->addNamedField('lineCount', Type::INTEGER, 'line_count')
+            ->addNamedField('processedLineCount', Type::INTEGER, 'processed_line_count')
             ->addField('priority', Type::INTEGER)
             ->addField('status', Type::INTEGER)
+            ->addNullableField('dateEnded', Type::DATETIME, 'date_ended')
             ->addField('object', Type::STRING)
             ->addNullableField('matchedFields', Type::JSON_ARRAY)
             ->addNullableField('properties', Type::JSON_ARRAY);
@@ -170,6 +174,7 @@ class Import extends FormEntity
                     'processedLineCount',
                     'priority',
                     'status',
+                    'dateEnded',
                     'object',
                     'matchedFields',
                     'properties',
@@ -217,8 +222,9 @@ class Import extends FormEntity
     public function setFile($file)
     {
         $this->isChanged('file', $file);
+        $this->file = $file;
 
-        return $this->file = $file;
+        return $this;
     }
 
     /**
@@ -230,6 +236,31 @@ class Import extends FormEntity
     }
 
     /**
+     * Get import file path.
+     *
+     * @return string
+     */
+    public function getFilePath()
+    {
+        return $this->getDir().'/'.$this->getFile();
+    }
+
+    /**
+     * Removes the file if exists.
+     * It won't throw any exception if the file is not readable.
+     * Not removing the CSV file is not consodered a big trouble.
+     * It will be removed on the next cache:clear.
+     */
+    public function removeFile()
+    {
+        $file = $this->getFilePath();
+
+        if (file_exists($file) && is_writable($file)) {
+            unlink($file);
+        }
+    }
+
+    /**
      * @param string $originalFile
      *
      * @return Import
@@ -237,8 +268,9 @@ class Import extends FormEntity
     public function setOriginalFile($originalFile)
     {
         $this->isChanged('originalFile', $originalFile);
+        $this->originalFile = $originalFile;
 
-        return $this->originalFile = $originalFile;
+        return $this;
     }
 
     /**
@@ -331,6 +363,27 @@ class Import extends FormEntity
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * @param int $dateEnded
+     *
+     * @return Import
+     */
+    public function setDateEnded(\DateTime $dateEnded)
+    {
+        $this->isChanged('dateEnded', $dateEnded);
+        $this->dateEnded = $dateEnded;
+
+        return $this;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getDateEnded()
+    {
+        return $this->dateEnded;
     }
 
     /**

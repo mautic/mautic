@@ -292,7 +292,7 @@ final class LeadEvents
      * The mautic.lead_import_pre_save event is dispatched right before an import is persisted.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadEvent instance.
+     * Mautic\LeadBundle\Event\ImportEvent instance.
      *
      * @var string
      */
@@ -302,7 +302,7 @@ final class LeadEvents
      * The mautic.lead_import_post_save event is dispatched right after an import is persisted.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadEvent instance.
+     * Mautic\LeadBundle\Event\ImportEvent instance.
      *
      * @var string
      */
@@ -312,7 +312,7 @@ final class LeadEvents
      * The mautic.lead_import_pre_delete event is dispatched before an import is deleted.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadEvent instance.
+     * Mautic\LeadBundle\Event\ImportEvent instance.
      *
      * @var string
      */
@@ -322,7 +322,7 @@ final class LeadEvents
      * The mautic.lead_import_post_delete event is dispatched after an import is deleted.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadEvent instance.
+     * Mautic\LeadBundle\Event\ImportEvent instance.
      *
      * @var string
      */

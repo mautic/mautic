@@ -12,49 +12,33 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\LeadNoteEvent;
+use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class ImportModel
- * {@inheritdoc}
+ * Class ImportModel.
  */
 class ImportModel extends FormModel
 {
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
-
     /**
      * @var PathsHelper
      */
     protected $pathsHelper;
 
     /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
      * ImportModel constructor.
      *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param PathsHelper    $pathsHelper
-     * @param AuditLogModel  $auditLogModel
+     * @param PathsHelper $pathsHelper
      */
     public function __construct(
-        IpLookupHelper $ipLookupHelper,
-        PathsHelper $pathsHelper,
-        AuditLogModel $auditLogModel
+        PathsHelper $pathsHelper
     ) {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->pathsHelper    = $pathsHelper;
-        $this->auditLogModel  = $auditLogModel;
+        $this->pathsHelper = $pathsHelper;
     }
 
     /**
@@ -140,7 +124,7 @@ class ImportModel extends FormModel
 
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
-                $event = new LeadNoteEvent($entity, $isNew);
+                $event = new ImportEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
 

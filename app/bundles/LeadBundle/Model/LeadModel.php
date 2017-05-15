@@ -24,7 +24,6 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Company;
@@ -128,11 +127,6 @@ class LeadModel extends FormModel
     protected $trackByIp = false;
 
     /**
-     * @var AuditLogModel
-     */
-    protected $auditLogModel;
-
-    /**
      * LeadModel constructor.
      *
      * @param RequestStack      $requestStack
@@ -147,7 +141,6 @@ class LeadModel extends FormModel
      * @param CategoryModel     $categoryModel
      * @param ChannelListHelper $channelListHelper
      * @param                   $trackByIp
-     * @param AuditLogModel     $auditLogModel
      */
     public function __construct(
         RequestStack $requestStack,
@@ -161,8 +154,7 @@ class LeadModel extends FormModel
         CompanyModel $companyModel,
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
-        $trackByIp,
-        AuditLogModel $auditLogModel
+        $trackByIp
     ) {
         $this->request           = $requestStack->getCurrentRequest();
         $this->cookieHelper      = $cookieHelper;
@@ -176,7 +168,6 @@ class LeadModel extends FormModel
         $this->categoryModel     = $categoryModel;
         $this->channelListHelper = $channelListHelper;
         $this->trackByIp         = $trackByIp;
-        $this->auditLogModel     = $auditLogModel;
     }
 
     /**
@@ -1915,39 +1906,6 @@ class LeadModel extends FormModel
         }
 
         return $merged;
-    }
-
-    /**
-     * Creates record about import which should be imported in the background.
-     *
-     * @param array $importConfig
-     *
-     * @return LeadModel
-     */
-    public function createImportEvent(array $importConfig)
-    {
-        $this->auditLogModel->writeToLog(
-            [
-                'bundle'    => 'core',
-                'object'    => 'import',
-                'objectId'  => 0,
-                'action'    => 'create',
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-                'details'   => $importConfig,
-            ]
-        );
-
-        return $this;
-    }
-
-    /**
-     * Returns the oldest unprocessed import details.
-     *
-     * @return array
-     */
-    public function getImportToProcess()
-    {
-        return $this->auditLogModel->getLogForObject('import', 0, null, 1, 'core');
     }
 
     /**

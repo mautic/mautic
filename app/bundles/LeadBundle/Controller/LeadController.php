@@ -1579,7 +1579,7 @@ class LeadController extends FormController
                                     ->setOriginalFile($session->get('mautic.lead.import.origfilename'))
                                     ->setLineCount($session->get('mautic.lead.import.linecount'))
                                     ->setMatchedFields($matchedFields)
-                                    ->setParams(
+                                    ->setProperties(
                                         [
                                             'defaults' => [
                                                 'owner' => $defaultOwner,
@@ -1590,8 +1590,6 @@ class LeadController extends FormController
                                     );
 
                                 $importModel->saveEntity($importEntity);
-
-                                $model->createImportEvent($importConfig);
 
                                 try {
                                     $this->addFlash('mautic.lead.batch.import.created');

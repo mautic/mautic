@@ -360,6 +360,13 @@ return [
             'mautic.lead.button.subscriber' => [
                 'class' => \Mautic\LeadBundle\EventListener\ButtonSubscriber::class,
             ],
+            'mautic.lead.import.subscriber' => [
+                'class'     => Mautic\LeadBundle\EventListener\ImportSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
@@ -593,7 +600,6 @@ return [
                     'mautic.category.model.category',
                     'mautic.channel.helper.channel_list',
                     '%mautic.track_contact_by_ip%',
-                    'mautic.core.model.auditlog',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -624,9 +630,7 @@ return [
             'mautic.lead.model.import' => [
                 'class'     => Mautic\LeadBundle\Model\ImportModel::class,
                 'arguments' => [
-                    'mautic.helper.ip_lookup',
                     'mautic.helper.paths',
-                    'mautic.core.model.auditlog',
                 ],
             ],
         ],
