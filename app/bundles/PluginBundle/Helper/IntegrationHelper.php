@@ -16,7 +16,9 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Class IntegrationHelper.
@@ -29,11 +31,20 @@ class IntegrationHelper
     private $factory;
 
     /**
-     * @param MauticFactory $factory
+     * @var Container
      */
-    public function __construct(MauticFactory $factory)
+    private $container;
+
+    /**
+     * IntegrationHelper constructor.
+     *
+     * @param MauticFactory $factory
+     * @param Kernel        $kernel
+     */
+    public function __construct(MauticFactory $factory, Kernel $kernel)
     {
-        $this->factory = $factory;
+        $this->factory   = $factory;
+        $this->container = $kernel->getContainer();
     }
 
     /**
@@ -100,12 +111,11 @@ class IntegrationHelper
                             $newIntegration->setName($integrationName)
                                 ->setPlugin($pluginReference);
                             $integrationSettings[$integrationName] = $newIntegration;
+                            $integrationContainerKey               = strtolower("mautic.integration.{$integrationName}");
 
                             // Initiate the class in order to get the features supported
-                            $class           = '\\MauticPlugin\\'.$pluginNamespace.'\\Integration\\'.$integrationName.'Integration';
-                            $reflectionClass = new \ReflectionClass($class);
-                            if ($reflectionClass->isInstantiable()) {
-                                $integrations[$integrationName] = new $class($this->factory);
+                            if ($this->container->has($integrationContainerKey)) {
+                                $integrations[$integrationName] = $this->container->get($integrationContainerKey);
 
                                 $features = $integrations[$integrationName]->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
@@ -162,11 +172,11 @@ class IntegrationHelper
                             $newIntegration->setName($integrationName);
                             $integrationSettings[$integrationName] = $newIntegration;
 
+                            $integrationContainerKey = strtolower("mautic.integration.{$integrationName}");
+
                             // Initiate the class in order to get the features supported
-                            $class           = '\\Mautic\\'.$coreBundleNamespace.'\\Integration\\'.$integrationName.'Integration';
-                            $reflectionClass = new \ReflectionClass($class);
-                            if ($reflectionClass->isInstantiable()) {
-                                $integrations[$integrationName] = new $class($this->factory);
+                            if ($this->container->has($integrationContainerKey)) {
+                                $integrations[$integrationName] = $this->container->get($integrationContainerKey);
                                 $features                       = $integrations[$integrationName]->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
@@ -240,19 +250,22 @@ class IntegrationHelper
             }
 
             if (!isset($integrations[$integrationName])) {
-                $integration     = $available[$integrationName];
-                $rootNamespace   = $integration['isPlugin'] ? 'MauticPlugin' : 'Mautic';
-                $class           = '\\'.$rootNamespace.'\\'.$integration['namespace'].'\\Integration\\'.$integrationName.'Integration';
-                $reflectionClass = new \ReflectionClass($class);
-                if ($reflectionClass->isInstantiable()) {
-                    $integrations[$integrationName] = new $class($this->factory);
+                $integration             = $available[$integrationName];
+                $integrationContainerKey = strtolower("mautic.integration.{$integrationName}");
+
+                if ($this->container->has($integrationContainerKey)) {
+                    $integrations[$integrationName] = $this->container->get($integrationContainerKey);
                     $integrations[$integrationName]->setIntegrationSettings($integration['settings']);
-                } else {
-                    continue;
                 }
             }
 
             $returnServices[$integrationName] = $integrations[$integrationName];
+        }
+
+        foreach ($returnServices as $key => $value) {
+            if (!isset($value)) {
+                unset($returnServices[$key]);
+            }
         }
 
         if (empty($alphabetical)) {

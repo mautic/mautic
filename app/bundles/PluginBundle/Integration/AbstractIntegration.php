@@ -11,12 +11,14 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -31,9 +33,13 @@ use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
@@ -154,29 +160,134 @@ abstract class AbstractIntegration
     protected $lastIntegrationError;
 
     /**
+     * AbstractIntegration constructor.
+     */
+    public function __construct()
+    {
+        $this->init();
+    }
+
+    /**
      * @param MauticFactory $factory
      *
-     * @todo divorce from MauticFactory
+     * @deprecated 2.8.2 To be removed in 3.0. Use constructor arguments
+     *             to set dependencies instead
      */
-    public function __construct(MauticFactory $factory)
+    public function setFactory(MauticFactory $factory)
     {
-        $this->factory           = $factory;
-        $this->dispatcher        = $factory->getDispatcher();
-        $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
-        $this->em                = $factory->getEntityManager();
-        $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-        $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
-        $this->router            = $factory->getRouter();
-        $this->translator        = $factory->getTranslator();
-        $this->logger            = $factory->getLogger();
-        $this->encryptionHelper  = $factory->getHelper('encryption');
-        $this->leadModel         = $factory->getModel('lead');
-        $this->companyModel      = $factory->getModel('lead.company');
-        $this->pathsHelper       = $factory->getHelper('paths');
-        $this->notificationModel = $factory->getModel('core.notification');
-        $this->fieldModel        = $factory->getModel('lead.field');
+        $this->factory = $factory;
+    }
 
-        $this->init();
+    /**
+     * @param FieldModel $fieldModel
+     */
+    public function setFieldModel(FieldModel $fieldModel)
+    {
+        $this->fieldModel = $fieldModel;
+    }
+
+    /**
+     * @param NotificationModel $notificationModel
+     */
+    public function setNotificationModel(NotificationModel $notificationModel)
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
+    /**
+     * @param PathsHelper $pathsHelper
+     */
+    public function setPathsHelper(PathsHelper $pathsHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+    }
+
+    /**
+     * @param CompanyModel $companyModel
+     */
+    public function setCompanyModel(CompanyModel $companyModel)
+    {
+        $this->companyModel = $companyModel;
+    }
+
+    /**
+     * @param LeadModel $leadModel
+     */
+    public function setLeadModel(LeadModel $leadModel)
+    {
+        $this->leadModel = $leadModel;
+    }
+
+    /**
+     * @param EncryptionHelper $encryptionHelper
+     */
+    public function setEncryptionHelper(EncryptionHelper $encryptionHelper)
+    {
+        $this->encryptionHelper = $encryptionHelper;
+    }
+
+    /**
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param Translator $translator
+     */
+    public function setTranslator(Translator $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param Router $router
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function setRequest(RequestStack $requestStack)
+    {
+        $this->request = !defined('IN_MAUTIC_CONSOLE') ? $requestStack->getCurrentRequest() : null;
+    }
+
+    /**
+     * @param Session|null $session
+     */
+    public function setSession(Session $session = null)
+    {
+        $this->session = !defined('IN_MAUTIC_CONSOLE') ? $session : null;
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
+    /**
+     * @param CacheStorageHelper $cacheStorageHelper
+     */
+    public function setCache(CacheStorageHelper $cacheStorageHelper)
+    {
+        $this->cache = $cacheStorageHelper->getCache($this->getName());
+    }
+
+    /**
+     * @param ContainerAwareEventDispatcher $dispatcher
+     */
+    public function setDispatcher(ContainerAwareEventDispatcher $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**

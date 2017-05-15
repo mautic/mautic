@@ -146,6 +146,14 @@ return [
                 ],
             ],
         ],
+        'integrations' => [
+            'mautic.integration.onesignal' => [
+                'class'     => \Mautic\NotificationBundle\Integration\OneSignalIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+        ],
     ],
     'routes' => [
         'main' => [

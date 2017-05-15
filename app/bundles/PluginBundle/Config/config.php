@@ -132,7 +132,10 @@ return [
         'other' => [
             'mautic.helper.integration' => [
                 'class'     => 'Mautic\PluginBundle\Helper\IntegrationHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.factory',
+                    'kernel',
+                ],
             ],
         ],
         'models' => [
