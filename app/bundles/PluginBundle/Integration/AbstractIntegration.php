@@ -33,9 +33,8 @@ use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
-use Monolog\Logger;
-//use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -63,7 +62,7 @@ abstract class AbstractIntegration
     protected $factory;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -227,9 +226,9 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param Logger $logger
+     * @param LoggerInterface $logger
      */
-    public function setLogger(Logger $logger)
+    public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
@@ -283,9 +282,9 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param ContainerAwareEventDispatcher $dispatcher
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function setDispatcher(ContainerAwareEventDispatcher $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }

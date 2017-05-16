@@ -131,10 +131,15 @@ return [
         ],
         'other' => [
             'mautic.helper.integration' => [
-                'class'     => 'Mautic\PluginBundle\Helper\IntegrationHelper',
+                'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,
                 'arguments' => [
-                    'mautic.factory',
                     'kernel',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.paths',
+                    'mautic.helper.bundle',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.templating',
+                    'mautic.plugin.model.plugin',
                 ],
             ],
         ],

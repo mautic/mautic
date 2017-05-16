@@ -11,11 +11,16 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
@@ -26,25 +31,60 @@ use Symfony\Component\HttpKernel\Kernel;
 class IntegrationHelper
 {
     /**
-     * @var MauticFactory
-     */
-    private $factory;
-
-    /**
      * @var Container
      */
     private $container;
 
     /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var PathsHelper
+     */
+    protected $pathsHelper;
+
+    /**
+     * @var BundleHelper
+     */
+    protected $bundleHelper;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var TemplatingHelper
+     */
+    protected $templatingHelper;
+
+    /**
+     * @var PluginModel
+     */
+    protected $pluginModel;
+
+    /**
      * IntegrationHelper constructor.
      *
-     * @param MauticFactory $factory
-     * @param Kernel        $kernel
+     * @param Kernel               $kernel
+     * @param EntityManager        $em
+     * @param PathsHelper          $pathsHelper
+     * @param BundleHelper         $bundleHelper
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param TemplatingHelper     $templatingHelper
+     * @param PluginModel          $pluginModel
      */
-    public function __construct(MauticFactory $factory, Kernel $kernel)
+    public function __construct(Kernel $kernel, EntityManager $em, PathsHelper $pathsHelper, BundleHelper $bundleHelper, CoreParametersHelper $coreParametersHelper, TemplatingHelper $templatingHelper, PluginModel $pluginModel)
     {
-        $this->factory   = $factory;
-        $this->container = $kernel->getContainer();
+        $this->container            = $kernel->getContainer();
+        $this->em                   = $em;
+        $this->pathsHelper          = $pathsHelper;
+        $this->bundleHelper         = $bundleHelper;
+        $this->pluginModel          = $pluginModel;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->templatingHelper     = $templatingHelper;
     }
 
     /**
@@ -64,21 +104,18 @@ class IntegrationHelper
 
         // Build the service classes
         if (empty($available)) {
-            $em = $this->factory->getEntityManager();
-
             $available = [];
 
             // Get currently installed integrations
             $integrationSettings = $this->getIntegrationSettings();
 
             // And we'll be scanning the addon bundles for additional classes, so have that data on standby
-            $plugins = $this->factory->getPluginBundles();
+            $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $pluginModel     = $this->factory->getModel('plugin');
-            $integrationRepo = $em->getRepository('MauticPluginBundle:Integration');
+            $integrationRepo = $this->em->getRepository('MauticPluginBundle:Integration');
             //get a list of plugins for filter
-            $installedPlugins = $pluginModel->getEntities(
+            $installedPlugins = $this->pluginModel->getEntities(
                 [
                     'hydration_mode' => 'hydrate_array',
                     'index'          => 'bundle',
@@ -100,7 +137,7 @@ class IntegrationHelper
 
                     $id              = $installedPlugins[$plugin['bundle']]['id'];
                     $byPlugin[$id]   = [];
-                    $pluginReference = $em->getReference('MauticPluginBundle:Plugin', $id);
+                    $pluginReference = $this->em->getReference('MauticPluginBundle:Plugin', $id);
                     $pluginNamespace = str_replace('MauticPlugin', '', $plugin['bundle']);
 
                     foreach ($finder as $file) {
@@ -157,7 +194,7 @@ class IntegrationHelper
             $coreIntegrationSettings = $this->getCoreIntegrationSettings();
 
             // Scan core bundles for integration classes
-            foreach ($this->factory->getMauticBundles() as $coreBundle) {
+            foreach ($this->bundleHelper->getMauticBundles() as $coreBundle) {
                 if (is_dir($coreBundle['directory'].'/Integration')) {
                     $finder = new Finder();
                     $finder->files()->name('*Integration.php')->in($coreBundle['directory'].'/Integration')->ignoreDotFiles(true);
@@ -317,7 +354,7 @@ class IntegrationHelper
     public function getIntegrationCount($plugin)
     {
         if (!is_array($plugin)) {
-            $plugins = $this->factory->getParameter('plugin.bundles');
+            $plugins = $this->coreParametersHelper->getParameter('plugin.bundles');
             if (array_key_exists($plugin, $plugins)) {
                 $plugin = $plugins[$plugin];
             } else {
@@ -393,12 +430,12 @@ class IntegrationHelper
      */
     public function getIntegrationSettings()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticPluginBundle:Integration')->getIntegrations();
+        return $this->em->getRepository('MauticPluginBundle:Integration')->getIntegrations();
     }
 
     public function getCoreIntegrationSettings()
     {
-        return $this->factory->getEntityManager()->getRepository('MauticPluginBundle:Integration')->getCoreIntegrations();
+        return $this->em->getRepository('MauticPluginBundle:Integration')->getCoreIntegrations();
     }
 
     /**
@@ -465,7 +502,7 @@ class IntegrationHelper
 
             if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
-                $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+                $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             }
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
@@ -498,7 +535,7 @@ class IntegrationHelper
             $socialCache = [];
         }
         $lead->setSocialCache($socialCache);
-        $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+        $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
 
         return $socialCache;
     }
@@ -512,7 +549,7 @@ class IntegrationHelper
 
         if (empty($shareBtns)) {
             $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], true);
-            $templating         = $this->factory->getTemplating();
+            $templating         = $this->templatingHelper->getTemplating();
 
             /**
              * @var string
@@ -610,9 +647,9 @@ class IntegrationHelper
      */
     public function getIconPath($integration)
     {
-        $systemPath  = $this->factory->getSystemPath('root');
-        $bundlePath  = $this->factory->getSystemPath('bundles');
-        $pluginPath  = $this->factory->getSystemPath('plugins');
+        $systemPath  = $this->pathsHelper->getSystemPath('root');
+        $bundlePath  = $this->pathsHelper->getSystemPath('bundles');
+        $pluginPath  = $this->pathsHelper->getSystemPath('plugins');
         $genericIcon = $bundlePath.'/PluginBundle/Assets/img/generic.png';
 
         if (is_array($integration)) {
