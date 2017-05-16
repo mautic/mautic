@@ -116,13 +116,6 @@ class Import extends FormEntity
     private $object = 'lead';
 
     /**
-     * Array of fields to match [mautic_field_alias => csv_column_name].
-     *
-     * @var array
-     */
-    private $matchedFields = [];
-
-    /**
      * @var array
      */
     private $properties = [];
@@ -171,7 +164,6 @@ class Import extends FormEntity
             ->addNullableField('dateStarted', Type::DATETIME, 'date_started')
             ->addNullableField('dateEnded', Type::DATETIME, 'date_ended')
             ->addField('object', Type::STRING)
-            ->addNullableField('matchedFields', Type::JSON_ARRAY)
             ->addNullableField('properties', Type::JSON_ARRAY);
     }
 
@@ -212,7 +204,6 @@ class Import extends FormEntity
                     'dateStarted',
                     'dateEnded',
                     'object',
-                    'matchedFields',
                     'properties',
                 ]
             )
@@ -589,24 +580,24 @@ class Import extends FormEntity
     }
 
     /**
-     * @param string $matchedFields
+     * @param array $fields
      *
      * @return Import
      */
-    public function setMatchedFields($matchedFields)
+    public function setMatchedFields(array $fields)
     {
-        $this->isChanged('matchedFields', $matchedFields);
-        $this->matchedFields = $matchedFields;
+        $properties           = $this->properties;
+        $properties['fields'] = $fields;
 
-        return $this;
+        return $this->setProperties($properties);
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getMatchedFields()
     {
-        return $this->properties;
+        return empty($this->properties['fields']) ? [] : $this->properties['fields'];
     }
 
     /**
