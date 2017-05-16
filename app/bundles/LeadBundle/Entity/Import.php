@@ -538,6 +538,32 @@ class Import extends FormEntity
     }
 
     /**
+     * Modify the entity for the start of import.
+     *
+     * @return Import
+     */
+    public function start()
+    {
+        $this->setDateStarted(new \DateTime())
+            ->setState(self::IN_PROGRESS);
+
+        return $this;
+    }
+
+    /**
+     * Modify the entity for the start of import.
+     *
+     * @return Import
+     */
+    public function end()
+    {
+        $this->setDateEnded(new \DateTime())
+            ->setState(self::IMPORTED);
+
+        return $this;
+    }
+
+    /**
      * @param int $dateEnded
      *
      * @return Import

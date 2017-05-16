@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Command;
 
+use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -67,12 +68,13 @@ EOT
         /** @var \Mautic\LeadBundle\Model\ImportModel $model */
         $model = $container->get('mautic.lead.model.import');
 
-        $batch  = $input->getOption('batch');
-        $dryRun = $input->getOption('dry-run');
+        $batch    = $input->getOption('batch');
+        $dryRun   = $input->getOption('dry-run');
+        $progress = new Progress();
 
-        $import = $model->processQueue();
+        $import = $model->processNext($progress);
         echo '<pre>';
-        var_dump($import);
+        var_dump($progress, $import);
         die('</pre>');
 
         // if ('dev' == MAUTIC_ENV) {

@@ -69,19 +69,38 @@ class ImportModel extends FormModel
         );
     }
 
-    public function processNext()
+    /**
+     * Import next pre-saved import.
+     *
+     * @return bool|null
+     */
+    public function processNext(Progress $progress)
     {
         $import = $this->getImportToProcess();
 
-        if ($import) {
+        if (!$import) {
             return;
         }
+
+        $import->start();
+        $this->saveEntity($import);
+
+        $this->process($import, $progress);
+
+        $import->end();
+        $this->saveEntity($import);
+
+        return $import;
     }
 
-    public function process(
-        Progress $progress,
-        Import $import
-    ) {
+    /**
+     * Import the CSV file from configuration in the $import entity.
+     *
+     * @param Import   $import
+     * @param Progress $progress
+     */
+    public function process(Import $import, Progress $progress)
+    {
         $config = $import->getParserConfig();
         $file   = new \SplFileObject($import->getFilePath());
         if ($file !== false) {

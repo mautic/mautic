@@ -123,8 +123,8 @@ class ImportController extends FormController
                         ->setParserConfig($session->get('mautic.lead.import.config'));
 
                     $importModel->process(
-                        $progress,
-                        $import
+                        $import,
+                        $progress
                     );
 
                     $session->set('mautic.lead.import.stats', $import->getStats());

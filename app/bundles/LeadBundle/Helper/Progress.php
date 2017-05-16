@@ -18,14 +18,14 @@ class Progress
      *
      * @var int
      */
-    protected $total;
+    protected $total = 0;
 
     /**
      * Currently proccessed items.
      *
      * @var int
      */
-    protected $done;
+    protected $done = 0;
 
     /**
      * Returns count of all items.
