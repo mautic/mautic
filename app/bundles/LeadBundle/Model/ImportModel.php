@@ -89,13 +89,14 @@ class ImportModel extends FormModel
         }
 
         $progress->setTotal($import->getLineCount());
+
         $import->start();
-        // $this->saveEntity($import);
+        $this->saveEntity($import);
 
         $this->process($import, $progress);
 
         $import->end();
-        // $this->saveEntity($import);
+        $this->saveEntity($import);
 
         return $import;
     }

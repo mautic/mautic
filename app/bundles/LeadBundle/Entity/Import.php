@@ -402,6 +402,9 @@ class Import extends FormEntity
      */
     public function setLineCount($lineCount)
     {
+        // The first line is header
+        --$lineCount;
+
         $this->isChanged('lineCount', $lineCount);
         $this->lineCount = $lineCount;
 

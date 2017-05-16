@@ -63,14 +63,13 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
+        $start = microtime(true);
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $this->getContainer()->get('translator');
-        // $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
 
         /** @var \Mautic\LeadBundle\Model\ImportModel $model */
-        $model = $container->get('mautic.lead.model.import');
+        $model = $this->getContainer()->get('mautic.lead.model.import');
 
         // $batch    = $input->getOption('batch');
         // $dryRun   = $input->getOption('dry-run');
@@ -95,10 +94,6 @@ EOT
             return 1;
         }
 
-        // echo '<pre>';
-        // var_dump($progress, $import);
-        // die('</pre>');
-
         $output->writeln('<info>'.$translator->trans(
             'mautic.lead.import.result',
             [
@@ -106,6 +101,7 @@ EOT
                 '%created%' => $import->getInsertedCount(),
                 '%updated%' => $import->getUpdatedCount(),
                 '%ignored%' => $import->getIgnoredCount(),
+                '%time%'    => round(microtime(true) - $start, 2),
             ]
         ).'</info>');
 
