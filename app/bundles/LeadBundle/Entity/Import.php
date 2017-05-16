@@ -279,6 +279,17 @@ class Import extends FormEntity
     }
 
     /**
+     * Decides if this import entity is triggered as the background
+     * job or as UI process. So far the UI process doesn't get saved.
+     *
+     * @return bool
+     */
+    public function isBackgroundProcess()
+    {
+        return (bool) $this->getId();
+    }
+
+    /**
      * @param string $dir
      *
      * @return Import
@@ -545,7 +556,7 @@ class Import extends FormEntity
     public function start()
     {
         $this->setDateStarted(new \DateTime())
-            ->setState(self::IN_PROGRESS);
+            ->setStatus(self::IN_PROGRESS);
 
         return $this;
     }
@@ -558,7 +569,7 @@ class Import extends FormEntity
     public function end()
     {
         $this->setDateEnded(new \DateTime())
-            ->setState(self::IMPORTED);
+            ->setStatus(self::IMPORTED);
 
         return $this;
     }

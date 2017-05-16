@@ -68,11 +68,17 @@ EOT
         /** @var \Mautic\LeadBundle\Model\ImportModel $model */
         $model = $container->get('mautic.lead.model.import');
 
-        $batch    = $input->getOption('batch');
-        $dryRun   = $input->getOption('dry-run');
+        // $batch    = $input->getOption('batch');
+        // $dryRun   = $input->getOption('dry-run');
         $progress = new Progress();
 
         $import = $model->processNext($progress);
+
+        // No import waiting in the queue
+        if ($import === null) {
+            return 0;
+        }
+
         echo '<pre>';
         var_dump($progress, $import);
         die('</pre>');

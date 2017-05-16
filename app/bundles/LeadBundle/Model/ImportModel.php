@@ -185,6 +185,11 @@ class ImportModel extends FormModel
                     $msg = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
                     $import->addFailure($lineNumber, $msg);
                 }
+
+                if ($batchSize === 0 && $import->isBackgroundProcess()) {
+                    $this->saveEntity($import);
+                    $batchSize = $config['batchlimit'];
+                }
             }
         }
 
