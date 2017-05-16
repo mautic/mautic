@@ -59,7 +59,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 '-l',
                 InputOption::VALUE_OPTIONAL,
                 'Number of records to process when syncing objects',
-                25
+                100
             )
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
 
@@ -79,7 +79,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $endDate     = $input->getOption('end-date');
         $interval    = $input->getOption('time-interval');
         $limit       = $input->getOption('limit');
-        $leads       = $contacts       = 0;
+        $leads       = $contacts       = $processed       = 0;
 
         if (!$interval) {
             $interval = '15 minutes';
@@ -141,13 +141,20 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
             if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
-                list($updated, $created) = $integrationObject->pushLeads($params);
+                $result = $integrationObject->pushLeads($params);
+                if (3 === count($result)) {
+                    list($updated, $created, $errored) = $result;
+                } else {
+                    $errored = '?';
+                    list($updated, $created) = $result;
+                }
                 $output->writeln(
                     '<comment>'.$translator->trans(
                         'mautic.plugin.command.fetch.pushing.leads.events_executed',
                         [
                             '%updated%' => $updated,
                             '%created%' => $created,
+                            '%errored%' => $errored,
                         ]
                     )
                     .'</comment>'."\n"

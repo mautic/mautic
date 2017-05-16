@@ -15,6 +15,17 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
 {
     private $fromAddresses = [];
     private $metadatas     = [];
+    private $validate      = false;
+
+    /**
+     * BatchTransport constructor.
+     *
+     * @param bool $validate
+     */
+    public function __construct($validate = false)
+    {
+        $this->validate = true;
+    }
 
     /**
      * @param \Swift_Mime_Message $message
@@ -22,10 +33,23 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        $this->message = $message;
-
+        $this->message         = $message;
         $this->fromAddresses[] = key($message->getFrom());
         $this->metadatas[]     = $this->getMetadata();
+
+        $messageArray = $this->messageToArray();
+
+        if ($this->validate) {
+            if (empty($messageArray['subject'])) {
+                $this->throwException('Subject empty');
+            }
+
+            if (empty($messageArray['recipients']['to'])) {
+                $this->throwException('To empty');
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -33,7 +57,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function getMaxBatchLimit()
     {
-        return 1;
+        return 4;
     }
 
     /**

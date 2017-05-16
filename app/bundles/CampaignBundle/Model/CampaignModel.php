@@ -290,6 +290,7 @@ class CampaignModel extends CommonFormModel
         }
 
         $relationships = [];
+
         if (isset($sessionConnections['connections'])) {
             foreach ($sessionConnections['connections'] as $connection) {
                 $source = $connection['sourceId'];
@@ -299,7 +300,12 @@ class CampaignModel extends CommonFormModel
                     // Only concerned with events and not sources
                     continue;
                 }
-                $sourceDecision = (!empty($connection['anchors'][0])) ? $connection['anchors'][0]['endpoint'] : null;
+
+                if (isset($connection['anchors']['source'])) {
+                    $sourceDecision = $connection['anchors']['source'];
+                } else {
+                    $sourceDecision = (!empty($connection['anchors'][0])) ? $connection['anchors'][0]['endpoint'] : null;
+                }
 
                 if ($sourceDecision == 'leadsource') {
                     // Lead source connection that does not matter
@@ -1270,8 +1276,21 @@ class CampaignModel extends CommonFormModel
             if ($events) {
                 foreach ($events as $type => $eventIds) {
                     $filter['event_id'] = $eventIds;
+
+                    // Exclude failed events
+                    $failedSq = $this->em->getConnection()->createQueryBuilder();
+                    $failedSq->select('null')
+                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
+                        ->where(
+                            $failedSq->expr()->eq('fe.log_id', 't.id')
+                        );
+                    $filter['failed_events'] = [
+                        'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
+                    ];
+
                     $q                  = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
                     $rawData            = $q->execute()->fetchAll();
+
                     if (!empty($rawData)) {
                         $triggers = $query->completeTimeData($rawData);
                         $chart->setDataset($this->translator->trans('mautic.campaign.'.$type), $triggers);

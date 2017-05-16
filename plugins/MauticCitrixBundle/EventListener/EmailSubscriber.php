@@ -154,11 +154,6 @@ class EmailSubscriber extends CommonSubscriber
      */
     public function decodeTokens(EmailSendEvent $event, $triggerEvent = false)
     {
-        // Get content
-        $content = $event->getContent();
-
-        // Search and replace tokens
-
         $products = [
             CitrixProducts::GOTOMEETING,
             CitrixProducts::GOTOTRAINING,
@@ -166,10 +161,13 @@ class EmailSubscriber extends CommonSubscriber
             CitrixProducts::GOTOWEBINAR,
         ];
 
+        $tokens = [];
         foreach ($products as $product) {
             if (CitrixHelper::isAuthorized('Goto'.$product)) {
                 $params = [
-                    'product' => $product,
+                    'product'     => $product,
+                    'productText' => '',
+                    'productLink' => '',
                 ];
 
                 if ('webinar' == $product) {
@@ -190,15 +188,11 @@ class EmailSubscriber extends CommonSubscriber
                     'MauticCitrixBundle:SubscribedEvents\EmailToken:token.html.php',
                     $params
                 );
-                $content = str_replace('{'.$product.'_button}', $button, $content);
-                $content = str_replace('{'.$product.'_link}', $params['productLink'], $content);
-            } else {
-                // remove the token
-                $content = str_replace('{'.$product.'_button}', '', $content);
+
+                $tokens['{'.$product.'_link}']   = $params['productLink'];
+                $tokens['{'.$product.'_button}'] = $button;
             }
         }
-
-        // Set updated content
-        $event->setContent($content);
+        $event->addTokens($tokens);
     }
 }

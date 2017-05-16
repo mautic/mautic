@@ -97,18 +97,19 @@ return [
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',
-                    'translator',
                     'monolog.logger.mautic',
                 ],
                 'alias' => 'integration_featuresettings',
             ],
             'mautic.form.type.integration.fields' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\FieldsType',
-                'alias' => 'integration_fields',
+                'class'     => 'Mautic\PluginBundle\Form\Type\FieldsType',
+                'alias'     => 'integration_fields',
+                'arguments' => 'translator',
             ],
             'mautic.form.type.integration.company.fields' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\CompanyFieldsType',
-                'alias' => 'integration_company_fields',
+                'class'     => 'Mautic\PluginBundle\Form\Type\CompanyFieldsType',
+                'alias'     => 'integration_company_fields',
+                'arguments' => 'translator',
             ],
             'mautic.form.type.integration.keys' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\KeysType',
