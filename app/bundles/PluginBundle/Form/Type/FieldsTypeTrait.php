@@ -177,13 +177,13 @@ trait FieldsTypeTrait
                         [
                             'choices'    => $mauticFields,
                             'label'      => false,
-                            'data'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
+                            'data'       => $matched || isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                             'label_attr' => ['class' => 'control-label'],
                             'attr'       => [
                                 'class'            => 'field-selector',
                                 'data-placeholder' => ' ',
                                 'data-required'    => $required,
-                                'data-value'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
+                                'data-value'       => $matched || isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                                 'data-choices'     => $mauticFields,
                             ],
                         ]
