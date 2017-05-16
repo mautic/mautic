@@ -68,6 +68,6 @@ class LeadSubscriber extends CommonSubscriber
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead                  = $event->getLead();
         $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
-        $integrationEntityRepo->findLeadsToDelete('lead-error', $lead->getId());
+        $integrationEntityRepo->updateErrorLeads('lead-error', $lead->getId());
     }
 }

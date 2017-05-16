@@ -264,6 +264,18 @@ class IntegrationEntityRepository extends CommonRepository
 
         $q->where('internal_entity_id = :leadId')
             ->andWhere($q->expr()->eq('internal_entity', ':internalEntity'))
+            ->andWhere($q->expr()->isNotNull('integration_entity_id'))
+            ->setParameter('leadId', $leadId)
+            ->setParameter('internalEntity', $internalEntity)
+            ->execute();
+
+        $z = $this->_em->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity');
+
+        $z->where('internal_entity_id = :leadId')
+            ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
+            ->andWhere($q->expr()->isNull('integration_entity_id'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
             ->execute();
