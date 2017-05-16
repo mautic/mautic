@@ -57,6 +57,7 @@ CREATE TABLE {$this->prefix}imports (
     inserted_count INT NOT NULL,
     updated_count INT NOT NULL,
     failed_count INT NOT NULL,
+    ignored_count INT NOT NULL,
     priority INT NOT NULL,
     status INT NOT NULL,
     date_started DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',

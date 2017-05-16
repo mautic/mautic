@@ -91,6 +91,13 @@ class Import extends FormEntity
     private $failedCount = 0;
 
     /**
+     * Count of ignored items.
+     *
+     * @var int
+     */
+    private $ignoredCount = 0;
+
+    /**
      * @var bool
      */
     private $priority;
@@ -159,6 +166,7 @@ class Import extends FormEntity
             ->addNamedField('insertedCount', Type::INTEGER, 'inserted_count')
             ->addNamedField('updatedCount', Type::INTEGER, 'updated_count')
             ->addNamedField('failedCount', Type::INTEGER, 'failed_count')
+            ->addNamedField('ignoredCount', Type::INTEGER, 'ignored_count')
             ->addField('priority', Type::INTEGER)
             ->addField('status', Type::INTEGER)
             ->addNullableField('dateStarted', Type::DATETIME, 'date_started')
@@ -200,6 +208,7 @@ class Import extends FormEntity
                     'insertedCount',
                     'updatedCount',
                     'failedCount',
+                    'ignoredCount',
                     'priority',
                     'status',
                     'dateStarted',
@@ -392,6 +401,27 @@ class Import extends FormEntity
     public function getFailedCount()
     {
         return $this->failedCount;
+    }
+
+    /**
+     * @param int $ignoredCount
+     *
+     * @return Import
+     */
+    public function setIgnoredCount($ignoredCount)
+    {
+        $this->isChanged('ignoredCount', $ignoredCount);
+        $this->ignoredCount = $ignoredCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIgnoredCount()
+    {
+        return $this->ignoredCount;
     }
 
     /**

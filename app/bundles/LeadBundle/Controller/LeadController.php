@@ -1338,13 +1338,6 @@ class LeadController extends FormController
                     $session->set('mautic.lead.import.inprogress', true);
                     $session->set('mautic.lead.import.progresschecks', 1);
 
-                    // Batch process
-                    $defaultOwner = $session->get('mautic.lead.import.defaultowner', null);
-                    $defaultList  = $session->get('mautic.lead.import.defaultlist', null);
-                    $defaultTags  = $session->get('mautic.lead.import.defaulttags', null);
-                    $headers      = $session->get('mautic.lead.import.headers', []);
-                    $importFields = $session->get('mautic.lead.import.fields', []);
-
                     $progressO = (new Progress())->bindArray($progress);
 
                     $importModel->process(
