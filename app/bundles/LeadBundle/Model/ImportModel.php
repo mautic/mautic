@@ -79,16 +79,11 @@ class ImportModel extends FormModel
     }
 
     public function process(
-        array $headers,
-        array $importFields,
-        $defaultOwner,
-        $defaultList,
-        $defaultTags,
         Progress $progress,
-        Import $import,
-        array $config
+        Import $import
     ) {
-        $file = new \SplFileObject($import->getFilePath());
+        $config = $import->getParserConfig();
+        $file   = new \SplFileObject($import->getFilePath());
         if ($file !== false) {
             $lineNumber = $progress->getDone();
 
@@ -117,7 +112,7 @@ class ImportModel extends FormModel
 
                 if (is_array($data) && $dataCount = count($data)) {
                     // Ensure the number of headers are equal with data
-                    $headerCount = count($headers);
+                    $headerCount = count($import->getHeaders());
 
                     if ($headerCount !== $dataCount) {
                         $diffCount = ($headerCount - $dataCount);
@@ -134,7 +129,7 @@ class ImportModel extends FormModel
                         $data = $data + $fill;
                     }
 
-                    $data = array_combine($headers, $data);
+                    $data = array_combine($import->getHeaders(), $data);
                     try {
                         $prevent = false;
                         foreach ($data as $key => $value) {
@@ -145,11 +140,11 @@ class ImportModel extends FormModel
                         }
                         if ($prevent) {
                             $merged = $this->leadModel->importLead(
-                                $importFields,
+                                $import->getMatchedFields(),
                                 $data,
-                                $defaultOwner,
-                                $defaultList,
-                                $defaultTags
+                                $import->getDefault('owner'),
+                                $import->getDefault('list'),
+                                $import->getDefault('tags')
                             );
                             if ($merged) {
                                 $import->increaseUpdatedCount();

@@ -623,6 +623,101 @@ class Import extends FormEntity
     }
 
     /**
+     * @param string $properties
+     *
+     * @return Import
+     */
+    public function mergeToProperties($properties)
+    {
+        return $this->setProperties(array_merge($this->properties, $properties));
+    }
+
+    /**
+     * Get array of default values.
+     *
+     * @return array
+     */
+    public function getDefaults()
+    {
+        if (isset($this->properties['defaults'])) {
+            return $this->properties['defaults'];
+        }
+
+        return [];
+    }
+
+    /**
+     * Set a default value to the defaults array.
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return Import
+     */
+    public function setDefault($key, $value)
+    {
+        return $this->mergeToProperties([
+            'defaults' => array_merge($this->getDefaults(), [$key => $value]),
+        ]);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string|null
+     */
+    public function getDefault($key)
+    {
+        return empty($this->properties['defaults'][$key]) ? null : $this->properties['defaults'][$key];
+    }
+
+    /**
+     * Set headers array to the properties.
+     *
+     * @param array $headers
+     *
+     * @return Import
+     */
+    public function setHeaders(array $headers)
+    {
+        $properties            = $this->properties;
+        $properties['headers'] = $headers;
+
+        return $this->setProperties($properties);
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return empty($this->properties['headers']) ? [] : $this->properties['headers'];
+    }
+
+    /**
+     * Set parser config array to the properties.
+     *
+     * @param array $parser
+     *
+     * @return Import
+     */
+    public function setParserConfig(array $parser)
+    {
+        $properties           = $this->properties;
+        $properties['parser'] = $parser;
+
+        return $this->setProperties($properties);
+    }
+
+    /**
+     * @return array
+     */
+    public function getParserConfig()
+    {
+        return empty($this->properties['parser']) ? [] : $this->properties['parser'];
+    }
+
+    /**
      * @return string
      */
     public function getProperties()

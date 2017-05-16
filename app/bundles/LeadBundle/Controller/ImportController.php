@@ -111,20 +111,20 @@ class ImportController extends FormController
                     $session->set('mautic.lead.import.inprogress', true);
                     $session->set('mautic.lead.import.progresschecks', 1);
 
-                    $import = $importModel->getEntity();
-                    $import->populateStats($stats);
-                    $import->setDir($importDir);
-                    $import->setFile($fileName);
+                    $import = $importModel->getEntity()
+                        ->populateStats($stats)
+                        ->setDir($importDir)
+                        ->setFile($fileName)
+                        ->setMatchedFields($session->get('mautic.lead.import.fields', []))
+                        ->setDefault('owner', $session->get('mautic.lead.import.defaultowner', null))
+                        ->setDefault('list', $session->get('mautic.lead.import.defaultlist', null))
+                        ->setDefault('tags', $session->get('mautic.lead.import.defaulttags', null))
+                        ->setHeaders($session->get('mautic.lead.import.headers', []))
+                        ->setParserConfig($session->get('mautic.lead.import.config'));
 
                     $importModel->process(
-                        $session->get('mautic.lead.import.headers', []),
-                        $session->get('mautic.lead.import.fields', []),
-                        $session->get('mautic.lead.import.defaultowner', null),
-                        $session->get('mautic.lead.import.defaultlist', null),
-                        $session->get('mautic.lead.import.defaulttags', null),
                         $progress,
-                        $import,
-                        $session->get('mautic.lead.import.config')
+                        $import
                     );
 
                     $session->set('mautic.lead.import.stats', $import->getStats());
@@ -286,17 +286,11 @@ class ImportController extends FormController
                                 $import = $importModel->getEntity($importId);
 
                                 $import->setMatchedFields($matchedFields)
-                                    ->setProperties(
-                                        [
-                                            'defaults' => [
-                                                'owner' => $defaultOwner,
-                                                'list'  => $list,
-                                                'tags'  => $tags,
-                                            ],
-                                            'headers' => $session->get('mautic.lead.import.importfields'),
-                                            'parser'  => $session->get('mautic.lead.import.config'),
-                                        ]
-                                    );
+                                    ->setDefault('owner', $defaultOwner)
+                                    ->setDefault('list', $list)
+                                    ->setDefault('tags', $tags)
+                                    ->setHeaders($session->get('mautic.lead.import.importfields'))
+                                    ->setParserConfig($session->get('mautic.lead.import.config'));
 
                                 $importModel->saveEntity($import);
 
