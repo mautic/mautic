@@ -23,6 +23,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ImportController extends FormController
 {
+    // Steps of the import
+    const STEP_UPLOAD_CSV      = 1;
+    const STEP_MATCH_FIELDS    = 2;
+    const STEP_PROGRESS_BAR    = 3;
+    const STEP_IMPORT_FROM_CSV = 4;
+
     /**
      * @param int  $objectId
      * @param bool $ignorePost
@@ -45,7 +51,7 @@ class ImportController extends FormController
 
         // Move the file to cache and rename it
         $forceStop = $this->request->get('cancel', false);
-        $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', 1);
+        $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
         $fileName  = 'import.csv';
         $importDir = $this->getImportDirName();
         $fullPath  = $importDir.'/'.$fileName;
@@ -56,7 +62,7 @@ class ImportController extends FormController
         if (!file_exists($fullPath)) {
             // Force step one if the file doesn't exist
             $step = 1;
-            $session->set('mautic.lead.import.step', 1);
+            $session->set('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
         }
 
         $progress = (new Progress())->bindArray($session->get('mautic.lead.import.progress', [0, 0]));
@@ -64,8 +70,7 @@ class ImportController extends FormController
         $action   = $this->generateUrl('mautic_contact_action', ['objectAction' => 'import']);
 
         switch ($step) {
-            case 1:
-                // Upload file
+            case self::STEP_UPLOAD_CSV:
 
                 if ($forceStop) {
                     $this->resetImport($fullPath);
@@ -73,8 +78,7 @@ class ImportController extends FormController
 
                 $form = $this->get('form.factory')->create('lead_import', [], ['action' => $action]);
                 break;
-            case 2:
-                // Match fields
+            case self::STEP_MATCH_FIELDS:
 
                 /** @var \Mautic\LeadBundle\Model\FieldModel $pluginModel */
                 $fieldModel = $this->getModel('lead.field');
@@ -93,12 +97,12 @@ class ImportController extends FormController
                 );
 
                 break;
-            case 3:
+            case self::STEP_PROGRESS_BAR:
                 // Just show the progress form
-                $session->set('mautic.lead.import.step', 4);
+                $session->set('mautic.lead.import.step', self::STEP_IMPORT_FROM_CSV);
                 break;
 
-            case 4:
+            case self::STEP_IMPORT_FROM_CSV:
                 ignore_user_abort(true);
 
                 $inProgress = $session->get('mautic.lead.import.inprogress', false);
@@ -143,7 +147,7 @@ class ImportController extends FormController
             if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
                 $valid = $this->isFormValid($form);
                 switch ($step) {
-                    case 1:
+                    case self::STEP_UPLOAD_CSV:
                         if ($valid) {
                             if (file_exists($fullPath)) {
                                 unlink($fullPath);
@@ -190,19 +194,19 @@ class ImportController extends FormController
                                             sort($headers);
                                             $headers = array_combine($headers, $headers);
 
-                                            $session->set('mautic.lead.import.step', 2);
+                                            $session->set('mautic.lead.import.step', self::STEP_MATCH_FIELDS);
                                             $session->set('mautic.lead.import.importfields', $headers);
                                             $session->set('mautic.lead.import.progress', [0, $linecount]);
 
                                             /** @var \Mautic\LeadBundle\Entity\Import $import */
-                                            $import = $this->importModel->getEntity();
+                                            $import = $importModel->getEntity();
 
                                             $import->setDir($importDir)
                                                 ->setLineCount($linecount)
                                                 ->setFile($fileName)
                                                 ->setOriginalFile($fileData->getClientOriginalName());
 
-                                            $this->importModel->saveEntity($import);
+                                            $importModel->saveEntity($import);
 
                                             $session->set('mautic.lead.import.id', $import->getId());
 
@@ -232,7 +236,7 @@ class ImportController extends FormController
                             }
                         }
                         break;
-                    case 2:
+                    case self::STEP_MATCH_FIELDS:
                         // Save matched fields
                         $matchedFields = $form->getData();
 
@@ -275,7 +279,7 @@ class ImportController extends FormController
                             if ($form->get('buttons')->get('apply')->isClicked()) {
 
                                 /** @var \Mautic\LeadBundle\Entity\Import $import */
-                                $import = $this->importModel->getEntity($importId);
+                                $import = $importModel->getEntity($importId);
 
                                 $import->setMatchedFields($matchedFields)
                                     ->setProperties(
@@ -295,7 +299,7 @@ class ImportController extends FormController
                                 try {
                                     $this->addFlash('mautic.lead.batch.import.created');
                                     $this->resetImport($fullPath, false);
-                                    $step = 1;
+                                    $step = self::STEP_UPLOAD_CSV;
                                 } catch (Exception $e) {
                                     $errorMessage = 'mautic.lead.import.filenotreadable';
                                 }
@@ -304,7 +308,7 @@ class ImportController extends FormController
                                 $session->set('mautic.lead.import.defaultowner', $defaultOwner);
                                 $session->set('mautic.lead.import.defaultlist', $list);
                                 $session->set('mautic.lead.import.defaulttags', $tags);
-                                $session->set('mautic.lead.import.step', 3);
+                                $session->set('mautic.lead.import.step', self::STEP_PROGRESS_BAR);
                             }
 
                             return $this->importAction(0, true);
@@ -325,7 +329,7 @@ class ImportController extends FormController
             }
         }
 
-        if ($step === 1 || $step === 2) {
+        if ($step === self::STEP_UPLOAD_CSV || $step === self::STEP_MATCH_FIELDS) {
             $contentTemplate = 'MauticLeadBundle:Import:form.html.php';
             $viewParameters  = ['form' => $form->createView()];
         } else {
@@ -398,7 +402,7 @@ class ImportController extends FormController
         $session->set('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0]);
         $session->set('mautic.lead.import.headers', []);
         $session->set('mautic.lead.import.dir', null);
-        $session->set('mautic.lead.import.step', 1);
+        $session->set('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
         $session->set('mautic.lead.import.progress', [0, 0]);
         $session->set('mautic.lead.import.fields', []);
         $session->set('mautic.lead.import.defaultowner', null);
