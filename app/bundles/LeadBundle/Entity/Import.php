@@ -84,13 +84,6 @@ class Import extends FormEntity
     private $updatedCount = 0;
 
     /**
-     * Count of failed saves.
-     *
-     * @var int
-     */
-    private $failedCount = 0;
-
-    /**
      * Count of ignored items.
      *
      * @var int
@@ -165,7 +158,6 @@ class Import extends FormEntity
             ->addNamedField('lineCount', Type::INTEGER, 'line_count')
             ->addNamedField('insertedCount', Type::INTEGER, 'inserted_count')
             ->addNamedField('updatedCount', Type::INTEGER, 'updated_count')
-            ->addNamedField('failedCount', Type::INTEGER, 'failed_count')
             ->addNamedField('ignoredCount', Type::INTEGER, 'ignored_count')
             ->addField('priority', Type::INTEGER)
             ->addField('status', Type::INTEGER)
@@ -207,7 +199,6 @@ class Import extends FormEntity
                     'lineCount',
                     'insertedCount',
                     'updatedCount',
-                    'failedCount',
                     'ignoredCount',
                     'priority',
                     'status',
@@ -380,27 +371,6 @@ class Import extends FormEntity
     public function getUpdatedCount()
     {
         return $this->updatedCount;
-    }
-
-    /**
-     * @param int $failedCount
-     *
-     * @return Import
-     */
-    public function setFailedCount($failedCount)
-    {
-        $this->isChanged('failedCount', $failedCount);
-        $this->failedCount = $failedCount;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getFailedCount()
-    {
-        return $this->failedCount;
     }
 
     /**
