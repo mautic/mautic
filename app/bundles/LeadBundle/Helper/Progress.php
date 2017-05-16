@@ -11,6 +11,10 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\CoreBundle\Helper\ProgressBarHelper;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\OutputInterface;
+
 class Progress
 {
     /**
@@ -28,6 +32,24 @@ class Progress
     protected $done = 0;
 
     /**
+     * @var OutputInterface|null
+     */
+    protected $output;
+
+    /**
+     * @var ProgressBar|null
+     */
+    protected $bar;
+
+    /**
+     * @param OutputInterface|null $output
+     */
+    public function __construct(OutputInterface $output = null)
+    {
+        $this->output = $output;
+    }
+
+    /**
      * Returns count of all items.
      *
      * @return int
@@ -35,6 +57,25 @@ class Progress
     public function getTotal()
     {
         return $this->total;
+    }
+
+    /**
+     * Set total value.
+     *
+     * @param int $total
+     *
+     * @return Progress
+     */
+    public function setTotal($total)
+    {
+        $this->total = (int) $total;
+
+        if ($this->output) {
+            $this->bar = ProgressBarHelper::init($this->output, $this->total);
+            $this->bar->start();
+        }
+
+        return $this;
     }
 
     /**
@@ -48,13 +89,36 @@ class Progress
     }
 
     /**
+     * Set total value.
+     *
+     * @param int $total
+     *
+     * @return Progress
+     */
+    public function setDone($done)
+    {
+        $this->done = (int) $done;
+
+        if ($this->bar) {
+            $this->bar->setProgress($this->done);
+
+            if ($this->isFinished()) {
+                $this->bar->finish();
+                $this->output->writeln('');
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Increase done count by 1.
      *
      * @return Progress
      */
     public function increase()
     {
-        ++$this->done;
+        $this->setDone($this->done + 1);
 
         return $this;
     }
@@ -79,11 +143,11 @@ class Progress
     public function bindArray(array $progress)
     {
         if (isset($progress[0])) {
-            $this->done = (int) $progress[0];
+            $this->setDone($progress[0]);
         }
 
         if (isset($progress[1])) {
-            $this->total = (int) $progress[1];
+            $this->setTotal($progress[1]);
         }
 
         return $this;

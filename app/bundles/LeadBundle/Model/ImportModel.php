@@ -82,13 +82,20 @@ class ImportModel extends FormModel
             return;
         }
 
+        if (!$import->canProceed()) {
+            $this->saveEntity($import);
+
+            return $import;
+        }
+
+        $progress->setTotal($import->getLineCount());
         $import->start();
-        $this->saveEntity($import);
+        // $this->saveEntity($import);
 
         $this->process($import, $progress);
 
         $import->end();
-        $this->saveEntity($import);
+        // $this->saveEntity($import);
 
         return $import;
     }
@@ -149,6 +156,7 @@ class ImportModel extends FormModel
                     }
 
                     $data = array_combine($import->getHeaders(), $data);
+
                     try {
                         $prevent = false;
                         foreach ($data as $key => $value) {

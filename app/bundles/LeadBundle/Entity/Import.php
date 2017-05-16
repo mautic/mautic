@@ -254,6 +254,24 @@ class Import extends FormEntity
     }
 
     /**
+     * Checks if the import has everything needed to proceed.
+     * If not, it will change its state to FAILED.
+     *
+     * @return bool
+     */
+    public function canProceed()
+    {
+        if (file_exists($this->getFilePath()) === false || is_readable($this->getFilePath()) === false) {
+            $this->setStatus(self::FAILED);
+            $this->setStatusInfo($this->getFilePath().' not found');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Add a new failure to the array.
      *
      * @param int    $key
@@ -751,5 +769,26 @@ class Import extends FormEntity
     public function getProperties()
     {
         return $this->properties;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatusInfo()
+    {
+        return empty($this->properties['status_info']) ? 'unknown' : $this->properties['status_info'];
+    }
+
+    /**
+     * @param string $info
+     *
+     * @return Import
+     */
+    public function setStatusInfo($info)
+    {
+        $properties                = $this->properties;
+        $properties['status_info'] = $info;
+
+        return $this->setProperties($properties);
     }
 }

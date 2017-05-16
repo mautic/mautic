@@ -289,7 +289,7 @@ class ImportController extends FormController
                                     ->setDefault('owner', $defaultOwner)
                                     ->setDefault('list', $list)
                                     ->setDefault('tags', $tags)
-                                    ->setHeaders($session->get('mautic.lead.import.importfields'))
+                                    ->setHeaders($session->get('mautic.lead.import.headers'))
                                     ->setParserConfig($session->get('mautic.lead.import.config'));
 
                                 $importModel->saveEntity($import);

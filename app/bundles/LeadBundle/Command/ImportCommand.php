@@ -65,23 +65,49 @@ EOT
     {
         $container = $this->getContainer();
 
+        /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
+        $translator = $this->getContainer()->get('translator');
+        // $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
+
         /** @var \Mautic\LeadBundle\Model\ImportModel $model */
         $model = $container->get('mautic.lead.model.import');
 
         // $batch    = $input->getOption('batch');
         // $dryRun   = $input->getOption('dry-run');
-        $progress = new Progress();
+        $progress = new Progress($output);
 
         $import = $model->processNext($progress);
 
         // No import waiting in the queue
         if ($import === null) {
-            return 0;
+            return 1;
         }
 
-        echo '<pre>';
-        var_dump($progress, $import);
-        die('</pre>');
+        // Import failed
+        if ($import->getStatus() === $import::FAILED) {
+            $output->writeln('<error>'.$translator->trans(
+                'mautic.lead.import.failed',
+                [
+                    '%reason%' => $import->getStatusInfo(),
+                ]
+            ).'</error>');
+
+            return 1;
+        }
+
+        // echo '<pre>';
+        // var_dump($progress, $import);
+        // die('</pre>');
+
+        $output->writeln('<info>'.$translator->trans(
+            'mautic.lead.import.result',
+            [
+                '%lines%'   => $import->getLineCount(),
+                '%created%' => $import->getInsertedCount(),
+                '%updated%' => $import->getUpdatedCount(),
+                '%ignored%' => $import->getIgnoredCount(),
+            ]
+        ).'</info>');
 
         // if ('dev' == MAUTIC_ENV) {
         //     $output->writeln('<comment>Debug</comment>');
