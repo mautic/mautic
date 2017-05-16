@@ -65,7 +65,7 @@ if (isset($_COOKIE['mautic_session_name'])) {
 
     $newSessionName = md5(md5($localConfigPath).$localParameters['secret_key']);
 
-    setcookie($newSessionName, $sessionValue);
+    setcookie($newSessionName, $sessionValue, 0, '/', '', false, true);
 
     unset($_COOKIE['mautic_session_name']);
     setcookie('mautic_session_name', null, -1);
