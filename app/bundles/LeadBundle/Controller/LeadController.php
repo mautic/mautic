@@ -1290,7 +1290,7 @@ class LeadController extends FormController
             $session->set('mautic.lead.import.step', 1);
         }
 
-        $progress = $session->get('mautic.lead.import.progress', [0, 0]);
+        $progress = (new Progress())->bindArray($session->get('mautic.lead.import.progress', [0, 0]));
         $stats    = $session->get('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0, 'failures' => []]);
         $action   = $this->generateUrl('mautic_contact_action', ['objectAction' => 'import']);
 
@@ -1338,8 +1338,6 @@ class LeadController extends FormController
                     $session->set('mautic.lead.import.inprogress', true);
                     $session->set('mautic.lead.import.progresschecks', 1);
 
-                    $progressO = (new Progress())->bindArray($progress);
-
                     $importModel->process(
                         $fullPath,
                         $session->get('mautic.lead.import.headers', []),
@@ -1347,7 +1345,7 @@ class LeadController extends FormController
                         $session->get('mautic.lead.import.defaultowner', null),
                         $session->get('mautic.lead.import.defaultlist', null),
                         $session->get('mautic.lead.import.defaulttags', null),
-                        $progressO,
+                        $progress,
                         $stats,
                         $session->get('mautic.lead.import.config')
                     );
@@ -1355,13 +1353,13 @@ class LeadController extends FormController
                     $session->set('mautic.lead.import.stats', $stats);
 
                     // Clear in progress
-                    if ($progressO->isFinished()) {
+                    if ($progress->isFinished()) {
                         $this->resetImport($fullPath);
                         $complete = true;
                     } else {
                         $complete = false;
                         $session->set('mautic.lead.import.inprogress', false);
-                        $session->set('mautic.lead.import.progress', $progressO->toArray());
+                        $session->set('mautic.lead.import.progress', $progress->toArray());
                     }
 
                     break;

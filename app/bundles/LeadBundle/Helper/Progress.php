@@ -101,4 +101,14 @@ class Progress
             $this->total,
         ];
     }
+
+    /**
+     * Counts percentage of the progress.
+     *
+     * @return int
+     */
+    public function toPercent()
+    {
+        return ($this->total) ? ceil(($this->done / $this->total) * 100) : 100;
+    }
 }

@@ -13,7 +13,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'leadImport');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.lead.import.leads'));
 
-$percent = ($progress[1]) ? ceil(($progress[0] / $progress[1]) * 100) : 100;
+$percent = $progress->toPercent();
 $id      = ($complete) ? 'leadImportProgressComplete' : 'leadImportProgress';
 $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.donotleave';
 ?>
@@ -34,7 +34,7 @@ $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.dono
                 <div class="progress mt-md" style="height:50px;">
                     <div class="progress-bar-import progress-bar progress-bar-striped<?php if (!$complete) {
     echo ' active';
-} ?>" role="progressbar" aria-valuenow="<?php echo $progress[0]; ?>" aria-valuemin="0" aria-valuemax="<?php echo $progress[1]; ?>" style="width: <?php echo $percent; ?>%; height: 50px;">
+} ?>" role="progressbar" aria-valuenow="<?php echo $progress->getDone(); ?>" aria-valuemin="0" aria-valuemax="<?php echo $progress->getTotal(); ?>" style="width: <?php echo $percent; ?>%; height: 50px;">
                         <span class="sr-only"><?php echo $percent; ?>%</span>
                     </div>
                 </div>
@@ -51,7 +51,7 @@ $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.dono
                 </ul>
             <?php endif; ?>
             <div class="panel-footer">
-                <p class="small"><span class="imported-count"><?php echo $progress[0]; ?></span> / <span class="total-count"><?php echo $progress[1]; ?></span></p>
+                <p class="small"><span class="imported-count"><?php echo $progress->getDone(); ?></span> / <span class="total-count"><?php echo $progress->getTotal(); ?></span></p>
                 <?php if (!$complete): ?>
                     <div>
                         <a class="text-danger mt-md" href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'import', 'cancel' => 1]); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.cancel'); ?></a>
