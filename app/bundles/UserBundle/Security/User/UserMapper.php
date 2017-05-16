@@ -77,7 +77,7 @@ class UserMapper implements UsernameMapperInterface
                 foreach ($assertion->getAllAttributeStatements() as $attributeStatement) {
                     $attribute = $attributeStatement->getFirstAttributeByName($attributeName);
                     if ($attribute && $attribute->getFirstAttributeValue()) {
-                        $attributes[$key] = $assertion->getSubject()->getNameID()->getValue();
+                        $attributes[$key] = $attribute->getFirstAttributeValue();
                     }
                 }
             }
