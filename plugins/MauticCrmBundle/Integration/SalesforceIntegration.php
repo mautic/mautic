@@ -585,6 +585,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $lead,
             ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]
         );
+        if (isset($mappedData[$object]['Id'])) {
+            unset($mappedData[$object]['Id']);
+        }
         $this->amendLeadDataBeforePush($mappedData[$object]);
 
         if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
@@ -967,10 +970,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $fieldsToUpdateInSf    = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
-        $leadFields            = array_unique(array_values($config['leadFields']));
-        $totalUpdated          = $totalCreated          = $totalErrors          = 0;
-        $leadModel             = $this->leadModel;
-        $companyModel          = $this->companyModel;
+        if (isset($fieldsToUpdateInSf['Id'])) {
+            unset($fieldsToUpdateInSf['Id']);
+        }
+        $leadFields   = array_unique(array_values($config['leadFields']));
+        $totalUpdated = $totalCreated = $totalErrors = 0;
+        $leadModel    = $this->leadModel;
+        $companyModel = $this->companyModel;
 
         if ($mauticContactLinkField = array_search('mauticContactTimelineLink', $leadFields)) {
             $this->pushContactLink = true;
@@ -984,10 +990,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields               = implode(', l.', $leadFields);
         $fields               = 'l.'.$fields;
         $leadSfFieldsToCreate = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
-        $leadSfFields         = array_diff_key($leadSfFieldsToCreate, array_flip($fieldsToUpdateInSf));
-        $contactSfFields      = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
-        $contactSfFields      = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
-        $availableFields      = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
+
+        if (isset($leadSfFieldsToCreate['Id'])) {
+            unset($leadSfFieldsToCreate['Id']);
+        }
+        $leadSfFields    = array_diff_key($leadSfFieldsToCreate, array_flip($fieldsToUpdateInSf));
+        $contactSfFields = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
+        $contactSfFields = array_diff_key($contactSfFields, array_flip($fieldsToUpdateInSf));
+        $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Lead', 'Contact']]]);
 
         $salesforceIdMapping = [];
 

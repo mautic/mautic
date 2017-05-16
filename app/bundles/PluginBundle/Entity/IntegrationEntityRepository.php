@@ -253,6 +253,19 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-        ->execute();
+            ->execute();
+    }
+
+    public function updateErrorLeads($internalEntity, $leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->set('internal_entity', ':lead')->setParameter('lead', 'lead');
+
+        $q->where('internal_entity_id = :leadId')
+            ->andWhere($q->expr()->eq('internal_entity', ':internalEntity'))
+            ->setParameter('leadId', $leadId)
+            ->setParameter('internalEntity', $internalEntity)
+            ->execute();
     }
 }

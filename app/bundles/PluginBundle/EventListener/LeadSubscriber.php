@@ -42,6 +42,7 @@ class LeadSubscriber extends CommonSubscriber
     {
         return [
             LeadEvents::LEAD_PRE_DELETE => ['onLeadDelete', 0],
+            LeadEvents::LEAD_POST_SAVE  => ['onLeadSave', 0],
         ];
     }
 
@@ -57,5 +58,16 @@ class LeadSubscriber extends CommonSubscriber
         $success = false;
 
         return $success;
+    }
+
+    /*
+    * Change lead event
+    */
+    public function onLeadSave(LeadEvent $event)
+    {
+        /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+        $lead                  = $event->getLead();
+        $integrationEntityRepo = $this->pluginModel->getIntegrationEntityRepository();
+        $integrationEntityRepo->findLeadsToDelete('lead-error', $lead->getId());
     }
 }
