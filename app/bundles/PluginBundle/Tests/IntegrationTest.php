@@ -11,21 +11,53 @@
 
 namespace Mautic\PluginBundle\Tests;
 
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+
 class IntegrationTest extends \PHPUnit_Framework_TestCase
 {
     public function testAmendLeadDataBeforeMauticPopulate()
     {
+        $integrationObject = $this->getIntegrationObject();
+
         //data object
+        $object = 'contact';
+        $data   = ['first_name' => 'first_name', 'last_name' => 'last_name', 'email' => 'email'];
 
-        //create an integration object
-        $this->getIntegrationObject();
+        $object = 'company';
+        $data   = ['company_name' => 'company_name', 'email' => 'company_email'];
 
-        //use the getLead() command to test contacts
+        $count = $integrationObject->amendLeadDataBeforeMauticPopulate($data, $object);
 
-        //use the getCompany() command to test companies
+        $this->assertGreaterThanOrEqual(0, $count);
+    }
+
+    public function testGetMauticLead()
+    {
+        $integrationObject = $this->getIntegrationObject();
+
+        $data = ['first_name' => 'first_name', 'last_name' => 'last_name', 'email' => 'email'];
+
+        $lead = $integrationObject->getMauticLead($data);
+        $this->assertInstanceOf(new Lead(), $lead);
+    }
+
+    public function testGetMauticCompany()
+    {
+        $integrationObject = $this->getIntegrationObject();
+
+        $data = ['company_name' => 'company_name', 'email' => 'company_email'];
+
+        $company = $integrationObject->getMauticCompany($data);
+        $this->assertInstanceOf(new Company(), $company);
     }
 
     public function getIntegrationObject()
     {
+        //create an integration object
+        return $this->getMockBuilder(IntegrationHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }
