@@ -113,7 +113,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getAuthLoginUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
+        return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
     /**
@@ -236,7 +236,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             if (!empty($response['name'])) {
                 return $response['description'];
             } else {
-                return $this->factory->getTranslator()->trans('mautic.integration.error.genericerror', [], 'flashes');
+                return $this->translator->trans('mautic.integration.error.genericerror', [], 'flashes');
             }
         } else {
             return parent::getErrorsFromResponse($response);

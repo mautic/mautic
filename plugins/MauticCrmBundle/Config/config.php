@@ -46,7 +46,7 @@ return [
             'mautic.integration.hubspot' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration::class,
                 'arguments' => [
-
+                    'mautic.helper.user',
                 ],
             ],
             'mautic.integration.salesforce' => [

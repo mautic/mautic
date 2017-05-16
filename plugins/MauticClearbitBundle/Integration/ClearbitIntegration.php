@@ -81,7 +81,7 @@ class ClearbitIntegration extends AbstractIntegration
      *
      * @param $section
      *
-     * @return string
+     * @return string|array
      */
     public function getFormNotes($section)
     {
@@ -89,7 +89,7 @@ class ClearbitIntegration extends AbstractIntegration
             return [
                 'template'   => 'MauticClearbitBundle:Integration:form.html.php',
                 'parameters' => [
-                    'mauticUrl' => $this->factory->get('router')->generate(
+                    'mauticUrl' => $this->router->generate(
                         'mautic_plugin_clearbit_index', [], UrlGeneratorInterface::ABSOLUTE_URL
                     ),
                 ],

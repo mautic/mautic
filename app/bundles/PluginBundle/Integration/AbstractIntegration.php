@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -42,6 +41,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class AbstractIntegration.
@@ -107,7 +107,7 @@ abstract class AbstractIntegration
     protected $logger;
 
     /**
-     * @var \Mautic\CoreBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -234,9 +234,9 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      */
-    public function setTranslator(Translator $translator)
+    public function setTranslator(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
