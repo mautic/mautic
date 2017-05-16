@@ -127,6 +127,13 @@ class Import extends FormEntity
      */
     private $properties = [];
 
+    /**
+     * An array to store failed rows.
+     *
+     * @var array
+     */
+    private $failures = [];
+
     public function __clone()
     {
         $this->id = null;
@@ -210,6 +217,64 @@ class Import extends FormEntity
                 ]
             )
             ->build();
+    }
+
+    /**
+     * Populates Import stats from the array.
+     *
+     * @param array $stats
+     *
+     * @return Import
+     */
+    public function populateStats(array $stats)
+    {
+        if (isset($stats['merged'])) {
+            $this->setUpdatedCount($stats['merged']);
+        }
+
+        if (isset($stats['created'])) {
+            $this->setInsertedCount($stats['created']);
+        }
+
+        if (isset($stats['ignored'])) {
+            $this->setIgnoredCount($stats['ignored']);
+        }
+
+        if (isset($stats['failures'])) {
+            $this->failures = $stats['failures'];
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the array of stats.
+     *
+     * @return array
+     */
+    public function getStats()
+    {
+        return [
+            'merged'   => $this->getUpdatedCount(),
+            'created'  => $this->getInsertedCount(),
+            'ignored'  => $this->getIgnoredCount(),
+            'failures' => $this->failures,
+        ];
+    }
+
+    /**
+     * Add a new failure to the array.
+     *
+     * @param int    $key
+     * @param string $msg
+     *
+     * @return Import
+     */
+    public function addFailure($key, $msg)
+    {
+        $this->failures[$key] = $msg;
+
+        return $this;
     }
 
     /**
@@ -345,6 +410,14 @@ class Import extends FormEntity
     }
 
     /**
+     * @return Import
+     */
+    public function increaseInsertedCount()
+    {
+        return $this->setInsertedCount($this->insertedCount + 1);
+    }
+
+    /**
      * @return int
      */
     public function getInsertedCount()
@@ -366,6 +439,14 @@ class Import extends FormEntity
     }
 
     /**
+     * @return Import
+     */
+    public function increaseUpdatedCount()
+    {
+        return $this->setUpdatedCount($this->updatedCount + 1);
+    }
+
+    /**
      * @return int
      */
     public function getUpdatedCount()
@@ -384,6 +465,14 @@ class Import extends FormEntity
         $this->ignoredCount = $ignoredCount;
 
         return $this;
+    }
+
+    /**
+     * @return Import
+     */
+    public function increaseIgnoredCount()
+    {
+        return $this->setIgnoredCount($this->ignoredCount + 1);
     }
 
     /**

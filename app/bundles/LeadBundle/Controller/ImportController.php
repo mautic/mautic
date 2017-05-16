@@ -111,19 +111,23 @@ class ImportController extends FormController
                     $session->set('mautic.lead.import.inprogress', true);
                     $session->set('mautic.lead.import.progresschecks', 1);
 
+                    $import = $importModel->getEntity();
+                    $import->populateStats($stats);
+                    $import->setDir($importDir);
+                    $import->setFile($fileName);
+
                     $importModel->process(
-                        $fullPath,
                         $session->get('mautic.lead.import.headers', []),
                         $session->get('mautic.lead.import.fields', []),
                         $session->get('mautic.lead.import.defaultowner', null),
                         $session->get('mautic.lead.import.defaultlist', null),
                         $session->get('mautic.lead.import.defaulttags', null),
                         $progress,
-                        $stats, // @todo use the Import entity instead
+                        $import,
                         $session->get('mautic.lead.import.config')
                     );
 
-                    $session->set('mautic.lead.import.stats', $stats);
+                    $session->set('mautic.lead.import.stats', $import->getStats());
 
                     // Clear in progress
                     if ($progress->isFinished()) {

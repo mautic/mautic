@@ -79,17 +79,16 @@ class ImportModel extends FormModel
     }
 
     public function process(
-        $fullPath,
         array $headers,
         array $importFields,
         $defaultOwner,
         $defaultList,
         $defaultTags,
         Progress $progress,
-        array &$stats,
+        Import $import,
         array $config
     ) {
-        $file = new \SplFileObject($fullPath);
+        $file = new \SplFileObject($import->getFilePath());
         if ($file !== false) {
             $lineNumber = $progress->getDone();
 
@@ -124,10 +123,9 @@ class ImportModel extends FormModel
                         $diffCount = ($headerCount - $dataCount);
 
                         if ($diffCount < 0) {
-                            ++$stats['ignored'];
-                            $stats['failures'][$lineNumber] = $this->get('translator')->trans(
-                                'mautic.lead.import.error.header_mismatch'
-                            );
+                            $import->increaseIgnoredCount();
+                            $msg = $this->get('translator')->trans('mautic.lead.import.error.header_mismatch');
+                            $import->addFailure($lineNumber, $msg);
 
                             continue;
                         }
@@ -154,24 +152,24 @@ class ImportModel extends FormModel
                                 $defaultTags
                             );
                             if ($merged) {
-                                ++$stats['merged'];
+                                $import->increaseUpdatedCount();
                             } else {
-                                ++$stats['created'];
+                                $import->increaseInsertedCount();
                             }
                         } else {
-                            ++$stats['ignored'];
-                            $stats['failures'][$lineNumber] = $this->get('translator')->trans(
-                                'mautic.lead.import.error.line_empty'
-                            );
+                            $import->increaseIgnoredCount();
+                            $msg = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
+                            $import->addFailure($lineNumber, $msg);
                         }
                     } catch (\Exception $e) {
                         // Email validation likely failed
-                        ++$stats['ignored'];
-                        $stats['failures'][$lineNumber] = $e->getMessage();
+                        $import->increaseIgnoredCount();
+                        $import->addFailure($lineNumber, $e->getMessage());
                     }
                 } else {
-                    ++$stats['ignored'];
-                    $stats['failures'][$lineNumber] = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
+                    $import->increaseIgnoredCount();
+                    $msg = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
+                    $import->addFailure($lineNumber, $msg);
                 }
             }
         }
