@@ -64,13 +64,13 @@ EOT
     {
         $container = $this->getContainer();
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $model = $container->get('mautic.lead.model.lead');
+        /** @var \Mautic\LeadBundle\Model\ImportModel $model */
+        $model = $container->get('mautic.lead.model.import');
 
         $batch  = $input->getOption('batch');
         $dryRun = $input->getOption('dry-run');
 
-        $import = $model->getImportToProcess();
+        $import = $model->processQueue();
         echo '<pre>';
         var_dump($import);
         die('</pre>');

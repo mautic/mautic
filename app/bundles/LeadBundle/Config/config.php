@@ -631,6 +631,7 @@ return [
                 'class'     => Mautic\LeadBundle\Model\ImportModel::class,
                 'arguments' => [
                     'mautic.helper.paths',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],

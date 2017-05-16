@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Event\ImportEvent;
+use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -31,14 +32,152 @@ class ImportModel extends FormModel
     protected $pathsHelper;
 
     /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
      * ImportModel constructor.
      *
      * @param PathsHelper $pathsHelper
+     * @param LeadModel   $leadModel
      */
     public function __construct(
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        LeadModel $leadModel
     ) {
         $this->pathsHelper = $pathsHelper;
+        $this->leadModel   = $leadModel;
+    }
+
+    /**
+     * Returns the Import entity which should be processed next.
+     *
+     * @return Import|null
+     */
+    public function getImportToProcess()
+    {
+        return $this->getRepository()->findOneBy(
+            [
+                'status'      => Import::CREATED,
+                'isPublished' => 1,
+            ],
+            [
+                'priority'  => 'ASC',
+                'dateAdded' => 'DESC',
+            ]
+        );
+    }
+
+    public function processNext()
+    {
+        $import = $this->getImportToProcess();
+
+        if ($import) {
+            return;
+        }
+    }
+
+    public function process(
+        $fullPath,
+        array $headers,
+        array $importFields,
+        $defaultOwner,
+        $defaultList,
+        $defaultTags,
+        Progress $progress,
+        array &$stats,
+        array $config
+    ) {
+        $file = new \SplFileObject($fullPath);
+        if ($file !== false) {
+            $lineNumber = $progress->getDone();
+
+            if ($lineNumber > 0) {
+                $file->seek($lineNumber);
+            }
+
+            $batchSize = $config['batchlimit'];
+
+            while ($batchSize && !$file->eof()) {
+                $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                array_walk($data, create_function('&$val', '$val = trim($val);'));
+
+                // Ignore the header row
+                if ($lineNumber === 0) {
+                    ++$lineNumber;
+                    continue;
+                }
+
+                ++$lineNumber;
+
+                $progress->increase();
+
+                // Decrease batch count
+                --$batchSize;
+
+                if (is_array($data) && $dataCount = count($data)) {
+                    // Ensure the number of headers are equal with data
+                    $headerCount = count($headers);
+
+                    if ($headerCount !== $dataCount) {
+                        $diffCount = ($headerCount - $dataCount);
+
+                        if ($diffCount < 0) {
+                            ++$stats['ignored'];
+                            $stats['failures'][$lineNumber] = $this->get('translator')->trans(
+                                'mautic.lead.import.error.header_mismatch'
+                            );
+
+                            continue;
+                        }
+                        // Fill in the data with empty string
+                        $fill = array_fill($dataCount, $diffCount, '');
+                        $data = $data + $fill;
+                    }
+
+                    $data = array_combine($headers, $data);
+                    try {
+                        $prevent = false;
+                        foreach ($data as $key => $value) {
+                            if ($value != '') {
+                                $prevent = true;
+                                break;
+                            }
+                        }
+                        if ($prevent) {
+                            $merged = $this->leadModel->importLead(
+                                $importFields,
+                                $data,
+                                $defaultOwner,
+                                $defaultList,
+                                $defaultTags
+                            );
+                            if ($merged) {
+                                ++$stats['merged'];
+                            } else {
+                                ++$stats['created'];
+                            }
+                        } else {
+                            ++$stats['ignored'];
+                            $stats['failures'][$lineNumber] = $this->get('translator')->trans(
+                                'mautic.lead.import.error.line_empty'
+                            );
+                        }
+                    } catch (\Exception $e) {
+                        // Email validation likely failed
+                        ++$stats['ignored'];
+                        $stats['failures'][$lineNumber] = $e->getMessage();
+                    }
+                } else {
+                    ++$stats['ignored'];
+                    $stats['failures'][$lineNumber] = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
+                }
+            }
+        }
+
+        // Close the file
+        $file = null;
     }
 
     /**

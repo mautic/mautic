@@ -63,14 +63,32 @@ class Import extends FormEntity
     private $originalFile;
 
     /**
+     * Tolal line count of the CSV file.
+     *
      * @var int
      */
     private $lineCount = 0;
 
     /**
+     * Count of entities which were newly created.
+     *
      * @var int
      */
-    private $processedLineCount = 0;
+    private $insertedCount = 0;
+
+    /**
+     * Count of entities which were updated.
+     *
+     * @var int
+     */
+    private $updatedCount = 0;
+
+    /**
+     * Count of failed saves.
+     *
+     * @var int
+     */
+    private $failedCount = 0;
 
     /**
      * @var bool
@@ -81,6 +99,11 @@ class Import extends FormEntity
      * @var int
      */
     private $status;
+
+    /**
+     * @var DateTime
+     */
+    private $dateStarted;
 
     /**
      * @var DateTime
@@ -133,9 +156,12 @@ class Import extends FormEntity
             ->addField('file', Type::STRING)
             ->addNullableField('originalFile', Type::STRING, 'original_file')
             ->addNamedField('lineCount', Type::INTEGER, 'line_count')
-            ->addNamedField('processedLineCount', Type::INTEGER, 'processed_line_count')
+            ->addNamedField('insertedCount', Type::INTEGER, 'inserted_count')
+            ->addNamedField('updatedCount', Type::INTEGER, 'updated_count')
+            ->addNamedField('failedCount', Type::INTEGER, 'failed_count')
             ->addField('priority', Type::INTEGER)
             ->addField('status', Type::INTEGER)
+            ->addNullableField('dateStarted', Type::DATETIME, 'date_started')
             ->addNullableField('dateEnded', Type::DATETIME, 'date_ended')
             ->addField('object', Type::STRING)
             ->addNullableField('matchedFields', Type::JSON_ARRAY)
@@ -171,9 +197,12 @@ class Import extends FormEntity
                     'file',
                     'originalFile',
                     'lineCount',
-                    'processedLineCount',
+                    'insertedCount',
+                    'updatedCount',
+                    'failedCount',
                     'priority',
                     'status',
+                    'dateStarted',
                     'dateEnded',
                     'object',
                     'matchedFields',
@@ -303,14 +332,14 @@ class Import extends FormEntity
     }
 
     /**
-     * @param int $processedLineCount
+     * @param int $insertedCount
      *
      * @return Import
      */
-    public function setProcessedLineCount($processedLineCount)
+    public function setInsertedCount($insertedCount)
     {
-        $this->isChanged('processedLineCount', $processedLineCount);
-        $this->processedLineCount = $processedLineCount;
+        $this->isChanged('insertedCount', $insertedCount);
+        $this->insertedCount = $insertedCount;
 
         return $this;
     }
@@ -318,9 +347,51 @@ class Import extends FormEntity
     /**
      * @return int
      */
-    public function getProcessedLineCount()
+    public function getInsertedCount()
     {
-        return $this->processedLineCount;
+        return $this->insertedCount;
+    }
+
+    /**
+     * @param int $updatedCount
+     *
+     * @return Import
+     */
+    public function setUpdatedCount($updatedCount)
+    {
+        $this->isChanged('updatedCount', $updatedCount);
+        $this->updatedCount = $updatedCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUpdatedCount()
+    {
+        return $this->updatedCount;
+    }
+
+    /**
+     * @param int $failedCount
+     *
+     * @return Import
+     */
+    public function setFailedCount($failedCount)
+    {
+        $this->isChanged('failedCount', $failedCount);
+        $this->failedCount = $failedCount;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFailedCount()
+    {
+        return $this->failedCount;
     }
 
     /**
@@ -363,6 +434,27 @@ class Import extends FormEntity
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * @param int $dateStarted
+     *
+     * @return Import
+     */
+    public function setDateStarted(\DateTime $dateStarted)
+    {
+        $this->isChanged('dateStarted', $dateStarted);
+        $this->dateStarted = $dateStarted;
+
+        return $this;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getDateStarted()
+    {
+        return $this->dateStarted;
     }
 
     /**

@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Form;
@@ -1344,102 +1345,30 @@ class LeadController extends FormController
                     $headers      = $session->get('mautic.lead.import.headers', []);
                     $importFields = $session->get('mautic.lead.import.fields', []);
 
-                    $file = new \SplFileObject($fullPath);
-                    if ($file !== false) {
-                        $lineNumber = $progress[0];
+                    $progressO = (new Progress())->bindArray($progress);
 
-                        if ($lineNumber > 0) {
-                            $file->seek($lineNumber);
-                        }
+                    $importModel->process(
+                        $fullPath,
+                        $session->get('mautic.lead.import.headers', []),
+                        $session->get('mautic.lead.import.fields', []),
+                        $session->get('mautic.lead.import.defaultowner', null),
+                        $session->get('mautic.lead.import.defaultlist', null),
+                        $session->get('mautic.lead.import.defaulttags', null),
+                        $progressO,
+                        $stats,
+                        $session->get('mautic.lead.import.config')
+                    );
 
-                        $config    = $session->get('mautic.lead.import.config');
-                        $batchSize = $config['batchlimit'];
-
-                        while ($batchSize && !$file->eof()) {
-                            $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
-                            array_walk($data, create_function('&$val', '$val = trim($val);'));
-
-                            if ($lineNumber === 0) {
-                                ++$lineNumber;
-                                continue;
-                            }
-
-                            ++$lineNumber;
-
-                            // Increase progress count
-                            ++$progress[0];
-
-                            // Decrease batch count
-                            --$batchSize;
-
-                            if (is_array($data) && $dataCount = count($data)) {
-                                // Ensure the number of headers are equal with data
-                                $headerCount = count($headers);
-
-                                if ($headerCount !== $dataCount) {
-                                    $diffCount = ($headerCount - $dataCount);
-
-                                    if ($diffCount < 0) {
-                                        ++$stats['ignored'];
-                                        $stats['failures'][$lineNumber] = $this->get('translator')->trans(
-                                            'mautic.lead.import.error.header_mismatch'
-                                        );
-
-                                        continue;
-                                    }
-                                    // Fill in the data with empty string
-                                    $fill = array_fill($dataCount, $diffCount, '');
-                                    $data = $data + $fill;
-                                }
-
-                                $data = array_combine($headers, $data);
-                                try {
-                                    $prevent = false;
-                                    foreach ($data as $key => $value) {
-                                        if ($value != '') {
-                                            $prevent = true;
-                                            break;
-                                        }
-                                    }
-                                    if ($prevent) {
-                                        $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
-                                        if ($merged) {
-                                            ++$stats['merged'];
-                                        } else {
-                                            ++$stats['created'];
-                                        }
-                                    } else {
-                                        ++$stats['ignored'];
-                                        $stats['failures'][$lineNumber] = $this->get('translator')->trans(
-                                            'mautic.lead.import.error.line_empty'
-                                        );
-                                    }
-                                } catch (\Exception $e) {
-                                    // Email validation likely failed
-                                    ++$stats['ignored'];
-                                    $stats['failures'][$lineNumber] = $e->getMessage();
-                                }
-                            } else {
-                                ++$stats['ignored'];
-                                $stats['failures'][$lineNumber] = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
-                            }
-                        }
-
-                        $session->set('mautic.lead.import.stats', $stats);
-                    }
-
-                    // Close the file
-                    $file = null;
+                    $session->set('mautic.lead.import.stats', $stats);
 
                     // Clear in progress
-                    if ($progress[0] >= $progress[1]) {
-                        $progress[0] = $progress[1];
+                    if ($progressO->isFinished()) {
                         $this->resetImport($fullPath);
                         $complete = true;
                     } else {
                         $complete = false;
                         $session->set('mautic.lead.import.inprogress', false);
-                        $session->set('mautic.lead.import.progress', $progress);
+                        $session->set('mautic.lead.import.progress', $progressO->toArray());
                     }
 
                     break;
@@ -1586,6 +1515,8 @@ class LeadController extends FormController
                                                 'list'  => $list,
                                                 'tags'  => $tags,
                                             ],
+                                            'headers' => $session->get('mautic.lead.import.importfields'),
+                                            'parser'  => $session->get('mautic.lead.import.config'),
                                         ]
                                     );
 
