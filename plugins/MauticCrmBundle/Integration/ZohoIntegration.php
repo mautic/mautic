@@ -91,30 +91,6 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get available company fields for choices in the config UI.
-     *
-     * @param array $settings
-     *
-     * @return array
-     */
-    public function getFormCompanyFields($settings = [])
-    {
-        return $this->getFormFieldsByObject('company', $settings);
-    }
-
-    /**
-     * @param array $settings
-     *
-     * @return array|mixed
-     */
-    public function getFormLeadFields($settings = [])
-    {
-        $this->logIntegrationError(new \Exception('get lead fields: '.var_export($settings, true)));
-
-        return $this->getFormFieldsByObject('contacts', $settings);
-    }
-
-    /**
      * @param array $params
      * @param null  $query
      */
@@ -505,6 +481,28 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get available company fields for choices in the config UI.
+     *
+     * @param array $settings
+     *
+     * @return array
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        return $this->getFormFieldsByObject('company', $settings);
+    }
+
+    /**
+     * @param array $settings
+     *
+     * @return array|mixed
+     */
+    public function getFormLeadFields($settings = [])
+    {
+        return $this->getFormFieldsByObject('contacts', $settings);
+    }
+
+    /**
      * @param array $settings
      *
      * @return array|bool
@@ -520,37 +518,54 @@ class ZohoIntegration extends CrmAbstractIntegration
         $zohoFields        = [];
         $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
 
+        if (isset($settings['feature_settings']['objects'])) {
+            $zohoObjects = $settings['feature_settings']['objects'];
+        } else {
+            $settings    = $this->settings->getFeatureSettings();
+            $zohoObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+        }
+
         try {
             if ($this->isAuthorized()) {
-                $leadObject = $this->getApiHelper()->getLeadFields();
+                if (!empty($zohoObjects) && is_array($zohoObjects)) {
+                    foreach ($zohoObjects as $key => $object) {
+                        // Check the cache first
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
+                        if ($fields = parent::getAvailableLeadFields($settings)) {
+                            $zohoFields[$object] = $fields;
 
-                if (null === $leadObject || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
-                    return [];
-                }
-
-                $zohoFields = [];
-                /** @var array $opts */
-                $opts = $leadObject['Leads']['section'];
-                foreach ($opts as $optgroup) {
-                    //$zohoFields[$optgroup['dv']] = array();
-                    if (!array_key_exists(0, $optgroup['FL'])) {
-                        $optgroup['FL'] = [$optgroup['FL']];
-                    }
-                    foreach ($optgroup['FL'] as $field) {
-                        if (!(bool) $field['isreadonly'] || in_array($field['type'], ['Lookup', 'OwnerLookup', 'Boolean'], true)) {
                             continue;
                         }
+                        $leadObject = $this->getApiHelper()->getLeadFields($object);
 
-                        $zohoFields[$this->getFieldKey($field['dv'])] = [
-                            'type'     => 'string',
-                            'label'    => $field['label'],
-                            'dv'       => $field['dv'],
-                            'required' => $field['req'] === 'true',
-                        ];
+                        if (null === $leadObject || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
+                            return [];
+                        }
+
+                        /** @var array $opts */
+                        $opts = $leadObject[$object]['section'];
+                        foreach ($opts as $optgroup) {
+                            //$zohoFields[$optgroup['dv']] = array();
+                            if (!array_key_exists(0, $optgroup['FL'])) {
+                                $optgroup['FL'] = [$optgroup['FL']];
+                            }
+                            foreach ($optgroup['FL'] as $field) {
+                                if (!(bool) $field['isreadonly'] || in_array($field['type'], ['Lookup', 'OwnerLookup', 'Boolean'], true)) {
+                                    continue;
+                                }
+
+                                $zohoFields[$object][$this->getFieldKey($field['dv'])] = [
+                                    'type'     => 'string',
+                                    'label'    => $field['label'],
+                                    'dv'       => $field['dv'],
+                                    'required' => $field['req'] === 'true',
+                                ];
+                            }
+                        }
+
+                        $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$object]);
                     }
                 }
-
-                $this->cache->set('leadFields', $zohoFields);
             }
         } catch (ApiErrorException $exception) {
             $this->logIntegrationError($exception);

@@ -6,12 +6,24 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class ZohoApi extends CrmApi
 {
-    private $module = 'Leads';
-
-    protected function request($operation, $parameters = [], $method = 'GET')
+    /**
+     * @param $operation
+     * @param array  $parameters
+     * @param string $method
+     * @param string $object
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    protected function request($operation, array $parameters = [], $method = 'GET', $object = 'contacts')
     {
+        $module = 'Leads';
+        if ($object === 'company') {
+            $module = 'Accounts'; // Zoho company object name
+        }
         $tokenData = $this->integration->getKeys();
-        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl(), $this->module, $operation);
+        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl(), $module, $operation);
 
         $parameters = array_merge([
             'authtoken' => $tokenData['AUTHTOKEN'],
@@ -29,17 +41,25 @@ class ZohoApi extends CrmApi
             throw new ApiErrorException($errorMsg);
         }
 
+        // this will keep the response array with the standard key names for companies and contacts
+        if (isset($response[$module])) {
+            $response[$object] = $response[$module];
+            unset($response[$module]);
+        }
+
         return $response;
     }
 
     /**
      * List types.
      *
+     * @param string $object Zoho module name
+     *
      * @return mixed
      */
-    public function getLeadFields()
+    public function getLeadFields($object = 'contacts')
     {
-        return $this->request('getFields');
+        return $this->request('getFields', [], 'GET', $object);
     }
 
     /**
@@ -58,32 +78,46 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * gets Hubspot contact.
+     * gets Zoho contacts.
      *
-     * @param array $data
-     *
-     * @return mixed
-     */
-    public function getContacts($params = [])
-    {
-        return $this->request('getLeads', $params);
-    }
-
-    /**
-     * gets Hubspot company.
-     *
-     * @param array $data
+     * @param array  $params
+     * @param string $id
      *
      * @return mixed
      */
-    public function getCompanies($params, $id)
+    public function getContacts(array $params, $id)
     {
+        if (!isset($params['selectColumns'])) {
+            $params['selectColumns'] = 'All';
+        }
         if ($id) {
             $params['id'] = $id;
 
-            return $this->request('getCompany', $params);
+            return $this->request('getRecordById', $params);
         }
 
-        return $this->request('getCompanies', $params);
+        return $this->request('getRecords', $params);
+    }
+
+    /**
+     * gets Zoho companies.
+     *
+     * @param array  $params
+     * @param string $id
+     *
+     * @return mixed
+     */
+    public function getCompanies(array $params, $id)
+    {
+        if (!isset($params['selectColumns'])) {
+            $params['selectColumns'] = 'All';
+        }
+        if ($id) {
+            $params['id'] = $id;
+
+            return $this->request('getRecordById', $params, 'GET', 'company');
+        }
+
+        return $this->request('getRecords', $params, 'GET', 'company');
     }
 }
