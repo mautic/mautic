@@ -195,6 +195,7 @@ trait FieldsTypeTrait
                             'data' => $field,
                             'attr' => [
                                 'data-required' => $required,
+                                'data-value'    => $field,
                             ],
                         ]
                     );
@@ -205,6 +206,7 @@ trait FieldsTypeTrait
                             'data' => $index,
                             'attr' => [
                                 'data-required' => $required,
+                                'data-value'    => $index,
                             ],
                         ]
                     );
