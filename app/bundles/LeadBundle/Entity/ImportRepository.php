@@ -18,4 +18,13 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class ImportRepository extends CommonRepository
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'i';
+    }
 }

@@ -396,6 +396,16 @@ class Import extends FormEntity
     }
 
     /**
+     * getName method is used by standart templates so there it is for this entity.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getOriginalFile() ? $this->getOriginalFile() : $this->getId();
+    }
+
+    /**
      * @param int $lineCount
      *
      * @return Import
@@ -504,6 +514,22 @@ class Import extends FormEntity
     }
 
     /**
+     * Counts current progress percentage.
+     *
+     * @return float
+     */
+    public function getProgressPercentage()
+    {
+        $processed = $this->getInsertedCount() + $this->getUpdatedCount() + $this->getIgnoredCount();
+
+        if ($processed && $total = $this->getLineCount()) {
+            return round($processed / $total * 100, 2);
+        }
+
+        return 0;
+    }
+
+    /**
      * @param int $priority
      *
      * @return Import
@@ -543,6 +569,29 @@ class Import extends FormEntity
     public function getStatus()
     {
         return $this->status;
+    }
+
+    /**
+     * Returns Twitter Bootstrap label class based on current status.
+     *
+     * @return string
+     */
+    public function getSatusLabelClass()
+    {
+        switch ($this->status) {
+            case self::CREATED:
+                return 'info';
+            case self::IN_PROGRESS:
+                return 'primary';
+            case self::IMPORTED:
+                return 'success';
+            case self::FAILED:
+                return 'danger';
+            case self::STOPPED:
+                return 'warning';
+            default:
+                return 'default';
+        }
     }
 
     /**
@@ -611,6 +660,23 @@ class Import extends FormEntity
     public function getDateEnded()
     {
         return $this->dateEnded;
+    }
+
+    /**
+     * Counts how many seconds the import runs so far.
+     *
+     * @return int
+     */
+    public function getRunTime()
+    {
+        $startTime = $this->getDateStarted() ? $this->getDateStarted() : $this->getDateAdded();
+        $endTime   = $this->getDateEnded() ? $this->getDateEnded() : $this->getDateModified();
+
+        if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
+            return $endTime->getTimestamp() - $startTime->getTimestamp();
+        }
+
+        return 0;
     }
 
     /**

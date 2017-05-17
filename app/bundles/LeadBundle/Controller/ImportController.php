@@ -30,18 +30,28 @@ class ImportController extends FormController
     const STEP_IMPORT_FROM_CSV = 4;
 
     /**
+     * @param int $page
+     *
+     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function indexAction($page = 1)
+    {
+        return $this->indexStandard($page);
+    }
+
+    /**
      * @param int  $objectId
      * @param bool $ignorePost
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function importAction($objectId = 0, $ignorePost = false)
+    public function newAction($objectId = 0, $ignorePost = false)
     {
         //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
         ini_set('auto_detect_line_endings', true);
 
         /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
-        $importModel = $this->getModel('lead.import');
+        $importModel = $this->getModel($this->getModelName());
 
         $session = $this->get('session');
 
@@ -67,7 +77,7 @@ class ImportController extends FormController
 
         $progress = (new Progress())->bindArray($session->get('mautic.lead.import.progress', [0, 0]));
         $stats    = $session->get('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0, 'failures' => []]);
-        $action   = $this->generateUrl('mautic_contact_action', ['objectAction' => 'import']);
+        $action   = $this->generateUrl('mautic_contact_import_action', ['objectAction' => 'new']);
 
         switch ($step) {
             case self::STEP_UPLOAD_CSV:
@@ -214,7 +224,7 @@ class ImportController extends FormController
 
                                             $session->set('mautic.lead.import.id', $import->getId());
 
-                                            return $this->importAction(0, true);
+                                            return $this->newAction(0, true);
                                         }
                                     }
                                 } catch (FileException $e) {
@@ -247,7 +257,7 @@ class ImportController extends FormController
                         if (empty($matchedFields)) {
                             $this->resetImport($fullPath);
 
-                            return $this->importAction(0, true);
+                            return $this->newAction(0, true);
                         }
 
                         $owner = $matchedFields['owner'];
@@ -309,7 +319,7 @@ class ImportController extends FormController
                                 $session->set('mautic.lead.import.step', self::STEP_PROGRESS_BAR);
                             }
 
-                            return $this->importAction(0, true);
+                            return $this->newAction(0, true);
                         }
                         break;
 
@@ -323,12 +333,12 @@ class ImportController extends FormController
             } else {
                 $this->resetImport($fullPath);
 
-                return $this->importAction(0, true);
+                return $this->newAction(0, true);
             }
         }
 
         if ($step === self::STEP_UPLOAD_CSV || $step === self::STEP_MATCH_FIELDS) {
-            $contentTemplate = 'MauticLeadBundle:Import:form.html.php';
+            $contentTemplate = 'MauticLeadBundle:Import:new.html.php';
             $viewParameters  = ['form' => $form->createView()];
         } else {
             $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
@@ -352,9 +362,9 @@ class ImportController extends FormController
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadImport',
                         'route'         => $this->generateUrl(
-                            'mautic_contact_action',
+                            'mautic_contact_import_action',
                             [
-                                'objectAction' => 'import',
+                                'objectAction' => 'new',
                             ]
                         ),
                         'step'     => $step,
@@ -412,5 +422,69 @@ class ImportController extends FormController
         if ($removeCsv) {
             unlink($filepath);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getModelName()
+    {
+        return 'lead.import';
+    }
+
+    /***
+     * @param null $objectId
+     *
+     * @return string
+     */
+    protected function getSessionBase($objectId = null)
+    {
+        return 'lead.import'.(($objectId) ? '.'.$objectId : '');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPermissionBase()
+    {
+        return $this->getModel($this->getModelName())->getPermissionBase();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getRouteBase()
+    {
+        return 'contact_import';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    protected function getTemplateBase()
+    {
+        return 'MauticLeadBundle:Import';
+    }
+
+    /**
+     * Provide the name of the column which is used for default ordering.
+     *
+     * @return string
+     */
+    protected function getDefaultOrderColumn()
+    {
+        return 'dateAdded';
+    }
+
+    /**
+     * Provide the direction for default ordering.
+     *
+     * @return string
+     */
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
     }
 }

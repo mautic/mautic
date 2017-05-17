@@ -78,9 +78,13 @@ return [
                     'leadId' => '\d+',
                 ],
             ],
-            'mautic_contact_import' => [
-                'path'       => '/contacts/import',
-                'controller' => 'MauticLeadBundle:Import:import',
+            'mautic_contact_import_index' => [
+                'path'       => '/contacts/import/{page}',
+                'controller' => 'MauticLeadBundle:Import:index',
+            ],
+            'mautic_contact_import_action' => [
+                'path'       => '/contacts/import/{objectAction}/{objectId}',
+                'controller' => 'MauticLeadBundle:Import:execute',
             ],
             'mautic_contact_action' => [
                 'path'       => '/contacts/{objectAction}/{objectId}',
