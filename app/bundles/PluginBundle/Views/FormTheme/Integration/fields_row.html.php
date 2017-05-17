@@ -62,7 +62,7 @@ $indexCount = 1;
             if ($child->vars['name'] == 'label_'.$indexCount):
                 if ($isRequired):
                     $name = $child->vars['full_name'];
-                    echo '<input type="hidden" value="'.$child->vars['value'].'" name="'.$name.'" />';
+                    echo '<input type="hidden" value="'.$child->vars['attr']['data-label'].'" name="'.$name.'" />';
                 endif;
                 ?>
                 <div class="pl-xs pr-xs <?php echo $class; ?><?php if ($isRequired): echo ' has-error'; endif; ?>">
