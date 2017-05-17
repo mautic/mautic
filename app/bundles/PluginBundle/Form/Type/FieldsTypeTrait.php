@@ -122,7 +122,7 @@ trait FieldsTypeTrait
                     $fieldsName = $fieldObject.'Fields';
                 }
                 foreach ($paginatedFields as $field => $details) {
-                    $matched = isset($fieldData['leadFields'][$field]);
+                    $matched = isset($fieldData[$fieldsName][$field]);
                     $required = (int) (!empty($integrationFields[$field]['required']) || $choices[$field] == 'Email');
                     ++$index;
                     $form->add(
@@ -135,7 +135,7 @@ trait FieldsTypeTrait
                                 'class'         => 'form-control integration-fields',
                                 'data-required' => $required,
                                 'data-label'    => $choices[$field],
-                                'placeholder'   => isset($group[$field]) ? $group[$field] : $fieldObject,
+                                'placeholder'   => isset($group[$field]) ? $group[$field] : '',
                                 'readonly'      => true,
                             ],
                             'by_reference' => true,
@@ -177,13 +177,13 @@ trait FieldsTypeTrait
                         [
                             'choices'    => $mauticFields,
                             'label'      => false,
-                            'data'       => $matched || isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
+                            'data'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                             'label_attr' => ['class' => 'control-label'],
                             'attr'       => [
                                 'class'            => 'field-selector',
                                 'data-placeholder' => ' ',
                                 'data-required'    => $required,
-                                'data-value'       => $matched || isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
+                                'data-value'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                                 'data-choices'     => $mauticFields,
                             ],
                         ]
