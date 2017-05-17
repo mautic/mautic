@@ -1072,6 +1072,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 $lead['id']
                             );
                             $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
+                            $checkEmailsInSF[$key] = $lead;
                         } else {
                             $checkEmailsInSF[$key] = $lead;
                         }
@@ -1149,17 +1150,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     );
                                     $integrationEntity->setIntegrationEntityId($sfLeadRecord['Id']);
                                     $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
-                                } else {
-                                    $integrationEntities[] = $this->createIntegrationEntity(
-                                        'Lead',
-                                        $sfLeadRecord['Id'],
-                                        'lead-converted',
-                                        $checkEmailsInSF[$key]['internal_entity_id'],
-                                        [],
-                                        false
-                                    );
-
-                                    $this->logger->debug('SALESFORCE: Converted lead '.$sfLeadRecord['Email']);
                                 }
 
                                 continue;
@@ -1221,6 +1211,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $key = mb_strtolower($sfContactRecord['Email']);
                         if (isset($checkEmailsInSF[$key])) {
                             $salesforceIdMapping[$checkEmailsInSF[$key]['internal_entity_id']] = $sfContactRecord['Id'];
+                            if (isset($checkEmailsInSF[$key]['integration_entity_id']) && $checkEmailsInSF[$key]['integration_entity_id'] != $sfContactRecord['Id'] && $checkEmailsInSF[$key]['integration_entity'] == 'Lead') {
+                                $checkEmailsInSF[$key]['id'] = null;
+                            }
                             if ($this->buildCompositeBody(
                                 $mauticData,
                                 $availableFields,
@@ -1484,7 +1477,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } elseif (204 === $item['httpStatusCode']) {
                     // Record was updated
                     if ($integrationEntityId) {
-                        $salesforceIdMapping[$contactId] = $integrationEntityId;
                         /** @var IntegrationEntity $integrationEntity */
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
 
