@@ -63,8 +63,10 @@ CREATE TABLE {$this->prefix}imports (
     date_ended DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime)',
     object VARCHAR(255) NOT NULL,
     properties LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)',
-    INDEX {$this->prefix}import_object (object), INDEX import_status (status),
-    INDEX {$this->prefix}import_priority (priority), PRIMARY KEY(id)
+    INDEX {$this->prefix}import_object (object),
+    INDEX {$this->prefix}import_status (status),
+    INDEX {$this->prefix}import_priority (priority),
+    PRIMARY KEY(id)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;
 

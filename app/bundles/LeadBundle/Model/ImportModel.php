@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
@@ -109,8 +110,9 @@ class ImportModel extends FormModel
      */
     public function process(Import $import, Progress $progress)
     {
-        $config = $import->getParserConfig();
-        $file   = new \SplFileObject($import->getFilePath());
+        $leadEventLogRepo = $this->leadModel->getEventLogRepository();
+        $config           = $import->getParserConfig();
+        $file             = new \SplFileObject($import->getFilePath());
         if ($file !== false) {
             $lineNumber = $progress->getDone();
 
@@ -121,7 +123,8 @@ class ImportModel extends FormModel
             $batchSize = $config['batchlimit'];
 
             while ($batchSize && !$file->eof()) {
-                $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+                $errorMessage = null;
+                $data         = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
                 array_walk($data, create_function('&$val', '$val = trim($val);'));
 
                 // Ignore the header row
@@ -132,6 +135,7 @@ class ImportModel extends FormModel
 
                 ++$lineNumber;
 
+                $eventLog = $this->initEventLog($import, $lineNumber);
                 $progress->increase();
 
                 // Decrease batch count
@@ -172,7 +176,9 @@ class ImportModel extends FormModel
                                 $data,
                                 $import->getDefault('owner'),
                                 $import->getDefault('list'),
-                                $import->getDefault('tags')
+                                $import->getDefault('tags'),
+                                true,
+                                $eventLog
                             );
                             if ($merged) {
                                 $import->increaseUpdatedCount();
@@ -180,21 +186,27 @@ class ImportModel extends FormModel
                                 $import->increaseInsertedCount();
                             }
                         } else {
-                            $import->increaseIgnoredCount();
-                            $msg = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
-                            $import->addFailure($lineNumber, $msg);
+                            $errorMessage = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
                         }
                     } catch (\Exception $e) {
                         // Email validation likely failed
-                        $import->increaseIgnoredCount();
-                        $import->addFailure($lineNumber, $e->getMessage());
+                        $errorMessage = $e->getMessage();
                     }
                 } else {
-                    $import->increaseIgnoredCount();
-                    $msg = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
-                    $import->addFailure($lineNumber, $msg);
+                    $errorMessage = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
                 }
 
+                if ($errorMessage) {
+                    // Inform Import entity about the failed row
+                    $import->increaseIgnoredCount();
+                    $import->addFailure($lineNumber, $errorMessage);
+
+                    // Save log about errored line
+                    $eventLog->addProperty('error', $errorMessage);
+                    $leadEventLogRepo->saveEntity($eventLog);
+                }
+
+                // Save Import entity once per batch so the user could see the progress
                 if ($batchSize === 0 && $import->isBackgroundProcess()) {
                     $this->saveEntity($import);
                     $batchSize = $config['batchlimit'];
@@ -204,6 +216,33 @@ class ImportModel extends FormModel
 
         // Close the file
         $file = null;
+    }
+
+    /**
+     * Initialize LeadEventLog object and configure it as the import event.
+     *
+     * @param Import $import
+     * @param int    $lineNumber
+     *
+     * @return LeadEventLog
+     */
+    public function initEventLog(Import $import, int $lineNumber)
+    {
+        $eventLog = new LeadEventLog();
+        $eventLog->setUserId($import->getCreatedBy())
+            ->setUserName($import->getCreatedByUser())
+            ->setBundle('lead')
+            ->setObject('import')
+            ->setObjectId($import->getId())
+            ->setAction('failed')
+            ->setProperties(
+                [
+                    'line' => $lineNumber,
+                    'file' => $import->getOriginalFile(),
+                ]
+            );
+
+        return $eventLog;
     }
 
     /**

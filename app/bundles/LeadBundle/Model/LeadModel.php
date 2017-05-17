@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -236,6 +237,16 @@ class LeadModel extends FormModel
     public function getDeviceRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:LeadDevice');
+    }
+
+    /**
+     * Get the lead event log repository.
+     *
+     * @return \Mautic\LeadBundle\Entity\LeadEventLogRepository
+     */
+    public function getEventLogRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadEventLog');
     }
 
     /**
@@ -1616,18 +1627,19 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param      $fields
-     * @param      $data
-     * @param null $owner
-     * @param null $list
-     * @param null $tags
-     * @param bool $persist
+     * @param array        $fields
+     * @param array        $data
+     * @param null         $owner
+     * @param null         $list
+     * @param null         $tags
+     * @param bool         $persist
+     * @param LeadEventLog $eventLog
      *
-     * @return array|bool|null
+     * @return bool|null
      *
      * @throws \Exception
      */
-    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true)
+    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
     {
         // Let's check for an existing lead by email
         $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
@@ -1896,6 +1908,10 @@ class LeadModel extends FormModel
         }
 
         $lead->imported = true;
+
+        if ($eventLog) {
+            $lead->addEventLog($eventLog);
+        }
 
         if ($persist) {
             $this->saveEntity($lead);
