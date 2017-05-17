@@ -135,7 +135,7 @@ trait FieldsTypeTrait
                                 'class'         => 'form-control integration-fields',
                                 'data-required' => $required,
                                 'data-label'    => $choices[$field],
-                                'placeholder'   => isset($group[$field]) ? $group[$field] : '',
+                                'placeholder'   => isset($group[$field]) ? $group[$field] : $fieldObject,
                                 'readonly'      => true,
                             ],
                             'by_reference' => true,

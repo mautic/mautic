@@ -71,7 +71,7 @@ $indexCount = 1;
                                id="<?php echo $child->vars['id']; ?>"
                                name="<?php echo $child->vars['full_name']; ?>"
                                class="<?php echo $child->vars['attr']['class']; ?>"
-                               value="<?php echo $child->vars['value']; ?>"
+                               value="<?php echo $child->vars['attr']['data-label']; ?>"
                                readonly />
                     </div>
                 </div>
