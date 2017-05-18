@@ -46,7 +46,7 @@ class ImportController extends FormController
      */
     public function viewAction($objectId)
     {
-        return $this->viewStandard($objectId, 'lead', 'import');
+        return $this->viewStandard($objectId, 'import', 'lead');
     }
 
     /**

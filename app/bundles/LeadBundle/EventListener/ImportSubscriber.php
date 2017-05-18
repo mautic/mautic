@@ -72,9 +72,6 @@ class ImportSubscriber extends CommonSubscriber
                 'details'   => $details,
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
-            echo '<pre>';
-            var_dump($log);
-            die('</pre>');
             $this->auditLogModel->writeToLog($log);
         }
     }
