@@ -1,3 +1,29 @@
+<?php
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'routeBase'       => 'contact_import',
+            'langVar'         => 'lead.import',
+            'templateButtons' => [
+                'close' => true,
+            ],
+        ]
+    )
+);
+
+?>
 <div class="row">
     <div class="col-sm-offset-3 col-sm-6">
         <div class="ml-lg mr-lg mt-md pa-lg">

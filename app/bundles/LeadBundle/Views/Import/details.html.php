@@ -15,6 +15,23 @@ $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $item])
 );
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        [
+            'routeBase'       => 'contact_import',
+            'langVar'         => 'lead.import',
+            'templateButtons' => [
+                'close' => $view['security']->hasEntityAccess(
+                    $permissions['lead:imports:viewown'],
+                    $permissions['lead:imports:viewother'],
+                    $item->getCreatedBy()
+                ),
+            ],
+        ]
+    )
+);
 $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
 
 ?>
