@@ -97,13 +97,13 @@ class IntegrationEntityRepository extends CommonRepository
             ->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
 
         if (false === $limit) {
-            $q->select('count(*) as total');
+            $q->select('count(distinct(i.integration_entity_id)) as total');
 
             if ($integrationEntity) {
                 $q->addSelect('i.integration_entity');
             }
         } else {
-            $q->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id,'.$leadFields);
+            $q->select('distinct(i.integration_entity_id), i.integration_entity, i.id, i.internal_entity_id,'.$leadFields);
         }
 
         $q->where('i.integration = :integration');

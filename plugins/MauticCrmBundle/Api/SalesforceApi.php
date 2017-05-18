@@ -15,6 +15,7 @@ class SalesforceApi extends CrmApi
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
+    protected $apiRequestCounter = 0;
 
     public function __construct(CrmAbstractIntegration $integration)
     {
@@ -54,7 +55,9 @@ class SalesforceApi extends CrmApi
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
+        // Wrap in a isAuthorized to refresh token if applicable
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
+        ++$this->apiRequestCounter;
 
         if (!empty($response['errors'])) {
             throw new ApiErrorException(implode(', ', $response['errors']));
@@ -136,6 +139,7 @@ class SalesforceApi extends CrmApi
 
             $createdLeadData       = $data[$sfObject];
             $createdLeadData['id'] = $sfLeadId;
+            $createdLeadData['Id'] = $sfLeadId; // Just because SF does this
         }
 
         if ($createLead && isset($data['Lead']['Email'])) {
@@ -252,7 +256,7 @@ class SalesforceApi extends CrmApi
                     }
                 }
         }
-        $result = [];
+
         if (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
@@ -267,7 +271,7 @@ class SalesforceApi extends CrmApi
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'].$ignoreConvertedLeads;
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } elseif (isset($query['nextUrl'])) {
+        } elseif (!empty($query['nextUrl'])) {
             $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
             $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
         } else {
@@ -334,5 +338,16 @@ class SalesforceApi extends CrmApi
         $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
 
         return $result;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRequestCounter()
+    {
+        $count = $this->apiRequestCounter;
+        $this->apiRequestCounter = 0;
+
+        return $count;
     }
 }
