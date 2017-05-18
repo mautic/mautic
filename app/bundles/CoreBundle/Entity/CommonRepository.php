@@ -1325,13 +1325,13 @@ class CommonRepository extends EntityRepository
     {
         $isOrm = $q instanceof QueryBuilder;
         if (isset($args['select'])) {
+
             // Build a custom select
-            if (!is_array($args['select'])) {
-                $args['select'] = [$args['select']];
+            if (is_string($args['select'])) {
+                $args['select'] = explode(',', $args['select']);
             }
 
-            $selects        = [];
-            $args['select'] = explode(',', $args['select']);
+            $selects = [];
             foreach ($args['select'] as $select) {
                 if (strpos($select, '.') !== false) {
                     list($alias, $select) = explode('.', $select);
@@ -1367,12 +1367,16 @@ class CommonRepository extends EntityRepository
             if ($partials) {
                 $newSelect = implode(', ', $partials);
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
-                if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
+                if ($isOrm) {
                     $q->select($newSelect);
-                } elseif (strpos($select, $this->getTableAlias().',') !== false) {
-                    $q->select(str_replace($this->getTableAlias().',', $newSelect.','));
-                } elseif (strpos($select, $this->getTableAlias().'.*,') !== false) {
-                    $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.','));
+                } else {
+                    if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
+                        $q->select($newSelect);
+                    } elseif (strpos($select, $this->getTableAlias().',') !== false) {
+                        $q->select(str_replace($this->getTableAlias().',', $newSelect.','));
+                    } elseif (strpos($select, $this->getTableAlias().'.*,') !== false) {
+                        $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.','));
+                    }
                 }
             }
         }
