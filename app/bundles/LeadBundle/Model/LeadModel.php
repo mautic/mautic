@@ -389,23 +389,26 @@ class LeadModel extends FormModel
         //check to see if we can glean information from ip address
         if (!$entity->imported && count($ips = $entity->getIpAddresses())) {
             $details = $ips->first()->getIpDetails();
-            if (!empty($details['city']) && empty($fields['core']['city']['value'])) {
-                $entity->addUpdatedField('city', $details['city']);
-                $companyFieldMatches['city'] = $details['city'];
-            }
+            // Only update with IP details if none of the following are set to prevent wrong combinations
+            if (empty($fields['core']['city']['value']) && empty($fields['core']['state']['value']) && empty($fields['core']['country']['value']) && empty($fields['core']['zipcode']['value'])) {
+                if (!empty($details['city'])) {
+                    $entity->addUpdatedField('city', $details['city']);
+                    $companyFieldMatches['city'] = $details['city'];
+                }
 
-            if (!empty($details['region']) && empty($fields['core']['state']['value'])) {
-                $entity->addUpdatedField('state', $details['region']);
-                $companyFieldMatches['state'] = $details['region'];
-            }
+                if (!empty($details['region'])) {
+                    $entity->addUpdatedField('state', $details['region']);
+                    $companyFieldMatches['state'] = $details['region'];
+                }
 
-            if (!empty($details['country']) && empty($fields['core']['country']['value'])) {
-                $entity->addUpdatedField('country', $details['country']);
-                $companyFieldMatches['country'] = $details['country'];
-            }
+                if (!empty($details['country'])) {
+                    $entity->addUpdatedField('country', $details['country']);
+                    $companyFieldMatches['country'] = $details['country'];
+                }
 
-            if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
-                $entity->addUpdatedField('zipcode', $details['zipcode']);
+                if (!empty($details['zipcode'])) {
+                    $entity->addUpdatedField('zipcode', $details['zipcode']);
+                }
             }
         }
 
