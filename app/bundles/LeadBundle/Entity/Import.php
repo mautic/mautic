@@ -24,14 +24,38 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class Import extends FormEntity
 {
-    // Statuses:
-    const QUEUED      = 1;
-    const IN_PROGRESS = 2;
-    const IMPORTED    = 3;
-    const FAILED      = 4;
-    const STOPPED     = 5;
+    /** ===== Statuses: ===== */
+    /**
+     * When the import entity is created for background processing.
+     */
+    const QUEUED = 1;
 
-    // Priorities
+    /**
+     * When the background process started the import.
+     */
+    const IN_PROGRESS = 2;
+
+    /**
+     * When the import is finished.
+     */
+    const IMPORTED = 3;
+
+    /**
+     * When the import process failed.
+     */
+    const FAILED = 4;
+
+    /**
+     * When the import has been stopped by a user.
+     */
+    const STOPPED = 5;
+
+    /**
+     * When the import happens in the browser.
+     */
+    const MANUAL = 6;
+
+    /** ===== Priorities: ===== */
     const LOW    = 512;
     const NORMAL = 64;
     const HIGH   = 1;
