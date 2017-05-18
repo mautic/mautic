@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Import extends FormEntity
 {
     // Statuses:
-    const CREATED     = 1;
+    const QUEUED      = 1;
     const IN_PROGRESS = 2;
     const IMPORTED    = 3;
     const FAILED      = 4;
@@ -136,7 +136,7 @@ class Import extends FormEntity
 
     public function __construct()
     {
-        $this->status   = self::CREATED;
+        $this->status   = self::QUEUED;
         $this->priority = self::LOW;
     }
 
@@ -589,7 +589,7 @@ class Import extends FormEntity
     public function getSatusLabelClass()
     {
         switch ($this->status) {
-            case self::CREATED:
+            case self::QUEUED:
                 return 'info';
             case self::IN_PROGRESS:
                 return 'primary';
@@ -915,7 +915,7 @@ class Import extends FormEntity
     public function setIsPublished($isPublished)
     {
         if ($isPublished && $this->getStatus() === self::STOPPED) {
-            $this->setStatus(self::CREATED);
+            $this->setStatus(self::QUEUED);
         }
 
         if (!$isPublished && $this->getStatus() === self::IN_PROGRESS) {

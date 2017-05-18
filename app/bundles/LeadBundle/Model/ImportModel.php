@@ -60,7 +60,7 @@ class ImportModel extends FormModel
     {
         return $this->getRepository()->findOneBy(
             [
-                'status'      => Import::CREATED,
+                'status'      => Import::QUEUED,
                 'isPublished' => 1,
             ],
             [
