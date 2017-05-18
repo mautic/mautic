@@ -238,8 +238,8 @@ class HubspotIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'contacts' => 'mautic.crm.object.contact',
-                        'company'  => 'mautic.crm.object.company',
+                        'contacts' => 'mautic.hubspot.object.contact',
+                        'company'  => 'mautic.hubspot.object.company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,

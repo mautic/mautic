@@ -16,12 +16,8 @@ class ZohoApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $object = 'contacts')
+    protected function request($operation, array $parameters = [], $method = 'GET', $module = 'Leads')
     {
-        $module = 'Leads';
-        if ($object === 'company') {
-            $module = 'Accounts'; // Zoho company object name
-        }
         $tokenData = $this->integration->getKeys();
         $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl(), $module, $operation);
 
@@ -41,12 +37,6 @@ class ZohoApi extends CrmApi
             throw new ApiErrorException($errorMsg);
         }
 
-        // this will keep the response array with the standard key names for companies and contacts
-        if (isset($response[$module])) {
-            $response[$object] = $response[$module];
-            unset($response[$module]);
-        }
-
         return $response;
     }
 
@@ -57,8 +47,12 @@ class ZohoApi extends CrmApi
      *
      * @return mixed
      */
-    public function getLeadFields($object = 'contacts')
+    public function getLeadFields($object = 'Leads')
     {
+        if ($object == 'company') {
+            $object = 'Accounts'; // Zoho object name
+        }
+
         return $this->request('getFields', [], 'GET', $object);
     }
 
@@ -78,14 +72,14 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * gets Zoho contacts.
+     * gets Zoho leads.
      *
      * @param array  $params
      * @param string $id
      *
      * @return mixed
      */
-    public function getContacts(array $params, $id)
+    public function getLeads(array $params, $id)
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
@@ -115,9 +109,9 @@ class ZohoApi extends CrmApi
         if ($id) {
             $params['id'] = $id;
 
-            return $this->request('getRecordById', $params, 'GET', 'company');
+            return $this->request('getRecordById', $params, 'GET', 'Accounts');
         }
 
-        return $this->request('getRecords', $params, 'GET', 'company');
+        return $this->request('getRecords', $params, 'GET', 'Accounts');
     }
 }

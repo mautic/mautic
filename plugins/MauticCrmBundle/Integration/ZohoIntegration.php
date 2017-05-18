@@ -404,8 +404,9 @@ class ZohoIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'contacts' => 'mautic.crm.object.contact',
-                        'company'  => 'mautic.crm.object.company',
+                        'Leads'    => 'mautic.zoho.object.lead',
+                        'Contacts' => 'mautic.zoho.object.contact',
+                        'Accounts' => 'mautic.zoho.object.account',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -489,7 +490,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        return $this->getFormFieldsByObject('company', $settings);
+        return $this->getFormFieldsByObject('Accounts', $settings);
     }
 
     /**
@@ -499,7 +500,10 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        return $this->getFormFieldsByObject('contacts', $settings);
+        $leadFields    = $this->getFormFieldsByObject('Leads', $settings);
+        $contactFields = $this->getFormFieldsByObject('Contacts', $settings);
+
+        return array_merge($leadFields, $contactFields);
     }
 
     /**
@@ -522,7 +526,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $zohoObjects = $settings['feature_settings']['objects'];
         } else {
             $settings    = $this->settings->getFeatureSettings();
-            $zohoObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
+            $zohoObjects = isset($settings['objects']) ? $settings['objects'] : ['Leads'];
         }
 
         try {
