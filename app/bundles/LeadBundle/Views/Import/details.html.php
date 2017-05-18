@@ -142,8 +142,8 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
+        <?php if (!empty($failedRows) && count($failedRows)) : ?>
         <h3><?php echo $view['translator']->trans('mautic.lead.import.failed.rows'); ?></h3>
-        <?php if (!empty($failedRows)) : ?>
             <table class="table">
                 <thead>
                     <tr>
@@ -167,10 +167,10 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
         <?php else : ?>
             <i><?php echo $view['translator']->trans('mautic.lead.import.no.failed.rows'); ?></i>
         <?php endif; ?>
+        </div>
         <!--/ end: tab-content -->
     </div>
     <!--/ left section -->

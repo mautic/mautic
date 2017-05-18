@@ -686,7 +686,7 @@ class Import extends FormEntity
             return $endTime->diff($startTime);
         }
 
-        return new \DateInterval();
+        return new \DateInterval('PT0S');
     }
 
     /**
@@ -696,9 +696,14 @@ class Import extends FormEntity
      */
     public function getRunTimeSedonds()
     {
-        $interval = $this->getRunTime();
+        $startTime = $this->getDateStarted() ? $this->getDateStarted() : $this->getDateAdded();
+        $endTime   = $this->getDateEnded() ? $this->getDateEnded() : $this->getDateModified();
 
-        return $interval->s;
+        if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
+            return $endTime->format('U') - $startTime->format('U');
+        }
+
+        return 0;
     }
 
     /**

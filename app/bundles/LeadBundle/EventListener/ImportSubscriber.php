@@ -72,6 +72,9 @@ class ImportSubscriber extends CommonSubscriber
                 'details'   => $details,
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
             ];
+            echo '<pre>';
+            var_dump($log);
+            die('</pre>');
             $this->auditLogModel->writeToLog($log);
         }
     }
@@ -81,7 +84,7 @@ class ImportSubscriber extends CommonSubscriber
      *
      * @param ImportEvent $event
      */
-    public function onAssetDelete(ImportEvent $event)
+    public function onImportDelete(ImportEvent $event)
     {
         $entity = $event->getEntity();
         $log    = [
