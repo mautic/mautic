@@ -674,6 +674,12 @@ class ReportModel extends FormModel
             $debugData['query_time'] = (isset($queryTime)) ? $queryTime : 'N/A';
         }
 
+        foreach ($data as $keys => $lead) {
+            foreach ($lead as $key => $field) {
+                $data[$keys][$key] = html_entity_decode($field, ENT_QUOTES);
+            }
+        }
+
         return [
             'totalResults'    => $totalResults,
             'data'            => $data,
