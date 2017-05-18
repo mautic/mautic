@@ -645,8 +645,11 @@ class Import extends FormEntity
      */
     public function end()
     {
-        $this->setDateEnded(new \DateTime())
-            ->setStatus(self::IMPORTED);
+        $this->setDateEnded(new \DateTime());
+
+        if ($this->getStatus() === self::IN_PROGRESS) {
+            $this->setStatus(self::IMPORTED);
+        }
 
         return $this;
     }
@@ -900,5 +903,25 @@ class Import extends FormEntity
         $properties['status_info'] = $info;
 
         return $this->setProperties($properties);
+    }
+
+    /**
+     * Overwrite this method so we could change import status based on it.
+     *
+     * @param bool $isPublished
+     *
+     * @return $this
+     */
+    public function setIsPublished($isPublished)
+    {
+        if ($isPublished && $this->getStatus() === self::STOPPED) {
+            $this->setStatus(self::CREATED);
+        }
+
+        if (!$isPublished && $this->getStatus() === self::IN_PROGRESS) {
+            $this->setStatus(self::STOPPED);
+        }
+
+        return parent::setIsPublished($isPublished);
     }
 }

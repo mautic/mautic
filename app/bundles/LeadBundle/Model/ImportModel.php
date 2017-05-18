@@ -90,6 +90,7 @@ class ImportModel extends FormModel
         }
 
         $progress->setTotal($import->getLineCount());
+        $progress->setDone($import->getProcessedRows());
 
         $import->start();
         $this->saveEntity($import);
@@ -209,7 +210,19 @@ class ImportModel extends FormModel
 
                 // Save Import entity once per batch so the user could see the progress
                 if ($batchSize === 0 && $import->isBackgroundProcess()) {
+                    $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
+
+                    if (!$isPublished) {
+                        $import->setStatus($import::STOPPED);
+                    }
+
                     $this->saveEntity($import);
+
+                    // Stop the import loop if the import got unpublished
+                    if (!$isPublished) {
+                        break;
+                    }
+
                     $batchSize = $config['batchlimit'];
                 }
             }

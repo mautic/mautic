@@ -550,7 +550,7 @@ class CommonRepository extends EntityRepository
         $q        = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(*)')
-          ->from($table, $alias);
+            ->from($table, $alias);
 
         // Join associations for permission filtering
         $this->buildDbalJoinsFromAssociations($q, $metadata->getAssociationMappings(), $alias, $allowedJoins);
@@ -583,6 +583,31 @@ class CommonRepository extends EntityRepository
             'total'   => $count,
             'results' => $results,
         ];
+    }
+
+    /**
+     * Returns a single value for a single row.
+     *
+     * @param int    $id
+     * @param string $column
+     *
+     * @return string|null
+     */
+    public function getValue(int $id, $column)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select($this->getTableAlias().'.'.$column)
+            ->from($this->getClassMetadata()->getTableName(), $this->getTableAlias())
+            ->where($this->getTableAlias().'.id = :id')
+            ->setParameter('id', $id);
+
+        $result = $q->execute()->fetch();
+
+        if (isset($result[$column])) {
+            return $result[$column];
+        }
+
+        return null;
     }
 
     /**
