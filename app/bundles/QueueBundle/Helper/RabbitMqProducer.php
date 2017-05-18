@@ -14,7 +14,7 @@ namespace Mautic\QueueBundle\Helper;
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
 
 /**
- * Class RabbitMqProducer
+ * Class RabbitMqProducer.
  */
 class RabbitMqProducer extends Producer
 {
@@ -27,8 +27,9 @@ class RabbitMqProducer extends Producer
             return;
         }
 
-        $this->queueOptions['name'] = $queue;
-        $this->queueDeclared = false;
+        $this->queueOptions['name']        = $queue;
+        $this->queueOptions['auto_delete'] = true;
+        $this->queueDeclared               = false;
         $this->setupFabric();
     }
 }

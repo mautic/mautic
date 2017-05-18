@@ -63,7 +63,10 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
     public function consumeMessage(Events\QueueEvent $event)
     {
         $consumer = $this->container->get('old_sound_rabbit_mq.mautic_consumer');
-        $consumer->setQueueOptions(['name' => $event->getQueueName()]);
+        $consumer->setQueueOptions([
+            'name'        => $event->getQueueName(),
+            'auto_delete' => true,
+        ]);
         $consumer->setRoutingKey($event->getQueueName());
         $consumer->consume($event->getMessages());
     }

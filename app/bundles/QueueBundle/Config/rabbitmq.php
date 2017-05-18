@@ -27,14 +27,15 @@ $container->loadFromExtension(
         ],
         'producers' => [
             'mautic' => [
-                'class' => 'Mautic\QueueBundle\Helper\RabbitMqProducer',
+                'class'            => 'Mautic\QueueBundle\Helper\RabbitMqProducer',
                 'connection'       => 'default',
                 'exchange_options' => [
                     'name' => 'mautic',
                     'type' => 'direct',
                 ],
                 'queue_options' => [
-                    'name' => 'email_hit',
+                    'name'        => 'email_hit',
+                    'auto_delete' => true,
                 ],
             ],
         ],
@@ -46,7 +47,8 @@ $container->loadFromExtension(
                     'type' => 'direct',
                 ],
                 'queue_options' => [
-                    'name' => 'email_hit',
+                    'name'        => 'email_hit',
+                    'auto_delete' => true,
                 ],
                 'callback' => 'mautic.queue.helper.rabbitmq_consumer',
             ],
