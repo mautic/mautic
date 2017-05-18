@@ -943,7 +943,7 @@ class Import extends FormEntity
             $this->setStatus(self::QUEUED);
         }
 
-        if (!$isPublished && $this->getStatus() === self::IN_PROGRESS) {
+        if (!$isPublished && ($this->getStatus() === self::IN_PROGRESS || $this->getStatus() === self::QUEUED)) {
             $this->setStatus(self::STOPPED);
         }
 

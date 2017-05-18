@@ -14,11 +14,13 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -38,17 +40,25 @@ class ImportModel extends FormModel
     protected $leadModel;
 
     /**
+     * @var NotificationModel
+     */
+    protected $notificationModel;
+
+    /**
      * ImportModel constructor.
      *
-     * @param PathsHelper $pathsHelper
-     * @param LeadModel   $leadModel
+     * @param PathsHelper       $pathsHelper
+     * @param LeadModel         $leadModel
+     * @param NotificationModel $notificationModel
      */
     public function __construct(
         PathsHelper $pathsHelper,
-        LeadModel $leadModel
+        LeadModel $leadModel,
+        NotificationModel $notificationModel
     ) {
-        $this->pathsHelper = $pathsHelper;
-        $this->leadModel   = $leadModel;
+        $this->pathsHelper       = $pathsHelper;
+        $this->leadModel         = $leadModel;
+        $this->notificationModel = $notificationModel;
     }
 
     /**
@@ -99,6 +109,23 @@ class ImportModel extends FormModel
 
         $import->end();
         $this->saveEntity($import);
+        $this->notificationModel->addNotification(
+            $this->translator->trans(
+                'mautic.lead.import.completed.info',
+                [
+                    '%import%' => '<a href="'.$this->router->generate(
+                            'mautic_contact_import_action',
+                            ['objectAction' => 'view', 'objectId' => $import->getId()]
+                        ).'" data-toggle="ajax">'.$import->getOriginalFile().' ('.$import->getId().')</a>',
+                ]
+            ),
+            'info',
+            false,
+            $this->translator->trans('mautic.lead.import.completed'),
+            'fa-download',
+            null,
+            $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+        );
 
         return $import;
     }

@@ -640,6 +640,7 @@ return [
                 'arguments' => [
                     'mautic.helper.paths',
                     'mautic.lead.model.lead',
+                    'mautic.core.model.notification',
                 ],
             ],
         ],
