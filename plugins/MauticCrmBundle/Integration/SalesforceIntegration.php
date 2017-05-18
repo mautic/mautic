@@ -266,23 +266,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $sfObject = 'company';
                     }
 
-                    if ($this->isAuthorized()) {
-                        if (isset($sfObject) and $sfObject == 'Activity') {
+                    if (isset($sfObject) and $sfObject == 'Activity') {
+                        continue;
+                    }
+
+                    $sfObject = trim($sfObject);
+
+                    // Check the cache first
+                    $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
+                    if ($fields = parent::getAvailableLeadFields($settings)) {
+                        if (('company' === $sfObject && isset($fields['Id'])) || isset($fields['Id__'.$sfObject])) {
+                            $salesFields[$sfObject] = $fields;
+
                             continue;
                         }
+                    }
 
-                        $sfObject = trim($sfObject);
-
-                        // Check the cache first
-                        $settings['cache_suffix'] = $cacheSuffix = '.'.$sfObject;
-                        if ($fields = parent::getAvailableLeadFields($settings)) {
-                            if (('company' === $sfObject && isset($fields['Id'])) || isset($fields['Id__'.$sfObject])) {
-                                $salesFields[$sfObject] = $fields;
-
-                                continue;
-                            }
-                        }
-
+                    if ($this->isAuthorized()) {
                         if (!isset($salesFields[$sfObject])) {
                             $fields = $this->getApiHelper()->getLeadFields($sfObject);
                             if (!empty($fields['fields'])) {
@@ -807,7 +807,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $leadIds = (!is_array($leadId)) ? [$leadId] : $leadId;
 
         $leadActivity = [];
-        $options      = ['leadIds' => $leadIds, 'basic_select' => true, 'fromDate' => $startDate, 'toDate' => $endDate];
+        $options      = [
+            'leadIds'      => $leadIds,
+            'basic_select' => true,
+            'fromDate'     => $startDate,
+            'toDate'       => $endDate
+        ];
 
         /** @var LeadModel $leadModel */
         $leadModel      = $this->leadModel;
@@ -950,8 +955,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = [])
     {
-        $limit                 = $params['limit'];
-        $config                = $this->mergeConfigToFeatureSettings();
+        $limit                 = (isset($params['limit'])) ? $params['limit'] : 100;
+        $config                = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
         $totalUpdated = $totalCreated = $totalErrors = $totalIgnored = 0;
@@ -1034,6 +1039,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $sfEntityRecords = $this->getMauticContactsToCreate(
                         $checkEmailsInSF,
                         $mauticDuplicates,
+                        $trackedContacts,
                         $requiredFields,
                         $mauticLeadFieldString,
                         $limit,
@@ -1137,17 +1143,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $resultLead = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', 'Lead', 'lead', $lead->getId());
 
         return $resultLead;
-    }
-
-    /**
-     * @param array $fields
-     *
-     * @return array
-     *
-     * @deprecated 2.6.0 to be removed in 3.0
-     */
-    public function amendToSfFields($fields)
-    {
     }
 
     /**
@@ -1675,14 +1670,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param      $checkEmailsInSF
+     * @param      $mauticDuplicates
+     * @param      $trackedContacts
+     * @param      $requiredFields
      * @param      $mauticLeadFieldString
      * @param      $limit
      * @param      $totalCount
      * @param null $progress
+     *
+     * @return array
+     * @throws ApiErrorException
      */
     protected function getMauticContactsToCreate(
         &$checkEmailsInSF,
         &$mauticDuplicates,
+        &$trackedContacts,
         $requiredFields,
         $mauticLeadFieldString,
         $limit,
@@ -1710,23 +1713,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $error           = false;
         $sfEntityRecords = $this->getSalesforceObjectsByEmails('Contact', $checkEmailsInSF, $requiredFields['Contact']['string']);
         if (isset($sfEntityRecords['records'])) {
-            $contactEntityRecords = [];
-
             // Loop over the records and remove those from the $checkEmailsToCreateInSF array to check against Leads
             foreach ($sfEntityRecords['records'] as $sfContactRecord) {
                 $key = $this->getSyncKey($sfContactRecord['Email']);
 
                 if (isset($checkEmailsToCreateInSF[$key])) {
                     // Create a Contact record for this lead
-                    $contactEntityRecords[] = $this->createIntegrationEntity(
+                    $integrationEntity = $this->createIntegrationEntity(
                         'Contact',
                         $sfContactRecord['Id'],
                         'lead',
-                        $checkEmailsToCreateInSF[$key]['internal_entity_id'],
-                        [],
-                        false
+                        $checkEmailsToCreateInSF[$key]['internal_entity_id']
                     );
-
+                    $trackedContacts['Contact'][$key] = $integrationEntity->getId();
                     unset($checkEmailsToCreateInSF[$key]);
                 }
             }
@@ -1741,6 +1740,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $error = json_encode($sfLeadRecords);
                 }
             }
+
         } else {
             $error = json_encode($sfEntityRecords);
         }
@@ -2318,4 +2318,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $key;
     }
+
+    /**
+     * @param array $fields
+     *
+     * @return array
+     *
+     * @deprecated 2.6.0 to be removed in 3.0
+     */
+    public function amendToSfFields($fields)
+    {
+    }
+
 }
