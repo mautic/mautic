@@ -712,7 +712,7 @@ class Import extends FormEntity
         $processedRows = $this->getProcessedRows();
 
         if ($runtime && $processedRows) {
-            return $processedRows / $runtime;
+            return round($processedRows / $runtime, 2);
         }
 
         return 0;

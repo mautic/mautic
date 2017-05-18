@@ -150,7 +150,7 @@ class ImportModel extends FormModel
 
                         if ($diffCount < 0) {
                             $import->increaseIgnoredCount();
-                            $msg = $this->get('translator')->trans('mautic.lead.import.error.header_mismatch');
+                            $msg = $this->translator->trans('mautic.lead.import.error.header_mismatch');
                             $import->addFailure($lineNumber, $msg);
 
                             continue;
@@ -186,14 +186,14 @@ class ImportModel extends FormModel
                                 $import->increaseInsertedCount();
                             }
                         } else {
-                            $errorMessage = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
+                            $errorMessage = $this->translator->trans('mautic.lead.import.error.line_empty');
                         }
                     } catch (\Exception $e) {
                         // Email validation likely failed
                         $errorMessage = $e->getMessage();
                     }
                 } else {
-                    $errorMessage = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
+                    $errorMessage = $this->translator->trans('mautic.lead.import.error.line_empty');
                 }
 
                 if ($errorMessage) {

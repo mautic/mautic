@@ -79,7 +79,7 @@ EOT
 
         // No import waiting in the queue
         if ($import === null) {
-            return 1;
+            return 0;
         }
 
         // Import failed
