@@ -125,8 +125,35 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
-            content
+        <h3><?php echo $view['translator']->trans('mautic.lead.import.failed.rows'); ?></h3>
+        <?php if (!empty($failedRows)) : ?>
+            <table class="table">
+                <thead>
+                    <tr>
+                    <?php foreach (['mautic.lead.import.csv.line.number', 'mautic.core.error.message'] as $headItem) : ?>
+                        <th><?php echo $view['translator']->trans($headItem); ?></th>
+                    <?php endforeach; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($failedRows as $row) : ?>
+                        <?php if (is_array($row['properties'])) : ?>
+                            <tr>
+                                <td>
+                                    <?php echo $row['properties']['line']; ?>
+                                </td>
+                                <td>
+                                    <?php echo isset($row['properties']['error']) ? $row['properties']['error'] : 'N/A'; ?>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
+        <?php else : ?>
+            <i><?php echo $view['translator']->trans('mautic.lead.import.no.failed.rows'); ?></i>
+        <?php endif; ?>
         <!--/ end: tab-content -->
     </div>
     <!--/ left section -->

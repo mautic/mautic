@@ -1910,6 +1910,8 @@ class LeadModel extends FormModel
         $lead->imported = true;
 
         if ($eventLog) {
+            $action = $merged ? 'updated' : 'inserted';
+            $eventLog->setAction($action);
             $lead->addEventLog($eventLog);
         }
 

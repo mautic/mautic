@@ -435,6 +435,38 @@ class ImportController extends FormController
     }
 
     /**
+     * @param array $args
+     * @param       $action
+     *
+     * @return array
+     */
+    public function getViewArguments(array $args, $action)
+    {
+        switch ($action) {
+            case 'view':
+                /** @var Import $entity */
+                $entity = $args['entity'];
+
+                /** @var \Mautic\LeadBundle\Model\ImportModel $model */
+                $model = $this->getModel($this->getModelName());
+
+                /** @var LeadEventLogRepository $eventLogRepo */
+                $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:LeadEventLog');
+
+                $args['viewParameters'] = array_merge(
+                    $args['viewParameters'],
+                    [
+                        'failedRows' => $eventLogRepo->getFailedRows($entity->getId(), ['select' => 'properties,id']),
+                    ]
+                );
+
+                break;
+        }
+
+        return $args;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getModelName()

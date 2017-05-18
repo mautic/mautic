@@ -202,7 +202,8 @@ class ImportModel extends FormModel
                     $import->addFailure($lineNumber, $errorMessage);
 
                     // Save log about errored line
-                    $eventLog->addProperty('error', $errorMessage);
+                    $eventLog->addProperty('error', $errorMessage)
+                        ->setAction('failed');
                     $leadEventLogRepo->saveEntity($eventLog);
                 }
 
@@ -234,7 +235,6 @@ class ImportModel extends FormModel
             ->setBundle('lead')
             ->setObject('import')
             ->setObjectId($import->getId())
-            ->setAction('failed')
             ->setProperties(
                 [
                     'line' => $lineNumber,
