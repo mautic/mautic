@@ -18,6 +18,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class LeadEventLogRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * Returns paginator with failed rows.
      *
@@ -77,6 +79,41 @@ class LeadEventLogRepository extends CommonRepository
             ],
             $args)
         );
+    }
+
+    /**
+     * Loads data for specified lead events.
+     *
+     * @param string $bundle
+     * @param string $object
+     * @param Lead   $lead
+     * @param array  $options
+     *
+     * @return array
+     */
+    public function getEventsByLead($bundle, $object, Lead $lead, array $options)
+    {
+        if (empty($lead)) {
+            return [];
+        }
+
+        $alias = $this->getTableAlias();
+
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', $alias)
+            ->where($alias.'.lead_id = :lead')
+            ->setParameter('lead', $lead->getId())
+            ->andWhere($alias.'.bundle = :bundle')
+            ->setParameter('bundle', $bundle)
+            ->andWhere($alias.'.object = :object')
+            ->setParameter('object', $object);
+
+        if (isset($options['search']) && $options['search']) {
+            $qb->andWhere($qb->expr()->like($alias.'.original_file', $qb->expr()->literal('%'.$options['search'].'%')));
+        }
+
+        return $this->getTimelineResults($qb, $options, $alias.'.original_file', $alias.'.date_added', ['query'], ['date_added']);
     }
 
     /**
