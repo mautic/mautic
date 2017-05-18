@@ -40,6 +40,16 @@ class ImportController extends FormController
     }
 
     /**
+     * @param $objectId
+     *
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($objectId)
+    {
+        return $this->viewStandard($objectId, 'lead', 'import');
+    }
+
+    /**
      * @param int  $objectId
      * @param bool $ignorePost
      *

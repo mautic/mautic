@@ -22,10 +22,10 @@
                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                     ['item' => $item, 'model' => 'lead.import']
                 ); ?>
-                <?php if ($view['security']->hasEntityAccess(true, $permissions[$permissionBase.':editother'], $item->getCreatedBy())) : ?>
+                <?php if ($view['security']->hasEntityAccess(true, $permissions[$permissionBase.':viewother'], $item->getCreatedBy())) : ?>
                     <a href="<?php echo $view['router']->path(
                         $actionRoute,
-                        ['objectAction' => 'edit', 'objectId' => $item->getId()]
+                        ['objectAction' => 'view', 'objectId' => $item->getId()]
                     ); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>
@@ -34,14 +34,14 @@
                 <?php endif; ?>
             </div>
         </td>
-        <td class="visible-md visible-lg"><?php echo $item->getRunTime(); ?> sec</td>
+        <td class="visible-md visible-lg"><?php echo $view['date']->formatRange($item->getRunTime()); ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getProgressPercentage(); ?>%</td>
         <td class="visible-md visible-lg"><?php echo $item->getLineCount(); ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getInsertedCount(); ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getUpdatedCount(); ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getIgnoredCount(); ?></td>
         <td class="visible-md visible-lg">
-        <abbr title="<?php echo $view['date']->toFull($item->getDateAdded()); ?>">
+            <abbr title="<?php echo $view['date']->toFull($item->getDateAdded()); ?>">
                 <?php echo $view['date']->toText($item->getDateAdded()); ?>
             </abbr>
         </td>

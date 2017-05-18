@@ -663,9 +663,9 @@ class Import extends FormEntity
     }
 
     /**
-     * Counts how many seconds the import runs so far.
+     * Counts how log the import run so far.
      *
-     * @return int
+     * @return DateInterval
      */
     public function getRunTime()
     {
@@ -673,10 +673,10 @@ class Import extends FormEntity
         $endTime   = $this->getDateEnded() ? $this->getDateEnded() : $this->getDateModified();
 
         if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
-            return $endTime->getTimestamp() - $startTime->getTimestamp();
+            return $endTime->diff($startTime);
         }
 
-        return 0;
+        return new \DateInterval();
     }
 
     /**

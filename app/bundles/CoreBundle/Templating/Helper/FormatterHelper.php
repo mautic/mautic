@@ -98,6 +98,36 @@ class FormatterHelper extends Helper
     }
 
     /**
+     * Converts array to string with provided delimiter
+     * Internally, the method uses conversion to json
+     * instead of simple implode to cover multidimensional arrays.
+     *
+     * @param mixed  $array
+     * @param string $delimiter
+     *
+     * @return string
+     */
+    public function arrayToString($array, $delimiter = ', ')
+    {
+        if (is_array($array)) {
+            $replacements = [
+                '{'    => '(',
+                '}'    => ')',
+                '"'    => '',
+                ','    => $delimiter,
+                '[]'   => 'undefined',
+                'null' => 'undefined',
+                ':'    => ' = ',
+            ];
+            $json = json_encode($array);
+
+            return trim(str_replace(array_keys($replacements), array_values($replacements), $json), '()[]');
+        }
+
+        return $array;
+    }
+
+    /**
      * @return string
      */
     public function getName()
