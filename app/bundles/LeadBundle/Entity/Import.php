@@ -514,13 +514,23 @@ class Import extends FormEntity
     }
 
     /**
+     * Counts how many rows has been processed so far.
+     *
+     * @return int
+     */
+    public function getProcessedRows()
+    {
+        return $this->getInsertedCount() + $this->getUpdatedCount() + $this->getIgnoredCount();
+    }
+
+    /**
      * Counts current progress percentage.
      *
      * @return float
      */
     public function getProgressPercentage()
     {
-        $processed = $this->getInsertedCount() + $this->getUpdatedCount() + $this->getIgnoredCount();
+        $processed = $this->getProcessedRows();
 
         if ($processed && $total = $this->getLineCount()) {
             return round($processed / $total * 100, 2);
@@ -677,6 +687,35 @@ class Import extends FormEntity
         }
 
         return new \DateInterval();
+    }
+
+    /**
+     * Returns run time in seconds.
+     *
+     * @return int
+     */
+    public function getRunTimeSedonds()
+    {
+        $interval = $this->getRunTime();
+
+        return $interval->s;
+    }
+
+    /**
+     * Counts speed in items per second.
+     *
+     * @return float
+     */
+    public function getSpeed()
+    {
+        $runtime       = $this->getRunTimeSedonds();
+        $processedRows = $this->getProcessedRows();
+
+        if ($runtime && $processedRows) {
+            return $processedRows / $runtime;
+        }
+
+        return 0;
     }
 
     /**

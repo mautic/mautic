@@ -75,6 +75,10 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                                     'value' => $view['date']->formatRange($item->getRunTime()),
                                 ]); ?>
                                 <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.speed',
+                                    'value' => $view['translator']->trans('mautic.lead.import.speed.value', ['%speed%' => $item->getSpeed()]),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
                                     'label' => 'mautic.lead.import.progress',
                                     'value' => $item->getProgressPercentage().'%',
                                 ]); ?>
@@ -117,32 +121,6 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                 </span>
             </div>
             <!--/ asset detail collapseable toggler -->
-
-            <!-- some stats -->
-            <div class="pa-md">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="panel">
-                            <div class="panel-body box-layout">
-                                <div class="col-md-2 va-m">
-                                    <h5 class="text-white dark-md fw-sb mb-xs">
-                                        <span class="fa fa-download"></span>
-                                        <?php echo $view['translator']->trans('mautic.asset.graph.line.downloads'); ?>
-                                    </h5>
-                                </div>
-                                <div class="col-md-8 va-m">
-                                    <?php //echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm, 'class' => 'pull-right']);?>
-                                </div>
-                            </div>
-                            <div class="pt-0 pl-15 pb-10 pr-15">
-                                chart
-                                <?php //echo $view->render('MauticCoreBundle:Helper:chart.html.php', ['chartData' => $stats['downloads']['timeStats'], 'chartType' => 'line', 'chartHeight' => 300]);?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--/ stats -->
         </div>
 
         <!-- start: tab-content -->
