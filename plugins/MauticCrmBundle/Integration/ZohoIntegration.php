@@ -91,12 +91,22 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead', 'get_leads', 'push_leads'];
+    }
+
+    /**
      * @param array $params
      * @param null  $query
+     *
+     * @return int
      */
     public function getLeads($params = [], $query = null)
     {
-        $executed = null;
+        $executed = 0;
 
         try {
             if ($this->isAuthorized()) {
@@ -104,15 +114,15 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $fields                         = implode('&property=', array_keys($config['leadFields']));
                 $params['post_append_to_query'] = '&property='.$fields.'&property=lifecyclestage';
 
-                $data = $this->getApiHelper()->getContacts($params);
-                if (isset($data['contacts'])) {
-                    /** @var array $contacts */
-                    $contacts = $data['contacts'];
-                    foreach ($contacts as $contact) {
-                        if (is_array($contact)) {
-                            $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
-                            $contact     = $this->getMauticLead($contactData);
-                            if ($contact) {
+                $data = $this->getApiHelper()->getLeads($params);
+                if (isset($data['Leads'])) {
+                    /** @var array $leads */
+                    $leads = $data['Leads'];
+                    foreach ($leads as $lead) {
+                        if (is_array($lead)) {
+                            $leadData = $this->amendLeadDataBeforeMauticPopulate($lead, 'Lead');
+                            $lead     = $this->getMauticLead($leadData);
+                            if ($lead) {
                                 ++$executed;
                             }
                         }
@@ -120,7 +130,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     if ($data['has-more']) {
                         $params['vidOffset']  = $data['vid-offset'];
                         $params['timeOffset'] = $data['time-offset'];
-                        $this->getLeads($params);
+                        $executed += $this->getLeads($params);
                     }
                 }
 
@@ -164,10 +174,10 @@ class ZohoIntegration extends CrmAbstractIntegration
                             }
                         }
                     }
-                    if (isset($data['hasMore']) and $data['hasMore']) {
+                    if (isset($data['hasMore']) && $data['hasMore']) {
                         $params['vidOffset']  = $data['vid-offset'];
                         $params['timeOffset'] = $data['time-offset'];
-                        $this->getCompanies($params);
+                        $executed += $this->getCompanies($params);
                     }
                 }
 
@@ -188,7 +198,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      * @param array|null  $socialCache
      * @param mixed||null $identifiers
      *
-     * @return Lead|void
+     * @return Lead|null
      *
      * @throws \InvalidArgumentException
      */
@@ -216,7 +226,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $matchedFields = $this->populateMauticLeadData($data);
 
         if (empty($matchedFields)) {
-            return;
+            return null;
         }
 
         // Find unique identifier fields used by the integration
@@ -316,7 +326,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             } catch (\Exception $exception) {
                 $this->factory->getLogger()->addWarning($exception->getMessage());
 
-                return;
+                return null;
             }
         }
 
@@ -406,7 +416,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     'choices' => [
                         'Leads'    => 'mautic.zoho.object.lead',
                         'Contacts' => 'mautic.zoho.object.contact',
-                        'Accounts' => 'mautic.zoho.object.account',
+                        'company'  => 'mautic.zoho.object.account',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -532,22 +542,23 @@ class ZohoIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if (!empty($zohoObjects) && is_array($zohoObjects)) {
-                    foreach ($zohoObjects as $key => $object) {
+                    foreach ($zohoObjects as $key => $zohoObject) {
                         // Check the cache first
-                        $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.$zohoObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
-                            $zohoFields[$object] = $fields;
+                            $zohoFields[$zohoObject] = $fields;
 
                             continue;
                         }
-                        $leadObject = $this->getApiHelper()->getLeadFields($object);
+                        $leadObject = $this->getApiHelper()->getLeadFields($zohoObject);
 
                         if (null === $leadObject || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
                             return [];
                         }
 
+                        $objKey = 'company' === $zohoObject ? 'Accounts' : $zohoObject;
                         /** @var array $opts */
-                        $opts = $leadObject[$object]['section'];
+                        $opts = $leadObject[$objKey]['section'];
                         foreach ($opts as $optgroup) {
                             //$zohoFields[$optgroup['dv']] = array();
                             if (!array_key_exists(0, $optgroup['FL'])) {
@@ -558,7 +569,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                                     continue;
                                 }
 
-                                $zohoFields[$object][$this->getFieldKey($field['dv'])] = [
+                                $zohoFields[$zohoObject][$this->getFieldKey($field['dv'])] = [
                                     'type'     => 'string',
                                     'label'    => $field['label'],
                                     'dv'       => $field['dv'],
@@ -567,7 +578,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                             }
                         }
 
-                        $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$object]);
+                        $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$zohoObject]);
                     }
                 }
             }

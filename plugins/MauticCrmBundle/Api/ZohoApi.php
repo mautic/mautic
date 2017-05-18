@@ -16,10 +16,10 @@ class ZohoApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $module = 'Leads')
+    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads')
     {
         $tokenData = $this->integration->getKeys();
-        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl(), $module, $operation);
+        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl(), $moduleobject, $operation);
 
         $parameters = array_merge([
             'authtoken' => $tokenData['AUTHTOKEN'],
