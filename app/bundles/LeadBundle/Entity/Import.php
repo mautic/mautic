@@ -322,13 +322,13 @@ class Import extends FormEntity
 
     /**
      * Decides if this import entity is triggered as the background
-     * job or as UI process. So far the UI process doesn't get saved.
+     * job or as UI process.
      *
      * @return bool
      */
     public function isBackgroundProcess()
     {
-        return (bool) $this->getId();
+        return !($this->getStatus() === self::MANUAL);
     }
 
     /**
@@ -616,6 +616,7 @@ class Import extends FormEntity
             case self::QUEUED:
                 return 'info';
             case self::IN_PROGRESS:
+            case self::MANUAL:
                 return 'primary';
             case self::IMPORTED:
                 return 'success';

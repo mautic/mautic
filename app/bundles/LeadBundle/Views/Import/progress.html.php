@@ -54,11 +54,21 @@ $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.dono
                 <p class="small"><span class="imported-count"><?php echo $progress->getDone(); ?></span> / <span class="total-count"><?php echo $progress->getTotal(); ?></span></p>
                 <?php if (!$complete): ?>
                     <div>
-                        <a class="text-danger mt-md" href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'import', 'cancel' => 1]); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.cancel'); ?></a>
+                        <a class="btn btn-danger" href="<?php echo $view['router']->path('mautic_contact_import_action', ['objectAction' => 'cancel']); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.core.form.cancel'); ?>
+                        </a>
+                        <a class="btn btn-primary" href="<?php echo $view['router']->path('mautic_contact_import_action', ['objectAction' => 'queue']); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.lead.import.queue.btn'); ?>
+                        </a>
                     </div>
                 <?php else: ?>
                     <div>
-                        <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_contact_index'); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.lead.list.view_leads'); ?></a>
+                        <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_contact_index'); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.lead.list.view_leads'); ?>
+                        </a>
+                        <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_contact_import_index'); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.lead.view.imports'); ?>
+                        </a>
                     </div>
                 <?php endif; ?>
             </div>
