@@ -15,6 +15,7 @@ $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $item])
 );
+$detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
 
 ?>
 
@@ -30,168 +31,73 @@ $view['slots']->set(
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
                                 <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', ['entity' => $item]); ?>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.source.file'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $item->getOriginalFile(); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.status'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="label label-<?php echo $item->getSatusLabelClass(); ?>">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.status.'.$item->getStatus()); ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.status.info'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $item->getStatusInfo(); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.line.count'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $item->getLineCount(); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.inserted.count'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $item->getInsertedCount(); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.updated.count'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $item->getUpdatedCount(); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.ignored.count'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $item->getIgnoredCount(); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.date.started'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $view['date']->toFull($item->getDateStarted()); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.date.ended'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $view['date']->toFull($item->getDateEnded()); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.runtime'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $view['date']->formatRange($item->getRunTime()); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.progress'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $item->getProgressPercentage(); ?>%
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.asset.filename.local'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $item->getFilePath(); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.mapped.fields'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $view['formatter']->arrayToString($item->getMatchedFields()); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.default.options'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $view['formatter']->arrayToString($item->getDefaults()); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.csv.headers'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $view['formatter']->arrayToString($item->getHeaders()); ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="20%">
-                                        <span class="fw-b">
-                                            <?php echo $view['translator']->trans('mautic.lead.import.csv.parser.config'); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php echo $view['formatter']->arrayToString($item->getParserConfig()); ?>
-                                    </td>
-                                </tr>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.source.file',
+                                    'value' => $item->getOriginalFile(),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.status',
+                                    'value' => $view->render('MauticCoreBundle:Helper:label.html.php', [
+                                        'text' => 'mautic.lead.import.status.'.$item->getStatus(),
+                                        'type' => $item->getSatusLabelClass(),
+                                    ]),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.status.info',
+                                    'value' => $item->getStatusInfo(),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.line.count',
+                                    'value' => $item->getLineCount(),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.inserted.count',
+                                    'value' => $item->getInsertedCount(),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.updated.count',
+                                    'value' => $item->getUpdatedCount(),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.ignored.count',
+                                    'value' => $item->getIgnoredCount(),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.date.started',
+                                    'value' => $view['date']->toFull($item->getDateStarted()),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.date.ended',
+                                    'value' => $view['date']->toFull($item->getDateEnded()),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.runtime',
+                                    'value' => $view['date']->formatRange($item->getRunTime()),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.progress',
+                                    'value' => $item->getProgressPercentage().'%',
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.asset.filename.local',
+                                    'value' => $item->getFilePath(),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.mapped.fields',
+                                    'value' => $view['formatter']->arrayToString($item->getMatchedFields()),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.default.options',
+                                    'value' => $view['formatter']->arrayToString($item->getDefaults()),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.csv.headers',
+                                    'value' => $view['formatter']->arrayToString($item->getHeaders()),
+                                ]); ?>
+                                <?php echo $view->render($detailRowTmpl, [
+                                    'label' => 'mautic.lead.import.csv.parser.config',
+                                    'value' => $view['formatter']->arrayToString($item->getParserConfig()),
+                                ]); ?>
                             </tbody>
                         </table>
                     </div>
