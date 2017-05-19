@@ -29,19 +29,30 @@ $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.dono
                 <?php if (!$complete): ?>
                     <h4><?php echo $view['translator']->trans('mautic.lead.import.inprogress'); ?></h4>
                 <?php else: ?>
-                    <h4><?php echo $view['translator']->trans('mautic.lead.import.stats', ['%merged%' => $stats['merged'], '%created%' => $stats['created'], '%ignored%' => $stats['ignored']]); ?></h4>
+                    <h4>
+                        <?php echo $view['translator']->trans(
+                            'mautic.lead.import.stats',
+                            [
+                            '%merged%'  => $import->getUpdatedCount(),
+                            '%created%' => $import->getInsertedCount(),
+                            '%ignored%' => $import->getIgnoredCount(),
+                            ]
+                        ); ?>
+                    </h4>
                 <?php endif; ?>
                 <div class="progress mt-md" style="height:50px;">
                     <div class="progress-bar-import progress-bar progress-bar-striped<?php if (!$complete) {
-    echo ' active';
-} ?>" role="progressbar" aria-valuenow="<?php echo $progress->getDone(); ?>" aria-valuemin="0" aria-valuemax="<?php echo $progress->getTotal(); ?>" style="width: <?php echo $percent; ?>%; height: 50px;">
+                            echo ' active';
+                        } ?>" role="progressbar" aria-valuenow="<?php echo $progress->getDone(); ?>" aria-valuemin="0" aria-valuemax="<?php echo $progress->getTotal(); ?>" style="width: <?php echo $percent; ?>%; height: 50px;">
                         <span class="sr-only"><?php echo $percent; ?>%</span>
                     </div>
                 </div>
             </div>
-            <?php if (!empty($stats['failures'])): ?>
+            <?php if (!empty($failedRows)): ?>
                 <ul class="list-group">
-                    <?php foreach ($stats['failures'] as $lineNumber => $failure): ?>
+                    <?php foreach ($failedRows as $row): ?>
+                        <?php $lineNumber = isset($row['properties']['line']) ? $row['properties']['line'] : 'N/A'; ?>
+                        <?php $failure    = isset($row['properties']['error']) ? $row['properties']['error'] : 'N/A'; ?>
                         <li class="list-group-item text-left">
                             <a target="_new" class="text-danger">
                                 <?php echo "(#$lineNumber) $failure"; ?>
@@ -54,10 +65,16 @@ $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.dono
                 <p class="small"><span class="imported-count"><?php echo $progress->getDone(); ?></span> / <span class="total-count"><?php echo $progress->getTotal(); ?></span></p>
                 <?php if (!$complete): ?>
                     <div>
-                        <a class="btn btn-danger" href="<?php echo $view['router']->path('mautic_contact_import_action', ['objectAction' => 'cancel']); ?>" data-toggle="ajax">
+                        <a class="btn btn-danger" href="<?php echo $view['router']->path(
+                            'mautic_contact_import_action',
+                            ['objectAction' => 'cancel']
+                        ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.core.form.cancel'); ?>
                         </a>
-                        <a class="btn btn-primary" href="<?php echo $view['router']->path('mautic_contact_import_action', ['objectAction' => 'queue']); ?>" data-toggle="ajax">
+                        <a class="btn btn-primary" href="<?php echo $view['router']->path(
+                            'mautic_contact_import_action',
+                            ['objectAction' => 'queue']
+                        ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.import.queue.btn'); ?>
                         </a>
                     </div>
@@ -68,6 +85,12 @@ $header  = ($complete) ? 'mautic.lead.import.success' : 'mautic.lead.import.dono
                         </a>
                         <a class="btn btn-success" href="<?php echo $view['router']->path('mautic_contact_import_index'); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans('mautic.lead.view.imports'); ?>
+                        </a>
+                        <a class="btn btn-success" href="<?php echo $view['router']->path(
+                            'mautic_contact_import_action',
+                            ['objectAction' => 'view', 'objectId' => $import->getId()]
+                        ); ?>" data-toggle="ajax">
+                            <?php echo $view['translator']->trans('mautic.lead.import.result.info', ['%import%' => $import->getName()]); ?>
                         </a>
                     </div>
                 <?php endif; ?>

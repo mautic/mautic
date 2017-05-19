@@ -134,7 +134,7 @@ class ImportController extends FormController
         }
 
         $progress = (new Progress())->bindArray($session->get('mautic.lead.import.progress', [0, 0]));
-        $stats    = $session->get('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0, 'failures' => []]);
+        $import   = $importModel->getEntity();
         $action   = $this->generateUrl('mautic_contact_import_action', ['objectAction' => 'new']);
 
         switch ($step) {
@@ -181,13 +181,16 @@ class ImportController extends FormController
 
                     $import = $importModel->getEntity($session->get('mautic.lead.import.id', null));
 
-                    $importModel->process($import, $progress);
+                    if (!$import->getDateStarted()) {
+                        $import->setDateStarted(new \DateTime());
+                    }
 
-                    $session->set('mautic.lead.import.stats', $import->getStats());
+                    $importModel->process($import, $progress);
 
                     // Clear in progress
                     if ($progress->isFinished()) {
-                        $import->setStatus($import::IMPORTED);
+                        $import->setStatus($import::IMPORTED)
+                            ->setDateEnded(new \DateTime());
                         $this->resetImport($fullPath);
                         $complete = true;
                     } else {
@@ -385,9 +388,10 @@ class ImportController extends FormController
         } else {
             $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
             $viewParameters  = [
-                'progress' => $progress,
-                'stats'    => $stats,
-                'complete' => $complete,
+                'progress'   => $progress,
+                'import'     => $import,
+                'complete'   => $complete,
+                'failedRows' => $this->getFailedRows($import->getId()),
             ];
         }
 
@@ -472,7 +476,6 @@ class ImportController extends FormController
     private function resetImport($filepath, $removeCsv = true)
     {
         $session = $this->get('session');
-        $session->set('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0]);
         $session->set('mautic.lead.import.headers', []);
         $session->set('mautic.lead.import.file', null);
         $session->set('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
@@ -503,13 +506,10 @@ class ImportController extends FormController
                 /** @var \Mautic\LeadBundle\Model\ImportModel $model */
                 $model = $this->getModel($this->getModelName());
 
-                /** @var LeadEventLogRepository $eventLogRepo */
-                $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:LeadEventLog');
-
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'failedRows' => $eventLogRepo->getFailedRows($entity->getId(), ['select' => 'properties,id']),
+                        'failedRows' => $this->getFailedRows($entity->getId()),
                     ]
                 );
 
@@ -517,6 +517,25 @@ class ImportController extends FormController
         }
 
         return $args;
+    }
+
+    /**
+     * Returns a list of failed rows for the import.
+     *
+     * @param int $importId
+     *
+     * @return array|null
+     */
+    protected function getFailedRows(int $importId = null)
+    {
+        if (!$importId) {
+            return null;
+        }
+
+        /** @var LeadEventLogRepository $eventLogRepo */
+        $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:LeadEventLog');
+
+        return $eventLogRepo->getFailedRows($importId, ['select' => 'properties,id']);
     }
 
     /**
