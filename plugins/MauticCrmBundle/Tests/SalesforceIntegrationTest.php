@@ -40,6 +40,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->setLeadsToCreate($repo);
 
         $stats = $sf->pushLeads();
+        die(var_dump($stats));
         $this->assertEmpty(array_sum($stats));
     }
 
@@ -105,10 +106,20 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testIntegrationPushFindsDuplicate()
     {
-        $sf = $this->getSalesforceIntegration();
+
     }
 
     public function testIntegrationPushCreatesNew()
+    {
+
+    }
+
+    public function testApostropheInEmailDoesNotCauseDuplicates()
+    {
+
+    }
+
+    public function testExistingEntityRecordsDoesNotCreate()
     {
 
     }
@@ -393,6 +404,8 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                         return $this->getSalesforceLeads();
                                 }
                                 break;
+                            case strpos($args[0], '/composite') !== false:
+                                return $this->getSalesforceCompositeResponse($args[1]);
                         }
                     }
                 )
@@ -401,8 +414,17 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         /** @var \PHPUnit_Framework_MockObject_MockObject $mockDispatcher */
         $mockDispatcher = $mockFactory->getDispatcher();
         $mockDispatcher->method('dispatch')
-            ->willReturn(
-                new PluginIntegrationKeyEvent($sf, $integration->getApiKeys())
+            ->will(
+                $this->returnCallback(
+                    function() use ($sf, $integration) {
+                        $args = func_get_args();
+
+                        switch ($args[0]) {
+                            default:
+                                return new PluginIntegrationKeyEvent($sf, $integration->getApiKeys());
+                        }
+                    }
+                )
             );
 
         $sf->setIntegrationSettings($integration);
@@ -574,5 +596,42 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             'done'      => true,
             'records'   => $records,
         ];
+    }
+
+    /**
+     * Mock SF response
+     *
+     * @param $data
+     */
+    protected function getSalesforceCompositeResponse($data)
+    {
+        $response = [];
+
+        foreach ($data['compositeRequest'] as $subrequest) {
+            if ('PATCH' === $subrequest['method']) {
+                $response[] = [
+                    'body'           => null,
+                    'httpHeaders'    => [],
+                    'httpStatusCode' => 204,
+                    'referenceId'    => $subrequest['referenceId'],
+                ];
+            } else {
+                list($contactId, $sfObject) = $subrequest['referenceId'];
+                $response[] = [
+                    'body'           => [
+                        'id'      => 'SF'.$contactId,
+                        'success' => true,
+                        'errors'  => [],
+                    ],
+                    'httpHeaders'    => [
+                        'Location' => '/services/data/v38.0/sobjects/Lead/SF'.$contactId,
+                    ],
+                    'httpStatusCode' => 201,
+                    'referenceId'    => $subrequest['referenceId'],
+                ];
+            }
+        }
+
+        return $response;
     }
 }
