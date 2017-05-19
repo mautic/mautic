@@ -641,8 +641,12 @@ return [
                     'mautic.helper.paths',
                     'mautic.lead.model.lead',
                     'mautic.core.model.notification',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
+    ],
+    'parameters' => [
+        'parallel_import_limit' => 1,
     ],
 ];

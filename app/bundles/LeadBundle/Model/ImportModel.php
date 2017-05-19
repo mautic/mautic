@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -45,20 +46,28 @@ class ImportModel extends FormModel
     protected $notificationModel;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $config;
+
+    /**
      * ImportModel constructor.
      *
-     * @param PathsHelper       $pathsHelper
-     * @param LeadModel         $leadModel
-     * @param NotificationModel $notificationModel
+     * @param PathsHelper          $pathsHelper
+     * @param LeadModel            $leadModel
+     * @param NotificationModel    $notificationModel
+     * @param CoreParametersHelper $config
      */
     public function __construct(
         PathsHelper $pathsHelper,
         LeadModel $leadModel,
-        NotificationModel $notificationModel
+        NotificationModel $notificationModel,
+        CoreParametersHelper $config
     ) {
         $this->pathsHelper       = $pathsHelper;
         $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
+        $this->config            = $config;
     }
 
     /**
@@ -68,16 +77,86 @@ class ImportModel extends FormModel
      */
     public function getImportToProcess()
     {
-        return $this->getRepository()->findOneBy(
-            [
-                'status'      => Import::QUEUED,
-                'isPublished' => 1,
-            ],
-            [
-                'priority'  => 'ASC',
-                'dateAdded' => 'DESC',
-            ]
-        );
+        $result = $this->getRepository()->getImportsWithStatuses([Import::QUEUED, Import::DELAYED], 1);
+
+        if (isset($result[0]) && $result[0] instanceof Import) {
+            return $result[0];
+        }
+
+        return null;
+    }
+
+    /**
+     * Compares current number of imports in progress with the limit from the configuration.
+     * If the limit is hit, the import changes its status to delayed.
+     *
+     * @param Import $import
+     *
+     * @return bool
+     */
+    public function checkParallelImportLimit(Import $import)
+    {
+        $parallelImportLimit = $this->config->getParameter('parallel_import_limit', 1);
+        $importsInProgress   = $this->getRepository()->countImportsWithStatuses([$import::IN_PROGRESS]);
+
+        if ($importsInProgress > $parallelImportLimit) {
+            $import->setStatus($import::DELAYED)
+                ->setStatusInfo($this->translator->trans('mautic.lead.import.parallel.limit.hit', ['%limit%' => $parallelImportLimit]));
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Generates a HTML link to the import detail.
+     *
+     * @param Import $import
+     *
+     * @return string
+     */
+    public function generateLink(Import $import)
+    {
+        return '<a href="'.$this->router->generate(
+            'mautic_contact_import_action',
+            ['objectAction' => 'view', 'objectId' => $import->getId()]
+        ).'" data-toggle="ajax">'.$import->getOriginalFile().' ('.$import->getId().')</a>';
+    }
+
+    /**
+     * Check if there are some IN_PROGRESS imports which got stuck for a while.
+     * Set those as failed.
+     */
+    public function setGhostImportsAsFailed()
+    {
+        $ghostDelay = 2;
+        $imports    = $this->getRepository()->getGhostImports($ghostDelay, 5);
+
+        if (empty($imports)) {
+            return null;
+        }
+
+        foreach ($imports as $import) {
+            $import->setStatus($import::FAILED)
+                ->setStatusInfo($this->translator->trans('mautic.lead.import.ghost.limit.hit', ['%limit%' => $ghostDelay]))
+                ->removeFile();
+
+            $this->notificationModel->addNotification(
+                $this->translator->trans(
+                    'mautic.lead.import.result.info',
+                    ['%import%' => $this->generateLink($import)]
+                ),
+                'info',
+                false,
+                $this->translator->trans('mautic.lead.import.failed'),
+                'fa-download',
+                null,
+                $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+            );
+        }
+
+        $this->saveEntities($imports);
     }
 
     /**
@@ -87,6 +166,8 @@ class ImportModel extends FormModel
      */
     public function processNext(Progress $progress)
     {
+        $this->setGhostImportsAsFailed();
+
         $import = $this->getImportToProcess();
 
         if (!$import) {
@@ -94,6 +175,12 @@ class ImportModel extends FormModel
         }
 
         if (!$import->canProceed()) {
+            $this->saveEntity($import);
+
+            return $import;
+        }
+
+        if (!$this->checkParallelImportLimit($import)) {
             $this->saveEntity($import);
 
             return $import;
@@ -111,13 +198,8 @@ class ImportModel extends FormModel
         $this->saveEntity($import);
         $this->notificationModel->addNotification(
             $this->translator->trans(
-                'mautic.lead.import.completed.info',
-                [
-                    '%import%' => '<a href="'.$this->router->generate(
-                            'mautic_contact_import_action',
-                            ['objectAction' => 'view', 'objectId' => $import->getId()]
-                        ).'" data-toggle="ajax">'.$import->getOriginalFile().' ('.$import->getId().')</a>',
-                ]
+                'mautic.lead.import.result.info',
+                ['%import%' => $this->generateLink($import)]
             ),
             'info',
             false,

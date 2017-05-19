@@ -55,6 +55,11 @@ class Import extends FormEntity
      */
     const MANUAL = 6;
 
+    /**
+     * When the import happens is scheduled for later processing.
+     */
+    const DELAYED = 7;
+
     /** ===== Priorities: ===== */
     const LOW    = 512;
     const NORMAL = 64;
@@ -623,6 +628,7 @@ class Import extends FormEntity
             case self::FAILED:
                 return 'danger';
             case self::STOPPED:
+            case self::DELAYED:
                 return 'warning';
             default:
                 return 'default';
@@ -673,7 +679,8 @@ class Import extends FormEntity
         $this->setDateEnded(new \DateTime());
 
         if ($this->getStatus() === self::IN_PROGRESS) {
-            $this->setStatus(self::IMPORTED);
+            $this->setStatus(self::IMPORTED)
+                ->removeFile();
         }
 
         return $this;

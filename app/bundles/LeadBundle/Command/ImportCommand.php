@@ -94,6 +94,15 @@ EOT
             return 1;
         }
 
+        if ($import->getStatus() === $import::DELAYED) {
+            $output->writeln('<info>'.$translator->trans(
+                'mautic.lead.import.delayed',
+                [
+                    '%reason%' => $import->getStatusInfo(),
+                ]
+            ).'</info>');
+        }
+
         $output->writeln('<info>'.$translator->trans(
             'mautic.lead.import.result',
             [
