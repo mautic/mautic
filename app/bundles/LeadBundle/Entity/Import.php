@@ -514,7 +514,7 @@ class Import extends FormEntity
         $processed = $this->getProcessedRows();
 
         if ($processed && $total = $this->getLineCount()) {
-            return round($processed / $total * 100, 2);
+            return round(($processed / $total) * 100, 2);
         }
 
         return 0;
@@ -626,13 +626,16 @@ class Import extends FormEntity
      *
      * @return Import
      */
-    public function end()
+    public function end($removeFile = true)
     {
         $this->setDateEnded(new \DateTime());
 
         if ($this->getStatus() === self::IN_PROGRESS) {
-            $this->setStatus(self::IMPORTED)
-                ->removeFile();
+            $this->setStatus(self::IMPORTED);
+
+            if ($removeFile) {
+                $this->removeFile();
+            }
         }
 
         return $this;
@@ -681,7 +684,7 @@ class Import extends FormEntity
      *
      * @return int
      */
-    public function getRunTimeSedonds()
+    public function getRunTimeSeconds()
     {
         $startTime = $this->getDateStarted() ? $this->getDateStarted() : $this->getDateAdded();
         $endTime   = $this->getDateEnded() ? $this->getDateEnded() : $this->getDateModified();
@@ -700,7 +703,7 @@ class Import extends FormEntity
      */
     public function getSpeed()
     {
-        $runtime       = $this->getRunTimeSedonds();
+        $runtime       = $this->getRunTimeSeconds();
         $processedRows = $this->getProcessedRows();
 
         if ($runtime && $processedRows) {
