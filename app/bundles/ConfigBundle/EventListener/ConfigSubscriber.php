@@ -56,7 +56,7 @@ class ConfigSubscriber extends CommonSubscriber
 
         array_walk_recursive($config, function (&$value) use ($escapeInvalidReference) {
             if (is_string($value)) {
-                $value = preg_replace_callback('/%(.*?)%/', $escapeInvalidReference, $value);
+                $value = preg_replace_callback('/%(.*?)%/s', $escapeInvalidReference, $value);
             }
         });
         $event->setConfig($config);
