@@ -100,10 +100,6 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                                     'value' => $item->getProgressPercentage().'%',
                                 ]); ?>
                                 <?php echo $view->render($detailRowTmpl, [
-                                    'label' => 'mautic.asset.filename.local',
-                                    'value' => $item->getFilePath(),
-                                ]); ?>
-                                <?php echo $view->render($detailRowTmpl, [
                                     'label' => 'mautic.lead.import.mapped.fields',
                                     'value' => $view['formatter']->arrayToString($item->getMatchedFields()),
                                 ]); ?>
