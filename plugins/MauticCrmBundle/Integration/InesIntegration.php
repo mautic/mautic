@@ -150,7 +150,16 @@ class InesIntegration extends CrmAbstractIntegration
                     'label'       => 'mautic.ines.form.isfullsync',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
-                    'required'    => false
+                    'required'    => false,
+                    'attr'     => array(
+                        'onchange' => "
+                            var checkbox = mQuery(this),
+                                is_checked = checkbox.prop('checked');
+                            if (is_checked) {
+                                checkbox.closest('#features-container').find('input:checkbox:first').prop('checked', true);
+                            }
+                        "
+                    )
                 ]
             );
 

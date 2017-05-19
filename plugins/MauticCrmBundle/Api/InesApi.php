@@ -835,7 +835,7 @@ class InesApi extends CrmApi
             $items = $response['GetUserInfoFromUserRefResult']['UserInfoRH'];
             $values = [];
             foreach($items as $item) {
-                $values[ $item['UserRef'] ] = $this->switchFirstNameLastName($item['Name']);
+                $values[ $item['UserRef'] ] = $item['LastName'].' '.$item['FirstName'];
             }
             asort($values);
             $syncConfig['ValuesFromWS']['GetUserInfoFromUserRef'] = $values;
@@ -848,7 +848,7 @@ class InesApi extends CrmApi
             $items = $response['GetUserInfoFromRHRefResult']['UserInfoRH'];
             $values = [];
             foreach($items as $item) {
-                $values[ $item['RHRef'] ] = $this->switchFirstNameLastName($item['Name']);
+                $values[ $item['RHRef'] ] = $item['LastName'].' '.$item['FirstName'];
             }
             asort($values);
             $syncConfig['ValuesFromWS']['GetUserInfoFromRHRef'] = $values;
@@ -1060,30 +1060,4 @@ class InesApi extends CrmApi
 		return $datas;
 	}
 
-
-    /**
-     * Detects the name and first name from a merged string "FirstName NAME", then switch them
-     *
-     * @param 	string   $fullname
-     *
-     * @return 	string
-     */
-    protected function switchFirstNameLastName($fullname)
-    {
-        $pos = strlen($fullname);
-        do {
-            $pos--;
-            $char = substr($fullname, $pos, 1);
-        } while($pos > 0 && $char == strtoupper($char));
-
-        if ($pos > 0) {
-            $last_name = trim(substr($fullname, $pos + 1));
-            $first_name = trim(substr($fullname, 0, $pos + 1));
-        }
-        else {
-            $last_name = $fullname;
-            $first_name = "";
-        }
-        return $last_name.' '.$first_name;
-    }
 }
