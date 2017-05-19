@@ -391,7 +391,7 @@ class ImportController extends FormController
                 'progress'   => $progress,
                 'import'     => $import,
                 'complete'   => $complete,
-                'failedRows' => $this->getFailedRows($import->getId()),
+                'failedRows' => $importModel->getFailedRows($import->getId()),
             ];
         }
 
@@ -509,7 +509,7 @@ class ImportController extends FormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'failedRows' => $this->getFailedRows($entity->getId()),
+                        'failedRows' => $model->getFailedRows($entity->getId()),
                     ]
                 );
 
@@ -517,25 +517,6 @@ class ImportController extends FormController
         }
 
         return $args;
-    }
-
-    /**
-     * Returns a list of failed rows for the import.
-     *
-     * @param int $importId
-     *
-     * @return array|null
-     */
-    protected function getFailedRows(int $importId = null)
-    {
-        if (!$importId) {
-            return null;
-        }
-
-        /** @var LeadEventLogRepository $eventLogRepo */
-        $eventLogRepo = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:LeadEventLog');
-
-        return $eventLogRepo->getFailedRows($importId, ['select' => 'properties,id']);
     }
 
     /**

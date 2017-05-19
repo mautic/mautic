@@ -368,13 +368,35 @@ class ImportModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a list of failed rows for the import.
      *
-     * @return string
+     * @param int $importId
+     *
+     * @return array|null
+     */
+    public function getFailedRows(int $importId = null)
+    {
+        if (!$importId) {
+            return null;
+        }
+
+        return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id']);
+    }
+
+    /**
+     * @return ImportRepository
      */
     public function getRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:Import');
+    }
+
+    /**
+     * @return LeadEventLogRepository
+     */
+    public function getEventLogRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadEventLog');
     }
 
     /**
