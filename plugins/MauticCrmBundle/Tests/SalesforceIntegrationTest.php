@@ -33,24 +33,28 @@ use Symfony\Component\Routing\Router;
 
 class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var array
+     */
+    protected $persistedIntegrationEntities = [];
+
     public function testPushLeadsUpdateAndCreateCorrectNumbers()
     {
         $sf   = $this->getSalesforceIntegration();
         $stats = $sf->pushLeads();
 
         // 500 Leads to update, 500 Contacts to update, 1000 to create
-        // Should have have updated 25 per batch of 100; (2000 total / 100 per batch) * 25 = 500 updates
+        // Should have updated 25 per batch of 100; (2000 total / 100 per batch) * 25 = 500 updates
         $this->assertEquals(500, $stats[0]);
         $this->assertEquals(1500, $stats[1]);
-    }
 
-    public function testThatFoundSfEntitiesAreUpdated()
-    {
-
+        $this->assertEquals(2000, count($this->getPersistedIntegrationEntities()));
     }
 
     public function testThatMultipleSfLeadsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated()
     {
+        $sf = $this->getSalesforceIntegration();
+        $sf->pushLeads();
 
     }
 
@@ -148,6 +152,17 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $mockIntegrationEntityRepository = $this->getMockBuilder(IntegrationEntityRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        // we need insight into the entities persisted
+        $mockIntegrationEntityRepository->method('saveEntities')
+            ->will(
+                $this->returnCallback(
+                    function() {
+                        $args = func_get_args();
+                        $this->persistedIntegrationEntities= array_merge($this->persistedIntegrationEntities, $args[0]);
+                    }
+                )
+            );
         $mockEntityManager->method('getRepository')
             ->will(
                 $this->returnValueMap(
@@ -156,6 +171,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+
         $mockEntityManager->method('getReference')
             ->will(
                 $this->returnCallback(
@@ -713,4 +729,16 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         return ['compositeResponse' => $response];
     }
+
+    /**
+     * @return array
+     */
+    protected function getPersistedIntegrationEntities()
+    {
+        $entities = $this->persistedIntegrationEntities;
+        $this->persistedIntegrationEntities = [];
+
+        return $entities;
+    }
+
 }
