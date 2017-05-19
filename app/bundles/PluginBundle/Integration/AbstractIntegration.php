@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
@@ -43,6 +44,8 @@ use Symfony\Component\Routing\Router;
  *
  * @method pushLead(Lead $lead, array $config = [])
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
+ * @method getLeads(array $params, string $query, &$executed, array $result = [],  $object = 'Lead')
+ * @method getCompanies(array $params)
  */
 abstract class AbstractIntegration
 {
@@ -162,7 +165,7 @@ abstract class AbstractIntegration
     {
         $this->factory           = $factory;
         $this->dispatcher        = $factory->getDispatcher();
-        $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+        $this->cache             = $factory->getHelper('cache_storage')->getCache($this->getName());
         $this->em                = $factory->getEntityManager();
         $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
         $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
@@ -700,6 +703,11 @@ abstract class AbstractIntegration
      */
     public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
     {
+        // If not authorizing the session itself, check isAuthorized which will refresh tokens if applicable
+        if (empty($settings['authorize_session'])) {
+            $this->isAuthorized();
+        }
+
         $method   = strtoupper($method);
         $authType = (empty($settings['auth_type'])) ? $this->getAuthenticationType() : $settings['auth_type'];
 
@@ -860,9 +868,11 @@ abstract class AbstractIntegration
      */
     public function createIntegrationEntity($integrationEntity, $integrationEntityId, $internalEntity, $internalEntityId, array $internal = null, $persist = true)
     {
+        $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+            : new \DateTime();
         $entity = new IntegrationEntity();
-        $entity->setDateAdded(new \DateTime())
-            ->setLastSyncDate(new \DateTime())
+        $entity->setDateAdded($date)
+            ->setLastSyncDate($date)
             ->setIntegration($this->getName())
             ->setIntegrationEntity($integrationEntity)
             ->setIntegrationEntityId($integrationEntityId)
@@ -875,6 +885,14 @@ abstract class AbstractIntegration
         }
 
         return $entity;
+    }
+
+    /**
+     * @return IntegrationEntityRepository
+     */
+    public function getIntegrationEntityRepository()
+    {
+        return $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
     }
 
     /**
