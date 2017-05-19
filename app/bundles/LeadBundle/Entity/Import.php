@@ -149,13 +149,6 @@ class Import extends FormEntity
      */
     private $properties = [];
 
-    /**
-     * An array to store failed rows.
-     *
-     * @var array
-     */
-    private $failures = [];
-
     public function __clone()
     {
         $this->id = null;
@@ -258,21 +251,6 @@ class Import extends FormEntity
     }
 
     /**
-     * Add a new failure to the array.
-     *
-     * @param int    $key
-     * @param string $msg
-     *
-     * @return Import
-     */
-    public function addFailure($key, $msg)
-    {
-        $this->failures[$key] = $msg;
-
-        return $this;
-    }
-
-    /**
      * Get id.
      *
      * @return int
@@ -343,6 +321,23 @@ class Import extends FormEntity
     public function getFilePath()
     {
         return $this->getDir().'/'.$this->getFile();
+    }
+
+    /**
+     * Set import file path.
+     *
+     * @param string $path
+     *
+     * @return Import
+     */
+    public function setFilePath($path)
+    {
+        $fileName = basename($path);
+        $dir      = rtrim($path, '/'.$fileName);
+        $this->setDir($dir);
+        $this->setFile($fileName);
+
+        return $this;
     }
 
     /**

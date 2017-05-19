@@ -261,7 +261,6 @@ class ImportModel extends FormModel
                         if ($diffCount < 0) {
                             $import->increaseIgnoredCount();
                             $msg = $this->translator->trans('mautic.lead.import.error.header_mismatch');
-                            $import->addFailure($lineNumber, $msg);
 
                             continue;
                         }
@@ -309,7 +308,6 @@ class ImportModel extends FormModel
                 if ($errorMessage) {
                     // Inform Import entity about the failed row
                     $import->increaseIgnoredCount();
-                    $import->addFailure($lineNumber, $errorMessage);
 
                     // Save log about errored line
                     $eventLog->addProperty('error', $errorMessage)
