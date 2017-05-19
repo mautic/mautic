@@ -240,49 +240,6 @@ class Import extends FormEntity
     }
 
     /**
-     * Populates Import stats from the array.
-     *
-     * @param array $stats
-     *
-     * @return Import
-     */
-    public function populateStats(array $stats)
-    {
-        if (isset($stats['merged'])) {
-            $this->setUpdatedCount($stats['merged']);
-        }
-
-        if (isset($stats['created'])) {
-            $this->setInsertedCount($stats['created']);
-        }
-
-        if (isset($stats['ignored'])) {
-            $this->setIgnoredCount($stats['ignored']);
-        }
-
-        if (isset($stats['failures'])) {
-            $this->failures = $stats['failures'];
-        }
-
-        return $this;
-    }
-
-    /**
-     * Returns the array of stats.
-     *
-     * @return array
-     */
-    public function getStats()
-    {
-        return [
-            'merged'   => $this->getUpdatedCount(),
-            'created'  => $this->getInsertedCount(),
-            'ignored'  => $this->getIgnoredCount(),
-            'failures' => $this->failures,
-        ];
-    }
-
-    /**
      * Checks if the import has everything needed to proceed.
      * If not, it will change its state to FAILED.
      *
