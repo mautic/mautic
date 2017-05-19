@@ -72,11 +72,13 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param bool $isJson
+     *
      * @return string
      */
-    public function getApiUrl()
+    public function getApiUrl($isJson = true)
     {
-        return 'https://crm.zoho.com/crm/private/json';
+        return 'https://crm.zoho.com/crm/private/'.($isJson ? 'json' : 'xml');
     }
 
     /**
@@ -621,7 +623,8 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function populateLeadData($lead, $config = [])
     {
-        $mappedData = parent::populateLeadData($lead, $config);
+        $config['object'] = 'Leads';
+        $mappedData       = parent::populateLeadData($lead, $config);
 
         $xmlData = '<Leads>';
         $xmlData .= '<row no="1">';

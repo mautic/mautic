@@ -7,19 +7,20 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 class ZohoApi extends CrmApi
 {
     /**
-     * @param $operation
+     * @param        $operation
      * @param array  $parameters
      * @param string $method
-     * @param string $object
+     * @param string $moduleobject
+     * @param bool   $isJson
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads')
+    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads', $isJson = true)
     {
         $tokenData = $this->integration->getKeys();
-        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl(), $moduleobject, $operation);
+        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl($isJson), $moduleobject, $operation);
 
         $parameters = array_merge([
             'authtoken' => $tokenData['AUTHTOKEN'],
@@ -65,10 +66,11 @@ class ZohoApi extends CrmApi
     {
         $parameters = [
             'xmlData'        => $data,
-            'duplicateCheck' => 2, //update if exists
+            'duplicateCheck' => 2, // update if exists
+            'newFormat'      => 1,
         ];
 
-        return $this->request('insertRecords', $parameters, 'POST');
+        return $this->request('insertRecords', $parameters, 'POST', 'Leads', false);
     }
 
     /**
