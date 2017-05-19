@@ -109,10 +109,10 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
-                        if (in_array('Lead', $config['objects'])) {
-                            $processed = intval($integrationObject->getLeads($params, null, $leads, [], 'Lead'));
+                        if (in_array('Lead', $config['objects'], true) || in_array('Leads', $config['objects'], true)) {
+                            $processed += intval($integrationObject->getLeads($params, null, $leads, [], 'Lead'));
                         }
-                        if (in_array('Contact', $config['objects'])) {
+                        if (in_array('Contact', $config['objects'], true) || in_array('Contacts', $config['objects'], true)) {
                             $processed += intval($integrationObject->getLeads($params, null, $contacts, [], 'Contact'));
                         }
 
@@ -145,7 +145,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 if (3 === count($result)) {
                     list($updated, $created, $errored) = $result;
                 } else {
-                    $errored = '?';
+                    $errored                 = '?';
                     list($updated, $created) = $result;
                 }
                 $output->writeln(

@@ -13,10 +13,11 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\PluginBundle\Exception\ApiErrorException;
-use Mautic\StageBundle\Entity\Stage;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -101,39 +102,57 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     * @param null  $query
+     * @param array      $params
+     * @param null|array $query
      *
-     * @return int
+     * @return int|null
      */
-    public function getLeads($params = [], $query = null)
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Leads')
     {
+        if ('Lead' === $object || 'Contact' === $object) {
+            $object .= 's'; // pluralize object name for Zoho
+        }
+
         $executed = 0;
 
         try {
             if ($this->isAuthorized()) {
-                $config                         = $this->mergeConfigToFeatureSettings();
-                $fields                         = implode('&property=', array_keys($config['leadFields']));
-                $params['post_append_to_query'] = '&property='.$fields.'&property=lifecyclestage';
+                $config           = $this->mergeConfigToFeatureSettings();
+                $fields           = $config['leadFields'];
+                $config['object'] = $object;
+                $aFields          = $this->getAvailableLeadFields($config);
+                $mappedData       = [];
 
-                $data = $this->getApiHelper()->getLeads($params);
-                if (isset($data['Leads'])) {
+                foreach (array_keys($fields) as $k) {
+                    if (isset($aFields[$object][$k])) {
+                        $mappedData[] = $aFields[$object][$k]['dv'];
+                    }
+                }
+
+                $fields = implode(',', $mappedData);
+
+                $params['selectColumns'] = $object.'('.$fields.')';
+                $params['toIndex']       = 200; // maximum number of records
+
+                $data = $this->getApiHelper()->getLeads($params, $object);
+                if (isset($data[$object])) {
                     /** @var array $leads */
-                    $leads = $data['Leads'];
-                    foreach ($leads as $lead) {
-                        if (is_array($lead)) {
-                            $leadData = $this->amendLeadDataBeforeMauticPopulate($lead, 'Lead');
-                            $lead     = $this->getMauticLead($leadData);
-                            if ($lead) {
-                                ++$executed;
+                    $rows = $data[$object];
+                    foreach ($rows as $row) {
+                        if (is_array($row)) {
+                            $leads = $this->amendLeadDataBeforeMauticPopulate($row, $object);
+                            foreach ($leads as $leadData) {
+                                $lead = $this->getMauticLead($leadData);
+                                if ($lead) {
+                                    ++$executed;
+                                }
                             }
                         }
                     }
-                    if ($data['has-more']) {
-                        $params['vidOffset']  = $data['vid-offset'];
-                        $params['timeOffset'] = $data['time-offset'];
-                        $executed += $this->getLeads($params);
-                    }
+                    //TODO: fetch more records using fromIndex and toIndex until exception is thrown
+//                    if ($data['has-more']) {
+//                        $executed += $this->getLeads($params, $object);
+//                    }
                 }
 
                 return $executed;
@@ -146,41 +165,52 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $params
-     * @param bool  $id
+     * @param array      $params
+     * @param null|array $query
      *
-     * @return int
+     * @return int|null
      */
-    public function getCompanies(array $params = [], $id = false)
+    public function getCompanies($params = [], $query = null, &$executed = null, $result = [])
     {
         $executed = 0;
-        $results  = [];
+        $object   = 'company';
+
         try {
             if ($this->isAuthorized()) {
-                $data = $this->getApiHelper()->getCompanies($params, $id);
-                if ($id) {
-                    $results['results'][] = array_merge($results, $data);
-                } else {
-                    $results['results'] = array_merge($results, $data['results']);
+                $config           = $this->mergeConfigToFeatureSettings();
+                $fields           = $config['companyFields'];
+                $config['object'] = $object;
+                $aFields          = $this->getAvailableLeadFields($config);
+                $mappedData       = [];
+
+                foreach (array_keys($fields) as $k) {
+                    $mappedData[] = $aFields['company'][$k]['dv'];
                 }
-                if (isset($results['results'])) {
-                    foreach ($results['results'] as $company) {
-                        if (isset($company['properties'])) {
-                            $companyData = $this->amendLeadDataBeforeMauticPopulate($company, null);
-                            $company     = $this->getMauticCompany($companyData);
-                            if ($id) {
-                                return $company;
-                            }
-                            if ($company) {
-                                ++$executed;
+
+                $fields = implode(',', $mappedData);
+
+                $params['selectColumns'] = 'Accounts('.$fields.')';
+                $params['toIndex']       = 200; // maximum number of records
+
+                $data = $this->getApiHelper()->getCompanies($params);
+                if (isset($data['Accounts'])) {
+                    /** @var array $rows */
+                    $rows = $data['Accounts'];
+                    foreach ($rows as $row) {
+                        if (is_array($row)) {
+                            $companies = $this->amendLeadDataBeforeMauticPopulate($row);
+                            foreach ($companies as $companyData) {
+                                $company = $this->getMauticCompany($companyData);
+                                if ($company) {
+                                    ++$executed;
+                                }
                             }
                         }
                     }
-                    if (isset($data['hasMore']) && $data['hasMore']) {
-                        $params['vidOffset']  = $data['vid-offset'];
-                        $params['timeOffset'] = $data['time-offset'];
-                        $executed += $this->getCompanies($params);
-                    }
+                    //TODO: fetch more records using fromIndex and toIndex until exception is thrown
+//                    if (isset($data['hasMore']) && $data['hasMore']) {
+//                        $executed += $this->getCompanies($params);
+//                    }
                 }
 
                 return $executed;
@@ -214,18 +244,17 @@ class ZohoIntegration extends CrmAbstractIntegration
             $data = json_decode($data, true);
         }
 
-        if (isset($data['lifecyclestage'])) {
-            $stageName = $data['lifecyclestage'];
-            unset($data['lifecyclestage']);
-        }
-
-        if (isset($data['associatedcompanyid'])) {
-            $company = $this->getCompanies([], $data['associatedcompanyid']);
-            unset($data['associatedcompanyid']);
-        }
-
         // Match that data with mapped lead fields
-        $matchedFields = $this->populateMauticLeadData($data);
+        $config        = $this->mergeConfigToFeatureSettings();
+        $aFields       = $this->getAvailableLeadFields($config);
+        $matchedFields = [];
+        foreach ($aFields['Leads'] as $k => $v) {
+            foreach ($data as $dk => $dv) {
+                if ($dk === $v['dv']) {
+                    $matchedFields[$config['leadFields'][$k]] = $dv;
+                }
+            }
+        }
 
         if (empty($matchedFields)) {
             return null;
@@ -291,34 +320,6 @@ class ZohoIntegration extends CrmAbstractIntegration
             $leadModel->addToCompany($lead, $company);
         }
 
-        if (isset($stageName)) {
-            $stage = $this->factory->getEntityManager()->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
-
-            if (empty($stage)) {
-                $stage = new Stage();
-                $stage->setName($stageName);
-                $stages[$stageName] = $stage;
-            }
-            if (!$lead->getStage() && $lead->getStage() != $stage) {
-                $lead->setStage($stage);
-
-                //add a contact stage change log
-                $log = new StagesChangeLog();
-                $log->setStage($stage);
-                $log->setEventName($stage->getId().':'.$stage->getName());
-                $log->setLead($lead);
-                $log->setActionName(
-                    $this->factory->getTranslator()->trans(
-                        'mautic.stage.import.action.name',
-                        [
-                            '%name%' => $this->factory->getUser()->getUsername(),
-                        ]
-                    )
-                );
-                $log->setDateAdded(new \DateTime());
-                $lead->stageChangeLog($log);
-            }
-        }
         $pushData['email'] = $lead->getEmail();
         $this->getApiHelper()->createLead($pushData, $lead, $updateLink = true);
         if ($persist) {
@@ -337,68 +338,69 @@ class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param $data
-     * @param $object
      *
-     * @return mixed
+     * @return Company|void
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function getMauticCompany($data)
     {
-        $fieldsValues = [];
-        foreach ($data['properties'] as $key => $field) {
-            $fieldsValues[$key] = $field['value'];
+        if (is_object($data)) {
+            // Convert to array in all levels
+            $data = json_encode(json_decode($data), true);
+        } elseif (is_string($data)) {
+            // Assume JSON
+            $data = json_decode($data, true);
         }
-        if ('Lead' === $object && !isset($fieldsValues['email'])) {
-            foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
-                if ('EMAIL' === $identifiedProfile['type']) {
-                    $fieldsValues['email'] = $identifiedProfile['value'];
+        // Match that data with mapped lead fields
+        $config        = $this->mergeConfigToFeatureSettings();
+        $aFields       = $this->getAvailableLeadFields($config);
+        $matchedFields = [];
+        foreach ($aFields['company'] as $k => $v) {
+            foreach ($data as $dk => $dv) {
+                if ($dk === $v['dv']) {
+                    $matchedFields[$config['companyFields'][$k]] = $dv;
+                }
+            }
+        }
+
+        if (empty($matchedFields)) {
+            return;
+        }
+
+        // Find unique identifier fields used by the integration
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $companyModel = $this->factory->getModel('lead.company');
+
+        // Default to new company
+        $company = new Company();
+        $companyModel->setFieldValues($company, $matchedFields, false, false);
+        $companyModel->saveEntity($company, false);
+
+        return $company;
+    }
+
+    /**
+     * Amend mapped lead data before creating to Mautic.
+     *
+     * @param array  $data
+     * @param string $object
+     *
+     * @return array
+     */
+    public function amendLeadDataBeforeMauticPopulate($data, $object = null)
+    {
+        if (isset($data['FL'])) {
+            $data = [$data];
+        }
+        $fieldsValues = [];
+        foreach ($data as $row) {
+            if (isset($row['FL'])) {
+                foreach ($row['FL'] as $field) {
+                    $fieldsValues[$row['no'] - 1][$field['val']] = $field['content'];
                 }
             }
         }
 
         return $fieldsValues;
-    }
-
-    /**
-     * Format the lead data to the structure that Zoho requires for the createOrUpdate request.
-     *
-     * @param array $leadData All the lead fields mapped
-     * @param $lead
-     * @param bool $updateLink
-     *
-     * @return array
-     *
-     * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
-     * @throws \Symfony\Component\Routing\Exception\MissingMandatoryParametersException
-     * @throws \Symfony\Component\Routing\Exception\InvalidParameterException
-     */
-    public function formatLeadDataForCreateOrUpdate($leadData, $lead, $updateLink = false)
-    {
-        $formattedLeadData = [];
-
-        if (!$updateLink) {
-            foreach ($leadData as $field => $value) {
-                if ($field === 'lifecyclestage' || $field === 'associatedcompanyid') {
-                    continue;
-                }
-                $formattedLeadData['properties'][] = [
-                    'property' => $field,
-                    'value'    => $value,
-                ];
-            }
-        }
-
-        if ($lead && !empty($lead->getId())) {
-            //put mautic timeline link
-            $formattedLeadData['properties'][] = [
-                'property' => 'mautic_timeline',
-                'value'    => $this->factory->getRouter()->generate(
-                    'mautic_plugin_timeline_view',
-                    ['integration' => 'Zoho', 'leadId' => $lead->getId()],
-                    UrlGeneratorInterface::ABSOLUTE_URL),
-            ];
-        }
-
-        return $formattedLeadData;
     }
 
     /**
@@ -645,5 +647,111 @@ class ZohoIntegration extends CrmAbstractIntegration
     protected function getFieldKey($dv)
     {
         return InputHelper::alphanum(InputHelper::transliterate($dv));
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return mixed
+     */
+    public function pushLeads($params = [])
+    {
+        $limit                 = $params['limit'];
+        $config                = $this->mergeConfigToFeatureSettings();
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $leadFields            = array_unique(array_values($config['leadFields']));
+        $totalUpdated          = $totalCreated          = $totalErrors          = 0;
+        $leadModel             = $this->leadModel;
+        $companyModel          = $this->companyModel;
+
+        if (empty($leadFields)) {
+            return [0, 0, 0];
+        }
+
+        $fields        = implode(', l.', $leadFields);
+        $fields        = 'l.'.$fields;
+        $originalLimit = $limit;
+        $progress      = false;
+        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false));
+        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false);
+        $totalCount    = $totalToCreate + $totalToUpdate;
+
+        if (defined('IN_MAUTIC_CONSOLE')) {
+            // start with update
+            if ($totalToUpdate + $totalToCreate) {
+                $output = new ConsoleOutput();
+                $output->writeln("About $totalToUpdate to update and about $totalToCreate to create/update");
+                $progress = new ProgressBar($output, $totalCount);
+            }
+        }
+
+        $limit       = $originalLimit;
+        $leadsToSync = [];
+
+        // Fetch them separately so we can determine
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $limit, 'Lead', [])['Lead'];
+        $totalCount -= count($toUpdate);
+        $totalUpdated += count($toUpdate);
+        foreach ($toUpdate as $lead) {
+            if (isset($lead['email']) && !empty($lead['email'])) {
+                $key               = mb_strtolower($this->cleanPushData($lead['email']));
+                $leadsToSync[$key] = $lead;
+
+                if ($progress) {
+                    $progress->advance();
+                }
+            }
+        }
+        unset($toUpdate);
+
+        //create lead records
+        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $limit);
+        $totalCount -= count($leadsToCreate);
+        $totalCreated += count($leadsToCreate);
+        foreach ($leadsToCreate as $lead) {
+            if (isset($lead['email']) && !empty($lead['email'])) {
+                $key               = mb_strtolower($this->cleanPushData($lead['email']));
+                $leadsToSync[$key] = $lead;
+            }
+
+            if ($progress) {
+                $progress->advance();
+            }
+        }
+        unset($leadsToCreate);
+
+        $config     = $this->mergeConfigToFeatureSettings();
+        $aFields    = $this->getAvailableLeadFields($config);
+        $rowid      = 1;
+        $mappedData = [];
+        $xmlData    = '<Leads>';
+        foreach ($leadsToSync as $email => $lead) {
+            $xmlData .= '<row no="'.($rowid++).'">';
+            // Match that data with mapped lead fields
+            foreach ($config['leadFields'] as $k => $v) {
+                foreach ($lead as $dk => $dv) {
+                    if ($v === $dk) {
+                        if ($dv) {
+                            $mappedData[$aFields['Leads'][$k]['dv']] = $dv;
+                        }
+                    }
+                }
+            }
+            foreach ($mappedData as $name => $value) {
+                $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $this->cleanPushData($value));
+            }
+            $xmlData .= '</row>';
+        }
+        $xmlData .= '</Leads>';
+
+        $this->getApiHelper()->createLead($xmlData);
+
+        if ($progress) {
+            $progress->finish();
+            $output->writeln('');
+        }
+
+        return [$totalUpdated, $totalCreated, $totalErrors];
     }
 }

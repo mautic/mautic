@@ -77,22 +77,23 @@ class ZohoApi extends CrmApi
      * gets Zoho leads.
      *
      * @param array  $params
-     * @param string $id
+     * @param string $object
      *
      * @return mixed
      */
-    public function getLeads(array $params, $id)
+    public function getLeads(array $params, $object)
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
-        }
-        if ($id) {
-            $params['id'] = $id;
-
-            return $this->request('getRecordById', $params);
+            $params['newFormat']     = 1;
         }
 
-        return $this->request('getRecords', $params);
+        $data = $this->request('getRecords', $params, 'GET', $object);
+        if (isset($data['response'], $data['response']['result'])) {
+            $data = $data['response']['result'];
+        }
+
+        return $data;
     }
 
     /**
@@ -103,17 +104,24 @@ class ZohoApi extends CrmApi
      *
      * @return mixed
      */
-    public function getCompanies(array $params, $id)
+    public function getCompanies(array $params, $id = null)
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
         }
+
         if ($id) {
             $params['id'] = $id;
 
-            return $this->request('getRecordById', $params, 'GET', 'Accounts');
+            $data = $this->request('getRecordById', $params, 'GET', 'Accounts');
+        } else {
+            $data = $this->request('getRecords', $params, 'GET', 'Accounts');
         }
 
-        return $this->request('getRecords', $params, 'GET', 'Accounts');
+        if (isset($data['response'], $data['response']['result'])) {
+            $data = $data['response']['result'];
+        }
+
+        return $data;
     }
 }
