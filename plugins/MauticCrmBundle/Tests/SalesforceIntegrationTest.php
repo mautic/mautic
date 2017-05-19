@@ -32,23 +32,6 @@ use Symfony\Component\Routing\Router;
 
 class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 {
-    protected $leadsToUpdate = [
-        'Lead' => [
-            [
-
-            ]
-        ],
-        'Contact' => [
-            [
-
-            ]
-        ]
-    ];
-
-    protected $leadsToCreate = [
-
-    ];
-
     public function testThatMultipleSfLeadsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated()
     {
         $sf   = $this->getSalesforceIntegration();
@@ -210,7 +193,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $mockCacheHelper->method('getCache')
             ->willReturn($mockCacheHelper);
 
-        $leadFields = [
+        $leadFields    = [
             'Id__Lead'        =>
                 [
                     'type'        => 'string',
@@ -277,7 +260,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                     'group'       => 'Contact',
                     'optionLabel' => 'First Name',
                 ],
-            'Email__Contact' =>
+            'Email__Contact'     =>
                 [
                     'type'        => 'string',
                     'label'       => 'Contact-Email',
@@ -375,7 +358,8 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->setPlugin('MauticCrmBundle')
             ->setApiKeys(
                 [
-                    'access_token' => '123'
+                    'access_token' => '123',
+                    'instance_url' => 'https://sftest.com',
                 ]
             )
             ->setFeatureSettings($featureSettings)
@@ -387,7 +371,32 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $sf = new SalesforceIntegration($mockFactory);
+        $sf = $this->getMockBuilder(SalesforceIntegration::class)
+            ->setConstructorArgs([$mockFactory])
+            ->setMethods(['makeRequest'])
+            ->getMock();
+
+        $sf->method('makeRequest')
+            ->will(
+                $this->returnCallback(
+                    function() {
+                        $args = func_get_args();
+
+                        // Determine what to return by analyzing the URL and query parameters
+                        switch (true) {
+                            case strpos($args[0], '/query') !== false:
+                                // Check if Contact or Lead is being queried
+                                switch (true) {
+                                    case (strpos($args[1]['q'], 'from Contact')):
+                                        return $this->getSalesforceContacts();
+                                    case (strpos($args[1]['q'], 'from Lead')):
+                                        return $this->getSalesforceLeads();
+                                }
+                                break;
+                        }
+                    }
+                )
+            );
 
         /** @var \PHPUnit_Framework_MockObject_MockObject $mockDispatcher */
         $mockDispatcher = $mockFactory->getDispatcher();
@@ -411,16 +420,17 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
                         // determine whether to return a count or records
                         $results = [];
+                        $leadsToUpdate = $this->getLeadsToUpdate();
                         if (false === $args[3]) {
                             foreach ($args[4] as $object) {
-                                $results[$object] = count($this->leadsToUpdate[$object]);
+                                $results[$object] = count($leadsToUpdate[$object]);
                             }
 
                             return $results;
                         }
 
-                        foreach ($args[4] as $object) {
-                            $results[$object] = $this->leadsToUpdate[$object];
+                        foreach ((array) $args[4] as $object) {
+                            $results[$object] = $leadsToUpdate[$object];
                         }
 
                         return $results;
@@ -431,20 +441,138 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
     protected function setLeadsToCreate(\PHPUnit_Framework_MockObject_MockObject $mockRepository)
     {
-        $mockRepository->method('findLeadsToUpdate')
+        $mockRepository->method('findLeadsToCreate')
             ->will(
                 $this->returnCallback(
                     function () {
                         $args = func_get_args();
 
+                        $createLeads = $this->getLeadsToCreate();
                         // determine whether to return a count or records
                         if (false === $args[2]) {
-                            return count($this->leadsToCreate);
+                            return count($createLeads);
                         }
 
-                        return $this->leadsToCreate;
+                        return $createLeads;
                     }
                 )
             );
+    }
+
+    /**
+     * @param int $count
+     */
+    protected function getLeadsToUpdate($count = 1000)
+    {
+        $entities = [
+            'Lead' => [],
+            'Contact' => []
+        ];
+
+        $object = 'Lead';
+        while ($count) {
+            $entities[$object][$count] = [
+                'integration_entity_id' => 'SF'.$count,
+                'integration_entity'    => $object,
+                'id'                    => $count,
+                'internal_entity_id'    => $count,
+                'firstname'             => $object.$count,
+                'lastname'              => $object.$count,
+                'company'               => $object.$count,
+                'email'                 => $object.$count.'@sftest.com',
+            ];
+
+            $object = ('Lead' === $object) ? 'Contact' : 'Lead';
+            --$count;
+        }
+
+        return $entities;
+    }
+
+    protected function getLeadsToCreate($count = 1000, $startingId = 2000)
+    {
+        $entities = [];
+
+        while ($count) {
+            $entities[$startingId] = [
+                'id'                    => $startingId,
+                'internal_entity_id'    => $startingId,
+                'firstname'             => 'CreateLead'.$startingId,
+                'lastname'              => 'CreateLead'.$startingId,
+                'company'               => 'CreateLead'.$startingId,
+                'email'                 => 'CreateLead'.$startingId.'@sftest.com',
+            ];
+
+            --$count;
+            --$startingId;
+        }
+
+        return $entities;
+    }
+
+    /**
+     * Mock SF response
+     *
+     * @return array
+     */
+    protected function getSalesforceContacts()
+    {
+        // Let's find around 25 records
+        $records = [];
+        $count = 0;
+        while ($count < 25) {
+            $records[] = [
+                'attributes' =>
+                    [
+                        'type' => 'Contact',
+                        'url'  => '/services/data/v34.0/sobjects/Contact/SF'.$count,
+                    ],
+                'Id'         => 'SF'.$count,
+                'FirstName'  => 'Contact'.$count,
+                'LastName'   => 'Contact'.$count,
+                'Email'      => 'Contact'.$count.'@sftest.com',
+            ];
+            $count++;
+        }
+
+        return [
+            'totalSize' => 25,
+            'done'      => true,
+            'records'   => $records,
+        ];
+    }
+
+    /**
+     * Mock SF response
+     *
+     * @return array
+     */
+    protected function getSalesforceLeads()
+    {
+        // Let's find around 25 records
+        $records = [];
+        $count = 25;
+        while ($count < 50) {
+            $records[] = [
+                'attributes'         =>
+                    [
+                        'type' => 'Lead',
+                        'url'  => '/services/data/v34.0/sobjects/Lead/SF'.$count,
+                    ],
+                'Id'                 => 'SF'.$count,
+                'FirstName'          => 'Lead'.$count,
+                'LastName'           => 'Lead'.$count,
+                'Email'              => 'Lead'.$count.'@sftest.com',
+                'Company'            => 'Lead'.$count,
+                'ConvertedContactId' => null,
+            ];
+            $count++;
+        }
+
+        return [
+            'totalSize' => 25,
+            'done'      => true,
+            'records'   => $records,
+        ];
     }
 }

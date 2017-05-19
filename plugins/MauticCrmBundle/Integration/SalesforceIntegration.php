@@ -1079,9 +1079,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $integrationEntities,
                 $salesforceIdMapping,
                 $trackedContacts,
-                $requiredFields[$sfObject]['fields'],
-                $fieldMapping[$sfObject],
-                $sfObject,
+                $requiredFields,
+                $fieldMapping,
                 $sfEntityRecords,
                 $progress
             );
@@ -1695,7 +1694,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $leadsToCreate         = $integrationEntityRepo->findLeadsToCreate('Salesforce', $mauticLeadFieldString, $limit);
         $totalCount            -= count($leadsToCreate);
-
+        $checkEmailsToCreateInSF = [];
         foreach ($leadsToCreate as $lead) {
             if ($this->pushContactLink) {
                 $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
@@ -2119,11 +2118,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$trackedContacts,
         $requiredFields,
         $objectFields,
-        $sfObject,
         $sfEntityRecords,
         $progress = null
     ) {
         foreach ($sfEntityRecords['records'] as $sfEntityRecord) {
+            $sfObject = $sfEntityRecord['attributes']['type'];
+
             $key = $this->getSyncKey($sfEntityRecord['Email']);
             if (!isset($sfEntityRecord['Id']) || (!isset($checkEmailsInSF[$key]) && !isset($processedLeads[$key]))) {
                 // This is a record we don't recognize so continue
@@ -2181,8 +2181,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $syncLead   = false;
             if ($updateLead = $this->buildCompositeBody(
                 $mauticData,
-                $requiredFields,
-                $objectFields,
+                $requiredFields[$sfObject]['fields'],
+                $objectFields[$sfObject],
                 $sfObject,
                 $leadData,
                 $sfEntityRecord['Id'],
