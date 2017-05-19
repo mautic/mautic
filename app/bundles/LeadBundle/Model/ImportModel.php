@@ -388,15 +388,25 @@ class ImportModel extends FormModel
     }
 
     /**
-     * Returns a full path to a dir with unique name based on time.
+     * Returns a unique name of a CSV file based on time.
      *
      * @return string
      */
-    public function getUniqueDir()
+    public function getUniqueFileName()
+    {
+        return (new DateTimeHelper())->toUtcString('YmdHis').'.csv';
+    }
+
+    /**
+     * Returns a full path to the import dir.
+     *
+     * @return string
+     */
+    public function getImportDir()
     {
         $tmpDir = $this->pathsHelper->getSystemPath('tmp', true);
 
-        return $tmpDir.'/imports/'.(new DateTimeHelper())->toUtcString('YmdHis');
+        return $tmpDir.'/imports';
     }
 
     /**

@@ -29,8 +29,6 @@ class ImportController extends FormController
     const STEP_PROGRESS_BAR    = 3;
     const STEP_IMPORT_FROM_CSV = 4;
 
-    const DEFAULT_FILE_NAME = 'import.csv';
-
     /**
      * @param int $page
      *
@@ -123,7 +121,7 @@ class ImportController extends FormController
         // Move the file to cache and rename it
         $forceStop = $this->request->get('cancel', false);
         $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
-        $fileName  = self::DEFAULT_FILE_NAME;
+        $fileName  = $this->getImportFileName();
         $importDir = $this->getImportDirName();
         $fullPath  = $this->getFullCsvPath();
         $fs        = new Filesystem();
@@ -420,29 +418,42 @@ class ImportController extends FormController
     }
 
     /**
-     * Generates unique import directory name inside the cache dir if not stored in the session.
-     * If it exists in the session, returns that one.
+     * Generates import directory path.
      *
      * @return string
      */
     protected function getImportDirName()
     {
+        /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
+        $importModel = $this->getModel('lead.import');
+
+        return $importModel->getImportDir();
+    }
+
+    /**
+     * Generates unique import directory name inside the cache dir if not stored in the session.
+     * If it exists in the session, returns that one.
+     *
+     * @return string
+     */
+    protected function getImportFileName()
+    {
         $session = $this->get('session');
 
         // Return the dir path from session if exists
-        if ($importDir = $session->get('mautic.lead.import.dir')) {
-            return $importDir;
+        if ($fileName = $session->get('mautic.lead.import.file')) {
+            return $fileName;
         }
 
         /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
         $importModel = $this->getModel('lead.import');
 
-        $importDir = $importModel->getUniqueDir();
+        $fileName = $importModel->getUniqueFileName();
 
         // Set the dir path to session
-        $session->set('mautic.lead.import.dir', $importDir);
+        $session->set('mautic.lead.import.file', $fileName);
 
-        return $importDir;
+        return $fileName;
     }
 
     /**
@@ -452,7 +463,7 @@ class ImportController extends FormController
      */
     protected function getFullCsvPath()
     {
-        return $this->getImportDirName().'/'.self::DEFAULT_FILE_NAME;
+        return $this->getImportDirName().'/'.$this->getImportFileName();
     }
 
     /**
@@ -463,7 +474,7 @@ class ImportController extends FormController
         $session = $this->get('session');
         $session->set('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0]);
         $session->set('mautic.lead.import.headers', []);
-        $session->set('mautic.lead.import.dir', null);
+        $session->set('mautic.lead.import.file', null);
         $session->set('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
         $session->set('mautic.lead.import.progress', [0, 0]);
         $session->set('mautic.lead.import.inprogress', false);
