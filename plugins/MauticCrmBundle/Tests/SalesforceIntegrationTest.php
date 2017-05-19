@@ -32,12 +32,32 @@ use Symfony\Component\Routing\Router;
 
 class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 {
+    protected $leadsToUpdate = [
+        'Lead' => [
+            [
+
+            ]
+        ],
+        'Contact' => [
+            [
+
+            ]
+        ]
+    ];
+
+    protected $leadsToCreate = [
+
+    ];
 
     public function testThatMultipleSfLeadsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated()
     {
-        $sf = $this->getSalesforceIntegration();
+        $sf   = $this->getSalesforceIntegration();
+        $repo = $sf->getIntegrationEntityRepository();
+        $this->setLeadsToUpdate($repo);
+        $this->setLeadsToCreate($repo);
 
-        $sf->pushLeads();
+        $stats = $sf->pushLeads();
+        $this->assertEmpty(array_sum($stats));
     }
 
     public function testThatMultipleSfContactsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated()
@@ -369,6 +389,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $sf = new SalesforceIntegration($mockFactory);
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject $mockDispatcher */
         $mockDispatcher = $mockFactory->getDispatcher();
         $mockDispatcher->method('dispatch')
             ->willReturn(
@@ -378,5 +399,52 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $sf->setIntegrationSettings($integration);
 
         return $sf;
+    }
+
+    protected function setLeadsToUpdate(\PHPUnit_Framework_MockObject_MockObject $mockRepository)
+    {
+        $mockRepository->method('findLeadsToUpdate')
+            ->will(
+                $this->returnCallback(
+                    function () {
+                        $args = func_get_args();
+
+                        // determine whether to return a count or records
+                        $results = [];
+                        if (false === $args[3]) {
+                            foreach ($args[4] as $object) {
+                                $results[$object] = count($this->leadsToUpdate[$object]);
+                            }
+
+                            return $results;
+                        }
+
+                        foreach ($args[4] as $object) {
+                            $results[$object] = $this->leadsToUpdate[$object];
+                        }
+
+                        return $results;
+                    }
+                )
+            );
+    }
+
+    protected function setLeadsToCreate(\PHPUnit_Framework_MockObject_MockObject $mockRepository)
+    {
+        $mockRepository->method('findLeadsToUpdate')
+            ->will(
+                $this->returnCallback(
+                    function () {
+                        $args = func_get_args();
+
+                        // determine whether to return a count or records
+                        if (false === $args[2]) {
+                            return count($this->leadsToCreate);
+                        }
+
+                        return $this->leadsToCreate;
+                    }
+                )
+            );
     }
 }
