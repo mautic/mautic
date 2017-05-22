@@ -290,11 +290,6 @@ class SubmissionModel extends CommonFormModel
             $leadField = $f->getLeadField();
             if (!empty($leadField)) {
                 $leadValue = $value;
-                if (is_array($leadValue)) {
-                    // Multiselect lead fields store the values with bars
-                    $delimeter = ('multiselect' === $leadFields[$leadField]['type']) ? '|' : ', ';
-                    $leadValue = implode($delimeter, $leadValue);
-                }
 
                 $leadFieldMatches[$leadField] = $leadValue;
             }
