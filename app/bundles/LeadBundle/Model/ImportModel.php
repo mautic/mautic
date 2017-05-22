@@ -420,7 +420,7 @@ class ImportModel extends FormModel
      *
      * @return array|null
      */
-    public function getFailedRows(int $importId = null)
+    public function getFailedRows($importId = null)
     {
         if (!$importId) {
             return null;
