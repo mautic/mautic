@@ -346,7 +346,7 @@ class ImportController extends FormController
                                 ->setHeaders($session->get('mautic.lead.import.headers'))
                                 ->setParserConfig($session->get('mautic.lead.import.config'));
 
-                            // In case the user chose to import in browser:
+                            // In case the user chose to import in browser
                             if ($form->get('buttons')->get('save')->isClicked()) {
                                 $import->setStatus($import::MANUAL);
 
@@ -361,7 +361,8 @@ class ImportController extends FormController
                             if ($form->get('buttons')->get('apply')->isClicked()) {
                                 $this->addFlash('mautic.lead.batch.import.created');
                                 $this->resetImport($fullPath, false);
-                                $step = self::STEP_UPLOAD_CSV;
+
+                                return $this->indexAction();
                             }
 
                             return $this->newAction(0, true);
