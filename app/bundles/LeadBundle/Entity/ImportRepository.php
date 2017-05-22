@@ -26,12 +26,8 @@ class ImportRepository extends CommonRepository
      *
      * @return array
      */
-    public function getGhostImports(float $ghostDelay = null, int $limit = null)
+    public function getGhostImports($ghostDelay = 2, $limit = null)
     {
-        if ($ghostDelay === null) {
-            $ghostDelay = 2;
-        }
-
         $q = $this->getQueryForStatuses([Import::IN_PROGRESS]);
         $q->select($this->getTableAlias())
             ->andWhere($q->expr()->lt($this->getTableAlias().'.dateModified', '(CURRENT_TIMESTAMP() - :delay)'))
@@ -53,7 +49,7 @@ class ImportRepository extends CommonRepository
      *
      * @return array
      */
-    public function getImportsWithStatuses(array $statuses, int $limit = null)
+    public function getImportsWithStatuses(array $statuses, $limit = null)
     {
         $q = $this->getQueryForStatuses($statuses);
         $q->select($this->getTableAlias())

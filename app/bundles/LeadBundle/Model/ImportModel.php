@@ -349,7 +349,7 @@ class ImportModel extends FormModel
      *
      * @return LeadEventLog
      */
-    public function initEventLog(Import $import, int $lineNumber)
+    public function initEventLog(Import $import, $lineNumber)
     {
         $eventLog = new LeadEventLog();
         $eventLog->setUserId($import->getCreatedBy())
