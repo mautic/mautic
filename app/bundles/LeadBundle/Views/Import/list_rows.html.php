@@ -18,10 +18,12 @@
         </td>
         <td>
             <div>
+                <?php if (in_array($item->getStatus(), [$item::QUEUED, $item::IN_PROGRESS, $item::STOPPED])) : ?>
                 <?php echo $view->render(
                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                     ['item' => $item, 'model' => 'lead.import']
                 ); ?>
+                <?php endif; ?>
                 <?php if ($view['security']->hasEntityAccess(true, $permissions[$permissionBase.':viewother'], $item->getCreatedBy())) : ?>
                     <a href="<?php echo $view['router']->path(
                         $actionRoute,
