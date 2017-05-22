@@ -510,7 +510,16 @@ class ImportController extends FormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'failedRows' => $model->getFailedRows($entity->getId()),
+                        'failedRows'        => $model->getFailedRows($entity->getId()),
+                        'importedRowsChart' => $model->getImportedRowsLineChartData(
+                            'i',
+                            $entity->getDateStarted(),
+                            $entity->getDateEnded(),
+                            null,
+                            [
+                                'object_id' => $entity->getId(),
+                            ]
+                        ),
                     ]
                 );
 

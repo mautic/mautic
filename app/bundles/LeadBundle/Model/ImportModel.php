@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -363,6 +365,37 @@ class ImportModel extends FormModel
             );
 
         return $eventLog;
+    }
+
+    /**
+     * Get line chart data of imported rows.
+     *
+     * @param char      $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime $dateFrom
+     * @param \DateTime $dateTo
+     * @param string    $dateFormat
+     * @param array     $filter
+     *
+     * @return array
+     */
+    public function getImportedRowsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    {
+        $filter['object'] = 'import';
+        $filter['bundle'] = 'lead';
+
+        // Clear the times for display by minutes
+        $dateFrom->modify('-1 minute');
+        $dateFrom->setTime($dateFrom->format('H'), $dateFrom->format('i'), 0);
+        $dateTo->modify('+1 minute');
+        $dateTo->setTime($dateTo->format('H'), $dateTo->format('i'), 0);
+
+        $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
+        $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
+        $data  = $query->fetchTimeData('lead_event_log', 'date_added', $filter);
+
+        $chart->setDataset($this->translator->trans('mautic.lead.import.processed.rows'), $data);
+
+        return $chart->render();
     }
 
     /**
