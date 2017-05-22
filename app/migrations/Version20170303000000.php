@@ -28,7 +28,7 @@ class Version20170303000000 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         $table = $schema->getTable(MAUTIC_TABLE_PREFIX.'leads');
-        if ($table->hasIndex('date_added_country_index')) {
+        if ($table->hasIndex(MAUTIC_TABLE_PREFIX.'date_added_country_index')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -38,7 +38,7 @@ class Version20170303000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("CREATE INDEX {$this->prefix}date_added_country_index ON {$this->prefix}leads (date_added, country)");
+        $this->addSql("CREATE INDEX {$this->prefix}date_added_country_index ON {$this->prefix}leads (date_added, country(50))");
         $this->addSql("CREATE INDEX {$this->prefix}date_added_index ON {$this->prefix}audit_log (date_added)");
         $this->addSql("CREATE INDEX {$this->prefix}date_hit_left_index ON {$this->prefix}page_hits (date_hit, date_left)");
     }
