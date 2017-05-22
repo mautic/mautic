@@ -511,15 +511,15 @@ class ImportController extends FormController
                     $args['viewParameters'],
                     [
                         'failedRows'        => $model->getFailedRows($entity->getId()),
-                        'importedRowsChart' => $model->getImportedRowsLineChartData(
+                        'importedRowsChart' => $entity->getDateStarted() ? $model->getImportedRowsLineChartData(
                             'i',
                             $entity->getDateStarted(),
-                            $entity->getDateEnded(),
+                            $entity->getDateEnded() ? $entity->getDateEnded() : $entity->getDateModified(),
                             null,
                             [
                                 'object_id' => $entity->getId(),
                             ]
-                        ),
+                        ) : [],
                     ]
                 );
 
