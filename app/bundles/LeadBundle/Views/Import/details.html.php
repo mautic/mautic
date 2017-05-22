@@ -68,18 +68,6 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                                     'value' => $item->getLineCount(),
                                 ]); ?>
                                 <?php echo $view->render($detailRowTmpl, [
-                                    'label' => 'mautic.lead.import.inserted.count',
-                                    'value' => $item->getInsertedCount(),
-                                ]); ?>
-                                <?php echo $view->render($detailRowTmpl, [
-                                    'label' => 'mautic.lead.import.updated.count',
-                                    'value' => $item->getUpdatedCount(),
-                                ]); ?>
-                                <?php echo $view->render($detailRowTmpl, [
-                                    'label' => 'mautic.lead.import.ignored.count',
-                                    'value' => $item->getIgnoredCount(),
-                                ]); ?>
-                                <?php echo $view->render($detailRowTmpl, [
                                     'label' => 'mautic.lead.import.date.started',
                                     'value' => $view['date']->toFull($item->getDateStarted()),
                                 ]); ?>
@@ -134,6 +122,35 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                 </span>
             </div>
             <!--/ asset detail collapseable toggler -->
+
+            <!-- some stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-md-2 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-row-statuses"></span>
+                                        <?php echo $view['translator']->trans('mautic.lead.import.row.statuses'); ?>
+                                    </h5>
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                <?php echo $view->render(
+                                    'MauticCoreBundle:Helper:chart.html.php',
+                                    [
+                                        'chartData'   => $item->getRowStatusesPieChart($view['translator']),
+                                        'chartType'   => 'pie',
+                                        'chartHeight' => 210,
+                                    ]
+                                ); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ stats -->
         </div>
 
         <!-- start: tab-content -->
