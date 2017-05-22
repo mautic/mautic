@@ -52,8 +52,8 @@ class VtigerIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'url' => 'mautic.vtiger.form.url',
-            'username' => 'mautic.vtiger.form.username',
+            'url'       => 'mautic.vtiger.form.url',
+            'username'  => 'mautic.vtiger.form.username',
             'accessKey' => 'mautic.vtiger.form.password',
         ];
     }
@@ -101,10 +101,10 @@ class VtigerIntegration extends CrmAbstractIntegration
             return false;
         }
 
-        $url = $this->getApiUrl();
+        $url        = $this->getApiUrl();
         $parameters = [
             'operation' => 'getchallenge',
-            'username' => $this->keys['username'],
+            'username'  => $this->keys['username'],
         ];
 
         $response = $this->makeRequest($url, $parameters);
@@ -115,7 +115,7 @@ class VtigerIntegration extends CrmAbstractIntegration
 
         $loginParameters = [
             'operation' => 'login',
-            'username' => $this->keys['username'],
+            'username'  => $this->keys['username'],
             'accessKey' => md5($response['result']['token'].$this->keys['accessKey']),
         ];
 
@@ -180,13 +180,13 @@ class VtigerIntegration extends CrmAbstractIntegration
             return $fields;
         }
 
-        $vTigerFields = [];
+        $vTigerFields      = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
 
         if (isset($settings['feature_settings']['objects'])) {
             $vTigerObjects = $settings['feature_settings']['objects'];
         } else {
-            $settings = $this->settings->getFeatureSettings();
+            $settings      = $this->settings->getFeatureSettings();
             $vTigerObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
         }
 
@@ -213,8 +213,8 @@ class VtigerIntegration extends CrmAbstractIntegration
                                 }
 
                                 $vTigerFields[$object][$fieldInfo['name']] = [
-                                    'type' => 'string',
-                                    'label' => $fieldInfo['label'],
+                                    'type'     => 'string',
+                                    'label'    => $fieldInfo['label'],
                                     'required' => ('email' === $fieldInfo['name']),
                                 ];
                             }
@@ -265,8 +265,8 @@ class VtigerIntegration extends CrmAbstractIntegration
 
     /**
      * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array $data
-     * @param string $formArea
+     * @param array                                             $data
+     * @param string                                            $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
@@ -279,17 +279,16 @@ class VtigerIntegration extends CrmAbstractIntegration
                         'contacts' => 'mautic.vtiger.object.contact',
                         'company'  => 'mautic.vtiger.object.company',
                     ],
-                    'expanded' => true,
-                    'multiple' => true,
-                    'label' => 'mautic.vtiger.form.objects_to_pull_from',
-                    'label_attr' => ['class' => ''],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.vtiger.form.objects_to_pull_from',
+                    'label_attr'  => ['class' => ''],
                     'empty_value' => false,
-                    'required' => false,
+                    'required'    => false,
                 ]
             );
         }
     }
-
 
     /**
      * @return array
@@ -297,7 +296,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     public function getFormSettings()
     {
         return [
-            'requires_callback' => false,
+            'requires_callback'      => false,
             'requires_authorization' => true,
         ];
     }
@@ -311,15 +310,15 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $fields = parent::getAvailableLeadFields();
+        $fields        = parent::getAvailableLeadFields();
         $companyFields = ['company'];
-        $integrations = array();
-        foreach($companyFields as $companyField){
-            if(isset($fields[$companyField])){
+        $integrations  = [];
+        foreach ($companyFields as $companyField) {
+            if (isset($fields[$companyField])) {
                 $integrations[$companyField] = ['label' => $fields[$companyField]['label']];
             }
         }
-       return $integrations;
-    }
 
+        return $integrations;
+    }
 }
