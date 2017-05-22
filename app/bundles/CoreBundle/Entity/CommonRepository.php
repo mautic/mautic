@@ -593,7 +593,7 @@ class CommonRepository extends EntityRepository
      *
      * @return string|null
      */
-    public function getValue(int $id, $column)
+    public function getValue($id, $column)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select($this->getTableAlias().'.'.$column)
