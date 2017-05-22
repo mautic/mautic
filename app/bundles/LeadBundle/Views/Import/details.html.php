@@ -123,6 +123,7 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
             </div>
             <!--/ asset detail collapseable toggler -->
 
+            <?php if ($item->getDateStarted()) : ?>
             <!-- some stats -->
             <div class="pa-md">
                 <div class="row">
@@ -173,6 +174,7 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                 </div>
             </div>
             <!--/ stats -->
+            <?php endif; ?>
         </div>
 
         <!-- start: tab-content -->
