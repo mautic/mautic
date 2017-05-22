@@ -11,15 +11,11 @@
 
 namespace Mautic\LeadBundle\Tests;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\LeadBundle\Model\ImportModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Helper\Progress;
 
-class ImportModelTest extends \PHPUnit_Framework_TestCase
+class ImportModelTest extends StandardImportTestHelper
 {
     public function testInitEventLog()
     {
@@ -28,7 +24,7 @@ class ImportModelTest extends \PHPUnit_Framework_TestCase
         $fileName = 'import.csv';
         $line     = 104;
         $model    = $this->initImportModel();
-        $entity   = new Import();
+        $entity   = $this->initImportEntity();
         $entity->setCreatedBy($userId)
             ->setCreatedByUser($userName)
             ->setOriginalFile($fileName);
@@ -42,29 +38,17 @@ class ImportModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['line' => $line, 'file' => $fileName], $log->getProperties());
     }
 
-    /**
-     * Initialize the ImportModel object.
-     *
-     * @return ImportModel
-     */
-    protected function initImportModel()
+    public function testProcess()
     {
-        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $model  = $this->initImportModel();
+        $entity = $this->initImportEntity();
+        $entity->start();
+        $model->process($entity, new Progress());
+        $entity->end();
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $notificationModel = $this->getMockBuilder(NotificationModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        return new ImportModel($pathsHelper, $leadModel, $notificationModel, $coreParametersHelper);
+        $this->assertEquals(100, $entity->getProgressPercentage());
+        $this->assertSame(4, $entity->getInsertedCount());
+        $this->assertSame(2, $entity->getIgnoredCount());
+        $this->assertSame(Import::IMPORTED, $entity->getStatus());
     }
 }

@@ -9,38 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Tests;
+namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
-class ImportTest extends \PHPUnit_Framework_TestCase
+class ImportTest extends StandardImportTestHelper
 {
-    protected static $csvPath;
-    protected static $initialList = [
-        ['email', 'firstname', 'lastname'],
-        ['john@doe.email', 'John', 'Doe'],
-        ['bad.@doe.email', 'Bad', 'Doe'],
-        ['donald@doe.email', 'Don', 'Doe'],
-        [''],
-        ['ella@doe.email', 'Ella', 'Doe'],
-    ];
-
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-
-        $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_test_');
-        $file    = fopen($tmpFile, 'w');
-
-        foreach (self::$initialList as $line) {
-            fputcsv($file, $line);
-        }
-
-        fclose($file);
-
-        self::$csvPath = $tmpFile;
-    }
-
     public function testSetPath()
     {
         $import = $this->initImportEntity();
@@ -231,23 +206,5 @@ class ImportTest extends \PHPUnit_Framework_TestCase
         $dateStarted = new \DateTime();
         $dateStarted->modify('-'.$runtime.' seconds');
         $import->setDateStarted($dateStarted);
-    }
-
-    protected function initImportEntity()
-    {
-        $entity = new Import();
-        $entity->setFilePath(self::$csvPath)
-            ->setLineCount(count(self::$initialList));
-
-        return $entity;
-    }
-
-    public static function tearDownAfterClass()
-    {
-        if (file_exists(self::$csvPath)) {
-            unlink(self::$csvPath);
-        }
-
-        parent::tearDownAfterClass();
     }
 }
