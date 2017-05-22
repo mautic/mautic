@@ -19,15 +19,19 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class ImportRepository extends CommonRepository
 {
     /**
-     * Count how many imports with the status is there
+     * Count how many imports with the status is there.
      *
-     * @param  float $ghostDelay when is the import ghost? In hours
-     * @param  int   $limit
+     * @param float $ghostDelay when is the import ghost? In hours
+     * @param int   $limit
      *
      * @return array
      */
-    public function getGhostImports(float $ghostDelay = 2, int $limit = null)
+    public function getGhostImports(float $ghostDelay = null, int $limit = null)
     {
+        if ($ghostDelay === null) {
+            $ghostDelay = 2;
+        }
+
         $q = $this->getQueryForStatuses([Import::IN_PROGRESS]);
         $q->select($this->getTableAlias())
             ->andWhere($q->expr()->lt($this->getTableAlias().'.dateModified', '(CURRENT_TIMESTAMP() - :delay)'))
@@ -42,10 +46,10 @@ class ImportRepository extends CommonRepository
     }
 
     /**
-     * Count how many imports with the status is there
+     * Count how many imports with the status is there.
      *
-     * @param  array $statuses
-     * @param  int   $limit
+     * @param array $statuses
+     * @param int   $limit
      *
      * @return array
      */
@@ -65,9 +69,9 @@ class ImportRepository extends CommonRepository
     }
 
     /**
-     * Count how many imports with the status is there
+     * Count how many imports with the status is there.
      *
-     * @param  array $statuses
+     * @param array $statuses
      *
      * @return int
      */
