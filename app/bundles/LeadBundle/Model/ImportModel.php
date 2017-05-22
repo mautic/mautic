@@ -53,6 +53,11 @@ class ImportModel extends FormModel
     protected $config;
 
     /**
+     * @var LeadEventLogRepository
+     */
+    protected $leadEventLogRepo;
+
+    /**
      * ImportModel constructor.
      *
      * @param PathsHelper          $pathsHelper
@@ -70,6 +75,7 @@ class ImportModel extends FormModel
         $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->config            = $config;
+        $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
     }
 
     /**
@@ -222,9 +228,8 @@ class ImportModel extends FormModel
      */
     public function process(Import $import, Progress $progress)
     {
-        $leadEventLogRepo = $this->leadModel->getEventLogRepository();
-        $config           = $import->getParserConfig();
-        $file             = new \SplFileObject($import->getFilePath());
+        $config = $import->getParserConfig();
+        $file   = new \SplFileObject($import->getFilePath());
         if ($file !== false) {
             $lineNumber = $progress->getDone();
 
@@ -262,7 +267,8 @@ class ImportModel extends FormModel
 
                         if ($diffCount < 0) {
                             $import->increaseIgnoredCount();
-                            $msg = $this->translator->trans('mautic.lead.import.error.header_mismatch');
+                            $errorMessage = $this->translator->trans('mautic.lead.import.error.header_mismatch');
+                            $this->logImportRowError($eventLog, $errorMessage);
 
                             continue;
                         }
@@ -308,13 +314,8 @@ class ImportModel extends FormModel
                 }
 
                 if ($errorMessage) {
-                    // Inform Import entity about the failed row
                     $import->increaseIgnoredCount();
-
-                    // Save log about errored line
-                    $eventLog->addProperty('error', $errorMessage)
-                        ->setAction('failed');
-                    $leadEventLogRepo->saveEntity($eventLog);
+                    $this->logImportRowError($eventLog, $errorMessage);
                 }
 
                 // Save Import entity once per batch so the user could see the progress
@@ -339,6 +340,20 @@ class ImportModel extends FormModel
 
         // Close the file
         $file = null;
+    }
+
+    /**
+     * Save log about errored line.
+     *
+     * @param LeadEventLog $eventLog
+     * @param string       $errorMessage
+     */
+    public function logImportRowError(LeadEventLog $eventLog, $errorMessage)
+    {
+        $eventLog->addProperty('error', $errorMessage)
+            ->setAction('failed');
+
+        $this->leadEventLogRepo->saveEntity($eventLog);
     }
 
     /**
