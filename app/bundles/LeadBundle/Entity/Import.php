@@ -712,7 +712,7 @@ class Import extends FormEntity
             return round($processedRows / $runtime, 2);
         }
 
-        return 0;
+        return $processedRows;
     }
 
     /**

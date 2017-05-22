@@ -208,6 +208,18 @@ class ImportTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1.5, $import->getSpeed());
     }
 
+    public function testGetSpeedWhenRunTimeIsUnderOneSecond()
+    {
+        $import = $this->initImportEntity()->start();
+
+        $this->assertSame(0, $import->getSpeed());
+
+        $import->setInsertedCount(3);
+        $import->end(false);
+
+        $this->assertSame(3, $import->getSpeed());
+    }
+
     /**
      * Fake the start date to the past to emulate that the import runs for a while.
      *
