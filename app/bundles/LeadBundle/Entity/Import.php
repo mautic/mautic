@@ -335,7 +335,8 @@ class Import extends FormEntity
     public function setFilePath($path)
     {
         $fileName = basename($path);
-        $dir      = rtrim($path, '/'.$fileName);
+        $dir      = substr($path, 0, (-1 * (strlen($fileName) + 1)));
+
         $this->setDir($dir);
         $this->setFile($fileName);
 
