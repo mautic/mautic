@@ -10,23 +10,15 @@ class ListModelFunctionalTest extends MauticWebTestCase
     public function testSegmentCountIsCorrect()
     {
         $repo            = $this->em->getRepository(LeadList::class);
-        $leadListRef     = $this->fixtures->getReference('lead-list');
         $segmentTest1Ref = $this->fixtures->getReference('segment-test-1');
         $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
         $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
 
         $segmentContacts = $repo->getLeadsByList([
-            $leadListRef->getId(),
             $segmentTest1Ref->getId(),
             $segmentTest2Ref->getId(),
             $segmentTest3Ref->getId(),
         ], ['countOnly' => true]);
-
-        $this->assertEquals(
-            8,
-            $segmentContacts[$leadListRef->getId()]['count'],
-            'There should be 8 contacts in the lead-list segment.'
-        );
 
         $this->assertEquals(
             1,
