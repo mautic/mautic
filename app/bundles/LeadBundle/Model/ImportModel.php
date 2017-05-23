@@ -168,42 +168,49 @@ class ImportModel extends FormModel
     }
 
     /**
-     * Import next pre-saved import.
+     * Start import. This is meant for the CLI command since it will import
+     * the whole file at once.
      *
-     * @return bool|null
+     * @param Import   $import
+     * @param Progress $progress
+     *
+     * @return bool
      */
-    public function processNext(Progress $progress)
+    public function startImport(Import $import, Progress $progress)
     {
         $this->setGhostImportsAsFailed();
 
-        $import = $this->getImportToProcess();
-
         if (!$import) {
-            return;
+            return false;
         }
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
 
-            return $import;
+            return false;
         }
 
         if (!$this->checkParallelImportLimit($import)) {
             $this->saveEntity($import);
 
-            return $import;
+            return false;
         }
 
         $progress->setTotal($import->getLineCount());
         $progress->setDone($import->getProcessedRows());
 
         $import->start();
+
+        // Save the start changes so the user could see it
         $this->saveEntity($import);
 
         $this->process($import, $progress);
 
         $import->end();
+
+        // Save the end changes so the user could see it
         $this->saveEntity($import);
+
         $this->notificationModel->addNotification(
             $this->translator->trans(
                 'mautic.lead.import.result.info',
@@ -217,7 +224,7 @@ class ImportModel extends FormModel
             $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
         );
 
-        return $import;
+        return true;
     }
 
     /**

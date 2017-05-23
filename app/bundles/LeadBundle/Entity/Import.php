@@ -236,15 +236,20 @@ class Import extends FormEntity
 
     /**
      * Checks if the import has everything needed to proceed.
-     * If not, it will change its state to FAILED.
      *
      * @return bool
      */
     public function canProceed()
     {
+        if (!in_array($this->getStatus(), [self::QUEUED, self::DELAYED])) {
+            $this->setStatusInfo('Import could not be triggered since it is not queued nor delayed');
+
+            return false;
+        }
+
         if (file_exists($this->getFilePath()) === false || is_readable($this->getFilePath()) === false) {
             $this->setStatus(self::FAILED);
-            $this->setStatusInfo($this->getFilePath().' not found');
+            $this->setStatusInfo($this->getFile().' not found');
 
             return false;
         }

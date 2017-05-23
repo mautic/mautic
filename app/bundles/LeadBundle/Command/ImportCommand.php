@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Command;
 use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -28,6 +29,7 @@ class ImportCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:import')
             ->setDescription('Imports data to Mautic')
+            ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
             ->setHelp(
                 <<<'EOT'
 The <info>%command.name%</info> command starts to import CSV files when some are created.
@@ -51,24 +53,27 @@ EOT
         $model = $this->getContainer()->get('mautic.lead.model.import');
 
         $progress = new Progress($output);
-        $import   = $model->processNext($progress);
+        $id       = (int) $input->getOption('id');
 
-        // No import waiting in the queue
-        if ($import === null) {
-            return 0;
+        if ($id) {
+            $import = $model->getEntity($id);
+
+            // This specific import was not found
+            if (!$import) {
+                $output->writeln('<error>'.$translator->trans('mautic.core.error.notfound', [], 'flashes').'</error>');
+
+                return 1;
+            }
+        } else {
+            $import = $model->getImportToProcess();
+
+            // No import waiting in the queue. Finish silently.
+            if ($import === null) {
+                return 0;
+            }
         }
 
-        // Import failed
-        if ($import->getStatus() === $import::FAILED) {
-            $output->writeln('<error>'.$translator->trans(
-                'mautic.lead.import.failed',
-                [
-                    '%reason%' => $import->getStatusInfo(),
-                ]
-            ).'</error>');
-
-            return 1;
-        }
+        $success = $model->startImport($import, $progress);
 
         // Import was delayed
         if ($import->getStatus() === $import::DELAYED) {
@@ -78,6 +83,18 @@ EOT
                     '%reason%' => $import->getStatusInfo(),
                 ]
             ).'</info>');
+        }
+
+        // Import failed
+        if (!$success) {
+            $output->writeln('<error>'.$translator->trans(
+                'mautic.lead.import.failed',
+                [
+                    '%reason%' => $import->getStatusInfo(),
+                ]
+            ).'</error>');
+
+            return 1;
         }
 
         // Success
