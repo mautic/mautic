@@ -182,9 +182,11 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $config['object'] = $object;
                 $aFields          = $this->getAvailableLeadFields($config);
                 $mappedData       = [];
-
+                if (isset($aFields['company'])) {
+                    $aFields = $aFields['company'];
+                }
                 foreach (array_keys($fields) as $k) {
-                    $mappedData[] = $aFields['company'][$k]['dv'];
+                    $mappedData[] = $aFields[$k]['dv'];
                 }
 
                 $fields = implode(',', $mappedData);
@@ -248,7 +250,10 @@ class ZohoIntegration extends CrmAbstractIntegration
         $config        = $this->mergeConfigToFeatureSettings();
         $aFields       = $this->getAvailableLeadFields($config);
         $matchedFields = [];
-        foreach ($aFields['Leads'] as $k => $v) {
+        if (isset($aFields['Leads'])) {
+            $aFields = $aFields['Leads'];
+        }
+        foreach ($aFields as $k => $v) {
             foreach ($data as $dk => $dv) {
                 if ($dk === $v['dv']) {
                     $matchedFields[$config['leadFields'][$k]] = $dv;
@@ -394,7 +399,11 @@ class ZohoIntegration extends CrmAbstractIntegration
         $fieldsValues = [];
         foreach ($data as $row) {
             if (isset($row['FL'])) {
-                foreach ($row['FL'] as $field) {
+                $fl = $row['FL'];
+                if (isset($fl['val'])) {
+                    $fl = [$fl];
+                }
+                foreach ($fl as $field) {
                     $fieldsValues[$row['no'] - 1][$field['val']] = $field['content'];
                 }
             }
