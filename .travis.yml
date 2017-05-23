@@ -1,5 +1,18 @@
 language: php
 
+services:
+  - mysql
+
+before_install:
+  - mysql -e 'CREATE DATABASE mautictest;'
+
+env:
+  DB_HOST: 127.0.0.1
+  DB_PORT: 3306
+  DB_USER: travis
+  DB_PASSWD: ''
+  DB_NAME: mautictest
+
 php:
   # At the moment Composer can't resolve dependencies for these PHP versions.
   #- 5.3

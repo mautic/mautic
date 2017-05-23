@@ -297,8 +297,6 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
-
-                <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -338,7 +336,6 @@ $view['slots']->set(
                 </div>
             <?php endif; ?>
             <!--/ #social-container -->
-          <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
 
             <!-- #place-container -->
             <?php if ($places): ?>

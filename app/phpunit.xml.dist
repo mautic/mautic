@@ -19,9 +19,13 @@
         </testsuite>
     </testsuites>
 
-    <!--
+    <!-- Set these in your phpunit.xml to your local test db
     <php>
-        <server name="KERNEL_DIR" value="/path/to/your/app/" />
+        <env name="DB_HOST" value="127.0.0.1" />
+        <env name="DB_PORT" value="3306" />
+        <env name="DB_USER" value="" />
+        <env name="DB_PASSWD" value="" />
+        <env name="DB_NAME" value="mautictest" />
     </php>
     -->
 

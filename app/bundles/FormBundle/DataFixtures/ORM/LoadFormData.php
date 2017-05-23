@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -44,7 +45,8 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $factory      = $this->container->get('mautic.factory');
+        $factory = $this->container->get('mautic.factory');
+        /** @var FormModel $model */
         $model        = $factory->getModel('form.form');
         $repo         = $model->getRepository();
         $forms        = CsvHelper::csv_to_array(__DIR__.'/fakeformdata.csv');
