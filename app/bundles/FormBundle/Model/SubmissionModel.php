@@ -238,7 +238,7 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            if (in_array($type, $components['viewOnlyFields'])) {
+            if (isset($components['viewOnlyFields']) && in_array($type, $components['viewOnlyFields'])) {
                 //don't save items that don't have a value associated with it
                 continue;
             }
