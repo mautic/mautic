@@ -639,35 +639,39 @@ class CampaignModel extends CommonFormModel
     /**
      * Get a list of source choices.
      *
-     * @param $sourceType
+     * @param string $sourceType
+     * @param bool   $globalOnly
      *
      * @return array
      */
-    public function getSourceLists($sourceType = null)
+    public function getSourceLists($sourceType = null, $globalOnly = false)
     {
         $choices = [];
         switch ($sourceType) {
             case 'lists':
             case null:
                 $choices['lists'] = [];
+                $lists            = $globalOnly ? $this->leadListModel->getGlobalLists() : $this->leadListModel->getUserLists();
 
-                $lists = (empty($options['global_only'])) ? $this->leadListModel->getUserLists() : $this->leadListModel->getGlobalLists();
-
-                foreach ($lists as $list) {
-                    $choices['lists'][$list['id']] = $list['name'];
+                if ($lists) {
+                    foreach ($lists as $list) {
+                        $choices['lists'][$list['id']] = $list['name'];
+                    }
                 }
 
             case 'forms':
             case null:
                 $choices['forms'] = [];
-
-                $viewOther = $this->security->isGranted('form:forms:viewother');
-                $repo      = $this->formModel->getRepository();
+                $viewOther        = $this->security->isGranted('form:forms:viewother');
+                $repo             = $this->formModel->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
-                foreach ($forms as $form) {
-                    $choices['forms'][$form['id']] = $form['name'];
+
+                if ($forms) {
+                    foreach ($forms as $form) {
+                        $choices['forms'][$form['id']] = $form['name'];
+                    }
                 }
         }
 
@@ -1285,11 +1289,11 @@ class CampaignModel extends CommonFormModel
                             $failedSq->expr()->eq('fe.log_id', 't.id')
                         );
                     $filter['failed_events'] = [
-                        'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
+                        'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL()),
                     ];
 
-                    $q                  = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
-                    $rawData            = $q->execute()->fetchAll();
+                    $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                    $rawData = $q->execute()->fetchAll();
 
                     if (!empty($rawData)) {
                         $triggers = $query->completeTimeData($rawData);
