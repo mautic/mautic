@@ -146,7 +146,7 @@ class ImportTest extends StandardImportTestHelper
     {
         $import = $this->initImportEntity()->start();
 
-        $this->assertTrue($import->getRunTime() instanceof \DateInterval);
+        $this->assertNull($import->getRunTime());
 
         $this->fakeImportStartDate($import, (10 * 60));
 

@@ -673,18 +673,22 @@ class Import extends FormEntity
     /**
      * Counts how log the import run so far.
      *
-     * @return DateInterval
+     * @return DateInterval|null
      */
     public function getRunTime()
     {
-        $startTime = $this->getDateStarted() ? $this->getDateStarted() : $this->getDateAdded();
-        $endTime   = $this->getDateEnded() ? $this->getDateEnded() : $this->getDateModified();
+        $startTime = $this->getDateStarted();
+        $endTime   = $this->getDateEnded();
+
+        if (!$endTime && $this->getStatus() === self::IN_PROGRESS) {
+            $endTime = $this->getDateModified();
+        }
 
         if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
             return $endTime->diff($startTime);
         }
 
-        return new \DateInterval('PT0S');
+        return null;
     }
 
     /**
@@ -694,8 +698,12 @@ class Import extends FormEntity
      */
     public function getRunTimeSeconds()
     {
-        $startTime = $this->getDateStarted() ? $this->getDateStarted() : $this->getDateAdded();
-        $endTime   = $this->getDateEnded() ? $this->getDateEnded() : $this->getDateModified();
+        $startTime = $this->getDateStarted();
+        $endTime   = $this->getDateEnded();
+
+        if (!$endTime && $this->getStatus() === self::IN_PROGRESS) {
+            $endTime = $this->getDateModified();
+        }
 
         if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
             return $endTime->format('U') - $startTime->format('U');

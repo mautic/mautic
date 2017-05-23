@@ -77,7 +77,7 @@ $detailRowTmpl = 'MauticCoreBundle:Helper:detail_row.html.php';
                                 ]); ?>
                                 <?php echo $view->render($detailRowTmpl, [
                                     'label' => 'mautic.lead.import.runtime',
-                                    'value' => $view['date']->formatRange($item->getRunTime()),
+                                    'value' => $item->getRunTime() ? $view['date']->formatRange($item->getRunTime()) : '',
                                 ]); ?>
                                 <?php echo $view->render($detailRowTmpl, [
                                     'label' => 'mautic.lead.import.speed',

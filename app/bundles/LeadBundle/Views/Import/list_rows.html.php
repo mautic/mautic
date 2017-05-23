@@ -36,7 +36,7 @@
                 <?php endif; ?>
             </div>
         </td>
-        <td class="visible-md visible-lg"><?php echo $view['date']->formatRange($item->getRunTime()); ?></td>
+        <td class="visible-md visible-lg"><?php echo $item->getRunTime() ? $view['date']->formatRange($item->getRunTime()) : ''; ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getProgressPercentage(); ?>%</td>
         <td class="visible-md visible-lg"><?php echo $item->getLineCount(); ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getInsertedCount(); ?></td>
