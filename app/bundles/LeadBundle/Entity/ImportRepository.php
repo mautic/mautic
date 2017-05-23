@@ -30,8 +30,8 @@ class ImportRepository extends CommonRepository
     {
         $q = $this->getQueryForStatuses([Import::IN_PROGRESS]);
         $q->select($this->getTableAlias())
-            ->andWhere($q->expr()->lt($this->getTableAlias().'.dateModified', '(CURRENT_TIMESTAMP() - :delay)'))
-            ->setParameter('delay', (3600 * $ghostDelay));
+            ->andWhere($q->expr()->lt($this->getTableAlias().'.dateModified', ':delay'))
+            ->setParameter('delay', (new \DateTime())->modify('-'.$ghostDelay.' hours'));
 
         if ($limit !== null) {
             $q->setFirstResult(0)
