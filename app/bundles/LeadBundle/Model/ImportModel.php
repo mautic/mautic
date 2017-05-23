@@ -274,7 +274,7 @@ class ImportModel extends FormModel
 
                         if ($diffCount < 0) {
                             $import->increaseIgnoredCount();
-                            $errorMessage = $this->translator->trans('mautic.lead.import.error.header_mismatch');
+                            $errorMessage = 'mautic.lead.import.error.header_mismatch';
                             $this->logImportRowError($eventLog, $errorMessage);
 
                             continue;
@@ -310,14 +310,14 @@ class ImportModel extends FormModel
                                 $import->increaseInsertedCount();
                             }
                         } else {
-                            $errorMessage = $this->translator->trans('mautic.lead.import.error.line_empty');
+                            $errorMessage = 'mautic.lead.import.error.line_empty';
                         }
                     } catch (\Exception $e) {
                         // Email validation likely failed
                         $errorMessage = $e->getMessage();
                     }
                 } else {
-                    $errorMessage = $this->translator->trans('mautic.lead.import.error.line_empty');
+                    $errorMessage = 'mautic.lead.import.error.line_empty';
                 }
 
                 if ($errorMessage) {
@@ -357,7 +357,7 @@ class ImportModel extends FormModel
      */
     public function logImportRowError(LeadEventLog $eventLog, $errorMessage)
     {
-        $eventLog->addProperty('error', $errorMessage)
+        $eventLog->addProperty('error', $this->translator->trans($errorMessage))
             ->setAction('failed');
 
         $this->leadEventLogRepo->saveEntity($eventLog);

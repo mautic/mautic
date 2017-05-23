@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Tests;
 
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -87,12 +86,6 @@ abstract class StandardImportTestHelper extends CommonMocks
         $pathsHelper          = $this->getPathsHelperMock();
         $entityManager        = $this->getEntityManagerMock();
         $coreParametersHelper = $this->getCoreParametersHelperMock();
-
-        $translator->expects($this->any())
-            ->method('trans')
-            ->will(
-                $this->returnValue('a.mock.of.translator.string')
-            );
 
         $logRepository = $this->getMockBuilder(LeadEventLogRepository::class)
             ->disableOriginalConstructor()
