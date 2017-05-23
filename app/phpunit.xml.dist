@@ -19,11 +19,9 @@
         </testsuite>
     </testsuites>
 
-    <!--
-    <php>
-        <server name="KERNEL_DIR" value="/path/to/your/app/" />
-    </php>
-    -->
+    <!--php>
+        <server name="KERNEL_DIR" value="Applications/MAMP/htdocs/mautic/app" />
+    </php-->
 
     <filter>
         <whitelist>

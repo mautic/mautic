@@ -76,14 +76,17 @@ class FormAbstractTest extends WebTestCase
             ->getMockBuilder(SchemaHelperFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
+
         $formActionModel = $this
             ->getMockBuilder(ActionModel::class)
             ->disableOriginalConstructor()
             ->getMock();
+
         $formFieldModel = $this
             ->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
             ->getMock();
+
         $leadModel = $this
             ->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
@@ -98,7 +101,8 @@ class FormAbstractTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)
+        $dispatcher = $this
+            ->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -107,20 +111,29 @@ class FormAbstractTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $leadModel->expects($this->any())->method('getCurrentLead')
-            ->willReturn($this->returnValue(['id' => self::$mockId, 'name' => self::$mockName]));
+        $leadModel->expects($this
+            ->any())
+            ->method('getCurrentLead')
+            ->willReturn($this
+                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName]));
 
-        $templatingHelperMock->expects($this->any())->method('getTemplating')
+        $templatingHelperMock->expects($this
+            ->any())
+            ->method('getTemplating')
             ->willReturn($this->container->get('templating'));
 
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $formRepository = $this->getMockBuilder(FormRepository::class)
+
+        $formRepository = $this
+            ->getMockBuilder(FormRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $entityManager->expects($this->any())
+
+        $entityManager->expects($this
+            ->any())
             ->method('getRepository')
             ->will(
                 $this->returnValueMap(
@@ -154,35 +167,82 @@ class FormAbstractTest extends WebTestCase
      */
     protected function getSubmissionModel()
     {
-        $ipLookupHelper       = $this->getMockBuilder(IpLookupHelper::class)->disableOriginalConstructor()->getMock();
-        $templatingHelperMock = $this->getMockBuilder(TemplatingHelper::class)->disableOriginalConstructor()->getMock();
-        $formModel            = $this->getMockBuilder(FormModel::class)->disableOriginalConstructor()->getMock();
-        $pageModel            = $this->getMockBuilder(PageModel::class)->disableOriginalConstructor()->getMock();
-        $leadModel            = $this->getMockBuilder(LeadModel::class)->disableOriginalConstructor()->getMock();
-        $campaignModel        = $this->getMockBuilder(CampaignModel::class)->disableOriginalConstructor()->getMock();
-        $leadFieldModel       = $this->getMockBuilder(LeadFieldModel::class)->disableOriginalConstructor()->getMock();
-        $companyModel         = $this->getMockBuilder(CompanyModel::class)->disableOriginalConstructor()->getMock();
-        $fieldHelper          = $this->getMockBuilder(FormFieldHelper::class)->disableOriginalConstructor()->getMock();
+        $ipLookupHelper = $this
+            ->getMockBuilder(IpLookupHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $templatingHelperMock = $this
+            ->getMockBuilder(TemplatingHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $formModel = $this
+            ->getMockBuilder(FormModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $pageModel = $this
+            ->getMockBuilder(PageModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $leadModel = $this
+            ->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $campaignModel = $this
+            ->getMockBuilder(CampaignModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $leadFieldModel = $this
+            ->getMockBuilder(LeadFieldModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $companyModel = $this
+            ->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $fieldHelper = $this
+            ->getMockBuilder(FormFieldHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $dispatcher = $this->getMockBuilder(EventDispatcher::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()
+        $translator = $this
+            ->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
             ->getMock();
-        $leadModel->expects($this->any())->method('getTrackingCookie')
+
+        $leadModel->expects($this
+            ->any())->method('getTrackingCookie')
             ->willReturn([$this->mockTrackingId, true]);
 
-        $leadModel->expects($this->any())->method('getCurrentLead')
+        $leadModel->expects($this
+            ->any())
+            ->method('getCurrentLead')
             ->with($this->logicalOr(
                 false,
                 true
             ))
             ->will($this->returnCallback([$this, 'getCurrentLead']));
 
-        $userHelper = $this->getMockBuilder(UserHelper::class)->disableOriginalConstructor()->getMock();
+        $userHelper = $this
+            ->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $userHelper->expects($this->any())->method('getUser')->willReturn(new User());
+        $userHelper->expects($this
+            ->any())
+            ->method('getUser')
+            ->willReturn(new User());
 
         $mockLeadField['email'] = [
                 'label'        => 'Email',
@@ -194,13 +254,20 @@ class FormAbstractTest extends WebTestCase
                 'properties'   => [],
             ];
 
-        $leadFieldModel->expects($this->any())->method('getFieldListWithProperties')->willReturn($mockLeadField);
-        $leadFieldModel->expects($this->any())->method('getUniqueIdentiferFields')->willReturn($mockLeadField);
+        $leadFieldModel->expects($this
+            ->any())
+            ->method('getFieldListWithProperties')
+            ->willReturn($mockLeadField);
+
+        $leadFieldModel->expects($this
+            ->any())->method('getUniqueIdentiferFields')
+            ->willReturn($mockLeadField);
 
         $entityManager = $this
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
+
         $formRepository = $this->getMockBuilder(FormRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -224,9 +291,14 @@ class FormAbstractTest extends WebTestCase
             ->method('getLeadsByUniqueFields')
             ->willReturn(null);
         $ipAddress = new IpAddress();
-        $ipLookupHelper->expects($this->any())->method('getIpAddress')->willReturn($ipAddress);
+        $ipLookupHelper
+            ->expects($this
+                ->any())
+            ->method('getIpAddress')
+            ->willReturn($ipAddress);
 
-        $mockLogger = $this->getMockBuilder(Logger::class)
+        $mockLogger = $this
+            ->getMockBuilder(Logger::class)
             ->disableOriginalConstructor()
             ->getMock();
 
