@@ -46,11 +46,6 @@ class MauticWebTestCase extends WebTestCase
     protected $container;
 
     /**
-     * @var bool
-     */
-    protected static $dbBooted;
-
-    /**
      * @var ReferenceRepository
      */
     public $fixtures;
