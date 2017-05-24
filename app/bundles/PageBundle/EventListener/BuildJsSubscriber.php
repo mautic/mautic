@@ -420,7 +420,7 @@ MauticJS.processGatedVideos = function (videoElements) {
                     
                     MauticJS.addVideoView(i, currentTime);
 
-                    if (document.cookie.indexOf(cookieName) == -1 && currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false && node.dataset.formId) {
+                    if (node.dataset.formId && document.cookie.indexOf(cookieName) == -1 && currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
                         if (document.activeElement.tagName == 'IFRAME') {
                             window.mejs.previousActiveElement = document.activeElement;
                             document.activeElement.blur();
