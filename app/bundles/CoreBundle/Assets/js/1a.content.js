@@ -110,6 +110,9 @@ Mautic.generatePageTitle = function(route){
             currentModuleItem = mQuery('.page-header h3').text();
         }
 
+        // Encoded entites are decoded by this process and can cause a XSS
+        currentModuleItem = mQuery('<div>'+currentModuleItem+'</div>').text();
+
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
         //loading basic title

@@ -259,8 +259,14 @@ class PluginController extends FormController
 
                     if ($valid || $authorize) {
                         $dispatcher = $this->get('event_dispatcher');
+                        $this->get('logger')->info('Dispatching integration config save event.');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, new PluginIntegrationEvent($integrationObject));
+                            $this->get('logger')->info('Event dispatcher has integration config save listeners.');
+                            $event = new PluginIntegrationEvent($integrationObject);
+
+                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
+
+                            $entity = $event->getEntity();
                         }
 
                         $em->persist($entity);
@@ -319,14 +325,19 @@ class PluginController extends FormController
         $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
 
         $formNotes    = [];
-        $noteSections = ['authorization', 'features', 'feature_settings'];
+        $noteSections = ['authorization', 'features', 'feature_settings', 'custom'];
         foreach ($noteSections as $section) {
-            list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
-            if (!empty($specialInstructions)) {
-                $formNotes[$section] = [
-                    'note' => $specialInstructions,
-                    'type' => $alertType,
-                ];
+            if ('custom' === $section) {
+                $formNotes[$section] = $integrationObject->getFormNotes($section);
+            } else {
+                list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+
+                if (!empty($specialInstructions)) {
+                    $formNotes[$section] = [
+                        'note' => $specialInstructions,
+                        'type' => $alertType,
+                    ];
+                }
             }
         }
 

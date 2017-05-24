@@ -237,7 +237,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $xmlData = '<Leads>';
         $xmlData .= '<row no="1">';
         foreach ($mappedData as $name => $value) {
-            $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $value);
+            $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $this->cleanPushData($value));
         }
         $xmlData .= '</row>';
         $xmlData .= '</Leads>';

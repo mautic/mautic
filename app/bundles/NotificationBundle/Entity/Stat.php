@@ -142,6 +142,7 @@ class Stat
 
         $builder->createField('dateRead', 'datetime')
             ->columnName('date_read')
+            ->nullable()
             ->build();
 
         $builder->createField('isClicked', 'boolean')

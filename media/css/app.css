@@ -519,7 +519,7 @@ solid #123456}.campaign-event-buttons{position:absolute;top:-10px;right:-10px}.c
 #CampaignEventSelector_chosen .list-campaign-decision,
 #CampaignEventSelector_chosen .list-campaign-leadsource{border-left:none;border-right:none;border-top:none;padding:10px
 5px}#CampaignEventSelector_chosen .disabled-result{display:none}.campaign-builder .list-group-item.ui-draggable-dragging{width:206px;padding:10px
-15px;border-radius:6px}.campaign-builder .builder-active{height:10000px !important}.campaign-builder .builder-content{height:auto;width:auto;bottom:0;overflow:auto}#CampaignCanvas{height:10000px;width:10000px;position:relative}.campaign-event-list .progress-bar{position:absolute;top:0;left:0;height:3px}.campaign-event-buttons .btn-edit{background:#337ab7}.stat-boxes .pie-legend
+15px;border-radius:6px}.campaign-builder .builder-active{height:10000px !important}.campaign-builder .builder-content{height:auto;width:auto;bottom:0;overflow:auto}#CampaignCanvas{height:10000px;width:10000px;position:relative}.campaign-event-list .progress-bar{position:absolute;top:0;height:3px}.campaign-event-buttons .btn-edit{background:#337ab7}.stat-boxes .pie-legend
 li{display:inline}.col-category-color{width:50px}.input-group-addon
 label{margin-bottom:0px}.vector-map{height:350px;color:transparent}.jvectormap-container{height:100%;width:100%}.dashboard-widgets .sortable-placeholder{background-color:#fff;border:1px
 dashed #4e5d9d;flex-grow:0}.dashboard-widgets.cards{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-wrap:wrap;-ms-flex-wrap:wrap;flex-wrap:wrap;padding:10px}.dashboard-widgets

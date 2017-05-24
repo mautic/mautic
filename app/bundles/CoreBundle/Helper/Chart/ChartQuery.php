@@ -103,6 +103,8 @@ class ChartQuery extends AbstractChart
                     if (isset($value['value'])) {
                         $query->setParameter($valId, $value['value']);
                     }
+                } elseif (isset($value['subquery'])) {
+                    $query->andWhere($value['subquery']);
                 } else {
                     if (is_array($value)) {
                         $query->andWhere($query->expr()->in('t.'.$column, $value));

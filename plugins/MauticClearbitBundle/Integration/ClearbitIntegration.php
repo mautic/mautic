@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticClearbitBundle\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ClearbitIntegration extends AbstractIntegration
 {
@@ -68,20 +69,33 @@ class ClearbitIntegration extends AbstractIntegration
         }
     }
 
-    /**
-     * Allows integration to set a custom form template.
-     *
-     * @return string
-     */
-    public function getFormTemplate()
-    {
-        return 'MauticClearbitBundle:Integration:form.html.php';
-    }
-
     public function shouldAutoUpdate()
     {
         $featureSettings = $this->getKeys();
 
         return (isset($featureSettings['auto_update'])) ? (bool) $featureSettings['auto_update'] : false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $section
+     *
+     * @return string
+     */
+    public function getFormNotes($section)
+    {
+        if ('custom' === $section) {
+            return [
+                'template'   => 'MauticClearbitBundle:Integration:form.html.php',
+                'parameters' => [
+                    'mauticUrl' => $this->factory->get('router')->generate(
+                        'mautic_plugin_clearbit_index', [], UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                ],
+            ];
+        }
+
+        return parent::getFormNotes($section);
     }
 }
