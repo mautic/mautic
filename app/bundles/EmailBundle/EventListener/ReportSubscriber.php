@@ -82,7 +82,7 @@ class ReportSubscriber extends CommonSubscriber
                     'alias'   => 'read_ratio',
                     'label'   => 'mautic.email.report.read_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100, 1),\'%\')',
                 ],
                 $prefix.'sent_count' => [
                     'label' => 'mautic.email.report.sent_count',
