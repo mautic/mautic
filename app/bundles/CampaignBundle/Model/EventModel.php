@@ -458,7 +458,7 @@ class EventModel extends CommonFormModel
      * @return int
      */
     public function triggerStartingEvents(
-        $campaign,
+        Campaign $campaign,
         &$totalEventCount,
         $limit = 100,
         $max = false,
@@ -633,60 +633,62 @@ class EventModel extends CommonFormModel
                             'createdBy' => $campaign->getCreatedBy(),
                         ];
 
-                        $decisionEvent = [
-                            $campaignId => [
-                                array_merge(
-                                    $event,
-                                    ['children' => $decisionChildren[$event['id']]]
-                                ),
-                            ],
-                        ];
-                        $decisionTriggerEvent = new CampaignDecisionEvent($lead, $event['type'], null, $decisionEvent, $eventSettings, true);
-                        $this->dispatcher->dispatch(
-                            CampaignEvents::ON_EVENT_DECISION_TRIGGER,
-                            $decisionTriggerEvent
-                        );
-                        if ($decisionTriggerEvent->wasDecisionTriggered()) {
-                            ++$executedEventCount;
-                            ++$rootExecutedCount;
-
-                            $this->logger->debug(
-                                'CAMPAIGN: Decision ID# '.$event['id'].' for contact ID# '.$lead->getId()
-                                .' noted as completed by event listener thus executing children.'
+                        if (isset($decisionChildren[$event['id']])) {
+                            $decisionEvent = [
+                                $campaignId => [
+                                    array_merge(
+                                        $event,
+                                        ['children' => $decisionChildren[$event['id']]]
+                                    ),
+                                ],
+                            ];
+                            $decisionTriggerEvent = new CampaignDecisionEvent($lead, $event['type'], null, $decisionEvent, $eventSettings, true);
+                            $this->dispatcher->dispatch(
+                                CampaignEvents::ON_EVENT_DECISION_TRIGGER,
+                                $decisionTriggerEvent
                             );
+                            if ($decisionTriggerEvent->wasDecisionTriggered()) {
+                                ++$executedEventCount;
+                                ++$rootExecutedCount;
 
-                            // Decision has already been triggered by the lead so process the associated events
-                            $decisionLogged = false;
-                            foreach ($decisionEvent['children'] as $childEvent) {
-                                if ($this->executeEvent(
-                                        $childEvent,
-                                        $campaign,
-                                        $lead,
-                                        $eventSettings,
-                                        false,
-                                        null,
-                                        null,
-                                        false,
-                                        $evaluatedEventCount,
-                                        $executedEventCount,
-                                        $totalEventCount
-                                    )
-                                    && !$decisionLogged
-                                ) {
-                                    // Log the decision
-                                    $log = $this->getLogEntity($decisionEvent['id'], $campaign, $lead, null, true);
-                                    $log->setDateTriggered(new \DateTime());
-                                    $log->setNonActionPathTaken(true);
-                                    $logRepo->saveEntity($log);
-                                    $this->em->detach($log);
-                                    unset($log);
+                                $this->logger->debug(
+                                    'CAMPAIGN: Decision ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                                    .' noted as completed by event listener thus executing children.'
+                                );
 
-                                    $decisionLogged = true;
+                                // Decision has already been triggered by the lead so process the associated events
+                                $decisionLogged = false;
+                                foreach ($decisionEvent['children'] as $childEvent) {
+                                    if ($this->executeEvent(
+                                            $childEvent,
+                                            $campaign,
+                                            $lead,
+                                            $eventSettings,
+                                            false,
+                                            null,
+                                            null,
+                                            false,
+                                            $evaluatedEventCount,
+                                            $executedEventCount,
+                                            $totalEventCount
+                                        )
+                                        && !$decisionLogged
+                                    ) {
+                                        // Log the decision
+                                        $log = $this->getLogEntity($decisionEvent['id'], $campaign, $lead, null, true);
+                                        $log->setDateTriggered(new \DateTime());
+                                        $log->setNonActionPathTaken(true);
+                                        $logRepo->saveEntity($log);
+                                        $this->em->detach($log);
+                                        unset($log);
+
+                                        $decisionLogged = true;
+                                    }
                                 }
                             }
-                        }
 
-                        unset($decisionEvent);
+                            unset($decisionEvent);
+                        }
                     } else {
                         if ($this->executeEvent(
                             $event,
