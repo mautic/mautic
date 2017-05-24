@@ -237,7 +237,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         if (empty($newMatchedFields)) {
-            return;
+            return null;
         }
 
         // Find unique identifier fields used by the integration
@@ -283,7 +283,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
         if (empty($matchedFields)) {
-            return;
+            return null;
         }
 
         // Find unique identifier fields used by the integration
@@ -300,7 +300,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
             //return if uniqueIdentifiers have no data set to avoid duplicating leads.
-            return;
+            return null;
         }
 
         // Default to new lead
@@ -321,6 +321,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
         }
+
+        if (empty($matchedFields)) {
+            return null;
+        }
+
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
 
         if (!empty($socialCache)) {

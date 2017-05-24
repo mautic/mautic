@@ -107,7 +107,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return int|null
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Leads')
+    public function getLeads($params = [], $query = null, &$executed = null, &$result = [], $object = 'Leads')
     {
         if ('Lead' === $object || 'Contact' === $object) {
             $object .= 's'; // pluralize object name for Zoho
@@ -144,6 +144,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                             foreach ($leads as $leadData) {
                                 $lead = $this->getMauticLead($leadData);
                                 if ($lead) {
+                                    $result[] = $lead->getEmail();
                                     ++$executed;
                                 }
                             }
@@ -170,7 +171,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return int|null
      */
-    public function getCompanies($params = [], $query = null, &$executed = null, $result = [])
+    public function getCompanies($params = [], $query = null, &$executed = null, &$result = [])
     {
         $executed = 0;
         $object   = 'company';
@@ -204,6 +205,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                             foreach ($companies as $companyData) {
                                 $company = $this->getMauticCompany($companyData);
                                 if ($company) {
+                                    $result[] = $company->getName();
                                     ++$executed;
                                 }
                             }
@@ -225,162 +227,34 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Create or update existing Mautic lead from the integration's profile data.
+     * {@inheritdoc}
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param array|null  $socialCache
-     * @param mixed||null $identifiers
+     * @param array $data
+     * @param array $config
+     * @param null  $object
      *
-     * @return Lead|null
-     *
-     * @throws \InvalidArgumentException
+     * @return array
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
+    public function populateMauticLeadData($data, $config = [], $object = 'Leads')
     {
-        if (is_object($data)) {
-            // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
-        } elseif (is_string($data)) {
-            // Assume JSON
-            $data = json_decode($data, true);
-        }
-
         // Match that data with mapped lead fields
-        $config        = $this->mergeConfigToFeatureSettings();
         $aFields       = $this->getAvailableLeadFields($config);
         $matchedFields = [];
-        if (isset($aFields['Leads'])) {
-            $aFields = $aFields['Leads'];
+
+        $fieldsName = ('company' === $object) ? 'companyFields' : 'leadFields';
+
+        if (isset($aFields[$object])) {
+            $aFields = $aFields[$object];
         }
         foreach ($aFields as $k => $v) {
             foreach ($data as $dk => $dv) {
                 if ($dk === $v['dv']) {
-                    $matchedFields[$config['leadFields'][$k]] = $dv;
+                    $matchedFields[$config[$fieldsName][$k]] = $dv;
                 }
             }
         }
 
-        if (empty($matchedFields)) {
-            return null;
-        }
-
-        // Find unique identifier fields used by the integration
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel           = $this->factory->getModel('lead');
-        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
-        $uniqueLeadFieldData = [];
-
-        foreach ($matchedFields as $leadField => $value) {
-            if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
-                $uniqueLeadFieldData[$leadField] = $value;
-            }
-        }
-
-        // Default to new lead
-        $lead = new Lead();
-        $lead->setNewlyCreated(true);
-
-        if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
-                ->getLeadsByUniqueFields($uniqueLeadFieldData);
-
-            if (!empty($existingLeads)) {
-                $lead = array_shift($existingLeads);
-            }
-        }
-
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
-
-        // Update the social cache
-        $leadSocialCache = $lead->getSocialCache();
-        if (!isset($leadSocialCache[$this->getName()])) {
-            $leadSocialCache[$this->getName()] = [];
-        }
-
-        if (null !== $socialCache) {
-            $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
-        }
-
-        // Check for activity while here
-        if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
-            $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
-        }
-
-        $lead->setSocialCache($leadSocialCache);
-
-        // Update the internal info integration object that has updated the record
-        if (isset($data['internal'])) {
-            $internalInfo                   = $lead->getInternal();
-            $internalInfo[$this->getName()] = $data['internal'];
-            $lead->setInternal($internalInfo);
-        }
-
-        if (isset($company)) {
-            if (!isset($matchedFields['companyname'])) {
-                if (isset($matchedFields['companywebsite'])) {
-                    $matchedFields['companyname'] = $matchedFields['companywebsite'];
-                }
-            }
-            $leadModel->addToCompany($lead, $company);
-        }
-
-        $pushData['email'] = $lead->getEmail();
-        $this->getApiHelper()->createLead($pushData, $lead, $updateLink = true);
-        if ($persist) {
-            // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
-            try {
-                $leadModel->saveEntity($lead, false);
-            } catch (\Exception $exception) {
-                $this->factory->getLogger()->addWarning($exception->getMessage());
-
-                return null;
-            }
-        }
-
-        return $lead;
-    }
-
-    /**
-     * @param $data
-     *
-     * @return Company|void
-     */
-    public function getMauticCompany($data)
-    {
-        if (is_object($data)) {
-            // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
-        } elseif (is_string($data)) {
-            // Assume JSON
-            $data = json_decode($data, true);
-        }
-        // Match that data with mapped lead fields
-        $config        = $this->mergeConfigToFeatureSettings();
-        $aFields       = $this->getAvailableLeadFields($config);
-        $matchedFields = [];
-        foreach ($aFields['company'] as $k => $v) {
-            foreach ($data as $dk => $dv) {
-                if ($dk === $v['dv']) {
-                    $matchedFields[$config['companyFields'][$k]] = $dv;
-                }
-            }
-        }
-
-        if (empty($matchedFields)) {
-            return;
-        }
-
-        // Find unique identifier fields used by the integration
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $companyModel = $this->factory->getModel('lead.company');
-
-        // Default to new company
-        $company = new Company();
-        $companyModel->setFieldValues($company, $matchedFields, false, false);
-        $companyModel->saveEntity($company, false);
-
-        return $company;
+        return $matchedFields;
     }
 
     /**
@@ -762,5 +636,15 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         return [$totalUpdated, $totalCreated, $totalErrors];
+    }
+
+    /**
+     * Get if data priority is enabled in the integration or not default is false.
+     *
+     * @return string
+     */
+    public function getDataPriority()
+    {
+        return true;
     }
 }
