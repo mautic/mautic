@@ -762,7 +762,9 @@ class CampaignModel extends CommonFormModel
     public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
         foreach ($leads as $lead) {
-            if (!$lead instanceof Lead) {
+            if ($lead instanceof Lead) {
+                $leadId = $lead->getId();
+            } else {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
