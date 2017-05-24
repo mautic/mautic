@@ -710,7 +710,7 @@ class EventModel extends CommonFormModel
 
                     unset($event);
 
-                    if ($output && $rootEvaluatedCount < $maxCount) {
+                    if ($output && isset($progress) && $rootEvaluatedCount < $maxCount) {
                         $progress->setProgress($rootEvaluatedCount);
                     }
                 }
@@ -735,7 +735,7 @@ class EventModel extends CommonFormModel
             ++$batchDebugCounter;
         }
 
-        if ($output) {
+        if ($output && isset($progress)) {
             $progress->finish();
             $output->writeln('');
         }
@@ -933,7 +933,7 @@ class EventModel extends CommonFormModel
                     if ($max && $totalEventCount >= $max) {
                         unset($campaignEvents, $event, $leads, $eventSettings);
 
-                        if ($output) {
+                        if ($output && isset($progress)) {
                             $progress->finish();
                             $output->writeln('');
                         }
@@ -952,7 +952,7 @@ class EventModel extends CommonFormModel
                         $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
 
                         return ($returnCounts) ? $counts : $executedEventCount;
-                    } elseif ($output) {
+                    } elseif ($output && isset($progress)) {
                         $currentCount = ($max) ? $totalEventCount : $evaluatedEventCount;
                         $progress->setProgress($currentCount);
                     }
@@ -974,7 +974,7 @@ class EventModel extends CommonFormModel
             $this->triggerConditions($campaign, $evaluatedEventCount, $executedEventCount, $totalEventCount);
         }
 
-        if ($output) {
+        if ($output && isset($progress)) {
             $progress->finish();
             $output->writeln('');
         }
@@ -1234,7 +1234,7 @@ class EventModel extends CommonFormModel
                             if ($max && ($totalEventCount + count($nonActionEvents)) >= $max) {
 
                                 // Hit the max or will hit the max while mid-process for the lead
-                                if ($output) {
+                                if ($output && isset($progress)) {
                                     $progress->finish();
                                     $output->writeln('');
                                 }
@@ -1309,7 +1309,7 @@ class EventModel extends CommonFormModel
                         }
 
                         $currentCount = ($max) ? $totalEventCount : $negativeEvaluatedCount;
-                        if ($output && $currentCount < $maxCount) {
+                        if ($output && isset($progress) && $currentCount < $maxCount) {
                             $progress->setProgress($currentCount);
                         }
 
@@ -1331,7 +1331,7 @@ class EventModel extends CommonFormModel
                 unset($leads, $campaignLeadIds, $leadLog);
 
                 $currentCount = ($max) ? $totalEventCount : $negativeEvaluatedCount;
-                if ($output && $currentCount < $maxCount) {
+                if ($output && isset($progress) && $currentCount < $maxCount) {
                     $progress->setProgress($currentCount);
                 }
 
@@ -1341,7 +1341,7 @@ class EventModel extends CommonFormModel
                 ++$batchDebugCounter;
             }
 
-            if ($output) {
+            if ($output && isset($progress)) {
                 $progress->finish();
                 $output->writeln('');
             }
