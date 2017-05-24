@@ -19,10 +19,10 @@ class CampaignModelTest extends CampaignAbstractTest
     {
         $model = $this->initCampaignModel();
         $lists = $model->getSourceLists();
-        $this->assertTrue(isset($lists['lists'][0]));
-        $this->assertSame([parent::$mockId => parent::$mockName], $lists['lists'][0]);
-        $this->assertTrue(isset($lists['forms'][0]));
-        $this->assertSame([parent::$mockId => parent::$mockName], $lists['forms'][0]);
+        $this->assertTrue(isset($lists['lists']));
+        $this->assertSame([parent::$mockId => parent::$mockName], $lists['lists']);
+        $this->assertTrue(isset($lists['forms']));
+        $this->assertSame([parent::$mockId => parent::$mockName], $lists['forms']);
     }
 
     public function testGetSourceListsWithLists()
