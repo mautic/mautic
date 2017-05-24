@@ -377,10 +377,11 @@ MauticJS.processGatedVideos = function (videoElements) {
             node.id = 'mautic-player-' + i;
         }
        
-        var cookieName = 'mautic-player-'+i+'-'+node.dataset.formId;
+
             mediaPlayers[i] = [];
             
             if(node.dataset.formId){
+           var cookieName = 'mautic-player-'+i+'-'+node.dataset.formId;
             MauticJS.makeCORSRequest('GET', '{$mauticBaseUrl}form/embed/' + node.dataset.formId, {}, function (data) {
                 mediaPlayers[i].formHtml = data;
             });
