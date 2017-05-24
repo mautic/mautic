@@ -13,8 +13,10 @@ matrix:
     - php: 7.0
 
 before_script:
+  - composer global require phpstan/phpstan-shim --ignore-platform-reqs
   - composer install
   - cd app
 
 script:
   - phpunit
+  - ~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/CampaignBundle/Model
