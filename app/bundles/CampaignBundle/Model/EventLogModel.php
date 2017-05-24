@@ -164,7 +164,7 @@ class EventLogModel extends AbstractCommonModel
                     break;
                 case 'ipAddress':
                     $log->setIpAddress(
-                        $this->ipLookupHelper->getIpAddress($value);
+                        $this->ipLookupHelper->getIpAddress($value)
                     );
                     break;
                 case 'metadata':
