@@ -104,15 +104,13 @@ class ReportSubscriber extends CommonSubscriber
                     'alias'   => 'hits_ratio',
                     'label'   => 'mautic.email.report.hits_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                        .'trackable_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count)*100, 1),\'%\')',
                 ],
                 'unique_ratio' => [
                     'alias'   => 'unique_ratio',
                     'label'   => 'mautic.email.report.unique_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                        .'trackable_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count)*100, 1),\'%\')',
                 ],
                 'unsubscribed' => [
                     'alias'   => 'unsubscribed',
@@ -124,7 +122,7 @@ class ReportSubscriber extends CommonSubscriber
                     'alias'   => 'unsubscribed_ratio',
                     'label'   => 'mautic.email.report.unsubscribed_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND((COUNT(DISTINCT '.$doNotContact.'id)/'.$prefix.'sent_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND((COUNT(DISTINCT '.$doNotContact.'id)/'.$prefix.'sent_count)*100, 1),\'%\')',
                 ],
                 $prefix.'revision' => [
                     'label' => 'mautic.email.report.revision',
