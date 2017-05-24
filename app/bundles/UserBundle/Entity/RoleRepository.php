@@ -11,6 +11,7 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -26,7 +27,7 @@ class RoleRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this->createQueryBuilder('r');
 
@@ -69,7 +70,7 @@ class RoleRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -84,7 +85,7 @@ class RoleRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();

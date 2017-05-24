@@ -11,6 +11,7 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -25,7 +26,7 @@ class WebhookRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         return parent::getEntities($args);
     }
@@ -35,7 +36,7 @@ class WebhookRepository extends CommonRepository
      * @param              $filter
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, ['e.name']);
     }
@@ -46,7 +47,7 @@ class WebhookRepository extends CommonRepository
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

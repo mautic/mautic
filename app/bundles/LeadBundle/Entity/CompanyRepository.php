@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -59,7 +60,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         return $this->getEntitiesWithCustomFields('company', $args);
     }
@@ -136,7 +137,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -151,7 +152,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
@@ -406,8 +407,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             }
         }
 
-        $q->select($prefix.$valueColumn.' as value, 
-        case 
+        $q->select($prefix.$valueColumn.' as value,
+        case
         when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
         when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
         when (comp.companycity is not null) then concat(comp.companycity, " <small>", comp.companycity, "</small>")

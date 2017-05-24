@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -26,7 +27,7 @@ class MonitoringRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         return parent::getEntities($args);
     }
@@ -84,7 +85,7 @@ class MonitoringRepository extends CommonRepository
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

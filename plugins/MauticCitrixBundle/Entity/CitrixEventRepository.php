@@ -74,7 +74,7 @@ class CitrixEventRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
 
@@ -105,7 +105,7 @@ class CitrixEventRepository extends CommonRepository
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

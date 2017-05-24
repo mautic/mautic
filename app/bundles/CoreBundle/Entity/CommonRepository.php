@@ -301,7 +301,7 @@ class CommonRepository extends EntityRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
 
@@ -910,7 +910,7 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$qb, $filter)
+    protected function addCatchAllWhereClause(QueryBuilder $qb, $filter)
     {
         foreach (['name', 'title'] as $column) {
             if ($this->getClassMetadata()->hasField($column)) {
@@ -970,7 +970,7 @@ class CommonRepository extends EntityRepository
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
     {
         $command = $filter->command;
         $expr    = false;
