@@ -2425,6 +2425,11 @@ class LeadModel extends FormModel
             $company = $this->companyModel->getEntity($company);
         }
 
+        // company does not exist anymore
+        if ($company === null) {
+            return false;
+        }
+
         $companyLead = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());
 
         if (empty($companyLead)) {
