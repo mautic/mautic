@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignScheduledEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -35,15 +36,22 @@ class EventLogModel extends AbstractCommonModel
     protected $campaignModel;
 
     /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
+
+    /**
      * EventLogModel constructor.
      *
-     * @param EventModel    $eventModel
-     * @param CampaignModel $campaignModel
+     * @param EventModel     $eventModel
+     * @param CampaignModel  $campaignModel
+     * @param IpLookupHelper $ipLookupHelper
      */
-    public function __construct(EventModel $eventModel, CampaignModel $campaignModel)
+    public function __construct(EventModel $eventModel, CampaignModel $campaignModel, IpLookupHelper $ipLookupHelper)
     {
-        $this->eventModel    = $eventModel;
-        $this->campaignModel = $campaignModel;
+        $this->eventModel     = $eventModel;
+        $this->campaignModel  = $campaignModel;
+        $this->ipLookupHelper = $ipLookupHelper;
     }
 
     /**
@@ -156,7 +164,7 @@ class EventLogModel extends AbstractCommonModel
                     break;
                 case 'ipAddress':
                     $log->setIpAddress(
-                        $this->get('mautic.helper.ip_lookup')->getIpAddress($value)
+                        $this->ipLookupHelper->getIpAddress($value);
                     );
                     break;
                 case 'metadata':
