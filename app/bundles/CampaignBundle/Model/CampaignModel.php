@@ -15,6 +15,7 @@ use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -791,12 +792,7 @@ class CampaignModel extends CommonFormModel
                     $campaignLead->setManuallyRemoved(false);
                     $campaignLead->setManuallyAdded($manuallyAdded);
 
-                    try {
-                        $this->getRepository()->saveEntity($campaignLead);
-                    } catch (\Exception $exception) {
-                        $dispatchEvent = false;
-                        $this->logger->log('error', $exception->getMessage());
-                    }
+                    $dispatchEvent = $this->saveCampaignLead($campaignLead);
                 } else {
                     $this->em->detach($campaignLead);
                     if ($batchProcess) {
@@ -808,18 +804,13 @@ class CampaignModel extends CommonFormModel
                     continue;
                 }
             } else {
-                $campaignLead = new \Mautic\CampaignBundle\Entity\Lead();
+                $campaignLead = new CampaignLead();
                 $campaignLead->setCampaign($campaign);
                 $campaignLead->setDateAdded(new \DateTime());
                 $campaignLead->setLead($lead);
                 $campaignLead->setManuallyAdded($manuallyAdded);
 
-                try {
-                    $this->getRepository()->saveEntity($campaignLead);
-                } catch (\Exception $exception) {
-                    $dispatchEvent = false;
-                    $this->logger->log('error', $exception->getMessage());
-                }
+                $dispatchEvent = $this->saveCampaignLead($campaignLead);
             }
 
             if ($dispatchEvent && $this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
@@ -838,6 +829,26 @@ class CampaignModel extends CommonFormModel
         }
 
         unset($leadModel, $campaign, $leads);
+    }
+
+    /**
+     * Saves a campaign lead, logs the error if saving fails.
+     *
+     * @param CampaignLead $campaignLead
+     *
+     * @return bool
+     */
+    public function saveCampaignLead(CampaignLead $campaignLead)
+    {
+        try {
+            $this->getCampaignLeadRepository()->saveEntity($campaignLead);
+
+            return true;
+        } catch (\Exception $exception) {
+            $this->logger->log('error', $exception->getMessage());
+
+            return false;
+        }
     }
 
     /**
