@@ -61,7 +61,7 @@ class FocusRepository extends CommonRepository
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, ['f.name', 'f.website']);
     }

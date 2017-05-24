@@ -94,7 +94,7 @@ class CitrixEventRepository extends CommonRepository
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, ['c.product', 'c.email', 'c.eventType', 'c.eventName']);
     }
