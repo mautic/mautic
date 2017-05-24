@@ -367,7 +367,9 @@ Mautic.closeBuilder = function(model) {
             mQuery('#slot-form-container, #section-form-container').html('');
 
             customHtml = themeHtml.find('html').get(0).outerHTML;
-            customHtml = xs.serializeToString(doctype) + customHtml;
+            if (doctype instanceof Node) {
+                customHtml = xs.serializeToString(doctype) + customHtml;
+            }
         }
 
         // Convert dynamic slot definitions into tokens
@@ -377,6 +379,7 @@ Mautic.closeBuilder = function(model) {
         mQuery('.builder-html').val(customHtml);
     } catch (error) {
         // prevent from being able to close builder
+        console.error(error);
     }
 
     // Kill the overlay
