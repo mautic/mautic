@@ -289,7 +289,7 @@ class DateTimeHelper
      *
      * @return DateInterval
      */
-    public function buildInterval(int $interval, $unit)
+    public function buildInterval($interval, $unit)
     {
         $possibleUnits = ['Y', 'M', 'D', 'I', 'H', 'S'];
         $unit          = strtoupper($unit);
