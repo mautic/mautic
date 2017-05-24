@@ -23,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class CampaignType extends AbstractType
 {
-    private $security
+    private $security;
     private $translator;
     private $em;
 
