@@ -282,6 +282,38 @@ class DateTimeHelper
     }
 
     /**
+     * Returns interval based on $interval number and $unit.
+     *
+     * @param int    $interval
+     * @param string $unit
+     *
+     * @return DateInterval
+     */
+    public function buildInterval(int $interval, $unit)
+    {
+        $possibleUnits = ['Y', 'M', 'D', 'I', 'H', 'S'];
+        $unit          = strtoupper($unit);
+
+        if (!in_array($unit, $possibleUnits)) {
+            throw new \InvalidArgumentException($unit.' is invalid unit for DateInterval');
+        }
+
+        switch ($unit) {
+            case 'I':
+                $spec = "PT{$interval}M";
+                break;
+            case 'H':
+            case 'S':
+                $spec = "PT{$interval}{$unit}";
+                break;
+            default:
+                $spec = "P{$interval}{$unit}";
+        }
+
+        return new \DateInterval($spec);
+    }
+
+    /**
      * Modify datetime.
      *
      * @param            $string

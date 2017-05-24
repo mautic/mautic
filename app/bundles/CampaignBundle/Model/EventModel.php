@@ -1943,27 +1943,11 @@ class EventModel extends CommonFormModel
                 }
 
                 $interval = $action['triggerInterval'];
-                $unit     = strtoupper($action['triggerIntervalUnit']);
+                $unit     = $action['triggerIntervalUnit'];
 
                 $this->logger->debug('CAMPAIGN: Adding interval of '.$interval.$unit.' to '.$triggerOn->format('Y-m-d H:i:s T'));
 
-                switch ($unit) {
-                    case 'Y':
-                    case 'M':
-                    case 'D':
-                        $dt = "P{$interval}{$unit}";
-                        break;
-                    case 'I':
-                        $dt = "PT{$interval}M";
-                        break;
-                    case 'H':
-                    case 'S':
-                        $dt = "PT{$interval}{$unit}";
-                        break;
-                }
-
-                $dv = new \DateInterval($dt);
-                $triggerOn->add($dv);
+                $triggerOn->add((new DateTimeHelper())->buildInterval($interval, $unit));
 
                 if ($triggerOn > $now) {
                     $this->logger->debug(
