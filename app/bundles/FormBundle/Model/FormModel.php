@@ -693,7 +693,7 @@ class FormModel extends CommonFormModel
 
         //replace line breaks with literal symbol and escape quotations
         $search  = ["\r\n", "\n", '"'];
-        $replace = ['\n', '\n', '\"'];
+        $replace = ['', '', '\"'];
         $html    = str_replace($search, $replace, $html);
 
         return 'document.write("'.$html.'");';
