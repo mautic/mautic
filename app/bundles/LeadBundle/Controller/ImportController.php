@@ -158,9 +158,10 @@ class ImportController extends FormController
                     'lead_field_import',
                     [],
                     [
-                        'action'        => $action,
-                        'lead_fields'   => $leadFields,
-                        'import_fields' => $importFields,
+                        'action'           => $action,
+                        'lead_fields'      => $leadFields,
+                        'import_fields'    => $importFields,
+                        'line_count_limit' => $this->getLineCountLimit(),
                     ]
                 );
 
@@ -330,14 +331,12 @@ class ImportController extends FormController
                         } else {
                             $defaultOwner = ($owner) ? $owner->getId() : null;
 
-                            list($processed, $linecount) = $session->get('mautic.lead.import.progress');
-
                             /** @var \Mautic\LeadBundle\Entity\Import $import */
                             $import = $importModel->getEntity();
 
                             $import->setMatchedFields($matchedFields)
                                 ->setDir($importDir)
-                                ->setLineCount($linecount)
+                                ->setLineCount($this->getLineCount())
                                 ->setFile($fileName)
                                 ->setOriginalFile($session->get('mautic.lead.import.original.file'))
                                 ->setDefault('owner', $defaultOwner)
@@ -347,7 +346,7 @@ class ImportController extends FormController
                                 ->setParserConfig($session->get('mautic.lead.import.config'));
 
                             // In case the user chose to import in browser
-                            if ($form->get('buttons')->get('save')->isClicked()) {
+                            if ($this->importInBrowser($form)) {
                                 $import->setStatus($import::MANUAL);
 
                                 $session->set('mautic.lead.import.step', self::STEP_PROGRESS_BAR);
@@ -358,7 +357,7 @@ class ImportController extends FormController
                             $session->set('mautic.lead.import.id', $import->getId());
 
                             // In case the user decided to queue the import
-                            if ($form->get('buttons')->get('apply')->isClicked()) {
+                            if ($this->importInCli($form)) {
                                 $this->addFlash('mautic.lead.batch.import.created');
                                 $this->resetImport($fullPath, false);
 
@@ -420,6 +419,63 @@ class ImportController extends FormController
                 ]
             );
         }
+    }
+
+    /**
+     * Returns line count from the session.
+     *
+     * @return int
+     */
+    protected function getLineCount()
+    {
+        $progress = $this->get('session')->get('mautic.lead.import.progress', [0, 0]);
+
+        return isset($progress[1]) ? $progress[1] : 0;
+    }
+
+    /**
+     * Decide whether the import will be processed in client's browser.
+     *
+     * @param Form $form
+     *
+     * @return bool
+     */
+    protected function importInBrowser(Form $form)
+    {
+        $browserImportLimit = $this->getLineCountLimit();
+
+        if ($browserImportLimit && $this->getLineCount() < $browserImportLimit) {
+            return true;
+        } elseif (!$browserImportLimit && $form->get('buttons')->get('save')->isClicked()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function getLineCountLimit()
+    {
+        return $this->get('mautic.helper.core_parameters')->getParameter('background_import_if_more_rows_than', 0);
+    }
+
+    /**
+     * Decide whether the import will be queued to be processed by the CLI command in the background.
+     *
+     * @param Form $form
+     *
+     * @return bool
+     */
+    protected function importInCli(Form $form)
+    {
+        $browserImportLimit = $this->getLineCountLimit();
+
+        if ($browserImportLimit && $this->getLineCount() >= $browserImportLimit) {
+            return true;
+        } elseif (!$browserImportLimit && $form->get('buttons')->get('apply')->isClicked()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
