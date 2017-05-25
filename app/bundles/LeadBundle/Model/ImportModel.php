@@ -181,17 +181,21 @@ class ImportModel extends FormModel
         $this->setGhostImportsAsFailed();
 
         if (!$import) {
+            $this->logDebug('import is empty, closing the import process');
+
             return false;
         }
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
+            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
 
             return false;
         }
 
         if (!$this->checkParallelImportLimit($import)) {
             $this->saveEntity($import);
+            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
 
             return false;
         }
@@ -203,10 +207,12 @@ class ImportModel extends FormModel
 
         // Save the start changes so the user could see it
         $this->saveEntity($import);
+        $this->logDebug('The background import is about to start', $import);
 
         $this->process($import, $progress);
 
         $import->end();
+        $this->logDebug('The background import has ended', $import);
 
         // Save the end changes so the user could see it
         $this->saveEntity($import);
@@ -239,6 +245,7 @@ class ImportModel extends FormModel
         $file   = new \SplFileObject($import->getFilePath());
         if ($file !== false) {
             $lineNumber = $progress->getDone();
+            $this->logDebug('The import is starting on line '.$lineNumber, $import);
 
             if ($lineNumber > 0) {
                 $file->seek($lineNumber);
@@ -305,8 +312,10 @@ class ImportModel extends FormModel
                                 $eventLog
                             );
                             if ($merged) {
+                                $this->logDebug('Contact on line '.$lineNumber.' has been updated', $import);
                                 $import->increaseUpdatedCount();
                             } else {
+                                $this->logDebug('Contact on line '.$lineNumber.' has been created', $import);
                                 $import->increaseInsertedCount();
                             }
                         } else {
@@ -323,6 +332,7 @@ class ImportModel extends FormModel
                 if ($errorMessage) {
                     $import->increaseIgnoredCount();
                     $this->logImportRowError($eventLog, $errorMessage);
+                    $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
                 }
 
                 // Save Import entity once per batch so the user could see the progress
@@ -337,6 +347,7 @@ class ImportModel extends FormModel
 
                     // Stop the import loop if the import got unpublished
                     if (!$isPublished) {
+                        $this->logDebug('The import has been unpublished. Stopping the import now.', $import);
                         break;
                     }
 
@@ -544,6 +555,20 @@ class ImportModel extends FormModel
             return $event;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Logs a debug message if in dev environment.
+     *
+     * @param string $msg
+     * @param Import $import
+     */
+    protected function logDebug($msg, Import $import = null)
+    {
+        if (MAUTIC_ENV === 'dev') {
+            $importId = $import ? '('.$import->getId().')' : '';
+            $this->logger->debug(sprintf('IMPORT%s: %s', $importId, $msg));
         }
     }
 }
