@@ -68,9 +68,71 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
 
         $decisions = $event->getDecisions();
 
+        $this->assertSame(3, count($decisions));
+
         $shouldBe = 1;
         foreach ($decisions as $key => $resultDecision) {
             $this->assertSame('email.open'.$shouldBe, $key);
+            ++$shouldBe;
+        }
+    }
+
+    public function testEventConditionSort()
+    {
+        $conditionKey = 'form.field_value';
+        $condition    = [
+            'label'       => 'mautic.form.campaign.event.field_value',
+            'description' => 'mautic.form.campaign.event.field_value_descr',
+            'formType'    => 'campaignevent_form_field_value',
+            'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
+            'eventName'   => 'mautic.form.on_campaign_trigger_condition',
+        ];
+        $event = $this->initEvent();
+
+        // add 3 unsorted conditions
+        $event->addCondition('form.field_value1', $condition);
+        $condition['label'] = 'mautic.form.campaign.event.field_value.3';
+        $event->addCondition('form.field_value3', $condition);
+        $condition['label'] = 'mautic.form.campaign.event.field_value.2';
+        $event->addCondition('form.field_value2', $condition);
+
+        $conditions = $event->getConditions();
+
+        $this->assertSame(3, count($conditions));
+
+        $shouldBe = 1;
+        foreach ($conditions as $key => $resultCondition) {
+            $this->assertSame('form.field_value'.$shouldBe, $key);
+            ++$shouldBe;
+        }
+    }
+
+    public function testEventActionSort()
+    {
+        $actionKey = 'asset.download';
+        $action    = [
+            'group'       => 'mautic.asset.actions',
+            'label'       => 'mautic.asset.point.action.download',
+            'description' => 'mautic.asset.point.action.download_descr',
+            'callback'    => ['\\Mautic\\AssetBundle\\Helper\\PointActionHelper', 'validateAssetDownload'],
+            'formType'    => 'pointaction_assetdownload',
+        ];
+        $event = $this->initEvent();
+
+        // add 3 unsorted actions
+        $event->addAction('asset.download1', $action);
+        $action['label'] = 'mautic.asset.point.action.download.3';
+        $event->addAction('asset.download3', $action);
+        $action['label'] = 'mautic.asset.point.action.download.2';
+        $event->addAction('asset.download2', $action);
+
+        $actions = $event->getActions();
+
+        $this->assertSame(3, count($actions));
+
+        $shouldBe = 1;
+        foreach ($actions as $key => $resultAction) {
+            $this->assertSame('asset.download'.$shouldBe, $key);
             ++$shouldBe;
         }
     }

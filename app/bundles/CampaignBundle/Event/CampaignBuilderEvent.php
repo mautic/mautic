@@ -103,9 +103,7 @@ class CampaignBuilderEvent extends Event
      */
     public function getDecisions()
     {
-        $this->sort('decisions');
-
-        return $this->decisions;
+        return $this->sort('decisions');
     }
 
     /**
@@ -175,22 +173,7 @@ class CampaignBuilderEvent extends Event
      */
     public function getConditions()
     {
-        static $sorted = false;
-
-        if (empty($sorted)) {
-            uasort(
-                $this->conditions,
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
-            );
-            $sorted = true;
-        }
-
-        return $this->conditions;
+        return $this->sort('conditions');
     }
 
     /**
@@ -262,28 +245,15 @@ class CampaignBuilderEvent extends Event
      */
     public function getActions()
     {
-        static $sorted = false;
-
-        if (empty($sorted)) {
-            uasort(
-                $this->actions,
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
-            );
-            $sorted = true;
-        }
-
-        return $this->actions;
+        return $this->sort('actions');
     }
 
     /**
      * Sort internal actions, decisions and conditions arrays.
      *
      * @param string $property name
+     *
+     * @return array
      */
     protected function sort($property)
     {
@@ -299,5 +269,7 @@ class CampaignBuilderEvent extends Event
             );
             $this->sortCache[$property] = true;
         }
+
+        return $this->{$property};
     }
 }
