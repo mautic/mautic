@@ -375,6 +375,9 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.lead.configbundle.subscriber' => [
+                'class' => Mautic\LeadBundle\EventListener\ConfigSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
@@ -565,6 +568,10 @@ return [
                 'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
                 'alias' => 'scorecontactscompanies_action',
             ],
+            'mautic.form.type.config.form' => [
+                'class' => Mautic\LeadBundle\Form\Type\ConfigType::class,
+                'alias' => 'leadconfig',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
@@ -647,6 +654,7 @@ return [
         ],
     ],
     'parameters' => [
-        'parallel_import_limit' => 1,
+        'parallel_import_limit'               => 1,
+        'background_import_if_more_rows_than' => 0,
     ],
 ];
