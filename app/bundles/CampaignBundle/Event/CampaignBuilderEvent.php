@@ -84,7 +84,7 @@ class CampaignBuilderEvent extends Event
         );
 
         $decision['label']       = $this->translator->trans($decision['label']);
-        $decision['description'] = (isset($action['description'])) ? $this->translator->trans($decision['description']) : '';
+        $decision['description'] = (isset($decision['description'])) ? $this->translator->trans($decision['description']) : '';
 
         $this->decisions[$key] = $decision;
     }
