@@ -63,9 +63,9 @@ class ImportController extends FormController
         $importModel = $this->getModel($this->getModelName());
         $import      = $importModel->getEntity($session->get('mautic.lead.import.id', null));
 
-        if ($import) {
+        if ($import && $import->getId()) {
             $import->setStatus($import::STOPPED)
-                ->setPublished(false);
+                ->setIsPublished(false);
             $importModel->saveEntity($import);
         }
 
@@ -542,7 +542,7 @@ class ImportController extends FormController
         $session->set('mautic.lead.import.original.file', null);
         $session->set('mautic.lead.import.id', null);
 
-        if ($removeCsv) {
+        if ($removeCsv && file_exists($filepath) && is_readable($filepath)) {
             unlink($filepath);
         }
     }
