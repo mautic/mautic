@@ -43,6 +43,13 @@ class CampaignBuilderEvent extends Event
     private $translator;
 
     /**
+     * Holds info if some property has been already sorted or not.
+     *
+     * @var array
+     */
+    private $sortCache = [];
+
+    /**
      * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
      */
     public function __construct($translator)
@@ -96,20 +103,7 @@ class CampaignBuilderEvent extends Event
      */
     public function getDecisions()
     {
-        static $sorted = false;
-
-        if (empty($sorted)) {
-            uasort(
-                $this->decisions,
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
-            );
-            $sorted = true;
-        }
+        $this->sort('decisions');
 
         return $this->decisions;
     }
@@ -284,5 +278,26 @@ class CampaignBuilderEvent extends Event
         }
 
         return $this->actions;
+    }
+
+    /**
+     * Sort internal actions, decisions and conditions arrays.
+     *
+     * @param string $property name
+     */
+    protected function sort($property)
+    {
+        if (empty($this->sortCache[$property])) {
+            uasort(
+                $this->{$property},
+                function ($a, $b) {
+                    return strnatcasecmp(
+                        $a['label'],
+                        $b['label']
+                    );
+                }
+            );
+            $this->sortCache[$property] = true;
+        }
     }
 }
