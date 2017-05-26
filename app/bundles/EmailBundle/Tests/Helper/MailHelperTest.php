@@ -55,9 +55,6 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
-    /**
-     *
-     */
     public function setUp()
     {
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
@@ -282,7 +279,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateValidEmails()
     {
-        $helper = $this->mockEmptyMailHelper();
+        $helper    = $this->mockEmptyMailHelper();
         $addresses = [
             'john@doe.com',
             'john@doe.email',
@@ -299,56 +296,63 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateEmailWithoutTld()
     {
+        $heper = $this->mockEmptyMailHelper();
         $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $this->mockEmptyMailHelper()::validateEmail('john@doe');
+        $heper::validateEmail('john@doe');
     }
 
     public function testValidateEmailWithSpaceInIt()
     {
+        $heper = $this->mockEmptyMailHelper();
         $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $this->mockEmptyMailHelper()::validateEmail('jo hn@doe.email');
+        $heper::validateEmail('jo hn@doe.email');
     }
 
     public function testValidateEmailWithCaretInIt()
     {
+        $heper = $this->mockEmptyMailHelper();
         $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $this->mockEmptyMailHelper()::validateEmail('jo^hn@doe.email');
+        $heper::validateEmail('jo^hn@doe.email');
     }
 
     public function testValidateEmailWithApostropheInIt()
     {
+        $heper = $this->mockEmptyMailHelper();
         $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $this->mockEmptyMailHelper()::validateEmail('jo\'hn@doe.email');
+        $heper::validateEmail('jo\'hn@doe.email');
     }
 
     public function testValidateEmailWithSemicolonInIt()
     {
+        $heper = $this->mockEmptyMailHelper();
         $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $this->mockEmptyMailHelper()::validateEmail('jo;hn@doe.email');
+        $heper::validateEmail('jo;hn@doe.email');
     }
 
     public function testValidateEmailWithAmpersandInIt()
     {
+        $heper = $this->mockEmptyMailHelper();
         $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $this->mockEmptyMailHelper()::validateEmail('jo&hn@doe.email');
+        $heper::validateEmail('jo&hn@doe.email');
     }
 
     public function testValidateEmailWithStarInIt()
     {
+        $heper = $this->mockEmptyMailHelper();
         $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $this->mockEmptyMailHelper()::validateEmail('jo*hn@doe.email');
+        $heper::validateEmail('jo*hn@doe.email');
     }
 
     public function testValidateEmailWithPercentInIt()
     {
+        $heper = $this->mockEmptyMailHelper();
         $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $this->mockEmptyMailHelper()::validateEmail('jo%hn@doe.email');
+        $heper::validateEmail('jo%hn@doe.email');
     }
 
     protected function mockEmptyMailHelper()
     {
         $mockFactory = $this->getMockFactory();
-
         $transport   = new SmtpTransport();
         $swiftMailer = new \Swift_Mailer($transport);
 
