@@ -267,6 +267,7 @@ class ImportModel extends FormModel
         $batchSize = $config['batchlimit'];
 
         while ($batchSize && !$file->eof()) {
+            $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
 
             // Ignore the header row
             if ($lineNumber === 0) {
@@ -281,7 +282,6 @@ class ImportModel extends FormModel
 
             $errorMessage = null;
             $eventLog     = $this->initEventLog($import, $lineNumber);
-            $data         = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
 
             if ($this->isEmptyCsvRow($data)) {
                 $errorMessage = 'mautic.lead.import.error.line_empty';

@@ -252,7 +252,7 @@ class ImportController extends FormController
 
                                         // Get the number of lines so we can track progress
                                         $file->seek(PHP_INT_MAX);
-                                        $linecount = ($file->key() + 1);
+                                        $linecount = $file->key();
 
                                         if (!empty($headers) && is_array($headers)) {
                                             array_walk($headers, create_function('&$val', '$val = trim($val);'));
