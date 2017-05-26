@@ -117,4 +117,42 @@ class ImportModelTest extends StandardImportTestHelper
             );
         }
     }
+
+    public function testHasMoreValuesThanColumns()
+    {
+        $model    = $this->initImportModel();
+        $columns  = 3;
+        $testData = [
+            [
+                'row' => ['John'],
+                'mod' => ['John', '', ''],
+                'res' => false,
+            ],
+            [
+                'row' => ['John', 'Doe'],
+                'mod' => ['John', 'Doe', ''],
+                'res' => false,
+            ],
+            [
+                'row' => ['key' => 'John', 2 => 'Doe', 'stuff'],
+                'mod' => ['key' => 'John', 2 => 'Doe', 'stuff'],
+                'res' => false,
+            ],
+            [
+                'row' => ['key' => 'John', 2 => 'Doe', 'stuff', 'this is too much'],
+                'mod' => ['key' => 'John', 2 => 'Doe', 'stuff', 'this is too much'],
+                'res' => true,
+            ],
+        ];
+
+        foreach ($testData as $test) {
+            $res = $model->hasMoreValuesThanColumns($test['row'], $columns);
+            $this->assertSame(
+                $test['res'],
+                $res,
+                'Failed on row '.var_export($test['row'], true)
+            );
+            $this->assertSame($test['mod'], $test['row']);
+        }
+    }
 }

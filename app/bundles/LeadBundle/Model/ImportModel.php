@@ -241,10 +241,13 @@ class ImportModel extends FormModel
      */
     public function process(Import $import, Progress $progress)
     {
-        $config = $import->getParserConfig();
-        $file   = new \SplFileObject($import->getFilePath());
+        $file = new \SplFileObject($import->getFilePath());
         if ($file !== false) {
-            $lineNumber = $progress->getDone();
+            $lineNumber  = $progress->getDone();
+            $headers     = $import->getHeaders();
+            $headerCount = count($headers);
+            $config      = $import->getParserConfig();
+
             $this->logDebug('The import is starting on line '.$lineNumber, $import);
 
             if ($lineNumber > 0) {
@@ -274,29 +277,13 @@ class ImportModel extends FormModel
                     $errorMessage = 'mautic.lead.import.error.line_empty';
                 }
 
-                $data = $this->trimArrayValues($data);
+                if ($this->hasMoreValuesThanColumns($data, $headerCount)) {
+                    $errorMessage = 'mautic.lead.import.error.header_mismatch';
+                }
 
                 if (!$errorMessage) {
-                    // Ensure the number of headers are equal with data
-                    $headerCount = count($import->getHeaders());
-                    $dataCount   = count($data);
-
-                    if ($headerCount !== $dataCount) {
-                        $diffCount = ($headerCount - $dataCount);
-
-                        if ($diffCount < 0) {
-                            $import->increaseIgnoredCount();
-                            $errorMessage = 'mautic.lead.import.error.header_mismatch';
-                            $this->logImportRowError($eventLog, $errorMessage);
-
-                            continue;
-                        }
-                        // Fill in the data with empty string
-                        $fill = array_fill($dataCount, $diffCount, '');
-                        $data = $data + $fill;
-                    }
-
-                    $data = array_combine($import->getHeaders(), $data);
+                    $data = $this->trimArrayValues($data);
+                    $data = array_combine($headers, $data);
 
                     try {
                         $merged = $this->leadModel->importLead(
@@ -320,10 +307,6 @@ class ImportModel extends FormModel
                         $errorMessage = $e->getMessage();
                     }
                 } else {
-                    $errorMessage = 'mautic.lead.import.error.line_empty';
-                }
-
-                if ($errorMessage) {
                     $import->increaseIgnoredCount();
                     $this->logImportRowError($eventLog, $errorMessage);
                     $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
@@ -352,6 +335,35 @@ class ImportModel extends FormModel
 
         // Close the file
         $file = null;
+    }
+
+    /**
+     * Check if the CSV row has more values than the CSV header has columns.
+     * If it is less, generate empty values for the rest of the missing values.
+     * If it is more, return true.
+     *
+     * @param array &$data
+     * @param int   $headerCount
+     *
+     * @return bool
+     */
+    public function hasMoreValuesThanColumns(array &$data, $headerCount)
+    {
+        $dataCount = count($data);
+
+        if ($headerCount !== $dataCount) {
+            $diffCount = ($headerCount - $dataCount);
+
+            if ($diffCount > 0) {
+                // Fill in the data with empty string
+                $fill = array_fill($dataCount, $diffCount, '');
+                $data = $data + $fill;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
