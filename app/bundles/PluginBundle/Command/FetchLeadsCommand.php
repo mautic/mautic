@@ -49,6 +49,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 'Set end date for updated values.'
             )
             ->addOption(
+                '--fetch-all',
+                null,
+                InputOption::VALUE_NONE,
+                'Get all CRM contacts whatever the date is. Should be used at instance initialization only'
+            )
+            ->addOption(
                 '--time-interval',
                 '-a',
                 InputOption::VALUE_OPTIONAL,
@@ -110,7 +116,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
-                    if (strtotime($startDate) > strtotime('-30 days')) {
+                    if (strtotime($startDate) > strtotime('-30 days') || $input->getOption('fetch-all')) {
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
                         $list = ['Lead' => [], 'Contact' => []];
