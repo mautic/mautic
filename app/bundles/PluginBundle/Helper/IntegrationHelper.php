@@ -127,7 +127,7 @@ class IntegrationHelper
             // Scan the plugins for integration classes
             foreach ($plugins as $plugin) {
                 // Do not list the integration if the bundle has not been "installed"
-                if (!isset($installedPlugins[$plugin['bundle']])) {
+                if (!isset($plugin['bundle']) || !isset($installedPlugins[$plugin['bundle']])) {
                     continue;
                 }
 
