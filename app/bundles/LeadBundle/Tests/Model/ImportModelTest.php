@@ -51,4 +51,38 @@ class ImportModelTest extends StandardImportTestHelper
         $this->assertSame(2, $entity->getIgnoredCount());
         $this->assertSame(Import::IMPORTED, $entity->getStatus());
     }
+
+    public function testIsEmptyCsvRow()
+    {
+        $model    = $this->initImportModel();
+        $testData = [
+            [
+                'row' => '',
+                'res' => true,
+            ],
+            [
+                'row' => [],
+                'res' => true,
+            ],
+            [
+                'row' => [''],
+                'res' => true,
+            ],
+            [
+                'row' => ['John'],
+                'res' => false,
+            ],
+            [
+                'row' => ['John', 'Doe'],
+                'res' => false,
+            ],
+        ];
+
+        foreach ($testData as $test) {
+            $this->assertSame(
+                $test['res'],
+                $model->isEmptyCsvRow($test['row']),
+                'Failed on row '.var_export($test['row'], true));
+        }
+    }
 }

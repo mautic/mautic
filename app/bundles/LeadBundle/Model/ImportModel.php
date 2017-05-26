@@ -254,9 +254,6 @@ class ImportModel extends FormModel
             $batchSize = $config['batchlimit'];
 
             while ($batchSize && !$file->eof()) {
-                $errorMessage = null;
-                $data         = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
-                array_walk($data, create_function('&$val', '$val = trim($val);'));
 
                 // Ignore the header row
                 if ($lineNumber === 0) {
@@ -264,17 +261,28 @@ class ImportModel extends FormModel
                     continue;
                 }
 
+                // Ensure the progress is changing
                 ++$lineNumber;
-
-                $eventLog = $this->initEventLog($import, $lineNumber);
                 $progress->increase();
+
+                $errorMessage = null;
+                $eventLog     = $this->initEventLog($import, $lineNumber);
+                $data         = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+
+                if ($this->isEmptyCsvRow($data)) {
+                    $import->increaseIgnoredCount();
+                    $errorMessage = 'mautic.lead.import.error.line_empty';
+                }
+
+                array_walk($data, create_function('&$val', '$val = trim($val);'));
 
                 // Decrease batch count
                 --$batchSize;
 
-                if (is_array($data) && $dataCount = count($data)) {
+                if (!$errorMessage) {
                     // Ensure the number of headers are equal with data
                     $headerCount = count($import->getHeaders());
+                    $dataCount   = count($data);
 
                     if ($headerCount !== $dataCount) {
                         $diffCount = ($headerCount - $dataCount);
@@ -294,32 +302,21 @@ class ImportModel extends FormModel
                     $data = array_combine($import->getHeaders(), $data);
 
                     try {
-                        $prevent = false;
-                        foreach ($data as $key => $value) {
-                            if ($value != '') {
-                                $prevent = true;
-                                break;
-                            }
-                        }
-                        if ($prevent) {
-                            $merged = $this->leadModel->importLead(
-                                $import->getMatchedFields(),
-                                $data,
-                                $import->getDefault('owner'),
-                                $import->getDefault('list'),
-                                $import->getDefault('tags'),
-                                true,
-                                $eventLog
-                            );
-                            if ($merged) {
-                                $this->logDebug('Contact on line '.$lineNumber.' has been updated', $import);
-                                $import->increaseUpdatedCount();
-                            } else {
-                                $this->logDebug('Contact on line '.$lineNumber.' has been created', $import);
-                                $import->increaseInsertedCount();
-                            }
+                        $merged = $this->leadModel->importLead(
+                            $import->getMatchedFields(),
+                            $data,
+                            $import->getDefault('owner'),
+                            $import->getDefault('list'),
+                            $import->getDefault('tags'),
+                            true,
+                            $eventLog
+                        );
+                        if ($merged) {
+                            $this->logDebug('Contact on line '.$lineNumber.' has been updated', $import);
+                            $import->increaseUpdatedCount();
                         } else {
-                            $errorMessage = 'mautic.lead.import.error.line_empty';
+                            $this->logDebug('Contact on line '.$lineNumber.' has been created', $import);
+                            $import->increaseInsertedCount();
                         }
                     } catch (\Exception $e) {
                         // Email validation likely failed
@@ -358,6 +355,26 @@ class ImportModel extends FormModel
 
         // Close the file
         $file = null;
+    }
+
+    /**
+     * Decide whether the CSV row is empty.
+     *
+     * @param mixed $row
+     *
+     * @return bool
+     */
+    public function isEmptyCsvRow($row)
+    {
+        if (!is_array($row) || empty($row)) {
+            return true;
+        }
+
+        if (count($row) === 1 && $row[0] === '') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
