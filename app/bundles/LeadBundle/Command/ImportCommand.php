@@ -73,6 +73,14 @@ EOT
             }
         }
 
+        $output->writeln('<info>'.$translator->trans(
+            'mautic.lead.import.is.starting',
+            [
+                '%id%'    => $import->getId(),
+                '%lines%' => $import->getLineCount(),
+            ]
+        ).'</info>');
+
         $success = $model->startImport($import, $progress);
 
         // Import was delayed
@@ -101,7 +109,7 @@ EOT
         $output->writeln('<info>'.$translator->trans(
             'mautic.lead.import.result',
             [
-                '%lines%'   => $import->getLineCount(),
+                '%lines%'   => $import->getProcessedRows(),
                 '%created%' => $import->getInsertedCount(),
                 '%updated%' => $import->getUpdatedCount(),
                 '%ignored%' => $import->getIgnoredCount(),
