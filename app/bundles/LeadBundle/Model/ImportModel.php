@@ -248,7 +248,7 @@ class ImportModel extends FormModel
         } catch (\Exception $e) {
             $import->setStatusInfo('SplFileObject cannot read the file');
             $import->setStatus($import::FAILED);
-            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
+            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
@@ -316,7 +316,9 @@ class ImportModel extends FormModel
                     // Email validation likely failed
                     $errorMessage = $e->getMessage();
                 }
-            } else {
+            }
+
+            if ($errorMessage) {
                 $import->increaseIgnoredCount();
                 $this->logImportRowError($eventLog, $errorMessage);
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
@@ -344,6 +346,8 @@ class ImportModel extends FormModel
 
         // Close the file
         $file = null;
+
+        return true;
     }
 
     /**
