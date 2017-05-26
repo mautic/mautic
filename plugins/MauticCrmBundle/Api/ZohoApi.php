@@ -59,10 +59,11 @@ class ZohoApi extends CrmApi
 
     /**
      * @param $data
+     * @param $object
      *
      * @return array
      */
-    public function createLead($data)
+    public function createLead($data, $object = 'Leads')
     {
         $parameters = [
             'xmlData'        => $data,
@@ -70,7 +71,7 @@ class ZohoApi extends CrmApi
             'newFormat'      => 1,
         ];
 
-        return $this->request('insertRecords', $parameters, 'POST', 'Leads', false);
+        return $this->request('insertRecords', $parameters, 'POST', $object, false);
     }
 
     /**

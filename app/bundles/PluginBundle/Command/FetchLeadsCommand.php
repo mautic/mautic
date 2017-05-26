@@ -98,6 +98,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $config            = $integrationObject->mergeConfigToFeatureSettings();
             $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
+            defined('MAUTIC_CONSOLE_VERBOSITY') or define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
+
             if (!isset($config['objects'])) {
                 $config['objects'] = [];
             }
@@ -128,25 +130,25 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
                     }
                 }
-            }
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']) && in_array('company', $config['objects'])) {
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
+                if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']) && in_array('company', $config['objects'])) {
+                    $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
 
-                if (strtotime($startDate) > strtotime('-30 days')) {
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
+                    if (strtotime($startDate) > strtotime('-30 days')) {
+                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
 
-                    $list      = [];
-                    $processed = intval($integrationObject->getCompanies($params, null, $companies, $list));
-                    if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                        foreach ($list as $item) {
-                            $output->writeln('Company: '.$item);
+                        $list      = [];
+                        $processed = intval($integrationObject->getCompanies($params, null, $companies, $list));
+                        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            foreach ($list as $item) {
+                                $output->writeln('Company: '.$item);
+                            }
                         }
-                    }
 
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed]).'</comment>'."\n");
-                } else {
-                    $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                    } else {
+                        $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                    }
                 }
             }
 

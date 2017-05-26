@@ -179,23 +179,29 @@ class IntegrationEntityRepository extends CommonRepository
     /**
      * @param $integration
      * @param $leadFields
+     * @param int    $limit
+     * @param string $extra
      *
      * @return array
      */
-    public function findLeadsToCreate($integration, $leadFields, $limit = 25)
+    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $extra = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->innerJoin('l', MAUTIC_TABLE_PREFIX.'integration_entity', 'i', 'i.internal_entity_id = l.id');
 
         if (false === $limit) {
             $q->select('count(*) as total');
         } else {
-            $q->select('l.id as internal_entity_id,'.$leadFields);
+            $q->select('i.id, l.id as internal_entity_id,'.$leadFields);
         }
 
+        if ($extra) {
+            $extra = ' and ('.$extra.')';
+        }
         $q->where('l.date_identified is not null')
             ->andWhere('l.email is not null')
-            ->andWhere('not exists (select null from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id )')
+            ->andWhere('not exists (select null from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id '.$extra.')')
             ->setParameter('integration', $integration);
 
         if ($limit) {
