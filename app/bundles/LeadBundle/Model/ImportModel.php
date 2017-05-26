@@ -274,7 +274,7 @@ class ImportModel extends FormModel
                     $errorMessage = 'mautic.lead.import.error.line_empty';
                 }
 
-                array_walk($data, create_function('&$val', '$val = trim($val);'));
+                $data = $this->trimArrayValues($data);
 
                 if (!$errorMessage) {
                     // Ensure the number of headers are equal with data
@@ -352,6 +352,18 @@ class ImportModel extends FormModel
 
         // Close the file
         $file = null;
+    }
+
+    /**
+     * Trim all values in a one dymensional array.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    public function trimArrayValues(array $data)
+    {
+        return array_map('trim', $data);
     }
 
     /**

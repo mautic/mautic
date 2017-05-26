@@ -86,7 +86,35 @@ class ImportModelTest extends StandardImportTestHelper
             $this->assertSame(
                 $test['res'],
                 $model->isEmptyCsvRow($test['row']),
-                'Failed on row '.var_export($test['row'], true));
+                'Failed on row '.var_export($test['row'], true)
+            );
+        }
+    }
+
+    public function testTrimArrayValues()
+    {
+        $model    = $this->initImportModel();
+        $testData = [
+            [
+                'row' => ['John '],
+                'res' => ['John'],
+            ],
+            [
+                'row' => ['  John  ', ' Do  e '],
+                'res' => ['John', 'Do  e'],
+            ],
+            [
+                'row' => ['key' => '  John  ', 2 => ' Do  e '],
+                'res' => ['key' => 'John', 2 => 'Do  e'],
+            ],
+        ];
+
+        foreach ($testData as $test) {
+            $this->assertSame(
+                $test['res'],
+                $model->trimArrayValues($test['row']),
+                'Failed on row '.var_export($test['row'], true)
+            );
         }
     }
 }
