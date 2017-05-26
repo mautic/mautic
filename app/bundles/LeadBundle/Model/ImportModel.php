@@ -263,6 +263,7 @@ class ImportModel extends FormModel
 
                 // Ensure the progress is changing
                 ++$lineNumber;
+                --$batchSize;
                 $progress->increase();
 
                 $errorMessage = null;
@@ -270,14 +271,10 @@ class ImportModel extends FormModel
                 $data         = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
 
                 if ($this->isEmptyCsvRow($data)) {
-                    $import->increaseIgnoredCount();
                     $errorMessage = 'mautic.lead.import.error.line_empty';
                 }
 
                 array_walk($data, create_function('&$val', '$val = trim($val);'));
-
-                // Decrease batch count
-                --$batchSize;
 
                 if (!$errorMessage) {
                     // Ensure the number of headers are equal with data
@@ -370,7 +367,7 @@ class ImportModel extends FormModel
             return true;
         }
 
-        if (count($row) === 1 && $row[0] === '') {
+        if (count($row) === 1 && ($row[0] === '' || $row[0] === null)) {
             return true;
         }
 

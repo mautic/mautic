@@ -65,6 +65,10 @@ class ImportModelTest extends StandardImportTestHelper
                 'res' => true,
             ],
             [
+                'row' => [null],
+                'res' => true,
+            ],
+            [
                 'row' => [''],
                 'res' => true,
             ],
