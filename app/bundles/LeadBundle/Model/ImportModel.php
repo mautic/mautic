@@ -209,7 +209,9 @@ class ImportModel extends FormModel
         $this->saveEntity($import);
         $this->logDebug('The background import is about to start', $import);
 
-        $this->process($import, $progress);
+        if (!$this->process($import, $progress)) {
+            return false;
+        }
 
         $import->end();
         $this->logDebug('The background import has ended', $import);
@@ -241,95 +243,102 @@ class ImportModel extends FormModel
      */
     public function process(Import $import, Progress $progress)
     {
-        $file = new \SplFileObject($import->getFilePath());
-        if ($file !== false) {
-            $lineNumber  = $progress->getDone();
-            $headers     = $import->getHeaders();
-            $headerCount = count($headers);
-            $config      = $import->getParserConfig();
+        try {
+            $file = new \SplFileObject($import->getFilePath());
+        } catch (\Exception $e) {
+            $import->setStatusInfo('SplFileObject cannot read the file');
+            $import->setStatus($import::FAILED);
+            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
 
-            $this->logDebug('The import is starting on line '.$lineNumber, $import);
+            return false;
+        }
 
-            if ($lineNumber > 0) {
-                $file->seek($lineNumber);
+        $lineNumber  = $progress->getDone();
+        $headers     = $import->getHeaders();
+        $headerCount = count($headers);
+        $config      = $import->getParserConfig();
+
+        $this->logDebug('The import is starting on line '.$lineNumber, $import);
+
+        if ($lineNumber > 0) {
+            $file->seek($lineNumber);
+        }
+
+        $batchSize = $config['batchlimit'];
+
+        while ($batchSize && !$file->eof()) {
+
+            // Ignore the header row
+            if ($lineNumber === 0) {
+                ++$lineNumber;
+                continue;
             }
 
-            $batchSize = $config['batchlimit'];
+            // Ensure the progress is changing
+            ++$lineNumber;
+            --$batchSize;
+            $progress->increase();
 
-            while ($batchSize && !$file->eof()) {
+            $errorMessage = null;
+            $eventLog     = $this->initEventLog($import, $lineNumber);
+            $data         = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
 
-                // Ignore the header row
-                if ($lineNumber === 0) {
-                    ++$lineNumber;
-                    continue;
-                }
+            if ($this->isEmptyCsvRow($data)) {
+                $errorMessage = 'mautic.lead.import.error.line_empty';
+            }
 
-                // Ensure the progress is changing
-                ++$lineNumber;
-                --$batchSize;
-                $progress->increase();
+            if ($this->hasMoreValuesThanColumns($data, $headerCount)) {
+                $errorMessage = 'mautic.lead.import.error.header_mismatch';
+            }
 
-                $errorMessage = null;
-                $eventLog     = $this->initEventLog($import, $lineNumber);
-                $data         = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+            if (!$errorMessage) {
+                $data = $this->trimArrayValues($data);
+                $data = array_combine($headers, $data);
 
-                if ($this->isEmptyCsvRow($data)) {
-                    $errorMessage = 'mautic.lead.import.error.line_empty';
-                }
-
-                if ($this->hasMoreValuesThanColumns($data, $headerCount)) {
-                    $errorMessage = 'mautic.lead.import.error.header_mismatch';
-                }
-
-                if (!$errorMessage) {
-                    $data = $this->trimArrayValues($data);
-                    $data = array_combine($headers, $data);
-
-                    try {
-                        $merged = $this->leadModel->importLead(
-                            $import->getMatchedFields(),
-                            $data,
-                            $import->getDefault('owner'),
-                            $import->getDefault('list'),
-                            $import->getDefault('tags'),
-                            true,
-                            $eventLog
-                        );
-                        if ($merged) {
-                            $this->logDebug('Contact on line '.$lineNumber.' has been updated', $import);
-                            $import->increaseUpdatedCount();
-                        } else {
-                            $this->logDebug('Contact on line '.$lineNumber.' has been created', $import);
-                            $import->increaseInsertedCount();
-                        }
-                    } catch (\Exception $e) {
-                        // Email validation likely failed
-                        $errorMessage = $e->getMessage();
+                try {
+                    $merged = $this->leadModel->importLead(
+                        $import->getMatchedFields(),
+                        $data,
+                        $import->getDefault('owner'),
+                        $import->getDefault('list'),
+                        $import->getDefault('tags'),
+                        true,
+                        $eventLog
+                    );
+                    if ($merged) {
+                        $this->logDebug('Contact on line '.$lineNumber.' has been updated', $import);
+                        $import->increaseUpdatedCount();
+                    } else {
+                        $this->logDebug('Contact on line '.$lineNumber.' has been created', $import);
+                        $import->increaseInsertedCount();
                     }
-                } else {
-                    $import->increaseIgnoredCount();
-                    $this->logImportRowError($eventLog, $errorMessage);
-                    $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
+                } catch (\Exception $e) {
+                    // Email validation likely failed
+                    $errorMessage = $e->getMessage();
+                }
+            } else {
+                $import->increaseIgnoredCount();
+                $this->logImportRowError($eventLog, $errorMessage);
+                $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
+            }
+
+            // Save Import entity once per batch so the user could see the progress
+            if ($batchSize === 0 && $import->isBackgroundProcess()) {
+                $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
+
+                if (!$isPublished) {
+                    $import->setStatus($import::STOPPED);
                 }
 
-                // Save Import entity once per batch so the user could see the progress
-                if ($batchSize === 0 && $import->isBackgroundProcess()) {
-                    $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
+                $this->saveEntity($import);
 
-                    if (!$isPublished) {
-                        $import->setStatus($import::STOPPED);
-                    }
-
-                    $this->saveEntity($import);
-
-                    // Stop the import loop if the import got unpublished
-                    if (!$isPublished) {
-                        $this->logDebug('The import has been unpublished. Stopping the import now.', $import);
-                        break;
-                    }
-
-                    $batchSize = $config['batchlimit'];
+                // Stop the import loop if the import got unpublished
+                if (!$isPublished) {
+                    $this->logDebug('The import has been unpublished. Stopping the import now.', $import);
+                    break;
                 }
+
+                $batchSize = $config['batchlimit'];
             }
         }
 
