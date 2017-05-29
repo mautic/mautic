@@ -1,0 +1,10 @@
+         * * * * *     www-data   php /usr/src/app/app/console mautic:segments:update
+         * * * * *     www-data   php /usr/src/app/app/console mautic:campaigns:rebuild
+         * * * * *     www-data   php /usr/src/app/app/console mautic:campaigns:trigger
+0,15,30,45 * * * *     www-data   php /usr/src/app/app/console mautic:messages:send
+0,15,30,45 * * * *     www-data   php /usr/src/app/app/console mautic:emails:send
+0,15,30,45 * * * *     www-data   php /usr/src/app/app/console mautic:email:fetch
+0,15,30,45 * * * *     www-data   php /usr/src/app/app/console mautic:social:monitoring
+0,15,30,45 * * * *     www-data   php /usr/src/app/app/console mautic:webhooks:process
+0,15,30,45 * * * *     www-data   php /usr/src/app/app/console mautic:broadcasts:send
+        0 4 15 * *     www-data   php /usr/src/app/app/console mautic:iplookup:download

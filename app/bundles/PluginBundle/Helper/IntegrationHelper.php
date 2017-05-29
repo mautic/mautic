@@ -28,6 +28,14 @@ class IntegrationHelper
      */
     private $factory;
 
+    private $integrations = [];
+
+    private $available = [];
+
+    private $byFeatureList = [];
+
+    private $byPlugin = [];
+
     /**
      * @param MauticFactory $factory
      */
@@ -49,13 +57,11 @@ class IntegrationHelper
      */
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false)
     {
-        static $integrations = [], $available = [], $byFeatureList = [], $byPlugin = [];
-
         // Build the service classes
-        if (empty($available)) {
+        if (empty($this->available)) {
             $em = $this->factory->getEntityManager();
 
-            $available = [];
+            $this->available = [];
 
             // Get currently installed integrations
             $integrationSettings = $this->getIntegrationSettings();
@@ -88,7 +94,7 @@ class IntegrationHelper
                     $finder->files()->name('*Integration.php')->in($plugin['directory'].'/Integration')->ignoreDotFiles(true);
 
                     $id              = $installedPlugins[$plugin['bundle']]['id'];
-                    $byPlugin[$id]   = [];
+                    $this->byPlugin[$id]   = [];
                     $pluginReference = $em->getReference('MauticPluginBundle:Plugin', $id);
                     $pluginNamespace = str_replace('MauticPlugin', '', $plugin['bundle']);
 
@@ -105,13 +111,13 @@ class IntegrationHelper
                             $class           = '\\MauticPlugin\\'.$pluginNamespace.'\\Integration\\'.$integrationName.'Integration';
                             $reflectionClass = new \ReflectionClass($class);
                             if ($reflectionClass->isInstantiable()) {
-                                $integrations[$integrationName] = new $class($this->factory);
+                                $this->integrations[$integrationName] = new $class($this->factory);
 
-                                $features = $integrations[$integrationName]->getSupportedFeatures();
+                                $features = $this->integrations[$integrationName]->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
                                 // Go ahead and stash it since it's built already
-                                $integrations[$integrationName]->setIntegrationSettings($newIntegration);
+                                $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
 
@@ -124,7 +130,7 @@ class IntegrationHelper
 
                         /** @var \Mautic\PluginBundle\Entity\Integration $settings */
                         $settings                    = $integrationSettings[$integrationName];
-                        $available[$integrationName] = [
+                        $this->available[$integrationName] = [
                             'isPlugin'    => true,
                             'integration' => $integrationName,
                             'settings'    => $settings,
@@ -134,12 +140,12 @@ class IntegrationHelper
                         // Sort by feature and plugin for later
                         $features = $settings->getSupportedFeatures();
                         foreach ($features as $feature) {
-                            if (!isset($byFeatureList[$feature])) {
-                                $byFeatureList[$feature] = [];
+                            if (!isset($this->byFeatureList[$feature])) {
+                                $this->byFeatureList[$feature] = [];
                             }
-                            $byFeatureList[$feature][] = $integrationName;
+                            $this->byFeatureList[$feature][] = $integrationName;
                         }
-                        $byPlugin[$id][] = $integrationName;
+                        $this->byPlugin[$id][] = $integrationName;
                     }
                 }
             }
@@ -166,12 +172,12 @@ class IntegrationHelper
                             $class           = '\\Mautic\\'.$coreBundleNamespace.'\\Integration\\'.$integrationName.'Integration';
                             $reflectionClass = new \ReflectionClass($class);
                             if ($reflectionClass->isInstantiable()) {
-                                $integrations[$integrationName] = new $class($this->factory);
-                                $features                       = $integrations[$integrationName]->getSupportedFeatures();
+                                $this->integrations[$integrationName] = new $class($this->factory);
+                                $features                       = $this->integrations[$integrationName]->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
                                 // Go ahead and stash it since it's built already
-                                $integrations[$integrationName]->setIntegrationSettings($newIntegration);
+                                $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
                             } else {
@@ -181,7 +187,7 @@ class IntegrationHelper
 
                         /** @var \Mautic\PluginBundle\Entity\Integration $settings */
                         $settings                    = isset($coreIntegrationSettings[$integrationName]) ? $coreIntegrationSettings[$integrationName] : $newIntegration;
-                        $available[$integrationName] = [
+                        $this->available[$integrationName] = [
                             'isPlugin'    => false,
                             'integration' => $integrationName,
                             'settings'    => $settings,
@@ -210,21 +216,21 @@ class IntegrationHelper
         // Build the integrations wanted
         if (!empty($pluginFilter)) {
             // Filter by plugin
-            $filteredIntegrations = $byPlugin[$pluginFilter];
+            $filteredIntegrations = $this->byPlugin[$pluginFilter];
         } elseif (!empty($specificIntegrations)) {
             // Filter by specific integrations
             $filteredIntegrations = $specificIntegrations;
         } else {
             // All services by default
-            $filteredIntegrations = array_keys($available);
+            $filteredIntegrations = array_keys($this->available);
         }
 
         // Filter by features
         if (!empty($withFeatures)) {
             $integrationsWithFeatures = [];
             foreach ($withFeatures as $feature) {
-                if (isset($byFeatureList[$feature])) {
-                    $integrationsWithFeatures = $integrationsWithFeatures + $byFeatureList[$feature];
+                if (isset($this->byFeatureList[$feature])) {
+                    $integrationsWithFeatures = $integrationsWithFeatures + $this->byFeatureList[$feature];
                 }
             }
 
@@ -235,24 +241,24 @@ class IntegrationHelper
 
         // Build the classes if not already
         foreach ($filteredIntegrations as $integrationName) {
-            if (!isset($available[$integrationName]) || ($publishedOnly && !$available[$integrationName]['settings']->isPublished())) {
+            if (!isset($this->available[$integrationName]) || ($publishedOnly && !$this->available[$integrationName]['settings']->isPublished())) {
                 continue;
             }
 
-            if (!isset($integrations[$integrationName])) {
-                $integration     = $available[$integrationName];
+            if (!isset($this->integrations[$integrationName])) {
+                $integration     = $this->available[$integrationName];
                 $rootNamespace   = $integration['isPlugin'] ? 'MauticPlugin' : 'Mautic';
                 $class           = '\\'.$rootNamespace.'\\'.$integration['namespace'].'\\Integration\\'.$integrationName.'Integration';
                 $reflectionClass = new \ReflectionClass($class);
                 if ($reflectionClass->isInstantiable()) {
-                    $integrations[$integrationName] = new $class($this->factory);
-                    $integrations[$integrationName]->setIntegrationSettings($integration['settings']);
+                    $this->integrations[$integrationName] = new $class($this->factory);
+                    $this->integrations[$integrationName]->setIntegrationSettings($integration['settings']);
                 } else {
                     continue;
                 }
             }
 
-            $returnServices[$integrationName] = $integrations[$integrationName];
+            $returnServices[$integrationName] = $this->integrations[$integrationName];
         }
 
         if (empty($alphabetical)) {

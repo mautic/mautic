@@ -1,0 +1,29 @@
+version: '2.1'
+services:
+  apache:
+    environment:
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_BASIC_AUTH: none
+    networks:
+      - default
+      - proxy
+    restart: unless-stopped
+
+  app:
+    image: ${IMAGE}
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+      args:
+        BUILD_TASK: ${BUILD_TASK:-build}
+        SYMFONY_ENV: ${SYMFONY_ENV:-prod}
+    volumes: ["/usr/src/app"]
+    restart: unless-stopped
+
+  db:
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external:
+      name: nginx-proxy
