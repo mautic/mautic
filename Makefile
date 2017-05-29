@@ -27,7 +27,7 @@ export APP_CONFIG
 
 .PHONY: test
 test: build-config-if-not-exists
-	bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles
+	bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
 
 # Development
 
