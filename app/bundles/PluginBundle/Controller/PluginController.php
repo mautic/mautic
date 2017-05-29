@@ -432,10 +432,10 @@ class PluginController extends FormController
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
-            $namespace = $meta->fullyQualifiedClassName('');
+            $namespace = $meta->fullyQualifiedClassName($meta->getName());
 
             if (strpos($namespace, 'MauticPlugin') !== false) {
-                $bundleName = str_replace('\Entity\\', '', $namespace);
+                $bundleName = strstr($namespace, '\Entity', true);
                 if (!isset($pluginMetadata[$bundleName])) {
                     $pluginMetadata[$bundleName] = [];
                 }
