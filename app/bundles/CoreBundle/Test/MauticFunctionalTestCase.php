@@ -62,7 +62,7 @@ abstract class MauticFunctionalTestCase extends WebTestCase
             ->expects($this->any())
             ->method('getParameter')
             ->willReturnCallback(function ($name, $default = null) {
-                if ($this->params[$name]) {
+                if (isset($this->params[$name])) {
                     return $this->params[$name];
                 }
 
@@ -92,7 +92,7 @@ abstract class MauticFunctionalTestCase extends WebTestCase
             ->expects($this->any())
             ->method('hasParameter')
             ->willReturnCallback(function ($name) {
-                if ($this->params[$name]) {
+                if (isset($this->params[$name])) {
                     return true;
                 }
 
