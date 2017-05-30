@@ -19,7 +19,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'templateButtons' => [
-                'new' => $permissions['dynamicContent:dynamicContents:create'],
+                'new' => $permissions['dynamiccontent:dynamiccontents:create'],
             ],
             'routeBase' => 'dynamicContent',
         ]

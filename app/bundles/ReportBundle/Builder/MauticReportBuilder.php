@@ -13,6 +13,7 @@ namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -72,6 +73,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
     ];
 
     /**
+     * Standard Channel Columns.
+     */
+    const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
+    const CHANNEL_COLUMN_NAME            = 'channel.name';
+    const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
+    const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
+    const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
+    const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
+
+    /**
      * @var Connection
      */
     private $db;
@@ -92,17 +103,24 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private $dispatcher;
 
     /**
+     * @var ChannelListHelper
+     */
+    private $channelListHelper;
+
+    /**
      * MauticReportBuilder constructor.
      *
      * @param EventDispatcherInterface $dispatcher
      * @param Connection               $db
      * @param Report                   $entity
+     * @param ChannelListHelper        $channelListHelper
      */
-    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity)
+    public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
     {
-        $this->entity     = $entity;
-        $this->dispatcher = $dispatcher;
-        $this->db         = $db;
+        $this->entity            = $entity;
+        $this->dispatcher        = $dispatcher;
+        $this->db                = $db;
+        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -146,7 +164,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         /** @var ReportGeneratorEvent $event */
         $event = $this->dispatcher->dispatch(
             ReportEvents::REPORT_ON_GENERATE,
-            new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder())
+            new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper)
         );
 
         // Build the QUERY
@@ -194,7 +212,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build GROUP BY
-        if (!empty($options['groupby'])) {
+        if ($groupByOptions = $this->entity->getGroupBy()) {
+            foreach ($groupByOptions as $groupBy) {
+                if (isset($options['columns'][$groupBy])) {
+                    $fieldOptions = $options['columns'][$groupBy];
+                    $columns[]    = (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
+                }
+            }
+            $groupByColumns = implode(',', $columns);
+            $queryBuilder->addGroupBy($groupByColumns);
+        } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
             if (is_array($options['groupby'])) {
                 foreach ($options['groupby'] as $groupBy) {
                     $queryBuilder->addGroupBy($groupBy);
@@ -203,7 +230,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $queryBuilder->groupBy($options['groupby']);
             }
         }
-
         // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
@@ -230,15 +256,21 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $fields = $this->entity->getColumns();
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
-                    $select = '';
-                    $select .= (isset($options['columns'][$field]['formula'])) ? $options['columns'][$field]['formula'] : $field;
+                    $fieldOptions = $options['columns'][$field];
+                    $select       = '';
+
+                    if (array_key_exists('channelData', $fieldOptions)) {
+                        $select .= $this->buildCaseSelect($fieldOptions['channelData']);
+                    } else {
+                        $select .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $field;
+                    }
 
                     if (strpos($select, '{{count}}')) {
                         $select = str_replace('{{count}}', $countSql, $select);
                     }
 
-                    if (isset($options['columns'][$field]['alias'])) {
-                        $select .= ' AS '.$options['columns'][$field]['alias'];
+                    if (isset($fieldOptions['alias'])) {
+                        $select .= ' AS '.$fieldOptions['alias'];
                     }
 
                     $selectColumns[] = $select;
@@ -247,8 +279,47 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         $queryBuilder->addSelect(implode(', ', $selectColumns));
+        // Add Aggregators
+        $aggregators = $this->entity->getAggregators();
+        if ($aggregators && $groupByOptions) {
+            foreach ($aggregators as $aggregator) {
+                $column = '';
+                if (isset($options['columns'][$aggregator['column']])) {
+                    $fieldOptions = $options['columns'][$aggregator['column']];
+                    if ($aggregator['function'] == 'AVG') {
+                        $field = (isset($fieldOptions['formula'])) ? 'ROUND('.$aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].'))' : 'ROUND('.$aggregator['function'].'(DISTINCT '.$aggregator['column'].'))';
+                    } else {
+                        $field = (isset($fieldOptions['formula'])) ? $aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].')' : $aggregator['function'].'(DISTINCT '.$aggregator['column'].')';
+                    }
+                    $column .= $field;
+                }
+
+                $formula = $column." as '".$aggregator['function'].' '.$aggregator['column']."'";
+                $queryBuilder->addSelect($formula);
+            }
+        }
 
         return $queryBuilder;
+    }
+
+    /**
+     * Build a CASE select statement.
+     *
+     * @param array $channelData ['channelName' => ['prefix' => XX, 'column' => 'XX.XX']
+     *
+     * @return string
+     */
+    private function buildCaseSelect(array $channelData)
+    {
+        $case = 'CASE';
+
+        foreach ($channelData as $channel => $data) {
+            $case .= ' WHEN '.$data['column'].' IS NOT NULL THEN '.$data['column'];
+        }
+
+        $case .= ' ELSE NULL END ';
+
+        return $case;
     }
 
     /**
@@ -291,7 +362,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         }
 
                         $columnValue = ":$paramName";
-                        switch ($filterDefinitions[$filter['column']]['type']) {
+                        $type        = $filterDefinitions[$filter['column']]['type'];
+                        if (isset($filterDefinitions[$filter['column']]['formula'])) {
+                            $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
+                        }
+
+                        switch ($type) {
                             case 'bool':
                             case 'boolean':
                                 if ((int) $filter['value'] > 1) {
@@ -315,9 +391,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
 
-                        $filterExpr->add(
-                            $expr->{$exprFunction}($filter['column'], $columnValue)
-                        );
+                    $filterExpr->add(
+                        $expr->{$exprFunction}($filter['column'], $columnValue)
+                    );
                 }
             }
         }

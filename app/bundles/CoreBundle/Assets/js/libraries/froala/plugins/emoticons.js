@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -339,17 +339,6 @@
       setDeletable();
 
       editor.events.on('html.set', setDeletable);
-
-      // Replace emoticons with unicode.
-      editor.events.on('html.get', function (html) {
-        for (var i = 0; i < editor.opts.emoticonsSet.length; i++) {
-          var em = editor.opts.emoticonsSet[i];
-          var text = $('<div>').html(em.code).text();
-          html = html.split(text).join(em.code);
-        }
-
-        return html;
-      });
 
       var inEmoticon = function () {
         if (!editor.selection.isCollapsed()) return false;

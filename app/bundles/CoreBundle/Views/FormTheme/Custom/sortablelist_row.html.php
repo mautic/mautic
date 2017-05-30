@@ -1,5 +1,11 @@
 <?php
-$list          = $form->children['list'];
+$list            = $form->children['list'];
+$parentHasErrors = $view['form']->containsErrors($form->parent);
+if ($parentHasErrors && empty($list->vars['value'])) {
+    // Work around for Symfony bug not repopulating values
+    $list = $form->parent->children['properties']['list'];
+}
+
 $hasErrors     = count($list->vars['errors']);
 $feedbackClass = (!empty($hasErrors)) ? ' has-error' : '';
 $datePrototype = (isset($list->vars['prototype'])) ?

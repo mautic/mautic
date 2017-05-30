@@ -125,6 +125,7 @@ class IntegrationHelper
                         /** @var \Mautic\PluginBundle\Entity\Integration $settings */
                         $settings                    = $integrationSettings[$integrationName];
                         $available[$integrationName] = [
+                            'isPlugin'    => true,
                             'integration' => $integrationName,
                             'settings'    => $settings,
                             'namespace'   => $pluginNamespace,
@@ -140,13 +141,60 @@ class IntegrationHelper
                         }
                         $byPlugin[$id][] = $integrationName;
                     }
+                }
+            }
 
-                    // Save newly found integrations
-                    if (!empty($newIntegrations)) {
-                        $integrationRepo->saveEntities($newIntegrations);
-                        unset($newIntegrations);
+            $coreIntegrationSettings = $this->getCoreIntegrationSettings();
+
+            // Scan core bundles for integration classes
+            foreach ($this->factory->getMauticBundles() as $coreBundle) {
+                if (is_dir($coreBundle['directory'].'/Integration')) {
+                    $finder = new Finder();
+                    $finder->files()->name('*Integration.php')->in($coreBundle['directory'].'/Integration')->ignoreDotFiles(true);
+
+                    $coreBundleNamespace = str_replace('Mautic', '', $coreBundle['bundle']);
+
+                    foreach ($finder as $file) {
+                        $integrationName = substr($file->getBaseName(), 0, -15);
+
+                        if (!isset($coreIntegrationSettings[$integrationName])) {
+                            $newIntegration = new Integration();
+                            $newIntegration->setName($integrationName);
+                            $integrationSettings[$integrationName] = $newIntegration;
+
+                            // Initiate the class in order to get the features supported
+                            $class           = '\\Mautic\\'.$coreBundleNamespace.'\\Integration\\'.$integrationName.'Integration';
+                            $reflectionClass = new \ReflectionClass($class);
+                            if ($reflectionClass->isInstantiable()) {
+                                $integrations[$integrationName] = new $class($this->factory);
+                                $features                       = $integrations[$integrationName]->getSupportedFeatures();
+                                $newIntegration->setSupportedFeatures($features);
+
+                                // Go ahead and stash it since it's built already
+                                $integrations[$integrationName]->setIntegrationSettings($newIntegration);
+
+                                $newIntegrations[] = $newIntegration;
+                            } else {
+                                continue;
+                            }
+                        }
+
+                        /** @var \Mautic\PluginBundle\Entity\Integration $settings */
+                        $settings                    = isset($coreIntegrationSettings[$integrationName]) ? $coreIntegrationSettings[$integrationName] : $newIntegration;
+                        $available[$integrationName] = [
+                            'isPlugin'    => false,
+                            'integration' => $integrationName,
+                            'settings'    => $settings,
+                            'namespace'   => $coreBundleNamespace,
+                        ];
                     }
                 }
+            }
+
+            // Save newly found integrations
+            if (!empty($newIntegrations)) {
+                $integrationRepo->saveEntities($newIntegrations);
+                unset($newIntegrations);
             }
         }
 
@@ -193,13 +241,14 @@ class IntegrationHelper
 
             if (!isset($integrations[$integrationName])) {
                 $integration     = $available[$integrationName];
-                $class           = '\\MauticPlugin\\'.$integration['namespace'].'\\Integration\\'.$integrationName.'Integration';
+                $rootNamespace   = $integration['isPlugin'] ? 'MauticPlugin' : 'Mautic';
+                $class           = '\\'.$rootNamespace.'\\'.$integration['namespace'].'\\Integration\\'.$integrationName.'Integration';
                 $reflectionClass = new \ReflectionClass($class);
                 if ($reflectionClass->isInstantiable()) {
                     $integrations[$integrationName] = new $class($this->factory);
                     $integrations[$integrationName]->setIntegrationSettings($integration['settings']);
                 } else {
-                    $integrations[$integrationName] = false;
+                    continue;
                 }
             }
 
@@ -332,6 +381,11 @@ class IntegrationHelper
     public function getIntegrationSettings()
     {
         return $this->factory->getEntityManager()->getRepository('MauticPluginBundle:Integration')->getIntegrations();
+    }
+
+    public function getCoreIntegrationSettings()
+    {
+        return $this->factory->getEntityManager()->getRepository('MauticPluginBundle:Integration')->getCoreIntegrations();
     }
 
     /**

@@ -108,6 +108,16 @@ class Notification extends FormEntity
      */
     private $notificationType = 'template';
 
+    /**
+     * @var bool
+     */
+    private $mobile = false;
+
+    /**
+     * @var array
+     */
+    private $mobileSettings;
+
     public function __clone()
     {
         $this->id        = null;
@@ -162,6 +172,7 @@ class Notification extends FormEntity
             ->build();
 
         $builder->createField('button', 'text')
+            ->nullable()
             ->build();
 
         $builder->createField('notificationType', 'text')
@@ -195,6 +206,10 @@ class Notification extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('mobile', 'boolean')->build();
+
+        $builder->createField('mobileSettings', 'array')->build();
     }
 
     /**
@@ -260,6 +275,7 @@ class Notification extends FormEntity
                     'url',
                     'language',
                     'category',
+                    'button',
                 ]
             )
             ->addProperties(
@@ -588,5 +604,45 @@ class Notification extends FormEntity
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMobileSettings()
+    {
+        return $this->mobileSettings;
+    }
+
+    /**
+     * @param array $mobileSettings
+     *
+     * @return $this
+     */
+    public function setMobileSettings(array $mobileSettings)
+    {
+        $this->mobileSettings = $mobileSettings;
+
+        return $this;
     }
 }

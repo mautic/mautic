@@ -54,16 +54,6 @@ if (class_exists('PHPExcel')) {
     ];
 }
 
-$buttons[] = [
-    'confirm' => [
-        'message'       => $view['translator']->trans('mautic.form.results.form.confirmbatchdelete'),
-        'confirmText'   => $view['translator']->trans('mautic.core.form.delete'),
-        'confirmAction' => $view['router']->path('mautic_form_results_delete', array_merge(['formId' => $form->getId()])),
-        'iconClass'     => 'fa fa-trash-o text-danger',
-        'btnText'       => $view['translator']->trans('mautic.core.form.delete'),
-    ],
-];
-
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', ['customButtons' => $buttons]));
 ?>
 

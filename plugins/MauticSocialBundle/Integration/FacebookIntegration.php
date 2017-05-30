@@ -61,6 +61,14 @@ class FacebookIntegration extends SocialIntegration
     {
         return 'https://graph.facebook.com/oauth/access_token';
     }
+	
+    /**
+     * @return string
+     */
+    public function getAuthScope()
+    {
+        return 'email';
+    }
 
     /**
      * {@inheritdoc}

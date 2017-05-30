@@ -14,6 +14,8 @@ namespace Mautic\LeadBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -21,15 +23,17 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class ListApiController extends CommonApiController
 {
+    use LeadAccessTrait;
+
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('lead.list');
         $this->entityClass      = 'Mautic\LeadBundle\Entity\LeadList';
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
-        $this->permissionBase   = 'lead:lists';
         $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress'];
+
+        parent::initialize($event);
     }
 
     /**
@@ -65,14 +69,9 @@ class ListApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $leadModel = $this->getModel('lead');
-        $contact   = $leadModel->getEntity($leadId);
-
-        // Does the contact exist and the user has permission to edit
-        if ($contact == null) {
-            return $this->notFound();
-        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
-            return $this->accessDenied();
+        $contact = $this->checkLeadAccess($leadId, 'edit');
+        if ($contact instanceof Response) {
+            return $contact;
         }
 
         // Does the user have access to the list
@@ -81,7 +80,7 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel->addToLists($leadId, $entity);
+        $this->getModel('lead')->addToLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Codes::HTTP_OK);
 
@@ -106,14 +105,9 @@ class ListApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $leadModel = $this->getModel('lead');
-        $contact   = $leadModel->getEntity($leadId);
-
-        // Does the lead exist and the user has permission to edit
-        if ($contact == null) {
-            return $this->notFound();
-        } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
-            return $this->accessDenied();
+        $contact = $this->checkLeadAccess($leadId, 'edit');
+        if ($contact instanceof Response) {
+            return $contact;
         }
 
         // Does the user have access to the list
@@ -122,7 +116,7 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel->removeFromLists($leadId, $entity);
+        $this->getModel('lead')->removeFromLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Codes::HTTP_OK);
 

@@ -13,21 +13,44 @@ namespace Mautic\PluginBundle\Integration;
 
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
+use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthCallbackUrlEvent;
+use Mautic\PluginBundle\Event\PluginIntegrationFormBuildEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
 
 /**
  * Class AbstractIntegration.
+ *
+ * @method pushLead(Lead $lead, array $config = [])
+ * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
  */
 abstract class AbstractIntegration
 {
+    /**
+     * @var bool
+     */
+    protected $coreIntegration = false;
+
     /**
      * @var MauticFactory
      */
@@ -46,17 +69,122 @@ abstract class AbstractIntegration
     /**
      * @var array Decrypted keys
      */
-    protected $keys;
+    protected $keys = [];
+
+    /**
+     * @var CacheStorageHelper
+     */
+    protected $cache;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var null|SessionInterface
+     */
+    protected $session;
+
+    /**
+     * @var null|Request
+     */
+    protected $request;
+
+    /**
+     * @var Router
+     */
+    protected $router;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var \Mautic\CoreBundle\Translation\Translator
+     */
+    protected $translator;
+
+    /**
+     * @var EncryptionHelper
+     */
+    protected $encryptionHelper;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
+     * @var PathsHelper
+     */
+    protected $pathsHelper;
+
+    /**
+     * @var NotificationModel
+     */
+    protected $notificationModel;
+
+    /**
+     * @var FieldModel
+     */
+    protected $fieldModel;
+
+    /**
+     * Used for notifications.
+     *
+     * @var array|null
+     */
+    protected $adminUsers;
+
+    /**
+     * @var
+     */
+    protected $notifications = [];
+
+    /**
+     * @var
+     */
+    protected $lastIntegrationError;
 
     /**
      * @param MauticFactory $factory
+     *
+     * @todo divorce from MauticFactory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->factory    = $factory;
-        $this->dispatcher = $factory->getDispatcher();
+        $this->factory           = $factory;
+        $this->dispatcher        = $factory->getDispatcher();
+        $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+        $this->em                = $factory->getEntityManager();
+        $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
+        $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
+        $this->router            = $factory->getRouter();
+        $this->translator        = $factory->getTranslator();
+        $this->logger            = $factory->getLogger();
+        $this->encryptionHelper  = $factory->getHelper('encryption');
+        $this->leadModel         = $factory->getModel('lead');
+        $this->companyModel      = $factory->getModel('lead.company');
+        $this->pathsHelper       = $factory->getHelper('paths');
+        $this->notificationModel = $factory->getModel('core.notification');
+        $this->fieldModel        = $factory->getModel('lead.field');
 
         $this->init();
+    }
+
+    /**
+     * @return CacheStorageHelper
+     */
+    public function getCache()
+    {
+        return $this->cache;
     }
 
     /**
@@ -64,7 +192,7 @@ abstract class AbstractIntegration
      */
     public function getTranslator()
     {
-        return $this->factory->getTranslator();
+        return $this->translator;
     }
 
     /**
@@ -72,6 +200,14 @@ abstract class AbstractIntegration
      */
     public function init()
     {
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCoreIntegration()
+    {
+        return $this->coreIntegration;
     }
 
     /**
@@ -119,9 +255,9 @@ abstract class AbstractIntegration
      */
     public function getIcon()
     {
-        $systemPath  = $this->factory->getSystemPath('root');
-        $bundlePath  = $this->factory->getSystemPath('bundles');
-        $pluginPath  = $this->factory->getSystemPath('plugins');
+        $systemPath  = $this->pathsHelper->getSystemPath('root');
+        $bundlePath  = $this->pathsHelper->getSystemPath('bundles');
+        $pluginPath  = $this->pathsHelper->getSystemPath('plugins');
         $genericIcon = $bundlePath.'/PluginBundle/Assets/img/generic.png';
 
         $name   = $this->getName();
@@ -142,6 +278,16 @@ abstract class AbstractIntegration
      * @return string
      */
     abstract public function getAuthenticationType();
+
+    /**
+     * Get if data priority is enabled in the integration or not default is false.
+     *
+     * @return string
+     */
+    public function getDataPriority()
+    {
+        return false;
+    }
 
     /**
      * Get a list of supported features for this integration.
@@ -218,9 +364,8 @@ abstract class AbstractIntegration
      */
     public function persistIntegrationSettings()
     {
-        $em = $this->factory->getEntityManager();
-        $em->persist($this->settings);
-        $em->flush();
+        $this->em->persist($this->settings);
+        $this->em->flush();
     }
 
     /**
@@ -332,12 +477,10 @@ abstract class AbstractIntegration
      */
     public function encryptApiKeys(array $keys)
     {
-        /** @var \Mautic\CoreBundle\Helper\EncryptionHelper $helper */
-        $helper    = $this->factory->getHelper('encryption');
         $encrypted = [];
 
         foreach ($keys as $name => $key) {
-            $key              = $helper->encrypt($key);
+            $key              = $this->encryptionHelper->encrypt($key);
             $encrypted[$name] = $key;
         }
 
@@ -353,12 +496,10 @@ abstract class AbstractIntegration
      */
     public function decryptApiKeys(array $keys)
     {
-        /** @var \Mautic\CoreBundle\Helper\EncryptionHelper $helper */
-        $helper    = $this->factory->getHelper('encryption');
         $decrypted = [];
 
         foreach ($keys as $name => $key) {
-            $key              = $helper->decrypt($key);
+            $key              = $this->encryptionHelper->decrypt($key);
             $decrypted[$name] = $key;
         }
 
@@ -595,7 +736,7 @@ abstract class AbstractIntegration
         if (!$this->isConfigured()) {
             return [
                 'error' => [
-                    'message' => $this->factory->getTranslator()->trans(
+                    'message' => $this->translator->trans(
                         'mautic.integration.missingkeys'
                     ),
                 ],
@@ -709,8 +850,41 @@ abstract class AbstractIntegration
         }
     }
 
-    /*
-     * Method to prepare the request parameters. Builds array of headers and parameters
+    /**
+     * @param            $integrationEntity
+     * @param            $integrationEntityId
+     * @param            $internalEntity
+     * @param            $internalEntityId
+     * @param array|null $internal
+     * @param bool       $persist
+     */
+    public function createIntegrationEntity($integrationEntity, $integrationEntityId, $internalEntity, $internalEntityId, array $internal = null, $persist = true)
+    {
+        $entity = new IntegrationEntity();
+        $entity->setDateAdded(new \DateTime())
+            ->setLastSyncDate(new \DateTime())
+            ->setIntegration($this->getName())
+            ->setIntegrationEntity($integrationEntity)
+            ->setIntegrationEntityId($integrationEntityId)
+            ->setInternalEntity($internalEntity)
+            ->setInternal($internal)
+            ->setInternalEntityId($internalEntityId);
+
+        if ($persist) {
+            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntity($entity);
+        }
+
+        return $entity;
+    }
+
+    /**
+     * Method to prepare the request parameters. Builds array of headers and parameters.
+     *
+     * @param $url
+     * @param $parameters
+     * @param $method
+     * @param $settings
+     * @param $authType
      *
      * @return array
      */
@@ -740,7 +914,7 @@ abstract class AbstractIntegration
                     if (!array_key_exists('append_callback', $settings) && !empty($requestTokenUrl)) {
                         $settings['append_callback'] = false;
                     }
-                    $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
+                    $oauthHelper = new oAuthHelper($this, $this->request, $settings);
                     $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
                     break;
                 case 'oauth2':
@@ -773,7 +947,7 @@ abstract class AbstractIntegration
                         }
 
                         if ($grantType == 'authorization_code') {
-                            $parameters['code'] = $this->factory->getRequest()->get('code');
+                            $parameters['code'] = $this->request->get('code');
                         }
                         if (empty($settings['ignore_redirecturi'])) {
                             $callback                   = $this->getAuthCallbackUrl();
@@ -790,7 +964,7 @@ abstract class AbstractIntegration
                     ];
                     break;
                 case 'oauth1a':
-                    $oauthHelper = new oAuthHelper($this, $this->factory->getRequest(), $settings);
+                    $oauthHelper = new oAuthHelper($this, $this->request, $settings);
                     $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
                     break;
                 case 'oauth2':
@@ -848,11 +1022,13 @@ abstract class AbstractIntegration
                 $url .= '&scope='.urlencode($scope);
             }
 
-            $this->factory->getSession()->set($this->getName().'_csrf_token', $state);
+            if ($this->session) {
+                $this->session->set($this->getName().'_csrf_token', $state);
+            }
 
             return $url;
         } else {
-            return $this->factory->getRouter()->generate(
+            return $this->router->generate(
                 'mautic_integration_auth_callback',
                 ['integration' => $this->getName()]
             );
@@ -886,7 +1062,7 @@ abstract class AbstractIntegration
      */
     public function getAuthCallbackUrl()
     {
-        $defaultUrl = $this->factory->getRouter()->generate(
+        $defaultUrl = $this->router->generate(
             'mautic_integration_auth_callback',
             ['integration' => $this->getName()],
             true //absolute
@@ -908,6 +1084,8 @@ abstract class AbstractIntegration
      * @param array $parameters
      *
      * @return bool|string false if no error; otherwise the error string
+     *
+     * @throws ApiErrorException if OAuth2 state does not match
      */
     public function authCallback($settings = [], $parameters = [])
     {
@@ -915,6 +1093,16 @@ abstract class AbstractIntegration
 
         switch ($authType) {
             case 'oauth2':
+                if ($this->session) {
+                    $state      = $this->session->get($this->getName().'_csrf_token', false);
+                    $givenState = ($this->request->isXmlHttpRequest()) ? $this->request->request->get('state') : $this->request->get('state');
+
+                    if ($state && $state !== $givenState) {
+                        $this->session->remove($this->getName().'_csrf_token');
+                        throw new ApiErrorException('mautic.integration.auth.invalid.state');
+                    }
+                }
+
                 if (!empty($settings['use_refresh_token'])) {
                     // Try refresh token
                     $refreshTokenKeys = $this->getRefreshTokenKeys();
@@ -933,7 +1121,8 @@ abstract class AbstractIntegration
                 $settings['include_verifier'] = true;
 
                 // Get request token returned from Twitter and submit it to get access_token
-                $settings['request_token'] = $this->factory->getRequest()->get('oauth_token');
+                $settings['request_token'] = ($this->request) ? $this->request->get('oauth_token') : '';
+
                 break;
         }
 
@@ -971,16 +1160,20 @@ abstract class AbstractIntegration
             $encrypted = $this->encryptApiKeys($keys);
             $entity->setApiKeys($encrypted);
 
-            $this->factory->getSession()->set($this->getName().'_tokenResponse', $data);
+            if ($this->session) {
+                $this->session->set($this->getName().'_tokenResponse', $data);
+            }
 
             $error = false;
         } elseif (is_array($data) && isset($data['access_token'])) {
-            $this->factory->getSession()->set($this->getName().'_tokenResponse', $data);
+            if ($this->session) {
+                $this->session->set($this->getName().'_tokenResponse', $data);
+            }
             $error = false;
         } else {
             $error = $this->getErrorsFromResponse($data);
             if (empty($error)) {
-                $error = $this->factory->getTranslator()->trans(
+                $error = $this->translator->trans(
                     'mautic.integration.error.genericerror',
                     [],
                     'flashes'
@@ -989,9 +1182,8 @@ abstract class AbstractIntegration
         }
 
         //save the data
-        $em = $this->factory->getEntityManager();
-        $em->persist($entity);
-        $em->flush();
+        $this->em->persist($entity);
+        $this->em->flush();
 
         $this->setIntegrationSettings($entity);
 
@@ -1205,9 +1397,7 @@ abstract class AbstractIntegration
      */
     protected function getRefererUrl()
     {
-        $request = $this->factory->getRequest();
-
-        return $request->getRequestUri();
+        return ($this->request) ? $this->request->getRequestUri() : null;
     }
 
     /**
@@ -1217,9 +1407,7 @@ abstract class AbstractIntegration
      */
     protected function getUserAgent()
     {
-        $request = $this->factory->getRequest();
-
-        return $request->server->get('HTTP_USER_AGENT');
+        return ($this->request) ? $this->request->server->get('HTTP_USER_AGENT') : null;
     }
 
     /**
@@ -1231,7 +1419,124 @@ abstract class AbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if (empty($settings['ignore_field_cache'])) {
+            $cacheSuffix = (isset($settings['cache_suffix'])) ? $settings['cache_suffix'] : '';
+            if ($fields = $this->cache->get('leadFields'.$cacheSuffix)) {
+                return $fields;
+            }
+        }
+
         return [];
+    }
+
+    /**
+     * @param Integration $entity
+     * @param array       $mauticLeadFields
+     * @param array       $mauticCompanyFields
+     *
+     * @return array
+     */
+    public function cleanUpFields(Integration $entity, array $mauticLeadFields, array $mauticCompanyFields)
+    {
+        $featureSettings        = $entity->getFeatureSettings();
+        $submittedFields        = (isset($featureSettings['leadFields'])) ? $featureSettings['leadFields'] : [];
+        $submittedCompanyFields = (isset($featureSettings['companyFields'])) ? $featureSettings['companyFields'] : [];
+        $submittedObjects       = (isset($featureSettings['objects'])) ? $featureSettings['objects'] : [];
+        $missingRequiredFields  = [];
+
+        // add special case in order to prevent it from being removed
+        $mauticLeadFields['mauticContactTimelineLink'] = '';
+
+        //make sure now non-existent aren't saved
+        $settings = [
+            'ignore_field_cache' => false,
+        ];
+        $settings['feature_settings']['objects'] = $submittedObjects;
+        $availableIntegrationFields              = $this->getAvailableLeadFields($settings);
+        $leadFields                              = [];
+
+        /**
+         * @param $mappedFields
+         * @param $integrationFields
+         * @param $mauticFields
+         * @param $fieldType
+         */
+        $cleanup = function (&$mappedFields, $integrationFields, $mauticFields, $fieldType) use (&$missingRequiredFields, &$featureSettings) {
+            $updateKey    = ('companyFields' === $fieldType) ? 'update_mautic_company' : 'update_mautic';
+            $removeFields = array_keys(array_diff_key($mappedFields, $integrationFields));
+
+            // Find all the mapped fields that no longer exist in Mautic
+            if ($nonExistentFields = array_diff($mappedFields, array_keys($mauticFields))) {
+                // Remove those fields
+                $removeFields = array_merge($removeFields, array_keys($nonExistentFields));
+            }
+
+            foreach ($removeFields as $field) {
+                unset($mappedFields[$field]);
+
+                if (isset($featureSettings[$updateKey])) {
+                    unset($featureSettings[$updateKey][$field]);
+                }
+            }
+
+            // Check if required fields are missing
+            $required = $this->getRequiredFields($integrationFields);
+            if (array_diff_key($required, $mappedFields)) {
+                $missingRequiredFields[$fieldType] = true;
+            }
+        };
+
+        if ($submittedObjects) {
+            if (in_array('company', $submittedObjects)) {
+                // special handling for company fields
+                if (isset($availableIntegrationFields['company'])) {
+                    $cleanup($submittedCompanyFields, $availableIntegrationFields['company'], $mauticCompanyFields, 'companyFields');
+                    $featureSettings['companyFields'] = $submittedCompanyFields;
+                    unset($availableIntegrationFields['company']);
+                }
+            }
+
+            // Rest of the objects are merged and assumed to be leadFields
+            foreach ($submittedObjects as $object) {
+                if (isset($availableIntegrationFields[$object])) {
+                    $leadFields = array_merge($leadFields, $availableIntegrationFields[$object]);
+                }
+            }
+        } else {
+            // Cleanup assuming there are no objects as keys
+            $leadFields = $availableIntegrationFields;
+        }
+
+        if (!empty($leadFields)) {
+            $cleanup($submittedFields, $leadFields, $mauticLeadFields, 'leadFields');
+            $featureSettings['leadFields'] = $submittedFields;
+        }
+
+        $entity->setFeatureSettings($featureSettings);
+
+        return $missingRequiredFields;
+    }
+
+    /**
+     * @param array $fields
+     *
+     * @return array
+     */
+    public function getRequiredFields(array $fields)
+    {
+        $requiredFields = [];
+        foreach ($fields as $field => $details) {
+            if ((is_array($details) && !empty($details['required'])) || 'email' === $field
+                || (isset($details['optionLabel'])
+                    && strtolower(
+                        $details['optionLabel']
+                    ) == 'email')
+            ) {
+                $requiredFields[$field] = $field;
+            }
+        }
+
+        return $requiredFields;
     }
 
     /**
@@ -1254,28 +1559,48 @@ abstract class AbstractIntegration
 
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);
+            $leadId = $lead->getId();
         } else {
             $fields = $lead;
+            $leadId = $lead['id'];
         }
 
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
-        $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
-        $matched         = [];
+        if (isset($config['object'])) {
+            $availableFields = $availableFields[$config['object']];
+        }
+        $unknown = $this->translator->trans('mautic.integration.form.lead.unknown');
+        $matched = [];
 
         foreach ($availableFields as $key => $field) {
-            $integrationKey = $this->convertLeadFieldKey($key, $field);
+            $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
+            if (is_array($integrationKey)) {
+                list($integrationKey, $matchIntegrationKey) = $integrationKey;
+            }
 
-            if (isset($leadFields[$key])) {
-                $mauticKey = $leadFields[$key];
+            if (isset($leadFields[$integrationKey])) {
+                if ($leadFields[$integrationKey] == 'mauticContactTimelineLink') {
+                    $this->pushContactLink  = true;
+                    $mauticContactLinkField = $integrationKey;
+                    continue;
+                }
+                $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                    $matched[$integrationKey] = $fields[$mauticKey]['value'];
+                    $matched[$matchIntegrationKey] = $this->cleanPushData($fields[$mauticKey]['value']);
                 }
             }
 
-            if (!empty($field['required']) && empty($matched[$integrationKey])) {
-                $matched[$integrationKey] = $unknown;
+            if (!empty($field['required']) && empty($matched[$matchIntegrationKey])) {
+                $matched[$matchIntegrationKey] = $unknown;
             }
+        }
+        if ($this->pushContactLink) {
+            $matched[$mauticContactLinkField] = $this->router->generate(
+                'mautic_plugin_timeline_view',
+                ['integration' => $this->getName(), 'leadId' => $leadId],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
         }
 
         return $matched;
@@ -1307,7 +1632,7 @@ abstract class AbstractIntegration
 
         $companyFields   = $config['companyFields'];
         $availableFields = $this->getAvailableLeadFields($config)['company'];
-        $unknown         = $this->factory->getTranslator()->trans('mautic.integration.form.lead.unknown');
+        $unknown         = $this->translator->trans('mautic.integration.form.lead.unknown');
         $matched         = [];
 
         foreach ($availableFields as $key => $field) {
@@ -1316,7 +1641,7 @@ abstract class AbstractIntegration
             if (isset($companyFields[$key])) {
                 $mauticKey = $companyFields[$key];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey])) {
-                    $matched[$integrationKey] = $fields[$mauticKey];
+                    $matched[$integrationKey] = $this->cleanPushData($fields[$mauticKey]);
                 }
             }
 
@@ -1406,8 +1731,8 @@ abstract class AbstractIntegration
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel           = $this->factory->getModel('lead');
-        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $leadModel           = $this->leadModel;
+        $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
         $uniqueLeadFieldData = [];
 
         foreach ($matchedFields as $leadField => $value) {
@@ -1421,7 +1746,7 @@ abstract class AbstractIntegration
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
+            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
@@ -1460,7 +1785,7 @@ abstract class AbstractIntegration
             try {
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
-                $this->factory->getLogger()->addWarning($exception->getMessage());
+                $this->logger->addWarning($exception->getMessage());
 
                 return;
             }
@@ -1628,16 +1953,106 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param \Exception $e
+     * @return \Mautic\CoreBundle\Model\NotificationModel
      */
-    public function logIntegrationError(\Exception $e)
+    public function getNotificationModel()
     {
-        $logger = $this->factory->getLogger();
-        if ('dev' == MAUTIC_ENV) {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e);
-        } else {
-            $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.$e->getMessage());
+        return $this->notificationModel;
+    }
+
+    /**
+     * @param \Exception $e
+     * @param Lead|null  $contact
+     */
+    public function logIntegrationError(\Exception $e, Lead $contact = null)
+    {
+        $logger = $this->logger;
+
+        if ($e instanceof ApiErrorException) {
+            if (null === $this->adminUsers) {
+                $this->adminUsers = $this->em->getRepository('MauticUserBundle:User')->getEntities(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
+                                    'column' => 'r.isAdmin',
+                                    'expr'   => 'eq',
+                                    'value'  => true,
+                                ],
+                            ],
+                        ],
+                    ]
+                );
+            }
+
+            $errorMessage = $e->getMessage();
+            $errorHeader  = $this->getTranslator()->trans(
+                'mautic.integration.error',
+                [
+                    '%name%' => $this->getName(),
+                ]
+            );
+
+            if ($contact || $contact = $e->getContact()) {
+                // Append a link to the contact
+                $contactId   = $contact->getId();
+                $contactName = $contact->getPrimaryIdentifier();
+            } elseif ($contactId = $e->getContactId()) {
+                $contactName = $this->getTranslator()->trans('mautic.integration.error.generic_contact_name', ['%id%' => $contactId]);
+            }
+
+            $this->lastIntegrationError = $errorHeader.': '.$errorMessage;
+
+            if ($contactId) {
+                $contactLink = $this->router->generate(
+                    'mautic_contact_action',
+                    [
+                        'objectAction' => 'view',
+                        'objectId'     => $contactId,
+                    ],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+                $errorMessage .= ' <a href="'.$contactLink.'">'.$contactName.'</a>';
+            }
+
+            // Prevent a flood of the same messages
+            $messageHash = md5($errorMessage);
+            if (!array_key_exists($messageHash, $this->notifications)) {
+                foreach ($this->adminUsers as $user) {
+                    $this->getNotificationModel()->addNotification(
+                        $errorMessage,
+                        $this->getName(),
+                        false,
+                        $errorHeader,
+                        'text-danger fa-exclamation-circle',
+                        null,
+                        $user
+                    );
+                }
+
+                $this->notifications[$messageHash] = true;
+            }
         }
+
+        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastIntegrationError()
+    {
+        return $this->lastIntegrationError;
+    }
+
+    /**
+     * @return $this
+     */
+    public function resetLastIntegrationError()
+    {
+        $this->lastIntegrationError = null;
+
+        return $this;
     }
 
     /**
@@ -1672,13 +2087,26 @@ abstract class AbstractIntegration
     }
 
     /**
+     * @param FormBuilder $builder
+     * @param array       $options
+     */
+    public function modifyForm($builder, $options)
+    {
+        $this->dispatcher->dispatch(
+            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD,
+            new PluginIntegrationFormBuildEvent($this, $builder, $options)
+        );
+    }
+
+    /**
      * Returns settings for the integration form.
      *
      * @return array
      */
     public function getFormSettings()
     {
-        $type = $this->getAuthenticationType();
+        $type               = $this->getAuthenticationType();
+        $enableDataPriority = $this->getDataPriority();
         switch ($type) {
             case 'oauth1a':
             case 'oauth2':
@@ -1693,9 +2121,13 @@ abstract class AbstractIntegration
             'requires_callback'      => $callback,
             'requires_authorization' => $authorization,
             'default_features'       => [],
+            'enable_data_priority'   => $enableDataPriority,
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getFormDisplaySettings()
     {
         /** @var PluginIntegrationFormDisplayEvent $event */
@@ -1749,6 +2181,20 @@ abstract class AbstractIntegration
     }
 
     /**
+     * @param $contactId
+     *
+     * @return string
+     */
+    public function getContactTimelineLink($contactId)
+    {
+        return $this->router->generate(
+            'mautic_plugin_timeline_view',
+            ['integration' => $this->getName(), 'leadId' => $contactId],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+    }
+
+    /**
      * @param       $eventName
      * @param array $keys
      *
@@ -1783,5 +2229,18 @@ abstract class AbstractIntegration
         }
 
         return $identifier;
+    }
+
+    /**
+     * @param $value
+     */
+    public function cleanPushData($value)
+    {
+        return strip_tags(html_entity_decode($value, ENT_QUOTES));
+    }
+
+    public function getLogger()
+    {
+        return $this->logger;
     }
 }

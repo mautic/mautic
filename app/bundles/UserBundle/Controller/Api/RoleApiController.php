@@ -24,13 +24,13 @@ class RoleApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('user.role');
         $this->entityClass      = 'Mautic\UserBundle\Entity\Role';
         $this->entityNameOne    = 'role';
         $this->entityNameMulti  = 'roles';
-        $this->permissionBase   = 'user:roles';
         $this->serializerGroups = ['roleDetails', 'publishDetails'];
+
+        parent::initialize($event);
     }
 
     /**

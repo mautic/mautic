@@ -82,10 +82,12 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                     if ($f['is_unique'] && $f['alias'] != 'email') {
                         $uniqueFields[$f['alias']] = $f['alias'];
                     }
-
                     $columnDef = FieldModel::getSchemaDefinition($f['alias'], $f['type'], !empty($f['is_unique']));
 
-                    $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
+                    if (!$table->hasColumn($f['alias'])) {
+                        $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
+                    }
+
                     if ('text' != $columnDef['type']) {
                         $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$f['alias'].'_search');
                     }
@@ -114,6 +116,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 switch ($object) {
                     case 'lead':
                         $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
+                        $table->addIndex(['date_added', 'country'], MAUTIC_TABLE_PREFIX.'date_added_country_index');
                         break;
                     case 'company':
                         $table->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');

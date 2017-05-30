@@ -15,6 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
@@ -86,6 +87,15 @@ class MauticCoreExtension extends Extension
                             // Fix escaped sprintf placeholders
                             $details['serviceAlias'] = str_replace('%%', '%', $details['serviceAlias']);
                             $container->setAlias(sprintf($details['serviceAlias'], $name), $name);
+                        } elseif (isset($details['serviceAliases'])) {
+                            foreach ($details['serviceAliases'] as $alias) {
+                                $alias = str_replace('%%', '%', $alias);
+                                $container->setAlias(sprintf($alias, $name), $name);
+                            }
+                        }
+                        // Alias with class name
+                        if ($name !== $details['class']) {
+                            $container->setAlias($details['class'], $name);
                         }
 
                         // Generate definition arguments
@@ -97,31 +107,7 @@ class MauticCoreExtension extends Extension
                         }
 
                         foreach ($details['arguments'] as $argument) {
-                            if ($argument === '') {
-                                // To be added during compilation
-                                $definitionArguments[] = '';
-                            } elseif (is_array($argument) || is_object($argument)) {
-                                foreach ($argument as $k => &$v) {
-                                    if (strpos($v, '%') === 0) {
-                                        $v = str_replace('%%', '%', $v);
-                                        $v = $container->getParameter(substr($v, 1, -1));
-                                    }
-                                }
-                                $definitionArguments[] = $argument;
-                            } elseif (strpos($argument, '%') === 0) {
-                                // Parameter
-                                $argument              = str_replace('%%', '%', $argument);
-                                $definitionArguments[] = $container->getParameter(substr($argument, 1, -1));
-                            } elseif (is_bool($argument) || strpos($argument, '\\') !== false) {
-                                // Parameter or Class
-                                $definitionArguments[] = $argument;
-                            } elseif (strpos($argument, '"') === 0) {
-                                // String
-                                $definitionArguments[] = substr($argument, 1, -1);
-                            } else {
-                                // Reference
-                                $definitionArguments[] = new Reference($argument);
-                            }
+                            $this->processArgument($argument, $container, $definitionArguments);
                         }
 
                         // Add the service
@@ -250,31 +236,7 @@ class MauticCoreExtension extends Extension
                             foreach ($details['methodCalls'] as $method => $methodArguments) {
                                 $methodCallArguments = [];
                                 foreach ($methodArguments as $argument) {
-                                    if ($argument === '') {
-                                        // To be added during compilation
-                                        $methodCallArguments[] = '';
-                                    } elseif (is_array($argument) || is_object($argument)) {
-                                        foreach ($argument as $k => &$v) {
-                                            if (strpos($v, '%') === 0) {
-                                                $v = str_replace('%%', '%', $v);
-                                                $v = $container->getParameter(substr($v, 1, -1));
-                                            }
-                                        }
-                                        $methodCallArguments[] = $argument;
-                                    } elseif (strpos($argument, '%') === 0) {
-                                        // Parameter
-                                        $argument              = str_replace('%%', '%', $argument);
-                                        $methodCallArguments[] = $container->getParameter(substr($argument, 1, -1));
-                                    } elseif (is_bool($argument) || strpos($argument, '\\') !== false) {
-                                        // Parameter or Class
-                                        $methodCallArguments[] = $argument;
-                                    } elseif (strpos($argument, '"') === 0) {
-                                        // String
-                                        $methodCallArguments[] = substr($argument, 1, -1);
-                                    } else {
-                                        // Reference
-                                        $methodCallArguments[] = new Reference($argument);
-                                    }
+                                    $this->processArgument($argument, $container, $methodCallArguments);
                                 }
 
                                 $definition->addMethodCall($method, $methodCallArguments);
@@ -318,5 +280,47 @@ class MauticCoreExtension extends Extension
         }
 
         unset($bundles);
+    }
+
+    /**
+     * @param $argument
+     * @param $container
+     * @param $definitionArguments
+     */
+    private function processArgument($argument, $container, &$definitionArguments)
+    {
+        if ($argument === '') {
+            // To be added during compilation
+            $definitionArguments[] = '';
+        } elseif (is_array($argument) || is_object($argument)) {
+            foreach ($argument as $k => &$v) {
+                if (strpos($v, '%') === 0) {
+                    $v = str_replace('%%', '%', $v);
+                    $v = $container->getParameter(substr($v, 1, -1));
+                }
+            }
+            $definitionArguments[] = $argument;
+        } elseif (strpos($argument, '%') === 0) {
+            // Parameter
+            $argument              = str_replace('%%', '%', $argument);
+            $definitionArguments[] = $container->getParameter(substr($argument, 1, -1));
+        } elseif (is_bool($argument) || strpos($argument, '\\') !== false) {
+            // Parameter or Class
+            $definitionArguments[] = $argument;
+        } elseif (strpos($argument, '"') === 0) {
+            // String
+            $definitionArguments[] = substr($argument, 1, -1);
+        } elseif (strpos($argument, '@=') === 0) {
+            // Expression
+            $argument              = substr($argument, 2);
+            $definitionArguments[] = new Expression($argument);
+        } elseif (strpos($argument, '@') === 0) {
+            // Service
+            $argument              = substr($argument, 1);
+            $definitionArguments[] = new Reference($argument);
+        } else {
+            // Reference
+            $definitionArguments[] = new Reference($argument);
+        }
     }
 }

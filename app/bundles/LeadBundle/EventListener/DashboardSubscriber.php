@@ -167,8 +167,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 // Build table rows with links
                 if ($lists) {
                     foreach ($lists as &$list) {
-                        $listUrl = $this->router->generate('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $list['id']]);
-                        $row     = [
+                        $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $list['id']]);
+                        $contactUrl = $this->router->generate('mautic_contact_index', ['search' => 'segment:'.$list['alias']]);
+                        $row        = [
                             [
                                 'value' => $list['name'],
                                 'type'  => 'link',
@@ -176,6 +177,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                             ],
                             [
                                 'value' => $list['leads'],
+                                'type'  => 'link',
+                                'link'  => $contactUrl,
                             ],
                         ];
                         $items[] = $row;

@@ -49,6 +49,10 @@
     width: 50%;
 }
 
+#mauticforms_fields .chosen-container-single .chosen-search input[type="text"] {
+    width:100%;
+}
+
 .mauticform-row {
     min-height: 60px;
 }

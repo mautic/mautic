@@ -24,11 +24,11 @@ class DynamicContentApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model           = $this->getModel('dynamicContent');
         $this->entityClass     = 'Mautic\DynamicContentBundle\Entity\DynamicContent';
         $this->entityNameOne   = 'dynamicContent';
         $this->entityNameMulti = 'dynamicContents';
-        $this->permissionBase  = 'dynamicContent:dynamicContents';
+
+        parent::initialize($event);
     }
 }

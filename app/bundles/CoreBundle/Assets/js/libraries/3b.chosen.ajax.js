@@ -76,6 +76,7 @@
                     });
                     items = callback != null ? callback(data, field) : data;
                     nbItems = 0;
+
                     $.each(items, function (i, element) {
                         var group, text, value;
                         nbItems++;
