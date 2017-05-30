@@ -742,8 +742,11 @@ class ReportModel extends FormModel
                     //set the header
                     $header[] = $k;
                 }
-
-                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+                if ($type = $reportData['columns'][$reportData['dataColumns'][$k]]['type'] !== 'string') {
+                    $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+                } else {
+                    $row[] = $v;
+                }
             }
 
             if ($page === 1 && $count === 0) {
