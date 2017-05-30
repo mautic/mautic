@@ -238,6 +238,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $channelRules = [];
 
     /**
+     * @var ArrayCollection
+     */
+    private $charLeadFields;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -392,12 +397,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 ->fetchExtraLazy()
                 ->build();
 
+        $builder->createOneToMany('charLeadFields', 'Mautic\LeadBundle\Entity\CharLeadField')
+                ->orphanRemoval()
+                ->mappedBy('lead')
+                ->cascadeAll()
+                ->fetchExtraLazy()
+                ->build();
+
         self::loadFixedFieldMetadata(
             $builder,
             [
                 'title',
-                'firstname',
-                'lastname',
+                // 'firstname',
+                // 'lastname',
                 'company',
                 'position',
                 'email',
@@ -1753,6 +1765,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         $this->isChanged('email', $email);
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCharLeadFields()
+    {
+        return $this->charLeadFields;
+    }
+
+    /**
+     * @param mixed $charLeadFields
+     *
+     * @return Lead
+     */
+    public function setCharLeadFields($charLeadFields)
+    {
+        $this->isChanged('charLeadFields', $charLeadFields);
+        $this->charLeadFields = $charLeadFields;
 
         return $this;
     }
