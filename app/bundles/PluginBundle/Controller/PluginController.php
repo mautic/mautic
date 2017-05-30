@@ -432,10 +432,10 @@ class PluginController extends FormController
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
-            $namespace = $meta->fullyQualifiedClassName('');
+            $namespace = $meta->namespace;
 
             if (strpos($namespace, 'MauticPlugin') !== false) {
-                $bundleName = str_replace('\Entity\\', '', $namespace);
+                $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginMetadata[$bundleName])) {
                     $pluginMetadata[$bundleName] = [];
                 }
@@ -564,12 +564,10 @@ class PluginController extends FormController
             }
 
             // Call the install callback
-            $callback        = $plugin['bundleClass'];
-            $metadata        = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
-            $installedSchema = (isset($pluginInstalledSchemas[$plugin['namespace']]))
-                ? $pluginInstalledSchemas[$plugin['namespace']] : null;
+            $callback = $plugin['bundleClass'];
+            $metadata = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
 
-            $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
+            $callback::onPluginInstall($entity, $this->factory, $metadata);
 
             $persist[] = $entity;
         }
