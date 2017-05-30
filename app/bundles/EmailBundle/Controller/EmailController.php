@@ -590,6 +590,15 @@ class EmailController extends FormController
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
+        $pluginsAssets = [];
+        $plugins       = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
+
+        if ($plugins) {
+            foreach ($plugins as $name => $config) {
+                $pluginsAssets[] = '<script src="/plugins/'.$name.'/Assets/js/index.js"></script>';
+            }
+        }
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -599,6 +608,8 @@ class EmailController extends FormController
                     'slots'         => $this->buildSlotForms($slotTypes),
                     'sections'      => $this->buildSlotForms($sections),
                     'themes'        => $this->factory->getInstalledThemes('email', true),
+                    'plugins'       => $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
+                    'pluginsAssets' => $pluginsAssets,
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
@@ -792,6 +803,15 @@ class EmailController extends FormController
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
+        $pluginsAssets = [];
+        $plugins       = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
+
+        if ($plugins) {
+            foreach ($plugins as $name => $config) {
+                $pluginsAssets[] = '<script src="/plugins/'.$name.'/Assets/js/index.js"></script>';
+            }
+        }
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -800,6 +820,8 @@ class EmailController extends FormController
                     'slots'              => $this->buildSlotForms($slotTypes),
                     'sections'           => $this->buildSlotForms($sections),
                     'themes'             => $this->factory->getInstalledThemes('email', true),
+                    'plugins'            => $this->factory->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
+                    'pluginsAssets'      => $pluginsAssets,
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
@@ -961,7 +983,11 @@ class EmailController extends FormController
         }
 
         $template = InputHelper::clean($this->request->query->get('template'));
-        $slots    = $this->factory->getTheme($template)->getSlots('email');
+        if (explode(':', $template)[0] === 'plugin') {
+            return new Response(explode(':', $template)[1]);
+        }
+
+        $slots = $this->factory->getTheme($template)->getSlots('email');
 
         //merge any existing changes
         $newContent = $this->get('session')->get('mautic.emailbuilder.'.$objectId.'.content', []);
