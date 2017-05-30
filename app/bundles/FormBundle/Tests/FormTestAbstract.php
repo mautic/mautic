@@ -38,7 +38,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class FormAbstractTest extends WebTestCase
+class FormTestAbstract extends WebTestCase
 {
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
