@@ -46,12 +46,14 @@ class TablePrefix
         }
 
         $indexes = &$table[$key];
+        $newIndexes = [];
 
         foreach ($indexes as $name => $index)
         {
             $newName = uniqid($prefix . $name);
-            $indexes[$newName] = $index;
-            unset($indexes[$name]);
+            $newIndexes[$newName] = $index;
         }
+
+        $table[$key] = $newIndexes;
     }
 }
