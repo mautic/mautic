@@ -1252,17 +1252,18 @@ class MailHelper
      */
     public static function validateEmail($address)
     {
-        static $grammer;
+        $invalidChar = strpbrk($address, '\'^&*%');
 
-        if ($grammer === null) {
-            $grammer = new \Swift_Mime_Grammar();
+        if ($invalidChar !== false) {
+            throw new \Swift_RfcComplianceException(
+                'Email address ['.$address.
+                '] contains this invalid character: '.substr($invalidChar, 0, 1)
+            );
         }
 
-        if (!preg_match('/^'.$grammer->getDefinition('addr-spec').'$/D',
-            $address)) {
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
             throw new \Swift_RfcComplianceException(
-                'Address in mailbox given ['.$address.
-                '] does not comply with RFC 2822, 3.6.2.'
+                'Email address ['.$address.'] is invalid'
             );
         }
     }
