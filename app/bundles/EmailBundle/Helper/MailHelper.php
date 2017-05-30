@@ -1256,15 +1256,14 @@ class MailHelper
 
         if ($invalidChar !== false) {
             throw new \Swift_RfcComplianceException(
-                'Address in mailbox given ['.$address.
-                '] contains the invalid character: '.substr($invalidChar, 0, 1)
+                'Email address ['.$address.
+                '] contains this invalid character: '.substr($invalidChar, 0, 1)
             );
         }
 
         if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
             throw new \Swift_RfcComplianceException(
-                'Address in mailbox given ['.$address.
-                '] does not comply with RFC 882'
+                'Email address ['.$address.'] is invalid'
             );
         }
     }
