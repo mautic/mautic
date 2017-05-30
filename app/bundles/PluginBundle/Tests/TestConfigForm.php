@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
@@ -54,14 +55,6 @@ class TestConfigForm extends KernelTestCase
                 $this->assertNotEmpty($s->getAuthCallbackUrl());
             }
         }
-
-        //get integration fields...from all plugins
-
-        //test that all fields come
-
-        //test that they are all saved correctly
-
-        //test ajax for pagination
     }
 
     public function testOauth()
@@ -74,6 +67,20 @@ class TestConfigForm extends KernelTestCase
         $authType   = 'oauth2';
         foreach ($plugins as $s) {
             $s->prepareRequest($url, $parameters, $method, [], $authType);
+        }
+    }
+
+    public function testAmendLeadDataBeforeMauticPopulate()
+    {
+        $plugins = $this->getIntegrationObject()->getIntegrationObjects();
+
+        $object = 'company';
+        $data   = ['company_name' => 'company_name', 'email' => 'company_email'];
+        foreach ($plugins as $name => $s) {
+            if (method_exists($s, 'amendLeadDataBeforeMauticPopulate')) {
+                $count = $s->amendLeadDataBeforeMauticPopulate($data, $object);
+                $this->assertGreaterThanOrEqual(0, $count);
+            }
         }
     }
 

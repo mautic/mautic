@@ -272,6 +272,9 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
+        if (!isset($data['properties'])) {
+            return [];
+        }
         foreach ($data['properties'] as $key => $field) {
             $fieldsValues[$key] = $field['value'];
         }
