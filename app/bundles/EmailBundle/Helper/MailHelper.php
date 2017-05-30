@@ -476,12 +476,12 @@ class MailHelper
      *
      * @param bool   $dispatchSendEvent
      * @param string $returnMode        What should happen post send/queue to $this->message after the email send is attempted.
-     *                  Options are:
-     *                  RESET_TO           resets the to recipients and resets errors
-     *                  FULL_RESET         creates a new MauticMessage instance and resets errors
-     *                  DO_NOTHING         leaves the current errors array and MauticMessage instance intact
-     *                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
-     *                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
+     *                                  Options are:
+     *                                  RESET_TO           resets the to recipients and resets errors
+     *                                  FULL_RESET         creates a new MauticMessage instance and resets errors
+     *                                  DO_NOTHING         leaves the current errors array and MauticMessage instance intact
+     *                                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
+     *                                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
      *
      * @return bool
      */
@@ -1614,7 +1614,7 @@ class MailHelper
             // Clean up the error message
             $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
 
-            $this->fatal  = true;
+            $this->fatal = true;
         } else {
             $errorMessage = trim($error);
         }
