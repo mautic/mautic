@@ -16,7 +16,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Tests\FormTestAbstract;
 use Symfony\Component\HttpFoundation\Request;
 
-class TestSubmissionModel extends FormTestAbstract
+class SubmissionModelTest extends FormTestAbstract
 {
     public function testSaveSubmission()
     {

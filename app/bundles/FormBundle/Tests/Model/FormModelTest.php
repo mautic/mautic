@@ -15,7 +15,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Tests\FormTestAbstract;
 
-class TestFormModel extends FormTestAbstract
+class FormModelTest extends FormTestAbstract
 {
     public function testSetFields()
     {
