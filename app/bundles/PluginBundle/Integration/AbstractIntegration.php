@@ -161,8 +161,12 @@ abstract class AbstractIntegration
     /**
      * AbstractIntegration constructor.
      */
-    public function __construct()
+    public function __construct(MauticFactory $factory)
     {
+        if ($factory) {
+            $this->setFactory($factory);
+        }
+
         $this->init();
     }
 
