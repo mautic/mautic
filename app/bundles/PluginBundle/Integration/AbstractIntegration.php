@@ -165,7 +165,7 @@ abstract class AbstractIntegration
         $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
         $this->em                = $factory->getEntityManager();
         $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-        $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
+        $this->request           = $factory->getRequest();
         $this->router            = $factory->getRouter();
         $this->translator        = $factory->getTranslator();
         $this->logger            = $factory->getLogger();
