@@ -225,7 +225,12 @@ class IntegrationHelper
 
             // Scan core bundles for integration classes
             foreach ($this->bundleHelper->getMauticBundles() as $coreBundle) {
-                if (is_dir($coreBundle['directory'].'/Integration')) {
+                if (
+                    // Skip plugin bundles
+                    strpos($coreBundle['directory'], 'app/bundles') !== false
+                    // Skip core bundles without an Integration directory
+                    && is_dir($coreBundle['directory'].'/Integration')
+                ) {
                     $finder = new Finder();
                     $finder->files()->name('*Integration.php')->in($coreBundle['directory'].'/Integration')->ignoreDotFiles(true);
 
