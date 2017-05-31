@@ -163,8 +163,28 @@ abstract class AbstractIntegration
      */
     public function __construct(MauticFactory $factory = null)
     {
+        /*
+         * @deprecated: 2.8.2 To be removed in 3.0
+         *            This keeps BC with 3rd party plugins that
+         *            don't use the container for the
+         *            integration pass to set all of these properties
+         */
         if ($factory) {
-            $this->setFactory($factory);
+            $this->factory           = $factory;
+            $this->dispatcher        = $factory->getDispatcher();
+            $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+            $this->em                = $factory->getEntityManager();
+            $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
+            $this->request           = $factory->getRequest();
+            $this->router            = $factory->getRouter();
+            $this->translator        = $factory->getTranslator();
+            $this->logger            = $factory->getLogger();
+            $this->encryptionHelper  = $factory->getHelper('encryption');
+            $this->leadModel         = $factory->getModel('lead');
+            $this->companyModel      = $factory->getModel('lead.company');
+            $this->pathsHelper       = $factory->getHelper('paths');
+            $this->notificationModel = $factory->getModel('core.notification');
+            $this->fieldModel        = $factory->getModel('lead.field');
         }
 
         $this->init();

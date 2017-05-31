@@ -182,7 +182,7 @@ class IntegrationHelper
 
                                 if ($refClass->isInstantiable()) {
                                     $integrations[$integrationName] = new $class($this->factory);
-                                    $features                       = $integrationName[$integrationName]->getSupportedFeatures();
+                                    $features                       = $integrations[$integrationName]->getSupportedFeatures();
 
                                     $newIntegration->setSupportedFeatures($features);
 
