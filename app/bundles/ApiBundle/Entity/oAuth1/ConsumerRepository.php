@@ -11,7 +11,6 @@
 
 namespace Mautic\ApiBundle\Entity\oAuth1;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
@@ -79,7 +78,7 @@ class ConsumerRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'c.name',

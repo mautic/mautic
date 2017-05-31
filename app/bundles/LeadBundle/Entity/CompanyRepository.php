@@ -137,7 +137,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -152,7 +152,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

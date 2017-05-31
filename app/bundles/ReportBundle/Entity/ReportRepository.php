@@ -11,7 +11,6 @@
 
 namespace Mautic\ReportBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -41,7 +40,7 @@ class ReportRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -55,7 +54,7 @@ class ReportRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();

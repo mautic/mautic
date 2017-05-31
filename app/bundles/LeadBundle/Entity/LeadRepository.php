@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\QueryBuilder as ORMQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -575,12 +574,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(ORMQueryBuilder $q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         $columns = array_merge(
             [
@@ -602,12 +601,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the command where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(ORMQueryBuilder $q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command                 = $filter->command;
         $string                  = $filter->string;

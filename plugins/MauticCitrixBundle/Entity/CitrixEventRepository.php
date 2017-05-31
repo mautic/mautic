@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticCitrixBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -89,23 +88,23 @@ class CitrixEventRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param mixed        $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, ['c.product', 'c.email', 'c.eventType', 'c.eventName']);
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param mixed        $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

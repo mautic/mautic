@@ -12,7 +12,6 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -83,7 +82,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'f.name',
@@ -94,7 +93,7 @@ class FormRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {

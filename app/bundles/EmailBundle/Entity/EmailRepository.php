@@ -12,7 +12,6 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -393,12 +392,12 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param                            $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(QueryBuilder $q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'e.name',
@@ -407,12 +406,12 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param                            $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {

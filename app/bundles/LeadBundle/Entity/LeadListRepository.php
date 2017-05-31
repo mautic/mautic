@@ -17,7 +17,6 @@ use Doctrine\DBAL\Types\FloatType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\TimeType;
 use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\QueryBuilder as ORMQueryBuilder;
 use Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter;
 use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -1482,12 +1481,12 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(ORMQueryBuilder $q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -1500,12 +1499,12 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(ORMQueryBuilder $q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
         if ($expr) {

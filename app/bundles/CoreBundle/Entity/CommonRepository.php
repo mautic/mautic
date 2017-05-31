@@ -870,12 +870,12 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param array                      $filters
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addAdvancedSearchWhereClause(&$qb, $filters)
+    protected function addAdvancedSearchWhereClause($qb, $filters)
     {
         $parseFilters = [];
         if (isset($filters->root[0])) {
@@ -905,12 +905,12 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param array                      $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(QueryBuilder $qb, $filter)
+    protected function addCatchAllWhereClause($qb, $filter)
     {
         foreach (['name', 'title'] as $column) {
             if ($this->getClassMetadata()->hasField($column)) {
@@ -965,12 +965,12 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param $q
-     * @param $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(QueryBuilder $q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command = $filter->command;
         $expr    = false;
