@@ -1285,11 +1285,11 @@ class CampaignModel extends CommonFormModel
                             $failedSq->expr()->eq('fe.log_id', 't.id')
                         );
                     $filter['failed_events'] = [
-                        'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
+                        'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL()),
                     ];
 
-                    $q                  = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
-                    $rawData            = $q->execute()->fetchAll();
+                    $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                    $rawData = $q->execute()->fetchAll();
 
                     if (!empty($rawData)) {
                         $triggers = $query->completeTimeData($rawData);

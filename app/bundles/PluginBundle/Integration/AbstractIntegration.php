@@ -165,7 +165,7 @@ abstract class AbstractIntegration
         $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
         $this->em                = $factory->getEntityManager();
         $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-        $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
+        $this->request           = $factory->getRequest();
         $this->router            = $factory->getRouter();
         $this->translator        = $factory->getTranslator();
         $this->logger            = $factory->getLogger();
@@ -303,6 +303,21 @@ abstract class AbstractIntegration
      * @return array
      */
     public function getSupportedFeatures()
+    {
+        return [];
+    }
+
+    /**
+     * Get a list of tooltips for the specified supported features.
+     * This allows you to add detail / informational tooltips to your
+     * supported feature checkbox group.
+     *
+     * Example:
+     *  'cloud_storage' => 'mautic.integration.form.features.cloud_storage.tooltip'
+     *
+     * @return array
+     */
+    public function getSupportedFeatureTooltips()
     {
         return [];
     }
