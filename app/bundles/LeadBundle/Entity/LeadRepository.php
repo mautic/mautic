@@ -326,8 +326,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $fieldValues = $this->getFieldValues($id);
             $entity->setFields($fieldValues);
 
-            $entity->setFirstname($entity->getCharLeadFields()[0]->getValue());
-            $entity->setLastname($entity->getCharLeadFields()[1]->getValue());
+            foreach ($entity->getCharLeadFields() as $charLeadField) {
+                $alias = $charLeadField->getLeadField()->getAlias();
+                $value = $charLeadField->getValue();
+                $entity->{'set' . ucfirst($alias)}($value);
+            }
 
             $entity->setAvailableSocialFields($this->availableSocialFields);
         }
