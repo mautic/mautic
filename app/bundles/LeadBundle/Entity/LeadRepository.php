@@ -511,10 +511,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $alias = $this->getTableAlias();
         $q     = $this->getEntityManager()->createQueryBuilder();
-        $q->select($alias.', u, i,'.$order)
+        $q->select($alias.', u, i, clf,'.$order)
             ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
             ->leftJoin($alias.'.ipAddresses', 'i')
             ->leftJoin($alias.'.owner', 'u')
+            ->leftJoin($alias.'.charLeadFields', 'clf')
             ->indexBy($alias, $alias.'.id');
 
         return $q;

@@ -80,6 +80,16 @@ trait CustomFieldRepositoryTrait
                 //unset all the columns that are not fields
                 $this->removeNonFieldColumns($result, $fixedFields);
 
+                //use DBAL to get entity fields
+                $q = $this->getLeadFieldsDbalQueryBuilder();
+                $charValues = $q->execute()->fetchAll();
+
+                $charValues = array_map(function ($charValue) {
+                    return [$charValue["alias"] => $charValue["value"]];
+                }, $charValues);
+
+                $result = array_replace($result, ...$charValues);
+
                 foreach ($result as $k => $r) {
                     if (isset($fields[$k])) {
                         $fieldValues[$id][$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
@@ -133,6 +143,12 @@ trait CustomFieldRepositoryTrait
                 foreach ($results as $r) {
                     $id = $r->getId();
                     $r->setFields($fieldValues[$id]);
+
+                    foreach ($r->getCharLeadFields() as $charLeadField) {
+                        $alias = $charLeadField->getLeadField()->getAlias();
+                        $value = $charLeadField->getValue();
+                        $r->{'set' . ucfirst($alias)}($value);
+                    }
 
                     if (is_callable($resultsCallback)) {
                         $resultsCallback($r);
