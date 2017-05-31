@@ -29,4 +29,4 @@ script:
 
   # Check if the code standards weren't broken.
   # Run it only on PHP 7.1 which should be the fastest. No need to run it for all PHP versions
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.6" ]]; then bin/php-cs-fixer fix -v --dry-run --diff; fi
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then bin/php-cs-fixer fix -v --dry-run --diff; fi
