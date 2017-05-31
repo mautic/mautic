@@ -762,7 +762,9 @@ class CampaignModel extends CommonFormModel
     public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
         foreach ($leads as $lead) {
-            if (!$lead instanceof Lead) {
+            if ($lead instanceof Lead) {
+                $leadId = $lead->getId();
+            } else {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
@@ -866,7 +868,9 @@ class CampaignModel extends CommonFormModel
         foreach ($leads as $lead) {
             $dispatchEvent = false;
 
-            if (!$lead instanceof Lead) {
+            if ($lead instanceof Lead) {
+                $leadId = $lead->getId();
+            } else {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
@@ -1028,7 +1032,7 @@ class CampaignModel extends CommonFormModel
                     $this->addLeads($campaign, [$l], false, true, -1);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
-                    if ($output && $leadsProcessed < $maxCount) {
+                    if ($output && isset($progress) && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
 
@@ -1054,7 +1058,7 @@ class CampaignModel extends CommonFormModel
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
                     // done for this round, bye bye
-                    if ($output) {
+                    if (isset($progress)) {
                         $progress->finish();
                     }
 
@@ -1062,7 +1066,7 @@ class CampaignModel extends CommonFormModel
                 }
             }
 
-            if ($output) {
+            if ($output && isset($progress)) {
                 $progress->finish();
                 $output->writeln('');
             }
@@ -1114,7 +1118,7 @@ class CampaignModel extends CommonFormModel
                     $this->removeLeads($campaign, [$l], false, true, true);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
-                    if ($output && $leadsProcessed < $maxCount) {
+                    if (isset($progress) && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
 
@@ -1140,13 +1144,16 @@ class CampaignModel extends CommonFormModel
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
                     // done for this round, bye bye
-                    $progress->finish();
+
+                    if (isset($progress)) {
+                        $progress->finish();
+                    }
 
                     return $leadsProcessed;
                 }
             }
 
-            if ($output) {
+            if ($output && isset($progress)) {
                 $progress->finish();
                 $output->writeln('');
             }
@@ -1212,7 +1219,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of leads added to campaigns.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -1242,7 +1249,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
