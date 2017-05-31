@@ -207,6 +207,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 } elseif (3 === count($result)) {
                     list($updated, $created, $errored) = $result;
                 } else {
+                    $errored                 = '?';
                     list($updated, $created) = $result;
                 }
                 $output->writeln(

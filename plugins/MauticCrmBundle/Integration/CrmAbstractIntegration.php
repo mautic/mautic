@@ -25,6 +25,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
     protected $pushContactLink = false;
+    protected $helper;
 
     /**
      * @param Integration $settings
@@ -178,13 +179,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getApiHelper()
     {
-        static $helper;
-        if (empty($helper)) {
+        if (empty($this->helper)) {
             $class  = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
-            $helper = new $class($this);
+            $this->helper = new $class($this);
         }
 
-        return $helper;
+        return $this->helper;
     }
 
     /**
@@ -288,8 +288,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel           = $this->factory->getModel('lead');
-        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $leadModel           = $this->leadModel;
+        $uniqueLeadFields    = $this->fieldModel->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
 
         foreach ($matchedFields as $leadField => $value) {
@@ -308,7 +308,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
+            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
             if (!empty($existingLeads)) {
                 $lead          = array_shift($existingLeads);

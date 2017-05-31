@@ -44,7 +44,7 @@ class SubmissionRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $form = $args['form'];
 

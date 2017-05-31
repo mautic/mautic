@@ -23,9 +23,9 @@ class EventRepository extends CommonRepository
      *
      * @param array $args
      *
-     * @return Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $select = 'e';
         $q      = $this
@@ -583,7 +583,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -599,7 +599,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
