@@ -175,11 +175,9 @@ trait CustomFieldRepositoryTrait
         $values = $q->execute()->fetch();
         $this->removeNonFieldColumns($values, $fixedFields);
 
-        $charValues = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('lf.alias, clf.value')
-            ->from('char_lead_fields_leads_xref', 'clf')
-            ->join('clf', 'lead_fields', 'lf', 'clf.lead_field_id = lf.id')
-            ->execute()->fetchAll();
+        //use DBAL to get entity fields
+        $q = $this->getLeadFieldsDbalQueryBuilder();
+        $charValues = $q->execute()->fetchAll();
 
         $charValues = array_map(function ($charValue) {
             return [$charValue["alias"] => $charValue["value"]];

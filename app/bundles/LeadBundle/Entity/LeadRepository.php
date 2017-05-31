@@ -490,6 +490,19 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
+     * @return \Doctrine\DBAL\Query\QueryBuilder
+     */
+    public function getLeadFieldsDbalQueryBuilder()
+    {
+        $dq = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('lf.alias, clf.value')
+            ->from('char_lead_fields_leads_xref', 'clf')
+            ->join('clf', 'lead_fields', 'lf', 'clf.lead_field_id = lf.id');
+
+        return $dq;
+    }
+
+    /**
      * @param $order
      *
      * @return \Doctrine\ORM\QueryBuilder
