@@ -175,6 +175,19 @@ trait CustomFieldRepositoryTrait
         $values = $q->execute()->fetch();
         $this->removeNonFieldColumns($values, $fixedFields);
 
+        $charValues = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('lf.alias, clf.value')
+            ->from('char_lead_fields_leads_xref', 'clf')
+            ->join('clf', 'lead_fields', 'lf', 'clf.lead_field_id = lf.id')
+            ->execute()->fetchAll();
+
+        $charValues = array_map(function ($charValue) {
+            return [$charValue["alias"] => $charValue["value"]];
+        }, $charValues);
+
+        $values = array_replace($values, ...$charValues);
+
+
         // Reorder leadValues based on field order
         $values = array_merge(array_flip(array_keys($fields)), $values);
 
