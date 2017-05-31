@@ -63,6 +63,14 @@ class FacebookIntegration extends SocialIntegration
     }
 
     /**
+     * @return string
+     */
+    public function getAuthScope()
+    {
+        return 'email';
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param string $data
@@ -155,7 +163,6 @@ class FacebookIntegration extends SocialIntegration
     {
         return [
             'about'       => ['type' => 'string'],
-            'bio'         => ['type' => 'string'],
             'birthday'    => ['type' => 'string'],
             'email'       => ['type' => 'string'],
             'first_name'  => ['type' => 'string'],
