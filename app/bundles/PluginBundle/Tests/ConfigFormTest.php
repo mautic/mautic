@@ -27,7 +27,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class TestConfigForm extends KernelTestCase
+class ConfigFormTest extends KernelTestCase
 {
     protected $container;
 
