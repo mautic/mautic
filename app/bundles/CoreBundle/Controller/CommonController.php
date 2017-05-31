@@ -619,7 +619,7 @@ class CommonController extends Controller implements MauticController
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
 
-        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId);
+        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId, false, 200);
 
         $lastNotification = reset($notifications);
 

@@ -425,6 +425,21 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get a list of tooltips for the specified supported features.
+     * This allows you to add detail / informational tooltips to your
+     * supported feature checkbox group.
+     *
+     * Example:
+     *  'cloud_storage' => 'mautic.integration.form.features.cloud_storage.tooltip'
+     *
+     * @return array
+     */
+    public function getSupportedFeatureTooltips()
+    {
+        return [];
+    }
+
+    /**
      * Returns the field the integration needs in order to find the user.
      *
      * @return mixed

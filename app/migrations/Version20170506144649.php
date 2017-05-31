@@ -10,9 +10,9 @@
 
 namespace Mautic\Migrations;
 
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -28,7 +28,6 @@ class Version20170506144649 extends AbstractMauticMigration
     public function preUp(Schema $schema)
     {
         if ($schema->hasTable(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log')) {
-
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -51,6 +50,5 @@ SQL;
 
         $fk = $this->generatePropertyName('campaign_lead_event_failed_log', 'fk', ['log_id']);
         $this->addSql("ALTER TABLE {$this->prefix}campaign_lead_event_failed_log ADD CONSTRAINT {$fk} FOREIGN KEY (log_id) REFERENCES {$this->prefix}campaign_lead_event_log (id) ON DELETE CASCADE;");
-
     }
 }
