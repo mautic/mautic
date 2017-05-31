@@ -32,6 +32,10 @@ use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Router;
 
+/**
+ * Class SalesforceIntegrationTest
+ *
+ */
 class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     const SC_MULTIPLE_SF_LEADS = 'multiple_sf_leads';
@@ -118,6 +122,8 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
+        $this->returnedSfEntities = [];
+        $this->persistedIntegrationEntities = [];
         $this->sfMockMethods       = $this->sfMockResetMethods;
         $this->sfObjects           = $this->sfMockResetObjects;
         $this->specialSfCase       = null;
@@ -127,6 +133,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             'Lead'    => 0,
             'Contact' => 0
         ];
+        $this->mauticContacts = [];
     }
 
     public function testPushLeadsUpdateAndCreateCorrectNumbers()
@@ -613,7 +620,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                 preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
                                 $emails = explode("','", $match[1]);
 
-                                return $this->getSalesforceObjects($maxSfContacts, $emails);
+                                return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
                             case strpos($args[0], '/composite') !== false:
                                 return $this->getSalesforceCompositeResponse($args[1]);
                         }
@@ -646,6 +653,13 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         return $sf;
     }
 
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $mockRepository
+     * @param                                          $max
+     * @param                                          $maxSfContacts
+     * @param                                          $maxSfLeads
+     * @param                                          $specificObject
+     */
     protected function setLeadsToUpdate(\PHPUnit_Framework_MockObject_MockObject $mockRepository, $max, $maxSfContacts, $maxSfLeads, $specificObject)
     {
         $mockRepository->method('findLeadsToUpdate')
@@ -678,6 +692,10 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             );
     }
 
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $mockRepository
+     * @param int                                      $max
+     */
     protected function setLeadsToCreate(\PHPUnit_Framework_MockObject_MockObject $mockRepository, $max = 200)
     {
         $mockRepository->method('findLeadsToCreate')
@@ -799,17 +817,30 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      *
      * @return array
      */
-    protected function getSalesforceObjects($max, $emails)
+    protected function getSalesforceObjects($emails, $maxContacts, $maxLeads)
     {
         // Let's find around $max records
         $records = [];
-        $count   = 0;
+        $contactCount   = 0;
+        $leadCount      = 0;
 
-        $emails = array_slice($emails, 0, $max);
         foreach ($emails as $email) {
             // Extact ID
             preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
             $object    = $match[1];
+
+            if ('Lead' === $object) {
+                if ($leadCount >= $maxLeads) {
+                    continue;
+                }
+                ++$leadCount;
+            } else {
+                if ($contactCount >= $maxContacts) {
+                    continue;
+                }
+                ++$contactCount;
+            }
+
             $id        = $match[2];
             $records[] = [
                 'attributes' =>
@@ -824,14 +855,12 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ];
 
             $this->addSpecialCases($id, $records);
-
-            ++$count;
         }
 
         $this->returnedSfEntities = array_merge($this->returnedSfEntities, $records);
 
         return [
-            'totalSize' => $max,
+            'totalSize' => count($records),
             'done'      => true,
             'records'   => $records,
         ];

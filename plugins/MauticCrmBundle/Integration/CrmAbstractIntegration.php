@@ -25,6 +25,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
     protected $pushContactLink = false;
+    protected $helper;
 
     /**
      * @param Integration $settings
@@ -178,13 +179,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getApiHelper()
     {
-        static $helper;
-        if (empty($helper)) {
+        if (empty($this->helper)) {
             $class  = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
-            $helper = new $class($this);
+            $this->helper = new $class($this);
         }
 
-        return $helper;
+        return $this->helper;
     }
 
     /**
