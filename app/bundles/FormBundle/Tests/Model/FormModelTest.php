@@ -24,7 +24,7 @@ class FormModelTest extends FormTestAbstract
         $formModel = $this->getFormModel();
         $formModel->setFields($form, $fields);
         $entityFields = $form->getFields()->toArray();
-        $this->assertInstanceOf(Field::class, $entityFields[$fields['id']]);
+        $this->assertInstanceOf(Field::class, $entityFields[array_keys($fields)[0]]);
     }
 
     public function testGetComponentsFields()
