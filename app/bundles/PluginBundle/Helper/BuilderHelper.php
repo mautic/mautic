@@ -2,24 +2,24 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PluginBundle\Model\PluginModel;
 
 class BuilderHelper
 {
-    private $factory;
+    private $pluginModel;
 
-    public function __construct(MauticFactory $factory)
+    public function __construct(PluginModel $pluginModel)
     {
-        $this->factory = $factory;
+        $this->pluginModel = $pluginModel;
     }
 
     public function getBuilderPlugins()
     {
         $builderPlugins = [];
-        $plugins        = $this->factory->getPluginBundles();
+        $plugins        = $this->pluginModel->getPluginBundles();
 
         foreach ($plugins as $plugin) {
-            $config = $this->factory->getBundleConfig($plugin['bundle'], '', true);
+            $config = $this->pluginModel->getBundleConfig($plugin['bundle'], '', true);
             $type   = !empty($config['type']) ? $config['type'] : null;
 
             if ($type === 'builder') {

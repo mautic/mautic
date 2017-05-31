@@ -96,6 +96,8 @@ return [
         'email' => null,
     ],
     'services' => [
+        'helpers' => [
+        ],
         'events' => [
             'mautic.email.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\EmailSubscriber',
@@ -355,6 +357,20 @@ return [
                 ],
                 'methodCalls' => [
                     'setMauticFactory' => ['mautic.factory'],
+                ],
+            ],
+            'mautic.helper.theme' => [
+                'class'     => 'Mautic\CoreBundle\Helper\ThemeHelper',
+                'arguments' => [
+                    'mautic.helper.paths',
+                    'mautic.helper.templating',
+                    'translator'
+                ],
+            ],
+            'mautic.helper.plugin.builder' => [
+                'class'     => 'Mautic\PluginBundle\Helper\BuilderHelper',
+                'arguments' => [
+                    'mautic.helper.bundle'
                 ],
             ],
         ],

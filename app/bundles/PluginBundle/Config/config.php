@@ -136,7 +136,9 @@ return [
             ],
             'mautic.helper.plugin.builder' => [
                 'class'     => 'Mautic\PluginBundle\Helper\BuilderHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.helper.bundle'
+                ]
             ],
         ],
         'models' => [

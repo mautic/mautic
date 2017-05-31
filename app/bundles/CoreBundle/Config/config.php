@@ -263,7 +263,9 @@ return [
             ],
             'mautic.form.type.theme_list' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.factory'
+                ],
                 'alias'     => 'theme_list',
             ],
             'mautic.form.type.daterange' => [
