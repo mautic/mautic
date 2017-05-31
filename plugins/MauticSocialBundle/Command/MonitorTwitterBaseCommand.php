@@ -113,10 +113,10 @@ EOT
     {
         $results = $this->getTweets($monitor);
 
-        if ($results === false || !array_key_exists('statuses', $results)) {
+        if ($results === false || !isset($results['statuses'])) {
             $this->output->writeln('No statuses found');
 
-            if (array_key_exists('errors', $results)) {
+            if (!empty($results['errors'])) {
                 foreach ($results['errors'] as $error) {
                     $this->output->writeln($error['code'].': '.$error['message']);
                 }
