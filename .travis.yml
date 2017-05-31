@@ -1,5 +1,18 @@
 language: php
 
+services:
+  - mysql
+
+before_install:
+  - mysql -e 'CREATE DATABASE mautictest;'
+
+env:
+  DB_HOST: 127.0.0.1
+  DB_PORT: 3306
+  DB_USER: travis
+  DB_PASSWD: ''
+  DB_NAME: mautictest
+
 php:
   - 5.6
   - 7.0
