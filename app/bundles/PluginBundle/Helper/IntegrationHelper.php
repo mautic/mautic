@@ -12,6 +12,7 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -66,6 +67,13 @@ class IntegrationHelper
     protected $pluginModel;
 
     /**
+     * @deprecated 2.8.2 To be removed in 3.0
+     *
+     * @var MauticFactory
+     */
+    protected $factory;
+
+    /**
      * IntegrationHelper constructor.
      *
      * @param Kernel               $kernel
@@ -85,6 +93,7 @@ class IntegrationHelper
         $this->pluginModel          = $pluginModel;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->templatingHelper     = $templatingHelper;
+        $this->factory              = $this->container->get('mautic.factory');
     }
 
     /**
@@ -164,8 +173,29 @@ class IntegrationHelper
 
                                 unset($newIntegration);
                             } else {
-                                // Something is bad so ignore
-                                continue;
+                                /**
+                                 * @deprecated: 2.8.2 To be removed in 3.0
+                                 *            This keeps BC for 3rd party plugins
+                                 */
+                                $class    = '\\MauticPlugin\\'.$pluginNamespace.'\\Integration\\'.$integrationName.'Integration';
+                                $refClass = new \ReflectionClass($class);
+
+                                if ($refClass->isInstantiable()) {
+                                    $integrations[$integrationName] = new $class($this->factory);
+                                    $features                       = $integrationName[$integrationName]->getSupportedFeatures();
+
+                                    $newIntegration->setSupportedFeatures($features);
+
+                                    // Go ahead and stash it since it's built already
+                                    $integrations[$integrationName]->setIntegrationSettings($newIntegration);
+
+                                    $newIntegrations[] = $newIntegration;
+
+                                    unset($newIntegration);
+                                } else {
+                                    // Something is bad so ignore
+                                    continue;
+                                }
                             }
                         }
 
@@ -293,6 +323,23 @@ class IntegrationHelper
                 if ($this->container->has($integrationContainerKey)) {
                     $integrations[$integrationName] = $this->container->get($integrationContainerKey);
                     $integrations[$integrationName]->setIntegrationSettings($integration['settings']);
+                } else {
+                    /**
+                     * @deprecated: 2.8.2 To be removed in 3.0
+                     *            This keeps BC for 3rd party plugins
+                     */
+                    $rootNamespace = $integration['isPlugin'] ? '\\MauticPlugin\\' : '\\Mautic\\';
+                    $class         = $rootNamespace.$integration['namespace'].'\\Integration\\'.$integrationName.'Integration';
+                    $refClass      = new \ReflectionClass($class);
+
+                    if ($refClass->isInstantiable()) {
+                        $integrations[$integrationName] = new $class($this->factory);
+
+                        $integrations[$integrationName]->setIntegrationSettings($integration['settings']);
+                    } else {
+                        // Something is bad so ignore
+                        continue;
+                    }
                 }
             }
 
