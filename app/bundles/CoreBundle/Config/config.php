@@ -264,7 +264,8 @@ return [
             'mautic.form.type.theme_list' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
                 'arguments' => [
-                    'mautic.factory'
+                    'mautic.factory',
+                    'mautic.helper.plugin.builder'
                 ],
                 'alias'     => 'theme_list',
             ],
@@ -463,6 +464,9 @@ return [
             ],
             'mautic.helper.phone_number' => [
                 'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
+            ],
+            'mautic.helper.plugin.builder' => [
+                'class'     => 'Mautic\PluginBundle\Helper\BuilderHelper'
             ],
         ],
         'menus' => [

@@ -103,7 +103,7 @@ class EmailController extends FormController
 
         //retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $this->container->get('mautic.helper.themes')->getInstalledThemes('email'),
+            'options' => $this->get('mautic.helper.theme')->getInstalledThemes('email'),
             'prefix'  => 'theme',
         ];
 
@@ -608,8 +608,8 @@ class EmailController extends FormController
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
                     'sections'      => $this->buildSlotForms($sections),
-                    'themes'        => $this->container->get('mautic.helper.theme').getInstalledThemes('email', true),
-                    'plugins'       => $this->container->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
+                    'themes'        => $this->get('mautic.helper.theme')->getInstalledThemes('email', true),
+                    'plugins'       => $this->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
                     'pluginsAssets' => $pluginsAssets,
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
@@ -820,8 +820,8 @@ class EmailController extends FormController
                     'isVariant'          => $entity->isVariant(true),
                     'slots'              => $this->buildSlotForms($slotTypes),
                     'sections'           => $this->buildSlotForms($sections),
-                    'themes'             => $this->container->get('mautic.helper.themes')->getInstalledThemes('email', true),
-                    'plugins'            => $this->container->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
+                    'themes'             => $this->get('mautic.helper.theme')->getInstalledThemes('email', true),
+                    'plugins'            => $this->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
                     'pluginsAssets'      => $pluginsAssets,
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
@@ -988,7 +988,7 @@ class EmailController extends FormController
             return new Response(explode(':', $template)[1]);
         }
 
-        $slots = $this->container->get('mautic.helper.theme')->getTheme($template)->getSlots('email');
+        $slots = $this->get('mautic.helper.theme')->getTheme($template)->getSlots('email');
 
         //merge any existing changes
         $newContent = $this->get('session')->get('mautic.emailbuilder.'.$objectId.'.content', []);
@@ -1005,7 +1005,7 @@ class EmailController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->container.get('mautic.helper.theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+        $logicalName = $this->get('mautic.helper.theme')->checkForTwigTemplate(':'.$template.':email.html.php');
 
         return $this->render(
             $logicalName,
