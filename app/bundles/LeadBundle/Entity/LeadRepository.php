@@ -314,7 +314,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
             $q->andWhere($this->getTableAlias().'.id = '.(int) $contactId);
             $entity = $q->getQuery()->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (\Exception $e) { // What is this supposed to catch? (T_T)
             $entity = null;
         }
 
@@ -324,6 +324,34 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
 
             $fieldValues = $this->getFieldValues($id);
+
+            $charLeadFieldValues = [];
+
+            foreach ($entity->getCharLeadFields() as $charLeadField) {
+                $leadField = $charLeadField->getLeadField();
+                $group = $leadField->getGroup();
+                $id = (string) $leadField->getId();
+                $alias = $leadField->getAlias();
+                $label = $leadField->getLabel();
+                $type = $leadField->getType();
+                $object = $leadField->getObject();
+                $isFixed = $leadField->getIsFixed() ? '1' : '0';
+                $value = $charLeadField->getValue();
+
+                $charLeadFieldValues[$group][$alias] = [
+                    "id" => $id,
+                    "label" => $label,
+                    "alias" => $alias,
+                    "type" => $type,
+                    "group" => $group,
+                    "object" => $object,
+                    "is_fixed" => $isFixed,
+                    "value" => $value
+                ];
+            }
+
+            $fieldValues = array_replace_recursive($fieldValues, $charLeadFieldValues);
+
             $entity->setFields($fieldValues);
 
             foreach ($entity->getCharLeadFields() as $charLeadField) {
