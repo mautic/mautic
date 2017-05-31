@@ -214,7 +214,10 @@ class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @param array                          $config
+     *
+     * @return bool
      */
     public function pushLead($lead, $config = [])
     {

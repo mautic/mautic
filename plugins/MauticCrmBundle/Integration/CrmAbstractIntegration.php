@@ -60,7 +60,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param Lead  $lead
+     * @param array $config
+     *
+     * @return array|bool
      */
     public function pushLead($lead, $config = [])
     {
@@ -92,7 +95,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param array $params
      */
     public function getLeads($params = [])
     {
@@ -134,9 +137,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Amend mapped lead data before creating to Mautic.
+     * Ammend mapped lead data before creating to Mautic.
      *
-     * @param $mappedData
+     * @param $data
+     * @param $object
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {

@@ -1,20 +1,21 @@
 language: php
 
 php:
-  # At the moment Composer can't resolve dependencies for these PHP versions.
-  #- 5.3
-  #- 5.4
-  #- 5.5
   - 5.6
   - 7.0
+  - 7.1
 
-matrix:
-  allow_failures:
-    - php: 7.0
+before_install:
 
-before_script:
+  # turn off XDebug
+  - phpenv config-rm xdebug.ini || return
+
+  # install dependencies in parallel
+  - travis_retry composer global require hirak/prestissimo
+
+install:
   - composer install
-  - cd app
 
 script:
-  - phpunit
+  - composer test
+  - bin/php-cs-fixer fix -v --dry-run --diff

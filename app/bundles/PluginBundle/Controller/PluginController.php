@@ -259,8 +259,14 @@ class PluginController extends FormController
 
                     if ($valid || $authorize) {
                         $dispatcher = $this->get('event_dispatcher');
+                        $this->get('logger')->info('Dispatching integration config save event.');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, new PluginIntegrationEvent($integrationObject));
+                            $this->get('logger')->info('Event dispatcher has integration config save listeners.');
+                            $event = new PluginIntegrationEvent($integrationObject);
+
+                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
+
+                            $entity = $event->getEntity();
                         }
 
                         $em->persist($entity);
@@ -426,10 +432,10 @@ class PluginController extends FormController
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
-            $namespace = $meta->fullyQualifiedClassName('');
+            $namespace = $meta->namespace;
 
             if (strpos($namespace, 'MauticPlugin') !== false) {
-                $bundleName = str_replace('\Entity\\', '', $namespace);
+                $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginMetadata[$bundleName])) {
                     $pluginMetadata[$bundleName] = [];
                 }
@@ -558,12 +564,10 @@ class PluginController extends FormController
             }
 
             // Call the install callback
-            $callback        = $plugin['bundleClass'];
-            $metadata        = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
-            $installedSchema = (isset($pluginInstalledSchemas[$plugin['namespace']]))
-                ? $pluginInstalledSchemas[$plugin['namespace']] : null;
+            $callback = $plugin['bundleClass'];
+            $metadata = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
 
-            $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
+            $callback::onPluginInstall($entity, $this->factory, $metadata);
 
             $persist[] = $entity;
         }
