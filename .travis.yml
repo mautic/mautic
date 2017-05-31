@@ -3,9 +3,6 @@ language: php
 services:
   - mysql
 
-before_install:
-  - mysql -e 'CREATE DATABASE mautictest;'
-
 env:
   DB_HOST: 127.0.0.1
   DB_PORT: 3306
@@ -19,6 +16,8 @@ php:
   - 7.1
 
 before_install:
+  # Create mautictest database
+  - mysql -e 'CREATE DATABASE mautictest;'
 
   # turn off XDebug
   - phpenv config-rm xdebug.ini || return
