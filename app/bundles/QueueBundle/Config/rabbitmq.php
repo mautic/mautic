@@ -30,12 +30,14 @@ $container->loadFromExtension(
                 'class'            => 'Mautic\QueueBundle\Helper\RabbitMqProducer',
                 'connection'       => 'default',
                 'exchange_options' => [
-                    'name' => 'mautic',
-                    'type' => 'direct',
+                    'name'    => 'mautic',
+                    'type'    => 'direct',
+                    'durable' => true,
                 ],
                 'queue_options' => [
                     'name'        => 'email_hit',
-                    'auto_delete' => true,
+                    'auto_delete' => false,
+                    'durable'     => true,
                 ],
             ],
         ],
@@ -43,12 +45,14 @@ $container->loadFromExtension(
             'mautic' => [
                 'connection'       => 'default',
                 'exchange_options' => [
-                    'name' => 'mautic',
-                    'type' => 'direct',
+                    'name'    => 'mautic',
+                    'type'    => 'direct',
+                    'durable' => true,
                 ],
                 'queue_options' => [
                     'name'        => 'email_hit',
-                    'auto_delete' => true,
+                    'auto_delete' => false,
+                    'durable'     => true,
                 ],
                 'callback' => 'mautic.queue.helper.rabbitmq_consumer',
             ],

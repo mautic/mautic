@@ -13,6 +13,7 @@ namespace Mautic\QueueBundle\EventListener;
 
 use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueProtocol;
+use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -54,7 +55,9 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
     {
         $producer = $this->container->get('old_sound_rabbit_mq.mautic_producer');
         $producer->setQueue($event->getQueueName());
-        $producer->publish(serialize($event->getPayload()), $event->getQueueName());
+        $producer->publish(serialize($event->getPayload()), $event->getQueueName(), [
+            'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT,
+        ]);
     }
 
     /**
@@ -66,6 +69,7 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
         $consumer->setQueueOptions([
             'name'        => $event->getQueueName(),
             'auto_delete' => true,
+            'durable'     => true,
         ]);
         $consumer->setRoutingKey($event->getQueueName());
         $consumer->consume($event->getMessages());
