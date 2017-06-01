@@ -2100,8 +2100,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             if (
                 isset($checkEmailsInSF[$key]) && (
-                    ('Lead' === $sfObject && !empty($sfEntityRecord['ConvertedContactId'])) ||
-                    ('Contact' === $sfObject && 'Lead' === $checkEmailsInSF[$key]['integration_entity'])
+                    (
+                        'Lead' === $sfObject && !empty($sfEntityRecord['ConvertedContactId'])
+                    ) ||
+                    (
+                        isset($checkEmailsInSF[$key]['integration_entity']) &&
+                        'Contact' === $sfObject &&
+                        'Lead' === $checkEmailsInSF[$key]['integration_entity']
+                    )
                 )
             ) {
                 $deleted = false;
