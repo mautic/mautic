@@ -345,7 +345,7 @@ class SalesforceApi extends CrmApi
      */
     public function getRequestCounter()
     {
-        $count = $this->apiRequestCounter;
+        $count                   = $this->apiRequestCounter;
         $this->apiRequestCounter = 0;
 
         return $count;
