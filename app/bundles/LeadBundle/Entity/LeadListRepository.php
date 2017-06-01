@@ -424,6 +424,7 @@ class LeadListRepository extends CommonRepository
                     $expr = $this->generateSegmentExpression($filters, $parameters, $sq, $q);
 
                     if ($this->hasCompanyFilter || $expr->count()) {
+                        $sq->andWhere($expr);
                         $mainExpr->add(
                             sprintf('l.id NOT IN (%s)', $sq->getSQL())
                         );
@@ -1481,12 +1482,12 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -1499,12 +1500,12 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
         if ($expr) {

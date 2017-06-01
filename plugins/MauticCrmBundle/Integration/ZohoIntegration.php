@@ -108,7 +108,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $response = $this->makeRequest($request_url, $parameters, 'GET', ['authorize_session' => true]);
 
         if ($response['RESULT'] == 'FALSE') {
-            return $this->factory->getTranslator()->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
+            return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
         }
 
         return $this->extractAuthKeys($response);

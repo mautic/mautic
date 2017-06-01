@@ -249,6 +249,20 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
+            case 'select':
+            case 'country':
+                $regex = '/<select\s*id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)<\/select>/is';
+                if (preg_match($regex, $formHtml, $match)) {
+                    $origText = $match[0];
+                    $replace  = str_replace(
+                        '<option value="'.urldecode($value).'">',
+                        '<option value="'.urldecode($value).'" selected="selected">',
+                        $origText
+                    );
+                    $formHtml = str_replace($origText, $replace, $formHtml);
+                }
+
+                break;
         }
     }
 }

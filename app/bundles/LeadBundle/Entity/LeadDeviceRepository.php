@@ -25,7 +25,7 @@ class LeadDeviceRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
