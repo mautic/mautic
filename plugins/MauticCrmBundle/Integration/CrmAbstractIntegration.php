@@ -236,10 +236,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             }
         }
 
-        if (empty($newMatchedFields)) {
-            return;
-        }
-
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $companyModel = $this->factory->getModel('lead.company');
@@ -249,8 +245,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
             $company = $existingCompany[2];
-        } else {
-            $matchedFields = $newMatchedFields; //change direction of fields only when updating an existing company
+            if (empty($newMatchedFields)) {
+                return;
+            }
+            //change direction of fields only when updating an existing company
+            $matchedFields = $newMatchedFields;
         }
 
         $companyModel->setFieldValues($company, $matchedFields, false, false);
