@@ -180,7 +180,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function getApiHelper()
     {
         if (empty($this->helper)) {
-            $class  = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
+            $class        = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
             $this->helper = new $class($this);
         }
 

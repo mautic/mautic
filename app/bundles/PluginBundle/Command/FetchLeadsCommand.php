@@ -183,14 +183,14 @@ class FetchLeadsCommand extends ContainerAwareCommand
                             .'</comment>'."\n"
                         );
                     } else {
-                            $output->writeln(
+                        $output->writeln(
                                 '<comment>'.$translator->trans(
                                     'mautic.plugin.command.fetch.companies.events_executed_breakout',
                                     ['%updated%' => $updated, '%created%' => $created]
                                 )
                                 .'</comment>'."\n"
                             );
-                        }
+                    }
                 } else {
                     $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
                 }
@@ -198,7 +198,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
 
             if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
-                $result = $integrationObject->pushLeads($params);
+                $result  = $integrationObject->pushLeads($params);
                 $errored = '?';
                 $ignored = 0;
 

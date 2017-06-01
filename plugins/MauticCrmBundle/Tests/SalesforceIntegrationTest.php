@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
-
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -33,15 +32,14 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\Router;
 
 /**
- * Class SalesforceIntegrationTest
- *
+ * Class SalesforceIntegrationTest.
  */
 class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 {
-    const SC_MULTIPLE_SF_LEADS = 'multiple_sf_leads';
-    const SC_MULTIPLE_SF_CONTACTS = 'multiple_sf_contacts';
-    const SC_CONVERTED_SF_LEAD = 'converted_sf_lead';
-    const SC_EMAIL_WITH_APOSTROPHE = 'email_with_apostrophe';
+    const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
+    const SC_MULTIPLE_SF_CONTACTS     = 'multiple_sf_contacts';
+    const SC_CONVERTED_SF_LEAD        = 'converted_sf_lead';
+    const SC_EMAIL_WITH_APOSTROPHE    = 'email_with_apostrophe';
     const SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
 
     /**
@@ -80,14 +78,14 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     protected $sfMockMethods = [
-        'makeRequest'
+        'makeRequest',
     ];
 
     /**
      * @var array
      */
     protected $sfMockResetMethods = [
-        'makeRequest'
+        'makeRequest',
     ];
 
     /**
@@ -109,7 +107,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      */
     protected $leadsUpdatedCounter = [
         'Lead'    => 0,
-        'Contact' => 0
+        'Contact' => 0,
     ];
 
     /**
@@ -118,20 +116,20 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     protected $leadsCreatedCounter = 0;
 
     /**
-     * Reset
+     * Reset.
      */
     public function tearDown()
     {
-        $this->returnedSfEntities = [];
+        $this->returnedSfEntities           = [];
         $this->persistedIntegrationEntities = [];
-        $this->sfMockMethods       = $this->sfMockResetMethods;
-        $this->sfObjects           = $this->sfMockResetObjects;
-        $this->specialSfCase       = null;
-        $this->idCounter           = 1;
-        $this->leadsCreatedCounter = 0;
-        $this->leadsUpdatedCounter = [
+        $this->sfMockMethods                = $this->sfMockResetMethods;
+        $this->sfObjects                    = $this->sfMockResetObjects;
+        $this->specialSfCase                = null;
+        $this->idCounter                    = 1;
+        $this->leadsCreatedCounter          = 0;
+        $this->leadsUpdatedCounter          = [
             'Lead'    => 0,
-            'Contact' => 0
+            'Contact' => 0,
         ];
         $this->mauticContacts = [];
     }
@@ -178,7 +176,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testThatMultipleMauticContactsAreNotDuplicatedInSF()
     {
-
     }
 
     public function testThatLeadsAreOnlyCreatedIfEnabled()
@@ -207,7 +204,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function () use (&$counter) {
-                        $counter++;
+                        ++$counter;
 
                         return true;
                     }
@@ -234,7 +231,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function () use (&$counter) {
-                        $counter++;
+                        ++$counter;
 
                         return true;
                     }
@@ -246,7 +243,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function () use (&$counter) {
-                        $counter++;
+                        ++$counter;
 
                         return (1 === $counter) ? 100 : 0;
                     }
@@ -261,57 +258,46 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testThatMissingRequiredDataIsPulledFromSfAndHydrated()
     {
-
     }
 
     public function testLeadsAreNotCreatedInSfIfFoundToAlreadyExistAsContacts()
     {
-
     }
 
     public function testLeadsAreNotCreatedInSfIfFoundToAlreadyExistAsLeads()
     {
-
     }
 
     public function testIntegrationEntityRecordIsCreatedForFoundSfContacts()
     {
-
     }
 
     public function testNonMatchingMauticContactsAreCreated()
     {
-
     }
 
     public function testExceptionIsThrownIfSfReturnsErrorOnEmailLookup()
     {
-
     }
 
     public function testIntegrationPushFindsDuplicate()
     {
-
     }
 
     public function testIntegrationPushCreatesNew()
     {
-
     }
 
     public function testApostropheInEmailDoesNotCauseDuplicates()
     {
-
     }
 
     public function testExistingEntityRecordsDoesNotCreate()
     {
-
     }
 
     public function testMauticContactTimelineLinkPopulatedsPayload()
     {
-
     }
 
     protected function getMockFactory()
@@ -322,7 +308,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockEntityManager               = $this->getMockBuilder(EntityManager::class)
+        $mockEntityManager = $this->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockIntegrationEntityRepository = $this->getMockBuilder(IntegrationEntityRepository::class)
@@ -334,7 +320,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function () {
-                        $args                               = func_get_args();
+                        $args = func_get_args();
                         $this->persistedIntegrationEntities = array_merge($this->persistedIntegrationEntities, $args[0]);
                     }
                 )
@@ -376,7 +362,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $mockFactory->method('getRouter')
             ->willReturn($mockRouter);
 
-        $mockLeadModel    = $this->getMockBuilder(LeadModel::class)
+        $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
@@ -386,7 +372,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->willReturn(
                 new Company()
             );
-        $mockFieldModel        = $this->getMockBuilder(FieldModel::class)
+        $mockFieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockNotificationModel = $this->getMockBuilder(NotificationModel::class)
@@ -423,41 +409,36 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $mockCacheHelper->method('getCache')
             ->willReturn($mockCacheHelper);
 
-        $leadFields    = [
-            'Id__Lead'        =>
-                [
+        $leadFields = [
+            'Id__Lead' => [
                     'type'        => 'string',
                     'label'       => 'Lead-Lead ID',
                     'required'    => false,
                     'group'       => 'Lead',
                     'optionLabel' => 'Lead ID',
                 ],
-            'LastName__Lead'  =>
-                [
+            'LastName__Lead' => [
                     'type'        => 'string',
                     'label'       => 'Lead-Last Name',
                     'required'    => true,
                     'group'       => 'Lead',
                     'optionLabel' => 'Last Name',
                 ],
-            'FirstName__Lead' =>
-                [
+            'FirstName__Lead' => [
                     'type'        => 'string',
                     'label'       => 'Lead-First Name',
                     'required'    => false,
                     'group'       => 'Lead',
                     'optionLabel' => 'First Name',
                 ],
-            'Company__Lead'   =>
-                [
+            'Company__Lead' => [
                     'type'        => 'string',
                     'label'       => 'Lead-Company',
                     'required'    => true,
                     'group'       => 'Lead',
                     'optionLabel' => 'Company',
                 ],
-            'Email__Lead'     =>
-                [
+            'Email__Lead' => [
                     'type'        => 'string',
                     'label'       => 'Lead-Email',
                     'required'    => false,
@@ -466,32 +447,28 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 ],
         ];
         $contactFields = [
-            'Id__Contact'        =>
-                [
+            'Id__Contact' => [
                     'type'        => 'string',
                     'label'       => 'Contact-Contact ID',
                     'required'    => false,
                     'group'       => 'Contact',
                     'optionLabel' => 'Contact ID',
                 ],
-            'LastName__Contact'  =>
-                [
+            'LastName__Contact' => [
                     'type'        => 'string',
                     'label'       => 'Contact-Last Name',
                     'required'    => true,
                     'group'       => 'Contact',
                     'optionLabel' => 'Last Name',
                 ],
-            'FirstName__Contact' =>
-                [
+            'FirstName__Contact' => [
                     'type'        => 'string',
                     'label'       => 'Contact-First Name',
                     'required'    => false,
                     'group'       => 'Contact',
                     'optionLabel' => 'First Name',
                 ],
-            'Email__Contact'     =>
-                [
+            'Email__Contact' => [
                     'type'        => 'string',
                     'label'       => 'Contact-Email',
                     'required'    => false,
@@ -505,7 +482,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 $this->returnValueMap(
                     [
                         ['leadFields.Lead', null, $leadFields],
-                        ['leadFields.Contact', null, $contactFields]
+                        ['leadFields.Contact', null, $contactFields],
                     ]
                 )
             );
@@ -513,7 +490,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $mockEncryptionHelper = $this->getMockBuilder(EncryptionHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $mockPathsHelper      = $this->getMockBuilder(PathsHelper::class)
+        $mockPathsHelper = $this->getMockBuilder(PathsHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockFactory->method('getHelper')
@@ -544,16 +521,13 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $mockFactory = $this->getMockFactory();
 
         $featureSettings = [
-            'sandbox'               =>
-                [
+            'sandbox' => [
                 ],
-            'updateOwner'           =>
-                [
+            'updateOwner' => [
                 ],
-            'objects'               => $this->sfObjects,
-            'namespace'             => null,
-            'leadFields'            =>
-                [
+            'objects'    => $this->sfObjects,
+            'namespace'  => null,
+            'leadFields' => [
                     'Company__Lead'      => 'company',
                     'FirstName__Lead'    => 'firstname',
                     'LastName__Lead'     => 'lastname',
@@ -563,8 +537,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                     'Email__Contact'     => 'email',
 
                 ],
-            'update_mautic'         =>
-                [
+            'update_mautic' => [
                     'Company__Lead'      => '0',
                     'FirstName__Lead'    => '0',
                     'LastName__Lead'     => '0',
@@ -573,12 +546,10 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                     'LastName__Contact'  => '0',
                     'Email__Contact'     => '0',
                 ],
-            'companyFields'         =>
-                [
+            'companyFields' => [
                     'Name' => 'companyname',
                 ],
-            'update_mautic_company' =>
-                [
+            'update_mautic_company' => [
                     'Name' => '0',
                 ],
         ];
@@ -598,7 +569,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 [
                     'get_leads',
                     'push_lead',
-                    'push_leads'
+                    'push_leads',
                 ]
             );
 
@@ -666,7 +637,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function () use ($max, $specificObject, $maxSfContacts, $maxSfLeads) {
-                        $args   = func_get_args();
+                        $args = func_get_args();
                         $object = $args[4];
 
                         // determine whether to return a count or records
@@ -702,7 +673,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function () use (&$restart, $max) {
-
                         $args = func_get_args();
 
                         if (false === $args[2]) {
@@ -723,7 +693,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Simulate looping over Mautic leads to update
+     * Simulate looping over Mautic leads to update.
      *
      * @param $object
      * @param $limit
@@ -771,7 +741,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Simulate looping over Mautic leads to create
+     * Simulate looping over Mautic leads to create.
      *
      * @param $start
      * @param $limit
@@ -813,21 +783,21 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Mock SF response
+     * Mock SF response.
      *
      * @return array
      */
     protected function getSalesforceObjects($emails, $maxContacts, $maxLeads)
     {
         // Let's find around $max records
-        $records = [];
-        $contactCount   = 0;
-        $leadCount      = 0;
+        $records      = [];
+        $contactCount = 0;
+        $leadCount    = 0;
 
         foreach ($emails as $email) {
             // Extact ID
             preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
-            $object    = $match[1];
+            $object = $match[1];
 
             if ('Lead' === $object) {
                 if ($leadCount >= $maxLeads) {
@@ -843,15 +813,14 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
             $id        = $match[2];
             $records[] = [
-                'attributes' =>
-                    [
+                'attributes' => [
                         'type' => $object,
                         'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
                     ],
-                'Id'         => 'SF'.$id,
-                'FirstName'  => $object.$id,
-                'LastName'   => $object.$id,
-                'Email'      => $object.$id.'@sftest.com',
+                'Id'        => 'SF'.$id,
+                'FirstName' => $object.$id,
+                'LastName'  => $object.$id,
+                'Email'     => $object.$id.'@sftest.com',
             ];
 
             $this->addSpecialCases($id, $records);
@@ -871,8 +840,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         switch ($this->specialSfCase) {
             case self::SC_MULTIPLE_SF_LEADS:
                 $records[] = [
-                    'attributes'         =>
-                        [
+                    'attributes' => [
                             'type' => 'Lead',
                             'url'  => '/services/data/v34.0/sobjects/Lead/SF'.$id.'b',
                         ],
@@ -887,8 +855,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
             case self::SC_MULTIPLE_SF_CONTACTS:
                 $records[] = [
-                    'attributes'         =>
-                        [
+                    'attributes' => [
                             'type' => 'Contact',
                             'url'  => '/services/data/v34.0/sobjects/Contact/SF'.$id.'b',
                         ],
@@ -904,7 +871,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Mock SF response
+     * Mock SF response.
      *
      * @param $data
      */
@@ -928,12 +895,12 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                     list($contactId, $sfObject) = $parts;
                 }
                 $response[] = [
-                    'body'           => [
+                    'body' => [
                         'id'      => 'SF'.$contactId,
                         'success' => true,
                         'errors'  => [],
                     ],
-                    'httpHeaders'    => [
+                    'httpHeaders' => [
                         'Location' => '/services/data/v38.0/sobjects/'.$sfObject.'/SF'.$contactId,
                     ],
                     'httpStatusCode' => 201,
