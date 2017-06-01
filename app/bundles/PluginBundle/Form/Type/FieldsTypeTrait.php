@@ -122,7 +122,7 @@ trait FieldsTypeTrait
                     $fieldsName = $fieldObject.'Fields';
                 }
                 foreach ($paginatedFields as $field => $details) {
-                    $matched = isset($fieldData['leadFields'][$field]);
+                    $matched = isset($fieldData[$fieldsName][$field]);
                     $required = (int) (!empty($integrationFields[$field]['required']) || $choices[$field] == 'Email');
                     ++$index;
                     $form->add(
@@ -195,6 +195,7 @@ trait FieldsTypeTrait
                             'data' => $field,
                             'attr' => [
                                 'data-required' => $required,
+                                'data-value'    => $field,
                             ],
                         ]
                     );
@@ -205,6 +206,7 @@ trait FieldsTypeTrait
                             'data' => $index,
                             'attr' => [
                                 'data-required' => $required,
+                                'data-value'    => $index,
                             ],
                         ]
                     );

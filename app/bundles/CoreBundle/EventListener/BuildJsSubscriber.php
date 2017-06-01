@@ -43,7 +43,7 @@ class BuildJsSubscriber extends CommonSubscriber
         --- fingerprint2.js.orig	2017-05-15 15:02:12.600335908 +0200
         +++ fingerprint2.js	2017-05-15 15:02:30.592522246 +0200
         @@ -18,10 +18,7 @@
-         
+
          (function (name, context, definition) {
            "use strict";
         -  if (typeof define === "function" && define.amd) { define(definition); }

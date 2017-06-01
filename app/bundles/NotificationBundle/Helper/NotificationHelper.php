@@ -231,7 +231,12 @@ JS;
         $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
 
         // disable on Landing pages
-        if ($landingPage == true && !in_array('landing_page_enabled', $supportedFeatures)) {
+        if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures)) {
+            return false;
+        }
+
+        // disable on Landing pages
+        if ($landingPage === false && !in_array('tracking_page_enabled', $supportedFeatures)) {
             return false;
         }
 
