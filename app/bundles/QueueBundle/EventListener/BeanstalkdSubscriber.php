@@ -81,7 +81,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
             $job        = $pheanstalk
                 ->watch($event->getQueueName())
                 ->ignore('default')
-                ->reserve();
+                ->reserve(3600);
 
             $consumerEvent = $this->queueService->dispatchConsumerEventFromPayload($job->getData());
 
