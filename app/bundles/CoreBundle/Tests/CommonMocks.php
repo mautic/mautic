@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -68,5 +69,17 @@ abstract class CommonMocks extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         return $paramHelper;
+    }
+
+    /**
+     * @return BundleHelper
+     */
+    protected function getBundleHelperMock()
+    {
+        $bundleHelper = $this->getMockBuilder(BundleHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        return $bundleHelper;
     }
 }
