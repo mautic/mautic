@@ -1,1 +1,1 @@
-alert('test');
+console.log('Bundle Plugin Test')
