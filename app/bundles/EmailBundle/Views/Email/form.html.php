@@ -48,8 +48,11 @@ $templates = [
 $attr = $form->vars['attr'];
 
 $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
-
 ?>
+
+<?php foreach ($pluginsAssets as $pluginAsset) {
+    echo $pluginAsset;
+}?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
 <div class="box-layout">
@@ -83,9 +86,10 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                             </div>
                         </div>
                         <?php echo $view->render('MauticCoreBundle:Helper:theme_select.html.php', [
-                            'type'   => 'email',
-                            'themes' => $themes,
-                            'active' => $form['template']->vars['value'],
+                            'type'    => 'email',
+                            'themes'  => $themes,
+                            'plugins' => $plugins,
+                            'active'  => $form['template']->vars['value'],
                         ]); ?>
                     </div>
 

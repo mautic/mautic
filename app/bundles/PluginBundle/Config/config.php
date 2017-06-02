@@ -142,6 +142,10 @@ return [
                     'mautic.plugin.model.plugin',
                 ],
             ],
+            'mautic.helper.plugin.builder' => [
+                'class'     => 'Mautic\PluginBundle\Helper\BuilderHelper',
+                'arguments' => 'mautic.factory',
+            ],
         ],
         'models' => [
             'mautic.plugin.model.plugin' => [
