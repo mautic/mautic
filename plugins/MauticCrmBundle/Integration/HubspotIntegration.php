@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\StageBundle\Entity\Stage;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class HubspotIntegration.
@@ -85,9 +84,13 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getFormSettings()
     {
+        $enableDataPriority = $this->getDataPriority();
+
         return [
             'requires_callback'      => false,
             'requires_authorization' => false,
+            'default_features'       => [],
+            'enable_data_priority'   => $enableDataPriority,
         ];
     }
     /**
@@ -106,6 +109,16 @@ class HubspotIntegration extends CrmAbstractIntegration
     public function getApiUrl()
     {
         return 'https://api.hubapi.com';
+    }
+
+    /**
+     * Get if data priority is enabled in the integration or not default is false.
+     *
+     * @return string
+     */
+    public function getDataPriority()
+    {
+        return true;
     }
 
     /**
@@ -208,17 +221,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                     'value'    => $value,
                 ];
             }
-        }
-
-        if ($lead && !empty($lead->getId())) {
-            //put mautic timeline link
-            $formattedLeadData['properties'][] = [
-                'property' => 'mautic_timeline',
-                'value'    => $this->router->generate(
-                    'mautic_plugin_timeline_view',
-                    ['integration' => 'Hubspot', 'leadId' => $lead->getId()],
-                    UrlGeneratorInterface::ABSOLUTE_URL),
-            ];
         }
 
         return $formattedLeadData;
@@ -348,12 +350,12 @@ class HubspotIntegration extends CrmAbstractIntegration
                             }
                             if ($company) {
                                 ++$executed;
+                                $this->em->detach($company);
                             }
                         }
                     }
                     if (isset($data['hasMore']) and $data['hasMore']) {
-                        $params['vidOffset']  = $data['vid-offset'];
-                        $params['timeOffset'] = $data['time-offset'];
+                        $params['offset'] = $data['offset'];
                         $this->getCompanies($params);
                     }
                 }
@@ -506,5 +508,40 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         return $lead;
+    }
+
+    /**
+     * @param Lead  $lead
+     * @param array $config
+     *
+     * @return array|bool
+     */
+    public function pushLead($lead, $config = [])
+    {
+        $config = $this->mergeConfigToFeatureSettings($config);
+
+        if (empty($config['leadFields'])) {
+            return [];
+        }
+
+        $mappedData = $this->populateLeadData($lead, ['leadFields' => $config['leadFields'], 'object' => 'contacts', 'feature_settings' => ['objects' => $config['objects']]]);
+
+        $this->amendLeadDataBeforePush($mappedData);
+
+        if (empty($mappedData)) {
+            return false;
+        }
+
+        try {
+            if ($this->isAuthorized()) {
+                $LeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return false;
     }
 }
