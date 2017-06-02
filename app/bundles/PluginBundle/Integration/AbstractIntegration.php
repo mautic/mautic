@@ -775,7 +775,7 @@ abstract class AbstractIntegration
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
-        if (!is_object($data) and !$parsed = json_decode($data, true)) {
+        if (!$parsed = json_decode($data, true)) {
             parse_str($data, $parsed);
         }
 
@@ -1730,6 +1730,7 @@ abstract class AbstractIntegration
             if (is_array($integrationKey)) {
                 list($integrationKey, $matchIntegrationKey) = $integrationKey;
             }
+
             if (isset($leadFields[$integrationKey])) {
                 if ($leadFields[$integrationKey] == 'mauticContactTimelineLink') {
                     $this->pushContactLink  = true;
