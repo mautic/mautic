@@ -15,6 +15,7 @@ use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use Mautic\QueueBundle\Queue\QueueService;
+use Pheanstalk;
 use Pheanstalk\PheanstalkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -71,6 +72,8 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
 
     /**
      * @param Events\QueueEvent $event
+     *
+     * @throws Pheanstalk\Exception\ServerException
      */
     public function consumeMessage(Events\QueueEvent $event)
     {
@@ -88,7 +91,15 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
             if ($consumerEvent->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
                 $pheanstalk->release($job, PheanstalkInterface::DEFAULT_PRIORITY, static::DELAY_DURATION);
             } elseif ($consumerEvent->getResult() === QueueConsumerResults::ACKNOWLEDGE) {
-                $pheanstalk->delete($job);
+                try {
+                    $pheanstalk->delete($job);
+                } catch (Pheanstalk\Exception\ServerException $e) {
+                    if (strpos($e->getMessage(), 'Cannot delete job') === false
+                        && strpos($e->getMessage(), 'NOT_FOUND') === false
+                    ) {
+                        throw $e;
+                    }
+                }
             } elseif ($consumerEvent->getResult() === QueueConsumerResults::REJECT) {
                 $pheanstalk->bury($job);
             }
