@@ -203,7 +203,9 @@ trait CustomFieldRepositoryTrait
         $values = array_replace($values, ...$charValues);
 
         // Reorder leadValues based on field order
-        $values = array_merge(array_flip(array_keys($fields)), $values);
+        $values = array_merge(array_map(function ($_) {
+            return null; // Remove the indices from the flipped array keys
+        }, array_flip(array_keys($fields))), $values);
 
         $fieldValues = [];
 
