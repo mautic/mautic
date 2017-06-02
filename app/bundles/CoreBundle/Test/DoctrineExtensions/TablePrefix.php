@@ -1,5 +1,5 @@
 <?php
-namespace MauticPlugin\MauticCrmBundle\Tests\DoctrineExtensions;
+namespace Mautic\CoreBundle\Test\DoctrineExtensions;
 
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;

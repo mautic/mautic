@@ -95,3 +95,6 @@ $loader->import('security_test.php');
 if (file_exists(__DIR__.'/config_override.php')) {
     $loader->import('config_override.php');
 }
+
+//Add required parameters
+$container->setParameter('mautic.secret_key', '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0');
