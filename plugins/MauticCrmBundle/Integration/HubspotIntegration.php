@@ -15,6 +15,8 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\StageBundle\Entity\Stage;
 
 /**
@@ -524,7 +526,11 @@ class HubspotIntegration extends CrmAbstractIntegration
             return [];
         }
 
-        $mappedData = $this->populateLeadData($lead, ['leadFields' => $config['leadFields'], 'object' => 'contacts', 'feature_settings' => ['objects' => $config['objects']]]);
+        $object             = 'contacts';
+        $leadFields         = $config['leadFields'];
+        $fieldsToUpdateInSf = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $leadFields         = array_diff_key($leadFields, array_flip($fieldsToUpdateInSf));
+        $mappedData         = $this->populateLeadData($lead, ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]);
 
         $this->amendLeadDataBeforePush($mappedData);
 
@@ -532,14 +538,27 @@ class HubspotIntegration extends CrmAbstractIntegration
             return false;
         }
 
-        try {
-            if ($this->isAuthorized()) {
-                $LeadData = $this->getApiHelper()->createLead($mappedData, $lead);
-
-                return true;
+        if ($this->isAuthorized()) {
+            $leadData = $this->getApiHelper()->createLead($mappedData, $lead);
+                /** @var IntegrationEntityRepository $integrationEntityRepo */
+                $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+            $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Hubspot', $object, 'leads', $lead->getId());
+            if (empty($integrationId)) {
+                $integrationEntity = new IntegrationEntity();
+                $integrationEntity->setDateAdded(new \DateTime());
+                $integrationEntity->setIntegration('Hubspot');
+                $integrationEntity->setIntegrationEntity($object);
+                $integrationEntity->setIntegrationEntityId($leadData['vid']);
+                $integrationEntity->setInternalEntity('lead');
+                $integrationEntity->setInternalEntityId($lead->getId());
+            } else {
+                $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
             }
-        } catch (\Exception $e) {
-            $this->logIntegrationError($e);
+            $integrationEntity->setLastSyncDate(new \DateTime());
+            $this->em->persist($integrationEntity);
+            $this->em->flush($integrationEntity);
+
+            return true;
         }
 
         return false;
