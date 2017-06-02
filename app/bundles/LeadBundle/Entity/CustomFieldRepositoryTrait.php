@@ -318,13 +318,15 @@ trait CustomFieldRepositoryTrait
             $em = $this->getEntityManager();
             foreach ($entity->getCharLeadFields() as $charLeadField) {
                 $alias = $charLeadField->getLeadField()->getAlias();
-                if (isset($fields[$alias])) {
-                    $charLeadField->setValue($fields[$alias]);
+                $value = $entity->{'get'.ucfirst($alias)}();
+                if ($value === null || $value === '') {
+                    $em->remove($charLeadField);
+                } else {
+                    $charLeadField->setValue($value);
                     $em->persist($charLeadField);
                 }
             }
             $em->flush();
-            //$this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }
     }
 
