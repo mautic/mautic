@@ -118,6 +118,16 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
+     * @return \MauticPlugin\MauticFocusBundle\Entity\FocusCampaignRepository
+     */
+    public function getFocusCampaignRepository()
+    {
+        return $this->em->getRepository('MauticFocusBundle:FocusCampaign');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @param null $id
      *
      * @return Focus
@@ -181,6 +191,8 @@ class FocusModel extends FormModel
             $focus = $focus->toArray();
         }
 
+        $inCampaign = $this->focusInCampaign();
+
         if (!empty($focus['form'])) {
             $form = $this->formModel->getEntity($focus['form']);
         } else {
@@ -220,6 +232,7 @@ class FocusModel extends FormModel
                     'preview'      => $preview,
                     'ignoreMinify' => $ignoreMinify,
                     'clickUrl'     => $url,
+                    'inCampaign'   => $inCampaign,
                 ]
             );
 

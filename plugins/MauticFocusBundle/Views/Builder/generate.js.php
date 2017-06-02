@@ -80,6 +80,7 @@ switch ($style) {
             debug: <?php echo $debug; ?>,
             modalsDismissed: {},
             ignoreConverted: <?php echo ($focus['type'] !== 'notification' && !empty($props['stop_after_conversion'])) ? 'true' : 'false'; ?>,
+            inCampaign:<?php echo $inCampaign; ?>,
 
             // Initialize the focus
             initialize: function () {
