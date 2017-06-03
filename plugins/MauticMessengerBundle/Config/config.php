@@ -12,6 +12,14 @@ return [
             ],
         ],
     ],
+    'services' => [
+        'forms' => [
+            'mautic.form.type.messenger.facebook' => [
+                'class' => 'MauticPlugin\MauticMessengerBundle\Form\Type\MessengerType',
+                'alias' => 'messenger_facebook',
+            ],
+        ],
+    ],
     'parameters' => array(),
 
 ];
