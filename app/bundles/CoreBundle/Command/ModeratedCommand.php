@@ -61,6 +61,15 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         $this->output         = $output;
         $this->lockExpiration = $input->getOption('timeout');
 
+        // Determine moderation mode
+        // getmypid may be disabled and posix_getpgid is not available on Windows machines
+        if (function_exists('getmypid') && function_exists('posix_getpgid')) {
+            $disabled = explode(',', ini_get('disable_functions'));
+            if (!in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled)) {
+                $this->moderationMode = self::MODE_PID;
+            }
+        }
+
         // Allow multiple runs of the same command if executing different IDs, etc
         $this->moderationKey = $this->getName().$moderationKey;
 
@@ -113,12 +122,23 @@ abstract class ModeratedCommand extends ContainerAwareCommand
      */
     private function checkStatus($force = false)
     {
-        // getmypid may be disabled and posix_getpgid is not available on Windows machines
-        if (function_exists('getmypid') && function_exists('posix_getpgid')) {
-            $disabled = explode(',', ini_get('disable_functions'));
-            if (!in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled)) {
-                $this->moderationMode = self::MODE_PID;
+        // Force literally means force - yes, sir!
+        if ($force) {
+            return true;
+        }
 
+        // Respect timeout setting.
+        if ($this->lockExpiration) {
+            $fileAge = time() - filemtime($this->lockFile);
+            if ($fileAge > $this->lockExpiration) {
+                return true;
+            } else {
+                $this->output->writeln("<info>Lock {$this->lockFile} expires in ".($this->lockExpiration - $fileAge).' seconds.</info>');
+            }
+        }
+
+        switch ($this->moderationMode) {
+            case self::MODE_PID:
                 // Check if the PID is still running
                 $fp = fopen($this->lockFile, 'c+');
                 if (!flock($fp, LOCK_EX)) {
@@ -128,7 +148,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 }
 
                 $pid = fgets($fp, 8192);
-                if (!$force && $pid && posix_getpgid($pid)) {
+                if ($pid && posix_getpgid($pid)) {
                     $this->output->writeln('<info>Script with pid '.$pid.' in progress.</info>');
 
                     flock($fp, LOCK_UN);
@@ -146,31 +166,19 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
                 flock($fp, LOCK_UN);
                 fclose($fp);
+                break;
+            case self::MODE_LOCK:
+            default:
+                // Accessing PID commands is not available so use a simple lock file mechanism
+                $lockHandler = $this->lockHandler = new LockHandler($this->moderationKey, $this->runDirectory);
 
-                return true;
-            }
-        }
-
-        // Accessing PID commands is not available so use a simple lock file mechanism
-        $lockHandler = $this->lockHandler = new LockHandler($this->moderationKey, $this->runDirectory);
-
-        if (!$force && !$lockHandler->lock()) {
-            // Check timestamp if $force is not requested
-            if ($this->lockExpiration) {
-                $fileAge = time() - filemtime($this->lockFile);
-
-                if ($fileAge <= $this->lockExpiration) {
-                    $this->output->writeln('<info>Lock expires in '.($this->lockExpiration - $fileAge).' seconds.</info>');
-
+                if (!$lockHandler->lock()) {
+                    // Lock is still in effect
                     return false;
+                } else {
+                    // Attempt to update the modified time just in case there was no lock but the file still exists
+                    @touch($this->lockFile);
                 }
-            } else {
-                // Lock is still in effect
-                return false;
-            }
-        } elseif (!$force) {
-            // Attempt to update the modified time just in case there was no lock but the file still exists
-            @touch($this->lockFile);
         }
 
         return true;
