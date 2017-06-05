@@ -25,6 +25,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
     protected $pushContactLink = false;
+    protected $helper;
 
     /**
      * @param Integration $settings
@@ -178,13 +179,12 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getApiHelper()
     {
-        static $helper;
-        if (empty($helper)) {
-            $class  = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
-            $helper = new $class($this);
+        if (empty($this->helper)) {
+            $class        = '\\MauticPlugin\\MauticCrmBundle\\Api\\'.$this->getName().'Api';
+            $this->helper = new $class($this);
         }
 
-        return $helper;
+        return $this->helper;
     }
 
     /**
@@ -248,8 +248,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 return;
             }
             $company = $existingCompany[2];
-        } else {
-            $matchedFields = $newMatchedFields; //change direction of fields only when updating an existing company
+            if (empty($newMatchedFields)) {
+                return;
+            }
+            //change direction of fields only when updating an existing company
+            $matchedFields = $newMatchedFields;
         }
 
         $companyModel->setFieldValues($company, $matchedFields, false, false);

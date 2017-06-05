@@ -31,8 +31,18 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array
      */
-    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate = null, $endDate = null, $push = false, $start = 0, $limit = 0, $integrationEntityIds = null)
-    {
+    public function getIntegrationsEntityId(
+        $integration,
+        $integrationEntity,
+        $internalEntity,
+        $internalEntityId = null,
+        $startDate = null,
+        $endDate = null,
+        $push = false,
+        $start = 0,
+        $limit = 0,
+        $integrationEntityIds = null
+    ) {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
@@ -82,6 +92,43 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
+     * @param      $integration
+     * @param      $integrationEntity
+     * @param      $internalEntity
+     * @param      $internalEntityId
+     * @param null $leadFields
+     *
+     * @return array
+     */
+    public function getIntegrationEntity($integration, $integrationEntity, $internalEntity, $internalEntityId, $leadFields = null)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i')
+            ->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
+        $q->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id');
+        if ($leadFields) {
+            $q->addSelect($leadFields);
+        }
+
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('i.integration', ':integration'),
+                $q->expr()->eq('i.internal_entity', ':internalEntity'),
+                $q->expr()->eq('i.integration_entity', ':integrationEntity'),
+                $q->expr()->eq('i.internal_entity_id', (int) $internalEntityId)
+            )
+        )
+            ->setParameter('integration', $integration)
+            ->setParameter('internalEntity', $internalEntity)
+            ->setParameter('integrationEntity', $integrationEntity)
+            ->setMaxResults(1);
+
+        $results = $q->execute()->fetchAll();
+
+        return ($results) ? $results[0] : null;
+    }
+
+    /**
      * @param $integration
      * @param $internalEntity
      * @param $leadFields
@@ -90,14 +137,20 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array
      */
-    public function findLeadsToUpdate($integration, $internalEntity, $leadFields, $limit = 25, $integrationEntity = ['Contact', 'Lead'], $excludeIntegrationIds = [])
-    {
+    public function findLeadsToUpdate(
+        $integration,
+        $internalEntity,
+        $leadFields,
+        $limit = 25,
+        $integrationEntity = ['Contact', 'Lead'],
+        $excludeIntegrationIds = []
+    ) {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i')
             ->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
 
         if (false === $limit) {
-            $q->select('count(*) as total');
+            $q->select('count(i.integration_entity_id) as total');
 
             if ($integrationEntity) {
                 $q->addSelect('i.integration_entity');
@@ -195,7 +248,10 @@ class IntegrationEntityRepository extends CommonRepository
 
         $q->where('l.date_identified is not null')
             ->andWhere('l.email is not null')
-            ->andWhere('not exists (select null from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id )')
+            ->andWhere(
+                'not exists (select null from '.MAUTIC_TABLE_PREFIX
+                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id )'
+            )
             ->setParameter('integration', $integration);
 
         if ($limit) {
@@ -253,6 +309,35 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-        ->execute();
+            ->execute();
+    }
+
+    /**
+     * @param $internalEntity
+     * @param $leadId
+     */
+    public function updateErrorLeads($internalEntity, $leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->set('internal_entity', ':lead')->setParameter('lead', 'lead');
+
+        $q->where('internal_entity_id = :leadId')
+            ->andWhere($q->expr()->isNotNull('integration_entity_id'))
+            ->andWhere($q->expr()->eq('internal_entity', ':internalEntity'))
+            ->setParameter('leadId', $leadId)
+            ->setParameter('internalEntity', $internalEntity)
+            ->execute();
+
+        $z = $this->_em->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity');
+
+        $z->where('internal_entity_id = :leadId')
+            ->andWhere($q->expr()->isNull('integration_entity_id'))
+            ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
+            ->setParameter('leadId', $leadId)
+            ->setParameter('internalEntity', $internalEntity)
+            ->execute();
     }
 }
