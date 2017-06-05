@@ -358,7 +358,8 @@ class HubspotIntegration extends CrmAbstractIntegration
                             }
                             if ($company) {
                                 ++$executed;
-                                $this->em->detach($company);
+                                $this->em->persist($company);
+                                $this->em->flush($company);
                             }
                         }
                     }
