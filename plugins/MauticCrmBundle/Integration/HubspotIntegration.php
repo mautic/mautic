@@ -323,7 +323,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                     if ($data['has-more']) {
                         $params['vidOffset']  = $data['vid-offset'];
                         $params['timeOffset'] = $data['time-offset'];
-                        $this->getLeads($params);
+                        $this->getLeads($params, $query, $executed);
                     }
                 }
 
@@ -336,10 +336,9 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $executed;
     }
 
-    public function getCompanies($params = [], $id = false)
+    public function getCompanies($params = [], $id = false, &$executed = null)
     {
-        $executed = 0;
-        $results  = [];
+        $results = [];
         try {
             if ($this->isAuthorized()) {
                 $data = $this->getApiHelper()->getCompanies($params, $id);
@@ -358,14 +357,12 @@ class HubspotIntegration extends CrmAbstractIntegration
                             }
                             if ($company) {
                                 ++$executed;
-                                $this->em->persist($company);
-                                $this->em->flush($company);
                             }
                         }
                     }
                     if (isset($data['hasMore']) and $data['hasMore']) {
                         $params['offset'] = $data['offset'];
-                        $this->getCompanies($params);
+                        $this->getCompanies($params, $id, $executed);
                     }
                 }
 
