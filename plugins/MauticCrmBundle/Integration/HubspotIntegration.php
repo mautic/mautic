@@ -293,10 +293,14 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
-    public function getLeads($params = [], $query = null)
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
-        $executed = null;
-
+        if (!is_array($executed)) {
+            $executed = [
+                0 => 0,
+                1 => 0,
+            ];
+        }
         try {
             if ($this->isAuthorized()) {
                 $config                         = $this->mergeConfigToFeatureSettings();
@@ -309,8 +313,10 @@ class HubspotIntegration extends CrmAbstractIntegration
                         if (is_array($contact)) {
                             $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
                             $contact     = $this->getMauticLead($contactData);
-                            if ($contact) {
-                                ++$executed;
+                            if ($contact && !$contact->isNewlyCreated()) { //updated
+                                $executed[0] = $executed[0] + 1;
+                            } elseif ($contact && $contact->isNewlyCreated()) { //newly created
+                                $executed[1] = $executed[1] + 1;
                             }
                         }
                     }
@@ -542,7 +548,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             $leadData = $this->getApiHelper()->createLead($mappedData, $lead);
                 /** @var IntegrationEntityRepository $integrationEntityRepo */
                 $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-            $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Hubspot', $object, 'leads', $lead->getId());
+            $integrationId             = $integrationEntityRepo->getIntegrationsEntityId('Hubspot', $object, 'leads', $lead->getId());
             if (empty($integrationId)) {
                 $integrationEntity = new IntegrationEntity();
                 $integrationEntity->setDateAdded(new \DateTime());
