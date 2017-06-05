@@ -423,8 +423,11 @@ class LeadListRepository extends CommonRepository
 
                     $expr = $this->generateSegmentExpression($filters, $parameters, $sq, $q);
 
-                    if ($this->hasCompanyFilter && $expr->count()) {
-                        $sq->andWhere($expr);
+                    if ($this->hasCompanyFilter || $expr->count()) {
+                        if ($expr->count()) {
+                            $sq->andWhere($expr);
+                        }
+
                         $mainExpr->add(
                             sprintf('l.id NOT IN (%s)', $sq->getSQL())
                         );
