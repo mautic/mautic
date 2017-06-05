@@ -143,7 +143,19 @@ class PageTestAbstract extends WebTestCase
 
         $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->setConstructorArgs([$urlHelper])
+            ->setMethods(['createRedirectEntity', 'generateRedirectUrl'])
             ->getMock();
+
+        $mockRedirect = $this->getMockBuilder('Mautic\PageBundle\Entity\Redirect')
+            ->getMock();
+
+        $mockRedirectModel->expects($this->any())
+            ->method('createRedirectEntity')
+            ->willReturn($mockRedirect);
+
+        $mockRedirectModel->expects($this->any())
+            ->method('generateRedirectUrl')
+            ->willReturn('http://some-url.com');
 
         return $mockRedirectModel;
     }

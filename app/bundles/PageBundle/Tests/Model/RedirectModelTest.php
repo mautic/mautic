@@ -16,11 +16,23 @@ use Mautic\PageBundle\Tests\PageTestAbstract;
 
 class RedirectModelTest extends PageTestAbstract
 {
-    public function testGetUrl()
+    public function testCreateRedirectEntity_WhenCalled_ReturnsRedirect()
     {
-        $redirect      = new Redirect();
         $redirectModel = $this->getRedirectModel();
+        $entity        = $redirectModel->createRedirectEntity('http://some-url.com');
+
+        $this->assertInstanceOf(Redirect::class, $entity);
+    }
+
+    public function testGenerateRedirectUrl_WhenCalled_ReturnsValidUrl()
+    {
+        $redirect = new Redirect();
         $redirect->setUrl('http://some-url.com');
-        $this->assertEquals('http://some-url.com', $redirect->getUrl());
+        $redirect->setRedirectId('redirect-id');
+
+        $redirectModel = $this->getRedirectModel();
+        $url           = $redirectModel->generateRedirectUrl($redirect);
+
+        $this->assertContains($url, 'http://some-url.com');
     }
 }
