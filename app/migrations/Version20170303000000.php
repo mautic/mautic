@@ -31,6 +31,9 @@ class Version20170303000000 extends AbstractMauticMigration
         if ($table->hasIndex('date_added_country_index')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
+        if (sizeof($table->getIndexes()) >= 64) {
+            throw new SkipMigrationException('This table already has 64 indexes');
+        }
     }
 
     /**
