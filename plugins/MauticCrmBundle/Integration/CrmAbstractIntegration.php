@@ -225,7 +225,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
         $fieldsToUpdateInMautic = isset($config['update_mautic_company']) ? array_keys($config['update_mautic_company'], 1) : [];
         if (!empty($fieldsToUpdateInMautic)) {
-            $fieldsToUpdateInMautic = array_diff_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
+            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
         } else {
             $newMatchedFields = $matchedFields;
@@ -317,7 +317,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $fieldsToUpdateInMautic = (isset($config['update_mautic']) && !empty($existingLeads)) ? array_keys($config['update_mautic'], 1) : [];
         if (!empty($fieldsToUpdateInMautic) && !empty($existingLeads)) {
-            $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
+            $fieldsToUpdateInMautic = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
         }
         $leadModel->setFieldValues($lead, $matchedFields, false, false);

@@ -563,22 +563,33 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param array  $fields
      * @param array  $keys
-     * @param string $object
+     * @param mixed $object
      *
      * @return array
      */
     public function cleanSalesForceData($fields, $keys, $object)
     {
         $leadFields = [];
+        $objects    = (!is_array($object)) ? [$object] : $object;
+
+        if (isset($fields['leadFields'])) {
+            $fields = $fields['leadFields'];
+        }
 
         foreach ($keys as $key) {
-            if (strstr($key, '__'.$object)) {
-                $newKey              = str_replace('__'.$object, '', $key);
-                $leadFields[$newKey] = $fields['leadFields'][$key];
+            foreach ($objects as $obj) {
+                if (!isset($leadFields[$obj])) {
+                    $leadFields[$obj] = [];
+                }
+
+                if (strpos($key, '__'.$obj)) {
+                    $newKey                       = str_replace('__'.$obj, '', $key);
+                    $leadFields[$obj][$newKey] = $fields[$key];
+                }
             }
         }
 
-        return $leadFields;
+        return (is_array($object)) ? $leadFields : $leadFields[$object];
     }
 
     /**
@@ -599,9 +610,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $fields = array_keys($config['leadFields']);
 
+        $fieldsToUpdateInSf = $this->getSalesforceFieldsToPush($config);
         $leadFields          = $this->cleanSalesForceData($config, $fields, $object);
-        $fieldsToUpdateInSf  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
-        $leadFields          = array_diff_key($leadFields, array_flip($fieldsToUpdateInSf));
+        $leadFields          = array_intersect_key($leadFields, $fieldsToUpdateInSf[$object]);
         $mappedData[$object] = $this->populateLeadData(
             $lead,
             ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]
@@ -1823,23 +1834,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $leadFields = array_combine($leadFields, $leadFields);
         unset($leadFields['mauticContactTimelineLink']);
 
-        $fieldsToUpdateInSf = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
-        if (isset($fieldsToUpdateInSf['Id'])) {
-            unset($fieldsToUpdateInSf['Id']);
-        }
+        $fieldsToUpdateInSf = $this->getSalesforceFieldsToPush($config);
+        $supportedObjects   = [];
+        $objectFields       = [];
 
-        $supportedObjects = [];
-        $objectFields     = [];
         // Important to have contacts first!!
         if (false !== array_search('Contact', $config['objects'])) {
             $supportedObjects['Contact'] = 'Contact';
             $fieldsToCreate              = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Contact');
-            $objectFields['Contact']     = array_diff_key($fieldsToCreate, array_flip($fieldsToUpdateInSf));
+            $objectFields['Contact']     = array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Contact']);
         }
         if (false !== array_search('Lead', $config['objects'])) {
             $supportedObjects['Lead'] = 'Lead';
             $fieldsToCreate           = $this->cleanSalesForceData($config, array_keys($config['leadFields']), 'Lead');
-            $objectFields['Lead']     = array_diff_key($fieldsToCreate, array_flip($fieldsToUpdateInSf));
+            $objectFields['Lead']     = array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Lead']);
         }
 
         $mauticLeadFieldString = implode(', l.', $leadFields);
@@ -1866,6 +1874,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return [$objectFields, $mauticLeadFieldString, $requiredFields, $supportedObjects];
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    protected function getSalesforceFieldsToPush(array $config)
+    {
+        $fieldsToUpdateInSf = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
+        $fieldsToUpdateInSf = $this->cleanSalesForceData(array_flip($fieldsToUpdateInSf), $fieldsToUpdateInSf, ['Lead', 'Contact']);
+        unset($fieldsToUpdateInSf['Contact']['Id'], $fieldsToUpdateInSf['Lead']['Id']);
+
+        return $fieldsToUpdateInSf;
     }
 
     /**
