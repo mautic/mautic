@@ -437,7 +437,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         );
                     } else {
                         $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate($entity, $params));
+                        $integrationEntity->setLastSyncDate($this->getLastSyncDate($entity, $params, false));
                         $this->persistIntegrationEntities[] = $integrationEntity;
                     }
 
