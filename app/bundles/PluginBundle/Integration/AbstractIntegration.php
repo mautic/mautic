@@ -1864,7 +1864,7 @@ abstract class AbstractIntegration
 
         $matched = [];
         foreach ($gleanedData as $key => $field) {
-            if (isset($fields[$key]) && isset($gleanedData[$key])) {
+            if (isset($fields[$key]) && isset($gleanedData[$key]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $gleanedData[$key]) {
                 $matched[$fields[$key]] = $gleanedData[$key];
             }
         }
