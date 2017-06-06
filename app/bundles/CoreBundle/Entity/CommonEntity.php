@@ -21,6 +21,11 @@ class CommonEntity
     protected $changes = [];
 
     /**
+     * @var array
+     */
+    protected $pastChanges = [];
+
+    /**
      * Wrapper function for isProperty methods.
      *
      * @param string $name
@@ -116,8 +121,12 @@ class CommonEntity
     /**
      * @return array
      */
-    public function getChanges()
+    public function getChanges($includePast = false)
     {
+        if ($includePast && empty($this->changes) && !empty($this->pastChanges)) {
+            return $this->pastChanges;
+        }
+
         return $this->changes;
     }
 
@@ -126,6 +135,7 @@ class CommonEntity
      */
     public function resetChanges()
     {
-        $this->changes = [];
+        $this->pastChanges = $this->changes;
+        $this->changes     = [];
     }
 }
