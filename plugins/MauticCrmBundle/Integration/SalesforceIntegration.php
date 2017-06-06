@@ -446,7 +446,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $entity->getId()
                     );
 
-                    if (null === $integrationId) {
+                    if (empty($integrationId)) {
                         $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
                             $object,
                             $record['Id'],
