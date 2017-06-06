@@ -111,7 +111,7 @@ class CommonEntity
      */
     protected function addChange($key, $value)
     {
-        if (isset($this->changes[$key]) && is_array($this->changes[$key])) {
+        if (isset($this->changes[$key]) && is_array($this->changes[$key]) && [0,1] !== array_keys($this->changes[$key])) {
             $this->changes[$key] = array_merge($this->changes[$key], $value);
         } else {
             $this->changes[$key] = $value;
