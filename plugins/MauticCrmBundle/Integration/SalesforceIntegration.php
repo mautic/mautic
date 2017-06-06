@@ -386,23 +386,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Amend mapped lead data before creating to Mautic.
+     * @param       $data
+     * @param       $object
+     * @param array $params
      *
-     * @param array  $data
-     * @param string $object
-     *
-     * @return int
+     * @return array
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object, $params = [])
     {
-        $integrationEntityRepo                     = $this->getIntegrationEntityRepository();
-        $settings['feature_settings']['objects'][] = $object;
-        $fields                                    = array_keys($this->getAvailableLeadFields($settings));
-        $params['fields']                          = implode(',', $fields);
-
-        $updated = 0;
-        $created = 0;
-        $entity  = null;
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
+        $updated               = 0;
+        $created               = 0;
+        $entity                = null;
 
         if (isset($data['records']) and $object !== 'Activity') {
             foreach ($data['records'] as $record) {
@@ -427,7 +422,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         } elseif (!empty($dataObject['Owner__Contact']['Email'])) {
                             $dataObject['owner_email'] = $dataObject['Owner__Contact']['Email'];
                         }
-                        $entity                = $this->getMauticLead($dataObject, true, null, null);
+                        $entity                = $this->getMauticLead($dataObject);
                         $mauticObjectReference = 'lead';
                     } elseif ($object == 'Account') {
                         $entity                = $this->getMauticCompany($dataObject);
@@ -451,7 +446,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $entity->getId()
                     );
 
-                    if ($integrationId == null) {
+                    if (null === $integrationId) {
                         $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
                             $object,
                             $record['Id'],
@@ -462,9 +457,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         );
                     } else {
                         $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                        $integrationEntity->setLastSyncDate($this->getLastSyncDate($entity, $params));
                         $this->persistIntegrationEntities[] = $integrationEntity;
                     }
+
                     if ($entity->isNewlyCreated()) {
                         ++$created;
                     } else {
@@ -682,7 +678,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $result = $this->getApiHelper()->getLeads($query, $object);
-                list($justUpdated, $justCreated) = $this->amendLeadDataBeforeMauticPopulate($result, $object);
+                list($justUpdated, $justCreated) = $this->amendLeadDataBeforeMauticPopulate($result, $object, $params);
 
                 $executed[0] += $justUpdated;
                 $executed[1] += $justCreated;
@@ -1573,8 +1569,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return bool|\DateTime
      */
-    protected function getLastSyncDate()
+    protected function getLastSyncDate(Lead $lead = null, $params = [])
     {
+        if (isset($params['start']) && $lead) {
+            // Check to see if this contact was modified prior to the fetch so that the push catches it
+            $changes = $lead->getChanges();
+            if (isset($changes['dateModified'])) {
+                $originalDateModified = \DateTime::createFromFormat('c', $changes['dateModified'][0]);
+                $startSyncDate        = \DateTime::createFromFormat('c', $params['start']);
+
+                if ($originalDateModified >= $startSyncDate) {
+                    // Return null so that the push sync catches
+                    return null;
+                }
+            }
+        }
+
         return (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
     }
@@ -1608,10 +1618,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$totalCount
     )
     {
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
-
         // Fetch them separately so we can determine if Leads are already Contacts
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate(
+        $toUpdate = $this->getIntegrationEntityRepository()->findLeadsToUpdate(
             'Salesforce',
             'lead',
             $mauticLeadFieldString,
@@ -1635,7 +1643,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $this->setContactToSync($checkEmailsInSF, $lead);
                 } elseif (isset($trackedContacts['Contact'][$key])) {
                     // We already know this is a converted contact so just ignore it
-                    $integrationEntity     = $this->em->getReference(
+                    $integrationEntity = $this->em->getReference(
                         'MauticPluginBundle:IntegrationEntity',
                         $lead['id']
                     );
@@ -2355,5 +2363,4 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function amendToSfFields($fields)
     {
     }
-
 }

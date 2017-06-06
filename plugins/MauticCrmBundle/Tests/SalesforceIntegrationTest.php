@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -257,6 +258,49 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->method('getMauticContactsToCreate');
 
         $sf->pushLeads();
+    }
+
+    public function testLastSyncDate()
+    {
+        $class = new \ReflectionClass(SalesforceIntegration::class);
+        $lastSyncMethod = $class->getMethod('getLastSyncDate');
+        $lastSyncMethod->setAccessible(true);
+
+        $sf = $this->getSalesforceIntegration();
+
+        // should be a DateTime
+        $lastSync = $lastSyncMethod->invokeArgs($sf, []);
+        $this->assertTrue($lastSync instanceof \DateTime);
+
+        // Set the override set by fetch command
+        define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
+
+        /** @var \DateTime $lastSync */
+        $lastSync = $lastSyncMethod->invokeArgs($sf, []);
+
+        // should be teh same as MAUTIC_DATE_MODIFIED_OVERRIDE override
+        $this->assertTrue($lastSync instanceof \DateTime);
+        $this->assertEquals(MAUTIC_DATE_MODIFIED_OVERRIDE, $lastSync->format('U'));
+
+        $lead = new Lead();
+        $modified = new \DateTime('-15 minutes');
+        $lead->setDateModified($modified);
+        // Set it twice to get an original and updated datetime
+        $now = new \DateTime();
+        $lead->setDateModified($now);
+
+        $params = [
+            'start' => $now->format('c')
+        ];
+
+        // Should be null due to the contact was updated since last sync
+        $lastSync = $lastSyncMethod->invokeArgs($sf, [$lead, $params]);
+        $this->assertNull($lastSync);
+
+        // Should be a DateTime object
+        $lead = new Lead();
+        $lastSync = $lastSyncMethod->invokeArgs($sf, [$lead, $params]);
+        $this->assertTrue($lastSync instanceof \DateTime);
     }
 
     public function testThatMissingRequiredDataIsPulledFromSfAndHydrated()
@@ -537,7 +581,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      * @param int  $maxSfContacts
      * @param null $updateObject
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return SalesforceIntegration|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getSalesforceIntegration($maxUpdate = 100, $maxCreate = 200, $maxSfLeads = 25, $maxSfContacts = 25, $updateObject = null)
     {
