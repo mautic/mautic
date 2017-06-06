@@ -1906,7 +1906,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
                         $integrationEntity->setLastSyncDate(new \DateTime());
                     } elseif (isset($campaignId) && $campaignId != null) {
-                        $integrationEntity                  = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $campaignId);
+                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $campaignId);
                         $integrationEntity->setLastSyncDate($this->getLastSyncDate());
                     } elseif ($contactId) {
                         $integrationEntity = $this->createIntegrationEntity(
@@ -1986,7 +1986,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                     $this->logIntegrationError($exception);
                     ++$totalErrored;
-
 
                     if ($integrationEntityId) {
                         /** @var IntegrationEntity $integrationEntity */
