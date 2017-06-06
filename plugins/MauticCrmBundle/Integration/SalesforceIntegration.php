@@ -446,7 +446,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $entity->getId()
                     );
 
-                    if (null === $integrationId) {
+                    if (empty($integrationId)) {
                         $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
                             $object,
                             $record['Id'],
@@ -2142,10 +2142,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $checkEmailsInSF[$key]            = $contactEntity;
                     $trackedContacts['Contact'][$key] = $contactEntity['id'];
                 } else {
+                    $id = (!empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['ConvertedContactId'] : $sfEntityRecord['Id'];
                     // This contact does not have a Contact record
                     $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
                         'Contact',
-                        (!empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['ConvertedContactId'] : $sfEntityRecord['Id'],
+                        $id,
                         'lead',
                         $contactId,
                         [],
@@ -2153,7 +2154,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     );
 
                     $checkEmailsInSF[$key]['integration_entity']    = 'Contact';
-                    $checkEmailsInSF[$key]['integration_entity_id'] = $sfEntityRecord['ConvertedContactId'];
+                    $checkEmailsInSF[$key]['integration_entity_id'] = $id;
                 }
 
                 $this->logger->debug('SALESFORCE: Converted lead '.$sfEntityRecord['Email']);
