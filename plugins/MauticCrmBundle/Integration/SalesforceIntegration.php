@@ -1111,9 +1111,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $mauticData,
                     $checkEmailsInSF,
                     $processedLeads,
-                    $requiredFields['Lead']['create_fields'],
-                    $requiredFields['Lead']['fields'],
-                    $fieldMapping['Lead']
+                    $requiredFields,
+                    $fieldMapping
                 );
             }
 
@@ -2144,17 +2143,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } else {
                     $id = (!empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['ConvertedContactId'] : $sfEntityRecord['Id'];
                     // This contact does not have a Contact record
-                    $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
+                    $integrationEntity = $this->createIntegrationEntity(
                         'Contact',
                         $id,
                         'lead',
-                        $contactId,
-                        [],
-                        false
+                        $contactId
                     );
 
                     $checkEmailsInSF[$key]['integration_entity']    = 'Contact';
                     $checkEmailsInSF[$key]['integration_entity_id'] = $id;
+                    $checkEmailsInSF[$key]['id']                    = $integrationEntity;
                 }
 
                 $this->logger->debug('SALESFORCE: Converted lead '.$sfEntityRecord['Email']);
@@ -2238,16 +2236,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$mauticData,
         &$checkEmailsInSF,
         &$processedLeads,
-        $leadSfFieldsToCreate,
-        $requiredFields,
+        $fieldMappings,
         $objectFields
     ) {
         foreach ($checkEmailsInSF as $key => $lead) {
             if (!empty($lead['integration_entity_id'])) {
                 if ($this->buildCompositeBody(
                     $mauticData,
-                    $requiredFields,
-                    $objectFields,
+                    $fieldMappings[$lead['integration_entity']]['fields'],
+                    $objectFields[$lead['integration_entity']],
                     $lead['integration_entity'],
                     $lead,
                     $lead['integration_entity_id']
@@ -2258,8 +2255,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             } else {
                 $this->buildCompositeBody(
                     $mauticData,
-                    $requiredFields,
-                    $leadSfFieldsToCreate, //use all matched fields when creating new records in SF
+                    $fieldMappings['Lead']['fields'],
+                    $fieldMappings['Lead']['create_fields'], //use all matched fields when creating new records in SF
                     'Lead',
                     $lead
                 );
