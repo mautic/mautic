@@ -259,7 +259,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testLastSyncDate()
     {
-        $class = new \ReflectionClass(SalesforceIntegration::class);
+        $class          = new \ReflectionClass(SalesforceIntegration::class);
         $lastSyncMethod = $class->getMethod('getLastSyncDate');
         $lastSyncMethod->setAccessible(true);
 
@@ -279,7 +279,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($lastSync instanceof \DateTime);
         $this->assertEquals(MAUTIC_DATE_MODIFIED_OVERRIDE, $lastSync->format('U'));
 
-        $lead = new Lead();
+        $lead     = new Lead();
         $modified = new \DateTime('-15 minutes');
         $lead->setDateModified($modified);
         // Set it twice to get an original and updated datetime
@@ -287,7 +287,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $lead->setDateModified($now);
 
         $params = [
-            'start' => $now->format('c')
+            'start' => $now->format('c'),
         ];
 
         // Should be null due to the contact was updated since last sync
@@ -295,7 +295,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($lastSync);
 
         // Should be a DateTime object
-        $lead = new Lead();
+        $lead     = new Lead();
         $lastSync = $lastSyncMethod->invokeArgs($sf, [$lead, $params]);
         $this->assertTrue($lastSync instanceof \DateTime);
     }
