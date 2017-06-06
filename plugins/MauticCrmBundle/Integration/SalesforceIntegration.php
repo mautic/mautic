@@ -1901,23 +1901,28 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $exception->setContactId($contactId);
                     }
                     $this->logIntegrationError($exception);
-
+                    $integrationEntity = null;
                     if ($integrationEntityId && $object !== 'CampaignMember') {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
                         $integrationEntity->setLastSyncDate(new \DateTime());
-                        $this->persistIntegrationEntities[] = $integrationEntity;
                     } elseif (isset($campaignId) && $campaignId != null) {
                         $integrationEntity                  = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $campaignId);
-                        $this->persistIntegrationEntities[] = $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
                     } elseif ($contactId) {
-                        $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
+                        $integrationEntity = $this->createIntegrationEntity(
                             $object,
                             null,
                             'lead-error',
                             $contactId,
-                            ['error' => $item['body'][0]['message']],
+                            null,
                             false
                         );
+                    }
+
+                    if ($integrationEntity) {
+                        $integrationEntity->setInternalEntity('ENTITY_IS_DELETED' === $item['body'][0]['errorCode'] ? 'lead-deleted' : 'lead-error')
+                            ->setInternal(['error' => $item['body'][0]['message']]);
+                        $this->persistIntegrationEntities[] = $integrationEntity;
                     }
                     ++$totalErrored;
                 } elseif (!empty($item['body']['success'])) {
@@ -1981,6 +1986,29 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                     $this->logIntegrationError($exception);
                     ++$totalErrored;
+
+
+                    if ($integrationEntityId) {
+                        /** @var IntegrationEntity $integrationEntity */
+                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+
+                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                        if (isset($this->salesforceIdMapping[$contactId])) {
+                            $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                        }
+
+                        $this->persistIntegrationEntities[] = $integrationEntity;
+                    } elseif (!empty($this->salesforceIdMapping[$contactId])) {
+                        // Found in Salesforce so create a new record for it
+                        $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
+                            $object,
+                            $this->salesforceIdMapping[$contactId],
+                            'lead',
+                            $contactId,
+                            [],
+                            false
+                        );
+                    }
                 }
             }
         }
