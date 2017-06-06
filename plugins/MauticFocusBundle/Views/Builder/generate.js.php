@@ -68,6 +68,8 @@ switch ($style) {
         $iframeClass = 'mf-'.$style.'-iframe';
         break;
 }
+    $focusCampaignUrl = $view['router']->path('mautic_focus_lead_incampaign');
+    $focusCampaignUrl = str_replace(['http://', 'https://'], '', $focusCampaignUrl);
 ?>
 
 (function (window) {
@@ -80,7 +82,6 @@ switch ($style) {
             debug: <?php echo $debug; ?>,
             modalsDismissed: {},
             ignoreConverted: <?php echo ($focus['type'] !== 'notification' && !empty($props['stop_after_conversion'])) ? 'true' : 'false'; ?>,
-            inCampaign:<?php echo $inCampaign; ?>,
 
             // Initialize the focus
             initialize: function () {
@@ -88,12 +89,54 @@ switch ($style) {
                     console.log('initialize()');
 
                 Focus.insertStyleIntoHead();
-                Focus.registerFocusEvent();
-
+                <?php echo $inCampaign ? 'Focus.inCampaign();' : 'Focus.registerFocusEvent();'; ?>                
                 // Add class to body
                 Focus.addClass(document.getElementsByTagName('body')[0], 'MauticFocus<?php echo ucfirst($style); ?>');
             },
+            inCampaign: function(){
+                var leadId = Focus.cookies.hasItem('mtc_id')?Focus.cookies.getItem('mtc_id'):false;
+                if(!leadId){
+                    setTimeout(function(){
+                        var leadId = Focus.cookies.hasItem('mtc_id')?Focus.cookies.getItem('mtc_id'):false;
+                        if(leadId){
+                            Focus.xhrCampaignCheck(leadId);
+                        }
+                    }, 3000);
+                }else{
+                    Focus.xhrCampaignCheck(leadId);
+                }
+            },
+            xhrCampaignCheck: function(leadId)
+            {
+                var focusId = <?php echo $focus['id']; ?>;
+                var method = 'GET';
+                var url ='<?php echo $focusCampaignUrl; ?>';
+                url = url + '?leadid='+leadId+'&focusid='+focusId;
+                
+                var xhr = new XMLHttpRequest();
+                if ("withCredentials" in xhr) {
+                    xhr.open(method, url, true);
+                } else if (typeof XDomainRequest != "undefined") {
+                    xhr = new XDomainRequest();
+                    xhr.open(method, url);
+                }
 
+                xhr.onreadystatechange = function (e) {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        response = JSON.parse(xhr.responseText);
+                        if (xhr.status === 200) {
+                            console.log('sdf',response);
+                            if(response){
+                                Focus.registerFocusEvent();
+                            }
+                        }
+                    }
+                };
+                
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.withCredentials = true;
+                xhr.send(query);
+            },
             // Register click events for toggling bar, closing windows, etc
             registerClickEvents: function () {
                 <?php if ($style == 'bar'): ?>

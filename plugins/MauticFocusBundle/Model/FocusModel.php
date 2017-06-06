@@ -190,8 +190,7 @@ class FocusModel extends FormModel
         if ($focus instanceof Focus) {
             $focus = $focus->toArray();
         }
-
-        $inCampaign = $this->focusInCampaign();
+        $inCampaign = $this->focusInCampaign($focus['id']);
 
         if (!empty($focus['form'])) {
             $form = $this->formModel->getEntity($focus['form']);
@@ -396,5 +395,10 @@ class FocusModel extends FormModel
         $q->join('t', MAUTIC_TABLE_PREFIX.'focus', 'm', 'e.id = t.focus_id')
             ->andWhere('m.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
+    }
+
+    public function focusInCampaign($focusId)
+    {
+        return $this->getFocusCampaignRepository()->checkFocusCampagin($focusId);
     }
 }

@@ -35,6 +35,10 @@ return [
                 'path'       => '/focus/{id}/viewpixel.gif',
                 'controller' => 'MauticFocusBundle:Public:viewPixel',
             ],
+            'mautic_focus_lead_incampaign' => [
+                'path'       => '/focus/campaign/lead',
+                'controller' => 'MauticFocusBundle:Public:campaignLead',
+            ],
         ],
     ],
 

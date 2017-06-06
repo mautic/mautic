@@ -66,4 +66,18 @@ class PublicController extends CommonController
 
         return $response;
     }
+
+    public function campaignLeadAction()
+    {
+        $focusId = $this->request->get('focusid', false);
+        $leadId  = $this->request->get('leadid', false);
+
+        /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
+        $model  = $this->getModel('focus');
+        $return = $model->campaignLeadInFocus($focusId, $leadId);
+
+        $response = new Response($return, 200, ['Content-Type' => 'application/javascript']);
+
+        return $response;
+    }
 }

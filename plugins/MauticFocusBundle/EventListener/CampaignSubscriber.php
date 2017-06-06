@@ -77,12 +77,16 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $currentEvent = $event->getEvent();
+        if ($currentEvent['properties']['focus'] > 0) {
+            $entity = new FocusEntity\FocusCampaign();
+            $entity->setCampaign($this->em->getReference(Campaign::class, $currentEvent['campaign']['id']));
+            $entity->setFocus($this->em->getReference(FocusEntity\Focus::class, $currentEvent['properties']['focus']));
+            $entity->setLead($event->getLead());
 
-        $entity = new FocusEntity\FocusCampaign();
-        $entity->setCampaign($this->em->getReference(Campaign::class, $currentEvent['campaign']['id']));
-        $entity->setFocus($this->em->getReference(FocusEntity\Focus::class, $currentEvent['properties']['focus']));
-        $entity->setLead($event->getLead());
+            $this->focusModel->getFocusCampaignRepository()->saveEntity($entity);
 
-        $this->focusModel->getFocusCampaignRepository()->saveEntity($entity);
+            $focus = $this->focusModel->getEntity($currentEvent['properties']['focus']);
+            $this->focusModel->saveEntity($focus);
+        }
     }
 }

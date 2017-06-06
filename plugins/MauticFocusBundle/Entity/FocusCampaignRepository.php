@@ -16,6 +16,40 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class FocusCampaignRepository extends CommonRepository
 {
     /**
+     * @param type $focusId
+     *
+     * @return type
+     */
+    public function checkFocusCampagin($focusId)
+    {
+        $q = $this->createQueryBuilder('f');
+        $q->select('f')
+            ->leftJoin('f.campaign', 'c')
+            ->where('f.focus = :focusId')
+            ->andWhere('c.isPublished = :isPublished')
+            ->setParameter('focusId', $focusId)
+            ->setParameter('isPublished', 1);
+
+        $result = $q->getQuery()->getResult();
+
+        return (!empty($result)) ? true : false;
+    }
+
+    public function campaignLeadInFocus($focusId, $leadId)
+    {
+        $q = $this->createQueryBuilder('f');
+        $q->select('f')
+            ->where('f.focus = :focusId')
+            ->andWhere('f.lead = :leadId')
+            ->setParameter('focusId', $focusId)
+            ->setParameter('leadId', $leadId);
+
+        $result = $q->getQuery()->getResult();
+
+        return (!empty($result)) ? true : false;
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
