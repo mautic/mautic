@@ -291,7 +291,7 @@ class InputHelper
         $value = filter_var($value, FILTER_SANITIZE_URL);
         $parts = parse_url($value);
 
-        if ($parts) {
+        if ($parts && !empty($parts['path'])) {
             if (isset($parts['scheme'])) {
                 if (!in_array($parts['scheme'], $allowedProtocols)) {
                     $parts['scheme'] = $defaultProtocol;

@@ -22,7 +22,7 @@ class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
         $q     = $this

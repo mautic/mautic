@@ -61,7 +61,7 @@ class FacebookIntegration extends SocialIntegration
     {
         return 'https://graph.facebook.com/oauth/access_token';
     }
-	
+
     /**
      * @return string
      */
@@ -86,7 +86,7 @@ class FacebookIntegration extends SocialIntegration
         if (null === $values) {
             parse_str($data, $values);
 
-            $this->factory->getSession()->set($this->getName().'_tokenResponse', $values);
+            $this->session->set($this->getName().'_tokenResponse', $values);
         }
 
         return $values;
