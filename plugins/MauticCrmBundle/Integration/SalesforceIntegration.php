@@ -1573,7 +1573,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         if (isset($params['start']) && $lead) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
-            $changes = $lead->getChanges();
+            $changes = $lead->getChanges(true);
             if (isset($changes['dateModified'])) {
                 $originalDateModified = \DateTime::createFromFormat('c', $changes['dateModified'][0]);
                 $startSyncDate        = \DateTime::createFromFormat('c', $params['start']);
