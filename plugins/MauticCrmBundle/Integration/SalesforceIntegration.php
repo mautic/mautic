@@ -600,7 +600,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $fields = array_keys($config['leadFields']);
 
         $leadFields          = $this->cleanSalesForceData($config, $fields, $object);
-        $fieldsToUpdateInSf  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $fieldsToUpdateInSf  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields          = array_diff_key($leadFields, array_flip($fieldsToUpdateInSf));
         $mappedData[$object] = $this->populateLeadData(
             $lead,
@@ -1823,7 +1823,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $leadFields = array_combine($leadFields, $leadFields);
         unset($leadFields['mauticContactTimelineLink']);
 
-        $fieldsToUpdateInSf = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $fieldsToUpdateInSf = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         if (isset($fieldsToUpdateInSf['Id'])) {
             unset($fieldsToUpdateInSf['Id']);
         }
