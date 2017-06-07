@@ -2500,11 +2500,11 @@ abstract class AbstractIntegration
     /**
      * @return bool|\DateTime
      */
-    protected function getLastSyncDate($lead = null, $params = [], $ignoreContactChanges = true)
+    protected function getLastSyncDate($entity = null, $params = [], $ignoreContactChanges = true)
     {
-        if (isset($params['start']) && $lead && !$ignoreContactChanges) {
+        if (isset($params['start']) && $entity && !$ignoreContactChanges) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
-            $changes = $lead->getChanges(true);
+            $changes = $entity->getChanges(true);
             if (isset($changes['dateModified'])) {
                 if (is_object($changes['dateModified'][0])) {
                     $changes['dateModified'][0] = $changes['dateModified'][0]->format('Y-m-d H:i:s');
