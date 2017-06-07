@@ -13,6 +13,7 @@ namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -121,6 +122,27 @@ class Webhook extends FormEntity
         $builder->createField('webhookUrl', 'string')
             ->columnName('webhook_url')
             ->length(255)
+            ->build();
+    }
+
+    /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('hook')
+            ->addProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'webhookUrl',
+                    'category',
+                    'events',
+                ]
+            )
             ->build();
     }
 

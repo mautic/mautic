@@ -21,6 +21,14 @@ return [
                 'controller' => 'MauticWebhookBundle:Webhook:execute',
             ],
         ],
+        'api' => [
+            'mautic_api_webhookstandard' => [
+                'standard_entity' => true,
+                'name'            => 'hooks',
+                'path'            => '/hooks',
+                'controller'      => 'MauticWebhookBundle:Api\WebhookApi',
+            ],
+        ],
     ],
 
     'menu' => [
