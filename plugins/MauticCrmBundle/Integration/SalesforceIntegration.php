@@ -1873,6 +1873,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     protected function getPriorityFieldsForIntegration($config, $object = null, $priorityObject = 'mautic')
     {
         $fields = parent::getPriorityFieldsForIntegration($config, $object, $priorityObject);
+        unset($fields['Contact']['Id'], $fields['Lead']['Id']);
 
         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
     }
@@ -2363,7 +2364,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
-        unset($fieldsToUpdate['Contact']['Id'], $fieldsToUpdate['Lead']['Id']);
 
         return $fieldsToUpdate;
     }
