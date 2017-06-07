@@ -38,9 +38,10 @@ class LeadApiController extends CommonApiController
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
-        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList'];
+        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
         parent::initialize($event);
+
     }
 
     /**
@@ -489,6 +490,63 @@ class LeadApiController extends CommonApiController
                 $this->entityNameOne => $entity,
             ]
         );
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Adds a UTM Tagset to the contact.
+     *
+     * @param int $id
+     */
+    public function addUtmTagsAction($id)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        $parameters = $this->request->request->all();
+
+        $result = $this->model->addUTMTags($entity, $parameters);
+        $view   = $this->view([$this->entityNameOne => $entity]);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Remove a UTM Tagset for the contact.
+     *
+     * @param int $id
+     * @param int $utmid
+     */
+    public function removeUtmTagsAction($id, $utmid)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        $result = $this->model->removeUtmTags($entity, (int) $utmid);
+        $view   = $this->view([$this->entityNameOne => $entity]);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
 
         return $this->handleView($view);
     }

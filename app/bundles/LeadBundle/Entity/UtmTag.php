@@ -126,7 +126,7 @@ class UtmTag
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('tmutmtag')
+        $metadata->setGroupPrefix('utmtags')
             ->addListProperties(
                 [
                     'id',
@@ -349,7 +349,7 @@ class UtmTag
      *
      * @return Hit
      */
-    public function setUtmConent($utmContent)
+    public function setUtmContent($utmContent)
     {
         $this->utmContent = $utmContent;
 
