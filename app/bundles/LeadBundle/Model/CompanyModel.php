@@ -251,6 +251,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param int           $searchCompanyLead 0 = reference, 1 = yes, -1 = known to not exist
      * @param \DateTime     $dateManipulated
      *
+     * @return bool
+     *
      * @throws \Doctrine\ORM\ORMException
      */
     public function addLeadToCompany($companies, $lead, $manuallyAdded = false, $searchCompanyLead = 1, $dateManipulated = null)
@@ -309,7 +311,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $persistCompany = [];
         $dispatchEvents = [];
-
+        $contactAdded   = false;
         foreach ($companies as $companyId) {
             if (!isset($companyLeadAdd[$companyId])) {
                 // List no longer exists in the DB so continue to the next
@@ -326,7 +328,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                     ]
                 );
             } else {
-                $companyLead = $this->em->getReference('MauticLeadBundle:CompanyLead',
+                $companyLead = $this->em->getReference(
+                    'MauticLeadBundle:CompanyLead',
                     [
                         'lead'    => $leadId,
                         'company' => $companyId,
@@ -338,7 +341,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 if ($manuallyAdded && $companyLead->wasManuallyRemoved()) {
                     $companyLead->setManuallyRemoved(false);
                     $companyLead->setManuallyAdded($manuallyAdded);
-
+                    $contactAdded     = true;
                     $persistLists[]   = $companyLead;
                     $dispatchEvents[] = $companyId;
                     $companyName      = $companyLeadAdd[$companyId]->getName();
@@ -354,7 +357,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 $companyLead->setLead($lead);
                 $companyLead->setManuallyAdded($manuallyAdded);
                 $companyLead->setDateAdded($dateManipulated);
-
+                $contactAdded     = true;
                 $persistCompany[] = $companyLead;
                 $dispatchEvents[] = $companyId;
                 $companyName      = $companyLeadAdd[$companyId]->getName();
@@ -386,6 +389,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         unset($lead, $persistCompany, $companies);
+
+        return $contactAdded;
     }
 
     /**

@@ -291,7 +291,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         ];
 
         // Should be null due to the contact was updated since last sync
-        $lastSync = $lastSyncMethod->invokeArgs($sf, [$lead, $params]);
+        $lastSync = $lastSyncMethod->invokeArgs($sf, [$lead, $params, false]);
         $this->assertNull($lastSync);
 
         // Should be a DateTime object

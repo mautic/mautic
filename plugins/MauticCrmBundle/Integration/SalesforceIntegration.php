@@ -978,11 +978,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         list($fieldMapping, $mauticLeadFieldString, $requiredFields, $supportedObjects) = $this->prepareFieldsForPush($config);
 
-        if ($mauticContactLinkField = array_search('mauticContactTimelineLink', $fieldMapping)) {
-            $this->pushContactLink = true;
-            unset($fieldMapping[$mauticContactLinkField]);
-        }
-
         if (empty($fieldMapping)) {
             return [0, 0, 0, 0];
         }
@@ -1607,9 +1602,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($toUpdate as $lead) {
             if (!empty($lead['email'])) {
-                if ($this->pushContactLink) {
-                    $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
-                }
+                $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
 
                 $key                                                = $this->getSyncKey($lead['email']);
                 $trackedContacts[$lead['integration_entity']][$key] = $lead['id'];
@@ -1660,9 +1653,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $foundContacts = [];
 
         foreach ($leadsToCreate as $lead) {
-            if ($this->pushContactLink) {
-                $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
-            }
+            $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
+
             if (isset($lead['email'])) {
                 $this->setContactToSync($checkEmailsInSF, $lead);
             } elseif ($progress) {
@@ -1707,7 +1699,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @param      $mauticData
      * @param      $requiredFields
-     * @param      $fieldsToUpdateInSfUpdate
+     * @param      $objectFields
      * @param      $object
      * @param      $lead
      * @param null $objectId
@@ -1718,7 +1710,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     protected function buildCompositeBody(
         &$mauticData,
         $requiredFields,
-        $fieldsToUpdateInSfUpdate,
+        $objectFields,
         $object,
         &$lead,
         $objectId = null,
@@ -1729,7 +1721,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         if (isset($lead['email']) && !empty($lead['email'])) {
             //use a composite patch here that can update and create (one query) every 200 records
-            foreach ($fieldsToUpdateInSfUpdate as $sfField => $mauticField) {
+            if (isset($objectFields['update'])) {
+                $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
+            } else {
+                $fields = $objectFields;
+            }
+
+            foreach ($fields as $sfField => $mauticField) {
                 if (isset($lead[$mauticField])) {
                     $body[$sfField] = $this->cleanPushData($lead[$mauticField]);
                 }
@@ -1737,7 +1735,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (array_key_exists($sfField, $requiredFields) && empty($body[$sfField])) {
                     if (isset($sfRecord[$sfField])) {
                         $body[$sfField] = $sfRecord[$sfField];
-                        if (empty($lead[$mauticField]) && !empty($sfRecord[$sfField])) {
+                        if (empty($lead[$mauticField]) && !empty($sfRecord[$sfField]) && $sfRecord[$sfField] !== $this->translator->trans('mautic.integration.form.lead.unknown')) {
                             $updateLead[$mauticField] = $sfRecord[$sfField];
                         }
                     } else {
@@ -1805,12 +1803,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (false !== array_search('Contact', $config['objects'])) {
             $supportedObjects['Contact'] = 'Contact';
             $fieldsToCreate              = $this->cleanSalesForceData($config['leadFields'], $fieldKeys, 'Contact');
-            $objectFields['Contact']     = array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Contact']);
+            $objectFields['Contact']     = [
+                'update' => isset($fieldsToUpdateInSf['Contact']) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Contact']) : [],
+                'create' => $fieldsToCreate
+            ];
         }
         if (false !== array_search('Lead', $config['objects'])) {
             $supportedObjects['Lead'] = 'Lead';
             $fieldsToCreate           = $this->cleanSalesForceData($config['leadFields'], $fieldKeys, 'Lead');
-            $objectFields['Lead']     = array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Lead']);
+            $objectFields['Lead']     = [
+                'update' => isset($fieldsToUpdateInSf['Lead']) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Lead']) : [],
+                'create' => $fieldsToCreate
+            ];
         }
 
         $mauticLeadFieldString = implode(', l.', $leadFields);
@@ -1825,15 +1829,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $availableFields,
                 $object
             );
-
-            if ('Lead' === $object) {
-                // Only Salesforce Leads are created
-                $requiredFields[$object]['create_fields'] = $this->cleanSalesForceData($config, null, $object);
-
-                if (isset($requiredFields[$object]['create_fields']['Id'])) {
-                    unset($requiredFields[$object]['create_fields']['Id']);
-                }
-            }
         }
 
         return [$objectFields, $mauticLeadFieldString, $requiredFields, $supportedObjects];
@@ -2173,7 +2168,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     foreach ($updateLead as $mauticField => $sfValue) {
                         $leadEntity->addUpdatedField($mauticField, $sfValue);
                     }
-                    $syncLead = true;
+
+                    $syncLead = !empty($leadEntity->getChanges(true));
                 }
 
                 // Validate if we have a company for this Mautic contact
@@ -2185,8 +2181,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     );
 
                     if (!empty($company[2])) {
-                        $this->companyModel->addLeadToCompany($company[2], $leadEntity);
-                        $syncLead = true;
+                        $syncLead = $this->companyModel->addLeadToCompany($company[2], $leadEntity);
                     }
                 }
 
@@ -2213,14 +2208,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$mauticData,
         &$checkEmailsInSF,
         &$processedLeads,
-        $fieldMappings,
+        $requiredFields,
         $objectFields
     ) {
         foreach ($checkEmailsInSF as $key => $lead) {
             if (!empty($lead['integration_entity_id'])) {
                 if ($this->buildCompositeBody(
                     $mauticData,
-                    $fieldMappings[$lead['integration_entity']]['fields'],
+                    $requiredFields[$lead['integration_entity']]['fields'],
                     $objectFields[$lead['integration_entity']],
                     $lead['integration_entity'],
                     $lead,
@@ -2232,8 +2227,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             } else {
                 $this->buildCompositeBody(
                     $mauticData,
-                    $fieldMappings['Lead']['fields'],
-                    $fieldMappings['Lead']['create_fields'], //use all matched fields when creating new records in SF
+                    $requiredFields['Lead']['fields'],
+                    $objectFields['Lead'],
                     'Lead',
                     $lead
                 );

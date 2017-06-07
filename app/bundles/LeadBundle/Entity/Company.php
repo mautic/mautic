@@ -237,7 +237,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
                 ];
             }
         } else {
-            $this->changes[$prop] = [$current, $val];
+            parent::isChanged($prop, $val);
         }
     }
 

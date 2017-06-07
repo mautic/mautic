@@ -457,8 +457,8 @@ class Webhook extends FormEntity
             }
         } elseif ($prop == 'events') {
             $this->changes[$prop] = [];
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 }
