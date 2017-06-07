@@ -1735,7 +1735,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (array_key_exists($sfField, $requiredFields) && empty($body[$sfField])) {
                     if (isset($sfRecord[$sfField])) {
                         $body[$sfField] = $sfRecord[$sfField];
-                        if (empty($lead[$mauticField]) && !empty($sfRecord[$sfField])) {
+                        if (empty($lead[$mauticField]) && !empty($sfRecord[$sfField]) && $sfRecord[$sfField] !== $this->translator->trans('mautic.integration.form.lead.unknown')) {
                             $updateLead[$mauticField] = $sfRecord[$sfField];
                         }
                     } else {
@@ -2181,8 +2181,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     );
 
                     if (!empty($company[2])) {
-                        $this->companyModel->addLeadToCompany($company[2], $leadEntity);
-                        $syncLead = true;
+                        $syncLead = $this->companyModel->addLeadToCompany($company[2], $leadEntity);
                     }
                 }
 
