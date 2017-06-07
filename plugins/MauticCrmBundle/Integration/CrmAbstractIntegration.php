@@ -429,4 +429,5 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         return $fieldsToUpdate;
     }
+
 }
