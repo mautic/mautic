@@ -2390,14 +2390,17 @@ class SalesforceIntegration extends CrmAbstractIntegration
         foreach (['Lead', 'Contact'] as $object) {
             if (isset($config['objects']) && false !== array_search($object, $config['objects'])) {
                 $fieldMapping[$object]['create'] = $this->prepareFieldsForSync($config['leadFields'], $fields, $object);
-                $fieldMapping[$object]['update'] = array_intersect_key($fieldMapping[$object]['create'], $fieldsToUpdateInSf[$object]);
+                $fieldMapping[$object]['update'] = isset($fieldsToUpdateInSf[$object]) ? array_intersect_key(
+                    $fieldMapping[$object]['create'],
+                    $fieldsToUpdateInSf[$object]
+                ) : [];
 
                 // Create an update and
                 $mappedData[$object]['create'] = $this->populateLeadData(
                     $lead,
                     [
-                        'leadFields'       => $fieldMapping[$object]['create'], // map with all fields available
-                        'object'           => $object,
+                        'leadFields' => $fieldMapping[$object]['create'], // map with all fields available
+                        'object' => $object,
                         'feature_settings' => [
                             'objects' => $config['objects']
                         ]
