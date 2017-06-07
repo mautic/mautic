@@ -1761,25 +1761,31 @@ abstract class AbstractIntegration
             $leadId = $lead['id'];
         }
 
+        $object          = isset($config['object']) ? $config['object'] : null;
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
-        if (isset($config['object'])) {
+
+        if ($object) {
             $availableFields = $availableFields[$config['object']];
         }
+
         $unknown = $this->translator->trans('mautic.integration.form.lead.unknown');
         $matched = [];
 
-        $timelineLinkUsed = false;
         foreach ($availableFields as $key => $field) {
             $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
+            if (!isset($config['leadFields'][$integrationKey])) {
+                continue;
+            }
+
             if (is_array($integrationKey)) {
                 list($integrationKey, $matchIntegrationKey) = $integrationKey;
             }
 
             if (isset($leadFields[$integrationKey])) {
-                if ($leadFields[$integrationKey] == 'mauticContactTimelineLink') {
-                    $mauticContactLinkField = $integrationKey;
-                    $timelineLinkUsed       = true;
+                if ('mauticContactTimelineLink' === $leadFields[$integrationKey]) {
+                    $matched[$integrationKey] = $this->getContactTimelineLink($leadId);
+
                     continue;
                 }
                 $mauticKey = $leadFields[$integrationKey];
@@ -1791,10 +1797,6 @@ abstract class AbstractIntegration
             if (!empty($field['required']) && empty($matched[$matchIntegrationKey])) {
                 $matched[$matchIntegrationKey] = $unknown;
             }
-        }
-
-        if ($timelineLinkUsed) {
-            $matched[$mauticContactLinkField] = $this->getContactTimelineLink($leadId);
         }
 
         return $matched;
@@ -2518,5 +2520,17 @@ abstract class AbstractIntegration
 
         return (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
+    }
+
+    /**
+     * @param      $fields
+     * @param      $keys
+     * @param null $object
+     *
+     * @return mixed
+     */
+    public function prepareFieldsForSync($fields, $keys, $object = null)
+    {
+        return $fields;
     }
 }

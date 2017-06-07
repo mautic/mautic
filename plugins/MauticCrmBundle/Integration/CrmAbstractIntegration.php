@@ -221,20 +221,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $data = json_decode($data, true);
         }
         $config = $this->mergeConfigToFeatureSettings([]);
+
         // Match that data with mapped lead fields
-        $fieldsToUpdateInMautic = (!empty($existingLeads)) ? $this->getPriorityFieldsForMautic($config, $object, 'company') : [];
-        $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
-        if (!empty($fieldsToUpdateInMautic)) {
-            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
-            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
-        } else {
-            $newMatchedFields = $matchedFields;
-        }
-        if (!isset($newMatchedFields['companyname'])) {
-            if (isset($newMatchedFields['companywebsite'])) {
-                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
-            }
-        }
+        $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
@@ -245,11 +234,16 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
             $company = $existingCompany[2];
-            if (empty($newMatchedFields)) {
-                return;
+        }
+
+        if (!$company->isNew()) {
+            $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'company');
+            $matchedFields  = array_intersect_key($matchedFields, array_flip($fieldsToUpdate));
+            if (!isset($matchedFields['companyname'])) {
+                if (isset($matchedFields['companywebsite'])) {
+                    $matchedFields['companyname'] = $matchedFields['companywebsite'];
+                }
             }
-            //change direction of fields only when updating an existing company
-            $matchedFields = $newMatchedFields;
         }
 
         $companyModel->setFieldValues($company, $matchedFields, false, false);
@@ -261,8 +255,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
+     * @param mixed       $data    Profile data from integration
+     * @param bool|true   $persist Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
      * @param mixed||null $identifiers
      * @param string|null $object
@@ -311,14 +305,18 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
             if (!empty($existingLeads)) {
-                $lead          = array_shift($existingLeads);
-                $existingLeads = true;
+                $lead = array_shift($existingLeads);
             }
         }
-        $fieldsToUpdateInMautic = (!empty($existingLeads)) ? $this->getPriorityFieldsForMautic($config, $object, 'mautic') : [];
-        $leadFields             = $this->cleanPriorityFields($config, $object);
 
-        if (!empty($fieldsToUpdateInMautic)) {
+        $leadFields = $this->cleanPriorityFields($config, $object);
+        if (!$lead->isNewlyCreated()) {
+            // Use only prioirty fields if updating
+            $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
+            if (empty($fieldsToUpdateInMautic)) {
+                return;
+            }
+
             $fieldsToUpdateInMautic = array_intersect_key($leadFields, $fieldsToUpdateInMautic);
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
         }
@@ -348,7 +346,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         // Update the owner if it matches (needs to be set by the integration) when fetching the data
-        if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
+        if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0])
+            && $config['updateOwner'][0] == 'updateOwner'
+        ) {
             if ($mauticUser = $this->em->getRepository('MauticUserBundle:User')->findOneBy(['email' => $data['owner_email']])) {
                 $lead->setOwner($mauticUser);
             }
@@ -378,7 +378,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param        $config
-     * @param null   $entityObject   Possibly used by the CRM
+     * @param null   $entityObject Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
@@ -391,20 +391,20 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         );
     }
 
-     /**
-      * @param        $config
-      * @param null   $entityObject    Possibly used by the CRM
-      * @param string $priorityObject
-      *
-      * @return array
-      */
-     protected function getPriorityFieldsForIntegration($config, $entityObject = null, $priorityObject = 'mautic')
-     {
-         return $this->cleanPriorityFields(
-             $this->getFieldsByPriority($config, $priorityObject, 0),
-             $entityObject
-         );
-     }
+    /**
+     * @param        $config
+     * @param null   $entityObject Possibly used by the CRM
+     * @param string $priorityObject
+     *
+     * @return array
+     */
+    protected function getPriorityFieldsForIntegration($config, $entityObject = null, $priorityObject = 'mautic')
+    {
+        return $this->cleanPriorityFields(
+            $this->getFieldsByPriority($config, $priorityObject, 0),
+            $entityObject
+        );
+    }
 
     /**
      * @param array  $config

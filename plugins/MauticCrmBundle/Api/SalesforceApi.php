@@ -100,6 +100,42 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public function getPerson(array $data)
+    {
+        $config          = $this->integration->mergeConfigToFeatureSettings([]);
+        $queryUrl        = $this->integration->getQueryUrl();
+        $sfRecords = [
+            'Contact' => [],
+            'Lead'    => []
+        ];
+
+        //try searching for lead as this has been changed before in updated done to the plugin
+        if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
+            $findContact = 'select Id from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
+            $response    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+
+            if (!empty($response['records'])) {
+                $sfRecords['Contact'] = $response['records'];
+            }
+        }
+
+        if (!empty($data['Lead']['Email'])) {
+            $findLead = 'select Id from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
+            $response = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+
+            if (!empty($response['records'])) {
+                $sfRecords['Lead'] = $response['records'];
+            }
+        }
+
+        return $sfRecords;
+    }
+
+    /**
      * Creates Salesforce lead.
      *
      * @param array $data
@@ -109,46 +145,49 @@ class SalesforceApi extends CrmApi
     public function createLead(array $data)
     {
         $createdLeadData = [];
-        $createLead      = true;
-        $config          = $this->integration->mergeConfigToFeatureSettings([]);
-        //if not found then go ahead and make an API call to find all the records with that email
 
-        $queryUrl            = $this->integration->getQueryUrl();
-        $sfRecord['records'] = [];
-        //try searching for lead as this has been changed before in updated done to the plugin
-        if (isset($config['objects']) && array_search('Contact', $config['objects']) && isset($data['Contact']['Email'])) {
-            $sfObject    = 'Contact';
-            $findContact = 'select Id from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
-            $sfRecord    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+        if (isset($data['Email'])) {
+            $createdLeadData = $this->createObject($data, 'Lead');
         }
 
-        if (empty($sfRecord['records']) && isset($data['Lead']['Email'])) {
-            $sfObject = 'Lead';
-            $findLead = 'select Id from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
-            $sfRecord = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
-        }
-        $sfLeadRecords = $sfRecord['records'];
-
-        if (!empty($sfLeadRecords)) {
-            $createLead = false;
-            foreach ($sfLeadRecords as $sfLeadRecord) {
-                $sfLeadId = $sfLeadRecord['Id'];
-                $this->request('', $data[$sfObject], 'PATCH', false, $sfObject.'/'.$sfLeadId);
-                $this->integration->getLogger()->debug('SALESFORCE: PATCH through trigger action '.$sfObject.' '.var_export($data[$sfObject], true));
-            }
-
-            $createdLeadData       = $data[$sfObject];
-            $createdLeadData['id'] = $sfLeadId;
-            $createdLeadData['Id'] = $sfLeadId; // Just because SF does this
-        }
-
-        if ($createLead && isset($data['Lead']['Email'])) {
-            $createdLeadData = $this->request('', $data['Lead'], 'POST', false, 'Lead');
-            $this->integration->getLogger()->debug('SALESFORCE: POST through trigger action Lead '.var_export($data['Lead'], true));
-        }
-
-        //todo: check if push activities is selected in config
         return $createdLeadData;
+    }
+
+    /**
+     * @param array $data
+     * @param       $sfObject
+     *
+     * @return mixed|string
+     */
+    public function createObject(array $data, $sfObject)
+    {
+        $objectData = $this->request('', $data, 'POST', false, $sfObject);
+        $this->integration->getLogger()->debug('SALESFORCE: POST createObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
+
+        if (isset($objectData['id'])) {
+            // Salesforce is inconsistent it seems
+            $objectData['Id'] = $objectData['id'];
+        }
+
+        return $objectData;
+    }
+
+    /**
+     * @param array $data
+     * @param       $sfObject
+     * @param       $sfObjectId
+     *
+     * @return array
+     */
+    public function updateObject(array $data, $sfObject, $sfObjectId)
+    {
+        $objectData = $this->request('', $data, 'PATCH', false, $sfObject.'/'.$sfObjectId);
+        $this->integration->getLogger()->debug('SALESFORCE: PATCH updateObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
+
+        // Salesforce is inconsistent it seems
+        $objectData['Id'] = $objectData['id'] = $sfObjectId;
+
+        return $objectData;
     }
 
     /**
