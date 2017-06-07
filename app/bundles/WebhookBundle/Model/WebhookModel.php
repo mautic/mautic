@@ -134,7 +134,7 @@ class WebhookModel extends FormModel
     /**
      * Get a list of webhooks by matching events.
      *
-     * @param $type string of event type
+     * @param string $type string of event type
      *
      * @return array
      */
@@ -222,7 +222,7 @@ class WebhookModel extends FormModel
     /**
      * Execute a list of webhooks to their specified endpoints.
      *
-     * @param array $webhooks
+     * @param array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks
      */
     public function processWebhooks($webhooks)
     {
@@ -359,7 +359,7 @@ class WebhookModel extends FormModel
         $queuesArray = $this->getWebhookQueues($webhook);
         $payload     = [];
 
-        /* @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
+        /* @var WebhookQueue $queue */
         foreach ($queuesArray as $queues) {
             foreach ($queues as $queue) {
 
@@ -379,7 +379,7 @@ class WebhookModel extends FormModel
                 $payload[$type][] = $queuePayload;
 
                 $this->webhookQueueIdList[] = $queue->getId();
-                $this->em->clear('\Mautic\WebhookBundle\Entity\WebhookQueue');
+                $this->em->clear(WebhookQueue::class);
             }
         }
 
