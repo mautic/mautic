@@ -106,9 +106,7 @@
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
         "symfony/expression-language": "~2.8",
-        "egeloen/ordered-form-bundle": "^3.0",
-
-        "spinen/connectwise-php-client": "3.1.0"
+        "egeloen/ordered-form-bundle": "^3.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
