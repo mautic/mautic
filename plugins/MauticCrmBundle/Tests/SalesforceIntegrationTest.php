@@ -287,7 +287,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $lead->setDateModified($now);
 
         $params = [
-            'start' => $now->format('c'),
+            'start' => $modified->format('c'),
         ];
 
         // Should be null due to the contact was updated since last sync

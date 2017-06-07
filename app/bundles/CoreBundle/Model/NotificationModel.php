@@ -136,8 +136,8 @@ class NotificationModel extends FormModel
         $notification = new Notification();
         $notification->setType($type);
         $notification->setIsRead($isRead);
-        $notification->setHeader(EmojiHelper::toHtml(InputHelper::html($header)));
-        $notification->setMessage(EmojiHelper::toHtml(InputHelper::html($message)));
+        $notification->setHeader(EmojiHelper::toHtml(InputHelper::strict_html($header)));
+        $notification->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
         if ($datetime == null) {
