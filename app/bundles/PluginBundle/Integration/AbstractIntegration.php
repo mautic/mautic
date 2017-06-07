@@ -548,7 +548,7 @@ abstract class AbstractIntegration
      *
      * @param            $mergeKeys
      * @param            $withKeys
-     * @param bool|false $return Returns the key array rather than setting them
+     * @param bool|false $return    Returns the key array rather than setting them
      *
      * @return void|array
      */
@@ -926,10 +926,10 @@ abstract class AbstractIntegration
         if ($method == 'GET' && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
-            $url        .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+            $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
-            $url   .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+            $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
         }
 
         if (isset($postAppend)) {
@@ -989,8 +989,8 @@ abstract class AbstractIntegration
             foreach ($parseHeaders as $key => $value) {
                 if (strpos($value, ':') !== false) {
                     list($key, $value) = explode(':', $value);
-                    $key   = trim($key);
-                    $value = trim($value);
+                    $key               = trim($key);
+                    $value             = trim($value);
                 }
 
                 $headers[$key] = $value;
@@ -1046,7 +1046,7 @@ abstract class AbstractIntegration
         array $internal = null,
         $persist = true
     ) {
-        $date   = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+        $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
         $entity = new IntegrationEntity();
         $entity->setDateAdded($date)
@@ -1115,7 +1115,7 @@ abstract class AbstractIntegration
                     break;
                 case 'oauth2':
                     if ($bearerToken = $this->getBearerToken(true)) {
-                        $headers                  = [
+                        $headers = [
                             "Authorization: Basic {$bearerToken}",
                             'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
                         ];
@@ -1123,13 +1123,13 @@ abstract class AbstractIntegration
                     } else {
                         $defaultGrantType = (!empty($settings['refresh_token'])) ? 'refresh_token'
                             : 'authorization_code';
-                        $grantType        = (!isset($settings['grant_type'])) ? $defaultGrantType
+                        $grantType = (!isset($settings['grant_type'])) ? $defaultGrantType
                             : $settings['grant_type'];
 
                         $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
                         $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey
                             : $settings[$clientSecretKey];
-                        $parameters         = array_merge(
+                        $parameters = array_merge(
                             $parameters,
                             [
                                 $useClientIdKey     => $this->keys[$clientIdKey],
@@ -1644,7 +1644,7 @@ abstract class AbstractIntegration
         $mauticLeadFields['mauticContactTimelineLink'] = '';
 
         //make sure now non-existent aren't saved
-        $settings                                = [
+        $settings = [
             'ignore_field_cache' => false,
         ];
         $settings['feature_settings']['objects'] = $submittedObjects;
@@ -1761,25 +1761,31 @@ abstract class AbstractIntegration
             $leadId = $lead['id'];
         }
 
+        $object          = isset($config['object']) ? $config['object'] : null;
         $leadFields      = $config['leadFields'];
         $availableFields = $this->getAvailableLeadFields($config);
-        if (isset($config['object'])) {
+
+        if ($object) {
             $availableFields = $availableFields[$config['object']];
         }
+
         $unknown = $this->translator->trans('mautic.integration.form.lead.unknown');
         $matched = [];
 
-        $timelineLinkUsed = false;
         foreach ($availableFields as $key => $field) {
             $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
+            if (!isset($config['leadFields'][$integrationKey])) {
+                continue;
+            }
+
             if (is_array($integrationKey)) {
                 list($integrationKey, $matchIntegrationKey) = $integrationKey;
             }
 
             if (isset($leadFields[$integrationKey])) {
-                if ($leadFields[$integrationKey] == 'mauticContactTimelineLink') {
-                    $mauticContactLinkField = $integrationKey;
-                    $timelineLinkUsed       = true;
+                if ('mauticContactTimelineLink' === $leadFields[$integrationKey]) {
+                    $matched[$integrationKey] = $this->getContactTimelineLink($leadId);
+
                     continue;
                 }
                 $mauticKey = $leadFields[$integrationKey];
@@ -1791,10 +1797,6 @@ abstract class AbstractIntegration
             if (!empty($field['required']) && empty($matched[$matchIntegrationKey])) {
                 $matched[$matchIntegrationKey] = $unknown;
             }
-        }
-
-        if ($timelineLinkUsed) {
-            $matched[$mauticContactLinkField] = $this->getContactTimelineLink($leadId);
         }
 
         return $matched;
@@ -1901,9 +1903,9 @@ abstract class AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed      $data    Profile data from integration
-     * @param bool|true  $persist Set to false to not persist lead to the database in this method
-     * @param array|null $socialCache
+     * @param mixed       $data        Profile data from integration
+     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
+     * @param array|null  $socialCache
      * @param mixed||null $identifiers
      *
      * @return Lead
@@ -2104,7 +2106,7 @@ abstract class AbstractIntegration
                             }
                         }
                     }
-                    $fn        = (isset($fieldDetails['fields'][0])) ? $this->matchFieldName(
+                    $fn = (isset($fieldDetails['fields'][0])) ? $this->matchFieldName(
                         $field,
                         $fieldDetails['fields'][0]
                     ) : $field;
@@ -2200,7 +2202,7 @@ abstract class AbstractIntegration
             $this->lastIntegrationError = $errorHeader.': '.$errorMessage;
 
             if ($contactId) {
-                $contactLink  = $this->router->generate(
+                $contactLink = $this->router->generate(
                     'mautic_contact_action',
                     [
                         'objectAction' => 'view',
@@ -2518,5 +2520,17 @@ abstract class AbstractIntegration
 
         return (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
+    }
+
+    /**
+     * @param      $fields
+     * @param      $keys
+     * @param null $object
+     *
+     * @return mixed
+     */
+    public function prepareFieldsForSync($fields, $keys, $object = null)
+    {
+        return $fields;
     }
 }
