@@ -2500,12 +2500,15 @@ abstract class AbstractIntegration
     /**
      * @return bool|\DateTime
      */
-    protected function getLastSyncDate(Lead $lead = null, $params = [], $ignoreContactChanges = true)
+    protected function getLastSyncDate($lead = null, $params = [], $ignoreContactChanges = true)
     {
         if (isset($params['start']) && $lead && !$ignoreContactChanges) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             $changes = $lead->getChanges(true);
             if (isset($changes['dateModified'])) {
+                if (is_object($changes['dateModified'][0])) {
+                    $changes['dateModified'][0] = $changes['dateModified'][0]->format('Y-m-d H:i:s');
+                }
                 $originalDateModified = \DateTime::createFromFormat(\DateTime::ISO8601, $changes['dateModified'][0]);
                 $startSyncDate        = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
 

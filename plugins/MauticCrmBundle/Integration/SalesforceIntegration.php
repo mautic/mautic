@@ -441,7 +441,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $this->persistIntegrationEntities[] = $integrationEntity;
                     }
 
-                    if ($entity->isNewlyCreated()) {
+                    if (method_exists($entity, 'isNewlyCreated()') && $entity->isNewlyCreated()) {
                         ++$created;
                     } else {
                         ++$updated;
