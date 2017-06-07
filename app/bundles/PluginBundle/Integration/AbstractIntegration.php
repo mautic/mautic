@@ -2519,5 +2519,4 @@ abstract class AbstractIntegration
         return (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
     }
-
 }
