@@ -24,7 +24,6 @@ use Mautic\UserBundle\Entity\User;
 abstract class CrmAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
-    protected $pushContactLink = false;
     protected $helper;
 
     /**
