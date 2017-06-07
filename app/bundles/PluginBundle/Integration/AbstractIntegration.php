@@ -162,6 +162,26 @@ abstract class AbstractIntegration
     protected $lastIntegrationError;
 
     /**
+     * @var array
+     */
+    protected $mauticDuplicates = [];
+
+    /**
+     * @var array
+     */
+    protected $salesforceIdMapping = [];
+
+    /**
+     * @var array
+     */
+    protected $deleteIntegrationEntities = [];
+
+    /**
+     * @var array
+     */
+    protected $persistIntegrationEntities = [];
+
+    /**
      * AbstractIntegration constructor.
      */
     public function __construct(MauticFactory $factory = null)
@@ -1864,7 +1884,7 @@ abstract class AbstractIntegration
 
         $matched = [];
         foreach ($gleanedData as $key => $field) {
-            if (isset($fields[$key]) && isset($gleanedData[$key])) {
+            if (isset($fields[$key]) && isset($gleanedData[$key]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $gleanedData[$key]) {
                 $matched[$fields[$key]] = $gleanedData[$key];
             }
         }
@@ -2409,8 +2429,97 @@ abstract class AbstractIntegration
         return strip_tags(html_entity_decode($value, ENT_QUOTES));
     }
 
+    /**
+     * @return \Monolog\Logger|LoggerInterface
+     */
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * @param                 $leadsToSync
+     * @param                 $totalIgnored
+     * @param bool|\Exception $error
+     *
+     * @throws ApiErrorException
+     */
+    protected function cleanupFromSync(&$leadsToSync = [], &$totalIgnored = 0, $error = false)
+    {
+        if ($this->mauticDuplicates) {
+            // Create integration entities for these to be ignored until they are updated
+            foreach ($this->mauticDuplicates as $id => $dup) {
+                $this->persistIntegrationEntities[] = $this->createIntegrationEntity('Lead', null, $dup, $id, [], false);
+                ++$totalIgnored;
+            }
+
+            $this->mauticDuplicates = [];
+        }
+
+        $integrationEntityRepo = $this->getIntegrationEntityRepository();
+        if (!empty($leadsToSync)) {
+            // Let's only sync thos that have actual changes to prevent a loop
+            /**
+             * @var
+             * @var Lead $lead
+             */
+            foreach ($leadsToSync as $key => $lead) {
+                if (!$lead || !$lead->getChanges(true)) {
+                    unset($leadsToSync[$key]);
+                }
+            }
+
+            $integrationEntityRepo->saveEntities($leadsToSync);
+            $this->em->clear(Lead::class);
+            $leadsToSync = [];
+        }
+
+        // Persist updated entities if applicable
+        if ($this->persistIntegrationEntities) {
+            $integrationEntityRepo->saveEntities($this->persistIntegrationEntities);
+            $this->persistIntegrationEntities = [];
+        }
+
+        // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
+        if ($this->deleteIntegrationEntities) {
+            $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
+            $this->deleteIntegrationEntities = [];
+        }
+
+        $this->em->clear(IntegrationEntity::class);
+
+        if ($error) {
+            if ($error instanceof \Exception) {
+                throw $error;
+            }
+
+            throw new ApiErrorException($error);
+        }
+    }
+
+    /**
+     * @return bool|\DateTime
+     */
+    protected function getLastSyncDate($entity = null, $params = [], $ignoreContactChanges = true)
+    {
+        if (isset($params['start']) && $entity && !$ignoreContactChanges) {
+            // Check to see if this contact was modified prior to the fetch so that the push catches it
+            $changes = $entity->getChanges(true);
+            if (isset($changes['dateModified'])) {
+                if (is_object($changes['dateModified'][0])) {
+                    $changes['dateModified'][0] = $changes['dateModified'][0]->format('Y-m-d H:i:s');
+                }
+                $originalDateModified = \DateTime::createFromFormat(\DateTime::ISO8601, $changes['dateModified'][0]);
+                $startSyncDate        = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
+
+                if ($originalDateModified >= $startSyncDate) {
+                    // Return null so that the push sync catches
+                    return null;
+                }
+            }
+        }
+
+        return (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+            : new \DateTime();
     }
 }
