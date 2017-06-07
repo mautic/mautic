@@ -361,6 +361,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                             }
                             if ($company) {
                                 ++$executed;
+                                $this->em->detach($company);
                             }
                         }
                     }
@@ -371,7 +372,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
-                $this->em->detach($company);
 
                 return $executed;
             }

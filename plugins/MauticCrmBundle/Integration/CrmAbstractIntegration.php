@@ -222,10 +222,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
-        $fieldsToUpdateInMautic = (!empty($existingLeads)) ? $this->getPriorityFieldsForMautic($config, $object, 'company') : [];
+        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'company');
         $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
         if (!empty($fieldsToUpdateInMautic)) {
-            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
+            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
         } else {
             $newMatchedFields = $matchedFields;
