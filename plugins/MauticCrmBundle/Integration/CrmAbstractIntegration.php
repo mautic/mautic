@@ -223,7 +223,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
         // Match that data with mapped lead fields
-        $fieldsToUpdateInMautic = (!empty($existingLeads)) ? $this->getPriorityFieldsForMautic($config, $object,'company') : [];
+        $fieldsToUpdateInMautic = (!empty($existingLeads)) ? $this->getPriorityFieldsForMautic($config, $object, 'company') : [];
         $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
         if (!empty($fieldsToUpdateInMautic)) {
             $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
@@ -316,7 +316,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $existingLeads = true;
             }
         }
-        $fieldsToUpdateInMautic = (!empty($existingLeads)) ? $this->getPriorityFieldsForMautic($config, $object,'mautic') : [];
+        $fieldsToUpdateInMautic = (!empty($existingLeads)) ? $this->getPriorityFieldsForMautic($config, $object, 'mautic') : [];
         $leadFields             = $this->cleanPriorityFields($config, $object);
 
         if (!empty($fieldsToUpdateInMautic)) {
@@ -379,7 +379,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param        $config
-     * @param null   $entityObject    Possibly used by the CRM
+     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
@@ -392,13 +392,13 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         );
     }
 
-    /**
-     * @param        $config
-     * @param null   $entityObject    Possibly used by the CRM
-     * @param string $priorityObject
-     *
-     * @return array
-     */
+     /**
+      * @param        $config
+      * @param null   $entityObject    Possibly used by the CRM
+      * @param string $priorityObject
+      *
+      * @return array
+      */
      protected function getPriorityFieldsForIntegration($config, $entityObject = null, $priorityObject = 'mautic')
      {
          return $this->cleanPriorityFields(
@@ -429,5 +429,4 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         return $fieldsToUpdate;
     }
-
 }

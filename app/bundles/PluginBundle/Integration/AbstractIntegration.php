@@ -2460,8 +2460,8 @@ abstract class AbstractIntegration
         if (!empty($leadsToSync)) {
             // Let's only sync thos that have actual changes to prevent a loop
             /**
-             * @var  $key
-             * @var  Lead $lead
+             * @var
+             * @var Lead $lead
              */
             foreach ($leadsToSync as $key => $lead) {
                 if (!$lead || !$lead->getChanges(true)) {

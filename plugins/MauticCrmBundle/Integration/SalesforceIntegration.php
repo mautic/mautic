@@ -541,8 +541,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array  $fields
-     * @param array  $keys
+     * @param array $fields
+     * @param array $keys
      * @param mixed $object
      *
      * @return array
@@ -568,7 +568,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 if (strpos($key, '__'.$obj)) {
-                    $newKey                       = str_replace('__'.$obj, '', $key);
+                    $newKey                    = str_replace('__'.$obj, '', $key);
                     $leadFields[$obj][$newKey] = $fields[$key];
                 }
             }
@@ -595,7 +595,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $fields = array_keys($config['leadFields']);
 
-        $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
+        $fieldsToUpdateInSf  = $this->getPriorityFieldsForIntegration($config);
         $leadFields          = $this->cleanSalesForceData($config['leadFields'], $fields, $object);
         $leadFields          = array_intersect_key($leadFields, $fieldsToUpdateInSf[$object]);
         $mappedData[$object] = $this->populateLeadData(
