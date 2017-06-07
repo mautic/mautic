@@ -11,7 +11,8 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -23,76 +24,85 @@ class Log
      * @var int
      */
     private $id;
+
     /**
      * @var Webhook
      */
     private $webhook;
+
     /**
      * @var string
      */
     private $statusCode;
+
     /**
      * @var \DateTime
      */
     private $dateAdded;
+
     /**
-     * @param ORM\ClassMetadata $metadata
+     * @var float
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    private $runtime;
+
+    /**
+     * @var string
+     */
+    private $note;
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_logs')
-            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\LogRepository');
-        // id columns
-        $builder->addId();
-        // M:1 for webhook
+            ->setCustomRepositoryClass(LogRepository::class)
+            ->addId();
+
         $builder->createManyToOne('webhook', 'Webhook')
             ->inversedBy('logs')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
-        // status code
-        $builder->createField('statusCode', 'string')
+
+        $builder->createField('statusCode', Type::STRING)
             ->columnName('status_code')
             ->length(50)
             ->build();
-        // date added
-        $builder->createField('dateAdded', 'datetime')
-            ->columnName('date_added')
-            ->nullable()
-            ->build();
+
+        $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');
+        $builder->addNullableField('note', Type::STRING);
+        $builder->addNullableField('runtime', Type::DECIMAL);
     }
+
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
         return $this->id;
     }
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
 
-        return $this;
-    }
     /**
-     * @return mixed
+     * @return Webhook
      */
     public function getWebhook()
     {
         return $this->webhook;
     }
+
     /**
-     * @param mixed $webhook
+     * @param Webhook $webhook
+     *
+     * @return Log
      */
-    public function setWebhook($webhook)
+    public function setWebhook(Webhook $webhook)
     {
         $this->webhook = $webhook;
 
         return $this;
     }
+
     /**
      * @return mixed
      */
@@ -100,8 +110,11 @@ class Log
     {
         return $this->statusCode;
     }
+
     /**
      * @param mixed $statusCode
+     *
+     * @return Log
      */
     public function setStatusCode($statusCode)
     {
@@ -109,19 +122,63 @@ class Log
 
         return $this;
     }
+
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getDateAdded()
     {
         return $this->dateAdded;
     }
+
     /**
-     * @param mixed $dateAdded
+     * @param DateTime $dateAdded
+     *
+     * @return Log
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded(\DateTime $dateAdded)
     {
         $this->dateAdded = $dateAdded;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNote()
+    {
+        return $this->note;
+    }
+
+    /**
+     * @param string $note
+     *
+     * @return Log
+     */
+    public function setNote($note)
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRuntime()
+    {
+        return $this->runtime;
+    }
+
+    /**
+     * @param float $runtime
+     *
+     * @return Log
+     */
+    public function setRuntime($runtime)
+    {
+        $this->runtime = $runtime;
 
         return $this;
     }
