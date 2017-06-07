@@ -34,6 +34,6 @@ class Version20170607155015 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE '.$this->prefix.'webhook_logs ADD runtime NUMERIC(10, 0) DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'webhook_logs ADD runtime DOUBLE PRECISION DEFAULT NULL');
     }
 }

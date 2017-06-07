@@ -72,7 +72,7 @@ class Log
 
         $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');
         $builder->addNullableField('note', Type::STRING);
-        $builder->addNullableField('runtime', Type::DECIMAL);
+        $builder->addNullableField('runtime', Type::FLOAT);
     }
 
     /**
@@ -178,7 +178,7 @@ class Log
      */
     public function setRuntime($runtime)
     {
-        $this->runtime = $runtime;
+        $this->runtime = round($runtime, 2);
 
         return $this;
     }
