@@ -23,6 +23,7 @@ use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
+use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Event as Events;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\WebhookEvents;
