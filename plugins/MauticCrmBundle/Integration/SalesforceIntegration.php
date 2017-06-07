@@ -1804,7 +1804,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $supportedObjects['Contact'] = 'Contact';
             $fieldsToCreate              = $this->cleanSalesForceData($config['leadFields'], $fieldKeys, 'Contact');
             $objectFields['Contact']     = [
-                'update' => array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Contact']),
+                'update' => isset($fieldsToUpdateInSf['Contact']) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Contact']) : [],
                 'create' => $fieldsToCreate
             ];
         }
@@ -1812,7 +1812,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $supportedObjects['Lead'] = 'Lead';
             $fieldsToCreate           = $this->cleanSalesForceData($config['leadFields'], $fieldKeys, 'Lead');
             $objectFields['Lead']     = [
-                'update' => array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Lead']),
+                'update' => isset($fieldsToUpdateInSf['Lead']) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf['Lead']) : [],
                 'create' => $fieldsToCreate
             ];
         }
