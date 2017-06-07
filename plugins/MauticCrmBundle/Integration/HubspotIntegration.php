@@ -306,6 +306,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 $config                         = $this->mergeConfigToFeatureSettings();
                 $fields                         = implode('&property=', array_keys($config['leadFields']));
                 $params['post_append_to_query'] = '&property='.$fields.'&property=lifecyclestage';
+                $params['Count']                = 100;
 
                 $data = $this->getApiHelper()->getContacts($params);
                 if (isset($data['contacts'])) {
@@ -323,9 +324,11 @@ class HubspotIntegration extends CrmAbstractIntegration
                     if ($data['has-more']) {
                         $params['vidOffset']  = $data['vid-offset'];
                         $params['timeOffset'] = $data['time-offset'];
+
                         $this->getLeads($params, $query, $executed);
                     }
                 }
+                $this->em->detach($contact);
 
                 return $executed;
             }
@@ -341,7 +344,8 @@ class HubspotIntegration extends CrmAbstractIntegration
         $results = [];
         try {
             if ($this->isAuthorized()) {
-                $data = $this->getApiHelper()->getCompanies($params, $id);
+                $params['Count'] = 100;
+                $data            = $this->getApiHelper()->getCompanies($params, $id);
                 if ($id) {
                     $results['results'][] = array_merge($results, $data);
                 } else {
@@ -362,9 +366,12 @@ class HubspotIntegration extends CrmAbstractIntegration
                     }
                     if (isset($data['hasMore']) and $data['hasMore']) {
                         $params['offset'] = $data['offset'];
-                        $this->getCompanies($params, $id, $executed);
+                        if ($params['offset'] < strtotime($params['start'])) {
+                            $this->getCompanies($params, $id, $executed);
+                        }
                     }
                 }
+                $this->em->detach($company);
 
                 return $executed;
             }
@@ -470,7 +477,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                     $matchedFields['companyname'] = $matchedFields['companywebsite'];
                 }
             }
-            $leadModel->addToCompany($lead, $company);
         }
 
         if (isset($stageName)) {
@@ -507,6 +513,10 @@ class HubspotIntegration extends CrmAbstractIntegration
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             try {
                 $leadModel->saveEntity($lead, false);
+                if (isset($company)) {
+                    $leadModel->addToCompany($lead, $company);
+                    $this->em->detach($company);
+                }
             } catch (\Exception $exception) {
                 $this->logger->addWarning($exception->getMessage());
 
