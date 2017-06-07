@@ -15,6 +15,7 @@ use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -639,35 +640,39 @@ class CampaignModel extends CommonFormModel
     /**
      * Get a list of source choices.
      *
-     * @param $sourceType
+     * @param string $sourceType
+     * @param bool   $globalOnly
      *
      * @return array
      */
-    public function getSourceLists($sourceType = null)
+    public function getSourceLists($sourceType = null, $globalOnly = false)
     {
         $choices = [];
         switch ($sourceType) {
             case 'lists':
             case null:
                 $choices['lists'] = [];
+                $lists            = $globalOnly ? $this->leadListModel->getGlobalLists() : $this->leadListModel->getUserLists();
 
-                $lists = (empty($options['global_only'])) ? $this->leadListModel->getUserLists() : $this->leadListModel->getGlobalLists();
-
-                foreach ($lists as $list) {
-                    $choices['lists'][$list['id']] = $list['name'];
+                if ($lists) {
+                    foreach ($lists as $list) {
+                        $choices['lists'][$list['id']] = $list['name'];
+                    }
                 }
 
             case 'forms':
             case null:
                 $choices['forms'] = [];
-
-                $viewOther = $this->security->isGranted('form:forms:viewother');
-                $repo      = $this->formModel->getRepository();
+                $viewOther        = $this->security->isGranted('form:forms:viewother');
+                $repo             = $this->formModel->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
-                foreach ($forms as $form) {
-                    $choices['forms'][$form['id']] = $form['name'];
+
+                if ($forms) {
+                    foreach ($forms as $form) {
+                        $choices['forms'][$form['id']] = $form['name'];
+                    }
                 }
         }
 
@@ -789,12 +794,7 @@ class CampaignModel extends CommonFormModel
                     $campaignLead->setManuallyRemoved(false);
                     $campaignLead->setManuallyAdded($manuallyAdded);
 
-                    try {
-                        $this->getRepository()->saveEntity($campaignLead);
-                    } catch (\Exception $exception) {
-                        $dispatchEvent = false;
-                        $this->logger->log('error', $exception->getMessage());
-                    }
+                    $dispatchEvent = $this->saveCampaignLead($campaignLead);
                 } else {
                     $this->em->detach($campaignLead);
                     if ($batchProcess) {
@@ -806,18 +806,13 @@ class CampaignModel extends CommonFormModel
                     continue;
                 }
             } else {
-                $campaignLead = new \Mautic\CampaignBundle\Entity\Lead();
+                $campaignLead = new CampaignLead();
                 $campaignLead->setCampaign($campaign);
                 $campaignLead->setDateAdded(new \DateTime());
                 $campaignLead->setLead($lead);
                 $campaignLead->setManuallyAdded($manuallyAdded);
 
-                try {
-                    $this->getRepository()->saveEntity($campaignLead);
-                } catch (\Exception $exception) {
-                    $dispatchEvent = false;
-                    $this->logger->log('error', $exception->getMessage());
-                }
+                $dispatchEvent = $this->saveCampaignLead($campaignLead);
             }
 
             if ($dispatchEvent && $this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
@@ -836,6 +831,26 @@ class CampaignModel extends CommonFormModel
         }
 
         unset($leadModel, $campaign, $leads);
+    }
+
+    /**
+     * Saves a campaign lead, logs the error if saving fails.
+     *
+     * @param CampaignLead $campaignLead
+     *
+     * @return bool
+     */
+    public function saveCampaignLead(CampaignLead $campaignLead)
+    {
+        try {
+            $this->getCampaignLeadRepository()->saveEntity($campaignLead);
+
+            return true;
+        } catch (\Exception $exception) {
+            $this->logger->log('error', $exception->getMessage());
+
+            return false;
+        }
     }
 
     /**

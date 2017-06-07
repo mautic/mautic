@@ -155,7 +155,7 @@ EOT
 
             $testFixturesDir = $bundle['directory'].'/Tests/DataFixtures/ORM';
 
-            if (MAUTIC_TEST_ENV && file_exists($testFixturesDir)) {
+            if (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV && file_exists($testFixturesDir)) {
                 $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\Tests\\DataFixtures\\ORM\\';
                 $this->populateFixturesFromDirectory($testFixturesDir, $fixtures, $classPrefix, $returnClassNames);
             }
