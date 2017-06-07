@@ -47,21 +47,21 @@ return [
     'services' => [
         'forms' => [
             'mautic.form.type.webhook' => [
-                'class'     => 'Mautic\WebhookBundle\Form\Type\WebhookType',
+                'class'     => \Mautic\WebhookBundle\Form\Type\WebhookType::class,
                 'arguments' => 'translator',
                 'alias'     => 'webhook',
             ],
             'mautic.form.type.webhookconfig' => [
-                'class' => 'Mautic\WebhookBundle\Form\Type\ConfigType',
+                'class' => \Mautic\WebhookBundle\Form\Type\ConfigType::class,
                 'alias' => 'webhookconfig',
             ],
         ],
         'events' => [
             'mautic.webhook.config.subscriber' => [
-                'class' => 'Mautic\WebhookBundle\EventListener\ConfigSubscriber',
+                'class' => \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
             ],
             'mautic.webhook.audit.subscriber' => [
-                'class'     => 'Mautic\WebhookBundle\EventListener\WebhookSubscriber',
+                'class'     => \Mautic\WebhookBundle\EventListener\WebhookSubscriber::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
@@ -76,19 +76,22 @@ return [
         ],
         'models' => [
             'mautic.webhook.model.webhook' => [
-                'class'     => 'Mautic\WebhookBundle\Model\WebhookModel',
+                'class'     => \Mautic\WebhookBundle\Model\WebhookModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'jms_serializer',
+                    'mautic.core.model.notification',
                 ],
             ],
         ],
     ],
 
     'parameters' => [
-        'webhook_start'   => 0,
-        'webhook_limit'   => 1000,
-        'webhook_log_max' => 10,
-        'queue_mode'      => 'immediate_process',
+        'webhook_start'         => 0, // deprecated, should be 0 by default
+        'webhook_limit'         => 10, // How many entities can be sent in one webhook
+        'webhook_log_max'       => 1000, // How many recent logs to keep
+        'webhook_disable_limit' => 100, // How many times the webhook response can fail until the webhook will be unpublished
+        'webhook_timeout'       => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
+        'queue_mode'            => 'immediate_process', // Trigger the webhook immediately or queue it for faster response times
     ],
 ];
