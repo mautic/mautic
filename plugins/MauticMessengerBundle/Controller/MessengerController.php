@@ -12,9 +12,10 @@
 namespace MauticPlugin\MauticMessengerBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\LeadBundle\Controller\EntityContactsTrait;
-use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\CoreBundle\Exception as MauticException;
+use Joomla\Http\Http;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -33,9 +34,9 @@ class MessengerController extends FormController
         if (isset($_REQUEST['hub_challenge'])) {
             $challenge = $_REQUEST['hub_challenge'];
             $hub_verify_token = $_REQUEST['hub_verify_token'];
-        }
-        if ($hub_verify_token === $verify_token) {
-            return new Response($challenge);
+            if ($hub_verify_token === $verify_token) {
+                return new Response($challenge);
+            }
         }
 
     }

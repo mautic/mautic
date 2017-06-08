@@ -20,6 +20,16 @@ return [
             ],
         ],
     ],
+    'other' => [
+        'mautic.plugin.helper.messenger' => [
+            'class' => 'MauticPlugin\MauticMessengerBundle\Helper\MessengerHelper',
+            'arguments' => [
+                'mautic.http.connector',
+                'request_stack',
+                'mautic.helper.core_parameters',
+            ],
+        ],
+    ],
     'parameters' => array(),
 
 ];

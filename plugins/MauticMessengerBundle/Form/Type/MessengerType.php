@@ -25,43 +25,44 @@ class MessengerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('layout', 'choice', [
-            'choices' => [
-                'standard'     => 'mautic.integration.Facebook.share.layout.standard',
-                'button_count' => 'mautic.integration.Facebook.share.layout.buttoncount',
-                'button'       => 'mautic.integration.Facebook.share.layout.button',
-                'box_count'    => 'mautic.integration.Facebook.share.layout.boxcount',
-                'icon'         => 'mautic.integration.Facebook.share.layout.icon',
-            ],
-            'label'       => 'mautic.integration.Facebook.share.layout',
-            'required'    => false,
-            'empty_value' => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => ['class' => 'form-control'],
-        ]);
+        $builder->add(
+            'messenger_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.notification.config.form.notification.enabled',
+                'attr'  => [
+                    'tooltip' => 'mautic.notification.config.form.notification.enabled.tooltip',
+                ],
+            ]
+        );
 
-        $builder->add('action', 'choice', [
-            'choices' => [
-                'like'      => 'mautic.integration.Facebook.share.action.like',
-                'recommend' => 'mautic.integration.Facebook.share.action.recommend',
-                'share'     => 'mautic.integration.Facebook.share.action.share',
-            ],
-            'label'       => 'mautic.integration.Facebook.share.action',
-            'required'    => false,
-            'empty_value' => false,
-            'label_attr'  => ['class' => 'control-label'],
-            'attr'        => ['class' => 'form-control'],
-        ]);
+        $builder->add(
+            'messenger_callback_verify_token',
+            'text',
+            [
+                'label' => 'mautic.notification.config.form.notification.subdomain_name',
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.subdomain_name.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"integration_details_isPublished_1":"checked"}',
+                ],
+            ]
+        );
 
-        $builder->add('showFaces', 'yesno_button_group', [
-            'label' => 'mautic.integration.Facebook.share.showfaces',
-            'data'  => (!isset($options['data']['showFaces'])) ? 1 : $options['data']['showFaces'],
-        ]);
 
-        $builder->add('showShare', 'yesno_button_group', [
-            'label' => 'mautic.integration.Facebook.share.showshare',
-            'data'  => (!isset($options['data']['showShare'])) ? 1 : $options['data']['showShare'],
-        ]);
+        $builder->add(
+            'messenger_page_access_token',
+            'text',
+            [
+                'label' => 'mautic.notification.config.form.notification.subdomain_name',
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.subdomain_name.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"integration_details_isPublished_1":"checked"}',
+
+                ],
+            ]
+        );
     }
 
     /**
