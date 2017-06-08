@@ -1675,6 +1675,14 @@ abstract class AbstractIntegration
                 }
             }
 
+            // Check that the remaining fields have an updateKey set
+            foreach ($mappedFields as $field => $mauticField) {
+                if (!isset($featureSettings[$updateKey][$field])) {
+                    // Assume it's mapped to Mautic
+                    $featureSettings[$updateKey][$field] = 1;
+                }
+            }
+
             // Check if required fields are missing
             $required = $this->getRequiredFields($integrationFields);
             if (array_diff_key($required, $mappedFields)) {
