@@ -196,8 +196,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'contacts' => 'mautic.hubspot.object.contact',
-                        'company'  => 'mautic.hubspot.object.company',
+                        'contacts' => 'mautic.connectwise.object.contact',
+                        'company'  => 'mautic.connectwise.object.company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
