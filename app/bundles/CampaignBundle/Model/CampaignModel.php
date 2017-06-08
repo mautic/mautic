@@ -667,6 +667,8 @@ class CampaignModel extends CommonFormModel
                 $repo             = $this->formModel->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
 
+                $repo->setCurrentUser($this->factory->getUser());
+
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
 
                 if ($forms) {
