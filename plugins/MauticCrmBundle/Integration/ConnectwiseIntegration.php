@@ -19,26 +19,11 @@ use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class HubspotIntegration.
+ * Class ConnectwiseIntegration.
  */
-class ConnectWiseIntegration extends CrmAbstractIntegration
+class ConnectwiseIntegration extends CrmAbstractIntegration
 {
-    /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
-     * HubspotIntegration constructor.
-     *
-     * @param UserHelper $userHelper
-     */
-    public function __construct(UserHelper $userHelper)
-    {
-        $this->userHelper = $userHelper;
-
-        parent::__construct();
-    }
+    private $cwappid = 'Mautic';
 
     /**
      * {@inheritdoc}
@@ -59,13 +44,37 @@ class ConnectWiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Get the array key for clientId.
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function getRequiredKeyFields()
+    {
+        return [
+            'companyid'   => 'mautic.connectwise.form.companyid',
+            'username'  => 'mautic.connectwise.form.publickey',
+            'password' => 'mautic.connectwise.form.privatekey',
+        ];
+    }
+
+    /**
+     * Get the array key for companyid.
+     *
+     * @return string
+     */
+    public function getCompanyIdKey()
+    {
+        return 'companyid';
+    }
+
+    /**
+     * Get the array key for client id.
      *
      * @return string
      */
     public function getClientIdKey()
     {
-        return 'company_id';
+        return 'username';
     }
 
     /**
@@ -75,7 +84,7 @@ class ConnectWiseIntegration extends CrmAbstractIntegration
      */
     public function getClientSecretKey()
     {
-        return 'client_secret';
+        return 'password';
     }
 
     /**
@@ -86,8 +95,7 @@ class ConnectWiseIntegration extends CrmAbstractIntegration
     public function getSecretKeys()
     {
         return [
-            'client_secret',
-            'private_key',
+            'password',
         ];
     }
 
@@ -101,28 +109,7 @@ class ConnectWiseIntegration extends CrmAbstractIntegration
         return (isset($this->keys['version']) && $this->keys['version'] == '6') ? 'id' : 'access_token';
     }
 
-    /**
-     * SugarCRM 7 refresh tokens.
-     */
-    public function getRefreshTokenKeys()
-    {
-        return [
-            'refresh_token',
-            'expires',
-        ];
-    }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAccessTokenUrl()
-    {
-        $apiUrl = ($this->keys['version'] == '6') ? 'service/v4_1/rest.php' : 'rest/v10/oauth2/token';
-
-        return sprintf('%s/%s', $this->keys['sugarcrm_url'], $apiUrl);
-    }
 
     /**
      * {@inheritdoc}
@@ -140,25 +127,39 @@ class ConnectWiseIntegration extends CrmAbstractIntegration
     {
         return [
             'requires_callback'      => false,
-            'requires_authorization' => false,
+            'requires_authorization' => true,
         ];
     }
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getAuthenticationType()
-    {
-        return 'key';
-    }
+
 
     /**
      * @return string
      */
     public function getApiUrl()
     {
-        return 'https://api.hubapi.com';
+        return 'https://staging.connectwisedev.com/v4_6_release';
+    }
+
+    /**
+     * @return bool
+     */
+    public function authCallback($settings = [], $parameters = [])
+    {
+        $url = $this->getApiUrl();
+        $request_url = sprintf('%s/login/login.aspx', $url);
+        $parameters  = [
+            'username'    => $this->keys[$this->getClientIdKey()],
+            'password' => $this->keys[$this->getClientSecretKey()],
+            'companyname' => $this->keys[$this->getCompanyIdKey()],
+        ];
+
+        $response = $this->makeRequest($request_url, $parameters, 'GET', ['authorize_session' => true]);
+
+        if ($response == 'FAIL') {
+            return $this->translator->trans('mautic.connectwise.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
+        }
+
+        return $this->extractAuthKeys($response);
     }
 
     /**

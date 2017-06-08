@@ -73,6 +73,12 @@ return [
 
                 ],
             ],
+            'mautic.integration.connectwise' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
         ],
     ],
 ];
