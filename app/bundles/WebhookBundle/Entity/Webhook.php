@@ -463,6 +463,23 @@ class Webhook extends FormEntity
         return $this;
     }
 
+    public function wasModifiedRecently()
+    {
+        $dateModified = $this->getDateModified();
+
+        if ($dateModified === null) {
+            return false;
+        }
+
+        $aWhileBack = (new \DateTime())->modify('-2 days');
+
+        if ($dateModified < $aWhileBack) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @param string $prop
      * @param mixed  $val

@@ -323,13 +323,18 @@ class WebhookModel extends FormModel
                 throw new \ErrorException($webhook->getWebhookUrl().' returned '.$response->code);
             }
         } catch (\Exception $e) {
-            // log any errors but allow the script to keep running
-            $this->logger->addError($e->getMessage());
-            $this->addLog($webhook, 'N/A', (microtime(true) - $start), $e->getMessage());
+            $messsge = $e->getMessage();
 
             if ($this->isSick($webhook)) {
                 $this->killWebhook($webhook);
+                $messsge .= ' '.$this->translator->trans('mautic.webhook.killed', ['%limit%' => $this->disableLimit]);
             }
+
+            // log any errors but allow the script to keep running
+            $this->logger->addError($messsge);
+
+            // log that the request failed to display it to the user
+            $this->addLog($webhook, 'N/A', (microtime(true) - $start), $messsge);
 
             return false;
         }
@@ -355,6 +360,7 @@ class WebhookModel extends FormModel
 
     /**
      * Look into the history and check if all the responses we care about had failed.
+     * But let it run for a while after the user modified it. Lets not aggravate the user.
      *
      * @param Webhook $webhook
      *
@@ -362,10 +368,19 @@ class WebhookModel extends FormModel
      */
     public function isSick(Webhook $webhook)
     {
-        $successCount       = $this->getLogRepository()->countSuccessStatusCodes($webhook->getId(), $this->disableLimit);
-        $allResponsesFailed = $successCount === $this->disableLimit;
+        // Do not mess with the user will! (at least not now)
+        if ($webhook->wasModifiedRecently()) {
+            return false;
+        }
 
-        return $allResponsesFailed;
+        $successRadio = $this->getLogRepository()->getSuccessVsErrorStatusCodeRatio($webhook->getId(), $this->disableLimit);
+
+        // If there are no log rows yet, consider it healthy
+        if ($successRadio === null) {
+            return false;
+        }
+
+        return !$successRadio;
     }
 
     /**
@@ -401,7 +416,7 @@ class WebhookModel extends FormModel
      * @param Webhook $webhook
      * @param int     $statusCode
      * @param float   $runtime    in seconds
-     * @param strin   $note
+     * @param string  $note
      */
     public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
     {
