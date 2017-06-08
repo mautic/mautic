@@ -29,8 +29,19 @@ class WebhookApiController extends CommonApiController
         $this->entityClass      = Webhook::class;
         $this->entityNameOne    = 'hook';
         $this->entityNameMulti  = 'hooks';
-        $this->serializerGroups = ['hookDetails', 'categoryList', 'publishDetails'];
+        $this->serializerGroups = ['hookDetails', 'eventList', 'categoryList', 'publishDetails'];
 
         parent::initialize($event);
+    }
+
+    public function getEventsAction()
+    {
+        return $this->handleView(
+            $this->view(
+                [
+                    'events' => $this->model->getEvents(),
+                ]
+            )
+        );
     }
 }

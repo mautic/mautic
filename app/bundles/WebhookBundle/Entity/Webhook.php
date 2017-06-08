@@ -93,32 +93,31 @@ class Webhook extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhooks')
-            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\WebhookRepository');
-        // id columns
+            ->setCustomRepositoryClass(WebhookRepository::class);
+
         $builder->addIdColumns();
-        // categories
+
         $builder->addCategory();
-        // 1:M for events
+
         $builder->createOneToMany('events', 'Event')
             ->orphanRemoval()
             ->setIndexBy('event_type')
             ->mappedBy('webhook')
             ->cascadePersist()
             ->build();
-        // 1:M for queues
+
         $builder->createOneToMany('queues', 'WebhookQueue')
             ->mappedBy('webhook')
             ->fetchExtraLazy()
             ->cascadePersist()
             ->build();
-        // 1:M for logs
+
         $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => 'DESC'])
             ->fetchExtraLazy()
             ->mappedBy('webhook')
             ->cascadePersist()
             ->build();
 
-        // status code
         $builder->createField('webhookUrl', 'string')
             ->columnName('webhook_url')
             ->length(255)
@@ -133,7 +132,7 @@ class Webhook extends FormEntity
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('hook')
-            ->addProperties(
+            ->addListProperties(
                 [
                     'id',
                     'name',

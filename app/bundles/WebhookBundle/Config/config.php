@@ -28,6 +28,10 @@ return [
                 'path'            => '/hooks',
                 'controller'      => 'MauticWebhookBundle:Api\WebhookApi',
             ],
+            'mautic_api_webhookevents' => [
+                'path'       => '/hooks/events',
+                'controller' => 'MauticWebhookBundle:Api\WebhookApi:getEvents',
+            ],
         ],
     ],
 
