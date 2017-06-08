@@ -68,7 +68,7 @@ class DynamicsIntegration extends AbstractIntegration
             return [
                 'template'   => 'MauticDynamicsBundle:Integration:form.html.php',
                 'parameters' => [
-                    'mauticUrl' => $this->router->generate('mautic_plugin_dynamics_index', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'mauticUrl' => $this->router->generate('mautic_plugin_dynamics_callback', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 ],
             ];
         }
