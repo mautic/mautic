@@ -70,7 +70,7 @@ class SalesforceApi extends CrmApi
                         $refreshError = $this->integration->authCallback(['use_refresh_token' => true]);
 
                         if (empty($refreshError)) {
-                            return $this->request($operation, $elementData, $method, true);
+                            return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
                         }
                     }
                     $errors[] = $r['message'];
