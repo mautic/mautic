@@ -447,7 +447,7 @@ class ReportModel extends FormModel
                                         //set the header
                                         $header[] = $k;
                                     }
-                                    $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+                                    $row[] = htmlspecialchars_decode($formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
                                 }
 
                                 if ($count === 0) {
