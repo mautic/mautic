@@ -223,7 +223,19 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $config = $this->mergeConfigToFeatureSettings([]);
 
         // Match that data with mapped lead fields
-        $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
+        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'company');
+        $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
+        if (!empty($fieldsToUpdateInMautic)) {
+            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
+            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        } else {
+            $newMatchedFields = $matchedFields;
+        }
+        if (!isset($newMatchedFields['companyname'])) {
+            if (isset($newMatchedFields['companywebsite'])) {
+                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
+            }
+        }
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
