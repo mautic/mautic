@@ -92,6 +92,8 @@ class MailchimpApi extends EmailMarketingApi
         $emailStruct        = new \stdClass();
         $emailStruct->email = $email;
 
+        print_r($email);
+
         $parameters = array_merge($config, [
             'id'         => $listId,
             'merge_vars' => $fields,

@@ -151,9 +151,11 @@ class MailchimpIntegration extends EmailAbstractIntegration
     public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
+        print_r($config);
 
-        $mappedData = $this->populateLeadData($lead, $config);
-
+        $mappedData = $this->populateLeadData($lead,
+            ['leadFields' => $config['leadFields'], 'object' => 'lead', 'feature_settings' => ['objects' => []]]);
+        print_r($mappedData);
         if (empty($mappedData)) {
             return false;
         } elseif (empty($mappedData['EMAIL'])) {
