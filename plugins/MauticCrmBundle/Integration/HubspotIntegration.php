@@ -339,6 +339,10 @@ class HubspotIntegration extends CrmAbstractIntegration
                             } elseif ($contact && $contact->isNewlyCreated()) { //newly created
                                 $executed[1] = $executed[1] + 1;
                             }
+
+                            if ($contact) {
+                                $this->em->detach($contact);
+                            }
                         }
                     }
                     if ($data['has-more']) {
@@ -348,7 +352,6 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $this->getLeads($params, $query, $executed);
                     }
                 }
-                $this->em->detach($contact);
 
                 return $executed;
             }
@@ -440,57 +443,49 @@ class HubspotIntegration extends CrmAbstractIntegration
             unset($data['associatedcompanyid']);
         }
 
-        $lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object);
+        if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
+            if (isset($stageName)) {
+                $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
 
-        if (isset($company)) {
-            if (!isset($matchedFields['companyname'])) {
-                if (isset($matchedFields['companywebsite'])) {
-                    $matchedFields['companyname'] = $matchedFields['companywebsite'];
+                if (empty($stage)) {
+                    $stage = new Stage();
+                    $stage->setName($stageName);
+                    $stages[$stageName] = $stage;
+                }
+                if (!$lead->getStage() && $lead->getStage() != $stage) {
+                    $lead->setStage($stage);
+
+                    //add a contact stage change log
+                    $log = new StagesChangeLog();
+                    $log->setStage($stage);
+                    $log->setEventName($stage->getId().':'.$stage->getName());
+                    $log->setLead($lead);
+                    $log->setActionName(
+                        $this->translator->trans(
+                            'mautic.stage.import.action.name',
+                            [
+                                '%name%' => $this->userHelper->getUser()->getUsername(),
+                            ]
+                        )
+                    );
+                    $log->setDateAdded(new \DateTime());
+                    $lead->stageChangeLog($log);
                 }
             }
-        }
 
-        if (isset($stageName)) {
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
+            if ($persist && !empty($lead->getChanges(true))) {
+                // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
+                try {
+                    $this->leadModel->saveEntity($lead, false);
+                    if (isset($company)) {
+                        $this->leadModel->addToCompany($lead, $company);
+                        $this->em->detach($company);
+                    }
+                } catch (\Exception $exception) {
+                    $this->logger->addWarning($exception->getMessage());
 
-            if (empty($stage)) {
-                $stage = new Stage();
-                $stage->setName($stageName);
-                $stages[$stageName] = $stage;
-            }
-            if (!$lead->getStage() && $lead->getStage() != $stage) {
-                $lead->setStage($stage);
-
-                //add a contact stage change log
-                $log = new StagesChangeLog();
-                $log->setStage($stage);
-                $log->setEventName($stage->getId().':'.$stage->getName());
-                $log->setLead($lead);
-                $log->setActionName(
-                    $this->translator->trans(
-                        'mautic.stage.import.action.name',
-                        [
-                            '%name%' => $this->userHelper->getUser()->getUsername(),
-                        ]
-                    )
-                );
-                $log->setDateAdded(new \DateTime());
-                $lead->stageChangeLog($log);
-            }
-        }
-
-        if ($persist && !empty($lead->getChanges(true))) {
-            // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
-            try {
-                $this->leadModel->saveEntity($lead, false);
-                if (isset($company)) {
-                    $this->leadModel->addToCompany($lead, $company);
-                    $this->em->detach($company);
+                    return;
                 }
-            } catch (\Exception $exception) {
-                $this->logger->addWarning($exception->getMessage());
-
-                return;
             }
         }
 
