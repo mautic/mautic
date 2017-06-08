@@ -156,7 +156,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticEmailBundle:Email');
+        $repo = $this->em->getRepository('MauticEmailBundle:Email');
+        $repo->setCurrentUser($this->userHelper->getUser());
+
+        return $repo;
     }
 
     /**
