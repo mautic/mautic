@@ -29,8 +29,8 @@ return [
                 'controller'      => 'MauticWebhookBundle:Api\WebhookApi',
             ],
             'mautic_api_webhookevents' => [
-                'path'       => '/hooks/events',
-                'controller' => 'MauticWebhookBundle:Api\WebhookApi:getEvents',
+                'path'       => '/hooks/triggers',
+                'controller' => 'MauticWebhookBundle:Api\WebhookApi:getTriggers',
             ],
         ],
     ],
@@ -76,6 +76,9 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                 ],
+            ],
+            'mautic.webhook.serialize.subscriber' => [
+                'class' => \Mautic\WebhookBundle\EventListener\SerializeSubscriber::class,
             ],
         ],
         'models' => [

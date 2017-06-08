@@ -76,6 +76,14 @@ class Webhook extends FormEntity
      */
     private $payload;
 
+    /**
+     * Holds a simplified array of events, just an array of event types.
+     * It's used for API serializaiton.
+     *
+     * @var array
+     */
+    private $triggers = [];
+
     /*
      * Constructor
      */
@@ -139,7 +147,7 @@ class Webhook extends FormEntity
                     'description',
                     'webhookUrl',
                     'category',
-                    'events',
+                    'triggers',
                 ]
             )
             ->build();
@@ -312,6 +320,69 @@ class Webhook extends FormEntity
         }
 
         return $this;
+    }
+
+    /**
+     * This builds a simple array with subscribed events.
+     *
+     * @return array
+     */
+    public function buildTriggers()
+    {
+        foreach ($this->events as $event) {
+            $this->triggers[] = $event->getEventType();
+        }
+    }
+
+    /**
+     * Takes the array of triggers and builds events from them if they don't exist already.
+     *
+     * @param array $triggers
+     */
+    public function setTriggers(array $triggers)
+    {
+        foreach ($triggers as $key) {
+            $this->addTrigger($key);
+        }
+    }
+
+    /**
+     * Takes a trigger (event type) and builds the Event object form it if it doesn't exist already.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function addTrigger($key)
+    {
+        if ($this->eventExists($key)) {
+            return false;
+        }
+
+        $event = new Event();
+        $event->setEventType($key);
+        $event->setWebhook($this);
+        $this->addEvent($event);
+
+        return true;
+    }
+
+    /**
+     * Check if an event exists comared to its type.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function eventExists($key)
+    {
+        foreach ($this->events as $event) {
+            if ($event->getEventType() === $key) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
