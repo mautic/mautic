@@ -679,6 +679,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 $result = $this->getApiHelper()->getLeads($query, $object);
+                var_export($result);
                 list($justUpdated, $justCreated) = $this->amendLeadDataBeforeMauticPopulate($result, $object, $params);
 
                 $executed[0] += $justUpdated;

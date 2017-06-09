@@ -296,7 +296,10 @@ class SalesforceApi extends CrmApi
                 }
         }
 
-        if (!empty($fields) and isset($query['start'])) {
+        if (!empty($query['nextUrl'])) {
+            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
+            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
+        } elseif (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
 
@@ -310,9 +313,6 @@ class SalesforceApi extends CrmApi
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'].$ignoreConvertedLeads;
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } elseif (!empty($query['nextUrl'])) {
-            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
-            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
         } else {
             $result = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
         }
