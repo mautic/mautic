@@ -87,7 +87,8 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
         $featureSettings = $this->settings->getFeatureSettings();
 
         if (isset($config['config']['list_settings']['leadFields'])) {
-            $config['config']['leadFields'] = $config['config']['list_settings']['leadFields'];
+            $config['config']['leadFields'] = $this->formatMatchedFields($config['config']['list_settings']['leadFields']);
+
             unset($config['config']['list_settings']['leadFields']);
         }
 

@@ -63,12 +63,11 @@ class MailchimpType extends AbstractType
 
         $api = $mailchimp->getApiHelper();
         try {
-            $lists = $api->getLists();
-
+            $lists   = $api->getLists();
             $choices = [];
             if (!empty($lists)) {
-                if ($lists['total']) {
-                    foreach ($lists['data'] as $list) {
+                if ($lists['total_items']) {
+                    foreach ($lists['lists'] as $list) {
                         $choices[$list['id']] = $list['name'];
                     }
                 }
@@ -139,7 +138,6 @@ class MailchimpType extends AbstractType
                     $fields = [];
                     $error  = $e->getMessage();
                     $page   = 1;
-                    $fields = $integrationCompanyFields = [];
                 }
 
                 list($specialInstructions) = $mailchimp->getFormNotes('leadfield_match');
@@ -154,7 +152,7 @@ class MailchimpType extends AbstractType
                     'data'                 => $data,
                     'integration_fields'   => $fields,
                     'special_instructions' => $specialInstructions,
-                    'mapped'               => false,
+                    'mapped'               => true,
                     'error_bubbling'       => false,
                 ]);
 
