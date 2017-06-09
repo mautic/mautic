@@ -84,12 +84,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
         if (!$interval) {
             $interval = '15 minutes';
         }
-        if (!$startDate) {
-            $startDate = date('c', strtotime('-'.$interval));
-        }
-        if (!$endDate) {
-            $endDate = date('c');
-        }
+        $startDate = !$startDate ? date('c', strtotime('-'.$interval)) : date('c', strtotime($startDate));
+        $endDate   = !$endDate ? date('c') : date('c', strtotime($endDate));
+
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $container->get('mautic.helper.integration');
