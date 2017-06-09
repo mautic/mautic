@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -70,14 +71,16 @@ class PublicController extends CommonController
     public function campaignLeadAction()
     {
         $focusId = $this->request->get('focusid', false);
-        $leadId  = $this->request->get('leadid', false);
+        $leadId    = $this->request->get('leadid', false);
 
-        /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
-        $model  = $this->getModel('focus');
-        $return = $model->campaignLeadInFocus($focusId, $leadId);
+        if ($focusId > 0 && $leadId > 0) {
+            /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
+            $model  = $this->getModel('focus');
+            $return = $model->getFocusCampaignRepository()->campaignLeadInFocus($focusId, $leadId);
 
-        $response = new Response($return, 200, ['Content-Type' => 'application/javascript']);
-
-        return $response;
+            return new JsonResponse(['success' => $return], 200, ['Access-Control-Allow-Origin' => '*']);
+        } else {
+            return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
+        }
     }
 }

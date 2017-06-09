@@ -124,6 +124,7 @@ return [
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
                     'mautic.helper.templating',
+                    'router',
                 ],
             ],
         ],

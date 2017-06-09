@@ -68,8 +68,7 @@ switch ($style) {
         $iframeClass = 'mf-'.$style.'-iframe';
         break;
 }
-    $focusCampaignUrl = $view['router']->path('mautic_focus_lead_incampaign');
-    $focusCampaignUrl = str_replace(['http://', 'https://'], '', $focusCampaignUrl);
+
 ?>
 
 (function (window) {
@@ -110,9 +109,9 @@ switch ($style) {
             {
                 var focusId = <?php echo $focus['id']; ?>;
                 var method = 'GET';
-                var url ='<?php echo $focusCampaignUrl; ?>';
-                url = url + '?leadid='+leadId+'&focusid='+focusId;
-                
+		var query = 'leadid='+leadId+'&focusid='+focusId;
+                var url =(window.location.protocol=='https:'?'https:':'http:')+'//<?php echo $focusCampaignUrl; ?>?'+query;
+                                
                 var xhr = new XMLHttpRequest();
                 if ("withCredentials" in xhr) {
                     xhr.open(method, url, true);
@@ -122,11 +121,10 @@ switch ($style) {
                 }
 
                 xhr.onreadystatechange = function (e) {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.readyState === XMLHttpRequest.DONE){
                         response = JSON.parse(xhr.responseText);
                         if (xhr.status === 200) {
-                            console.log('sdf',response);
-                            if(response){
+                            if(response.success==true){
                                 Focus.registerFocusEvent();
                             }
                         }
