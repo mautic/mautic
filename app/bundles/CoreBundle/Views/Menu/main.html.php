@@ -71,8 +71,8 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
 
         /* Submenu items start */
         if ($showChildren) {
-            $options['depth']         = ($options['depth']) ? $options['depth']-- : '';
-            $options['matchingDepth'] = ($options['matchingDepth']) ? $options['matchingDepth']-- : '';
+            $options['depth']         = ($options['depth']) ? $options['depth']-- : null;
+            $options['matchingDepth'] = ($options['matchingDepth']) ? $options['matchingDepth']-- : null;
 
             $levelClass = $isAncestor ? 'nav-submenu collapse in' : 'nav-submenu collapse';
 

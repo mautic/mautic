@@ -15,6 +15,7 @@ namespace Mautic\CoreBundle\Test;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
@@ -238,7 +239,7 @@ class MauticWebTestCase extends WebTestCase
     /**
      * TODO: Backup the database after creation, and store in cache dir to reimport between test.
      */
-    protected function setupDatabaseOnFirstRun()
+    private function setupDatabaseOnFirstRun()
     {
         $this->runCommand('doctrine:schema:drop', [
             '--env'   => 'test',

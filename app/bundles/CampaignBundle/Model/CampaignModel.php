@@ -15,6 +15,7 @@ use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -639,35 +640,39 @@ class CampaignModel extends CommonFormModel
     /**
      * Get a list of source choices.
      *
-     * @param $sourceType
+     * @param string $sourceType
+     * @param bool   $globalOnly
      *
      * @return array
      */
-    public function getSourceLists($sourceType = null)
+    public function getSourceLists($sourceType = null, $globalOnly = false)
     {
         $choices = [];
         switch ($sourceType) {
             case 'lists':
             case null:
                 $choices['lists'] = [];
+                $lists            = $globalOnly ? $this->leadListModel->getGlobalLists() : $this->leadListModel->getUserLists();
 
-                $lists = (empty($options['global_only'])) ? $this->leadListModel->getUserLists() : $this->leadListModel->getGlobalLists();
-
-                foreach ($lists as $list) {
-                    $choices['lists'][$list['id']] = $list['name'];
+                if ($lists) {
+                    foreach ($lists as $list) {
+                        $choices['lists'][$list['id']] = $list['name'];
+                    }
                 }
 
             case 'forms':
             case null:
                 $choices['forms'] = [];
-
-                $viewOther = $this->security->isGranted('form:forms:viewother');
-                $repo      = $this->formModel->getRepository();
+                $viewOther        = $this->security->isGranted('form:forms:viewother');
+                $repo             = $this->formModel->getRepository();
                 $repo->setCurrentUser($this->userHelper->getUser());
 
                 $forms = $repo->getFormList('', 0, 0, $viewOther, 'campaign');
-                foreach ($forms as $form) {
-                    $choices['forms'][$form['id']] = $form['name'];
+
+                if ($forms) {
+                    foreach ($forms as $form) {
+                        $choices['forms'][$form['id']] = $form['name'];
+                    }
                 }
         }
 
@@ -762,7 +767,9 @@ class CampaignModel extends CommonFormModel
     public function addLeads(Campaign $campaign, array $leads, $manuallyAdded = false, $batchProcess = false, $searchListLead = 1)
     {
         foreach ($leads as $lead) {
-            if (!$lead instanceof Lead) {
+            if ($lead instanceof Lead) {
+                $leadId = $lead->getId();
+            } else {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
@@ -787,12 +794,7 @@ class CampaignModel extends CommonFormModel
                     $campaignLead->setManuallyRemoved(false);
                     $campaignLead->setManuallyAdded($manuallyAdded);
 
-                    try {
-                        $this->getRepository()->saveEntity($campaignLead);
-                    } catch (\Exception $exception) {
-                        $dispatchEvent = false;
-                        $this->logger->log('error', $exception->getMessage());
-                    }
+                    $dispatchEvent = $this->saveCampaignLead($campaignLead);
                 } else {
                     $this->em->detach($campaignLead);
                     if ($batchProcess) {
@@ -804,18 +806,13 @@ class CampaignModel extends CommonFormModel
                     continue;
                 }
             } else {
-                $campaignLead = new \Mautic\CampaignBundle\Entity\Lead();
+                $campaignLead = new CampaignLead();
                 $campaignLead->setCampaign($campaign);
                 $campaignLead->setDateAdded(new \DateTime());
                 $campaignLead->setLead($lead);
                 $campaignLead->setManuallyAdded($manuallyAdded);
 
-                try {
-                    $this->getRepository()->saveEntity($campaignLead);
-                } catch (\Exception $exception) {
-                    $dispatchEvent = false;
-                    $this->logger->log('error', $exception->getMessage());
-                }
+                $dispatchEvent = $this->saveCampaignLead($campaignLead);
             }
 
             if ($dispatchEvent && $this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_LEADCHANGE)) {
@@ -834,6 +831,26 @@ class CampaignModel extends CommonFormModel
         }
 
         unset($leadModel, $campaign, $leads);
+    }
+
+    /**
+     * Saves a campaign lead, logs the error if saving fails.
+     *
+     * @param CampaignLead $campaignLead
+     *
+     * @return bool
+     */
+    public function saveCampaignLead(CampaignLead $campaignLead)
+    {
+        try {
+            $this->getCampaignLeadRepository()->saveEntity($campaignLead);
+
+            return true;
+        } catch (\Exception $exception) {
+            $this->logger->log('error', $exception->getMessage());
+
+            return false;
+        }
     }
 
     /**
@@ -866,7 +883,9 @@ class CampaignModel extends CommonFormModel
         foreach ($leads as $lead) {
             $dispatchEvent = false;
 
-            if (!$lead instanceof Lead) {
+            if ($lead instanceof Lead) {
+                $leadId = $lead->getId();
+            } else {
                 $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
                 $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             }
@@ -1028,7 +1047,7 @@ class CampaignModel extends CommonFormModel
                     $this->addLeads($campaign, [$l], false, true, -1);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
-                    if ($output && $leadsProcessed < $maxCount) {
+                    if ($output && isset($progress) && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
 
@@ -1054,7 +1073,7 @@ class CampaignModel extends CommonFormModel
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
                     // done for this round, bye bye
-                    if ($output) {
+                    if (isset($progress)) {
                         $progress->finish();
                     }
 
@@ -1062,7 +1081,7 @@ class CampaignModel extends CommonFormModel
                 }
             }
 
-            if ($output) {
+            if ($output && isset($progress)) {
                 $progress->finish();
                 $output->writeln('');
             }
@@ -1114,7 +1133,7 @@ class CampaignModel extends CommonFormModel
                     $this->removeLeads($campaign, [$l], false, true, true);
                     $processedLeads[] = $l;
                     ++$leadsProcessed;
-                    if ($output && $leadsProcessed < $maxCount) {
+                    if (isset($progress) && $leadsProcessed < $maxCount) {
                         $progress->setProgress($leadsProcessed);
                     }
 
@@ -1140,13 +1159,16 @@ class CampaignModel extends CommonFormModel
 
                 if ($maxLeads && $leadsProcessed >= $maxLeads) {
                     // done for this round, bye bye
-                    $progress->finish();
+
+                    if (isset($progress)) {
+                        $progress->finish();
+                    }
 
                     return $leadsProcessed;
                 }
             }
 
-            if ($output) {
+            if ($output && isset($progress)) {
                 $progress->finish();
                 $output->writeln('');
             }
@@ -1212,7 +1234,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of leads added to campaigns.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -1242,7 +1264,7 @@ class CampaignModel extends CommonFormModel
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -1285,11 +1307,11 @@ class CampaignModel extends CommonFormModel
                             $failedSq->expr()->eq('fe.log_id', 't.id')
                         );
                     $filter['failed_events'] = [
-                        'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
+                        'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL()),
                     ];
 
-                    $q                  = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
-                    $rawData            = $q->execute()->fetchAll();
+                    $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                    $rawData = $q->execute()->fetchAll();
 
                     if (!empty($rawData)) {
                         $triggers = $query->completeTimeData($rawData);

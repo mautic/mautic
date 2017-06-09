@@ -363,6 +363,12 @@ class IntegrationHelper
             }
         }
 
+        foreach ($returnServices as $key => $value) {
+            if (!isset($value)) {
+                unset($returnServices[$key]);
+            }
+        }
+
         if (empty($alphabetical)) {
             // Sort by priority
             uasort($returnServices, function ($a, $b) {

@@ -57,10 +57,10 @@ class OutlookIntegration extends AbstractIntegration
     {
         if ('custom' === $section) {
             return [
-                'template' => 'MauticOutlookBundle:Integration:form.html.php',
+                'template'   => 'MauticOutlookBundle:Integration:form.html.php',
                 'parameters' => [
-                    'mauticUrl' => UrlHelper::rel2abs('/index.php')
-                ]
+                    'mauticUrl' => UrlHelper::rel2abs('/index.php'),
+                ],
             ];
         }
 

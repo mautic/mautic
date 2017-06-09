@@ -147,7 +147,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getAuthLoginUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
+        return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
     /**

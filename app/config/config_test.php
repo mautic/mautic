@@ -49,7 +49,7 @@ $container->loadFromExtension('doctrine', [
                 'driver'   => 'pdo_mysql',
                 'host'     => isset($_SERVER['DB_HOST']) ? $_SERVER['DB_HOST'] : '%mautic.db_host%',
                 'port'     => isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : '%mautic.db_port%',
-                'dbname'   => isset($_SERVER['DB_NAME']) ? $_SERVER['DB_NAME'] : 'mautic_test',
+                'dbname'   => isset($_SERVER['DB_NAME']) ? $_SERVER['DB_NAME'] : '%mautic.db_name%',
                 'user'     => isset($_SERVER['DB_USER']) ? $_SERVER['DB_USER'] : '%mautic.db_user%',
                 'password' => isset($_SERVER['DB_PASSWD']) ? $_SERVER['DB_PASSWD'] : '%mautic.db_password%',
                 'charset'  => 'UTF8',
