@@ -120,11 +120,13 @@ if ($tmpl == 'index') {
                         </div>
                     </td>
                     <td>
+                        <?php if (isset($fields['core']['companyeail'])): ?>
                         <div class="text-muted mt-4">
                             <small>
                                 <?php echo $fields['core']['companyemail']['value']; ?>
                             </small>
                         </div>
+                        <?php endif; ?>
                     </td>
 
                     <td class="visible-md visible-lg">
