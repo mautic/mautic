@@ -29,10 +29,25 @@ class MessengerType extends AbstractType
             'messenger_enabled',
             'yesno_button_group',
             [
-                'label' => 'mautic.notification.config.form.notification.enabled',
+                'label' => 'mautic.integration.messenger.enabled',
                 'attr'  => [
-                    'tooltip' => 'mautic.notification.config.form.notification.enabled.tooltip',
+                    'tooltip' => 'mautic.integration.messenger.enabled.tooltip',
                 ],
+            ]
+        );
+
+        $builder->add(
+            'messenger_callback_url',
+            'text',
+            [
+                'label' => 'mautic.integration.messenger.callback.url',
+                'attr'  => [
+                    'tooltip'      => 'mautic.integration.messenger.callback.url.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"integration_details_isPublished_1":"checked"}',
+                    'readonly' => 'readonly',
+                ],
+                'required'   => false,
             ]
         );
 
@@ -40,12 +55,14 @@ class MessengerType extends AbstractType
             'messenger_callback_verify_token',
             'text',
             [
-                'label' => 'mautic.notification.config.form.notification.subdomain_name',
+                'label' => 'mautic.integration.messenger.verify.token',
                 'attr'  => [
-                    'tooltip'      => 'mautic.notification.config.form.notification.subdomain_name.tooltip',
+                    'tooltip'      => 'mautic.integration.messenger.verify.token.tooltip',
                     'class'        => 'form-control',
                     'data-show-on' => '{"integration_details_isPublished_1":"checked"}',
+                    'readonly' => 'readonly',
                 ],
+                'required'   => false,
             ]
         );
 
@@ -54,13 +71,14 @@ class MessengerType extends AbstractType
             'messenger_page_access_token',
             'text',
             [
-                'label' => 'mautic.notification.config.form.notification.subdomain_name',
+                'label' => 'mautic.integration.messenger.page.access.token',
                 'attr'  => [
-                    'tooltip'      => 'mautic.notification.config.form.notification.subdomain_name.tooltip',
+                    'tooltip'      => 'mautic.integration.messenger.page.access.token.tooltip',
                     'class'        => 'form-control',
                     'data-show-on' => '{"integration_details_isPublished_1":"checked"}',
-
+                    'readonly' => 'readonly',
                 ],
+                'required'   => false,
             ]
         );
     }
