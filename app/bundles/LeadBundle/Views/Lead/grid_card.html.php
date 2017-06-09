@@ -30,8 +30,8 @@ $img = $view['lead_avatar']->getAvatar($contact);
             </div>
             <div class="col-xs-8 va-t">
                 <div class="panel-body">
-                    <?php if (in_array($contact->getId(), $noContactList)) : ?>
-                    <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
+                    <?php if (!$contact->getDoNotContact()->isEmpty()) : ?>
+                        <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                     <?php endif; ?>
                     <h4 class="fw-sb mb-xs ellipsis">
                         <a href="<?php echo $view['router']->path('mautic_contact_action',
