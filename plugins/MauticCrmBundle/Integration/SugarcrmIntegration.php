@@ -375,13 +375,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $result                                  = $this->getApiHelper()->getLeads($query, $sugarObject);
-                $params['offset']                        = $result['next_offset'];
+                $result           = $this->getApiHelper()->getLeads($query, $sugarObject);
+                $params['offset'] = $result['next_offset'];
                 if (isset($result['total_count'])) {
                     $count = $result['total_count'];
                 } //Sugar 6
                 else {
-                    $count                              = count($result['records']);
+                    $count = count($result['records']);
                 } //Sugar 7
                 $executed += $this->amendLeadDataBeforeMauticPopulate($result, $sugarObject);
                 if ($count > $params['offset']) {
@@ -653,13 +653,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if ($object !== 'Activity' and $object !== 'company') {
-                    $result                                  = $this->getApiHelper()->getLeads($query, $object);
-                    $params['offset']                        = $result['next_offset'];
+                    $result           = $this->getApiHelper()->getLeads($query, $object);
+                    $params['offset'] = $result['next_offset'];
                     if (isset($result['total_count'])) {
                         $count = $result['total_count'];
                     } //Sugar 6
                     else {
-                        $count                              = count($result['records']);
+                        $count = count($result['records']);
                     } //Sugar 7
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
                     if ($count > $params['offset']) {
