@@ -46,6 +46,8 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected function tearDown()
     {
+        static::$class = null;
+
         $this->em->close();
 
         parent::tearDown();
