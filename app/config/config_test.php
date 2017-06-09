@@ -46,8 +46,20 @@ $container->loadFromExtension('doctrine', [
         'default_connection' => 'default',
         'connections'        => [
             'default' => [
-                'driver' => 'pdo_sqlite',
-                'path'   => '%kernel.root_dir%/cache/test.db',
+                'driver'   => 'pdo_mysql',
+                'host'     => isset($_SERVER['DB_HOST']) ? $_SERVER['DB_HOST'] : '%mautic.db_host%',
+                'port'     => isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : '%mautic.db_port%',
+                'dbname'   => isset($_SERVER['DB_NAME']) ? $_SERVER['DB_NAME'] : 'mautic_test',
+                'user'     => isset($_SERVER['DB_USER']) ? $_SERVER['DB_USER'] : '%mautic.db_user%',
+                'password' => isset($_SERVER['DB_PASSWD']) ? $_SERVER['DB_PASSWD'] : '%mautic.db_password%',
+                'charset'  => 'UTF8',
+                // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
+                'mapping_types' => [
+                    'enum'  => 'string',
+                    'point' => 'string',
+                    'bit'   => 'string',
+                ],
+
             ],
         ],
     ],

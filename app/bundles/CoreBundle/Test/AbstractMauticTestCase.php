@@ -5,23 +5,17 @@ namespace Mautic\CoreBundle\Test;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Events;
 use Mautic\CoreBundle\Helper\CookieHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\InstallBundle\Helper\SchemaHelper;
-use Mautic\CoreBundle\Test\DoctrineExtensions\TablePrefix;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpFoundation\Response;
 
-abstract class MauticFunctionalTestCase extends WebTestCase
+abstract class AbstractMauticTestCase extends WebTestCase
 {
     /**
      * @var EntityManager
@@ -48,15 +42,6 @@ abstract class MauticFunctionalTestCase extends WebTestCase
         $this->em        = $this->container->get('doctrine')->getManager();
 
         $this->mockServices();
-
-        if (file_exists($this->getOriginalDatabasePath())) {
-            $this->createDatabaseFromFile();
-        } else {
-            $this->createDatabase();
-            $this->applyMigrations();
-            $this->installDatabaseFixtures();
-            $this->backupOrginalDatabase();
-        }
     }
 
     protected function tearDown()
@@ -109,45 +94,11 @@ abstract class MauticFunctionalTestCase extends WebTestCase
         $cookieHelper->expects($this->any())
             ->method('setCookie');
 
-        $templateHelper = $this->getMockBuilder(DelegatingEngine::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['renderResponse'])
-            ->getMock();
-
-        $templateHelper->expects($this->any())
-            ->method('renderResponse')
-            ->willReturnCallback(function () {
-                return new Response();
-            });
-
         $this->container->set('mautic.helper.cookie', $cookieHelper);
         $this->container->set('translator', $this->container->get('translator.default'));
-        //uncomment to develop tests faster
-//        $this->container->set('templating', $templateHelper);
     }
 
-    private function createDatabase()
-    {
-        // fix problem with prefixes in sqlite
-        $tablePrefix = new TablePrefix('prefix_');
-        $this->em->getEventManager()->addEventListener(Events::loadClassMetadata, $tablePrefix);
-
-        $dbParams = array_merge($this->container->get('doctrine')->getConnection()->getParams(), [
-            'table_prefix'  => null,
-            'backup_tables' => 0,
-        ]);
-
-        // create schema
-        $schemaHelper = new SchemaHelper($dbParams);
-        $schemaHelper->setEntityManager($this->em);
-
-        $schemaHelper->createDatabase();
-        $schemaHelper->installSchema();
-
-        $this->em->getConnection()->close();
-    }
-
-    private function applyMigrations()
+    protected function applyMigrations()
     {
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
@@ -157,7 +108,7 @@ abstract class MauticFunctionalTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    private function installDatabaseFixtures()
+    protected function installDatabaseFixtures()
     {
         $paths  = [dirname(__DIR__).'/../InstallBundle/InstallFixtures/ORM'];
         $loader = new ContainerAwareLoader($this->container);
@@ -180,25 +131,5 @@ abstract class MauticFunctionalTestCase extends WebTestCase
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_DELETE);
         $executor = new ORMExecutor($this->em, $purger);
         $executor->execute($fixtures, true);
-    }
-
-    private function createDatabaseFromFile()
-    {
-        copy($this->getOriginalDatabasePath(), $this->getDatabasePath());
-    }
-
-    private function backupOrginalDatabase()
-    {
-        copy($this->getDatabasePath(), $this->getOriginalDatabasePath());
-    }
-
-    private function getOriginalDatabasePath()
-    {
-        return $this->getDatabasePath().'.original';
-    }
-
-    private function getDatabasePath()
-    {
-        return $this->container->get('doctrine')->getConnection()->getParams()['path'];
     }
 }

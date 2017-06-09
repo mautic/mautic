@@ -13,8 +13,10 @@ namespace Mautic\CoreBundle\Test;
 
 //@TODO - fix entity detachment issue that is leading to failed tests
 
+use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-//use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -38,9 +40,14 @@ class MauticWebTestCase extends WebTestCase
     protected $encoder;
 
     /**
-     * @var
+     * @var ContainerInterface
      */
     protected $container;
+
+    /**
+     * @var ReferenceRepository
+     */
+    public $fixtures;
 
     protected function getClient(array $options = [], array $server = [])
     {
@@ -206,38 +213,13 @@ class MauticWebTestCase extends WebTestCase
         $requestStack->push($request);
         $this->container->set('request_stack', $requestStack);
 
-        $command = new \Mautic\CoreBundle\Command\InstallDataCommand();
-        $command->setContainer($this->container);
-
-        /*
-        $application = new Application(static::$kernel);
-        $doctrineCreate = new CreateSchemaDoctrineCommand();
-        $application->add($doctrineCreate);
-        $doctrineDrop = new DropSchemaDoctrineCommand();
-        $application->add($doctrineDrop);
-        $doctrineLoad = new LoadDataFixturesDoctrineCommand();
-        $application->add($doctrineLoad);
-        $command->setApplication($application);
-
-        //recreate the database
-        $input = new ArrayInput(array(
-            'command' => 'mautic:install:data',
-            '--env'   => 'test',
-            '--force' => true,
-            '--quiet' => true
-        ));
-        $output = new ConsoleOutput();
-        $command->run($input, $output);
-        */
-
-        $fixtures = $command->getMauticFixtures(true);
-        $executor = $this->loadFixtures($fixtures);
-
         //setup the entity manager
         $this->em = $this->container
             ->get('doctrine')->getManager();
         $this->encoder = $this->container
             ->get('security.encoder_factory');
+
+        $this->setupDatabaseOnFirstRun();
     }
 
     /**
@@ -246,7 +228,85 @@ class MauticWebTestCase extends WebTestCase
     protected function tearDown()
     {
         parent::tearDown();
-        $this->em->close();
+
+        if ($this->em) {
+            $this->em->close();
+        }
         unset($this->em, $this->container, $this->client, $this->encoder);
+    }
+
+    /**
+     * TODO: Backup the database after creation, and store in cache dir to reimport between test.
+     */
+    protected function setupDatabaseOnFirstRun()
+    {
+        $this->runCommand('doctrine:schema:drop', [
+            '--env'   => 'test',
+            '--force' => true,
+            '--quiet' => true,
+        ], true);
+
+        $this->runCommand('doctrine:schema:create', [
+            '--env'   => 'test',
+            '--quiet' => true,
+        ], true);
+
+        $this->em->getConnection()->query('SET GLOBAL FOREIGN_KEY_CHECKS = 0;');
+
+        $this->fixtures = $this->loadFixtures($this->getMauticFixtures(true))->getReferenceRepository();
+
+        $this->em->getConnection()->query('SET GLOBAL FOREIGN_KEY_CHECKS = 1;');
+    }
+
+    /**
+     * Returns Mautic fixtures.
+     *
+     * @param bool $returnClassNames
+     *
+     * @return array
+     */
+    private function getMauticFixtures($returnClassNames = false)
+    {
+        $fixtures      = [];
+        $mauticBundles = $this->container->getParameter('mautic.bundles');
+        foreach ($mauticBundles as $bundle) {
+            $fixturesDir = $bundle['directory'].'/DataFixtures/ORM';
+
+            if (file_exists($fixturesDir)) {
+                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\DataFixtures\\ORM\\';
+                $this->populateFixturesFromDirectory($fixturesDir, $fixtures, $classPrefix, $returnClassNames);
+            }
+
+            $testFixturesDir = $bundle['directory'].'/Tests/DataFixtures/ORM';
+
+            if (MAUTIC_TEST_ENV && file_exists($testFixturesDir)) {
+                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\Tests\\DataFixtures\\ORM\\';
+                $this->populateFixturesFromDirectory($testFixturesDir, $fixtures, $classPrefix, $returnClassNames);
+            }
+        }
+
+        return $fixtures;
+    }
+
+    /**
+     * @param string $fixturesDir
+     * @param array  $fixtures
+     * @param string $classPrefix
+     * @param bool   $returnClassNames
+     */
+    private function populateFixturesFromDirectory($fixturesDir, array &$fixtures, $classPrefix = null, $returnClassNames = false)
+    {
+        if ($returnClassNames) {
+            //get files within the directory
+            $finder = new Finder();
+            $finder->files()->in($fixturesDir)->name('*.php');
+            foreach ($finder as $file) {
+                //add the file to be loaded
+                $class      = str_replace('.php', '', $file->getFilename());
+                $fixtures[] = $classPrefix.$class;
+            }
+        } else {
+            $fixtures[] = $fixturesDir;
+        }
     }
 }

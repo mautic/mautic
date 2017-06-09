@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive;
 
-use Mautic\CoreBundle\Test\MauticFunctionalTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
@@ -15,7 +15,7 @@ use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-abstract class PipedriveTest extends MauticFunctionalTestCase
+abstract class PipedriveTest extends MauticMysqlTestCase
 {
     const WEBHOOK_USER     = 'user';
     const WEBHOOK_PASSWORD = 'pa$$word';
