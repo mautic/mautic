@@ -320,6 +320,12 @@ class WebhookModel extends FormModel
 
             // throw an error exception if we don't get a 200 back
             if ($response->code >= 300 && $response->code < 200) {
+
+                // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
+                if ($response->code == 410) {
+                    $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
+                }
+
                 throw new \ErrorException($webhook->getWebhookUrl().' returned '.$response->code);
             }
         } catch (\Exception $e) {
@@ -389,7 +395,7 @@ class WebhookModel extends FormModel
      *
      * @param Webhook $webhook
      */
-    public function killWebhook(Webhook $webhook)
+    public function killWebhook(Webhook $webhook, $reason = 'mautic.webhook.stopped.reason')
     {
         $webhook->setIsPublished(false);
         $this->saveEntity($webhook);
@@ -398,6 +404,7 @@ class WebhookModel extends FormModel
             $this->translator->trans(
                 'mautic.webhook.stopped.details',
                 [
+                    '%reason%'  => $this->translator->trans($reason),
                     '%webhook%' => '<a href="'.$this->router->generate(
                         'mautic_webhook_action',
                         ['objectAction' => 'view', 'objectId' => $webhook->getId()]
@@ -406,7 +413,10 @@ class WebhookModel extends FormModel
             ),
             'error',
             false,
-            $this->translator->trans('mautic.webhook.stopped')
+            $this->translator->trans('mautic.webhook.stopped'),
+            null,
+            null,
+            $this->em->getReference('MauticUserBundle:User', $webhook->getCreatedBy())
         );
     }
 

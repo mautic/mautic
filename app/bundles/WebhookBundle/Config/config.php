@@ -77,9 +77,6 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
-            'mautic.webhook.serialize.subscriber' => [
-                'class' => \Mautic\WebhookBundle\EventListener\SerializeSubscriber::class,
-            ],
         ],
         'models' => [
             'mautic.webhook.model.webhook' => [
