@@ -97,7 +97,7 @@ class SugarcrmApi extends CrmApi
 
             $response = $this->request('metadata', $parameters, 'GET', $object);
 
-            return $response['modules']['Leads'];
+            return $response['modules'][$object];
         }
     }
 
@@ -452,28 +452,29 @@ class SugarcrmApi extends CrmApi
     public function getLeads($query, $object)
     {
         $tokenData = $this->integration->getKeys();
-        if ($tokenData['version'] == '6') {
-            $data   = ['filter' => 'all'];
-            $fields = $this->integration->getIntegrationSettings()->getFeatureSettings();
+        $data      = ['filter' => 'all'];
+        $fields    = $this->integration->getIntegrationSettings()->getFeatureSettings();
 
-            switch ($object) {
-                case 'company':
-                case 'Account':
-                case 'Accounts':
-                    $fields = array_keys(array_filter($fields['companyFields']));
-                    break;
-                default:
-                    $mixedFields = array_filter($fields['leadFields']);
-                    $fields      = [];
-                    foreach ($mixedFields as $sugarField => $mField) {
-                        if (strpos($sugarField, '__'.$object) !== false) {
-                            $fields[] = str_replace('__'.$object, '', $sugarField);
-                        }
-                        if (strpos($sugarField, '-'.$object) !== false) {
-                            $fields[] = str_replace('-'.$object, '', $sugarField);
-                        }
+        switch ($object) {
+            case 'company':
+            case 'Account':
+            case 'Accounts':
+                $fields = array_keys(array_filter($fields['companyFields']));
+                break;
+            default:
+                $mixedFields = array_filter($fields['leadFields']);
+                $fields      = [];
+                foreach ($mixedFields as $sugarField => $mField) {
+                    if (strpos($sugarField, '__'.$object) !== false) {
+                        $fields[] = str_replace('__'.$object, '', $sugarField);
                     }
-            }
+                    if (strpos($sugarField, '-'.$object) !== false) {
+                        $fields[] = str_replace('-'.$object, '', $sugarField);
+                    }
+                }
+        }
+
+        if ($tokenData['version'] == '6') {
             $result = [];
 
             if (!empty($fields)) {
@@ -538,8 +539,59 @@ class SugarcrmApi extends CrmApi
                 return $resp;
             }
         } else {
-            //TODO : not implemented
-            return null;
+            if (!empty($fields)) {
+                $q      = '';
+                $qry    = [];
+                $filter = [];
+                if (isset($query['start'])) {
+                    $filter[] = ['date_modified' => ['$gte' => $query['start']]];
+                    //$qry[] = ' '.strtolower($object).".date_modified >= '".$query['start']."' ";
+                }
+                if (isset($query['end'])) {
+                    $filter[] = ['date_modified' => ['$lte' => $query['end']]];
+                    //$qry[] = ' '.strtolower($object).".date_modified <= '".$query['end']."' ";
+                }
+                if (isset($query['email'])) {
+                    $filter[] = ['email' => ['$equals' => $query['email']]];
+                    //$qry[]    = " leads.id IN (SELECT bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (eabr.email_address_id = ea.id) WHERE bean_module = 'Leads' AND ea.email_address = '".$query['email']."' AND eabr.deleted=0) ";
+                    $fields[] = 'contact_id';
+                }
+                if (isset($query['checkemail'])) {
+                    $filter[] = ['email' => ['$in' => $query['checkemail']]];
+                    $filter[] = ['deleted' => '0'];
+                    $fields   = []; //Do not need previous fields
+                    $fields[] = 'contact_id';
+                    $fields[] = 'deleted';
+                }
+                if (isset($query['checkemail_contacts'])) {
+                    $filter[] = ['email' => ['$in' => $query['checkemail_contacts']]];
+                    $filter[] = ['deleted' => '0'];
+                    $fields   = []; //Do not need previous fields
+                    $fields[] = 'deleted';
+                }
+                $fields[] = 'id';
+                $fields[] = 'date_modified';
+                $fields[] = 'date_entered';
+                $fields[] = 'assigned_user_id';
+                $fields[] = 'email1';
+                if ($object != 'Accounts') {
+                    $fields[] = 'account_id';
+                }
+                $filter_args = ['filter' => [['$and' => $filter]]];
+                $fields_arg  = implode(',', $fields);
+                $parameters  = [
+//                     'order_by'                 => '',
+                     'filter' => ['filter' => [['$and' => $filter]]],
+                     'offset' => $query['offset'],
+                    'fields'  => implode(',', $fields),
+                    'max_num' => $query['max_results'],
+                    //'deleted'     => 0,
+                    //'favorites'   => false,
+                ];
+                $resp = $this->request("$object/filter", $parameters, 'POST', $object);
+
+                return $resp;
+            }
         }
     }
 }
