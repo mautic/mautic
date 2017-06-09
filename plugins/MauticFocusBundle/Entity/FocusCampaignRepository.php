@@ -35,7 +35,7 @@ class FocusCampaignRepository extends CommonRepository
         return (!empty($result)) ? true : false;
     }
 
-    public function campaignLeadInFocus($focusId, $leadId)
+    public function focusCampaignLeadFocus($focusId, $leadId)
     {
         $q = $this->createQueryBuilder('f');
         $q->select('f')
@@ -43,10 +43,21 @@ class FocusCampaignRepository extends CommonRepository
             ->andWhere('f.lead = :leadId')
             ->setParameter('focusId', $focusId)
             ->setParameter('leadId', $leadId);
+    }
 
+    public function campaignLeadInFocus($focusId, $leadId)
+    {
+        $q      = $this->focusCampaignLeadFocus($focusId, $leadId);
         $result = $q->getQuery()->getResult();
 
         return (!empty($result)) ? true : false;
+    }
+
+    public function eventLogFromFocusLeads($focusid, $leadid)
+    {
+        $result = $this->findOneBy(['focus' => $focusid, 'lead' => $leadid], ['id' => 'DESC']);
+
+        return (!empty($result) && is_object($result)) ? $result->getLeadEventLog() : false;
     }
 
     /**

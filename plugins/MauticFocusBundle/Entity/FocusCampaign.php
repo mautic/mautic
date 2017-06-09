@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -42,6 +43,11 @@ class FocusCampaign
     private $lead;
 
     /**
+     * @var \Mautic\CampaignBundle\Entity\LeadEventLog
+     */
+    private $leadeventlog;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -64,6 +70,10 @@ class FocusCampaign
         $builder->createManyToOne('lead', 'Mautic\LeadBundle\Entity\Lead')
             ->addJoinColumn('lead_id', 'id', true, false, 'CASCADE')
             ->build();
+
+        $builder->createManyToOne('leadeventlog', 'Mautic\CampaignBundle\Entity\LeadEventLog')
+            ->addJoinColumn('leadeventlog_id', 'id', true, false, 'CASCADE')
+            ->build();
     }
 
     /**
@@ -79,6 +89,7 @@ class FocusCampaign
                     'id',
                     'focus',
                     'campaign',
+                    'leadeventlog',
                 ]
             )
             ->build();
@@ -138,5 +149,21 @@ class FocusCampaign
     public function setLead(Lead $lead)
     {
         $this->lead = $lead;
+    }
+
+    /**
+     * @return LeadEventLog
+     */
+    public function getLeadEventLog()
+    {
+        return $this->leadeventlog;
+    }
+
+    /**
+     * @param LeadEventLog
+     */
+    public function setLeadEventLog(LeadEventLog $leadeventlog)
+    {
+        $this->leadeventlog = $leadeventlog;
     }
 }
