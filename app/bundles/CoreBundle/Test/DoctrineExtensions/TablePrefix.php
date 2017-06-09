@@ -1,4 +1,5 @@
 <?php
+
 namespace Mautic\CoreBundle\Test\DoctrineExtensions;
 
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
@@ -45,12 +46,11 @@ class TablePrefix
             return;
         }
 
-        $indexes = &$table[$key];
+        $indexes    = &$table[$key];
         $newIndexes = [];
 
-        foreach ($indexes as $name => $index)
-        {
-            $newName = uniqid($prefix . $name);
+        foreach ($indexes as $name => $index) {
+            $newName              = uniqid($prefix.$name);
             $newIndexes[$newName] = $index;
         }
 

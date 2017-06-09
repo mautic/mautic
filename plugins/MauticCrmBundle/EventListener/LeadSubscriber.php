@@ -51,7 +51,7 @@ class LeadSubscriber extends CommonSubscriber
     {
         return [
             LeadEvents::LEAD_POST_SAVE      => ['onLeadPostSave', 0],
-            LeadEvents::LEAD_PRE_DELETE    => ['onLeadPostDelete', 255],
+            LeadEvents::LEAD_PRE_DELETE     => ['onLeadPostDelete', 255],
             LeadEvents::LEAD_COMPANY_CHANGE => ['onLeadCompanyChange', 0],
         ];
     }

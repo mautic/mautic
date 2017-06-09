@@ -10,7 +10,7 @@ class PipedriveControllerTest extends PipedriveTest
     {
         $this->makeRequest('POST', []);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
         $this->assertSame(200, $response->getStatusCode());
@@ -23,7 +23,7 @@ class PipedriveControllerTest extends PipedriveTest
 
         $this->makeRequest('POST', []);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
         $this->assertSame(200, $response->getStatusCode());

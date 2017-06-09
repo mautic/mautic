@@ -3,38 +3,34 @@
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Import;
 
 use Mautic\LeadBundle\Entity\Company;
-use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 
 class CompanyTest extends PipedriveTest
 {
     private $features = [
         'objects' => [
-            'company'
+            'company',
         ],
         'companyFields' => [
-            'name' => 'companyname',
+            'name'    => 'companyname',
             'address' => 'companyaddress1',
-        ]
+        ],
     ];
 
     public function testCreateCompanyWhenFeatureIsDisabled()
     {
         $this->installPipedriveIntegration(true, [
             'companyFields' => [
-                'name' => 'companyname',
+                'name'    => 'companyname',
                 'address' => 'companyaddress1',
-            ]
+            ],
         ]);
 
         $data = $this->getData('organization.added');
 
         $this->makeRequest('POST', $data);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
         $this->assertSame(200, $response->getStatusCode());
@@ -49,9 +45,9 @@ class CompanyTest extends PipedriveTest
 
         $this->makeRequest('POST', $data);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $company = $this->em->getRepository(Company::class)->find(1);
+        $company      = $this->em->getRepository(Company::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertEquals($responseData['status'], 'ok');
@@ -79,9 +75,9 @@ class CompanyTest extends PipedriveTest
 
         $this->makeRequest('POST', $data);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $c = $this->em->getRepository(Company::class)->find(1);
+        $c            = $this->em->getRepository(Company::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertEquals($responseData['status'], 'ok');
@@ -103,9 +99,9 @@ class CompanyTest extends PipedriveTest
 
         $this->makeRequest('POST', $json);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $company = $this->em->getRepository(Company::class)->find(1);
+        $company      = $this->em->getRepository(Company::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertEquals($responseData['status'], 'ok');
@@ -123,9 +119,9 @@ class CompanyTest extends PipedriveTest
         $json = $this->getData('organization.updated');
         $data = json_decode($json, true);
 
-        $company = $this->createCompany();
+        $company  = $this->createCompany();
         $newOwner = $this->createUser(true, 'admin@admin.pl');
-        $owner = $this->createUser(true, 'test@test.pl', 'user');
+        $owner    = $this->createUser(true, 'test@test.pl', 'user');
 
         $this->createCompanyIntegrationEntity($data['current']['id'], $company->getId());
         $this->addOwnerToCompany($owner, $company);
@@ -135,9 +131,9 @@ class CompanyTest extends PipedriveTest
 
         $this->makeRequest('POST', $json);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $c = $this->em->getRepository(Company::class)->find(1);
+        $c            = $this->em->getRepository(Company::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertEquals($responseData['status'], 'ok');
@@ -152,15 +148,15 @@ class CompanyTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(true, $this->features);
         $company = $this->createCompany();
-        $json = $this->getData('organization.updated');
-        $data = json_decode($json, true);
+        $json    = $this->getData('organization.updated');
+        $data    = json_decode($json, true);
         $this->createCompanyIntegrationEntity($data['current']['id'], $company->getId());
 
         $this->makeRequest('POST', $json);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $c = $this->em->getRepository(Company::class)->find(1);
+        $c            = $this->em->getRepository(Company::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertEquals($responseData['status'], 'ok');
@@ -173,15 +169,15 @@ class CompanyTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(true, $this->features);
         $company = $this->createCompany();
-        $json = $this->getData('organization.deleted');
-        $data = json_decode($json, true);
+        $json    = $this->getData('organization.deleted');
+        $data    = json_decode($json, true);
         $this->createCompanyIntegrationEntity($data['previous']['id'], $company->getId());
 
         $this->assertEquals(count($this->em->getRepository(Company::class)->findAll()), 1);
 
         $this->makeRequest('POST', $json);
 
-        $response = $this->client->getResponse();
+        $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
         $this->assertSame(200, $response->getStatusCode());

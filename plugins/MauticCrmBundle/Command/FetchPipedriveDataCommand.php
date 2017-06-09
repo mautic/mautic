@@ -31,55 +31,56 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
-        $this->io = new SymfonyStyle($input, $output);
+        $this->io  = new SymfonyStyle($input, $output);
 
         $integrationHelper = $container->get('mautic.helper.integration');
         $integrationObject = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
         if (!$integrationObject->getIntegrationSettings()->getIsPublished()) {
             $this->io->note('Pipedrive integration id disabled.');
+
             return;
         }
 
         $types = [
             'owner' => PipedriveApi::USERS_API_ENDPOINT,
-            'lead' => PipedriveApi::PERSONS_API_ENDPOINT
+            'lead'  => PipedriveApi::PERSONS_API_ENDPOINT,
         ];
 
         if ($integrationObject->isCompanySupportEnabled()) {
             $types = ['company' => PipedriveApi::ORGANIZATIONS_API_ENDPOINT] + $types;
-
         }
 
-        foreach($types as $type => $endPoint) {
+        foreach ($types as $type => $endPoint) {
             $this->getData($type, $endPoint, $integrationObject);
         }
 
-        $this->io->success('Execution time: ' . number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+        $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
     }
 
-    private function getData($type, $endPoint, $integrationObject) {
+    private function getData($type, $endPoint, $integrationObject)
+    {
         $container = $this->getContainer();
-        $this->io->title('Pulling ' . $type);
+        $this->io->title('Pulling '.$type);
         $start = 0;
         $limit = 500;
 
-        while(true) {
+        while (true) {
             $query = [
                 'start' => $start,
-                'limit' => $limit
+                'limit' => $limit,
             ];
-            $service = $container->get('mautic_integration.pipedrive.import.' . $type);
+            $service = $container->get('mautic_integration.pipedrive.import.'.$type);
             $service->setIntegration($integrationObject);
 
             try {
                 $result = $service->getData($query, $endPoint);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 return;
             }
 
-            $this->io->text('Pulled ' . $result['processed']);
-            $this->io->note('Using ' . memory_get_peak_usage(1)/1000000 . ' megabytes of ram.');
+            $this->io->text('Pulled '.$result['processed']);
+            $this->io->note('Using '.memory_get_peak_usage(1) / 1000000 .' megabytes of ram.');
 
             if (!$result['more_items_in_collection']) {
                 return;

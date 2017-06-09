@@ -93,12 +93,6 @@ return [
                 ],
             ],
         ],
-        'forms' => [
-            'mautic_integration.form.type.integration.owners.fields' => [
-                'class' => 'MauticPlugin\MauticCrmBundle\Form\Type\OwnerFieldsType',
-                'alias' => 'integration_owner_fields',
-            ],
-        ],
         'other' => [
             'mautic_integration.pipedrive.guzzle.client' => [
                 'class' => 'GuzzleHttp\Client',

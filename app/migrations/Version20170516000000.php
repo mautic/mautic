@@ -20,7 +20,7 @@ class Version20170516000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        $em = $this->container->get('doctrine')->getManager();
+        $em        = $this->container->get('doctrine')->getManager();
         $leadField = $em->getRepository(LeadField::class)->findOneByAlias('points');
 
         if ($leadField) {

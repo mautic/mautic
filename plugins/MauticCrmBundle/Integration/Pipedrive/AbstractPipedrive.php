@@ -72,7 +72,6 @@ abstract class AbstractPipedrive
     private function createIntegrationEntity($date, $integrationEntityId, $internalEntityId, $integrationEntityName, $internalEntityName)
     {
         $integrationEntity = new IntegrationEntity();
-
         $integrationEntity->setDateAdded($date);
         $integrationEntity->setLastSyncDate($date);
         $integrationEntity->setIntegration($this->getIntegration()->getName());
