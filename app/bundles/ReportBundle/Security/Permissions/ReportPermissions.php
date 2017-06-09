@@ -24,6 +24,12 @@ class ReportPermissions extends AbstractPermissions
      */
     public function __construct($params)
     {
+        $this->permissions = [
+            'batch' => [
+                'export' => 4,
+                'full'   => 1024,
+            ],
+        ];
         parent::__construct($params);
         $this->addExtendedPermissions('reports');
     }
@@ -42,5 +48,15 @@ class ReportPermissions extends AbstractPermissions
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addExtendedFormFields('report', 'reports', $builder, $data);
+
+        $builder->add('report:batch', 'permissionlist', [
+            'choices' => [
+                'export'   => 'mautic.core.permissions.export',
+            ],
+            'label'  => 'mautic.report.permissions.batch',
+            'data'   => (!empty($data['batch']) ? $data['batch'] : []),
+            'bundle' => 'form',
+            'level'  => 'batch',
+        ]);
     }
 }
