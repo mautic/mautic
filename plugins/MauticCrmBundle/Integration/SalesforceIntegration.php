@@ -1061,6 +1061,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             // If there is still room - grab Mautic leads to create if the Lead object is enabled
+            $sfEntityRecords = [];
             if ('Lead' === $sfObject && (null === $limit || $limit > 0) && !empty($mauticLeadFieldString)) {
                 try {
                     $sfEntityRecords = $this->getMauticContactsToCreate(
