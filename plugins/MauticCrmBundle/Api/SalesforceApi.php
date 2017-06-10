@@ -43,14 +43,9 @@ class SalesforceApi extends CrmApi
         if (!$object) {
             $object = $this->object;
         }
-        if (!$queryUrl) {
-            $queryUrl   = $this->integration->getApiUrl();
-            $requestUrl = sprintf($queryUrl.'/%s/%s', $object, $operation);
-        } else {
-            $requestUrl = sprintf($queryUrl.'/%s', $operation);
-        }
 
-        $settings = $this->requestSettings;
+        $requestUrl = (!$queryUrl) ? sprintf($this->integration->getApiUrl().'/%s/%s', $object, $operation) : sprintf($queryUrl.'/%s', $operation);
+        $settings   = $this->requestSettings;
         if ($method == 'PATCH') {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
