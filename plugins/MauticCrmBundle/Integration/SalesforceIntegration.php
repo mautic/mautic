@@ -383,6 +383,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         if (isset($data['records']) and $object !== 'Activity') {
             foreach ($data['records'] as $record) {
+                if (isset($params['progress'])) {
+                    $params['progress']->advance();
+                }
+
                 $this->persistIntegrationEntities = [];
                 if (isset($record['attributes']['type']) && $record['attributes']['type'] == 'Account') {
                     $newName = '';
@@ -686,6 +690,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 $executed[0] += $justUpdated;
                 $executed[1] += $justCreated;
+
                 if (isset($result['nextRecordsUrl'])) {
                     $query['nextUrl'] = $result['nextRecordsUrl'];
                     $this->getLeads($params, $query, $executed, $result['records'], $object);
@@ -977,6 +982,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function pushLeads($params = [])
     {
         $limit                 = (isset($params['limit'])) ? $params['limit'] : 100;
+        $fromDate              = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
+            : null;
+        $toDate                = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
+            : null;
         $config                = $this->mergeConfigToFeatureSettings($params);
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
 
@@ -995,11 +1004,24 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $progress      = false;
 
         // Get a total number of contacts to be updated and/or created for the progress counter
-        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Salesforce', 'lead', $mauticLeadFieldString, false, $supportedObjects));
+        $totalToUpdate = array_sum(
+            $integrationEntityRepo->findLeadsToUpdate(
+                'Salesforce',
+                'lead',
+                $mauticLeadFieldString,
+                false,
+                $fromDate,
+                $toDate,
+                $supportedObjects,
+                []
+            )
+        );
         $totalToCreate = (in_array('Lead', $supportedObjects)) ? $integrationEntityRepo->findLeadsToCreate(
             'Salesforce',
             $mauticLeadFieldString,
-            false
+            false,
+            $fromDate,
+            $toDate
         ) : 0;
         $totalCount    = $totalToCreate + $totalToUpdate;
 
@@ -1042,6 +1064,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $sfObject,
                     $trackedContacts,
                     $limit,
+                    $fromDate,
+                    $toDate,
                     $totalCount
                 );
 
@@ -1054,6 +1078,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $sfObject,
                         $trackedContacts,
                         $limit,
+                        $fromDate,
+                        $toDate,
                         $totalCount
                     );
                 }
@@ -1073,6 +1099,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $requiredFields,
                         $mauticLeadFieldString,
                         $limit,
+                        $fromDate,
+                        $toDate,
                         $totalCount,
                         $progress
                     );
@@ -1590,12 +1618,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param   $checkEmailsInSF
-     * @param   $mauticLeadFieldString
-     * @param   $sfObject
-     * @param   $trackedContacts
-     * @param   $limit
-     * @param   $totalCount
+     * @param $checkEmailsInSF
+     * @param $mauticLeadFieldString
+     * @param $sfObject
+     * @param $trackedContacts
+     * @param $limit
+     * @param $fromDate
+     * @param $toDate
+     * @param $totalCount
      *
      * @return bool
      */
@@ -1605,6 +1635,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$sfObject,
         &$trackedContacts,
         $limit,
+        $fromDate,
+        $toDate,
         &$totalCount
     ) {
         // Fetch them separately so we can determine if Leads are already Contacts
@@ -1613,6 +1645,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
             'lead',
             $mauticLeadFieldString,
             $limit,
+            $fromDate,
+            $toDate,
             $sfObject
         )[$sfObject];
 
@@ -1650,6 +1684,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param      $requiredFields
      * @param      $mauticLeadFieldString
      * @param      $limit
+     * @param      $fromDate
+     * @param      $toDate
      * @param      $totalCount
      * @param null $progress
      *
@@ -1661,11 +1697,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $requiredFields,
         $mauticLeadFieldString,
         $limit,
+        $fromDate,
+        $toDate,
         &$totalCount,
         $progress = null
     ) {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
-        $leadsToCreate         = $integrationEntityRepo->findLeadsToCreate('Salesforce', $mauticLeadFieldString, $limit);
+        $leadsToCreate         = $integrationEntityRepo->findLeadsToCreate(
+            'Salesforce',
+            $mauticLeadFieldString,
+            $limit,
+            $fromDate,
+            $toDate
+        );
         $totalCount            -= count($leadsToCreate);
         $foundContacts         = [];
 
@@ -2405,8 +2449,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $mappedData[$object]['create'] = $this->populateLeadData(
                     $lead,
                     [
-                        'leadFields' => $fieldMapping[$object]['create'], // map with all fields available
-                        'object' => $object,
+                        'leadFields'       => $fieldMapping[$object]['create'], // map with all fields available
+                        'object'           => $object,
                         'feature_settings' => [
                             'objects' => $config['objects']
                         ]

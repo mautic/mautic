@@ -12,6 +12,7 @@
 namespace Mautic\PluginBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -110,6 +111,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
+                        $progress = new ProgressBar($output);
+                        $params['progress'] = $progress;
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
                         $updated = $created = $processed = 0;
@@ -133,7 +136,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                                 $processed += intval($results);
                             }
                         }
-
+                        $progress->finish();
+                        $output->writeln('');
                         if ($processed) {
                             $output->writeln(
                                 '<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed])
@@ -165,6 +169,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
 
                 if (strtotime($startDate) > strtotime('-30 days')) {
+                    $progress = new ProgressBar($output);
+                    $params['progress'] = $progress;
                     $results = $integrationObject->getCompanies($params);
                     if (is_array($results)) {
                         list($justUpdated, $justCreated) = $results;
@@ -173,7 +179,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     } else {
                         $processed += intval($results);
                     }
-
+                    $progress->finish();
+                    $output->writeln('');
                     if ($processed) {
                         $output->writeln(
                             '<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed])

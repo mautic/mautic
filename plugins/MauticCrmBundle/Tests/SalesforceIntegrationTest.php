@@ -682,7 +682,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function () use ($max, $specificObject, $maxSfContacts, $maxSfLeads) {
                         $args = func_get_args();
-                        $object = $args[4];
+                        $object = $args[6];
 
                         // determine whether to return a count or records
                         $results = [];

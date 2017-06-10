@@ -129,19 +129,22 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param $integration
-     * @param $internalEntity
-     * @param $leadFields
-     * @param $limit
-     * @param $excludeIntegrationIds
-     *
-     * @return array
+     * @param       $integration
+     * @param       $internalEntity
+     * @param       $leadFields
+     * @param int   $limit
+     * @param null  $fromDate
+     * @param null  $toDate
+     * @param array $integrationEntity
+     * @param array $excludeIntegrationIds
      */
     public function findLeadsToUpdate(
         $integration,
         $internalEntity,
         $leadFields,
         $limit = 25,
+        $fromDate = null,
+        $toDate = null,
         $integrationEntity = ['Contact', 'Lead'],
         $excludeIntegrationIds = []
     ) {
@@ -191,10 +194,43 @@ class IntegrationEntityRepository extends CommonRepository
             );
         }
 
-        $q->andWhere($q->expr()->isNotNull('i.integration_entity_id'))
-            ->andWhere(
-                '((i.last_sync_date is not null and l.date_modified > i.last_sync_date) or (i.last_sync_date is null and l.date_modified > i.date_added)) and l.email is not null'
+        $q->andWhere(
+                $q->expr()->andX(
+                    $q->expr()->isNotNull('i.integration_entity_id'),
+                    $q->expr()->isNotNull('l.email'),
+                    $q->expr()->orX(
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('i.last_sync_date'),
+                            $q->expr()->gt('l.date_modified', 'i.last_sync_date')
+                        ),
+                        $q->expr()->andX(
+                            $q->expr()->isNull('i.last_sync_date'),
+                            $q->expr()->isNotNull('l.date_modified'),
+                            $q->expr()->gt('l.date_modified', 'l.date_added')
+                        )
+                    )
+                )
             );
+
+        if ($fromDate) {
+            if ($toDate) {
+                $q->andWhere(
+                    $q->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
+                )
+                    ->setParameter('dateFrom', $fromDate)
+                    ->setParameter('dateTo', $toDate);
+            } else {
+                $q->andWhere(
+                    $q->expr()->gte('l.date_modified', ':dateFrom')
+                )
+                    ->setParameter('dateFrom', $fromDate);
+            }
+        } elseif ($toDate) {
+            $q->andWhere(
+                $q->expr()->lte('l.date_modified', ':dateTo')
+            )
+                ->setParameter('dateTo', $toDate);
+        }
 
         // Group by email to prevent duplicates from affecting this
         if (false === $limit and $integrationEntity) {
@@ -230,12 +266,15 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param $integration
-     * @param $leadFields
+     * @param      $integration
+     * @param      $leadFields
+     * @param int  $limit
+     * @param null $fromDate
+     * @param null $toDate
      *
-     * @return array
+     * @return array|int
      */
-    public function findLeadsToCreate($integration, $leadFields, $limit = 25)
+    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
@@ -256,6 +295,26 @@ class IntegrationEntityRepository extends CommonRepository
 
         if ($limit) {
             $q->setMaxResults($limit);
+        }
+
+        if ($fromDate) {
+            if ($toDate) {
+                $q->andWhere(
+                    $q->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                )
+                    ->setParameter('dateFrom', $fromDate)
+                    ->setParameter('dateTo', $toDate);
+            } else {
+                $q->andWhere(
+                    $q->expr()->gte('l.date_added', ':dateFrom')
+                )
+                    ->setParameter('dateFrom', $fromDate);
+            }
+        } elseif ($toDate) {
+            $q->andWhere(
+                $q->expr()->lte('l.date_added', ':dateTo')
+            )
+                ->setParameter('dateTo', $toDate);
         }
 
         $results = $q->execute()->fetchAll();
