@@ -236,7 +236,7 @@ class FocusModel extends FormModel
                     $focus['id']
                 );
 
-                $url = $this->trackableModel->generateTrackableUrl($trackable, ['channel' => ['focus', $focus['id']]], false, $focusModel->getUtmTagsForUrl());
+                $url = $this->trackableModel->generateTrackableUrl($trackable, ['channel' => ['focus', $focus['id']]], false, $focusModel->getUtmTags());
             }
 
             $content = $this->templating->getTemplating()->render(

@@ -214,7 +214,7 @@ class FocusSubscriber extends CommonSubscriber
              * @var Trackable $trackable
              */
             foreach ($trackables as $token => $trackable) {
-                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $focus->getUtmTagsForUrl());
+                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $focus->getUtmTags());
             }
 
             $content = str_replace(array_keys($tokens), array_values($tokens), $content);

@@ -435,20 +435,7 @@ class Focus extends FormEntity
     {
         return $this->utmTags;
     }
-    /**
-     * Generate UTMs params.
-     *
-     * @return array
-     */
-    public function getUtmTagsForUrl()
-    {
-        $utmTags = [];
-        foreach ($this->utmTags as $utmTag => $value) {
-            $utmTags[str_replace('utm', 'utm_', strtolower($utmTag))] = $value;
-        }
 
-        return $utmTags;
-    }
     /**
      * @param array $utmTags
      */
