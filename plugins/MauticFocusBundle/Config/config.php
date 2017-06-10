@@ -28,25 +28,25 @@ return [
         ],
         'public' => [
             'mautic_focus_generate' => [
-                'path' => '/focus/{id}.js',
+                'path'       => '/focus/{id}.js',
                 'controller' => 'MauticFocusBundle:Public:generate',
             ],
             'mautic_focus_pixel' => [
-                'path' => '/focus/{id}/viewpixel.gif',
+                'path'       => '/focus/{id}/viewpixel.gif',
                 'controller' => 'MauticFocusBundle:Public:viewPixel',
             ],
         ],
         'api' => [
             'mautic_api_focusstandard' => [
                 'standard_entity' => true,
-                'name' => 'focus',
-                'path' => '/focus',
-                'controller' => 'MauticFocusBundle:Api\FocusApi',
+                'name'            => 'focus',
+                'path'            => '/focus',
+                'controller'      => 'MauticFocusBundle:Api\FocusApi',
             ],
             'mautic_api_focusjs' => [
-                'path' => '/focus/{id}/js',
+                'path'       => '/focus/{id}/js',
                 'controller' => 'MauticFocusBundle:Api\FocusApi:generateJs',
-                'method' => 'POST',
+                'method'     => 'POST',
             ],
         ],
     ],
@@ -82,6 +82,7 @@ return [
                     'mautic.page.helper.token',
                     'mautic.asset.helper.token',
                     'mautic.form.helper.token',
+                    'mautic.focus.model.focus',
                 ],
             ],
             'mautic.focus.stats.subscriber' => [

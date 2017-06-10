@@ -10,9 +10,9 @@
 
 namespace Mautic\Migrations;
 
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -27,7 +27,7 @@ class Version20170216221648 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->getTable($this->prefix.'focus')->hasColumn('css') && $schema->getTable($this->prefix.'focus')->hasColumn('html') && $schema->getTable($this->prefix.'focus')->hasColumn('html_mode')) {
+        if ($schema->getTable($this->prefix.'focus')->hasColumn('css') && $schema->getTable($this->prefix.'focus')->hasColumn('html') && $schema->getTable($this->prefix.'focus')->hasColumn('html_mode') && $schema->getTable($this->prefix.'focus')->hasColumn('utm_Tags')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -40,5 +40,6 @@ class Version20170216221648 extends AbstractMauticMigration
         $this->addSql("ALTER TABLE {$this->prefix}focus ADD css LONGTEXT NULL");
         $this->addSql('ALTER TABLE '.$this->prefix.'focus ADD html_mode TINYINT(1) DEFAULT 0');
         $this->addSql("ALTER TABLE {$this->prefix}focus ADD html LONGTEXT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}focus ADD utm_tags LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
     }
 }

@@ -12,23 +12,22 @@
 namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
 
 class FocusModel extends FormModel
 {
@@ -70,7 +69,7 @@ class FocusModel extends FormModel
         $this->trackableModel = $trackableModel;
         $this->templating     = $templating;
         $this->dispatcher     = $dispatcher;
-        $this->leadModel    = $leadModel;
+        $this->leadModel      = $leadModel;
     }
 
     /**
@@ -193,7 +192,7 @@ class FocusModel extends FormModel
      */
     public function generateJavascript($focus, $preview = false, $ignoreMinify = false)
     {
-
+        $focusModel = $focus;
         if ($focus instanceof Focus) {
             $focus = $focus->toArray();
         }
@@ -203,13 +202,13 @@ class FocusModel extends FormModel
         } else {
             $form = null;
         }
-        if($focus['id'] != 'preview'){
+        if ($focus['id'] != 'preview') {
             $fid = $focus['id'];
-        }elseif(isset($focus['unlockId'])){
+        } elseif (isset($focus['unlockId'])) {
             $fid = $focus['unlockId'];
         }
-        if(isset($fid) && $focus['htmlMode'] && $focus['html']) {
-            $lead = $this->leadModel->getCurrentLead();
+        if (isset($fid) && $focus['htmlMode'] && $focus['html']) {
+            $lead       = $this->leadModel->getCurrentLead();
             $tokenEvent = new TokenReplacementEvent($focus['html'], $lead, ['focus_id' => $fid]);
             $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $focus['html'] = $tokenEvent->getContent();
@@ -237,7 +236,7 @@ class FocusModel extends FormModel
                     $focus['id']
                 );
 
-                $url = $this->trackableModel->generateTrackableUrl($trackable, ['channel' => ['focus', $focus['id']]]);
+                $url = $this->trackableModel->generateTrackableUrl($trackable, ['channel' => ['focus', $focus['id']]], false, $focus->getUtmTagsForUrl());
             }
 
             $content = $this->templating->getTemplating()->render(

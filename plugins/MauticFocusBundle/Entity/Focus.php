@@ -12,12 +12,12 @@
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 
 /**
  * Class Focus.
@@ -33,7 +33,7 @@ class Focus extends FormEntity
      * @var string
      */
     private $description;
-    
+
     /**
      * @var string
      */
@@ -43,7 +43,7 @@ class Focus extends FormEntity
      * @var string
      */
     private $htmlMode;
-    
+
     /**
      * @var string
      */
@@ -88,6 +88,11 @@ class Focus extends FormEntity
      * @var array()
      */
     private $properties = [];
+
+    /**
+     * @var array
+     */
+    private $utmTags = [];
 
     /**
      * @var int
@@ -155,6 +160,11 @@ class Focus extends FormEntity
 
         $builder->addNullableField('properties', 'array');
 
+        $builder->createField('utmTags', 'array')
+            ->columnName('utm_tags')
+            ->nullable()
+            ->build();
+
         $builder->addNamedField('form', 'integer', 'form_id', true);
 
         $builder->addNullableField('cache', 'text');
@@ -193,6 +203,7 @@ class Focus extends FormEntity
                     'publishUp',
                     'publishDown',
                     'properties',
+                    'utmTags',
                     'form',
                     'htmlMode',
                     'html',
@@ -413,6 +424,38 @@ class Focus extends FormEntity
         $this->isChanged('properties', $properties);
 
         $this->properties = $properties;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
+    }
+    /**
+     * Generate UTMs params.
+     *
+     * @return array
+     */
+    public function getUtmTagsForUrl()
+    {
+        $utmTags = [];
+        foreach ($this->utmTags as $utmTag => $value) {
+            $utmTags[str_replace('utm', 'utm_', strtolower($utmTag))] = $value;
+        }
+
+        return $utmTags;
+    }
+    /**
+     * @param array $utmTags
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmTags', $utmTags);
+        $this->utmTags = $utmTags;
 
         return $this;
     }
