@@ -245,7 +245,7 @@ Mautic.convertLeadFilterInput = function(el) {
     var prefix = 'leadlist';
 
     var parent = mQuery(el).parents('.dynamic-content-filter');
-    if (parent) {
+    if (parent.length) {
         prefix = parent.attr('id');
     }
 

@@ -127,7 +127,7 @@ class LeadType extends AbstractType
         $companies       = $companyLeadRepo->getCompaniesByLeadId($options['data']->getId());
         $leadCompanies   = [];
         foreach ($companies as $company) {
-            $leadCompanies[$company['company_id']] = $company['company_id'];
+            $leadCompanies[(string) $company['company_id']] = (string) $company['company_id'];
         }
 
         $builder->add(

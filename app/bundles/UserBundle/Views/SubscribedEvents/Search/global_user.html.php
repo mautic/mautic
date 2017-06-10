@@ -11,7 +11,7 @@
 ?>
 
 <?php if (!empty($showMore)): ?>
-<a href="<?php echo $this->container->get('router')->generate('mautic_user_index', ['filter-user' => $searchString]); ?>" data-toggle="ajax">
+<a href="<?php echo $view['router']->generate('mautic_user_index', ['filter-user' => $searchString]); ?>" data-toggle="ajax">
     <span><?php echo $view['translator']->trans('mautic.core.search.more', ['%count%' => $remaining]); ?></span>
 </a>
 <?php else: ?>
@@ -20,7 +20,7 @@
         <span class="img-wrapper img-rounded"><img src="<?php echo $view['gravatar']->getImage($user->getEmail(), '100'); ?>" /></span>
     </span>
     <?php if ($canEdit): ?>
-    <a href="<?php echo $this->container->get('router')->generate('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $user->getId()]); ?>" data-toggle="ajax">
+    <a href="<?php echo $view['router']->generate('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $user->getId()]); ?>" data-toggle="ajax">
         <?php echo $user->getName(true); ?>
     </a>
     <?php else: ?>

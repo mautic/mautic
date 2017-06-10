@@ -657,6 +657,7 @@ return [
                     'mautic.security',
                     'request_stack',
                     '%mautic.parameters%',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.menu_renderer' => [

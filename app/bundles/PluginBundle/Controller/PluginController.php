@@ -71,14 +71,15 @@ class PluginController extends FormController
 
         foreach ($integrationObjects as $name => $object) {
             $settings = $object->getIntegrationSettings();
-            $pluginId = $settings->getPlugin()->getId();
-            if (isset($plugins[$pluginId])) {
+            $plugin   = $settings->getPlugin();
+            $pluginId = $plugin ? $plugin->getId() : $name;
+            if (isset($plugins[$pluginId]) || $pluginId === $name) {
                 $integrations[$name] = [
                     'name'     => $object->getName(),
                     'display'  => $object->getDisplayName(),
                     'icon'     => $integrationHelper->getIconPath($object),
                     'enabled'  => $settings->isPublished(),
-                    'plugin'   => $settings->getPlugin()->getId(),
+                    'plugin'   => $pluginId,
                     'isBundle' => false,
                 ];
             }
@@ -258,8 +259,14 @@ class PluginController extends FormController
 
                     if ($valid || $authorize) {
                         $dispatcher = $this->get('event_dispatcher');
+                        $this->get('logger')->info('Dispatching integration config save event.');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, new PluginIntegrationEvent($integrationObject));
+                            $this->get('logger')->info('Event dispatcher has integration config save listeners.');
+                            $event = new PluginIntegrationEvent($integrationObject);
+
+                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
+
+                            $entity = $event->getEntity();
                         }
 
                         $em->persist($entity);
@@ -298,6 +305,7 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
+                        'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
                     ]
                 );
             }
@@ -317,14 +325,19 @@ class PluginController extends FormController
         $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
 
         $formNotes    = [];
-        $noteSections = ['authorization', 'features', 'feature_settings'];
+        $noteSections = ['authorization', 'features', 'feature_settings', 'custom'];
         foreach ($noteSections as $section) {
-            list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
-            if (!empty($specialInstructions)) {
-                $formNotes[$section] = [
-                    'note' => $specialInstructions,
-                    'type' => $alertType,
-                ];
+            if ('custom' === $section) {
+                $formNotes[$section] = $integrationObject->getFormNotes($section);
+            } else {
+                list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+
+                if (!empty($specialInstructions)) {
+                    $formNotes[$section] = [
+                        'note' => $specialInstructions,
+                        'type' => $alertType,
+                    ];
+                }
             }
         }
 
@@ -343,6 +356,7 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
+                    'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
                 ],
             ]
         );
@@ -418,10 +432,10 @@ class PluginController extends FormController
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
-            $namespace = $meta->fullyQualifiedClassName('');
+            $namespace = $meta->namespace;
 
             if (strpos($namespace, 'MauticPlugin') !== false) {
-                $bundleName = str_replace('\Entity\\', '', $namespace);
+                $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginMetadata[$bundleName])) {
                     $pluginMetadata[$bundleName] = [];
                 }
@@ -552,8 +566,11 @@ class PluginController extends FormController
             // Call the install callback
             $callback        = $plugin['bundleClass'];
             $metadata        = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
-            $installedSchema = (isset($pluginInstalledSchemas[$plugin['namespace']]))
-                ? $pluginInstalledSchemas[$plugin['namespace']] : null;
+            $installedSchema = null;
+
+            if (isset($pluginInstalledSchemas[$plugin['namespace']]) && count($pluginInstalledSchemas[$plugin['namespace']]->getTables()) !== 0) {
+                $installedSchema = true;
+            }
 
             $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
 
