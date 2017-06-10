@@ -701,10 +701,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array      $params
-     * @param null|array $query
+     * @param array $params
+     * @param null  $query
+     * @param null  $executed
      *
-     * @return int|null
+     * @return array|null
      */
     public function getCompanies($params = [], $query = null, $executed = null)
     {
@@ -1646,7 +1647,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param      $checkEmailsInSF
-     * @param      $trackedContacts
      * @param      $requiredFields
      * @param      $mauticLeadFieldString
      * @param      $limit
@@ -1654,7 +1654,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param null $progress
      *
      * @return array
-     *
      * @throws ApiErrorException
      */
     protected function getMauticContactsToCreate(
