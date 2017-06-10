@@ -658,10 +658,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array      $params
-     * @param null|array $query
+     * @param array  $params
+     * @param null   $query
+     * @param null   $executed
+     * @param array  $result
+     * @param string $object
      *
-     * @return int|null
+     * @return array|null
      */
     public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
