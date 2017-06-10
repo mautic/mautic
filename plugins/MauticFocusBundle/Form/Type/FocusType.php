@@ -66,16 +66,30 @@ class FocusType extends AbstractType
         );
 
         $builder->add(
+            'utmTags',
+            'utm_tags',
+            [
+                'label'      => 'mautic.email.utm_tags',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.utm_tags.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'css',
             'textarea',
             [
-                'label'      => 'mautic.focus.form.css',
-                'attr'       => [
-                    'class' => 'form-control',
-                    'rows' => 12,
+                'label' => 'mautic.focus.form.css',
+                'attr'  => [
+                    'class'  => 'form-control',
+                    'rows'   => 12,
                     'onblur' => 'Mautic.focusUpdatePreview()',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -84,10 +98,10 @@ class FocusType extends AbstractType
             'yesno_button_group',
             [
                 'label' => 'mautic.focus.form.html_mode',
-                'data'  => $options['data']->getHtmlMode()?:false,
+                'data'  => $options['data']->getHtmlMode() ?: false,
                 'attr'  => [
                     'tooltip'  => 'mautic.focus.form.html_mode.tooltip',
-                    'onchange'    => 'Mautic.focusUpdatePreview()',
+                    'onchange' => 'Mautic.focusUpdatePreview()',
                 ],
             ]
         );
@@ -99,12 +113,12 @@ class FocusType extends AbstractType
                 'label'      => 'mautic.focus.form.html',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
-                    'rows' => 12,
+                    'class'        => 'form-control',
+                    'rows'         => 12,
                     'data-show-on' => '{"focus_html_mode_1":"checked"}',
-                    'onblur' => 'Mautic.focusUpdatePreview()',
+                    'onblur'       => 'Mautic.focusUpdatePreview()',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -197,7 +211,7 @@ class FocusType extends AbstractType
                 'multiple'    => false,
                 'empty_value' => '',
                 'attr'        => [
-                    'onchange' => 'Mautic.focusUpdatePreview()',
+                    'onchange'     => 'Mautic.focusUpdatePreview()',
                     'data-show-on' => '{"focus_html_mode_1":""}',
                 ],
             ]
