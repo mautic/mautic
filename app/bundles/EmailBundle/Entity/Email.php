@@ -595,21 +595,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Generate UTMs params
-     * @return array
-     */
-    public function getUtmTagsForUrl()
-    {
-        $utmTags = [];
-
-        foreach ($this->utmTags as $utmTag => $value) {
-            $utmTags[str_replace('utm','utm_',strtolower($utmTag))] = $value;
-        }
-
-        return $utmTags;
-    }
-
-    /**
      * @param array $utmTags
      */
     public function setUtmTags($utmTags)
@@ -780,7 +765,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         return $this;
     }
-
 
     /**
      * @return mixed

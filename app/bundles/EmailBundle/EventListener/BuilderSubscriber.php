@@ -298,12 +298,11 @@ class BuilderSubscriber extends CommonSubscriber
 
         $email   = $event->getEmail();
         $emailId = ($email) ? $email->getId() : null;
-
         if (!$email instanceof Email) {
             $email = $this->emailModel->getEntity($emailId);
         }
 
-        $utmTags = $email->getUtmTagsForUrl();
+        $utmTags      = $email->getUtmTags();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
