@@ -294,8 +294,7 @@ return [
         'track_contact_by_ip'   => false,
         'track_by_fingerprint'  => false,
         'track_by_tracking_url' => true,
-
-        'redirect_list_types' => [
+        'redirect_list_types'   => [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
