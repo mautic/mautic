@@ -52,6 +52,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Intl;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 /**
  * Class LeadModel
@@ -127,6 +128,11 @@ class LeadModel extends FormModel
     protected $trackByIp = false;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack      $requestStack
@@ -141,6 +147,7 @@ class LeadModel extends FormModel
      * @param CategoryModel     $categoryModel
      * @param ChannelListHelper $channelListHelper
      * @param                   $trackByIp
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         RequestStack $requestStack,
@@ -154,7 +161,8 @@ class LeadModel extends FormModel
         CompanyModel $companyModel,
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
-        $trackByIp
+        $trackByIp,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->request           = $requestStack->getCurrentRequest();
         $this->cookieHelper      = $cookieHelper;
@@ -168,6 +176,7 @@ class LeadModel extends FormModel
         $this->categoryModel     = $categoryModel;
         $this->channelListHelper = $channelListHelper;
         $this->trackByIp         = $trackByIp;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -867,7 +876,7 @@ class LeadModel extends FormModel
         if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
             $lead = $this->getEntity($clickthrough['lead']);
             // identify contact from link
-            if(!isset($queryFields['email']) && empty($queryFields['email']) && $lead && $email = $lead->getEmail()) {
+            if($this->coreParametersHelper->getParameter('track_by_tracking_url') && !isset($queryFields['email']) && $lead && $email = $lead->getEmail()) {
                     $queryFields['email'] = $email;
             }
             $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
