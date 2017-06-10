@@ -480,7 +480,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     protected function isChanged($prop, $val, $oldValue = null)
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = ($oldValue) ? $oldValue : $this->$getter();
+        $current = $oldValue !== null ? $oldValue : $this->$getter();
         if ($prop == 'owner') {
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getId(), $val];
@@ -535,6 +535,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             } elseif ($current && $val && $current->getId() != $val->getId()) {
                 $this->changes['stage'] = [$current->getId(), $val->getId()];
             }
+        } elseif ($prop == 'points' && $current != $val) {
+            $this->changes['points'] = [$current, $val];
         } else {
             parent::isChanged($prop, $val);
         }
@@ -781,7 +783,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 throw new \UnexpectedValueException('Invalid operator');
         }
 
-        $this->isChanged('points', $this->points, $oldPoints);
+        $this->isChanged('points', (int) $this->points, (int) $oldPoints);
 
         return $this;
     }
@@ -945,24 +947,36 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param string $identifier
+     * @param      $identifier
+     * @param bool $enabled
+     * @param bool $mobile
      *
      * @return $this
      */
-    public function addPushIDEntry($identifier)
+    public function addPushIDEntry($identifier, $enabled = true, $mobile = false)
     {
+        $entity = new PushID();
+
         /** @var PushID $id */
         foreach ($this->pushIds as $id) {
             if ($id->getPushID() === $identifier) {
-                return $this;
+                if ($id->isEnabled() === $enabled) {
+                    return $this;
+                } else {
+                    $entity = $id;
+                    $this->removePushID($id);
+                }
             }
         }
 
-        $entity = new PushID();
         $entity->setPushID($identifier);
         $entity->setLead($this);
+        $entity->setEnabled($enabled);
+        $entity->setMobile($mobile);
 
         $this->addPushID($entity);
+
+        $this->isChanged('pushIds', $this->pushIds);
 
         return $this;
     }

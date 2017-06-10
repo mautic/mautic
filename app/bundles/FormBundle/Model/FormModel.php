@@ -418,6 +418,26 @@ class FormModel extends CommonFormModel
     }
 
     /**
+     * Get results for a form and lead.
+     *
+     * @param Form $form
+     * @param int  $leadId
+     * @param int  $limit
+     *
+     * @return array
+     */
+    public function getLeadSubmissions(Form $form, $leadId, $limit = 200)
+    {
+        return $this->getRepository()->getFormResults(
+            $form,
+            [
+                'leadId' => $leadId,
+                'limit'  => $limit,
+            ]
+        );
+    }
+
+    /**
      * Generate the form's html.
      *
      * @param Form $entity
@@ -438,13 +458,7 @@ class FormModel extends CommonFormModel
         }
 
         if ($entity->usesProgressiveProfiling()) {
-            $submissions = $this->getRepository()->getFormResults(
-                $entity,
-                [
-                    'leadId' => $lead->getId(),
-                    'limit'  => 200,
-                ]
-            );
+            $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
         if ($entity->getRenderStyle()) {
@@ -654,7 +668,7 @@ class FormModel extends CommonFormModel
             $customComponents['validators'] = $event->getValidators();
 
             // Generate a list of fields that are not persisted to the database by default
-            $notPersist = ['button', 'captcha', 'freetext', 'pagebreak'];
+            $notPersist = ['button', 'captcha', 'freetext', 'freehtml', 'pagebreak'];
             foreach ($customComponents['fields'] as $type => $field) {
                 if (isset($field['builderOptions']) && isset($field['builderOptions']['addSaveResult']) && false === $field['builderOptions']['addSaveResult']) {
                     $notPersist[] = $type;
@@ -678,8 +692,8 @@ class FormModel extends CommonFormModel
         $html = $this->getContent($form);
 
         //replace line breaks with literal symbol and escape quotations
-        $search  = ["\n", '"'];
-        $replace = ['\n', '\"'];
+        $search  = ["\r\n", "\n", '"'];
+        $replace = ['', '', '\"'];
         $html    = str_replace($search, $replace, $html);
 
         return 'document.write("'.$html.'");';

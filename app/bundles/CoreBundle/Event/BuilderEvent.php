@@ -21,6 +21,7 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 class BuilderEvent extends Event
 {
     protected $slotTypes            = [];
+    protected $sections             = [];
     protected $tokens               = [];
     protected $abTestWinnerCriteria = [];
     protected $translator;
@@ -46,14 +47,16 @@ class BuilderEvent extends Event
      * @param $icon
      * @param $content
      * @param $form
-     * @param $priority
+     * @param int   $priority
+     * @param array $params
      */
-    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0)
+    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = [])
     {
         $this->slotTypes[$key] = [
             'header'   => $this->translator->trans($header),
             'icon'     => $icon,
             'content'  => $content,
+            'params'   => $params,
             'form'     => $form,
             'priority' => $priority,
         ];
@@ -74,7 +77,50 @@ class BuilderEvent extends Event
 
         array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->slotTypes);
 
+        foreach ($this->slotTypes as $i => $slot) {
+            $slot['header'] = str_replace(' ', '<br />', $slot['header']);
+
+            $this->slotTypes[$i] = $slot;
+        }
+
         return $this->slotTypes;
+    }
+
+    /**
+     * @param $key
+     * @param $header
+     * @param $icon
+     * @param $content
+     * @param $form
+     * @param $priority
+     */
+    public function addSection($key, $header, $icon, $content, $form, $priority = 0)
+    {
+        $this->sections[$key] = [
+            'header'   => $this->translator->trans($header),
+            'icon'     => $icon,
+            'content'  => $content,
+            'form'     => $form,
+            'priority' => $priority,
+        ];
+    }
+
+    /**
+     * Get slot types.
+     *
+     * @return array
+     */
+    public function getSections()
+    {
+        $sort = ['priority' => [], 'header' => []];
+        foreach ($this->sections as $k => $v) {
+            $sort['priority'][$k] = $v['priority'];
+            $sort['header'][$k]   = $v['header'];
+        }
+
+        array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->sections);
+
+        return $this->sections;
     }
 
     /**
@@ -352,13 +398,23 @@ class BuilderEvent extends Event
     }
 
     /**
-     * Check if AB Test Winner Criteria has been requested.
+     * Check if Slot types has been requested.
      *
      * @return bool
      */
     public function slotTypesRequested()
     {
         return $this->getRequested('slotTypes');
+    }
+
+    /**
+     * Check if Sections has been requested.
+     *
+     * @return bool
+     */
+    public function sectionsRequested()
+    {
+        return $this->getRequested('sections');
     }
 
     /**

@@ -13,9 +13,9 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class EmailRepository.
@@ -24,6 +24,8 @@ class EmailRepository extends CommonRepository
 {
     /**
      * Get an array of do not email emails.
+     *
+     * @param array $leadIds
      *
      * @return array
      */
@@ -130,7 +132,7 @@ class EmailRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this->getEntityManager()
             ->createQueryBuilder()
@@ -187,9 +189,22 @@ class EmailRepository extends CommonRepository
         $dncQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $dncQb->expr()->eq('dnc.lead_id', 'l.id')
-            )
-            ->andWhere('dnc.channel = "email"');
+                $dncQb->expr()->andX(
+                    $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
+                    $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
+                )
+            );
+
+        // Do not include contacts where the message is pending in the message queue
+        $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $mqQb->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq');
+
+        $messageExpr = $mqQb->expr()->andX(
+            $mqQb->expr()->eq('mq.lead_id', 'l.id'),
+            $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('email')),
+            $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT))
+        );
 
         // Do not include leads that have already been emailed
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -207,12 +222,19 @@ class EmailRepository extends CommonRepository
             $statExpr->add(
                 $statQb->expr()->in('stat.email_id', $variantIds)
             );
+            $messageExpr->add(
+                $mqQb->expr()->in('mq.channel_id', $variantIds)
+            );
         } else {
             $statExpr->add(
                 $statQb->expr()->eq('stat.email_id', (int) $emailId)
             );
+            $messageExpr->add(
+                $mqQb->expr()->eq('mq.channel_id', (int) $emailId)
+            );
         }
         $statQb->where($statExpr);
+        $mqQb->where($messageExpr);
 
         // Only include those who belong to the associated lead lists
         if (null === $listIds) {
@@ -242,7 +264,6 @@ class EmailRepository extends CommonRepository
         if ($countOnly) {
             // distinct with an inner join seems faster
             $q->select('count(distinct(l.id)) as count');
-
             $q->innerJoin('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll',
                 $q->expr()->andX(
                     $q->expr()->in('ll.leadlist_id', $listIds),
@@ -269,6 +290,7 @@ class EmailRepository extends CommonRepository
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
+            ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
         // Has an email
@@ -322,7 +344,7 @@ class EmailRepository extends CommonRepository
                     ->setParameter('search', $search);
             } else {
                 $q->andWhere($q->expr()->like('e.name', ':search'))
-                  ->setParameter('search', "%{$search}%");
+                    ->setParameter('search', "%{$search}%");
             }
         }
 
@@ -370,12 +392,12 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param                            $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'e.name',
@@ -384,12 +406,12 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param                            $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
@@ -468,7 +490,7 @@ class EmailRepository extends CommonRepository
     /**
      * Resets variant_start_date, variant_read_count, variant_sent_count.
      *
-     * @param $variantParentId
+     * @param $relatedIds
      * @param $date
      */
     public function resetVariants($relatedIds, $date)

@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
@@ -46,11 +47,17 @@ class PageModel extends FormModel
 {
     use TranslationModelTrait;
     use VariantModelTrait;
+    use BuilderModelTrait;
 
     /**
      * @var bool
      */
     protected $catInUrl;
+
+    /**
+     * @var bool
+     */
+    protected $trackByFingerprint;
 
     /**
      * @var CookieHelper
@@ -115,6 +122,14 @@ class PageModel extends FormModel
     public function setCatInUrl($catInUrl)
     {
         $this->catInUrl = $catInUrl;
+    }
+
+    /**
+     * @param $trackByFingerprint
+     */
+    public function setTrackByFingerprint($trackByFingerprint)
+    {
+        $this->trackByFingerprint = $trackByFingerprint;
     }
 
     /**
@@ -451,7 +466,7 @@ class PageModel extends FormModel
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
+            $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
         }
 
         if ($lead && !$lead->getId()) {
@@ -788,34 +803,10 @@ class PageModel extends FormModel
      */
     public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
     {
-        $singleComponent = (!is_array($requestedComponents) && $requestedComponents != 'all');
-        $components      = [];
-        $event           = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
+        $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
         $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
 
-        if (!is_array($requestedComponents)) {
-            $requestedComponents = [$requestedComponents];
-        }
-        foreach ($requestedComponents as $requested) {
-            switch ($requested) {
-                case 'tokens':
-                    $components[$requested] = $event->getTokens();
-                    break;
-                case 'abTestWinnerCriteria':
-                    $components[$requested] = $event->getAbTestWinnerCriteria();
-                    break;
-                case 'slotTypes':
-                    $components[$requested] = $event->getSlotTypes();
-                    break;
-                default:
-                    $components['tokens']               = $event->getTokens();
-                    $components['abTestWinnerCriteria'] = $event->getAbTestWinnerCriteria();
-                    $components['slotTypes']            = $event->getSlotTypes();
-                    break;
-            }
-        }
-
-        return ($singleComponent) ? $components[$requestedComponents[0]] : $components;
+        return $this->getCommonBuilderComponents($requestedComponents, $event);
     }
 
     /**
@@ -879,8 +870,8 @@ class PageModel extends FormModel
         }
 
         if ($flag == 'unique' || $flag == 'total_and_unique') {
-            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter);
-            $q->groupBy('t.lead_id, t.date_hit');
+            $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter, 'distinct(t.lead_id)');
+            $q->groupBy('DATE_FORMAT(t.date_hit, \'%Y-%m-%d\')');
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
@@ -906,19 +897,23 @@ class PageModel extends FormModel
      */
     public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
     {
-        $chart   = new PieChart();
-        $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $allQ    = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
-        $uniqueQ = $query->getCountQuery('page_hits', 'lead_id', 'date_hit', $filters, ['getUnique' => true, 'selectAlso' => ['t.page_id']]);
+        $chart              = new PieChart();
+        $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $allQ               = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $filters['lead_id'] = [
+            'expression' => 'isNull',
+        ];
+        $returnQ = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($allQ);
-            $this->limitQueryToCreator($uniqueQ);
+            $this->limitQueryToCreator($returnQ);
         }
 
-        $all       = $query->fetchCount($allQ);
-        $unique    = $query->fetchCount($uniqueQ);
-        $returning = $all - $unique;
+        $all = $query->fetchCount($allQ);
+//        $unique    = $query->fetchCount($uniqueQ);
+        $returning = $query->fetchCount($returnQ);
+        $unique    = $all - $returning;
         $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
         $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
 

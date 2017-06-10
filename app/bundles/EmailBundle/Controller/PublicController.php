@@ -71,7 +71,7 @@ class PublicController extends CommonFormController
             $analytics = $this->factory->getHelper('template.analytics')->getCode();
 
             // Check for html doc
-            if (strpos($content, '<html>') === false) {
+            if (strpos($content, '<html') === false) {
                 $content = "<html>\n<head>{$analytics}</head>\n<body>{$content}</body>\n</html>";
             } elseif (strpos($content, '<head>') === false) {
                 $content = str_replace('<html>', "<html>\n<head>\n{$analytics}\n</head>", $content);
@@ -166,6 +166,10 @@ class PublicController extends CommonFormController
                 // Set the lead as current lead
                 $leadModel->setCurrentLead($lead);
             }
+            // Set lead lang
+            if ($lead->getPreferredLocale()) {
+                $translator->setLocale($lead->getPreferredLocale());
+            }
 
             if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
                 $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
@@ -191,7 +195,6 @@ class PublicController extends CommonFormController
                     ],
                     $message
                 );
-                $message = '<h2>'.$message.'</h2>';
             } elseif ($lead) {
                 $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
 
@@ -285,6 +288,11 @@ class PublicController extends CommonFormController
                 $leadModel->setCurrentLead($lead);
             }
 
+            // Set lead lang
+            if ($lead->getPreferredLocale()) {
+                $this->translator->setLocale($lead->getPreferredLocale());
+            }
+
             $model->removeDoNotContact($stat->getEmailAddress());
 
             $message = $this->coreParametersHelper->getParameter('resubscribe_message');
@@ -292,8 +300,8 @@ class PublicController extends CommonFormController
                 $message = $this->translator->trans(
                     'mautic.email.resubscribed.success',
                     [
-                        '%unsubscribedUrl%' => '|URL|',
-                        '%email%'           => '|EMAIL|',
+                        '%unsubscribeUrl%' => '|URL|',
+                        '%email%'          => '|EMAIL|',
                     ]
                 );
             }
@@ -528,6 +536,7 @@ class PublicController extends CommonFormController
 
             return;
         }
+
         // get secret from plugin settings
         $integrationHelper = $this->get('mautic.helper.integration');
         $myIntegration     = $integrationHelper->getIntegrationObject($integration);
@@ -566,6 +575,10 @@ class PublicController extends CommonFormController
             return;
         }
 
+        if (MAUTIC_ENV === 'dev') {
+            $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
+        }
+
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
 
@@ -588,13 +601,13 @@ class PublicController extends CommonFormController
 
             $stat = $model->getEmailStatus($idHash);
 
-            $stat->setSource('email.client');
-
             // stat doesn't exist, create one
             if ($stat === null) {
                 $lead['email'] = $email; // needed for stat
-                $this->addStat($lead, $email, $query, $idHash);
+                $stat          = $this->addStat($lead, $email, $query, $idHash);
             }
+
+            $stat->setSource('email.client');
 
             if ($stat || $integration !== 'Outlook') { // Outlook requests the tracking gif on send
                 $model->hitEmail($idHash, $this->request); // add email event
@@ -623,6 +636,7 @@ class PublicController extends CommonFormController
     private function addStat($lead, $email, $query, $idHash)
     {
         if ($lead !== null) {
+            /** @var \Mautic\EmailBundle\Helper\MailHelper $mailer */
             $mailer = $this->get('mautic.helper.mailer');
 
             // To lead
@@ -643,8 +657,11 @@ class PublicController extends CommonFormController
 
             $subject = filter_var($query['subject'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH);
             $mailer->setSubject($subject);
-            $mailer->createEmailStat();
+
+            return $mailer->createEmailStat();
         }
+
+        return null;
     }
 
     /**

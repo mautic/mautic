@@ -163,6 +163,7 @@ class ListController extends FormController
         //set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
         $action    = $this->generateUrl('mautic_segment_action', ['objectAction' => 'new']);
+
         //get the user form factory
         $form = $model->createForm($list, $this->get('form.factory'),  $action);
 

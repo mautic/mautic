@@ -16,6 +16,7 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 
 /**
@@ -23,6 +24,21 @@ use Mautic\ReportBundle\Model\ReportModel;
  */
 class ChannelSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
+     * ChannelSubscriber constructor.
+     *
+     * @param IntegrationHelper $integrationHelper
+     */
+    public function __construct(IntegrationHelper $integrationHelper)
+    {
+        $this->integrationHelper = $integrationHelper;
+    }
+
     /**
      * @return array
      */
@@ -38,7 +54,9 @@ class ChannelSubscriber extends CommonSubscriber
      */
     public function onAddChannel(ChannelEvent $event)
     {
-        if (!empty($this->params['sms_enabled'])) {
+        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $event->addChannel(
                 'sms',
                 [
@@ -50,6 +68,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'form.submit',
                         ],
                         'lookupFormType' => 'sms_list',
+                        'repository'     => 'MauticSmsBundle:Sms',
                     ],
                     LeadModel::CHANNEL_FEATURE   => [],
                     ReportModel::CHANNEL_FEATURE => [

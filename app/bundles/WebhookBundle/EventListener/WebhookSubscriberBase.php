@@ -12,22 +12,20 @@
 namespace Mautic\WebhookBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\WebhookBundle\Model\WebhookModel;
 
 /**
  * Class WebhookSubscriberBase.
  */
 class WebhookSubscriberBase extends CommonSubscriber
 {
-    /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
-    protected $webhookModel;
+    use WebhookModelTrait;
 
     /**
-     * @param WebhookModel $webhookModel
+     * WebhookSubscriberBase constructor.
      */
-    public function setWebhookModel(WebhookModel $webhookModel)
+    public function __construct()
     {
-        $this->webhookModel = $webhookModel;
+        @trigger_error(self::class.' has been deprecated as of 2.7.1; use trait '.WebhookModelTrait::class.' instead', E_USER_DEPRECATED);
     }
 
     /**
@@ -39,8 +37,6 @@ class WebhookSubscriberBase extends CommonSubscriber
      */
     public function getEventWebooksByType($type)
     {
-        $eventWebhooks = $this->webhookModel->getEventWebooksByType($type);
-
-        return $eventWebhooks;
+        return $this->webhookModel->getEventWebooksByType($type);
     }
 }

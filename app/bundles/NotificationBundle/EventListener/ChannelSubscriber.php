@@ -15,6 +15,7 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
 
 /**
@@ -22,6 +23,21 @@ use Mautic\ReportBundle\Model\ReportModel;
  */
 class ChannelSubscriber extends CommonSubscriber
 {
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
+     * ChannelSubscriber constructor.
+     *
+     * @param IntegrationHelper $integrationHelper
+     */
+    public function __construct(IntegrationHelper $integrationHelper)
+    {
+        $this->integrationHelper = $integrationHelper;
+    }
+
     /**
      * @return array
      */
@@ -37,7 +53,9 @@ class ChannelSubscriber extends CommonSubscriber
      */
     public function onAddChannel(ChannelEvent $event)
     {
-        if (!empty($this->params['notification_enabled'])) {
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $event->addChannel(
                 'notification',
                 [
@@ -49,9 +67,38 @@ class ChannelSubscriber extends CommonSubscriber
                             'form.submit',
                         ],
                         'lookupFormType' => 'notification_list',
+                        'repository'     => 'MauticNotificationBundle:Notification',
+                        'lookupOptions'  => [
+                            'mobile'  => false,
+                            'desktop' => true,
+                        ],
                     ],
                     ReportModel::CHANNEL_FEATURE => [
                         'table' => 'push_notifications',
+                    ],
+                ]
+            );
+        }
+
+        $supportedFeatures = $integration->getSupportedFeatures();
+
+        if (in_array('mobile', $supportedFeatures)) {
+            $event->addChannel(
+                'mobile_notification',
+                [
+                    MessageModel::CHANNEL_FEATURE => [
+                        'campaignAction'             => 'notification.send_mobile_notification',
+                        'campaignDecisionsSupported' => [
+                            'page.pagehit',
+                            'asset.download',
+                            'form.submit',
+                        ],
+                        'lookupFormType' => 'notification_list',
+                        'repository'     => 'MauticNotificationBundle:Notification',
+                        'lookupOptions'  => [
+                            'mobile'  => true,
+                            'desktop' => false,
+                        ],
                     ],
                 ]
             );

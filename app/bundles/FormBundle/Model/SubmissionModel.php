@@ -238,7 +238,7 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            if (in_array($type, $components['viewOnlyFields'])) {
+            if (isset($components['viewOnlyFields']) && in_array($type, $components['viewOnlyFields'])) {
                 //don't save items that don't have a value associated with it
                 continue;
             }
@@ -324,11 +324,6 @@ class SubmissionModel extends CommonFormModel
         // @deprecated - BC support; to be removed in 3.0 - be sure to remove the validator option from addSubmitAction as well
         $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
 
-        //return errors if there any - this should be moved to right after foreach($fields) once validateActionCallbacks support is dropped
-        if (!empty($validationErrors)) {
-            return ['errors' => $validationErrors];
-        }
-
         // Create/update lead
         if (!empty($leadFieldMatches)) {
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
@@ -345,6 +340,22 @@ class SubmissionModel extends CommonFormModel
             $submission->setTrackingId($trackingId);
         }
         $submission->setLead($lead);
+
+        // Remove validation errors if the field is not visible
+        if ($form->usesProgressiveProfiling()) {
+            $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
+
+            foreach ($fields as $field) {
+                if (isset($validationErrors[$field->getAlias()]) && !$field->showForContact($leadSubmissions, $lead, $form)) {
+                    unset($validationErrors[$field->getAlias()]);
+                }
+            }
+        }
+
+        //return errors if there any
+        if (!empty($validationErrors)) {
+            return ['errors' => $validationErrors];
+        }
 
         // Save the submission
         $this->saveEntity($submission);
@@ -791,8 +802,6 @@ class SubmissionModel extends CommonFormModel
         $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
             $uniqueFieldsWithData = $data = [];
             foreach ($leadFields as $alias => $properties) {
-                $data[$alias] = '';
-
                 if (isset($currentFields[$alias])) {
                     $value        = $currentFields[$alias];
                     $data[$alias] = $value;

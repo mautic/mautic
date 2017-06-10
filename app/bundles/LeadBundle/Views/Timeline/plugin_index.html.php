@@ -10,7 +10,11 @@
  */
 $view->extend('MauticCoreBundle:Default:slim.html.php');
 ?>
-
+<style>
+    .container {
+        margin: auto !important;
+    }
+</style>
 <!-- filter form -->
 <form method="post" action="<?php echo isset($lead) ? $view['router']->path(
     'mautic_plugin_timeline_view', ['leadId' => $lead->getId(), 'integration' => $integration]

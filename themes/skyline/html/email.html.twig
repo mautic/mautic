@@ -93,15 +93,20 @@
                 padding-right: 20px !important;
                 padding-bottom: 20px !important;
             }
+
+            [class="mobile-block"] {
+                width: 100% !important;
+                display: block !important;
+            }
         }
     </style>
 </head>
 <body class="body" style="padding:0; margin:0; display:block; background:#ffffff; -webkit-text-size-adjust:none" bgcolor="#ffffff">
-    <div data-section-wrapper style="border-bottom: 3px solid #3bcdc3;">
+    <div data-section-wrapper="1" style="border-bottom: 3px solid #3bcdc3;">
         <center>
-            <table data-section cellspacing="0" cellpadding="0" width="530" class="w320">
+            <table data-section="1" cellspacing="0" cellpadding="0" width="530" class="w320">
                 <tr>
-                    <td valign="top" style="text-align:left;" class="mobile-center" data-slot-container>
+                    <td valign="top" style="text-align:left;" class="mobile-center" data-slot-container="1">
                         <div data-slot="image">
                             <img width="250" height="62" src="{{ getAssetUrl('themes/'~template~'/img/logo.gif', null, null, true) }}">
                         </div>
@@ -110,11 +115,11 @@
             </table>
         </center>
     </div>
-    <div data-section-wrapper  background="{{ getAssetUrl('themes/'~template~'/img/bg.gif', null, null, true) }}" bgcolor="#64594b" valign="top" style="background: url({{ getAssetUrl('themes/'~template~'/img/bg.gif', null, null, true) }}) no-repeat center; background-color: #64594b; background-position: center;">
+    <div data-section-wrapper="1"  background="{{ getAssetUrl('themes/'~template~'/img/bg.gif', null, null, true) }}" bgcolor="#64594b" valign="top" style="background: url({{ getAssetUrl('themes/'~template~'/img/bg.gif', null, null, true) }}) no-repeat center; background-color: #64594b; background-position: center;">
         <center>
-            <table data-section cellspacing="0" cellpadding="0" width="530" height="303" class="w320">
+            <table data-section="1" cellspacing="0" cellpadding="0" width="530" height="303" class="w320">
                 <tr>
-                    <td valign="middle" style="vertical-align:middle; padding-right: 15px; padding-left: 15px; text-align:left;" class="mobile-center" height="303" data-slot-container>
+                    <td valign="middle" style="vertical-align:middle; padding-right: 15px; padding-left: 15px; text-align:left;" class="mobile-center" height="303" data-slot-container="1">
                         <div data-slot="text">
                             <h1 style="color: #ffffff">WE REALLY MISS YOU!</h1><br>
                             <h2 style="color: #ffffff">Like.. really, really! Please give us another chance.</h2>
@@ -124,11 +129,11 @@
             </table>
         </center>
     </div>
-    <div data-section-wrapper>
+    <div data-section-wrapper="1">
         <center>
-            <table data-section cellspacing="0" cellpadding="30" width="530" class="w290">
+            <table data-section="1" cellspacing="0" cellpadding="30" width="530" class="w290">
                 <tr>
-                    <td valign="top" data-slot-container>
+                    <td valign="top" data-slot-container="1">
                         <div data-slot="text">
                             <h3 style="text-align:center;">Enjoy 50% of your next purchase!</h3>
                             <br>
@@ -144,12 +149,12 @@
                     </td>
                 </tr>
             </table>
-            <table data-section cellspacing="0" cellpadding="8" width="530" class="w320">
+            <table data-section="1" cellspacing="0" cellpadding="8" width="530" class="w320">
                 <tr>
                     <td>
                         <table cellspacing="0" cellpadding="0" width="100%">
                             <tr>
-                                <td class="mobile-padding" style="text-align:left;" data-slot-container>
+                                <td class="mobile-padding" style="text-align:left;" data-slot-container="1">
                                     <div data-slot="separator"><hr/></div>
                                     <div data-slot="text">
                                         <br>
@@ -165,7 +170,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="mobile-padding" data-slot-container>
+                    <td class="mobile-padding" data-slot-container="1">
                         <div class="button" data-slot="button" data-param-padding-top="5" data-param-button-size="1" data-param-link-text="Come back!" data-param-href="http://" data-param-float="1" data-param-background-color="#3bcdc3" data-param-color="ffffff">
                             <a href="#" target="_blank" style="font-family:'Lato', Helvetica, Arial, sans-serif;font-weight:bold;font-size: 13px; color: #ffffff; text-decoration: none; text-decoration: none; padding: 12px 40px; background-color: #3bcdc3; display: inline-block;">
                                 Come back!
@@ -188,14 +193,14 @@
             </table>
         </center>
     </div>
-    <div data-section-wrapper style="background-color:#c2c2c2;">
+    <div data-section-wrapper="1" style="background-color:#c2c2c2;">
         <center>
-            <table data-section cellspacing="0" cellpadding="0" width="530" class="w320">
+            <table data-section="1" cellspacing="0" cellpadding="0" width="530" class="w320">
                 <tr>
                     <td>
                         <table cellspacing="0" cellpadding="30" width="100%">
                             <tr>
-                                <td style="text-align:center;" data-slot-container>
+                                <td style="text-align:center;" data-slot-container="1">
                                     <div data-slot="text">
                                         <a href="#">
                                             <img width="61" height="51" src="{{ getAssetUrl('themes/'~template~'/img/twitter.gif', null, null, true) }}" alt="twitter" />
@@ -217,7 +222,7 @@
                         <center>
                             <table style="margin:0 auto;" cellspacing="0" cellpadding="5" width="100%">
                                 <tr>
-                                    <td style="text-align:center; margin:0 auto;" width="100%" data-slot-container>
+                                    <td style="text-align:center; margin:0 auto;" width="100%" data-slot-container="1">
                                         <div data-slot="image">
                                             <a href="#" style="text-align:center;">
                                                 <img style="margin:0 auto;" width="123" height="24" src="{{ getAssetUrl('themes/'~template~'/img/logo-footer.gif', null, null, true) }}" alt="logo link" />

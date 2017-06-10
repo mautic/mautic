@@ -14,23 +14,22 @@
 <ul class="list-group campaign-event-list">
     <?php foreach ($events as $event) : ?>
         <li class="list-group-item bg-auto bg-light-xs">
-            <div class="progress-bar progress-bar-success" style="width:<?php echo $event['percent']; ?>%"></div>
+            <?php $yesClass = ('action' === $event['eventType'] && 'no' === $event['decisionPath']) ? 'danger' : 'success'; ?>
+            <div class="progress-bar progress-bar-<?php echo $yesClass; ?>" style="width:<?php echo $event['yesPercent']; ?>%; left: 0;"></div>
+            <div class="progress-bar progress-bar-danger" style="width:<?php echo $event['noPercent']; ?>%; left: <?php echo $event['yesPercent']; ?>%"></div>
             <div class="box-layout">
                 <div class="col-md-1 va-m">
-                    <h3>
-                        <?php if ($event['eventType'] == 'decision') : ?>
-                            <span class="fa fa-bullseye text-danger"></span>
-                        <?php elseif ($event['eventType'] == 'condition') : ?>
-                            <span class="fa fa fa-share-alt text-danger"></span>
-                        <?php else : ?>
-                            <span class="fa fa-rocket text-success"></span>
-                        <?php endif; ?>
-                    </h3>
+                    <span class="label label-<?php echo $yesClass; ?>"><?php echo $event['yesPercent'].'%'; ?></span>
+                    <?php if ('action' !== $event['eventType']): ?>
+                    <span class="label label-danger"><?php echo $event['noPercent'].'%'; ?></span>
+                    <?php endif; ?>
                 </div>
-                <div class="col-md-7 va-m">
+                <div class="col-md-6 va-m">
                     <h5 class="fw-sb text-primary mb-xs">
                         <?php echo $event['name']; ?>
-                        <small><?php echo $event['percent']; ?> %</small>
+                        <?php if ('action' !== $event['eventType']): ?>
+                        <small class="text-muted"><?php echo $event['percent']; ?>%</small>
+                        <?php endif; ?>
                     </h5>
                     <h6 class="text-white dark-sm"><?php echo $event['description']; ?></h6>
                 </div>
