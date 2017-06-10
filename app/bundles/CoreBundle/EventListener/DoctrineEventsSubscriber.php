@@ -26,7 +26,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
     /**
      * @var
      */
-    protected $deprecatedEntityTables;
+    protected $deprecatedEntityTables = [];
 
     /**
      * DoctrineEventsSubscriber constructor.

@@ -59,7 +59,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 '-l',
                 InputOption::VALUE_OPTIONAL,
                 'Number of records to process when syncing objects',
-                25
+                100
             )
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
 
@@ -73,15 +73,13 @@ class FetchLeadsCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory = $container->get('mautic.factory');
-
-        $translator  = $factory->getTranslator();
+        $translator  = $container->get('translator');
         $integration = $input->getOption('integration');
         $startDate   = $input->getOption('start-date');
         $endDate     = $input->getOption('end-date');
         $interval    = $input->getOption('time-interval');
         $limit       = $input->getOption('limit');
+        $leads       = $contacts       = $processed       = 0;
 
         if (!$interval) {
             $interval = '15 minutes';
@@ -94,20 +92,29 @@ class FetchLeadsCommand extends ContainerAwareCommand
         }
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-            $integrationHelper = $factory->getHelper('integration');
+            $integrationHelper = $container->get('mautic.helper.integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
             $config            = $integrationObject->mergeConfigToFeatureSettings();
             $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
+            if (!isset($config['objects'])) {
+                $config['objects'] = [];
+            }
+
             $params['start'] = $startDate;
             $params['end']   = $endDate;
             $params['limit'] = $limit;
-            if (isset($supportedFeatures[1]) && $supportedFeatures[1] == 'get_leads') {
-                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && (in_array('Lead', $config['objects']) || in_array('contacts', $config['objects']))) {
+            if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
+                if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
-                        $processed = intval($integrationObject->getLeads($params));
+                        if (in_array('Lead', $config['objects'])) {
+                            $processed = intval($integrationObject->getLeads($params, null, $leads, [], 'Lead'));
+                        }
+                        if (in_array('Contact', $config['objects'])) {
+                            $processed += intval($integrationObject->getLeads($params, null, $contacts, [], 'Contact'));
+                        }
 
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
@@ -118,7 +125,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && in_array('company', $config['objects'])) {
+            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']) && in_array('company', $config['objects'])) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
 
                 if (strtotime($startDate) > strtotime('-30 days')) {
@@ -132,22 +139,29 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
 
-            if (isset($supportedFeatures[2]) && $supportedFeatures[2] == 'push_leads') {
+            if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
-                list($updated, $created) = $integrationObject->pushLeads($params);
+                $result = $integrationObject->pushLeads($params);
+                if (3 === count($result)) {
+                    list($updated, $created, $errored) = $result;
+                } else {
+                    $errored                 = '?';
+                    list($updated, $created) = $result;
+                }
                 $output->writeln(
                     '<comment>'.$translator->trans(
                         'mautic.plugin.command.fetch.pushing.leads.events_executed',
                         [
                             '%updated%' => $updated,
                             '%created%' => $created,
+                            '%errored%' => $errored,
                         ]
                     )
                     .'</comment>'."\n"
                 );
             }
-        }
 
-        return true;
+            return true;
+        }
     }
 }

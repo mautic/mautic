@@ -37,9 +37,11 @@ foreach ($groups as $key => $group):
                                         <?php echo $view['form']->row($form['companyname']); ?>
                                     </div>
                                 <?php endif; ?>
-                                <div class="col-sm-<?php echo $halfSize; ?>">
-                                    <?php echo $view['form']->row($form['companyemail']); ?>
-                                </div>
+                                <?php if (isset($form['companyemail'])): ?>
+                                    <div class="col-sm-<?php echo $halfSize; ?>">
+                                        <?php echo $view['form']->row($form['companyemail']); ?>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <hr class="mnr-md mnl-md">

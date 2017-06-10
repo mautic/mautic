@@ -25,7 +25,7 @@ class LeadDeviceRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
@@ -97,5 +97,31 @@ class LeadDeviceRepository extends CommonRepository
         $device = $sq->execute()->fetchAll();
 
         return (!empty($device)) ? $device[0] : [];
+    }
+
+    /**
+     * @param string $fingerprint
+     *
+     * @return LeadDevice
+     */
+    public function getDeviceByFingerprint($fingerprint)
+    {
+        if (!$fingerprint) {
+            return null;
+        }
+
+        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq->select('es.id as id, es.lead_id as lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+
+        $sq->where(
+            $sq->expr()->eq('es.device_fingerprint', ':fingerprint')
+        )
+            ->setParameter('fingerprint', $fingerprint);
+
+        //get the first match
+        $device = $sq->execute()->fetch();
+
+        return $device ? $device : null;
     }
 }

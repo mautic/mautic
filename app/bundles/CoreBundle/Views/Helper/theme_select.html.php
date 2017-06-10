@@ -20,7 +20,7 @@ $isCodeMode = ($active == $codeMode);
                 <div class="panel-body text-center" style="height: 250px">
                     <i class="fa fa-code fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
                 </div>
-                <a href="#" type="button" data-theme="<?php echo $codeMode; ?>" class="select-theme-link btn btn-default <?php echo $isCodeMode ? 'hide' : '' ?>">
+                <a href="#" type="button" data-theme="<?php echo $codeMode; ?>" class="select-theme-link btn btn-default <?php echo $isCodeMode ? 'hide' : '' ?>" onclick="mQuery('#dynamic-content-tab').removeClass('hidden')">
                     Select
                 </a>
                 <button type="button" class="select-theme-selected btn btn-default <?php echo $isCodeMode ? '' : 'hide' ?>" disabled="disabled">
@@ -60,7 +60,7 @@ $isCodeMode = ($active == $codeMode);
                             <i class="fa fa-file-image-o fa-5x text-muted" aria-hidden="true" style="padding-top: 75px; color: #E4E4E4;"></i>
                         </div>
                     <?php endif; ?>
-                    <a href="#" type="button" data-theme="<?php echo $themeKey; ?>" class="select-theme-link btn btn-default <?php echo $isSelected ? 'hide' : '' ?>">
+                    <a href="#" type="button" data-theme="<?php echo $themeKey; ?>" class="select-theme-link btn btn-default <?php echo $isSelected ? 'hide' : '' ?>" onclick="mQuery('#dynamic-content-tab').addClass('hidden')">
                         Select
                     </a>
                     <button type="button" class="select-theme-selected btn btn-default <?php echo $isSelected ? '' : 'hide' ?>" disabled="disabled">

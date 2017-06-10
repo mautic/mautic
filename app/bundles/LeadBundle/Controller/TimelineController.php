@@ -102,8 +102,15 @@ class TimelineController extends CommonController
         $events = $this->getAllEngagements($leads, $filters, $order, $page, $limit);
 
         $str = $this->request->server->get('QUERY_STRING');
-        $str = substr($str, strpos($str, '?') + 1);
         parse_str($str, $query);
+
+        $tmpl = 'table';
+        if (array_key_exists('from', $query) && 'iframe' === $query['from']) {
+            $tmpl = 'list';
+        }
+        if (array_key_exists('tmpl', $query)) {
+            $tmpl = $query['tmpl'];
+        }
 
         return $this->delegateView(
             [
@@ -120,7 +127,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:plugin_list.html.php',
+                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.php', $tmpl),
             ]
         );
     }
@@ -158,8 +165,15 @@ class TimelineController extends CommonController
         $events = $this->getEngagements($lead, $filters, $order, $page);
 
         $str = $this->request->server->get('QUERY_STRING');
-        $str = substr($str, strpos($str, '?') + 1);
         parse_str($str, $query);
+
+        $tmpl = 'table';
+        if (array_key_exists('from', $query) && 'iframe' === $query['from']) {
+            $tmpl = 'list';
+        }
+        if (array_key_exists('tmpl', $query)) {
+            $tmpl = $query['tmpl'];
+        }
 
         return $this->delegateView(
             [
@@ -175,7 +189,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:plugin_list.html.php',
+                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.php', $tmpl),
             ]
         );
     }

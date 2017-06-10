@@ -775,7 +775,7 @@ class LeadModel extends FormModel
 
         if (empty($this->currentLead)) {
             $ip = $this->ipLookupHelper->getIpAddress();
-            if (!$leadId = $this->request->cookies->get($trackingId)) {
+            if ($this->request && !$leadId = $this->request->cookies->get($trackingId)) {
                 $leadId = ('GET' == $this->request->getMethod())
                     ?
                     $this->request->query->get('mtc_id')
@@ -851,7 +851,7 @@ class LeadModel extends FormModel
      *
      * @return array|Lead|null
      */
-    public function getContactFromRequest($queryFields = [])
+    public function getContactFromRequest($queryFields = [], $trackByFingerprint = false)
     {
         $lead = null;
 
@@ -921,6 +921,15 @@ class LeadModel extends FormModel
                     // Merge with existing lead or use the one found
                     $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
                 }
+            }
+        }
+
+        // Search for lead by fingerprint
+        if (empty($lead) && !empty($queryFields['fingerprint']) && $trackByFingerprint) {
+            $deviceRepo = $this->getDeviceRepository();
+            $device     = $deviceRepo->getDeviceByFingerprint($queryFields['fingerprint']);
+            if ($device) {
+                $lead = $this->getEntity($device['lead_id']);
             }
         }
 
@@ -1068,7 +1077,7 @@ class LeadModel extends FormModel
 
         if (empty($trackingId)) {
             //check for the tracking cookie or sid from query
-            if (!$trackingId = $this->request->cookies->get('mautic_session_id')) {
+            if ($this->request && !$trackingId = $this->request->cookies->get('mautic_session_id')) {
                 $trackingId = ('GET' == $this->request->getMethod())
                     ?
                     $this->request->query->get('mtc_sid')
@@ -2418,6 +2427,11 @@ class LeadModel extends FormModel
         //check if lead is in company already
         if (!$company instanceof Company) {
             $company = $this->companyModel->getEntity($company);
+        }
+
+        // company does not exist anymore
+        if ($company === null) {
+            return false;
         }
 
         $companyLead = $this->companyModel->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId(), $company->getId());

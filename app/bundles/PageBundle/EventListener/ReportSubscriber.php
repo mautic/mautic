@@ -102,7 +102,8 @@ class ReportSubscriber extends CommonSubscriber
             $columns = array_merge(
                 $columns,
                 $event->getStandardColumns('p.', ['name', 'description'], 'mautic_page_action'),
-                $event->getCategoryColumns()
+                $event->getCategoryColumns(),
+                $event->getCampaignByChannelColumns()
             );
             $data = [
                 'display_name' => 'mautic.page.pages',
@@ -257,6 +258,7 @@ class ReportSubscriber extends CommonSubscriber
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id');
                 $event->addCategoryLeftJoin($qb, 'p');
+                $event->addCampaignByChannelJoin($qb, 'p', 'page');
                 break;
             case 'page.hits':
                 $event->applyDateFilters($qb, 'date_hit', 'ph');
@@ -271,6 +273,7 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addIpAddressLeftJoin($qb, 'ph');
                 $event->addCategoryLeftJoin($qb, 'p');
                 $event->addLeadLeftJoin($qb, 'ph');
+                $event->addCampaignByChannelJoin($qb, 'p', 'page');
                 break;
         }
 

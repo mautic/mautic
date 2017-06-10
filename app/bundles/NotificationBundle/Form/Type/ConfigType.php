@@ -51,6 +51,19 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'notification_tracking_page_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.notification.config.form.notification.trackingpage.enabled',
+                'data'  => (bool) $options['data']['notification_tracking_page_enabled'],
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.trackingpage.enabled.tooltip',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
+                ],
+            ]
+        );
+
+        $builder->add(
             'notification_app_id',
             'text',
             [
@@ -106,13 +119,27 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'notification_subdomain_name',
+            'text',
+            [
+                'label' => 'mautic.notification.config.form.notification.subdomain_name',
+                'data'  => $options['data']['notification_subdomain_name'],
+                'attr'  => [
+                    'tooltip'      => 'mautic.notification.config.form.notification.subdomain_name.tooltip',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
+                ],
+            ]
+        );
+
+        $builder->add(
             'welcomenotification_enabled',
             'yesno_button_group',
             [
                 'label' => 'mautic.notification.config.form.notification.welcome.enabled',
                 'data'  => (bool) $options['data']['welcomenotification_enabled'],
                 'attr'  => [
-                    'tooltip'      => 'mautic.notification.config.form.notification.welcome.tooltip',
+                    'tooltip'      => 'mautic.notification.config.form.notification.welcome.enabled.tooltip',
                     'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
                 ],
             ]
