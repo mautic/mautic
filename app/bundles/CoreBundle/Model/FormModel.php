@@ -102,6 +102,19 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
+     * Create/edit entity then detach to preserve RAM
+     *
+     * @param      $entity
+     * @param bool $unlock
+     */
+    public function saveAndDetachEntity($entity, $unlock = true)
+    {
+        $this->saveEntity($entity, $unlock);
+
+        $this->em->detach($entity);
+    }
+
+    /**
      * Save an array of entities.
      *
      * @param array $entities
