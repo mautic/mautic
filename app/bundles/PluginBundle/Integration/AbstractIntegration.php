@@ -2446,19 +2446,21 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param                 $leadsToSync
-     * @param                 $totalIgnored
-     * @param bool|\Exception $error
+     * @param array $leadsToSync
+     * @param bool  $error
      *
+     * @return int Number ignored due to being duplicates
      * @throws ApiErrorException
+     * @throws \Exception
      */
-    protected function cleanupFromSync(&$leadsToSync = [], &$totalIgnored = 0, $error = false)
+    protected function cleanupFromSync(&$leadsToSync = [], $error = false)
     {
+        $duplicates = 0;
         if ($this->mauticDuplicates) {
             // Create integration entities for these to be ignored until they are updated
             foreach ($this->mauticDuplicates as $id => $dup) {
                 $this->persistIntegrationEntities[] = $this->createIntegrationEntity('Lead', null, $dup, $id, [], false);
-                ++$totalIgnored;
+                ++$duplicates;
             }
 
             $this->mauticDuplicates = [];
@@ -2493,6 +2495,8 @@ abstract class AbstractIntegration
 
             throw new ApiErrorException($error);
         }
+
+        return $duplicates;
     }
 
     /**

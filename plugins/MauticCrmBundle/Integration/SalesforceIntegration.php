@@ -992,7 +992,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $totalUpdated = 0;
         $totalCreated = 0;
         $totalErrors  = 0;
-        $totalIgnored = 0;
 
         list($fieldMapping, $mauticLeadFieldString, $requiredFields, $supportedObjects) = $this->prepareFieldsForPush($config);
 
@@ -1105,7 +1104,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $progress
                     );
                 } catch (ApiErrorException $exception) {
-                    $this->cleanupFromSync($leadsToSync, $totalIgnored, $exception);
+                    $this->cleanupFromSync($leadsToSync, $exception);
                 }
             } elseif ($checkEmailsInSF) {
                 $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, $requiredFields[$sfObject]['string']);
@@ -1114,7 +1113,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     // Something is wrong so throw an exception to prevent creating a bunch of new leads
                     $this->cleanupFromSync(
                         $leadsToSync,
-                        $totalIgnored,
                         json_encode($sfEntityRecords)
                     );
                 }
@@ -1150,7 +1148,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             // Persist pending changes
-            $this->cleanupFromSync($leadsToSync, $totalIgnored);
+            $this->cleanupFromSync($leadsToSync);
 
             // Make the request
             $this->makeCompositeRequest($mauticData, $totalUpdated, $totalCreated, $totalErrors);
