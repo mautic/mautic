@@ -61,10 +61,11 @@ class RedirectModel extends FormModel
      * @param Redirect $redirect
      * @param array    $clickthrough
      * @param bool     $shortenUrl
+     * @param array    $utmTags
      *
      * @return string
      */
-    public function generateRedirectUrl(Redirect $redirect, $clickthrough = [], $shortenUrl = false)
+    public function generateRedirectUrl(Redirect $redirect, $clickthrough = [], $shortenUrl = false, $utmTags = [])
     {
         $url = $this->buildUrl(
             'mautic_url_redirect',
@@ -73,6 +74,16 @@ class RedirectModel extends FormModel
             $clickthrough,
             $shortenUrl
         );
+
+        if (!empty($utmTags)) {
+            $query     = parse_url($url, PHP_URL_QUERY);
+            $urlString = http_build_query($utmTags, '', '&');
+            if ($query) {
+                $url .= '&'.$urlString;
+            } else {
+                $url .= '?'.$urlString;
+            }
+        }
 
         if ($shortenUrl) {
             $url = $this->urlHelper->buildShortUrl($url);

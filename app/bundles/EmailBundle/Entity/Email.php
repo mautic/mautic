@@ -93,6 +93,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $content = [];
 
     /**
+     * @var array
+     */
+    private $utmTags = [];
+
+    /**
      * @var string
      */
     private $plainText;
@@ -252,6 +257,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->build();
 
         $builder->createField('content', 'array')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTags', 'array')
+            ->columnName('utm_tags')
             ->nullable()
             ->build();
 
@@ -435,6 +445,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'utmTags',
                     'customHtml',
                     'plainText',
                     'template',
@@ -571,6 +582,40 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $this->isChanged('content', $content);
         $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
+    }
+
+    /**
+     * Generate UTMs params
+     * @return array
+     */
+    public function getUtmTagsForUrl()
+    {
+        $utmTags = [];
+
+        foreach ($this->utmTags as $utmTag => $value) {
+            $utmTags[str_replace('utm','utm_',strtolower($utmTag))] = $value;
+        }
+
+        return $utmTags;
+    }
+
+    /**
+     * @param array $utmTags
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmTags', $utmTags);
+        $this->utmTags = $utmTags;
 
         return $this;
     }
@@ -735,6 +780,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         return $this;
     }
+
 
     /**
      * @return mixed

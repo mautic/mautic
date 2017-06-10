@@ -293,13 +293,17 @@ class BuilderSubscriber extends CommonSubscriber
     {
         if ($event->isInternalSend()) {
             // Don't convert for previews, example emails, etc
-
             return;
         }
 
         $email   = $event->getEmail();
         $emailId = ($email) ? $email->getId() : null;
 
+        if (!$email instanceof Email) {
+            $email = $this->emailModel->getEntity($emailId);
+        }
+
+        $utmTags = $email->getUtmTagsForUrl();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
@@ -310,9 +314,9 @@ class BuilderSubscriber extends CommonSubscriber
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough)
+                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags)
                 :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough);
+                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, false, $utmTags);
 
             $event->addToken($token, $url);
         }
