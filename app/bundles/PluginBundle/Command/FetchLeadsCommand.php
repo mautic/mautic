@@ -196,7 +196,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
             if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
                 $result  = $integrationObject->pushLeads($params);
-                $errored = '?';
                 $ignored = 0;
 
                 if (4 === count($result)) {
