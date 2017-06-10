@@ -1136,6 +1136,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         $this->logger->debug('SALESFORCE: '.$this->getApiHelper()->getRequestCounter().' API requests made for pushLeads');
 
+        // Assume that those not touched are ignored due to not having matching fields, duplicates, etc
+        $totalIgnored = $totalCount - ($totalUpdated + $totalCreated + $totalErrors);
+
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
 
