@@ -61,6 +61,7 @@ return [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber',
                 'arguments' => [
                     'mautic.focus.model.focus',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.focus.subscriber.focus' => [
