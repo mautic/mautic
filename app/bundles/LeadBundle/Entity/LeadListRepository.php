@@ -905,6 +905,8 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'source':
                 case 'url_title':
+                    $ignoreAutoFilter = true;
+
                     $operand = in_array($func, ['eq', 'like', 'regexp', 'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
 
                     $column = $details['field'];
@@ -927,11 +929,12 @@ class LeadListRepository extends CommonRepository
                             );
                             break;
                         case 'like':
-                        case '!like':
+                        case 'notLike':
+                            $operand                = 'EXISTS';
                             $parameters[$parameter] = '%'.$details['filter'].'%';
-                        $subqb->where(
+                            $subqb->where(
                                 $q->expr()->andX(
-                                    $q->expr()->like($alias.'.'.$column, $exprParameter),
+                                    $q->expr()->$func($alias.'.'.$column, $exprParameter),
                                     $q->expr()->eq($alias.'.lead_id', 'l.id')
                                 )
                             );
