@@ -86,11 +86,17 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                 ->ignore('default')
                 ->reserve(3600);
 
+            if (empty($job)) {
+                continue;
+            }
+
             $consumerEvent = $this->queueService->dispatchConsumerEventFromPayload($job->getData());
 
             if ($consumerEvent->getResult() === QueueConsumerResults::TEMPORARY_REJECT) {
                 $pheanstalk->release($job, PheanstalkInterface::DEFAULT_PRIORITY, static::DELAY_DURATION);
-            } elseif ($consumerEvent->getResult() === QueueConsumerResults::ACKNOWLEDGE) {
+            } elseif ($consumerEvent->getResult() === QueueConsumerResults::REJECT) {
+                $pheanstalk->bury($job);
+            } else {
                 try {
                     $pheanstalk->delete($job);
                 } catch (Pheanstalk\Exception\ServerException $e) {
@@ -100,8 +106,6 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
                         throw $e;
                     }
                 }
-            } elseif ($consumerEvent->getResult() === QueueConsumerResults::REJECT) {
-                $pheanstalk->bury($job);
             }
 
             ++$messagesConsumed;
