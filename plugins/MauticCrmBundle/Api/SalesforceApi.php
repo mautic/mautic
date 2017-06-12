@@ -50,6 +50,11 @@ class SalesforceApi extends CrmApi
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
+        if (isset($queryUrl)) {
+            // Query commands can have long wait time while SF builds response as the offset increases
+            $settings['request_timeout'] = 300;
+        }
+
         // Wrap in a isAuthorized to refresh token if applicable
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
         ++$this->apiRequestCounter;

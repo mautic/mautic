@@ -383,6 +383,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         if (isset($data['records']) and $object !== 'Activity') {
             foreach ($data['records'] as $record) {
+                $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate record '.var_export($record, true));
                 if (isset($params['progress'])) {
                     $params['progress']->advance();
                 }
@@ -460,6 +461,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $integrationEntityRepo->saveEntities($this->persistIntegrationEntities);
                 $this->em->clear(IntegrationEntity::class);
             }
+
+            unset($data['records']);
+            $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate response '.var_export($data, true));
+
             unset($data);
             $this->persistIntegrationEntities = [];
             unset($dataObject);
@@ -685,15 +690,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $result = $this->getApiHelper()->getLeads($query, $object);
-                list($justUpdated, $justCreated) = $this->amendLeadDataBeforeMauticPopulate($result, $object, $params);
+                while (true) {
+                    $result = $this->getApiHelper()->getLeads($query, $object);
+                    if (!isset($result['records'])) {
+                        throw new ApiErrorException(var_export($result, true));
+                    }
 
-                $executed[0] += $justUpdated;
-                $executed[1] += $justCreated;
+                    list($justUpdated, $justCreated) = $this->amendLeadDataBeforeMauticPopulate($result, $object, $params);
 
-                if (isset($result['nextRecordsUrl'])) {
-                    $query['nextUrl'] = $result['nextRecordsUrl'];
-                    $this->getLeads($params, $query, $executed, $result['records'], $object);
+                    $executed[0] += $justUpdated;
+                    $executed[1] += $justCreated;
+
+                    if (isset($result['nextRecordsUrl'])) {
+                        $query['nextUrl'] = $result['nextRecordsUrl'];
+                    } else {
+                        break;
+                    }
                 }
             }
         } catch (\Exception $e) {
