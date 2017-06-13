@@ -329,23 +329,23 @@ class WebhookModel extends FormModel
                 throw new \ErrorException($webhook->getWebhookUrl().' returned '.$response->code);
             }
         } catch (\Exception $e) {
-            $messsge = $e->getMessage();
+            $message = $e->getMessage();
 
             if ($this->isSick($webhook)) {
                 $this->killWebhook($webhook);
-                $messsge .= ' '.$this->translator->trans('mautic.webhook.killed', ['%limit%' => $this->disableLimit]);
+                $message .= ' '.$this->translator->trans('mautic.webhook.killed', ['%limit%' => $this->disableLimit]);
             }
 
             // log any errors but allow the script to keep running
-            $this->logger->addError($messsge);
+            $this->logger->addError($message);
 
             // log that the request failed to display it to the user
-            $this->addLog($webhook, 'N/A', (microtime(true) - $start), $messsge);
+            $this->addLog($webhook, 'N/A', (microtime(true) - $start), $message);
 
             return false;
         }
 
-        if ($webhook->getId()) {
+        if ($this->queueMode === 'command_process' && !empty($this->webhookQueueIdList)) {
 
             // delete all the queued items we just processed
             $webhookQueueRepo->deleteQueuesById($this->webhookQueueIdList);
