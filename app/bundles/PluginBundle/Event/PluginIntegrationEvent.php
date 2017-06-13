@@ -36,4 +36,12 @@ class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
     {
         return $this->integration->getIntegrationSettings();
     }
+
+    /**
+     * @param Integration $integration
+     */
+    public function setEntity(Integration $integration)
+    {
+        $this->integration->setIntegrationSettings($integration);
+    }
 }

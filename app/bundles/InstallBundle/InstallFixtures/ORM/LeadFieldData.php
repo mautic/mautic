@@ -115,6 +115,8 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
             if ($object == 'lead') {
                 // Add an attribution index
                 $indexHelper->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
+                //Add date added and country index
+                $indexHelper->addIndex(['date_added', 'country'], 'date_added_country_index');
             } else {
                 $indexHelper->addIndex(['companyname', 'companyemail'], 'company_filter');
                 $indexHelper->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');

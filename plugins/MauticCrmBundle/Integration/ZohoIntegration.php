@@ -108,7 +108,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $response = $this->makeRequest($request_url, $parameters, 'GET', ['authorize_session' => true]);
 
         if ($response['RESULT'] == 'FALSE') {
-            return $this->factory->getTranslator()->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
+            return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
         }
 
         return $this->extractAuthKeys($response);
@@ -237,7 +237,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $xmlData = '<Leads>';
         $xmlData .= '<row no="1">';
         foreach ($mappedData as $name => $value) {
-            $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $value);
+            $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $this->cleanPushData($value));
         }
         $xmlData .= '</row>';
         $xmlData .= '</Leads>';
