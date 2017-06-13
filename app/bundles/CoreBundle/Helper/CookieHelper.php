@@ -57,7 +57,7 @@ class CookieHelper
      */
     public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = null)
     {
-        if ($this->request == null || MAUTIC_TEST_ENV) {
+        if ($this->request == null || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
             return true;
         }
 
