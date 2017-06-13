@@ -264,6 +264,22 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'disable_trackable_urls',
+            'yesno_button_group',
+            [
+                'label'      => 'mautic.email.config.mailer.disable.trackable.urls',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.mailer.disable.trackable.urls.tooltip',
+
+                ],
+                'data'     => empty($options['data']['disable_trackable_urls']) ? false : true,
+                'required' => false,
+            ]
+        );
+
         $smtpServiceShowConditions  = '{"config_emailconfig_mailer_transport":["smtp"]}';
         $amazonRegionShowConditions = '{"config_emailconfig_mailer_transport":["mautic.transport.amazon"]}';
 
