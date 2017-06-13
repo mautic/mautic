@@ -653,7 +653,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                return (isset($personData) && !empty($personData['Id'])) ? $personData['Id'] : true;
+                return (isset($personData) && !empty($personData['Id'])) ? $personData['Id'] : false;
             }
         } catch (\Exception $e) {
             if ($e instanceof ApiErrorException) {
@@ -1611,7 +1611,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         if (!empty($request)) {
             $result = $apiHelper->syncMauticToSalesforce($request);
 
-            return $this->processCompositeResponse($result['compositeResponse']);
+            return (bool) array_sum($this->processCompositeResponse($result['compositeResponse']));
         }
 
         return false;
