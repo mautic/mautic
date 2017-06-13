@@ -952,12 +952,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('ownerIds', implode(',', $ownerIds))
             ->setParameter('leadId', $lead->getId());
 
-        $result = $q->execute()->fetch();
-        if (!empty($result)) {
-            return true;
-        }
-
-        return false;
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**
