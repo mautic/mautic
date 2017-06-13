@@ -26,7 +26,7 @@ if ($tmpl == 'index') {
                         'target'          => '#companyTable',
                         'routeBase'       => 'company',
                         'templateButtons' => [
-                            'delete' => $permissions['lead:leads:deleteother'],
+                            'delete' => $permissions['lead:companies:delete'],
                         ],
                     ]
                 );
@@ -97,9 +97,9 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $permissions['lead:leads:editother'],
-                                    'clone'  => $permissions['lead:leads:create'],
-                                    'delete' => $permissions['lead:leads:deleteother'],
+                                    'edit'   => $permissions['lead:companies:edit'],
+                                    'clone'  => $permissions['lead:companies:create'],
+                                    'delete' => $permissions['lead:companies:delete'],
                                 ],
                                 'routeBase' => 'company',
                             ]
