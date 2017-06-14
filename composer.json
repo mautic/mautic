@@ -106,7 +106,12 @@
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
         "symfony/expression-language": "~2.8",
-        "egeloen/ordered-form-bundle": "^3.0"
+        "egeloen/ordered-form-bundle": "^3.0",
+
+        "monolog/monolog": "^1.22",
+        "nesbot/carbon": "^1.22",
+        "illuminate/support": "^5.4",
+        "saintsystems/dynamics-sdk-php": "0.1.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
@@ -123,6 +128,26 @@
         {
             "type": "git",
             "url": "https://github.com/mautic/BazingaOAuthServerBundle.git"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "saintsystems/dynamics-sdk-php",
+                "version": "0.1.0",
+                "dist": {
+                    "url": "https://github.com/saintsystems/dynamics-sdk-php/archive/master.zip",
+                    "type": "zip"
+                },
+                "autoload": {
+                    "files": [
+                        "src/OData/Core/helpers.php"
+                    ],
+                    "psr-4": {
+                        "SaintSystems\\OData\\": "src/OData",
+                        "Microsoft\\Dynamics\\": "src/Dynamics"
+                    }
+                }
+            }
         }
     ],
     "scripts": {
