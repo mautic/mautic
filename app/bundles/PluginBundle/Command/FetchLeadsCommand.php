@@ -12,7 +12,6 @@
 namespace Mautic\PluginBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -100,9 +99,10 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $config['objects'] = [];
             }
 
-            $params['start'] = $startDate;
-            $params['end']   = $endDate;
-            $params['limit'] = $limit;
+            $params['start']  = $startDate;
+            $params['end']    = $endDate;
+            $params['limit']  = $limit;
+            $params['output'] = $output;
 
             // set this constant to ensure that all contacts have the same date modified time and date synced time to prevent a pull/push loop
             define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
@@ -111,8 +111,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
-                        $progress = new ProgressBar($output);
-                        $params['progress'] = $progress;
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
                         $updated = $created = $processed = 0;
@@ -125,6 +123,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                             } else {
                                 $processed += intval($results);
                             }
+                            $output->writeln('');
                         }
                         if (in_array('Contact', $config['objects'])) {
                             $results = $integrationObject->getLeads($params, null, $contactsExecuted, [], 'Contact');
@@ -135,9 +134,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
                             } else {
                                 $processed += intval($results);
                             }
+                            $output->writeln('');
                         }
-                        $progress->finish();
-                        $output->writeln('');
+
                         if ($processed) {
                             $output->writeln(
                                 '<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed])
@@ -169,8 +168,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
 
                 if (strtotime($startDate) > strtotime('-30 days')) {
-                    $progress = new ProgressBar($output);
-                    $params['progress'] = $progress;
                     $results = $integrationObject->getCompanies($params);
                     if (is_array($results)) {
                         list($justUpdated, $justCreated) = $results;
@@ -179,7 +176,6 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     } else {
                         $processed += intval($results);
                     }
-                    $progress->finish();
                     $output->writeln('');
                     if ($processed) {
                         $output->writeln(
@@ -188,12 +184,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         );
                     } else {
                         $output->writeln(
-                                '<comment>'.$translator->trans(
-                                    'mautic.plugin.command.fetch.companies.events_executed_breakout',
-                                    ['%updated%' => $updated, '%created%' => $created]
-                                )
-                                .'</comment>'."\n"
-                            );
+                            '<comment>'.$translator->trans(
+                                'mautic.plugin.command.fetch.companies.events_executed_breakout',
+                                ['%updated%' => $updated, '%created%' => $created]
+                            )
+                            .'</comment>'."\n"
+                        );
                     }
                 } else {
                     $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
@@ -210,7 +206,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 } elseif (3 === count($result)) {
                     list($updated, $created, $errored) = $result;
                 } else {
-                    $errored                 = '?';
+                    $errored = '?';
                     list($updated, $created) = $result;
                 }
                 $output->writeln(

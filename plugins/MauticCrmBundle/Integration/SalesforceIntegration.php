@@ -13,7 +13,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\SubmissionModel;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -402,24 +401,29 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 if (isset($dataObject) && $dataObject) {
                     $entity = false;
-                    if ($object == 'Lead' or $object == 'Contact') {
-                        // Set owner so that it maps if configured to do so
-                        if (!empty($dataObject['Owner__Lead']['Email'])) {
-                            $dataObject['owner_email'] = $dataObject['Owner__Lead']['Email'];
-                        } elseif (!empty($dataObject['Owner__Contact']['Email'])) {
-                            $dataObject['owner_email'] = $dataObject['Owner__Contact']['Email'];
-                        }
-                        $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
-                        $mauticObjectReference = 'lead';
-                    } elseif ($object == 'Account') {
-                        $entity                = $this->getMauticCompany($dataObject, 'Account');
-                        $mauticObjectReference = 'company';
-                    } else {
-                        $this->logIntegrationError(
-                            new \Exception(
-                                sprintf('Received an unexpected object without an internalObjectReference "%s"', $object)
-                            )
-                        );
+                    switch ($object) {
+                        case 'Lead':
+                        case 'Contact':
+                            // Set owner so that it maps if configured to do so
+                            if (!empty($dataObject['Owner__Lead']['Email'])) {
+                                $dataObject['owner_email'] = $dataObject['Owner__Lead']['Email'];
+                            } elseif (!empty($dataObject['Owner__Contact']['Email'])) {
+                                $dataObject['owner_email'] = $dataObject['Owner__Contact']['Email'];
+                            }
+                            $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
+                            $mauticObjectReference = 'lead';
+                            break;
+                        case 'Account':
+                            $entity                = $this->getMauticCompany($dataObject, 'Account');
+                            $mauticObjectReference = 'company';
+                            break;
+                        default:
+                            $this->logIntegrationError(
+                                new \Exception(
+                                    sprintf('Received an unexpected object without an internalObjectReference "%s"', $object)
+                                )
+                            );
+                            break;
                     }
 
                     if (!$entity) {
@@ -690,22 +694,57 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
+                $total     = null;
+                $progress  = null;
+                $processed = 0;
+                $retry     = 0;
                 while (true) {
                     $result = $this->getApiHelper()->getLeads($query, $object);
                     if (!isset($result['records'])) {
                         throw new ApiErrorException(var_export($result, true));
                     }
 
+                    if (null === $total) {
+                        $total = $result['totalSize'];
+
+                        if (isset($params['output'])) {
+                            $progress = new ProgressBar($params['output'], $total);
+                            $progress->setFormat(' %current%/%max% [%bar%] %percent:3s%% ('.$object.')');
+
+                            $params['progress'] = $progress;
+                        }
+                    }
+
                     list($justUpdated, $justCreated) = $this->amendLeadDataBeforeMauticPopulate($result, $object, $params);
 
                     $executed[0] += $justUpdated;
                     $executed[1] += $justCreated;
+                    $processed   += count($result['records']);
 
                     if (isset($result['nextRecordsUrl'])) {
                         $query['nextUrl'] = $result['nextRecordsUrl'];
                     } else {
+                        if ($processed < $total) {
+                            // Something has gone wrong so try a few more times before giving up
+                            if ($retry <= 5) {
+                                $this->logger->debug("SALESFORCE: Processed less than total but didn't get a nextRecordsUrl in the response for getLeads ($object): ".var_export($result, true));
+
+                                usleep(500);
+                                ++$retry;
+
+                                continue;
+                            } else {
+                                // Throw an exception cause something isn't right
+                                throw new ApiErrorException("Expected to process $total but only processed $processed: ".var_export($result, true));
+                            }
+                        }
                         break;
                     }
+                }
+
+
+                if ($progress) {
+                    $progress->finish();
                 }
             }
         } catch (\Exception $e) {

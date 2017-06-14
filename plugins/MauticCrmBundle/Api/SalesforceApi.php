@@ -71,6 +71,8 @@ class SalesforceApi extends CrmApi
 
                         if (empty($refreshError)) {
                             return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
+                        } else {
+                            $errors[] = $refreshError;
                         }
                     }
                     $errors[] = $r['message'];
