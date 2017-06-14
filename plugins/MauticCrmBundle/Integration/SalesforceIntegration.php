@@ -2315,7 +2315,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param $mauticData
      * @param $checkEmailsInSF
      * @param $processedLeads
-     * @param $leadSfFieldsToCreate
      * @param $requiredFields
      * @param $objectFields
      */
