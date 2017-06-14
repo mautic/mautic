@@ -12,6 +12,13 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use GuzzleHttp\Client;
+use Spinen\ConnectWise\Api\Client as ConnectWiseClient;
+use Spinen\ConnectWise\Api\Token;
+use Spinen\ConnectWise\Models\Company\Company;
+use Spinen\ConnectWise\Models\Company\Contact;
+use Spinen\ConnectWise\Support\ModelResolver;
+
 /**
  * Class ConnectwiseIntegration.
  */
@@ -44,8 +51,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     {
         return [
             'companyid' => 'mautic.connectwise.form.companyid',
-            'username'  => 'mautic.connectwise.form.publickey',
+            'memberid'  => 'mautic.connectwise.form.memberid',
+            'username'  => 'mautic.connectwise.form.integrator',
             'password'  => 'mautic.connectwise.form.privatekey',
+            'site'      => 'mautic.connectwise.form.site',
             'appcookie' => 'mautic.connectwise.form.cookie',
         ];
     }
@@ -70,13 +79,33 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get the array key for member id.
+     *
+     * @return string
+     */
+    public function getMemberIdKey()
+    {
+        return 'memberid';
+    }
+
+    /**
      * Get the array key for client id.
      *
      * @return string
      */
-    public function getClientIdKey()
+    public function getIntegrator()
     {
         return 'username';
+    }
+
+    /**
+     * Get the array key for client id.
+     *
+     * @return string
+     */
+    public function getConnectwiseUrl()
+    {
+        return 'site';
     }
 
     /**
@@ -134,21 +163,22 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function authCallback($settings = [], $parameters = [])
     {
-        $url         = $this->getApiUrl();
-        $request_url = sprintf('%s/login/login.aspx', $url);
-        $parameters  = [
-            'username'    => $this->keys[$this->getClientIdKey()],
-            'password'    => $this->keys[$this->getClientSecretKey()],
-            'companyname' => $this->keys[$this->getCompanyIdKey()],
-        ];
+        $token    = new Token();
+        $guzzle   = new Client();
+        $resolver = new ModelResolver();
+        $client   = new ConnectWiseClient($token, $guzzle, $resolver);
+        $headers  = $client->getHeaders();
 
-        $response = $this->makeRequest($request_url, $parameters, 'GET', ['headers' => ['cookie' => $this->keys[$this->getCompanyCookieKey()]]]);
+        $token
+            ->setCompanyId($this->keys[$this->getCompanyIdKey()])
+            ->setMemberId($this->keys[$this->getMemberIdKey()]);
 
-        if ($response == 'FAIL') {
-            return $this->translator->trans('mautic.connectwise.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
-        }
+        $client
+            ->setIntegrator($this->keys[$this->getIntegrator()])
+            ->setPassword($this->keys[$this->getClientSecretKey()])
+            ->setUrl($this->keys[$this->getConnectwiseUrl()]);
 
-        return $this->extractAuthKeys($response);
+        return $this->extractAuthKeys($client);
     }
 
     /**
