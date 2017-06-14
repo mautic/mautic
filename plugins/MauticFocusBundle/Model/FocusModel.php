@@ -204,6 +204,11 @@ class FocusModel extends FormModel
             '',
             $this->router->generate('mautic_focus_lead_incampaign', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
+        $noticeTraceUrl = str_replace(
+            ['http://', 'https://'],
+            '',
+            $this->router->generate('mautic_focus_track_notice', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
 
         if (!empty($focus['form'])) {
             $form = $this->formModel->getEntity($focus['form']);
@@ -246,6 +251,7 @@ class FocusModel extends FormModel
                     'clickUrl'         => $url,
                     'inCampaign'       => $inCampaign,
                     'focusCampaignUrl' => $focusCampaignUrl,
+                    'noticeTraceUrl'   => $noticeTraceUrl,
                 ]
             );
 

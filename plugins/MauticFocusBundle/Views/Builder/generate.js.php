@@ -551,10 +551,31 @@ switch ($style) {
                     Focus.toggleBarCollapse(collapser[0], true);
                 }
                 <?php endif; ?>
-
+                <?php if ($inCampaign && $focus['type'] == 'notice'): ?>
+                    Focus.traceNoticeShown();
+                <?php endif; ?>
                 return true;
             },
+            <?php if ($inCampaign && $focus['type'] == 'notice'): ?>
+            traceNoticeShown: function () {
+                var leadId = Focus.cookies.hasItem('mtc_id')?Focus.cookies.getItem('mtc_id'):false;
+                var focusId = <?php echo $focus['id']; ?>;
+                var method = 'GET';
+		var query = 'leadid='+leadId+'&focusid='+focusId;
+                var url =(window.location.protocol=='https:'?'https:':'http:')+'//<?php echo $noticeTraceUrl; ?>?'+query;
 
+                var xhr = new XMLHttpRequest();
+                if ("withCredentials" in xhr) {
+                    xhr.open(method, url, true);
+                } else if (typeof XDomainRequest != "undefined") {
+                    xhr = new XDomainRequest();
+                    xhr.open(method, url);
+                }                
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.withCredentials = true;
+                xhr.send(query);
+            },
+            <?php endif; ?>
             // Enable iframe resizer
             enableIframeResizer: function () {
                 <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>

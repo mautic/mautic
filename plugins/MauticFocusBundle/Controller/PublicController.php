@@ -71,7 +71,7 @@ class PublicController extends CommonController
     public function campaignLeadAction()
     {
         $focusId = $this->request->get('focusid', false);
-        $leadId    = $this->request->get('leadid', false);
+        $leadId  = $this->request->get('leadid', false);
 
         if ($focusId > 0 && $leadId > 0) {
             /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
@@ -82,5 +82,22 @@ class PublicController extends CommonController
         } else {
             return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
         }
+    }
+
+    public function trackNoticeAction()
+    {
+        $focusId = $this->request->get('focusid', false);
+        $leadId  = $this->request->get('leadid', false);
+
+        if ($focusId > 0 && $leadId > 0) {
+            $leadeventlog = $this->getModel('focus')->getFocusCampaignRepository()->eventLogFromFocusLeads($focusId, $leadId);
+            if ($leadeventlog) {
+                $this->getModel('campaign.event')->setEventStatus($leadeventlog, true, 'User action:View');
+
+                return new JsonResponse(['success' => 'true'], 200, ['Access-Control-Allow-Origin' => '*']);
+            }
+        }
+
+        return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
     }
 }

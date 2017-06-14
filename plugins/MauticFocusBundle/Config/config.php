@@ -39,6 +39,10 @@ return [
                 'path'       => '/focus/campaign/lead',
                 'controller' => 'MauticFocusBundle:Public:campaignLead',
             ],
+            'mautic_focus_track_notice' => [
+                'path'       => '/focus/track/notice',
+                'controller' => 'MauticFocusBundle:Public:trackNotice',
+            ],
         ],
     ],
 
