@@ -111,7 +111,6 @@ class FilterSelectorType extends AbstractType
                     'tooltip' => 'mautic.report.report.label.filterdynamic_tooltip',
                 ],
                 'required' => false,
-                'data'     => (!isset($options['data']['dynamic']) || !empty($options['data']['dynamic'])),
             ]
         );
     }

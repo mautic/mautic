@@ -176,7 +176,7 @@ trait FrequencyRuleTrait
         foreach ($formData['subscribed_channels'] as $contactChannel) {
             if (!isset($leadChannels[$contactChannel])) {
                 $contactable = $model->isContactable($lead, $contactChannel);
-                if ($contactable !== DoNotContact::UNSUBSCRIBED) {
+                if ($contactable == DoNotContact::UNSUBSCRIBED) {
                     // Only resubscribe if the contact did not opt out themselves
                     $model->removeDncForLead($lead, $contactChannel);
                 }

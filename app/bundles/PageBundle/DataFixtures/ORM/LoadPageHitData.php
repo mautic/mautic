@@ -42,10 +42,9 @@ class LoadPageHitData extends AbstractFixture implements OrderedFixtureInterface
      */
     public function load(ObjectManager $manager)
     {
-        $factory = $this->container->get('mautic.factory');
-        $repo    = $factory->getModel('page.page')->getRepository();
-
+        $repo = $this->container->get('mautic.page.model.page')->getRepository();
         $hits = CsvHelper::csv_to_array(__DIR__.'/fakepagehitdata.csv');
+
         foreach ($hits as $count => $rows) {
             $hit = new Hit();
             foreach ($rows as $col => $val) {

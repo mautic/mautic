@@ -52,7 +52,7 @@ class UntrackableUrlsEvent extends Event
      */
     public function addNonTrackable($url)
     {
-        $this->doNotTrack[$url] = true;
+        $this->doNotTrack[] = $url;
     }
 
     /**

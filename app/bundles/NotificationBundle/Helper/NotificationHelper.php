@@ -102,9 +102,9 @@ class NotificationHelper
     public function getScript()
     {
         if ($this->hasScript()) {
-            $integration = $this->integrationHelper->getIntegrationObject('Twilio');
+            $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-            if ($integration === false) {
+            if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
                 return;
             }
 
@@ -147,7 +147,7 @@ scrpt.rel ='manifest';
 scrpt.href ='/manifest.json';
 var head = document.getElementsByTagName('head')[0];
 head.appendChild(scrpt);
-     
+
 OneSignal.push(["init", {
     appId: "{$appId}",
     safari_web_id: "{$safariWebId}",
@@ -184,8 +184,8 @@ OneSignal.push(function() {
         OneSignal.getUserId(function(userId) {
             if (userId) {
                 postUserIdToMautic(userId);
-            }        
-        });    
+            }
+        });
     };
 });
 JS;
@@ -222,16 +222,21 @@ JS;
             $landingPage = false;
         }
 
-        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
-        if ($integration === false) {
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return false;
         }
 
         $supportedFeatures = $integration->getIntegrationSettings()->getSupportedFeatures();
 
         // disable on Landing pages
-        if ($landingPage == true && !in_array('landing_page_enabled', $supportedFeatures)) {
+        if ($landingPage === true && !in_array('landing_page_enabled', $supportedFeatures)) {
+            return false;
+        }
+
+        // disable on Landing pages
+        if ($landingPage === false && !in_array('tracking_page_enabled', $supportedFeatures)) {
             return false;
         }
 
