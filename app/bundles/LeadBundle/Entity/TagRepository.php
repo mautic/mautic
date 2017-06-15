@@ -75,8 +75,6 @@ class TagRepository extends CommonRepository
         return $results;
     }
 
-
-
     /**
      * Check Lead tags by Ids.
      *
@@ -94,7 +92,7 @@ class TagRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-            $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
+        $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
                 ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
                 ->where(
                     $q->expr()->andX(
@@ -104,14 +102,6 @@ class TagRepository extends CommonRepository
                 )
                 ->setParameter('leadId', $lead->getId());
 
-        $result = $q->execute()->fetch();
-
-        if (!empty($result)) {
-            return true;
-        }
-
-        return false;
+        return (bool) $q->execute()->fetchColumn();
     }
-
-
 }

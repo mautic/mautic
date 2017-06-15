@@ -207,7 +207,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * Check Lead segments by ids
+     * Check Lead segments by ids.
      *
      * @param Lead $lead
      * @param $ids
@@ -233,12 +233,7 @@ class LeadListRepository extends CommonRepository
             ->setParameter('ids', implode(',', $ids))
             ->setParameter('leadId', $lead->getId());
 
-        $result = $q->execute()->fetch();
-        if (!empty($result)) {
-            return true;
-        }
-
-        return false;
+        return  (bool) $q->execute()->fetchColumn();
     }
 
     /**

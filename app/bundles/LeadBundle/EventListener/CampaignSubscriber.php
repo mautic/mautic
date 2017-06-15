@@ -177,7 +177,6 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('lead.segments', $trigger);
-
     }
 
     /**
@@ -343,17 +342,12 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if ($event->checkContext('lead.tags')) {
-
             $tagRepo = $this->leadModel->getTagRepository();
-            $result = $tagRepo->checkLeadByTags($lead, $event->getConfig()['tags']);
-
+            $result  = $tagRepo->checkLeadByTags($lead, $event->getConfig()['tags']);
         } elseif ($event->checkContext('lead.segments')) {
-
             $listRepo = $this->listModel->getRepository();
             $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
-
         } elseif ($event->checkContext('lead.field_value')) {
-
             if ($event->getConfig()['operator'] === 'date') {
                 // Set the date in system timezone since this is triggered by cron
                 $triggerDate = new \DateTime('now', new \DateTimeZone($this->params['default_timezone']));

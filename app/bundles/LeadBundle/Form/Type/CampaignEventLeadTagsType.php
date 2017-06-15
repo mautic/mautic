@@ -11,10 +11,9 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class CampaignEventLeadTagsType.
@@ -23,7 +22,7 @@ class CampaignEventLeadTagsType extends AbstractType
 {
     private $translator;
 
-    public function __construct(Translator $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -32,7 +31,6 @@ class CampaignEventLeadTagsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder->add(
             'tags',
             'lead_tag',
@@ -47,8 +45,6 @@ class CampaignEventLeadTagsType extends AbstractType
                 ],
             ]
         );
-
-
     }
 
     /**
