@@ -108,13 +108,6 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
     private $onlineStatus = 'offline';
 
     /**
-     * Notes if user is guest or not.
-     *
-     * @var bool
-     */
-    public $isGuest = false;
-
-    /**
      * Stores active role permissions.
      *
      * @var
@@ -130,6 +123,34 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
      * @var string
      */
     private $signature;
+
+    /**
+     * @var bool
+     */
+    private $guest = false;
+
+    /**
+     * User constructor.
+     *
+     * @param bool $isGuest
+     */
+    public function __construct($isGuest = false)
+    {
+        $this->guest = $isGuest;
+    }
+
+    /**
+     * @deprecated 2.9.0 to be removed in 3.0; support for $isGuest public property
+     * @param $name
+     */
+    public function __get($name)
+    {
+        if ('isGuest' === $name) {
+            @trigger_error('$isGuest is deprecated as of 2.9.0; use construct and isGuest() instead', E_USER_DEPRECATED);
+
+            return $this->guest;
+        }
+    }
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -877,5 +898,13 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
         $thatUser = $user->getId().$user->getUsername().$user->getPassword();
 
         return $thisUser === $thatUser;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isGuest()
+    {
+        return $this->guest;
     }
 }
