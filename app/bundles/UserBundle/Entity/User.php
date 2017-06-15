@@ -141,6 +141,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
     /**
      * @deprecated 2.9.0 to be removed in 3.0; support for $isGuest public property
+     *
      * @param $name
      */
     public function __get($name)
