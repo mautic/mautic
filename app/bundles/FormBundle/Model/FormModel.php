@@ -409,7 +409,7 @@ class FormModel extends CommonFormModel
         if (empty($cachedHtml)) {
             $cachedHtml = $this->generateHtml($form, $useCache);
         }
-
+        $this->formModel->populateValuesWithLead($form, $cachedHtml);
         if ($withScript) {
             $cachedHtml = $this->getFormScript($form)."\n\n".$cachedHtml;
         }
