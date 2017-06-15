@@ -365,8 +365,8 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
                     $val->getName().'('.$val->getId().')',
                 ];
             }
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 
