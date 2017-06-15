@@ -143,7 +143,7 @@ class SugarcrmApi extends CrmApi
                     $sugarObject = (isset($sLeadRecord['integration_entity']) ? $sLeadRecord['integration_entity'] : 'Leads');
                     //update the converted contact if found and not the Lead
                     if (isset($sLeadRecord['contact_id']) && $sLeadRecord['contact_id'] != null && $sLeadRecord['contact_id'] != '') {
-                        unset($fields['Company']); //because this record is not in the Contact object
+                        unset($fields['Company']); //because this record is not in the Contact object.
                         $localParams['name_value_list'][] = ['name' => 'id', 'value' => $sLeadRecord['contact_id']];
                         $createdLeadData[]                = $this->request('set_entry', $localParams, 'POST', 'Contacts');
                     } else {
@@ -157,7 +157,30 @@ class SugarcrmApi extends CrmApi
 
             //$createdLeadData[] = $this->request('set_entry', $parameters, 'POST');
         } else {
-            $createdLeadData[] = $this->request('set_entry', $fields, 'POST', 'Leads');
+
+            //if not found then go ahead and make an API call to find all the records with that email
+            if (isset($fields['email1']) && empty($sugarLeadRecords)) {
+                $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
+                $sugarLeadRecords = $sLeads['records'];
+            }
+            unset($fields['id']);
+
+            if (!empty($sugarLeadRecords)) {
+                foreach ($sugarLeadRecords as $sLeadRecord) {
+                    $sugarLeadId = (isset($sLeadRecord['integration_entity_id']) ? $sLeadRecord['integration_entity_id'] : $sLeadRecord['id']);
+                    $sugarObject = (isset($sLeadRecord['integration_entity']) ? $sLeadRecord['integration_entity'] : 'Leads');
+                    //update the converted contact if found and not the Lead
+                    if (isset($sLeadRecord['contact_id']) && $sLeadRecord['contact_id'] != null && $sLeadRecord['contact_id'] != '') {
+                        unset($fields['Company']); //because this record is not in the Contact object
+                        $createdLeadData[] = $this->request("Contacts/$sugarLeadId", $fields, 'PUT', 'Contacts');
+                    } else {
+                        $createdLeadData[] = $this->request("$sugarObject/$sugarLeadId", $fields, 'PUT', $sugarObject);
+                    }
+                }
+            } else {
+                $createdLeadData = $this->request('Leads', $fields, 'POST', 'Leads');
+            }
+            //$createdLeadData[] = $this->request('set_entry', $fields, 'POST', 'Leads');
         }
 
         return $createdLeadData;
@@ -206,19 +229,79 @@ class SugarcrmApi extends CrmApi
 
             return $response;
         } else {
-            return false;
+            $leadFieldsList = [];
+            $response       = [];
+            //body is prepared for Sugar6. Translate it to sugar 7
+            $reference_ids = [];
+            foreach ($data as $object => $leadFieldsList) {
+                $requests = [];
+                $all_ids  = [];
+                foreach ($leadFieldsList as $body) {
+                    $fields = [];
+                    $ids    = [];
+                    foreach ($body as $field) {
+                        $fields[$field['name']] = $field['value'];
+                    }
+                    $request = [];
+                    if (isset($fields['id'])) {
+                        $ids['id'] = $fields['id'];
+                        //Update record
+                        $sugarLeadId = $fields['id'];
+                        unset($fields['id']);
+                        $request['method'] = 'PUT';
+                        $request['url']    = "/v10/$object/$sugarLeadId";
+                        $request['data']   = $fields;
+                    } else {
+                        //Create record
+                        $request['data']   = $fields;
+                        $request['url']    = '/v10/'.$object;
+                        $request['method'] = 'POST';
+                    }
+                    $requests[]          = $request;
+                    $ids['reference_id'] = $fields['reference_id'];
+                    $all_ids[]           = $ids;
+                }
+                $parameters = [
+                    'requests' => $requests,
+                ];
+
+                $resp = $this->request('bulk', $parameters, 'POST', $object);
+                if (!empty($resp)) {
+                    foreach ($resp as $k => $leadFields) {
+                        $fields = $leadFields['contents'];
+                        if ($leadFields['status'] != 200) {
+                            $result = ['ko' => true,
+                                'error'         => $leadFields['error'].' '.$leadFields['error_message'], ];
+                        } else {
+                            $result = ['reference_id' => $all_ids[$k]['reference_id'],
+                                    'id'              => $fields['id'],
+                                    'new'             => !isset($all_ids[$k]['id']),
+                                    'ko'              => false, ];
+                            if (isset($all_ids[$k]['id']) && $fields['id'] != $all_ids[$k]['id']) {
+                                $result['ko']    = true;
+                                $result['error'] = 'Returned ID does not correspond to input id';
+                            }
+                        }
+                        $response[] = $result;
+                    }
+                }
+            }
+
+            return $response;
         }
     }
 
     /**
      * @param array $activity
      * @param       $object
+     *                        TODO 7.x
      *
      * @return array|mixed|string
      */
     public function createLeadActivity(array $activity, $object)
     {
-        $config = $this->integration->getIntegrationSettings()->getFeatureSettings();
+        $config    = $this->integration->getIntegrationSettings()->getFeatureSettings();
+        $tokenData = $this->integration->getKeys();
 
         //1st : set_entries to return ids module_name : "Leads" or "Contacts" and name_value_lists (array of arrays of name/value)
         $module_name          = $object;
@@ -231,7 +314,7 @@ class SugarcrmApi extends CrmApi
         $name_value_lists = []; //array of empty arrays
         $delete_array     = []; //Array of 0
         //set_relationships
-
+        $s7_records = [];
         //Send activities and get back sugar activities id
 
         if (!empty($activity)) {
@@ -248,16 +331,36 @@ class SugarcrmApi extends CrmApi
                     } else {
                         $rec[] = ['name' => 'lead_id_c', 'value' => $sugarId];
                     }
-
-                    $set_name_value_lists[] = $rec;
+                    $set_name_value_lists[]                     = $rec; //Sugar 6
+                    $s7_record                                  = [];
+                    foreach ($rec as $r) {
+                        $s7_record[$r['name']] = $r['value'];
+                    }
+                    $s7_records[]                               = $s7_record;
                 }
             }
 
             $parameters = [
                     'name_value_lists' => $set_name_value_lists,
                 ];
+            if ($tokenData['version'] == '6') {
+                $resp = $this->request('set_entries', $parameters, 'POST', 'mtc_WebActivities');
+            } else {
+                $requests = [];
+                foreach ($s7_records as $fields) {
+                    //Create record
+                    $request['data']   = $fields;
+                    $request['url']    = '/v10/'.'mtc_WebActivities';
+                    $request['method'] = 'POST';
+                    $requests[]        = $request;
+                }
+                $parameters = [
+                    'requests' => $requests,
+                ];
+                $resp = $this->request('bulk', $parameters, 'POST', 'bulk');
+            }
 
-            $resp = $this->request('set_entries', $parameters, 'POST', 'mtc_WebActivities');
+            if ($tokenData['version'] == '6') {
 
                 //Send sugar relationsips
                 if (!empty($resp)) {
@@ -279,20 +382,8 @@ class SugarcrmApi extends CrmApi
                         foreach ($records['records'] as $key => $record) {
                             $name_value_lists[] = [];
                             $delete_array[]     = 0;
-                            $rec                = [];
-                            $rec[]              = ['name' => 'name', 'value' => $record['name']];
-                            $rec[]              = ['name' => 'description', 'value' => $record['description']];
-                            $rec[]              = ['name' => 'url', 'value' => $records['leadUrl']];
-                            $rec[]              = ['name' => 'date_entered', 'value' => $record['dateAdded']->format('c')];
-                            $rec[]              = ['name' => 'reference_id', 'value' => $record['id'].'-'.$sugarId];
-                            if ($object == 'Contacts') {
-                                $rec[] = ['name' => 'contact_id_c', 'value' => $sugarId];
-                            } else {
-                                $rec[] = ['name' => 'lead_id_c', 'value' => $sugarId];
-                            }
-                            $set_name_value_lists[] = $rec;
-                            $idList[]               = $sugarId;
-                            $related_ids_row[]      = $resp['ids'][$nbAct];
+                            $idList[]           = $sugarId;
+                            $related_ids_row[]  = $resp['ids'][$nbAct];
                             ++$nbAct;
                         }
                         $related_ids[] = $related_ids_row;
@@ -305,63 +396,28 @@ class SugarcrmApi extends CrmApi
                         'name_value_lists' => $name_value_lists, //array of empty arrays
                         'delete_array'     => $delete_array, //Array of 0
                     ];
-
                     $resp2 = $this->request('set_relationships', $parameters, 'POST', $object);
                 }
-
-            if (!empty($activityData)) {
-                //TODO
-                //Send activities and get activities id
-                //Send relationships
-
-                //todo: log posted activities so that they don't get sent over again
-                $queryUrl = $this->integration->getQueryUrl();
-                $results  = $this->request(
-                    'composite/tree/'.$mActivityObjectName,
-                    $activityData,
-                    'POST',
-                    false,
-                    null,
-                    $queryUrl
-                );
-
-                $newRecordData = [];
-                if ($results['hasErrors']) {
-                    foreach ($results['results'] as $result) {
-                        if ($result['errors'][0]['statusCode'] == 'CANNOT_UPDATE_CONVERTED_LEAD') {
-                            $references   = explode('-', $result['referenceId']);
-                            $SF_leadIds[] = $references[1];
-
-                            $leadIds = implode("','", $SF_leadIds);
-                            $query   = 'select Id, ConvertedContactId from '.$object." where id in ('".$leadIds."')";
-
-                            $contacts = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
-
-                            foreach ($contacts['records'] as $contact) {
-                                foreach ($activityData['records'] as $key => $record) {
-                                    if ($record[$namespace.'WhoId__c'] == $contact['Id']) {
-                                        unset($record[$namespace.'WhoId__c']);
-                                        $record[$namespace.'contact_id__c'] = $contact['ConvertedContactId'];
-                                        $newRecordData['records'][]         = $record;
-                                        unset($activityData['records'][$key]);
-                                    }
-                                }
-                            }
+            } else {
+                //Sugar 7 set relationship
+                if (!empty($resp)) {
+                    $nbAct = 0;
+                    foreach ($activity as $sugarId => $records) {
+                        if ($object == 'Contacts') {
+                            $link_field_name = 'mtc_webactivities_contacts';
+                        } else {
+                            $link_field_name = 'mtc_webactivities_leads';
+                        }
+                        foreach ($records['records'] as $key => $record) {
+                            if (!isset($resp[$nbAct]['contents']['id'])) {
+                                continue;
+                            } //current Web activity was not created
+                            $wa_id = $resp[$nbAct]['contents']['id'];
+                            $resp2 = $this->request("mtc_WebActivities/$wa_id/link/$link_field_name/$sugarId", [], 'POST');
+                            ++$nbAct;
                         }
                     }
-                    if (!empty($newRecordData)) {
-                        $results = $this->request(
-                            'composite/tree/'.$mActivityObjectName,
-                            $newRecordData,
-                            'POST',
-                            false,
-                            null,
-                            $queryUrl
-                        );
-                    }
                 }
-
-                return $results;
             }
 
             return [];
@@ -419,14 +475,55 @@ class SugarcrmApi extends CrmApi
             return $res;
         } else {
             //TODO
+
+            if (isset($query['emails'])) {
+                $filter[] = ['email_addresses.email_address' => ['$in' => $query['emails']]];
+                $filter[] = ['deleted' => '0'];
+            }
+            if (isset($query['ids'])) {
+                $filter[] = ['id' => ['$in' => $query['ids']]];
+            }
+
+            $data   = ['filter' => 'all'];
+            $fields = ['id', 'email1'];
+
             $parameters = [
-                'module_filter' => $this->module,
-                'type_filter'   => 'modules',
+                    'filter' => [['$and' => $filter]],
+                    'offset' => 0,
+                'fields'     => implode(',', $fields),
+                'max_num'    => 1000,
+                //'deleted'     => 0,
+                //'favorites'   => false,
             ];
+            $data = $this->request('Users/filter', $parameters, 'POST', 'Users');
 
-            $response = $this->request('metadata', $parameters);
+            if (isset($query['type']) && $query['type'] == 'BYEMAIL') {
+                $type = 'BYEMAIL';
+            } else {
+                $type = 'BYID';
+            }
+            $res = [];
+            if (isset($data['records'])) {
+                foreach ($data['records'] as $key => $record) {
+                    if (isset($record['email'][0]['email_address']) && $record['email'][0]['email_address'] != '') {
+                        $emails      = $record['email'];
+                        $found_email = $record['email'][0]['email_address'];
+                        foreach ($record['name_value_list'] as $email) {
+                            if ($email['email_address'] != '' && $email['primary_address'] == 1) {
+                                $found_email = $email;
+                                break;
+                            }
+                        }
+                        if ($type == 'BYID') {
+                            $res[$record['id']] = $found_email;
+                        } else {
+                            $res[$found_email] = $record['id'];
+                        }
+                    }
+                }
+            }
 
-            return $response['modules']['Leads'];
+            return $res;
         }
     }
 
@@ -577,11 +674,11 @@ class SugarcrmApi extends CrmApi
                 if ($object != 'Accounts') {
                     $fields[] = 'account_id';
                 }
-                $filter_args = ['filter' => [['$and' => $filter]]];
-                $fields_arg  = implode(',', $fields);
-                $parameters  = [
+                //$filter_args = ['filter' => [['$and' => $filter]]];
+                //$fields_arg  = implode(',', $fields);
+                $parameters = [
 //                     'order_by'                 => '',
-                     'filter' => ['filter' => [['$and' => $filter]]],
+                     'filter' => [['$and' => $filter]],
                      'offset' => $query['offset'],
                     'fields'  => implode(',', $fields),
                     'max_num' => $query['max_results'],

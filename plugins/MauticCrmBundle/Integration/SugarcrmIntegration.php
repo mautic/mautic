@@ -54,7 +54,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             return ['push_lead', 'get_leads', 'push_leads'];
         }
         //Only push_lead is currently supported for version 7
-        return ['push_lead'];
+        return ['push_lead', 'get_leads', 'push_leads'];
     }
 
     /**
@@ -282,7 +282,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                     }
                                     $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[$sObject]);
                                 } elseif (isset($fields['fields']) && !empty($fields['fields'])) {
-
                                     //7.x
 
                                     foreach ($fields['fields'] as $fieldInfo) {
@@ -858,8 +857,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
             }
             if (!empty($assignedUserIds)) {
-                $assignedUserIds = array_unique($assignedUserIds);
-                //Sugar 7.X : TODO
+                $assignedUserIds            = array_unique($assignedUserIds);
                 $onwerEmailByAssignedUserId = $this->getApiHelper()->getEmailBySugarUserId(['ids' => $assignedUserIds]);
             }
 
@@ -908,15 +906,29 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 } else {
                     $newName = '__'.$object;
                 }
-                foreach ($record['name_value_list'] as $item) {
-                    if ($object !== 'Activity') {
-                        $dataObject[$item['name'].$newName] = $item['value'];
+                if ($SUGAR_VERSION == '6') {
+                    foreach ($record['name_value_list'] as $item) {
+                        if ($object !== 'Activity') {
+                            $dataObject[$item['name'].$newName] = $item['value'];
 
-                        if ($item['name'] == 'date_entered') {
-                            $itemDateEntered = new \DateTime($item['value']);
+                            if ($item['name'] == 'date_entered') {
+                                $itemDateEntered = new \DateTime($item['value']);
+                            }
+                            if ($item['name'] == 'date_modified') {
+                                $itemDateModified = new \DateTime($item['value']);
+                            }
                         }
-                        if ($item['name'] == 'date_modified') {
-                            $itemDateModified = new \DateTime($item['value']);
+                    }
+                } else {
+                    if ($object !== 'Activity') {
+                        if (isset($record['date_entered']) && $record['date_entered'] != '') {
+                            $itemDateEntered = new \DateTime($record['date_entered']);
+                        }
+                        if (isset($record['date_modified']) && $record['date_modified'] != '') {
+                            $itemDateEntered = new \DateTime($record['date_modified']);
+                        }
+                        foreach ($record as $k => $item) {
+                            $dataObject[$k.$newName] = $item;
                         }
                     }
                 }
@@ -1257,18 +1269,20 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $availableFields         = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
 
             //update lead/contact records
-            $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Sugarcrm', 'lead', $fields, $limit);
+            $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate('Sugarcrm', 'lead', $fields, $limit, ['Contacts', 'Leads']);
         }
         $checkEmailsInSugar = [];
 
         $leadOwnerEmails = [];
-        foreach ($leadsToUpdate as $lead) {
-            if (isset($lead['email']) && !empty($lead['email'])) {
-                $lead['owner_email'] = $this->getOwnerEmail($lead);
-                if ($lead['owner_email']) {
-                    $leadOwnerEmails[] = $lead['owner_email'];
+        foreach ($leadsToUpdate as $object => $objectToUpdate) {
+            foreach ($objectToUpdate as $lead) {
+                if (isset($lead['email']) && !empty($lead['email'])) {
+                    $lead['owner_email'] = $this->getOwnerEmail($lead);
+                    if ($lead['owner_email']) {
+                        $leadOwnerEmails[] = $lead['owner_email'];
+                    }
+                    $checkEmailsInSugar[mb_strtolower($lead['email'])] = $lead;
                 }
-                $checkEmailsInSugar[mb_strtolower($lead['email'])] = $lead;
             }
         }
 
@@ -1296,46 +1310,51 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         if ($checkEmailsInSugar) {
             $sugarLead = $this->getApiHelper()->getLeads(['checkemail' => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], 'Leads');
             if (isset($sugarLead['entry_list'])) {
+                //Sugar 6.X
+                $sugarLeadRecords = [];
                 foreach ($sugarLead['entry_list'] as $k => $record) {
                     $sugarLeadRecord = [];
                     foreach ($record['name_value_list'] as $item) {
                         $sugarLeadRecord[$item['name']] = $item['value'];
                     }
+                    $sugarLeadRecords[] = $sugarLeadRecord;
+                }
+            } elseif (isset($sugarLead['records'])) { //Sugar 7
+                $sugarLeadRecords = $sugarLead['records'];
+            }
+            foreach ($sugarLeadRecords as $sugarLeadRecord) {
+                if (isset($sugarLeadRecord) && $sugarLeadRecord) {
+                    $email = $sugarLeadRecord['email1'];
+                    $key   = mb_strtolower($email);
 
-                    if (isset($sugarLeadRecord) && $sugarLeadRecord) {
-                        $email = $sugarLeadRecord['email1'];
-                        $key   = mb_strtolower($email);
+                    if (isset($checkEmailsInSugar[$key])) {
+                        $isConverted = (isset($sugarLeadRecord['contact_id'])
+                            && $sugarLeadRecord['contact_id'] != null && $sugarLeadRecord['contact_id'] != '');
+                        $sugarIdMapping[$checkEmailsInSugar[$key]['internal_entity_id']] = ($isConverted) ? $sugarLeadRecord['contact_id']
+                            : $sugarLeadRecord['id'];
 
-                        if (isset($checkEmailsInSugar[$key])) {
-                            $isConverted = (isset($sugarLeadRecord['contact_id'])
-                                && $sugarLeadRecord['contact_id'] != null && $sugarLeadRecord['contact_id'] != '');
-                            $sugarIdMapping[$checkEmailsInSugar[$key]['internal_entity_id']] = ($isConverted) ? $sugarLeadRecord['contact_id']
-                                : $sugarLeadRecord['id'];
-
-                            if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
-                                $this->buildCompositeBody(
-                                    $mauticData,
-                                    $availableFields,
-                                    $isConverted ? $contactSugarFields : $leadSugarFields,
-                                    $isConverted ? 'Contacts' : 'Leads',
-                                    $checkEmailsInSugar[$key],
-                                    $onwerAssignedUserIdByEmail,
-                                    $isConverted ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id']
-                                );
-                            } else {
-                                // @todo - Should return also deleted contacts from Sugar
-                                $deletedSugarLeads[] = $sugarLeadRecord['id'];
-                                if (!empty($sugarLeadRecord['contact_id']) || $sugarLeadRecord['contact_id'] != '') {
-                                    $deletedSugarLeads[] = $sugarLeadRecord['contact_id'];
-                                }
+                        if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
+                            $this->buildCompositeBody(
+                                $mauticData,
+                                $availableFields,
+                                $isConverted ? $contactSugarFields : $leadSugarFields,
+                                $isConverted ? 'Contacts' : 'Leads',
+                                $checkEmailsInSugar[$key],
+                                $onwerAssignedUserIdByEmail,
+                                $isConverted ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id']
+                            );
+                        } else {
+                            // @todo - Should return also deleted contacts from Sugar
+                            $deletedSugarLeads[] = $sugarLeadRecord['id'];
+                            if (!empty($sugarLeadRecord['contact_id']) || $sugarLeadRecord['contact_id'] != '') {
+                                $deletedSugarLeads[] = $sugarLeadRecord['contact_id'];
                             }
-                            unset($checkEmailsInSugar[$key]);
-                        } // Otherwise a duplicate in Sugar and has already been processed
-                    }
+                        }
+                        unset($checkEmailsInSugar[$key]);
+                    } // Otherwise a duplicate in Sugar and has already been processed
                 }
             }
         }
-
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
         if ($deletedSugarLeads) {
             $integrationEntityRepo->markAsDeleted($deletedSugarLeads, $this->getName(), 'lead');
