@@ -30,7 +30,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
      */
     public function __construct($host, Http $httpClient)
     {
-        parent::__construct($host, 587, 'tls');
+        parent::__construct($host, 2587, 'tls');
         $this->setAuthMode('login');
         $this->httpClient = $httpClient;
     }
@@ -145,7 +145,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
                     }
 
                     if ($reason == null) {
-                        $reason = $translator->trans('mautic.email.complaint.reason.unkown');
+                        $reason = $translator->trans('mautic.email.complaint.reason.unknown');
                     }
 
                     $rows[DoNotContact::UNSUBSCRIBED]['emails'][$complainedRecipient['emailAddress']] = $reason;

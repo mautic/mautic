@@ -33,6 +33,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead'];
+    }
+
+    /**
      * Get the array key for clientId.
      *
      * @return string
@@ -105,7 +113,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getAuthLoginUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
+        return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
     /**
@@ -165,6 +173,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
+            return $fields;
+        }
+
         $sugarFields       = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
@@ -196,6 +208,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                     }
+
+                    $this->cache->set('leadFields', $sugarFields);
                 }
             } else {
                 throw new ApiErrorException($this->authorzationError);
@@ -222,7 +236,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             if (!empty($response['name'])) {
                 return $response['description'];
             } else {
-                return $this->factory->getTranslator()->trans('mautic.integration.error.genericerror', [], 'flashes');
+                return $this->translator->trans('mautic.integration.error.genericerror', [], 'flashes');
             }
         } else {
             return parent::getErrorsFromResponse($response);
@@ -250,7 +264,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
-        if ($authType == 'oauth2' && empty($settings['authorize_session'])) {
+        if ($authType == 'oauth2' && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
 
             // Append the access token as the oauth-token header
             $headers = [

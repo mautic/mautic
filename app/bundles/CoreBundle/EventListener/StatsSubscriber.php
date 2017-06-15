@@ -12,25 +12,12 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Event\StatsEvent;
 
 /**
  * Class StatsSubscriber.
  */
-class StatsSubscriber extends CommonSubscriber
+class StatsSubscriber extends CommonStatsSubscriber
 {
-    /**
-     * @var array of CommonRepository
-     */
-    protected $repositories = [];
-
-    /**
-     * @var null
-     */
-    protected $selects = null;
-
     /**
      * StatsSubscriber constructor.
      *
@@ -38,33 +25,9 @@ class StatsSubscriber extends CommonSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticCoreBundle:AuditLog');
-        $this->repositories[] = $em->getRepository('MauticCoreBundle:IpAddress');
-    }
+        $this->repositories['MauticCoreBundle:AuditLog'] = $em->getRepository('MauticCoreBundle:AuditLog');
+        $this->permissions['MauticCoreBundle:AuditLog']  = ['admin'];
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
-    {
-        return [
-            CoreEvents::LIST_STATS => ['onStatsFetch', 0],
-        ];
-    }
-
-    /**
-     * @param StatsEvent $event
-     */
-    public function onStatsFetch(StatsEvent $event)
-    {
-        /** @var CommonRepository $repository */
-        foreach ($this->repositories as $repository) {
-            $table = $repository->getTableName();
-            if ($event->isLookingForTable($table)) {
-                $select = (isset($this->selects[$table])) ? $this->selects[$table] : null;
-                $event->setSelect($select)
-                      ->setRepository($repository);
-            }
-        }
+        $this->repositories['MauticCoreBundle:IpAddress'] = $em->getRepository('MauticCoreBundle:IpAddress');
     }
 }

@@ -37,6 +37,6 @@ class Version20161122215214 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("ALTER TABLE {$this->prefix}push_notifications ADD button LONGTEXT NOT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}push_notifications ADD button LONGTEXT NULL");
     }
 }

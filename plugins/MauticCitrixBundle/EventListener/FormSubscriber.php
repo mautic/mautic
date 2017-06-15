@@ -18,12 +18,14 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event as Events;
+use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
+use Mautic\PluginBundle\PluginEvents;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
@@ -73,27 +75,27 @@ class FormSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_ON_BUILD                                         => ['onFormBuilder', 0],
-            CitrixEvents::ON_WEBINAR_REGISTER_ACTION                          => ['onWebinarRegister', 0],
-            CitrixEvents::ON_MEETING_START_ACTION                             => ['onMeetingStart', 0],
-            CitrixEvents::ON_TRAINING_REGISTER_ACTION                         => ['onTrainingRegister', 0],
-            CitrixEvents::ON_TRAINING_START_ACTION                            => ['onTrainingStart', 0],
-            CitrixEvents::ON_ASSIST_REMOTE_ACTION                             => ['onAssistRemote', 0],
-            CitrixEvents::ON_FORM_VALIDATE_ACTION                             => ['onFormValidate', 0],
-            FormEvents::FORM_PRE_SAVE                                         => ['onFormPreSave', 0],
-            \Mautic\PluginBundle\PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST  => ['onRequest', 0],
-            \Mautic\PluginBundle\PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],
+            FormEvents::FORM_ON_BUILD                    => ['onFormBuilder', 0],
+            CitrixEvents::ON_WEBINAR_REGISTER_ACTION     => ['onWebinarRegister', 0],
+            CitrixEvents::ON_MEETING_START_ACTION        => ['onMeetingStart', 0],
+            CitrixEvents::ON_TRAINING_REGISTER_ACTION    => ['onTrainingRegister', 0],
+            CitrixEvents::ON_TRAINING_START_ACTION       => ['onTrainingStart', 0],
+            CitrixEvents::ON_ASSIST_REMOTE_ACTION        => ['onAssistRemote', 0],
+            CitrixEvents::ON_FORM_VALIDATE_ACTION        => ['onFormValidate', 0],
+            FormEvents::FORM_PRE_SAVE                    => ['onFormPreSave', 0],
+            PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST  => ['onRequest', 0],
+            PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE => ['onResponse', 0],
         ];
     }
 
     /**
-     * @param Events\SubmissionEvent $event
-     * @param string                 $product
-     * @param string                 $startType indicates that this is a start product, not registration
+     * @param SubmissionEvent $event
+     * @param string          $product
+     * @param string          $startType indicates that this is a start product, not registration
      *
      * @throws ValidationException
      */
-    private function _doRegistration(Events\SubmissionEvent $event, $product, $startType = null)
+    private function _doRegistration(SubmissionEvent $event, $product, $startType = null)
     {
         $submission = $event->getSubmission();
         $form       = $submission->getForm();
@@ -203,27 +205,27 @@ class FormSubscriber extends CommonSubscriber
         }
     }
 
-    public function onWebinarRegister(Events\SubmissionEvent $event)
+    public function onWebinarRegister(SubmissionEvent $event)
     {
         $this->_doRegistration($event, CitrixProducts::GOTOWEBINAR);
     }
 
-    public function onMeetingStart(Events\SubmissionEvent $event)
+    public function onMeetingStart(SubmissionEvent $event)
     {
         $this->_doRegistration($event, CitrixProducts::GOTOMEETING, 'start.meeting');
     }
 
-    public function onTrainingRegister(Events\SubmissionEvent $event)
+    public function onTrainingRegister(SubmissionEvent $event)
     {
         $this->_doRegistration($event, CitrixProducts::GOTOTRAINING);
     }
 
-    public function onTrainingStart(Events\SubmissionEvent $event)
+    public function onTrainingStart(SubmissionEvent $event)
     {
         $this->_doRegistration($event, CitrixProducts::GOTOTRAINING, 'start.training');
     }
 
-    public function onAssistRemote(Events\SubmissionEvent $event)
+    public function onAssistRemote(SubmissionEvent $event)
     {
         $this->_doRegistration($event, CitrixProducts::GOTOASSIST, 'screensharing.assist');
     }

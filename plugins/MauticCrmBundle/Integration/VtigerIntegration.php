@@ -29,6 +29,14 @@ class VtigerIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead'];
+    }
+
+    /**
      * @return string
      */
     public function getDisplayName()
@@ -139,7 +147,7 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getAuthLoginUrl()
     {
-        return $this->factory->getRouter()->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
+        return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
     }
 
     /**
@@ -165,6 +173,10 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields($settings)) {
+            return $fields;
+        }
+
         $vtigerFields      = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         try {
@@ -186,6 +198,8 @@ class VtigerIntegration extends CrmAbstractIntegration
                         'required' => $fieldInfo['mandatory'],
                     ];
                 }
+
+                $this->cache->set('leadFields', $vtigerFields);
             }
         } catch (ErrorException $exception) {
             $this->logIntegrationError($exception);

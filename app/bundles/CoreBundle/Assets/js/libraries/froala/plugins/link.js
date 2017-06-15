@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.4.0 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -221,7 +221,7 @@
         editor.popups.refresh('link.edit');
       }
 
-      editor.popups.setContainer('link.edit', $(editor.opts.scrollableContainer));
+      editor.popups.setContainer('link.edit', editor.$sc);
       var left = $link.offset().left + $(link).outerWidth() / 2;
       var top = $link.offset().top + $link.outerHeight();
 
@@ -319,7 +319,7 @@
 
       if (!$popup.hasClass('fr-active')) {
         editor.popups.refresh('link.insert');
-        editor.popups.setContainer('link.insert', editor.$tb || $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('link.insert', editor.$tb || editor.$sc);
 
         if ($btn.is(':visible')) {
           var left = $btn.offset().left + $btn.outerWidth() / 2;
@@ -496,11 +496,11 @@
           attrs[$input.attr('name')] = $input.data('checked');
         }
         else {
-          attrs[$input.attr('name')] = $input.data('unchecked');
+          attrs[$input.attr('name')] = $input.data('unchecked') || null;
         }
       }
 
-      var t = $(editor.o_win).scrollTop();
+      var t = editor.helpers.scrollTop();
       insert(href, text, attrs);
       $(editor.o_win).scrollTop(t);
     }
@@ -610,16 +610,6 @@
       if (link) {
         $link = $(link);
 
-        // Clear attributes.
-        var a_list = editor.node.rawAttributes(link);
-        for (var attr in a_list) {
-          if (a_list.hasOwnProperty(attr)) {
-            if (attr != 'class' && attr != 'style' && attr != 'id' && attr != 'contenteditable') {
-              $link.removeAttr(attr);
-            }
-          }
-        }
-
         $link.attr('href', href);
 
         // Change text if it is different.
@@ -719,7 +709,7 @@
           }
         }
 
-        editor.popups.setContainer('link.insert', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('link.insert', editor.$sc);
         var $ref = (editor.image ? editor.image.get() : null) || $(link);
         var left = $ref.offset().left + $ref.outerWidth() / 2;
         var top = $ref.offset().top + $ref.outerHeight();
@@ -764,7 +754,7 @@
         if (!$popup) $popup = _initInsertPopup();
 
         _refreshInsertPopup(true);
-        editor.popups.setContainer('link.insert', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('link.insert', editor.$sc);
         var left = $current_image.offset().left + $current_image.outerWidth() / 2;
         var top = $current_image.offset().top + $current_image.outerHeight();
 

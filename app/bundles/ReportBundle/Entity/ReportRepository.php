@@ -26,7 +26,7 @@ class ReportRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('r')
@@ -40,7 +40,7 @@ class ReportRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -54,7 +54,7 @@ class ReportRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
@@ -63,16 +63,19 @@ class ReportRepository extends CommonRepository
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('r.isPublished', ":$unique");
                 $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
                 $expr            = $q->expr()->eq('r.isPublished', ":$unique");
                 $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
+            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
                 $expr = $q->expr()->eq('IDENTITY(r.createdBy)', $this->currentUser->getId());
                 break;
         }

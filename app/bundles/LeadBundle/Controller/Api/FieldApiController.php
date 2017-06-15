@@ -20,15 +20,15 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class FieldApiController extends CommonApiController
 {
+    protected $fieldObject;
+
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->fieldObject     = $this->request->get('object');
         $this->model           = $this->getModel('lead.field');
         $this->entityClass     = LeadField::class;
         $this->entityNameOne   = 'field';
         $this->entityNameMulti = 'fields';
-        $this->permissionBase  = 'lead:fields';
         $this->routeParams     = ['object' => $this->fieldObject];
 
         if ($this->fieldObject === 'contact') {
@@ -42,6 +42,8 @@ class FieldApiController extends CommonApiController
             'expr'   => 'eq',
             'value'  => $this->fieldObject,
         ];
+
+        parent::initialize($event);
     }
 
     /**
@@ -54,6 +56,10 @@ class FieldApiController extends CommonApiController
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
         $parameters['object'] = $this->fieldObject;
+        // Workaround for mispelled isUniqueIdentifer.
+        if (isset($parameters['isUniqueIdentifier'])) {
+            $parameters['isUniqueIdentifer'] = $parameters['isUniqueIdentifier'];
+        }
 
         return $parameters;
     }

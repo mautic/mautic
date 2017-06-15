@@ -13,6 +13,9 @@ $filterType  = $form['field']->vars['value'];
 $inGroup     = $form->vars['data']['glue'] === 'and';
 $object      = (isset($form->vars['data']['object'])) ? $form->vars['data']['object'] : 'lead';
 $class       = (isset($form->vars['data']['object']) && $form->vars['data']['object'] == 'company') ? 'fa-building' : 'fa-user';
+if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
+    return;
+}
 ?>
 
 <div class="panel<?php echo ($inGroup && $first === false) ? ' in-group' : ''; ?>">
@@ -33,12 +36,10 @@ $class       = (isset($form->vars['data']['object']) && $form->vars['data']['obj
         </div>
 
         <?php $hasErrors = count($form['filter']->vars['errors']) || count($form['display']->vars['errors']); ?>
-        <div class="col-xs-10 col-sm-5 padding-none<?php if ($hasErrors) {
-    echo ' has-error';
-} ?>">
+        <div class="col-xs-10 col-sm-5 padding-none<?php if ($hasErrors): echo ' has-error'; endif; ?>">
             <?php echo $view['form']->widget($form['filter']); ?>
-            <?php echo $view['form']->errors($form['filter']); ?>
             <?php echo $view['form']->widget($form['display']); ?>
+            <?php echo $view['form']->errors($form['filter']); ?>
             <?php echo $view['form']->errors($form['display']); ?>
         </div>
 

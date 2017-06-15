@@ -12,7 +12,7 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\EventListener\StatsSubscriber as CommonStatsSubscriber;
+use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 
 /**
  * Class StatsSubscriber.
@@ -26,9 +26,15 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticPageBundle:Hit');
+        $this->addContactRestrictedRepositories(
+            $em,
+            [
+                'MauticPageBundle:Hit',
+                'MauticPageBundle:VideoHit',
+            ]
+        );
+
         $this->repositories[] = $em->getRepository('MauticPageBundle:Redirect');
-        $this->repositories[] = $em->getRepository('MauticPageBundle:VideoHit');
         $this->repositories[] = $em->getRepository('MauticPageBundle:Trackable');
     }
 }

@@ -169,59 +169,8 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
-        // Set available event types
-        $eventTypeKey  = 'campaign.event';
-        $eventTypeName = $this->translator->trans('mautic.campaign.triggered');
-        $event->addEventType($eventTypeKey, $eventTypeName);
-
-        // Decide if those events are filtered
-        if (!$event->isApplicable($eventTypeKey)) {
-            return;
-        }
-
-        $lead = $event->getLead();
-
-        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
-        $logRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
-        $logs          = $logRepository->getLeadLogs($lead->getId(), $event->getQueryOptions());
-        $eventSettings = $this->campaignModel->getEvents();
-
-        // Add total number to counter
-        $event->addToCounter($eventTypeKey, $logs);
-
-        if (!$event->isEngagementCount()) {
-            foreach ($logs['results'] as $log) {
-                // Hide this from the time line all together
-                if (!empty($log['metadata']['failed'])) {
-                    $event->subtractFromCounter($eventTypeKey);
-
-                    continue;
-                }
-
-                $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
-                    ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
-
-                $event->addEvent(
-                    [
-                        'event'      => $eventTypeKey,
-                        'eventLabel' => [
-                            'label' => $log['event_name'].' / '.$log['campaign_name'],
-                            'href'  => $this->router->generate(
-                                'mautic_campaign_action',
-                                ['objectAction' => 'view', 'objectId' => $log['campaign_id']]
-                            ),
-                        ],
-                        'eventType' => $eventTypeName,
-                        'timestamp' => $log['dateTriggered'],
-                        'extra'     => [
-                            'log' => $log,
-                        ],
-                        'contentTemplate' => $template,
-                        'icon'            => 'fa-clock-o',
-                    ]
-                );
-            }
-        }
+        $this->addTimelineEvents($event, 'campaign.event', $this->translator->trans('mautic.campaign.triggered'));
+        $this->addTimelineEvents($event, 'campaign.event.scheduled', $this->translator->trans('mautic.campaign.scheduled'));
     }
 
     /**
@@ -234,5 +183,73 @@ class LeadSubscriber extends CommonSubscriber
         $this->em->getRepository('MauticCampaignBundle:LeadEventLog')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
 
         $this->em->getRepository('MauticCampaignBundle:Lead')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+    }
+
+    /**
+     * @param LeadTimelineEvent $event
+     * @param                   $eventTypeKey
+     * @param                   $eventTypeName
+     */
+    protected function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    {
+        $event->addEventType($eventTypeKey, $eventTypeName);
+
+        // Decide if those events are filtered
+        if (!$event->isApplicable($eventTypeKey)) {
+            return;
+        }
+
+        $lead = $event->getLead();
+
+        /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
+        $logRepository             = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $options                   = $event->getQueryOptions();
+        $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
+        $logs                      = $logRepository->getLeadLogs($lead->getId(), $options);
+        $eventSettings             = $this->campaignModel->getEvents();
+
+        // Add total number to counter
+        $event->addToCounter($eventTypeKey, $logs);
+
+        if (!$event->isEngagementCount()) {
+            foreach ($logs['results'] as $log) {
+                $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
+                    ? $eventSettings['action'][$log['type']]['timelineTemplate'] : 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
+
+                $label = $log['event_name'].' / '.$log['campaign_name'];
+
+                if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
+                    // Note as cancelled
+                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled')
+                        .'" class="fa fa-calendar-times-o text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
+                }
+
+                if ((!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) || !empty($log['metadata']['failed'])) {
+                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error')
+                        .'" class="fa fa-warning text-danger"></i>';
+                }
+
+                $event->addEvent(
+                    [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => [
+                            'label' => $label,
+                            'href'  => $this->router->generate(
+                                'mautic_campaign_action',
+                                ['objectAction' => 'view', 'objectId' => $log['campaign_id']]
+                            ),
+                        ],
+                        'eventType' => $eventTypeName,
+                        'timestamp' => $log['dateTriggered'],
+                        'extra'     => [
+                            'log'                   => $log,
+                            'campaignEventSettings' => $eventSettings,
+                        ],
+                        'contentTemplate' => $template,
+                        'icon'            => 'fa-clock-o',
+                    ]
+                );
+            }
+        }
     }
 }

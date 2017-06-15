@@ -79,7 +79,32 @@ class IntegrationsListType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormInterface $form, $data) use ($integrationObjects) {
+        $formModifier = function (FormInterface $form, $data) use ($integrationObjects, $integrationHelper) {
+            $statusChoices   = [];
+            $campaignChoices = [];
+
+            if (isset($data['integration'])) {
+                $integration       = $data['integration'];
+                $integrationObject = $integrationHelper->getIntegrationObject($data['integration']);
+                if (method_exists($integrationObject, 'getCampaigns')) {
+                    $campaigns = $integrationObject->getCampaigns();
+
+                    if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+                        foreach ($campaigns['records'] as $campaign) {
+                            $campaignChoices[$campaign['Id']] = $campaign['Name'];
+                        }
+                    }
+                }
+                if (method_exists($integrationObject, 'getCampaignMemberStatus') && isset($data['config']['campaigns'])) {
+                    $campaignStatus = $integrationObject->getCampaignMemberStatus($data['config']['campaigns']);
+
+                    if (isset($campaignStatus['records']) && !empty($campaignStatus['records'])) {
+                        foreach ($campaignStatus['records'] as $campaignS) {
+                            $statusChoices[$campaignS['Label']] = $campaignS['Label'];
+                        }
+                    }
+                }
+            }
             $form->add(
                 'config',
                 'integration_config',
@@ -89,7 +114,21 @@ class IntegrationsListType extends AbstractType
                         'class' => 'integration-config-container',
                     ],
                     'integration' => (isset($integrationObjects[$data['integration']])) ? $integrationObjects[$data['integration']] : null,
+                    'campaigns'   => $campaignChoices,
                     'data'        => (isset($data['config'])) ? $data['config'] : [],
+                ]
+            );
+            $hideClass = (isset($data['campaign_member_status'])) ? '' : ' hide';
+            $form->add(
+                'campaign_member_status',
+                'integration_campaign_status',
+                [
+                    'label' => false,
+                    'attr'  => [
+                        'class' => 'integration-campaigns-status'.$hideClass,
+                    ],
+                    'campaignContactStatus' => $statusChoices,
+                    'data'                  => (isset($data['campaign_member_status'])) ? $data['campaign_member_status'] : [],
                 ]
             );
         };

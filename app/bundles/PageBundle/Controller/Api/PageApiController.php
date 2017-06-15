@@ -24,13 +24,13 @@ class PageApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('page');
         $this->entityClass      = 'Mautic\PageBundle\Entity\Page';
         $this->entityNameOne    = 'page';
         $this->entityNameMulti  = 'pages';
-        $this->permissionBase   = 'page:pages';
         $this->serializerGroups = ['pageDetails', 'categoryList', 'publishDetails'];
+
+        parent::initialize($event);
     }
 
     /**
@@ -40,14 +40,6 @@ class PageApiController extends CommonApiController
      */
     public function getEntitiesAction()
     {
-        if (!$this->security->isGranted('page:pages:viewother')) {
-            $this->listFilters = [
-                'column' => 'p.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->user->getId(),
-            ];
-        }
-
         //get parent level only
         $this->listFilters[] = [
             'column' => 'p.variantParent',

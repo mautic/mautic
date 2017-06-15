@@ -72,6 +72,30 @@ div[data-section-focus="left"] {
     left: 0px;
 }
 
+div[data-section-focus="handle"] {
+  width: 25px;
+  height: 25px;
+  bottom: 10px;
+  left: 10px;
+  background: #4e5e9e;
+  color: #fff;
+  text-align: center;
+  border: 0;
+  line-height: 25px;
+}
+
+div[data-section-focus="delete"] {
+  width: 25px;
+  height: 25px;
+  bottom: 36px;
+  left: 10px;
+  background: #4e5e9e;
+  color: #fff;
+  text-align: center;
+  border: 0;
+  line-height: 25px;
+}
+
 div[data-slot-toolbar] {
     position: absolute;
     top: -24px;
@@ -85,6 +109,7 @@ div[data-slot-toolbar] {
     background-color: @mautic-primary;
     border-left: 1px solid @mautic-primary;
     border-right: 1px solid @mautic-primary;
+    padding-top:2px;
 }
 
 div[data-slot-toolbar] .btn {
@@ -107,8 +132,8 @@ div[data-slot-toolbar] .btn {
     font-size: 11px;
     line-height: 1.456;
     float: right;
-    margin-right: 5px;
-    color: #ffffff;
+    margin-right: 2px;
+    color: #fff;
 }
 
 div[data-slot-toolbar] .btn .fa {
@@ -117,14 +142,16 @@ div[data-slot-toolbar] .btn .fa {
 
 div[data-slot], [data-section-wrapper] {
     position: relative;
+    font-size: initial;
+    line-height: initial;
 }
 
-div[data-slot="image"] {
+div[data-slot^="image"] {
     padding-top: 1px; // prevent z-index of image from hiding the bottom border of a slot with focus above it
     padding-bottom: 1px;
 }
 
-div[data-slot="image"] img {
+div[data-slot^="image"] img {
     z-index: 2;
     position: relative;
 }
@@ -177,14 +204,18 @@ div[data-slot].ui-sortable-helper {
     }
 }
 
-.slot-type-handle.btn {
+.slot-type-handle.btn, .section-type-handle.btn {
     float: left;
     width: 111px;
     margin: 2px;
-    height: 62px;
+    height: 75px;
+    padding-left:5px;
+    padding-right:5px;
+    text-align:center;
+    word-wrap: break-word;
 }
 
-.slot-type-handle.ui-draggable-dragging {
+.slot-type-handle.ui-draggable-dragging, .section-type-handle.ui-draggable-dragging{
     color: #5d6c7c;
     background-color: #f5f5f5;
     border-color: #d3d3d3;
@@ -203,4 +234,11 @@ div[data-slot].ui-sortable-helper {
     .select-theme-link {
         margin-top: 5px;
     }
+    .select-theme-selected {
+        margin-top:5px;
+    }
+}
+
+[data-slot="dynamicContent"] {
+    z-index:50;
 }

@@ -27,8 +27,8 @@ if ($tmpl == 'index') {
                         'target'          => '#dwcTable',
                         'routeBase'       => 'dynamicContent',
                         'templateButtons' => [
-                            'delete' => $permissions['dynamicContent:dynamicContents:deleteown']
-                                || $permissions['dynamicContent:dynamicContents:deleteother'],
+                            'delete' => $permissions['dynamiccontent:dynamiccontents:deleteown']
+                                || $permissions['dynamiccontent:dynamiccontents:deleteother'],
                         ],
                     ]
                 );
@@ -37,9 +37,9 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.title',
-                        'text'       => 'mautic.core.title',
-                        'class'      => 'col-dwc-title',
+                        'orderBy'    => 'e.name',
+                        'text'       => 'mautic.core.name',
+                        'class'      => 'col-dwc-name',
                         'default'    => true,
                     ]
                 );
@@ -48,7 +48,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.name',
+                        'orderBy'    => 'c.title',
                         'text'       => 'mautic.core.category',
                         'class'      => 'visible-md visible-lg col-dwc-category',
                     ]
@@ -77,14 +77,14 @@ if ($tmpl == 'index') {
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit' => $view['security']->hasEntityAccess(
-                                        $permissions['dynamicContent:dynamicContents:editown'],
-                                        $permissions['dynamicContent:dynamicContents:editother'],
+                                        $permissions['dynamiccontent:dynamiccontents:editown'],
+                                        $permissions['dynamiccontent:dynamiccontents:editother'],
                                         $item->getCreatedBy()
                                     ),
-                                    'clone'  => $permissions['dynamicContent:dynamicContents:create'],
+                                    'clone'  => $permissions['dynamiccontent:dynamiccontents:create'],
                                     'delete' => $view['security']->hasEntityAccess(
-                                        $permissions['dynamicContent:dynamicContents:deleteown'],
-                                        $permissions['dynamicContent:dynamicContents:deleteother'],
+                                        $permissions['dynamiccontent:dynamiccontents:deleteown'],
+                                        $permissions['dynamiccontent:dynamiccontents:deleteother'],
                                         $item->getCreatedBy()
                                     ),
                                 ],

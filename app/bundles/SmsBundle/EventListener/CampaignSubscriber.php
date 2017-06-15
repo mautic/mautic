@@ -14,14 +14,8 @@ namespace Mautic\SmsBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\SmsBundle\Api\AbstractSmsApi;
-use Mautic\SmsBundle\Event\SmsSendEvent;
-use Mautic\SmsBundle\Helper\SmsHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\SmsEvents;
 
@@ -31,14 +25,9 @@ use Mautic\SmsBundle\SmsEvents;
 class CampaignSubscriber extends CommonSubscriber
 {
     /**
-     * @var CoreParametersHelper
+     * @var IntegrationHelper
      */
-    protected $coreParametersHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
+    protected $integrationHelper;
 
     /**
      * @var SmsModel
@@ -46,36 +35,17 @@ class CampaignSubscriber extends CommonSubscriber
     protected $smsModel;
 
     /**
-     * @var AbstractSmsApi
-     */
-    protected $smsApi;
-
-    /**
-     * @var smsHelper
-     */
-    protected $smsHelper;
-
-    /**
      * CampaignSubscriber constructor.
      *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param LeadModel            $leadModel
-     * @param SmsModel             $smsModel
-     * @param AbstractSmsApi       $smsApi
-     * @param SmsHelper            $smsHelper
+     * @param IntegrationHelper $integrationHelper
+     * @param SmsModel          $smsModel
      */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
-        LeadModel $leadModel,
-        SmsModel $smsModel,
-        AbstractSmsApi $smsApi,
-        SmsHelper $smsHelper
+        IntegrationHelper $integrationHelper,
+        SmsModel $smsModel
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->leadModel            = $leadModel;
-        $this->smsModel             = $smsModel;
-        $this->smsApi               = $smsApi;
-        $this->smsHelper            = $smsHelper;
+        $this->integrationHelper = $integrationHelper;
+        $this->smsModel          = $smsModel;
     }
 
     /**
@@ -94,7 +64,9 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        if ($this->coreParametersHelper->getParameter('sms_enabled')) {
+        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
             $event->addAction(
                 'sms.send_text_sms',
                 [
@@ -105,6 +77,8 @@ class CampaignSubscriber extends CommonSubscriber
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
                     'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
+                    'channel'          => 'sms',
+                    'channelIdField'   => 'sms',
                 ]
             );
         }
@@ -112,77 +86,33 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return mixed
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $lead = $event->getLead();
-
-        if ($this->leadModel->isContactable($lead, 'sms') !== DoNotContact::IS_CONTACTABLE) {
-            return $event->setFailed('mautic.sms.campaign.failed.not_contactable');
-        }
-
-        $leadPhoneNumber = $lead->getFieldValue('mobile');
-
-        if (empty($leadPhoneNumber)) {
-            $leadPhoneNumber = $lead->getFieldValue('phone');
-        }
-
-        if (empty($leadPhoneNumber)) {
-            return $event->setFailed('mautic.sms.campaign.failed.missing_number');
-        }
-
+        $lead  = $event->getLead();
         $smsId = (int) $event->getConfig()['sms'];
         $sms   = $this->smsModel->getEntity($smsId);
 
-        if ($sms->getId() !== $smsId) {
+        if (!$sms) {
             return $event->setFailed('mautic.sms.campaign.failed.missing_entity');
         }
 
-        $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
-        $smsEvent->setSmsId($smsId);
-        $this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
+        $result = $this->smsModel->sendSms($sms, $lead, ['channel' => ['campaign.event', $event->getEvent()['id']]])[$lead->getId()];
 
-        $tokenEvent = $this->dispatcher->dispatch(
-            SmsEvents::TOKEN_REPLACEMENT,
-            new TokenReplacementEvent(
-                $smsEvent->getContent(),
-                $lead,
-                ['channel' => ['sms', $sms->getId()]]
-            )
-        );
-
-        $metadata = $this->smsApi->sendSms($leadPhoneNumber, $tokenEvent->getContent());
-
-        $defaultFrequencyNumber = $this->coreParametersHelper->getParameter('sms_frequency_number');
-        $defaultFrequencyTime   = $this->coreParametersHelper->getParameter('sms_frequency_time');
-
-        /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
-        $frequencyRulesRepo = $this->leadModel->getFrequencyRuleRepository();
-
-        $leadIds = $lead->getId();
-
-        $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules('sms', $leadIds, $defaultFrequencyNumber, $defaultFrequencyTime);
-
-        if (!empty($dontSendTo) and $dontSendTo[0]['lead_id'] != $lead->getId()) {
-            $metadata = $this->smsApi->sendSms($leadPhoneNumber, $smsEvent->getContent());
-        }
-
-        // If there was a problem sending at this point, it's an API problem and should be requeued
-        if ($metadata === false) {
+        if ('Authenticate' === $result['status']) {
+            // Don't fail the event but reschedule it for later
             return $event->setResult(false);
         }
 
-        $this->smsModel->createStatEntry($sms, $lead);
-        $this->smsModel->getRepository()->upCount($smsId);
-        $event->setChannel('sms', $sms->getId());
-        $event->setResult(
-            [
-                'type'    => 'mautic.sms.sms',
-                'status'  => 'mautic.sms.timeline.status.delivered',
-                'id'      => $sms->getId(),
-                'name'    => $sms->getName(),
-                'content' => $tokenEvent->getContent(),
-            ]
-        );
+        if (!empty($result['sent'])) {
+            $event->setChannel('sms', $sms->getId());
+            $event->setResult($result);
+        } else {
+            $result['failed'] = true;
+            $result['reason'] = $result['status'];
+            $event->setResult($result);
+        }
     }
 }

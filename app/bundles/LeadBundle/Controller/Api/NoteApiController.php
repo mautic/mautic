@@ -15,6 +15,7 @@ use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -26,13 +27,13 @@ class NoteApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('lead.note');
         $this->entityClass      = LeadNote::class;
         $this->entityNameOne    = 'note';
         $this->entityNameMulti  = 'notes';
-        $this->permissionBase   = 'lead:leads';
         $this->serializerGroups = ['leadNoteDetails', 'leadList'];
+
+        parent::initialize($event);
     }
 
     /**
@@ -46,7 +47,7 @@ class NoteApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         if (!empty($parameters['lead'])) {
-            $lead = $this->checkLeadAccess($parameters['lead'], 'view');
+            $lead = $this->checkLeadAccess($parameters['lead'], $action);
 
             if ($lead instanceof Response) {
                 return $lead;

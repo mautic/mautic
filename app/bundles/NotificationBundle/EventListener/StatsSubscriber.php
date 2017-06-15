@@ -12,7 +12,7 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\EventListener\StatsSubscriber as CommonStatsSubscriber;
+use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
 
 /**
  * Class StatsSubscriber.
@@ -26,6 +26,6 @@ class StatsSubscriber extends CommonStatsSubscriber
      */
     public function __construct(EntityManager $em)
     {
-        $this->repositories[] = $em->getRepository('MauticNotificationBundle:Stat');
+        $this->addContactRestrictedRepositories($em, 'MauticNotificationBundle:Stat');
     }
 }

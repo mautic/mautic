@@ -26,11 +26,16 @@ class MonitoringRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         return parent::getEntities($args);
     }
 
+    /**
+     * @param array $args
+     *
+     * @return Paginator
+     */
     public function getPublishedEntities($args = [])
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
@@ -42,8 +47,8 @@ class MonitoringRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /*
-     *
+    /**
+     * @return float|int
      */
     public function getPublishedEntitiesCount()
     {
@@ -56,12 +61,12 @@ class MonitoringRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -74,12 +79,12 @@ class MonitoringRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

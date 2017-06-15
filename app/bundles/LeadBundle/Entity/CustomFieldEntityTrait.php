@@ -11,6 +11,9 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Model\FieldModel;
+
 trait CustomFieldEntityTrait
 {
     /**
@@ -39,6 +42,9 @@ trait CustomFieldEntityTrait
 
     /**
      * @param $name
+     * @param $value
+     *
+     * @return $this
      */
     public function __set($name, $value)
     {
@@ -103,10 +109,19 @@ trait CustomFieldEntityTrait
      *
      * @return $this
      */
-    public function addUpdatedField($alias, $value, $oldValue = '')
+    public function addUpdatedField($alias, $value, $oldValue = null)
     {
-        if (method_exists($this, 'isAnonymous') && $this->wasAnonymous == null) {
-            $this->wasAnonymous = $this->isAnonymous();
+        $property = (defined('self::FIELD_ALIAS')) ? str_replace(self::FIELD_ALIAS, '', $alias) : $alias;
+
+        if (property_exists($this, $property)) {
+            // Fixed custom field so use the setter
+            $setter = 'set'.ucfirst($property);
+
+            $this->$setter($value);
+        }
+
+        if (null == $oldValue) {
+            $oldValue = $this->getFieldValue($alias);
         }
 
         if (is_string($value)) {
@@ -114,11 +129,20 @@ trait CustomFieldEntityTrait
             if ('' === $value) {
                 // Ensure value is null for consistency
                 $value = null;
+
+                if ('' === $oldValue) {
+                    $oldValue = null;
+                }
             }
+        } elseif (is_array($value)) {
+            // Flatten the array
+            $value = implode('|', $value);
         }
 
-        $this->addChange('fields', [$alias => [$oldValue, $value]]);
-        $this->updatedFields[$alias] = $value;
+        if ($oldValue !== $value) {
+            $this->addChange('fields', [$alias => [$oldValue, $value]]);
+            $this->updatedFields[$alias] = $value;
+        }
 
         return $this;
     }
@@ -186,6 +210,30 @@ trait CustomFieldEntityTrait
             // The fields are already flattened
 
             return $this->fields;
+        }
+    }
+
+    /**
+     * @param ClassMetadataBuilder $builder
+     * @param array                $fields
+     * @param array                $customFieldDefinitions
+     */
+    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions)
+    {
+        foreach ($fields as $fieldProperty) {
+            $field = (defined('self::FIELD_ALIAS')) ? self::FIELD_ALIAS.$fieldProperty : $fieldProperty;
+
+            $type = 'text';
+            if (isset($customFieldDefinitions[$field]) && !empty($customFieldDefinitions[$field]['type'])) {
+                $type = $customFieldDefinitions[$field]['type'];
+            }
+
+            $builder->addNamedField(
+                $fieldProperty,
+                FieldModel::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']))['type'],
+                $field,
+                true
+            );
         }
     }
 }

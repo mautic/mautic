@@ -68,7 +68,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                             <?php echo $view['translator']->trans('mautic.core.advanced'); ?>
                         </a>
                     </li>
-                    <li>
+                    <li id="dynamic-content-tab" <?php echo (!$isCodeMode) ? 'class="hidden"' : ''; ?>>
                         <a href="#dynamic-content-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?>
                         </a>
@@ -246,12 +246,13 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
     'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
+    'sections'      => $sections,
     'objectId'      => $email->getSessionId(),
 ]); ?>
 
 <?php
 $type = $email->getEmailType();
-if (!$isExisting || empty($type) || !empty($forceTypeSelection)):
+if ((empty($updateSelect) && !$isExisting && !$view['form']->containsErrors($form) && !$variantParent) || empty($type) || !empty($forceTypeSelection)):
     echo $view->render('MauticCoreBundle:Helper:form_selecttype.html.php',
         [
             'item'       => $email,

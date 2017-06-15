@@ -114,13 +114,17 @@ MauticJS.replaceDynamicContent = function () {
                             MauticJS.insertScript(m[1]);
                         }
                     }
+
+                    if (response.search("fr-gatedvideo") > 0) {
+                        MauticJS.initGatedVideo();
+                    }
                 }
             });
         });
     }
 };
 
-MauticJS.pixelLoaded(MauticJS.replaceDynamicContent);
+MauticJS.onFirstEventDelivery(MauticJS.replaceDynamicContent);
 JS;
         $event->appendJs($js, 'Mautic Dynamic Content');
     }

@@ -32,4 +32,47 @@ return [
             ],
         ],
     ],
+    'services' => [
+        'events' => [
+            'mautic.integration.leadbundle.subscriber' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\LeadListSubscriber',
+                'arguments' => [
+                    'mautic.helper.integration',
+                    'mautic.lead.model.list',
+                ],
+            ],
+        ],
+        'integrations' => [
+            'mautic.integration.hubspot' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration::class,
+                'arguments' => [
+                    'mautic.helper.user',
+                ],
+            ],
+            'mautic.integration.salesforce' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.sugarcrm' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.vtiger' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.zoho' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+        ],
+    ],
 ];

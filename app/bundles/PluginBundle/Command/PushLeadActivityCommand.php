@@ -31,7 +31,6 @@ class PushLeadActivityCommand extends ContainerAwareCommand
             ->setAliases(
                 [
                     'mautic:integration:pushactivity',
-                    'mautic:pushactivity:integration',
                 ]
             )
             ->setDescription('Push lead activity to integration.')

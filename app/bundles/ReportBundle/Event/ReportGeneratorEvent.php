@@ -13,7 +13,9 @@ namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 
 /**
  * Class ReportGeneratorEvent.
@@ -50,16 +52,25 @@ class ReportGeneratorEvent extends AbstractReportEvent
     private $filterExpression = null;
 
     /**
-     * Constructor.
-     *
-     * @param string $context Event context
+     * @var ChannelListHelper
      */
-    public function __construct(Report $report, array $options, QueryBuilder $qb)
+    private $channelListHelper;
+
+    /**
+     * ReportGeneratorEvent constructor.
+     *
+     * @param Report            $report
+     * @param array             $options
+     * @param QueryBuilder      $qb
+     * @param ChannelListHelper $channelListHelper
+     */
+    public function __construct(Report $report, array $options, QueryBuilder $qb, ChannelListHelper $channelListHelper)
     {
-        $this->report       = $report;
-        $this->context      = $report->getSource();
-        $this->options      = $options;
-        $this->queryBuilder = $qb;
+        $this->report            = $report;
+        $this->context           = $report->getSource();
+        $this->options           = $options;
+        $this->queryBuilder      = $qb;
+        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -233,9 +244,74 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add IP left join.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $prefix
+     * @param string       $ipPrefix
+     *
+     * @return $this
+     */
+    public function addCampaignByChannelJoin(QueryBuilder $queryBuilder, $prefix, $channel)
+    {
+        $options = $this->getOptions();
+        $cmpName = 'cmp.name';
+        $cmpId   = 'clel.campaign_id';
+
+        if ($this->hasColumn($cmpName)
+            || $this->hasFilter($cmpName)
+            || $this->hasColumn($cmpId)
+            || $this->hasFilter($cmpId)
+            || (!empty($options['order'][0]
+                    && ($options['order'][0] === $cmpName
+                        || $options['order'][0] === $cmpId)))) {
+            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel', $prefix.'.id = clel.channel_id AND clel.channel="'.$channel.'"')
+                    ->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaigns', 'cmp', 'cmp.id = clel.campaign_id');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Join channel columns.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $prefix
+     *
+     * @return $this
+     */
+    public function addChannelLeftJoins(QueryBuilder $queryBuilder, $prefix)
+    {
+        foreach ($this->channelListHelper->getChannels() as $channel => $details) {
+            if (!array_key_exists(ReportModel::CHANNEL_FEATURE, $details)) {
+                continue;
+            }
+
+            $reportDetails = $details[ReportModel::CHANNEL_FEATURE];
+
+            if (!array_key_exists('table', $reportDetails)) {
+                continue;
+            }
+
+            $channelParameter = 'channelParameter'.$channel;
+
+            $queryBuilder->leftJoin(
+                $prefix,
+                MAUTIC_TABLE_PREFIX.$reportDetails['table'],
+                $channel,
+                $prefix.'.channel_id = '.$channel.'.id AND '.$prefix.'.channel = :'.$channelParameter
+            );
+
+            $queryBuilder->setParameter($channelParameter, $channel);
+        }
+
+        return $this;
+    }
+
+    /**
      * Apply date filters to the query.
      *
-     * @param QueryBuilder $query
+     * @param QueryBuilder $queryBuilder
      * @param string       $dateColumn
      * @param string       $tablePrefix
      *
@@ -331,6 +407,21 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         return isset($sorted[$column]);
+    }
+
+    /**
+     * Check if the report has a groupBy columns selected.
+     *
+     *
+     * @return bool
+     */
+    public function hasGroupBy()
+    {
+        if (!empty($this->getReport()->getGroupBy())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

@@ -53,6 +53,11 @@ class Stat
     private $dateSent;
 
     /**
+     * @var \DateTime
+     */
+    private $dateRead;
+
+    /**
      * @var bool
      */
     private $isClicked = false;
@@ -133,6 +138,11 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->build();
+
+        $builder->createField('dateRead', 'datetime')
+            ->columnName('date_read')
+            ->nullable()
             ->build();
 
         $builder->createField('isClicked', 'boolean')
@@ -486,6 +496,26 @@ class Stat
     public function setClickDetails($clickDetails)
     {
         $this->clickDetails = $clickDetails;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateRead()
+    {
+        return $this->dateRead;
+    }
+
+    /**
+     * @param \DateTime $dateRead
+     *
+     * @return Stat
+     */
+    public function setDateRead($dateRead)
+    {
+        $this->dateRead = $dateRead;
 
         return $this;
     }

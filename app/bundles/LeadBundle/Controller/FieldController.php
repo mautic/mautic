@@ -197,6 +197,12 @@ class FieldController extends FormController
                 );
             } elseif ($valid && !$cancelled) {
                 return $this->editAction($field->getId(), true);
+            } elseif (!$valid) {
+                // some bug in Symfony prevents repopulating list options on errors
+                $field   = $form->getData();
+                $newForm = $model->createForm($field, $this->get('form.factory'), $action);
+                $this->copyErrorsRecursively($form, $newForm);
+                $form = $newForm;
             }
         }
 
@@ -313,6 +319,12 @@ class FieldController extends FormController
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'edit', 'objectId' => $field->getId()]);
                 $form   = $model->createForm($field, $this->get('form.factory'), $action);
+            } else {
+                // some bug in Symfony prevents repopulating list options on errors
+                $field   = $form->getData();
+                $newForm = $model->createForm($field, $this->get('form.factory'), $action);
+                $this->copyErrorsRecursively($form, $newForm);
+                $form = $newForm;
             }
         } else {
             //lock the entity

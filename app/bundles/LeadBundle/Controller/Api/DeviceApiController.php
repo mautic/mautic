@@ -11,9 +11,11 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -25,12 +27,12 @@ class DeviceApiController extends CommonApiController
 
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model           = $this->getModel('lead.device');
         $this->entityClass     = LeadDevice::class;
         $this->entityNameOne   = 'device';
         $this->entityNameMulti = 'devices';
-        $this->permissionBase  = 'lead:leads';
+
+        parent::initialize($event);
     }
 
     /**
@@ -43,17 +45,23 @@ class DeviceApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
+        $lead = null;
         if (!empty($parameters['lead'])) {
-            $lead = $this->checkLeadAccess($parameters['lead'], 'view');
+            $lead = $parameters['lead'];
+        } elseif (!empty($parameters['contact'])) {
+            $lead = $parameters['contact'];
+        }
+        if ($lead) {
+            $lead = $this->checkLeadAccess($lead, $action);
 
             if ($lead instanceof Response) {
                 return $lead;
             }
 
             $entity->setLead($lead);
-            unset($parameters['lead']);
+            unset($parameters['lead'], $parameters['contact']);
         } elseif ($action === 'new') {
-            return $this->returnError('lead ID is mandatory', Codes::HTTP_BAD_REQUEST);
+            return $this->returnError('contact ID is mandatory', Codes::HTTP_BAD_REQUEST);
         }
     }
 

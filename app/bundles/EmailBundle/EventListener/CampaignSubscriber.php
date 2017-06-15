@@ -15,8 +15,8 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Model\MessageQueueModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -82,23 +82,35 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        $trigger = [
-            'label'             => 'mautic.email.campaign.event.open',
-            'description'       => 'mautic.email.campaign.event.open_descr',
-            'eventName'         => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-            'associatedActions' => ['email.send'],
-        ];
-        $event->addDecision('email.open', $trigger);
+        $event->addDecision(
+            'email.open',
+            [
+                'label'                  => 'mautic.email.campaign.event.open',
+                'description'            => 'mautic.email.campaign.event.open_descr',
+                'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'connectionRestrictions' => [
+                    'source' => [
+                        'action' => [
+                            'email.send',
+                        ],
+                    ],
+                ],
+            ]
+        );
 
-        $action = [
-            'label'           => 'mautic.email.campaign.event.send',
-            'description'     => 'mautic.email.campaign.event.send_descr',
-            'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'        => 'emailsend_list',
-            'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
-        ];
-        $event->addAction('email.send', $action);
+        $event->addAction(
+            'email.send',
+            [
+                'label'           => 'mautic.email.campaign.event.send',
+                'description'     => 'mautic.email.campaign.event.send_descr',
+                'eventName'       => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'        => 'emailsend_list',
+                'formTypeOptions' => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
+                'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+                'channel'         => 'email',
+                'channelIdField'  => 'email',
+            ]
+        );
     }
 
     /**
@@ -158,6 +170,8 @@ class CampaignSubscriber extends CommonSubscriber
                 'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
                 'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
                 'email_type'     => $type,
+                'return_errors'  => true,
+                'dnc_as_error'   => true,
             ];
 
             $event->setChannel('email', $emailId);
@@ -174,6 +188,21 @@ class CampaignSubscriber extends CommonSubscriber
 
                 if (empty($stats)) {
                     $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+                }
+
+                if (is_array($emailSent)) {
+                    $errors = implode('<br />', $emailSent);
+
+                    // Add to the metadata of the failed event
+                    $emailSent = [
+                        'result' => false,
+                        'errors' => $errors,
+                    ];
+                } elseif (true !== $emailSent) {
+                    $emailSent = [
+                        'result' => false,
+                        'errors' => $emailSent,
+                    ];
                 }
             } else {
                 return $event->setFailed('Email not found or published');

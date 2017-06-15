@@ -74,12 +74,12 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -193,12 +193,25 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } else {
-                $q->where(
-                    $q->expr()->andX(
-                        $q->expr()->eq('l.id', ':lead'),
+                $expr = $q->expr()->andX(
+                    $q->expr()->eq('l.id', ':lead')
+                );
+
+                if ($operatorExpr == 'neq') {
+                    // include null
+                    $expr->add(
+                        $q->expr()->orX(
+                            $q->expr()->$operatorExpr('l.'.$field, ':value'),
+                            $q->expr()->isNull('l.'.$field)
+                        )
+                    );
+                } else {
+                    $expr->add(
                         $q->expr()->$operatorExpr('l.'.$field, ':value')
-                    )
-                )
+                    );
+                }
+
+                $q->where($expr)
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             }

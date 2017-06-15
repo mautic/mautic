@@ -12,6 +12,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\StageBundle\Entity\Stage;
@@ -22,6 +23,23 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * HubspotIntegration constructor.
+     *
+     * @param UserHelper $userHelper
+     */
+    public function __construct(UserHelper $userHelper)
+    {
+        $this->userHelper = $userHelper;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -99,9 +117,17 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $settings['feature_settings']['objects']['company'] = 'company';
+        return $this->getFormFieldsByObject('company', $settings);
+    }
 
-        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+    /**
+     * @param array $settings
+     *
+     * @return array|mixed
+     */
+    public function getFormLeadFields($settings = [])
+    {
+        return $this->getFormFieldsByObject('contacts', $settings);
     }
 
     /**
@@ -109,6 +135,10 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        if ($fields = parent::getAvailableLeadFields()) {
+            return $fields;
+        }
+
         $hubsFields        = [];
         $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
 
@@ -116,31 +146,33 @@ class HubspotIntegration extends CrmAbstractIntegration
             $hubspotObjects = $settings['feature_settings']['objects'];
         } else {
             $settings       = $this->settings->getFeatureSettings();
-            $hubspotObjects = isset($settings['objects']) ? $settings['objects'] : 'contacts';
+            $hubspotObjects = isset($settings['objects']) ? $settings['objects'] : ['contacts'];
         }
 
         try {
             if ($this->isAuthorized()) {
                 if (!empty($hubspotObjects) and is_array($hubspotObjects)) {
                     foreach ($hubspotObjects as $key => $object) {
+                        // Check the cache first
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.$object;
+                        if ($fields = parent::getAvailableLeadFields($settings)) {
+                            $hubsFields[$object] = $fields;
+
+                            continue;
+                        }
+
                         $leadFields = $this->getApiHelper()->getLeadFields($object);
                         if (isset($leadFields)) {
                             foreach ($leadFields as $fieldInfo) {
-                                if ($object != 'company') {
-                                    $hubsFields[$fieldInfo['name']] = [
-                                        'type'  => 'string',
-                                        'label' => $fieldInfo['label'],
-                                    ];
-                                } else {
-                                    $hubsFields[$object][$fieldInfo['name']] = [
-                                        'type'  => 'string',
-                                        'label' => $fieldInfo['label'],
-                                    ];
-                                }
+                                $hubsFields[$object][$fieldInfo['name']] = [
+                                    'type'     => 'string',
+                                    'label'    => $fieldInfo['label'],
+                                    'required' => ('email' === $fieldInfo['name']),
+                                ];
                             }
                         }
-                        // Email is Required for this kind of integration
-                        $hubsFields['email']['required'] = true;
+
+                        $this->cache->set('leadFields'.$cacheSuffix, $hubsFields[$object]);
                     }
                 }
             }
@@ -182,7 +214,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             //put mautic timeline link
             $formattedLeadData['properties'][] = [
                 'property' => 'mautic_timeline',
-                'value'    => $this->factory->getRouter()->generate(
+                'value'    => $this->router->generate(
                     'mautic_plugin_timeline_view',
                     ['integration' => 'Hubspot', 'leadId' => $lead->getId()],
                     UrlGeneratorInterface::ABSOLUTE_URL),
@@ -240,6 +272,9 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
+        if (!isset($data['properties'])) {
+            return [];
+        }
         foreach ($data['properties'] as $key => $field) {
             $fieldsValues[$key] = $field['value'];
         }
@@ -371,8 +406,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel           = $this->factory->getModel('lead');
-        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $leadModel           = $this->leadModel;
+        $uniqueLeadFields    = $this->fieldModel->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
 
         foreach ($matchedFields as $leadField => $value) {
@@ -386,7 +421,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
+            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
@@ -430,7 +465,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         if (isset($stageName)) {
-            $stage = $this->factory->getEntityManager()->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
+            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
 
             if (empty($stage)) {
                 $stage = new Stage();
@@ -446,10 +481,10 @@ class HubspotIntegration extends CrmAbstractIntegration
                 $log->setEventName($stage->getId().':'.$stage->getName());
                 $log->setLead($lead);
                 $log->setActionName(
-                    $this->factory->getTranslator()->trans(
+                    $this->translator->trans(
                         'mautic.stage.import.action.name',
                         [
-                            '%name%' => $this->factory->getUser()->getUsername(),
+                            '%name%' => $this->userHelper->getUser()->getUsername(),
                         ]
                     )
                 );
@@ -464,7 +499,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             try {
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
-                $this->factory->getLogger()->addWarning($exception->getMessage());
+                $this->logger->addWarning($exception->getMessage());
 
                 return;
             }

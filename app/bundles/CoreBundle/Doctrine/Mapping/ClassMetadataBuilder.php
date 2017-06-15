@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
+use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder as OrmClassMetadataBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
@@ -20,7 +21,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
  * See @link https://github.com/doctrine/doctrine2/pull/1326/
  */
-class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder
+class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
     /**
      * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $cm
@@ -117,6 +118,8 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
 
     /**
      * Add Id column.
+     *
+     * @return $this
      */
     public function addId()
     {
@@ -124,6 +127,8 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
             ->makePrimaryKey()
             ->generatedValue()
             ->build();
+
+        return $this;
     }
 
     /**
@@ -131,6 +136,8 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
      *
      * @param string $nameColumn
      * @param string $descriptionColumn
+     *
+     * @return $this
      */
     public function addIdColumns($nameColumn = 'name', $descriptionColumn = 'description')
     {
@@ -146,20 +153,28 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
                 ->nullable()
                 ->build();
         }
+
+        return $this;
     }
 
     /**
      * Add category to metadata.
+     *
+     * @return $this
      */
     public function addCategory()
     {
         $this->createManyToOne('category', 'Mautic\CategoryBundle\Entity\Category')
             ->addJoinColumn('category_id', 'id', true, false, 'SET NULL')
             ->build();
+
+        return $this;
     }
 
     /**
      * Add publish up and down dates to metadata.
+     *
+     * @return $this
      */
     public function addPublishDates()
     {
@@ -172,12 +187,16 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
             ->columnName('publish_down')
             ->nullable()
             ->build();
+
+        return $this;
     }
 
     /**
      * Added dateAdded column.
      *
      * @param bool|false $nullable
+     *
+     * @return $this
      */
     public function addDateAdded($nullable = false)
     {
@@ -189,6 +208,37 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         }
 
         $dateAdded->build();
+
+        return $this;
+    }
+
+    /**
+     * Add a contact column.
+     *
+     * @param bool|false $nullable
+     * @param string     $onDelete
+     * @param bool|false $isPrimaryKey
+     * @param null       $inversedBy
+     *
+     * @return $this
+     */
+    public function addContact($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
+    {
+        $lead = $this->createManyToOne('contact', 'Mautic\LeadBundle\Entity\Lead');
+
+        if ($isPrimaryKey) {
+            $lead->makePrimaryKey();
+        }
+
+        if ($inversedBy) {
+            $lead->inversedBy($inversedBy);
+        }
+
+        $lead
+            ->addJoinColumn('contact_id', 'id', $nullable, false, $onDelete)
+            ->build();
+
+        return $this;
     }
 
     /**
@@ -198,13 +248,17 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
      * @param string     $onDelete
      * @param bool|false $isPrimaryKey
      * @param null       $inversedBy
+     *
+     * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
+     *
+     * @return $this
      */
     public function addLead($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
     {
         $lead = $this->createManyToOne('lead', 'Mautic\LeadBundle\Entity\Lead');
 
         if ($isPrimaryKey) {
-            $lead->isPrimaryKey();
+            $lead->makePrimaryKey();
         }
 
         if ($inversedBy) {
@@ -214,12 +268,16 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         $lead
             ->addJoinColumn('lead_id', 'id', $nullable, false, $onDelete)
             ->build();
+
+        return $this;
     }
 
     /**
      * Adds IP address.
      *
-     * @param bool|false $nullable
+     * @param bool $nullable
+     *
+     * @return $this
      */
     public function addIpAddress($nullable = false)
     {
@@ -228,6 +286,8 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
             ->cascadeMerge()
             ->addJoinColumn('ip_id', 'id', $nullable)
             ->build();
+
+        return $this;
     }
 
     /**
@@ -236,6 +296,8 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
      * @param        $name
      * @param string $type
      * @param null   $columnName
+     *
+     * @return $this
      */
     public function addNullableField($name, $type = 'string', $columnName = null)
     {
@@ -247,15 +309,19 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         }
 
         $field->build();
+
+        return $this;
     }
 
     /**
      * Add a field with a custom column name.
      *
-     * @param            $name
-     * @param            $type
-     * @param            $columnName
-     * @param bool|false $nullable
+     * @param      $name
+     * @param      $type
+     * @param      $columnName
+     * @param bool $nullable
+     *
+     * @return $this
      */
     public function addNamedField($name, $type, $columnName, $nullable = false)
     {
@@ -267,6 +333,22 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         }
 
         $field->build();
+
+        return $this;
+    }
+
+    /**
+     * Adds Field. Overridden for IDE suggestions when stringing methods in entity class.
+     *
+     * @param string $name
+     * @param string $type
+     * @param array  $mapping
+     *
+     * @return $this
+     */
+    public function addField($name, $type, array $mapping = [])
+    {
+        return parent::addField($name, $type, $mapping);
     }
 
     /**
