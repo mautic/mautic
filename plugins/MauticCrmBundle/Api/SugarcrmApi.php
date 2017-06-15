@@ -190,10 +190,16 @@ class SugarcrmApi extends CrmApi
                         foreach ($leadFields as $item) {
                             $fields[$item['name']] = $item['value'];
                         }
-                        $result = ['reference_id' => $fields['reference_id'],
-                                   'id'           => $resp['ids'][$k],
-                                   'new'          => !isset($fields['id']),
-                                   'ko'           => false, ];
+                        if (isset($resp['ids'])) {
+                            $result = ['reference_id' => $fields['reference_id'],
+                                       'id'           => $resp['ids'][$k],
+                                       'new'          => !isset($fields['id']),
+                                       'ko'           => false, ];
+                        }
+                        if (isset($resp['error'])) {
+                            $result['ko']    = true;
+                            $result['error'] = $resp['error']['message'];
+                        }
                         if (isset($fields['id']) && $fields['id'] != $resp['ids'][$k]) {
                             $result['ko']    = true;
                             $result['error'] = 'Returned ID does not correspond to input id';
