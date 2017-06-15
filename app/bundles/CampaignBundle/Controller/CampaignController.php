@@ -274,6 +274,7 @@ class CampaignController extends FormController
         foreach ($events as $event) {
             $event['logCount']                   = (isset($campaignLogCounts[$event['id']])) ? (int) $campaignLogCounts[$event['id']] : 0;
             $event['percent']                    = ($leadCount) ? round($event['logCount'] / $leadCount * 100) : 0;
+            $event['leadCount']                  = $leadCount;
             $sortedEvents[$event['eventType']][] = $event;
         }
 
