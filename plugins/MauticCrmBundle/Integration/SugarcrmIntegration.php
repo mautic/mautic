@@ -1247,7 +1247,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $deletedSugarLeads          = [];
         $sugarIdMapping             = [];
         foreach ($checkEmailsInSugar as $object => $objectEmails) {
-            $checkEmailsInSugar = $this->getObjectDataToUpdate($objectEmails, $mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $ownerAssignedUserIdByEmail, $object);
+            list($checkEmailsInSugar, $deletedSugarLeads) = $this->getObjectDataToUpdate($objectEmails, $mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $ownerAssignedUserIdByEmail, $object);
+        }
+        //recheck synced records that might have been deleted in Sugar (deleted records don't come back in the query)
+        foreach ($checkEmailsInSugar as $key => $deletedSugarRedords) {
+            if (isset($deletedSugarRedords['integration_entity_id']) && $deletedSugarRedords['integration_entity_id']) {
+                $deletedSugarLeads[] = $deletedSugarRedords['integration_entity_id'];
+            }
+            unset($checkEmailsInSugar[$key]);
         }
 
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
@@ -1269,8 +1276,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
         }
 
-        $request['allOrNone']        = 'false';
-        $request['compositeRequest'] = array_values($mauticData);
         /** @var SugarcrmApi $apiHelper */
         $apiHelper = $this->getApiHelper();
         if (!empty($mauticData)) {
@@ -1279,65 +1284,85 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return $this->processCompositeResponse($result, $sugarIdMapping);
     }
+
+    /**
+     * @param $checkEmailsInSugar
+     * @param $mauticData
+     * @param $availableFields
+     * @param $contactSugarFields
+     * @param $leadSugarFields
+     * @param $ownerAssignedUserIdByEmail
+     * @param string $object
+     *
+     * @return mixed
+     */
     public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $ownerAssignedUserIdByEmail, $object = 'Leads')
     {
         $queryParam = ($object == 'Leads') ? 'checkemail' : 'checkemail_contacts';
 
-        $sugarLead = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
-
+        $sugarLead         = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
+        $deletedSugarLeads = [];
         if (isset($sugarLead['entry_list'])) {
-            $sugarContactRecord = [];
-            if ($object == 'Contacts') {
-                foreach ($sugarLead['relationship_list'] as $links) {
-                    foreach ($links as $items) {
-                        foreach ($items as $item) {
-                            if ($item['name'] == 'email_addresses') {
-                                foreach ($item['records'] as $contactEmails) {
-                                    $sugarContactRecord['email1'] = $contactEmails['link_value']['email_address']['value'];
+            foreach ($sugarLead['entry_list'] as $k => $record) {
+                $sugarLeadRecord                = [];
+                $sugarLeadRecord['id']          = $record['id'];
+                $sugarLeadRecord['name_module'] = $record['name_module'];
+                foreach ($record['name_value_list'] as $item) {
+                    $sugarLeadRecord[$item['name']] = $item['value'];
+                }
+                if (!isset($sugarLeadRecord['email1'])) {
+                    foreach ($sugarLead['relationship_list'][$k]['link_list'] as $links) {
+                        if ($links['name'] == 'email_addresses') {
+                            foreach ($links['records'] as $records) {
+                                foreach ($records as $contactEmails) {
+                                    foreach ($contactEmails as $anyAddress) {
+                                        if ($anyAddress['name'] == 'email_address' && !empty($anyAddress['value'])) {
+                                            $sugarLeadRecord['email1'] = $anyAddress['value'];
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            foreach ($sugarLead['entry_list'] as $k => $record) {
-                $sugarLeadRecord = [];
-                foreach ($record['name_value_list'] as $item) {
-                    $sugarLeadRecord[$item['name']] = $item['value'];
-                }
-                if ((isset($sugarLeadRecord) && $sugarLeadRecord) || (isset($sugarContactRecord) && $sugarContactRecord)) {
-                    $email = ($object == 'Contacts') ? $sugarContactRecord['email1'] : $sugarLeadRecord['email1'];
-                    $key   = mb_strtolower($email);
-                    if (isset($checkEmailsInSugar[$key])) {
-                        $isConverted = (isset($sugarLeadRecord['contact_id'])
-                            && $sugarLeadRecord['contact_id'] != null && $sugarLeadRecord['contact_id'] != '');
-                        $sugarIdMapping[$checkEmailsInSugar[$key]['internal_entity_id']] = ($isConverted) ? $sugarLeadRecord['contact_id']
-                            : $sugarLeadRecord['id'];
 
-                        if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
-                            $this->buildCompositeBody(
-                                $mauticData,
-                                $availableFields,
-                                $isConverted || ($object == 'Contacts') ? $contactSugarFields : $leadSugarFields,
-                                $isConverted || ($object == 'Contacts') ? 'Contacts' : 'Leads',
-                                $checkEmailsInSugar[$key],
-                                $ownerAssignedUserIdByEmail,
-                                $isConverted ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id']
-                            );
-                        } else {
-                            // @todo - Should return also deleted contacts from Sugar
-                            $deletedSugarLeads[] = $sugarLeadRecord['id'];
-                            if (!empty($sugarLeadRecord['contact_id']) || $sugarLeadRecord['contact_id'] != '') {
-                                $deletedSugarLeads[] = $sugarLeadRecord['contact_id'];
+                if ((isset($sugarLeadRecord) && $sugarLeadRecord)) {
+                    $email = $sugarLeadRecord['email1'];
+                    $key   = mb_strtolower($email);
+                    foreach ($checkEmailsInSugar as $emailKey => $mauticRecord) {
+                        if ($email == $emailKey) {
+                            $isConverted = (isset($sugarLeadRecord['contact_id'])
+                                            && $sugarLeadRecord['contact_id'] != null
+                                            && $sugarLeadRecord['contact_id'] != '');
+
+                            $sugarIdMapping[$checkEmailsInSugar[$key]['internal_entity_id']] = ($isConverted) ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id'];
+
+                            if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
+                                $this->buildCompositeBody(
+                                    $mauticData,
+                                    $availableFields,
+                                    $isConverted || ($object == 'Contacts') ? $contactSugarFields : $leadSugarFields,
+                                    $isConverted || ($object == 'Contacts') ? 'Contacts' : 'Leads',
+                                    $checkEmailsInSugar[$key],
+                                    $ownerAssignedUserIdByEmail,
+                                    $isConverted ? $sugarLeadRecord['contact_id'] : $sugarLeadRecord['id']
+                                );
+                            } else {
+                                // @todo - Should return also deleted contacts from Sugar
+                                $deletedSugarLeads[] = $sugarLeadRecord['id'];
+                                if (!empty($sugarLeadRecord['contact_id']) || $sugarLeadRecord['contact_id'] != '') {
+                                    $deletedSugarLeads[] = $sugarLeadRecord['contact_id'];
+                                }
                             }
+                            unset($checkEmailsInSugar[$key]);
                         }
-                        unset($checkEmailsInSugar[$key]);
-                    } // Otherwise a duplicate in Sugar and has already been processed
+                    }
                 }
             }
         }
 
-        return $checkEmailsInSugar;
+        return [$checkEmailsInSugar, $deletedSugarLeads];
     }
     /**
      * @param $lead
