@@ -1116,7 +1116,7 @@ abstract class AbstractIntegration
                     ];
                     break;
                 case 'oauth1a':
-                    $oauthHelper = new oAuthHelper($this, $this->request, $settings);
+                    $oauthHelper = new oAuthHelper($this, new Request(), $settings);
                     $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
                     break;
                 case 'oauth2':
