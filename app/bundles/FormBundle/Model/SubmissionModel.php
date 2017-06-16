@@ -238,7 +238,7 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            if (in_array($type, $components['viewOnlyFields'])) {
+            if (isset($components['viewOnlyFields']) && in_array($type, $components['viewOnlyFields'])) {
                 //don't save items that don't have a value associated with it
                 continue;
             }
@@ -290,11 +290,6 @@ class SubmissionModel extends CommonFormModel
             $leadField = $f->getLeadField();
             if (!empty($leadField)) {
                 $leadValue = $value;
-                if (is_array($leadValue)) {
-                    // Multiselect lead fields store the values with bars
-                    $delimeter = ('multiselect' === $leadFields[$leadField]['type']) ? '|' : ', ';
-                    $leadValue = implode($delimeter, $leadValue);
-                }
 
                 $leadFieldMatches[$leadField] = $leadValue;
             }

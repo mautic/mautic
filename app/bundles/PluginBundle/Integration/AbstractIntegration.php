@@ -11,6 +11,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -32,11 +33,15 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class AbstractIntegration.
@@ -57,7 +62,7 @@ abstract class AbstractIntegration
     protected $factory;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -102,7 +107,7 @@ abstract class AbstractIntegration
     protected $logger;
 
     /**
-     * @var \Mautic\CoreBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -154,29 +159,158 @@ abstract class AbstractIntegration
     protected $lastIntegrationError;
 
     /**
-     * @param MauticFactory $factory
-     *
-     * @todo divorce from MauticFactory
+     * AbstractIntegration constructor.
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory = null)
     {
-        $this->factory           = $factory;
-        $this->dispatcher        = $factory->getDispatcher();
-        $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
-        $this->em                = $factory->getEntityManager();
-        $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-        $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
-        $this->router            = $factory->getRouter();
-        $this->translator        = $factory->getTranslator();
-        $this->logger            = $factory->getLogger();
-        $this->encryptionHelper  = $factory->getHelper('encryption');
-        $this->leadModel         = $factory->getModel('lead');
-        $this->companyModel      = $factory->getModel('lead.company');
-        $this->pathsHelper       = $factory->getHelper('paths');
-        $this->notificationModel = $factory->getModel('core.notification');
-        $this->fieldModel        = $factory->getModel('lead.field');
+        /*
+         * @deprecated: 2.8.2 To be removed in 3.0
+         *            This keeps BC with 3rd party plugins that
+         *            don't use the container for the
+         *            integration pass to set all of these properties
+         */
+        if ($factory) {
+            $this->factory           = $factory;
+            $this->dispatcher        = $factory->getDispatcher();
+            $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+            $this->em                = $factory->getEntityManager();
+            $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
+            $this->request           = $factory->getRequest();
+            $this->router            = $factory->getRouter();
+            $this->translator        = $factory->getTranslator();
+            $this->logger            = $factory->getLogger();
+            $this->encryptionHelper  = $factory->getHelper('encryption');
+            $this->leadModel         = $factory->getModel('lead');
+            $this->companyModel      = $factory->getModel('lead.company');
+            $this->pathsHelper       = $factory->getHelper('paths');
+            $this->notificationModel = $factory->getModel('core.notification');
+            $this->fieldModel        = $factory->getModel('lead.field');
+        }
 
         $this->init();
+    }
+
+    /**
+     * @param MauticFactory $factory
+     *
+     * @deprecated 2.8.2 To be removed in 3.0. Use constructor arguments
+     *             to set dependencies instead
+     */
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
+     * @param FieldModel $fieldModel
+     */
+    public function setFieldModel(FieldModel $fieldModel)
+    {
+        $this->fieldModel = $fieldModel;
+    }
+
+    /**
+     * @param NotificationModel $notificationModel
+     */
+    public function setNotificationModel(NotificationModel $notificationModel)
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
+    /**
+     * @param PathsHelper $pathsHelper
+     */
+    public function setPathsHelper(PathsHelper $pathsHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+    }
+
+    /**
+     * @param CompanyModel $companyModel
+     */
+    public function setCompanyModel(CompanyModel $companyModel)
+    {
+        $this->companyModel = $companyModel;
+    }
+
+    /**
+     * @param LeadModel $leadModel
+     */
+    public function setLeadModel(LeadModel $leadModel)
+    {
+        $this->leadModel = $leadModel;
+    }
+
+    /**
+     * @param EncryptionHelper $encryptionHelper
+     */
+    public function setEncryptionHelper(EncryptionHelper $encryptionHelper)
+    {
+        $this->encryptionHelper = $encryptionHelper;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param Router $router
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function setRequest(RequestStack $requestStack)
+    {
+        $this->request = !defined('IN_MAUTIC_CONSOLE') ? $requestStack->getCurrentRequest() : null;
+    }
+
+    /**
+     * @param Session|null $session
+     */
+    public function setSession(Session $session = null)
+    {
+        $this->session = !defined('IN_MAUTIC_CONSOLE') ? $session : null;
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
+    /**
+     * @param CacheStorageHelper $cacheStorageHelper
+     */
+    public function setCache(CacheStorageHelper $cacheStorageHelper)
+    {
+        $this->cache = $cacheStorageHelper->getCache($this->getName());
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -197,6 +331,9 @@ abstract class AbstractIntegration
 
     /**
      * Called on construct.
+     *
+     * @deprecated 2.8.2 To be removed in 3.0
+     *             Setup your integration in the class constructor instead
      */
     public function init()
     {
@@ -308,6 +445,21 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get a list of tooltips for the specified supported features.
+     * This allows you to add detail / informational tooltips to your
+     * supported feature checkbox group.
+     *
+     * Example:
+     *  'cloud_storage' => 'mautic.integration.form.features.cloud_storage.tooltip'
+     *
+     * @return array
+     */
+    public function getSupportedFeatureTooltips()
+    {
+        return [];
+    }
+
+    /**
      * Returns the field the integration needs in order to find the user.
      *
      * @return mixed
@@ -373,7 +525,7 @@ abstract class AbstractIntegration
      *
      * @param            $mergeKeys
      * @param            $withKeys
-     * @param bool|false $return Returns the key array rather than setting them
+     * @param bool|false $return    Returns the key array rather than setting them
      *
      * @return void|array
      */
@@ -746,10 +898,10 @@ abstract class AbstractIntegration
         if ($method == 'GET' && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
-            $url        .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+            $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
-            $url   .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+            $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
         }
 
         if (isset($postAppend)) {
@@ -809,8 +961,8 @@ abstract class AbstractIntegration
             foreach ($parseHeaders as $key => $value) {
                 if (strpos($value, ':') !== false) {
                     list($key, $value) = explode(':', $value);
-                    $key   = trim($key);
-                    $value = trim($value);
+                    $key               = trim($key);
+                    $value             = trim($value);
                 }
 
                 $headers[$key] = $value;
@@ -919,7 +1071,7 @@ abstract class AbstractIntegration
                     break;
                 case 'oauth2':
                     if ($bearerToken = $this->getBearerToken(true)) {
-                        $headers                  = [
+                        $headers = [
                             "Authorization: Basic {$bearerToken}",
                             'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
                         ];
@@ -927,13 +1079,13 @@ abstract class AbstractIntegration
                     } else {
                         $defaultGrantType = (!empty($settings['refresh_token'])) ? 'refresh_token'
                             : 'authorization_code';
-                        $grantType        = (!isset($settings['grant_type'])) ? $defaultGrantType
+                        $grantType = (!isset($settings['grant_type'])) ? $defaultGrantType
                             : $settings['grant_type'];
 
                         $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
                         $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey
                             : $settings[$clientSecretKey];
-                        $parameters         = array_merge(
+                        $parameters = array_merge(
                             $parameters,
                             [
                                 $useClientIdKey     => $this->keys[$clientIdKey],
@@ -1448,7 +1600,7 @@ abstract class AbstractIntegration
         $mauticLeadFields['mauticContactTimelineLink'] = '';
 
         //make sure now non-existent aren't saved
-        $settings                                = [
+        $settings = [
             'ignore_field_cache' => false,
         ];
         $settings['feature_settings']['objects'] = $submittedObjects;
@@ -1705,9 +1857,9 @@ abstract class AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed      $data    Profile data from integration
-     * @param bool|true  $persist Set to false to not persist lead to the database in this method
-     * @param array|null $socialCache
+     * @param mixed       $data        Profile data from integration
+     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
+     * @param array|null  $socialCache
      * @param mixed||null $identifiers
      *
      * @return Lead
@@ -1908,7 +2060,7 @@ abstract class AbstractIntegration
                             }
                         }
                     }
-                    $fn        = (isset($fieldDetails['fields'][0])) ? $this->matchFieldName(
+                    $fn = (isset($fieldDetails['fields'][0])) ? $this->matchFieldName(
                         $field,
                         $fieldDetails['fields'][0]
                     ) : $field;
@@ -2004,7 +2156,7 @@ abstract class AbstractIntegration
             $this->lastIntegrationError = $errorHeader.': '.$errorMessage;
 
             if ($contactId) {
-                $contactLink  = $this->router->generate(
+                $contactLink = $this->router->generate(
                     'mautic_contact_action',
                     [
                         'objectAction' => 'view',
@@ -2234,8 +2386,13 @@ abstract class AbstractIntegration
     /**
      * @param $value
      */
-    protected function cleanPushData($value)
+    public function cleanPushData($value)
     {
         return strip_tags(html_entity_decode($value, ENT_QUOTES));
+    }
+
+    public function getLogger()
+    {
+        return $this->logger;
     }
 }
