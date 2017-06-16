@@ -35,7 +35,7 @@ class oAuthHelper
 
     private $request;
 
-    public function __construct(AbstractIntegration $integration, Request $request, $settings = [])
+    public function __construct(AbstractIntegration $integration, Request $request = null, $settings = [])
     {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
