@@ -1,0 +1,4 @@
+add new column 
+'to_address',
+'cc_address'
+in 'emails' table
