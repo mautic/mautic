@@ -159,7 +159,7 @@ class FieldController extends FormController
                             //form is valid so process the data
                             $model->saveEntity($field);
                         } catch (\ErrorException $ee) {
-                            $flashMessage = 'mautic.core.error.max.field';
+                            $flashMessage = $ee->getMessage();
                         } catch (\Exception $e) {
                             $form['alias']->addError(
                                     new FormError(

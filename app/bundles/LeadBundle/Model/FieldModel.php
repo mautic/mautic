@@ -390,7 +390,7 @@ class FieldModel extends FormModel
             } catch (\Exception $e) {
                 $this->logger->addWarning($e->getMessage());
                 $isCreated = false;
-                throw new \ErrorException('Too many field');
+                throw new \ErrorException($this->translator->trans('mautic.core.error.max.field'));
             }
 
             if ($isCreated === true) {
