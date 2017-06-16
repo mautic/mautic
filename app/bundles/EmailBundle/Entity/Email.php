@@ -364,38 +364,32 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             )
         );
 
-        /**
-         * commented by Eric J.
-         * 06/16/2017
-         * customize header fields to accept token string as well
-         */
+        /*$metadata->addPropertyConstraint(
+            'fromAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                [
+                    'message' => 'mautic.core.email.required',
+                ]
+            )
+        );
 
-//        $metadata->addPropertyConstraint(
-//            'fromAddress',
-//            new \Symfony\Component\Validator\Constraints\Email(
-//                [
-//                    'message' => 'mautic.core.email.required',
-//                ]
-//            )
-//        );
-//
-//        $metadata->addPropertyConstraint(
-//            'replyToAddress',
-//            new \Symfony\Component\Validator\Constraints\Email(
-//                [
-//                    'message' => 'mautic.core.email.required',
-//                ]
-//            )
-//        );
-//
-//        $metadata->addPropertyConstraint(
-//            'bccAddress',
-//            new \Symfony\Component\Validator\Constraints\Email(
-//                [
-//                    'message' => 'mautic.core.email.required',
-//                ]
-//            )
-//        );
+        $metadata->addPropertyConstraint(
+            'replyToAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                [
+                    'message' => 'mautic.core.email.required',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'bccAddress',
+            new \Symfony\Component\Validator\Constraints\Email(
+                [
+                    'message' => 'mautic.core.email.required',
+                ]
+            )
+        );*/
 
         $metadata->addConstraint(new Callback([
             'callback' => function (Email $email, ExecutionContextInterface $context) {
@@ -707,6 +701,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setFromAddress($fromAddress)
     {
         $this->fromAddress = $fromAddress;
+
         return $this;
     }
 
