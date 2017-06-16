@@ -87,7 +87,6 @@ $indexCount = 1;
                                     <input type="radio"
                                            id="<?php echo $child->vars['id']; ?>_0"
                                            name="<?php echo $child->vars['full_name']; ?>"
-                                           data-toggle="tooltip"
                                            title=""
                                            autocomplete="false"
                                            value="0"
@@ -99,7 +98,6 @@ $indexCount = 1;
                                 <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
                                     <input type="radio" id="<?php echo $child->vars['id']; ?>_1"
                                            name="<?php echo $child->vars['full_name']; ?>"
-                                           data-toggle="tooltip"
                                            title=""
                                            autocomplete="false"
                                            value="1"

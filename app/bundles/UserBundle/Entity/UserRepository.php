@@ -122,7 +122,7 @@ class UserRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('u')
@@ -235,7 +235,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -254,7 +254,7 @@ class UserRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();

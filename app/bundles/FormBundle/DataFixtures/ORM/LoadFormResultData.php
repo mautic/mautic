@@ -45,12 +45,11 @@ class LoadFormResultData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function load(ObjectManager $manager)
     {
-        $factory   = $this->container->get('mautic.factory');
-        $pageModel = $factory->getModel('page.page');
-        $repo      = $factory->getModel('form.submission')->getRepository();
+        $pageModel = $this->container->get('mautic.page.model.page');
+        $repo      = $this->container->get('mautic.form.model.submission')->getRepository();
 
         $fixture       = &$this;
-        $importResults = function ($results) use ($factory, $pageModel, $repo, &$fixture) {
+        $importResults = function ($results) use ($pageModel, $repo, &$fixture) {
             foreach ($results as $count => $rows) {
                 $submission = new Submission();
                 $submission->setDateSubmitted(new \DateTime());
