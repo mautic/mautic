@@ -78,12 +78,21 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $currentEvent = $event->getEvent();
         if ($currentEvent['properties']['focus'] > 0) {
+            /**
+             * log leads, campaign in to focus_campaign table.
+             */
             $entity = new FocusEntity\FocusCampaign();
             $entity->setCampaign($this->em->getReference(Campaign::class, $currentEvent['campaign']['id']));
             $entity->setFocus($this->em->getReference(FocusEntity\Focus::class, $currentEvent['properties']['focus']));
             $entity->setLead($event->getLead());
-
+            $entity->setLeadEventLog($event->getLogEntry());
             $this->focusModel->getFocusCampaignRepository()->saveEntity($entity);
+
+            /*
+             * Set current LeadEventLog as failed (log to LeadEventFailedLog), since
+             * event completion is based on action from focus page
+             */
+            $this->campaignEventModel->setEventStatus($event->getLogEntry(), false, 'No user interaction');
 
             $focus = $this->focusModel->getEntity($currentEvent['properties']['focus']);
             $this->focusModel->saveEntity($focus);

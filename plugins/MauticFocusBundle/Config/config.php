@@ -39,6 +39,10 @@ return [
                 'path'       => '/focus/campaign/lead',
                 'controller' => 'MauticFocusBundle:Public:campaignLead',
             ],
+            'mautic_focus_track_notice' => [
+                'path'       => '/focus/track/notice',
+                'controller' => 'MauticFocusBundle:Public:trackNotice',
+            ],
         ],
     ],
 
@@ -61,6 +65,7 @@ return [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber',
                 'arguments' => [
                     'mautic.focus.model.focus',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.focus.subscriber.focus' => [

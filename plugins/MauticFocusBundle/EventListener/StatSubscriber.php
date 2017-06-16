@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
@@ -30,13 +31,20 @@ class StatSubscriber extends CommonSubscriber
     protected $model;
 
     /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
      * FormSubscriber constructor.
      *
      * @param FocusModel $model
+     * @param EventModel $eventModel
      */
-    public function __construct(FocusModel $model)
+    public function __construct(FocusModel $model, EventModel $eventModel)
     {
-        $this->model = $model;
+        $this->model              = $model;
+        $this->campaignEventModel = $eventModel;
     }
 
     /**
@@ -64,6 +72,7 @@ class StatSubscriber extends CommonSubscriber
 
             if ($focus && $focus->isPublished()) {
                 $this->model->addStat($focus, Stat::TYPE_CLICK, $hit, $hit->getLead());
+                $this->setCampaignLeadEventStatus($sourceId, $hit->getLead(), Stat::TYPE_CLICK);
             }
         }
     }
@@ -86,8 +95,17 @@ class StatSubscriber extends CommonSubscriber
                 $form = $event->getSubmission()->getForm();
                 if ((int) $form->getId() === (int) $focus->getForm()) {
                     $this->model->addStat($focus, Stat::TYPE_FORM, $event->getSubmission(), $event->getLead());
+                    $this->setCampaignLeadEventStatus($id, $event->getLead(), Stat::TYPE_FORM);
                 }
             }
+        }
+    }
+
+    public function setCampaignLeadEventStatus($focusid, $leadid, $useraction)
+    {
+        $leadeventlog = $this->model->getFocusCampaignRepository()->eventLogFromFocusLeads($focusid, $leadid);
+        if ($leadeventlog) {
+            $this->campaignEventModel->setEventStatus($leadeventlog, true, 'User action:'.$useraction);
         }
     }
 }
