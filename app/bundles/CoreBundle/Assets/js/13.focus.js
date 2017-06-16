@@ -21,7 +21,6 @@ Mautic.standardFocusUrl = function(options) {
         var previewFocusKey = '/focus/preview/focusId';
         if (url.indexOf(editFocusKey) > -1 ||
             url.indexOf(previewFocusKey) > -1) {
-            console.log(url.replace('focusId', mQuery('#campaignevent_properties_focus').val()));
             options.windowUrl = url.replace('focusId', mQuery('#campaignevent_properties_focus').val());
         }
     }

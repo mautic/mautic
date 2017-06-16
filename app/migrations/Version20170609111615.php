@@ -40,9 +40,12 @@ class Version20170609111615 extends AbstractMauticMigration
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
+        $idx = $this->generatePropertyName('focus_campaign', 'idx', ['leadeventlog_id']);
+        $fk  = $this->generatePropertyName('focus_campaign', 'fk', ['leadeventlog_id']);
+
         $this->addSql('ALTER TABLE '.$this->prefix.'focus_campaign ADD leadeventlog_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE '.$this->prefix.'focus_campaign ADD CONSTRAINT FK_963C8FF26A94EBD2 FOREIGN KEY (leadeventlog_id) REFERENCES campaign_lead_event_log (id) ON DELETE CASCADE');
-        $this->addSql('CREATE INDEX IDX_963C8FF26A94EBD2 ON '.$this->prefix.'focus_campaign (leadeventlog_id)');
+        $this->addSql('ALTER TABLE '.$this->prefix.'focus_campaign ADD CONSTRAINT '.$fk.' FOREIGN KEY (leadeventlog_id) REFERENCES campaign_lead_event_log (id) ON DELETE CASCADE');
+        $this->addSql('CREATE INDEX '.$idx.' ON '.$this->prefix.'focus_campaign (leadeventlog_id)');
     }
 
     /**
