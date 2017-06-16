@@ -1044,7 +1044,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $totalCreated = 0;
         $totalErrors  = 0;
 
-        list($fieldMapping, $mauticLeadFieldString, $requiredFields, $supportedObjects) = $this->prepareFieldsForPush($config);
+        list($fieldMapping, $mauticLeadFieldString, $supportedObjects) = $this->prepareFieldsForPush($config);
 
         if (empty($fieldMapping)) {
             return [0, 0, 0, 0];
@@ -1073,7 +1073,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $fromDate,
             $toDate
         ) : 0;
-        $totalCount    = $totalToCreate + $totalToUpdate;
+        $totalCount = $totalToProcess = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
             // start with update
@@ -1146,7 +1146,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 try {
                     $sfEntityRecords = $this->getMauticContactsToCreate(
                         $checkEmailsInSF,
-                        $requiredFields,
+                        $fieldMapping,
                         $mauticLeadFieldString,
                         $limit,
                         $fromDate,
@@ -1158,7 +1158,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $this->cleanupFromSync($leadsToSync, $exception);
                 }
             } elseif ($checkEmailsInSF) {
-                $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, $requiredFields[$sfObject]['string']);
+                $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, $fieldMapping[$sfObject]['required']['string']);
 
                 if (!isset($sfEntityRecords['records'])) {
                     // Something is wrong so throw an exception to prevent creating a bunch of new leads
@@ -1180,7 +1180,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $processedLeads,
                 $trackedContacts,
                 $leadsToSync,
-                $requiredFields,
                 $fieldMapping,
                 $mauticLeadFieldString,
                 $sfEntityRecords,
@@ -1188,12 +1187,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
             );
 
             // Only create left over if Lead object is enabled in integration settings
-            if ($checkEmailsInSF && isset($requiredFields['Lead'])) {
+            if ($checkEmailsInSF && isset($fieldMapping['Lead'])) {
                 $this->prepareMauticContactsToCreate(
                     $mauticData,
                     $checkEmailsInSF,
                     $processedLeads,
-                    $requiredFields,
                     $fieldMapping
                 );
             }
@@ -1218,7 +1216,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $this->logger->debug('SALESFORCE: '.$this->getApiHelper()->getRequestCounter().' API requests made for pushLeads');
 
         // Assume that those not touched are ignored due to not having matching fields, duplicates, etc
-        $totalIgnored = $totalCount - ($totalUpdated + $totalCreated + $totalErrors);
+        $totalIgnored = $totalToProcess - ($totalUpdated + $totalCreated + $totalErrors);
 
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
@@ -1730,7 +1728,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param      $checkEmailsInSF
-     * @param      $requiredFields
+     * @param      $fieldMapping
      * @param      $mauticLeadFieldString
      * @param      $limit
      * @param      $fromDate
@@ -1743,14 +1741,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function getMauticContactsToCreate(
         &$checkEmailsInSF,
-        $requiredFields,
+        $fieldMapping,
         $mauticLeadFieldString,
         $limit,
         $fromDate,
         $toDate,
         &$totalCount,
         $progress = null
-    ) {
+    )
+    {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $leadsToCreate         = $integrationEntityRepo->findLeadsToCreate(
             'Salesforce',
@@ -1761,6 +1760,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         );
         $totalCount            -= count($leadsToCreate);
         $foundContacts         = [];
+        $sfEntityRecords       = [
+            'totalSize' => 0,
+            'records'   => []
+        ];
+        $error                 = false;
 
         foreach ($leadsToCreate as $lead) {
             $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
@@ -1773,28 +1777,29 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         // When creating, we have to check for Contacts first then Lead
-        $error           = false;
-        $sfEntityRecords = $this->getSalesforceObjectsByEmails('Contact', $checkEmailsInSF, $requiredFields['Contact']['string']);
-        if (isset($sfEntityRecords['records'])) {
-            foreach ($sfEntityRecords['records'] as $sfContactRecord) {
-                $key                 = $this->getSyncKey($sfContactRecord['Email']);
-                $foundContacts[$key] = $key;
-            }
-
-            // For any Mautic contacts left over, check to see if existing Leads exist
-            if ($checkSfLeads = array_diff_key($checkEmailsInSF, $foundContacts)) {
-                $sfLeadRecords = $this->getSalesforceObjectsByEmails('Lead', $checkSfLeads, $requiredFields['Lead']['string']);
-
-                if (isset($sfLeadRecords['records'])) {
-                    // Merge contact records with these
-                    $sfEntityRecords['records']   = array_merge($sfEntityRecords['records'], $sfLeadRecords['records']);
-                    $sfEntityRecords['totalSize'] = (int) $sfEntityRecords['totalSize'] + (int) $sfLeadRecords['totalSize'];
-                } else {
-                    $error = json_encode($sfLeadRecords);
+        if (isset($fieldMapping['Contact'])) {
+            $sfEntityRecords = $this->getSalesforceObjectsByEmails('Contact', $checkEmailsInSF, $fieldMapping['Contact']['required']['string']);
+            if (isset($sfEntityRecords['records'])) {
+                foreach ($sfEntityRecords['records'] as $sfContactRecord) {
+                    $key                 = $this->getSyncKey($sfContactRecord['Email']);
+                    $foundContacts[$key] = $key;
                 }
+            } else {
+                $error = json_encode($sfEntityRecords);
             }
-        } else {
-            $error = json_encode($sfEntityRecords);
+        }
+
+        // For any Mautic contacts left over, check to see if existing Leads exist
+        if (isset($fieldMapping['Lead']) && $checkSfLeads = array_diff_key($checkEmailsInSF, $foundContacts)) {
+            $sfLeadRecords = $this->getSalesforceObjectsByEmails('Lead', $checkSfLeads, $fieldMapping['Lead']['required']['string']);
+
+            if (isset($sfLeadRecords['records'])) {
+                // Merge contact records with these
+                $sfEntityRecords['records']   = array_merge($sfEntityRecords['records'], $sfLeadRecords['records']);
+                $sfEntityRecords['totalSize'] = (int) $sfEntityRecords['totalSize'] + (int) $sfLeadRecords['totalSize'];
+            } else {
+                $error = json_encode($sfLeadRecords);
+            }
         }
 
         if ($error) {
@@ -1808,7 +1813,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param      $mauticData
-     * @param      $requiredFields
      * @param      $objectFields
      * @param      $object
      * @param      $lead
@@ -1819,7 +1823,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function buildCompositeBody(
         &$mauticData,
-        $requiredFields,
         $objectFields,
         $object,
         &$lead,
@@ -1839,10 +1842,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             foreach ($fields as $sfField => $mauticField) {
                 if (isset($lead[$mauticField])) {
-                    $body[$sfField] = $this->cleanPushData($lead[$mauticField]);
+                    $fieldType = (isset($objectFields['types']) && isset($objectFields['types'][$sfField])) ? $objectFields['types'][$sfField] : 'string';
+                    $body[$sfField] = $this->cleanPushData($lead[$mauticField], $fieldType);
                 }
 
-                if (array_key_exists($sfField, $requiredFields) && empty($body[$sfField])) {
+                if (array_key_exists($sfField, $objectFields['required']['fields']) && empty($body[$sfField])) {
                     if (isset($sfRecord[$sfField])) {
                         $body[$sfField] = $sfRecord[$sfField];
                         if (empty($lead[$mauticField]) && !empty($sfRecord[$sfField])
@@ -1935,17 +1939,29 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $mauticLeadFieldString = 'l.'.$mauticLeadFieldString;
         $availableFields       = $this->getAvailableLeadFields(['feature_settings' => ['objects' => $supportedObjects]]);
 
-        // Setup required fields
-        $requiredFields = [];
+        // Setup required fields and field types
         foreach ($supportedObjects as $object) {
-            list($requiredFields[$object]['fields'], $requiredFields[$object]['string']) = $this->getRequiredFieldString(
+            $objectFields[$object]['types'] = [];
+            if (isset($availableFields[$object])) {
+                $fieldData  = $this->prepareFieldsForSync($availableFields[$object], array_keys($availableFields[$object]), $object);
+                foreach ($fieldData as $fieldName => $field) {
+                    $objectFields[$object]['types'][$fieldName] = (isset($field['type'])) ? $field['type'] : 'string';
+                }
+            }
+
+            list($fields, $string) = $this->getRequiredFieldString(
                 $config,
                 $availableFields,
                 $object
             );
+
+            $objectFields[$object]['required'] = [
+                'fields' => $fields,
+                'string' => $string,
+            ];
         }
 
-        return [$objectFields, $mauticLeadFieldString, $requiredFields, $supportedObjects];
+        return [$objectFields, $mauticLeadFieldString, $supportedObjects];
     }
 
     /**
@@ -2172,7 +2188,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         &$processedLeads,
         &$trackedContacts,
         &$leadsToSync,
-        $requiredFields,
         $objectFields,
         $mauticLeadFieldString,
         $sfEntityRecords,
@@ -2270,7 +2285,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $leadEntity = $this->em->getReference('MauticLeadBundle:Lead', $leadData['internal_entity_id']);
                 if ($updateLead = $this->buildCompositeBody(
                     $mauticData,
-                    $requiredFields[$sfObject]['fields'],
                     $objectFields[$sfObject],
                     $sfObject,
                     $leadData,
@@ -2315,21 +2329,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param $mauticData
      * @param $checkEmailsInSF
      * @param $processedLeads
-     * @param $requiredFields
      * @param $objectFields
      */
     protected function prepareMauticContactsToCreate(
         &$mauticData,
         &$checkEmailsInSF,
         &$processedLeads,
-        $requiredFields,
         $objectFields
     ) {
         foreach ($checkEmailsInSF as $key => $lead) {
             if (!empty($lead['integration_entity_id'])) {
                 if ($this->buildCompositeBody(
                     $mauticData,
-                    $requiredFields[$lead['integration_entity']]['fields'],
                     $objectFields[$lead['integration_entity']],
                     $lead['integration_entity'],
                     $lead,
@@ -2341,7 +2352,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             } else {
                 $this->buildCompositeBody(
                     $mauticData,
-                    $requiredFields['Lead']['fields'],
                     $objectFields['Lead'],
                     'Lead',
                     $lead

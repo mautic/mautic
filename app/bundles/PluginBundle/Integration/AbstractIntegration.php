@@ -54,6 +54,10 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 abstract class AbstractIntegration
 {
+    const FIELD_TYPE_STRING = 'string';
+    const FIELD_TYPE_BOOL = 'boolean';
+    const FIELD_TYPE_NUMBER = 'number';
+
     /**
      * @var bool
      */
@@ -1791,7 +1795,7 @@ abstract class AbstractIntegration
                 }
                 $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                    $matched[$matchIntegrationKey] = $this->cleanPushData($fields[$mauticKey]['value']);
+                    $matched[$matchIntegrationKey] = $this->cleanPushData($fields[$mauticKey]['value'], (isset($field['type'])) ? $field['type'] : 'string');
                 }
             }
 
@@ -1838,7 +1842,7 @@ abstract class AbstractIntegration
             if (isset($companyFields[$key])) {
                 $mauticKey = $companyFields[$key];
                 if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey])) {
-                    $matched[$integrationKey] = $this->cleanPushData($fields[$mauticKey]);
+                    $matched[$integrationKey] = $this->cleanPushData($fields[$mauticKey], (isset($field['type'])) ? $field['type'] : 'string');
                 }
             }
 
@@ -2431,11 +2435,23 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param $value
+     * @param        $value
+     * @param string $fieldType
+     *
+     * @return bool|float|string
      */
-    public function cleanPushData($value)
+    public function cleanPushData($value, $fieldType = AbstractIntegration::FIELD_TYPE_STRING)
     {
-        return strip_tags(html_entity_decode($value, ENT_QUOTES));
+        $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
+
+        switch ($fieldType) {
+            case AbstractIntegration::FIELD_TYPE_BOOL:
+                return (bool) $clean;
+            case AbstractIntegration::FIELD_TYPE_NUMBER:
+                return (float) $clean;
+            default:
+                return $clean;
+        }
     }
 
     /**
