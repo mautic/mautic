@@ -56,6 +56,7 @@ class FocusShowType extends AbstractType
                         ['message' => 'mautic.focus.choosefocus.notblank']
                     ),
                 ],
+                'data' => $options['data']['properties']['focus'],
             ]
         );
 
@@ -84,7 +85,7 @@ class FocusShowType extends AbstractType
                 ]
             );
 
-            // create button edit email
+            // create button edit focus
             $windowUrlEdit = $this->factory->getRouter()->generate(
                 'mautic_focus_action',
                 [
@@ -106,23 +107,6 @@ class FocusShowType extends AbstractType
                         'icon'     => 'fa fa-edit',
                     ],
                     'label' => 'mautic.focus.show.edit.item',
-                ]
-            );
-
-            // create button preview email
-            $windowUrlPreview = $this->factory->getRouter()->generate('mautic_focus_action', ['objectAction' => 'edit', 'objectId' => 'focusId']);
-
-            $builder->add(
-                'previewFocusButton',
-                'button',
-                [
-                    'attr' => [
-                        'class'    => 'btn btn-primary btn-nospin',
-                        'onclick'  => 'Mautic.loadNewWindow(Mautic.standardFocusUrl({"windowUrl": "'.$windowUrlPreview.'"}))',
-                        'disabled' => !isset($options['data']['email']),
-                        'icon'     => 'fa fa-external-link',
-                    ],
-                    'label' => 'mautic.focus.show.preview.item',
                 ]
             );
         }

@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FocusListType extends AbstractType
 {
     /**
-     * @var EmailRepository
+     * @var FocusRepository
      */
     private $repo;
 
@@ -36,7 +36,7 @@ class FocusListType extends AbstractType
                 'choices' => function (Options $options) {
                     $choices = [];
 
-                    $list = $this->repo->getFocusList('', 0, 0);
+                    $list = $this->repo->getFocusList($options['data']);
                     foreach ($list as $row) {
                         $choices[$row['id']] = $row['name'];
                     }
@@ -52,8 +52,7 @@ class FocusListType extends AbstractType
                 'empty_value' => function (Options $options) {
                     return (empty($options['choices'])) ? 'mautic.focus.no.focusitem.note' : 'mautic.core.form.chooseone';
                 },
-                'email_type' => 'template',
-                'disabled'   => function (Options $options) {
+                'disabled' => function (Options $options) {
                     return empty($options['choices']);
                 },
                 'top_level'      => 'variant',

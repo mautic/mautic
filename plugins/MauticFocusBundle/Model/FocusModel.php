@@ -400,7 +400,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Joins the email table and limits created_by to currently logged in user.
+     * Joins the focus table and limits created_by to currently logged in user.
      *
      * @param QueryBuilder $q
      */

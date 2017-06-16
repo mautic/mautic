@@ -95,27 +95,26 @@ class FocusRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
      * @return array
      */
-    public function getFocusList($search = '', $limit = 10, $start = 0)
+    public function getFocusList($currentId)
     {
-        $q = $this->createQueryBuilder('f');
-        $q->select('partial f.{id, name, description}');
-
-        if (!empty($search)) {
-            $q->andWhere($q->expr()->like('f.name', ':search'))
-                ->setParameter('search', "{$search}%");
+        $usedFocusIds = $this->_em->getRepository('MauticFocusBundle:FocusCampaign')->focusIdsInCampaign();
+        if ($usedFocusIds) {
+            if ($currentId > 0) {
+                if (($key = array_search($currentId, $usedFocusIds)) !== false) {
+                    unset($usedFocusIds[$key]);
+                }
+            }
         }
 
-        $q->orderBy('f.name');
+        $q = $this->createQueryBuilder('f');
+        $q->select('partial f.{id, name, description}')
+            ->orderBy('f.name');
 
-        if (!empty($limit)) {
-            $q->setFirstResult($start)
-                ->setMaxResults($limit);
+        if ($usedFocusIds) {
+            $q->where('f.id NOT IN (:usedFocusIds)')
+                ->setParameter('usedFocusIds', $usedFocusIds);
         }
 
         return $q->getQuery()->getArrayResult();

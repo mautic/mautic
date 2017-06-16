@@ -35,6 +35,12 @@ class FocusCampaignRepository extends CommonRepository
         return (!empty($result)) ? true : false;
     }
 
+    /**
+     * @param type $focusId
+     * @param type $leadId
+     *
+     * @return type
+     */
     public function campaignLeadInFocus($focusId, $leadId)
     {
         $q = $this->createQueryBuilder('f');
@@ -47,6 +53,17 @@ class FocusCampaignRepository extends CommonRepository
         $result = $q->getQuery()->getResult();
 
         return (!empty($result)) ? true : false;
+    }
+
+    public function focusIdsInCampaign()
+    {
+        $q = $this->createQueryBuilder('f');
+        $q->select('IDENTITY(f.focus) AS focusid')
+           ->groupBy('focusid');
+
+        $result = $q->getQuery()->getResult();
+
+        return (!empty($result)) ? array_column($result, 'focusid') : false;
     }
 
     /**
