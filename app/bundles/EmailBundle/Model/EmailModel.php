@@ -1165,6 +1165,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $leadIds = array_keys($sendTo);
         $leadIds = array_combine($leadIds, $leadIds);
 
+        /**
+         * @author Eric Jen.
+         * 06/14/2017
+         */
+
+        $to_address = $email->getToAddress();
+        $cc_address = $email->getCcAddress();
+
         if (!$ignoreDNC) {
             $dnc = $emailRepo->getDoNotEmailList($leadIds);
 
@@ -1324,6 +1332,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                 $mailer->setSource($channel);
                 $emailConfigured = $mailer->setEmail($emailEntity, true, $useSettings['slots'], $assetAttachments);
+
 
                 if (!empty($customHeaders)) {
                     $mailer->setCustomHeaders($customHeaders);

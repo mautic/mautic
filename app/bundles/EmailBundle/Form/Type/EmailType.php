@@ -100,6 +100,36 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
+            'toAddress',
+            'text',
+            [
+                'label'      => 'mautic.email.to_address',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'preaddon' => 'fa fa-envelope',
+                    'tooltip'  => 'mautic.email.to_address.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'ccAddress',
+            'text',
+            [
+                'label'      => 'mautic.email.cc_address',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'    => 'form-control',
+                    'preaddon' => 'fa fa-envelope',
+                    'tooltip'  => 'mautic.email.cc_address.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'fromName',
             'text',
             [
@@ -338,7 +368,7 @@ class EmailType extends AbstractType
 
         // Building the form
         $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
+           FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($variantSettingsModifier) {
                 $variantSettingsModifier(
                     $event,

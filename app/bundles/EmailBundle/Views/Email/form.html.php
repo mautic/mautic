@@ -90,6 +90,16 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                     </div>
 
                     <div class="tab-pane fade bdr-w-0" id="advanced-container">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['toAddress']); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['ccAddress']); ?>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['fromName']); ?>
