@@ -11,6 +11,7 @@
 
 namespace Mautic\PluginBundle\Entity;
 
+use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -126,6 +127,37 @@ class IntegrationEntityRepository extends CommonRepository
         $results = $q->execute()->fetchAll();
 
         return ($results) ? $results[0] : null;
+    }
+
+    /**
+     * @param      $integration
+     * @param      $integrationEntity
+     * @param      $internalEntity
+     * @param      $internalEntityId
+     * @param null $leadFields
+     *
+     * @return IntegrationEntity[]
+     */
+    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds)
+    {
+        $q = $this->createQueryBuilder('i', 'i.internalEntityId');
+
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('i.integration', ':integration'),
+                $q->expr()->eq('i.internalEntity', ':internalEntity'),
+                $q->expr()->eq('i.integrationEntity', ':integrationEntity'),
+                $q->expr()->in('i.internalEntityId', ':internalEntityIds')
+            )
+        )
+            ->setParameter('integration', $integration)
+            ->setParameter('internalEntity', $internalEntity)
+            ->setParameter('integrationEntity', $integrationEntity)
+            ->setParameter('internalEntityIds', $internalEntityIds);
+
+        $results = $q->getQuery()->getResult();
+
+        return $results;
     }
 
     /**

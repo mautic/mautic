@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -375,10 +376,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object, $params = [])
     {
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
         $updated               = 0;
         $created               = 0;
+        $counter               = 0;
         $entity                = null;
+        $detachClass           = null;
+        $mauticObjectReference = null;
+        $integrationMapping    = [];
 
         if (isset($data['records']) and $object !== 'Activity') {
             foreach ($data['records'] as $record) {
@@ -387,16 +391,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $params['progress']->advance();
                 }
 
-                $this->persistIntegrationEntities = [];
+                $dataObject = [];
                 if (isset($record['attributes']['type']) && $record['attributes']['type'] == 'Account') {
                     $newName = '';
                 } else {
                     $newName = '__'.$object;
                 }
+
                 foreach ($record as $key => $item) {
-                    if ($object !== 'Activity') {
-                        $dataObject[$key.$newName] = $item;
-                    }
+                    $dataObject[$key.$newName] = $item;
                 }
 
                 if (isset($dataObject) && $dataObject) {
@@ -412,10 +415,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             }
                             $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
                             $mauticObjectReference = 'lead';
+                            $detachClass           = Lead::class;
+
                             break;
                         case 'Account':
                             $entity                = $this->getMauticCompany($dataObject, 'Account');
                             $mauticObjectReference = 'company';
+                            $detachClass           = Company::class;
+
                             break;
                         default:
                             $this->logIntegrationError(
@@ -430,27 +437,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         continue;
                     }
 
-                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId(
-                        'Salesforce',
-                        $object,
-                        $mauticObjectReference,
-                        $entity->getId()
-                    );
-
-                    if (empty($integrationId)) {
-                        $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
-                            $object,
-                            $record['Id'],
-                            $mauticObjectReference,
-                            $entity->getId(),
-                            [],
-                            false
-                        );
-                    } else {
-                        $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate($entity, $params, false));
-                        $this->persistIntegrationEntities[] = $integrationEntity;
-                    }
+                    $integrationMapping[$entity->getId()] = [
+                        'entity'                => $entity,
+                        'integration_entity_id' => $record['Id'],
+                    ];
 
                     if (method_exists($entity, 'isNewlyCreated') && $entity->isNewlyCreated()) {
                         ++$created;
@@ -458,12 +448,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         ++$updated;
                     }
 
-                    $this->em->detach($entity);
-                    unset($entity);
-                }
+                    ++$counter;
 
-                $integrationEntityRepo->saveEntities($this->persistIntegrationEntities);
-                $this->em->clear(IntegrationEntity::class);
+                    if ($counter >= 100) {
+                        // Persist integration entities
+                        $this->buildIntegrationEntities($integrationMapping, $object, $mauticObjectReference, $params);
+                        $counter = 0;
+                        $this->em->clear($detachClass);
+                        $integrationMapping = [];
+                    }
+                }
+            }
+
+            if (count($integrationMapping)) {
+                // Persist integration entities
+                $this->buildIntegrationEntities($integrationMapping, $object, $mauticObjectReference, $params);
+                $this->em->clear($detachClass);
             }
 
             unset($data['records']);
