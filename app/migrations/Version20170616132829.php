@@ -14,10 +14,6 @@ use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
-
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
 class Version20170616132829 extends AbstractMauticMigration
 {
     /**

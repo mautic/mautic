@@ -1345,7 +1345,8 @@ class MailHelper
     /**
      * @param $source
      * @param string $fieldType
-     * @return null
+     *
+     * @return $validLeadField
      */
     public function getValidLeadField($source, $fieldType = 'text')
     {
@@ -1388,9 +1389,7 @@ class MailHelper
             return null;
         }
     }
-
-
-
+    
     /**
      * @param Email $email
      * @param bool  $allowBcc            Honor BCC if set in email
