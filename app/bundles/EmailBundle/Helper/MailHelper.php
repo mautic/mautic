@@ -1389,7 +1389,7 @@ class MailHelper
             return null;
         }
     }
-    
+
     /**
      * @param Email $email
      * @param bool  $allowBcc            Honor BCC if set in email
