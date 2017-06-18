@@ -21,8 +21,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
-use Mautic\UserBundle\Model\UserModel;
-use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -1365,7 +1363,7 @@ class MailHelper
 
             //check if source alias is owneremail
             if ($alias == 'owneremail') {
-                $owner = $this->getContactOwner($this->lead);
+                $owner          = $this->getContactOwner($this->lead);
                 $validLeadField = $owner['email'];
             } else {
                 if ($fieldType == 'email') {
