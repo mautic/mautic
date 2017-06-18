@@ -21,7 +21,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper.
@@ -1414,7 +1413,7 @@ class MailHelper
         if (!empty($toAddress)) {
             $addresses = array_fill_keys(array_map('trim', explode(',', $toAddress)), null);
             foreach ($addresses as $toAddress => $name) {
-                $this->addTo($toAddress, $name);
+                $this->setTo($toAddress, $name);
             }
         }
 
