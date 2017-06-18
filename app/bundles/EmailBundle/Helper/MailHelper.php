@@ -1365,7 +1365,7 @@ class MailHelper
 
             //check if source alias is owneremail
             if ($alias == 'owneremail') {
-                $owner          = $this->getContactOwner($this->lead);
+                $owner = $this->getContactOwner($this->lead);
                 $validLeadField = $owner['email'];
             } else {
                 if ($fieldType == 'email') {
@@ -1429,8 +1429,8 @@ class MailHelper
             }
         }
 
-        $fromName  = $this->getValidLeadField($email->getFromAddress());
-        $fromEmail = $this->getValidLeadField($email->getFromName(), 'email');
+        $fromName  = $this->getValidLeadField($email->getFromName());
+        $fromEmail = $this->getValidLeadField($email->getFromAddress(), 'email');
         if (!empty($fromEmail) || !empty($fromName)) {
             if (empty($fromName)) {
                 $fromName = array_values($this->from)[0];
