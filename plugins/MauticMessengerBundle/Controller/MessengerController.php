@@ -21,14 +21,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class MessengerController extends FormController
 {
-
-
     /**
-     *
+     * @return Response
      */
     public function callbackAction()
     {
-        $access_token = "EAAH5qCyWCdcBAP0ddTZBNbVRdmqd43TZCnBJGFEwRZAmO76hlrXfWmVzBXO5xEsochEnlrQ88Tkrwm2B63KzXctLxXQ8RU6KKM9sWEFsGZAaBzmmMUoqVjfir1n5ufXgW8btvZAL41bNJ5S0IceHKUCioOLTqCLZCZCOOMlNz5fRAZDZD";
         $verify_token = "bot_app";
         $hub_verify_token = null;
         if (isset($_REQUEST['hub_challenge'])) {
@@ -39,5 +36,29 @@ class MessengerController extends FormController
             }
         }
 
+    }
+
+
+    public function checkboxAction()
+    {
+        $integration = $this->get('mautic.helper.integration')->getIntegrationObject('Messenger');
+
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
+        $settings        = $integration->getIntegrationSettings();
+        $featureSettings = $settings->getFeatureSettings();
+
+        $content = '';
+        $html = $this->get('mautic.helper.templating')->getTemplating()->render(
+            'MauticMessengerBundle:Plugin:checkbox_plugin.html.php',
+            [
+                'lead' => $this->getModel('lead')->getCurrentLead(),
+                'featureSettings'=>$featureSettings
+            ]
+        );
+die($html);
+        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($html);
     }
 }

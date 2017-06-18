@@ -6,9 +6,13 @@ return [
     'version' => '1.0.0',
     'routes' => [
         'public' => [
-            'mautic_messenger' => [
+            'messenger_callback' => [
                 'path' => '/messenger/callback',
                 'controller' => 'MauticMessengerBundle:Messenger:callback',
+            ],
+            'messenger_checkbox_plugin' => [
+                'path' => '/messenger/checkbox',
+                'controller' => 'MauticMessengerBundle:Messenger:checkbox',
             ],
         ],
     ],

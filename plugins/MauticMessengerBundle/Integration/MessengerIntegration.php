@@ -36,7 +36,7 @@ class MessengerIntegration extends AbstractIntegration
     public function getFormSettings()
     {
         return [
-            'requires_callback'      => false,
+            'requires_callback' => false,
             'requires_authorization' => false,
         ];
     }
@@ -61,63 +61,89 @@ class MessengerIntegration extends AbstractIntegration
         return 'none';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return array
-     */
-    public function getRequiredKeyFields()
-    {
-        return [
-            'messenger_page_access_token'  => 'mautic.integration.messenger.page.access.token',
-            'messenger_callback_verify_token' => 'mautic.integration.messenger.verify.token',
-        ];
-    }
-
 
     /**
      * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param array $data
+     * @param string $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+
         if ($formArea == 'features') {
             /* @var FormBuilder $builder */
+
             $builder->add(
-                'subdomain_name',
+                'messenger_app_id',
                 TextType::class,
                 [
-                    'label'    => 'mautic.notification.form.subdomain_name.label',
+                    'label' => 'mautic.integration.messenger.app.id',
                     'required' => false,
-                    'attr'     => [
+                    'attr' => [
+                        'tooltip' => 'mautic.integration.messenger.app.id.tooltip',
                         'class' => 'form-control',
                     ],
                 ]
             );
 
             $builder->add(
-                'platforms',
-                ChoiceType::class,
+                'messenger_callback_verify_token',
+                TextType::class,
                 [
-                    'choices' => [
-                        'ios'     => 'mautic.integration.form.platforms.ios',
-                        'android' => 'mautic.integration.form.platforms.android',
-                    ],
+                    'label' => 'mautic.integration.messenger.verify.token',
+                    'required' => false,
                     'attr' => [
-                        'tooltip'      => 'mautic.integration.form.platforms.tooltip',
-                        'data-show-on' => '{"integration_details_supportedFeatures_0":"checked"}',
+                        'tooltip' => 'mautic.integration.messenger.verify.token.tooltip',
+                        'class' => 'form-control',
+                        'readonly' => 'readonly',
                     ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.integration.form.platforms',
-                    'empty_value' => false,
-                    'required'    => false,
+                    'data' => 'mautic_bot_app',
                 ]
             );
+            $builder->add(
+                'messenger_callback_verify_url',
+                TextType::class,
+                [
+                    'label' => 'mautic.integration.messenger.url.token',
+                    'required' => false,
+                    'attr' => [
+                        'tooltip' => 'mautic.integration.messenger.verify.url.tooltip',
+                        'class' => 'form-control',
+                        'readonly' => 'readonly',
+                    ],
+                    'data' => $this->router->generate('messenger_callback', [], true),
+                ]
+            );
+
+            $builder->add(
+                'messenger_page_id',
+                TextType::class,
+                [
+                    'label' => 'mautic.integration.messenger.page.id',
+                    'required' => false,
+                    'attr' => [
+                        'tooltip' => 'mautic.integration.messenger.page.id.tooltip',
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'messenger_page_access_token',
+                TextType::class,
+                [
+                    'label' => 'mautic.integration.messenger.page.access.token',
+                    'required' => false,
+                    'attr' => [
+                        'tooltip' => 'mautic.integration.messenger.page.access.token.tooltip',
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
+
+
         }
     }
-
 
 
 }
