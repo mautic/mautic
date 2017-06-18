@@ -21,6 +21,9 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\UserBundle\Model\UserModel;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper.
@@ -1348,46 +1351,43 @@ class MailHelper
      *
      * @return $validLeadField
      */
-    public function getValidLeadField($source, $fieldType = 'text')
+    public function getValidLeadField($source, $fieldType = null)
     {
-        $lead       = $this->lead;
-        $tokenRegex = [
-            '/({|%7B)leadfield=(.*?)(}|%7D)/',
-            '/({|%7B)contactfield=(.*?)(}|%7D)/',
-        ];
+        $tokenRegex = '/({|%7B)contactfield=(.*?)(}|%7D)/';
 
-        $type           = 'text';
+        $lead           = $this->lead;
         $validLeadField = null;
         $match          = null;
         $alias          = null;
 
-        if (preg_match($tokenRegex[0], $source, $match)) {
-            $alias          = $match[2];
-            $validLeadField = (!empty($lead[$alias])) ? $lead[$alias] : null;
-            if ($alias == 'email' || $alias == 'companyemail') {
-                $type = 'email';
+        if (preg_match($tokenRegex, $source, $match)) {
+            $alias = $match[2];
+
+            //check if source alias is owneremail
+            if ($alias == 'owneremail') {
+                $owner = $this->getContactOwner($this->lead);
+                $validLeadField = $owner['email'];
+            } else {
+                if ($fieldType == 'email') {
+                    if (strpos($alias, 'email') !== false) {
+                        $validLeadField = (!empty($lead[$alias]) ? $lead[$alias] : null);
+                    }
+                } else {
+                    $validLeadField = (!empty($lead[$alias]) ? $lead[$alias] : null);
+                }
             }
         } else {
-            if (preg_match($tokenRegex[1], $source, $match)) {
-                $alias          = $match[2];
-                $validLeadField = (!empty($lead[$alias])) ? $lead[$alias] : null;
-                if ($alias == 'email' || $alias == 'companyemail') {
-                    $type = 'email';
+            // Validate if it is email string
+            if ($fieldType == 'email') {
+                if (filter_var($source, FILTER_VALIDATE_EMAIL)) {
+                    $validLeadField = $source;
                 }
             } else {
-                // Validate if it is valid email string
-                if (filter_var($source, FILTER_VALIDATE_EMAIL)) {
-                    $type = 'email';
-                }
                 $validLeadField = $source;
             }
         }
 
-        if ($fieldType == $type) {
-            return $validLeadField;
-        } else {
-            return null;
-        }
+        return $validLeadField;
     }
 
     /**
@@ -1411,25 +1411,26 @@ class MailHelper
         // Set message settings from the email
         $this->setSubject($subject);
 
-        // Get valid field values from leads
-        $fromEmail = $email->getFromAddress();
-        $fromName  = $email->getFromName();
-        $toAddress = $email->getToAddress();
-        $ccAddress = $email->getCcAddress();
-
-        $fromName  = $this->getValidLeadField($fromName);
-        $fromEmail = $this->getValidLeadField($fromEmail, 'email');
-        $toAddress = $this->getValidLeadField($toAddress, 'email');
-        $ccAddress = $this->getValidLeadField($ccAddress, 'email');
-
+        // Add To_addresses
+        $toAddress = $this->getValidLeadField($email->getToAddress(), 'email');
         if (!empty($toAddress)) {
-            $this->addTo($toAddress);
+            $addresses = array_fill_keys(array_map('trim', explode(',', $toAddress)), null);
+            foreach ($addresses as $toAddress => $name) {
+                $this->addTo($toAddress, $name);
+            }
         }
 
+        // Add CC_addresses
+        $ccAddress = $this->getValidLeadField($email->getCcAddress(), 'email');
         if (!empty($ccAddress)) {
-            $this->addCc($ccAddress);
+            $addresses = array_fill_keys(array_map('trim', explode(',', $ccAddress)), null);
+            foreach ($addresses as $ccAddress => $name) {
+                $this->addCc($ccAddress, $name);
+            }
         }
 
+        $fromName  = $this->getValidLeadField($email->getFromAddress());
+        $fromEmail = $this->getValidLeadField($email->getFromName(), 'email');
         if (!empty($fromEmail) || !empty($fromName)) {
             if (empty($fromName)) {
                 $fromName = array_values($this->from)[0];
@@ -1448,7 +1449,8 @@ class MailHelper
             $addresses = explode(',', $replyTo);
 
             // Only a single email is supported
-            $this->setReplyTo($addresses[0]);
+            $replyTo = $this->getValidLeadField($addresses[0], 'email');
+            $this->setReplyTo($replyTo);
         }
 
         if ($allowBcc) {
@@ -1456,6 +1458,7 @@ class MailHelper
             if (!empty($bccAddress)) {
                 $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
+                    $bccAddress = $this->getValidLeadField($bccAddress, 'email');
                     $this->addBcc($bccAddress, $name);
                 }
             }
