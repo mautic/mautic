@@ -124,15 +124,21 @@ class MailchimpIntegration extends EmailAbstractIntegration
 
             $fields = $this->getApiHelper()->getCustomFields($listId);
 
-            if (!empty($fields['data'][0]['merge_vars']) && count($fields['data'][0]['merge_vars'])) {
-                foreach ($fields['data'][0]['merge_vars'] as $field) {
+            if (!empty($fields['merge_fields']) && count($fields['merge_fields'])) {
+                foreach ($fields['merge_fields'] as $field) {
                     $leadFields[$field['tag']] = [
                         'label'    => $field['name'],
                         'type'     => 'string',
-                        'required' => $field['req'],
+                        'required' => $field['required'],
                     ];
                 }
             }
+
+            $leadFields['EMAIL'] = [
+                'label'    => 'Email',
+                'type'     => 'string',
+                'required' => true,
+            ];
 
             $this->cache->set('leadFields'.$cacheSuffix, $leadFields);
 
@@ -150,8 +156,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
      */
     public function pushLead($lead, $config = [])
     {
-        $config = $this->mergeConfigToFeatureSettings($config);
-
+        $config     = $this->mergeConfigToFeatureSettings($config);
         $mappedData = $this->populateLeadData($lead, $config);
 
         if (empty($mappedData)) {

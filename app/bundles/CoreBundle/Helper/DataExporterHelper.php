@@ -43,7 +43,9 @@ class DataExporterHelper
 
         if (is_callable($resultsCallback)) {
             foreach ($items as $item) {
-                $toExport[] = $resultsCallback($item);
+                $toExport[] = array_map(function ($itemEncode) {
+                    return html_entity_decode($itemEncode, ENT_QUOTES);
+                }, $resultsCallback($item));
             }
         } else {
             foreach ($items as $item) {
