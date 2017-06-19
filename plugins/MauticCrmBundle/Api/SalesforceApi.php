@@ -43,16 +43,16 @@ class SalesforceApi extends CrmApi
         if (!$object) {
             $object = $this->object;
         }
-        if (!$queryUrl) {
-            $queryUrl   = $this->integration->getApiUrl();
-            $requestUrl = sprintf($queryUrl.'/%s/%s', $object, $operation);
-        } else {
-            $requestUrl = sprintf($queryUrl.'/%s', $operation);
-        }
 
-        $settings = $this->requestSettings;
+        $requestUrl = (!$queryUrl) ? sprintf($this->integration->getApiUrl().'/%s/%s', $object, $operation) : sprintf($queryUrl.'/%s', $operation);
+        $settings   = $this->requestSettings;
         if ($method == 'PATCH') {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
+        }
+
+        if (isset($queryUrl)) {
+            // Query commands can have long wait time while SF builds response as the offset increases
+            $settings['request_timeout'] = 300;
         }
 
         // Wrap in a isAuthorized to refresh token if applicable
@@ -70,7 +70,9 @@ class SalesforceApi extends CrmApi
                         $refreshError = $this->integration->authCallback(['use_refresh_token' => true]);
 
                         if (empty($refreshError)) {
-                            return $this->request($operation, $elementData, $method, true);
+                            return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
+                        } else {
+                            $errors[] = $refreshError;
                         }
                     }
                     $errors[] = $r['message'];
@@ -296,7 +298,10 @@ class SalesforceApi extends CrmApi
                 }
         }
 
-        if (!empty($fields) and isset($query['start'])) {
+        if (!empty($query['nextUrl'])) {
+            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
+            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
+        } elseif (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
 
@@ -310,9 +315,6 @@ class SalesforceApi extends CrmApi
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'].$ignoreConvertedLeads;
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } elseif (!empty($query['nextUrl'])) {
-            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
-            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
         } else {
             $result = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
         }
