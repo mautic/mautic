@@ -462,7 +462,7 @@ class SubmissionModel extends CommonFormModel
                                 if (in_array($r['type'], $viewOnlyFields)) {
                                     continue;
                                 }
-                                $row[] = $r['value'];
+                                $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
                                 //free memory
                                 unset($s['results'][$k2]);
                             }
@@ -539,7 +539,7 @@ class SubmissionModel extends CommonFormModel
                                     if (in_array($r['type'], $viewOnlyFields)) {
                                         continue;
                                     }
-                                    $row[] = $r['value'];
+                                    $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
                                     //free memory
                                     unset($s['results'][$k2]);
                                 }
