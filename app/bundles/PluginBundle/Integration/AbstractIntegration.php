@@ -2525,7 +2525,12 @@ abstract class AbstractIntegration
     protected function buildIntegrationEntities(array $mapping, $integrationEntity, $internalEntity, $params = [])
     {
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
-        $integrationEntities = $integrationEntityRepo->getIntegrationEntities($this->getName(), $integrationEntity, $internalEntity, array_keys($mapping));
+        $integrationEntities   = $integrationEntityRepo->getIntegrationEntities(
+            $this->getName(),
+            $integrationEntity,
+            $internalEntity,
+            array_keys($mapping)
+        );
 
         // Find those that don't exist and create them
         $createThese = array_diff_key($mapping, $integrationEntities);

@@ -723,6 +723,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (isset($result['nextRecordsUrl'])) {
                         $query['nextUrl'] = $result['nextRecordsUrl'];
+                        $retry = 0;
                     } else {
                         if ($processed < $total) {
                             // Something has gone wrong so try a few more times before giving up
@@ -2311,6 +2312,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (!empty($company[2])) {
                         $syncLead = $this->companyModel->addLeadToCompany($company[2], $leadEntity);
+                        $this->em->detach($company[2]);
                     }
                 }
 
