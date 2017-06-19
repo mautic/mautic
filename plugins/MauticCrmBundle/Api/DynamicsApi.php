@@ -2,43 +2,54 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
+use Joomla\Http\Response;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class DynamicsApi extends CrmApi
 {
     /**
-     * @param        $operation
+     * @return string
+     */
+    private function getUrl()
+    {
+        $keys = $this->integration->getKeys();
+
+        return $keys['resource'].'/api/data/v8.2/';
+    }
+
+    /**
+     * @param $operation
      * @param array  $parameters
      * @param string $method
      * @param string $moduleobject
-     * @param bool   $isJson
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'Leads', $isJson = true)
+    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'contact')
     {
-        $tokenData = $this->integration->getKeys();
-        $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl($isJson), $moduleobject, $operation);
-
-        $parameters = array_merge([
-            'authtoken' => $tokenData['AUTHTOKEN'],
-            'scope'     => 'crmapi',
-        ], $parameters);
-
-        $response = $this->integration->makeRequest($url, $parameters, $method);
-
-        if (!empty($response['response']['error'])) {
-            $response = $response['response'];
-            $errorMsg = $response['error']['message'].' ('.$response['error']['code'].')';
-            if (isset($response['uri'])) {
-                $errorMsg .= '; '.$response['uri'];
-            }
-            throw new ApiErrorException($errorMsg);
+        if (0 === strpos($operation, 'EntityDefinitions')) {
+            $url = sprintf('%s/%s', $this->getUrl(), $operation);
+        } else {
+            $moduleobject .= 's'; // pluralize object
+            $url = sprintf('%s/%s/%s', $this->getUrl(), $moduleobject, $operation);
         }
+        $keys     = $this->integration->getKeys();
+        $settings = [
+            'encode_parameters'   => 'json',
+            'return_raw'          => 'true', // needed to get the HTTP status code in the response
+            'override_auth_token' => 'Bearer '.$keys['access_token'],
+            'headers'             => [
+                'auth_type'     => 'none',
+                'Authorization' => 'Bearer '.$keys['access_token'],
+            ],
+        ];
 
-        return $response;
+        /** @var Response $response */
+        $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
+
+        return json_decode($response->body, true);
     }
 
     /**
@@ -48,13 +59,19 @@ class DynamicsApi extends CrmApi
      *
      * @return mixed
      */
-    public function getLeadFields($object = 'Leads')
+    public function getLeadFields($object = 'contact')
     {
-        if ($object == 'company') {
-            $object = 'Accounts'; // Zoho object name
+        if ('company' === $object) {
+            $object = 'account'; // Dynamics object name
         }
 
-        return $this->request('getFields', [], 'GET', $object);
+        $operation  = sprintf('EntityDefinitions(LogicalName=\'%s\')/Attributes', $object);
+        $parameters = [
+            'filter'  => 'AttributeOf eq null', // ignore system fields
+            '$select' => 'RequiredLevel,SchemaName,AttributeType,DisplayName,IsValidForUpdate', // select only miningful columns
+        ];
+
+        return $this->request($operation, $parameters, 'GET', $object);
     }
 
     /**

@@ -89,7 +89,7 @@ class IntegrationSubscriber extends CommonSubscriber
 
         if (defined('IN_MAUTIC_CONSOLE') && defined('MAUTIC_CONSOLE_VERBOSITY') && MAUTIC_CONSOLE_VERBOSITY >= ConsoleOutput::VERBOSITY_VERY_VERBOSE) {
             $output = new ConsoleOutput();
-            $output->writeln('<fg=magenta>RESPONSE:</>');
+            $output->writeln(sprintf('<fg=magenta>RESPONSE: %d</>', $response->code));
             $output->writeln('<fg=cyan>'.$headers.'</>');
             $output->writeln('');
 
@@ -101,6 +101,7 @@ class IntegrationSubscriber extends CommonSubscriber
                 $output->writeln('<fg=cyan>'.$response->body.'</>');
             }
         } elseif ('dev' === MAUTIC_ENV) {
+            $this->logger->alert('RESPONSE CODE: '.$response->code);
             $this->logger->alert("RESPONSE HEADERS: \n".$headers);
             $this->logger->alert('RESPONSE BODY:');
             if ($isJson) {

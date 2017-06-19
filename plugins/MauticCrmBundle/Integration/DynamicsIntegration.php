@@ -73,8 +73,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'contacts' => 'mautic.dynamics.object.contact',
-                        'company'  => 'mautic.dynamics.object.company',
+                        'contact' => 'mautic.dynamics.object.contact',
+                        'company' => 'mautic.dynamics.object.company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -164,6 +164,21 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return bool
      */
+    public function isAuthorized()
+    {
+        if ($this->isConfigured()) {
+            // Dynamics also uses password grant type so login each time to ensure session is valid
+            $this->authCallback();
+        }
+
+        return parent::isAuthorized();
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
     public function getDataPriority()
     {
         return true;
@@ -196,36 +211,36 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return int|null
      */
-    public function getLeads($params = [], $query = null, &$executed = null, &$result = [], $object = 'Leads')
+    public function getLeads($params = [], $query = null, &$executed = null, &$result = [], $object = 'contact')
     {
-        if ('Lead' === $object || 'Contact' === $object) {
-            $object .= 's'; // pluralize object name for Zoho
-        }
-        $executed = 0;
-        try {
-            if ($this->isAuthorized()) {
-                $config           = $this->mergeConfigToFeatureSettings();
-                $fields           = $config['leadFields'];
-                $config['object'] = $object;
-                $aFields          = $this->getAvailableLeadFields($config);
-                $mappedData       = [];
-                foreach (array_keys($fields) as $k) {
-                    if (isset($aFields[$object][$k])) {
-                        $mappedData[] = $aFields[$object][$k]['dv'];
-                    }
-                }
-                $fields                  = implode(',', $mappedData);
-                $params['selectColumns'] = $object.'('.$fields.')';
-                $params['toIndex']       = 200; // maximum number of records
-                $data                    = $this->getApiHelper()->getLeads($params, $object);
-                $result                  = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-                $executed += count($result);
-            }
-        } catch (\Exception $e) {
-            $this->logIntegrationError($e);
-        }
+        //        if ('Lead' === $object || 'Contact' === $object) {
+//            $object .= 's'; // pluralize object name for Zoho
+//        }
+//        $executed = 0;
+//        try {
+//            if ($this->isAuthorized()) {
+//                $config           = $this->mergeConfigToFeatureSettings();
+//                $fields           = $config['leadFields'];
+//                $config['object'] = $object;
+//                $aFields          = $this->getAvailableLeadFields($config);
+//                $mappedData       = [];
+//                foreach (array_keys($fields) as $k) {
+//                    if (isset($aFields[$object][$k])) {
+//                        $mappedData[] = $aFields[$object][$k]['dv'];
+//                    }
+//                }
+//                $fields                  = implode(',', $mappedData);
+//                $params['selectColumns'] = $object.'('.$fields.')';
+//                $params['toIndex']       = 200; // maximum number of records
+//                $data                    = $this->getApiHelper()->getLeads($params, $object);
+//                $result                  = $this->amendLeadDataBeforeMauticPopulate($data, $object);
+//                $executed += count($result);
+//            }
+//        } catch (\Exception $e) {
+//            $this->logIntegrationError($e);
+//        }
 
-        return $executed;
+//        return $executed;
     }
     /**
      * @param array      $params
@@ -235,38 +250,35 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getCompanies($params = [], $query = null, &$executed = null, &$result = [])
     {
-        $executed = 0;
-        $object   = 'company';
-        try {
-            if ($this->isAuthorized()) {
-                $config           = $this->mergeConfigToFeatureSettings();
-                $fields           = $config['companyFields'];
-                $config['object'] = $object;
-                $aFields          = $this->getAvailableLeadFields($config);
-                $mappedData       = [];
-                if (isset($aFields['company'])) {
-                    $aFields = $aFields['company'];
-                }
-                foreach (array_keys($fields) as $k) {
-                    $mappedData[] = $aFields[$k]['dv'];
-                }
-                $fields                  = implode(',', $mappedData);
-                $params['selectColumns'] = 'Accounts('.$fields.')';
-                $params['toIndex']       = 200; // maximum number of records
-                $data                    = $this->getApiHelper()->getCompanies($params);
-                $result                  = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-                $executed += count($result);
-//              //TODO: fetch more records using fromIndex and toIndex until exception is thrown
-//              if (isset($data['hasMore']) && $data['hasMore']) {
-//                  $executed += $this->getCompanies($params);
-//              }
-                return $executed;
-            }
-        } catch (\Exception $e) {
-            $this->logIntegrationError($e);
-        }
+        //        $executed = 0;
+//        $object   = 'company';
+//        try {
+//            if ($this->isAuthorized()) {
+//                $config           = $this->mergeConfigToFeatureSettings();
+//                $fields           = $config['companyFields'];
+//                $config['object'] = $object;
+//                $aFields          = $this->getAvailableLeadFields($config);
+//                $mappedData       = [];
+//                if (isset($aFields['company'])) {
+//                    $aFields = $aFields['company'];
+//                }
+//                foreach (array_keys($fields) as $k) {
+//                    $mappedData[] = $aFields[$k]['dv'];
+//                }
+//                $fields                  = implode(',', $mappedData);
+//                $params['selectColumns'] = 'Accounts('.$fields.')';
+//                $params['toIndex']       = 200; // maximum number of records
+//                $data                    = $this->getApiHelper()->getCompanies($params);
+//                $result                  = $this->amendLeadDataBeforeMauticPopulate($data, $object);
+//                $executed += count($result);
 
-        return $executed;
+//                return $executed;
+//            }
+//        } catch (\Exception $e) {
+//            $this->logIntegrationError($e);
+//        }
+
+//        return $executed;
     }
 
     /**
@@ -278,24 +290,24 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function populateMauticLeadData($data, $config = [], $object = 'Leads')
+    public function populateMauticLeadData($data, $config = [], $object = 'contact')
     {
         // Match that data with mapped lead fields
-        $aFields       = $this->getAvailableLeadFields($config);
-        $matchedFields = [];
-        $fieldsName    = ('company' === $object) ? 'companyFields' : 'leadFields';
-        if (isset($aFields[$object])) {
-            $aFields = $aFields[$object];
-        }
-        foreach ($aFields as $k => $v) {
-            foreach ($data as $dk => $dv) {
-                if ($dk === $v['dv']) {
-                    $matchedFields[$config[$fieldsName][$k]] = $dv;
-                }
-            }
-        }
+//        $aFields       = $this->getAvailableLeadFields($config);
+//        $matchedFields = [];
+//        $fieldsName    = ('company' === $object) ? 'companyFields' : 'leadFields';
+//        if (isset($aFields[$object])) {
+//            $aFields = $aFields[$object];
+//        }
+//        foreach ($aFields as $k => $v) {
+//            foreach ($data as $dk => $dv) {
+//                if ($dk === $v['dv']) {
+//                    $matchedFields[$config[$fieldsName][$k]] = $dv;
+//                }
+//            }
+//        }
 
-        return $matchedFields;
+//        return $matchedFields;
     }
 
     /**
@@ -307,7 +319,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        return $this->getFormFieldsByObject('Accounts', $settings);
+        return $this->getFormFieldsByObject('account', $settings);
     }
 
     /**
@@ -317,10 +329,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        $leadFields    = $this->getFormFieldsByObject('Leads', $settings);
-        $contactFields = $this->getFormFieldsByObject('Contacts', $settings);
-
-        return array_merge($leadFields, $contactFields);
+        return  $this->getFormFieldsByObject('contact', $settings);
     }
 
     /**
@@ -335,65 +344,55 @@ class DynamicsIntegration extends CrmAbstractIntegration
         if ($fields = parent::getAvailableLeadFields($settings)) {
             return $fields;
         }
-        $zohoFields        = [];
+        $dynamicsFields    = [];
         $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
         if (isset($settings['feature_settings']['objects'])) {
-            $zohoObjects = $settings['feature_settings']['objects'];
+            $dynamicsObjects = $settings['feature_settings']['objects'];
         } else {
-            $settings    = $this->settings->getFeatureSettings();
-            $zohoObjects = isset($settings['objects']) ? $settings['objects'] : ['Leads'];
+            $settings        = $this->settings->getFeatureSettings();
+            $dynamicsObjects = isset($settings['objects']) ? $settings['objects'] : ['contact'];
         }
         try {
             if ($this->isAuthorized()) {
-                if (!empty($zohoObjects) && is_array($zohoObjects)) {
-                    foreach ($zohoObjects as $key => $zohoObject) {
+                if (!empty($dynamicsObjects) && is_array($dynamicsObjects)) {
+                    foreach ($dynamicsObjects as $key => $dynamicsObject) {
                         // Check the cache first
-                        $settings['cache_suffix'] = $cacheSuffix = '.'.$zohoObject;
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.$dynamicsObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
-                            $zohoFields[$zohoObject] = $fields;
+                            $dynamicsFields[$dynamicsObject] = $fields;
                             continue;
                         }
-                        $leadObject = $this->getApiHelper()->getLeadFields($zohoObject);
+                        $leadObject = $this->getApiHelper()->getLeadFields($dynamicsObject);
                         if (null === $leadObject || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
                             return [];
                         }
-                        $objKey = 'company' === $zohoObject ? 'Accounts' : $zohoObject;
+                        $objKey = 'company' === $dynamicsObject ? 'account' : $dynamicsObject;
                         /** @var array $opts */
-                        $opts = $leadObject[$objKey]['section'];
-                        foreach ($opts as $optgroup) {
-                            //$zohoFields[$optgroup['dv']] = array();
-                            if (!array_key_exists(0, $optgroup['FL'])) {
-                                $optgroup['FL'] = [$optgroup['FL']];
+                        $fields = $leadObject['value'];
+                        foreach ($fields as $field) {
+                            if (!(bool) $field['IsValidForUpdate'] || in_array($field['AttributeType'], ['Virtual', 'Uniqueidentifier', 'Picklist', 'Lookup', 'Boolean', 'Owner', 'Customer'], true)) {
+                                continue;
                             }
-                            foreach ($optgroup['FL'] as $field) {
-                                if (!(bool) $field['isreadonly'] || in_array($field['type'], ['Lookup', 'OwnerLookup', 'Boolean'], true)) {
-                                    continue;
-                                }
-                                $zohoFields[$zohoObject][$this->getFieldKey($field['dv'])] = [
-                                    'type'     => 'string',
-                                    'label'    => $field['label'],
-                                    'dv'       => $field['dv'],
-                                    'required' => $field['req'] === 'true',
-                                ];
-                            }
+                            $dynamicsFields[$dynamicsObject][$field['SchemaName']] = [
+                                'type'     => 'string',
+                                'label'    => $field['DisplayName']['UserLocalizedLabel']['Label'],
+                                'dv'       => $field['SchemaName'],
+                                'required' => 'ApplicationRequired' === $field['RequiredLevel']['Value'],
+                            ];
                         }
-                        $this->cache->set('leadFields'.$cacheSuffix, $zohoFields[$zohoObject]);
+                        $this->cache->set('leadFields'.$cacheSuffix, $dynamicsFields[$dynamicsObject]);
                     }
                 }
             }
         } catch (ApiErrorException $exception) {
             $this->logIntegrationError($exception);
             if (!$silenceExceptions) {
-                if (strpos($exception->getMessage(), 'Invalid Ticket Id') !== false) {
-                    // Use a bit more friendly message
-                    $exception = new ApiErrorException('There was an issue with communicating with Zoho. Please try to reauthorize.');
-                }
                 throw $exception;
             }
 
             return false;
         }
 
-        return $zohoFields;
+        return $dynamicsFields;
     }
 }
