@@ -163,7 +163,6 @@ class FilterSelectorType extends AbstractType
                 'filterList'    => [],
                 'operatorList'  => [],
                 'operatorGroup' => 'default',
-                'glueList'      => [],
             ]
         );
     }

@@ -1,7 +1,8 @@
 <?php
 $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $form->vars['label_attr']['class'];
+$inGroup    = $form->vars['data']['glue'] === 'and';
 ?>
-<div class="panel" id="<?php echo $form->vars['id']; ?>_container">
+<div class="panel<?php echo $inGroup ? ' in-group' : ''; ?>" id="<?php echo $form->vars['id']; ?>_container">
     <div class="panel-heading">
         <div class="panel-glue col-sm-2 pl-0">
             <?php echo $view['form']->row($form->vars['form']->children['glue']); ?>
