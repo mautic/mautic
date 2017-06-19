@@ -27,6 +27,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
@@ -430,6 +431,7 @@ class LeadModel extends FormModel
             $this->companyModel->addLeadToCompany($companyEntity, $entity, true);
             $this->em->detach($companyEntity);
         }
+        $this->em->clear(CompanyChangeLog::class);
     }
 
     /**
