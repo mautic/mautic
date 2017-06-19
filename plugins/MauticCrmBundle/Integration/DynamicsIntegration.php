@@ -9,12 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticDynamicsBundle\Integration;
+namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Form;
 
-class DynamicsIntegration extends AbstractIntegration
+class DynamicsIntegration extends CrmAbstractIntegration
 {
     public function getName()
     {

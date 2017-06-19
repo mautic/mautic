@@ -73,6 +73,11 @@ return [
 
                 ],
             ],
+            'mautic.integration.dynamics' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration::class,
+                'arguments' => [
+                ],
+            ],
         ],
     ],
 ];
