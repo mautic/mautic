@@ -24,6 +24,7 @@ use Spinen\ConnectWise\Support\ModelResolver;
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
+    private $client;
     /**
      * {@inheritdoc}
      *
@@ -151,34 +152,71 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return string
+     * Get the API helper.
+     *
+     * @return ConnectWiseClient
      */
-    public function getApiUrl()
+    public function getApiHelper()
     {
-        return 'https://staging.connectwisedev.com/v4_6_release';
-    }
+        static $client;
+        static $token;
 
+        if (empty($client)) {
+            $token    = new Token();
+            $guzzle   = new Client();
+            $resolver = new ModelResolver();
+            $client   = new ConnectWiseClient($token, $guzzle, $resolver);
+        }
+        $token
+            ->setCompanyId($this->keys[$this->getCompanyIdKey()])
+            ->setMemberId($this->keys[$this->getMemberIdKey()]);
+
+        $client->setIntegrator($this->keys[$this->getIntegrator()])
+        ->setPassword($this->keys[$this->getClientSecretKey()])
+        ->setUrl($this->keys[$this->getConnectwiseUrl()]);
+
+        return $client;
+    }
     /**
      * @return bool
      */
     public function authCallback($settings = [], $parameters = [])
     {
-        $token    = new Token();
-        $guzzle   = new Client();
-        $resolver = new ModelResolver();
-        $client   = new ConnectWiseClient($token, $guzzle, $resolver);
-        $headers  = $client->getHeaders();
+        $client = $this->getApiHelper();
 
-        $token
-            ->setCompanyId($this->keys[$this->getCompanyIdKey()])
-            ->setMemberId($this->keys[$this->getMemberIdKey()]);
+        try {
+            $client
+                ->setIntegrator($this->keys[$this->getIntegrator()])
+                ->setPassword($this->keys[$this->getClientSecretKey()])
+                ->setUrl($this->keys[$this->getConnectwiseUrl()]);
+        } catch (RequestException $e) {
+            return $e->getMessage();
+        }
+        if (empty($client->buildAuth()[1])) {
+            return 'error';
+        } else {
+            $this->extractAuthKeys(['username' => $this->keys[$this->getIntegrator()], 'password' => $this->keys[$this->getClientSecretKey()]], 'username');
+        }
+    }
 
-        $client
-            ->setIntegrator($this->keys[$this->getIntegrator()])
-            ->setPassword($this->keys[$this->getClientSecretKey()])
-            ->setUrl($this->keys[$this->getConnectwiseUrl()]);
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getAuthenticationType()
+    {
+        return 'basic';
+    }
 
-        return $this->extractAuthKeys($client);
+    /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    public function getDataPriority()
+    {
+        return true;
     }
 
     /**
@@ -200,7 +238,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        return $this->getFormFieldsByObject('contacts', $settings);
+        return $this->getFormFieldsByObject('contact', $settings);
     }
 
     /**
@@ -208,9 +246,41 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
-        if ($fields = parent::getAvailableLeadFields()) {
-            return $fields;
+        if (isset($settings['feature_settings']['objects'])) {
+            $cwObjects = $settings['feature_settings']['objects'];
+        } else {
+            $cwObjects[] = 'contact';
         }
+
+        $client = $this->getApiHelper();
+
+        switch ($cwObjects) {
+            case isset($cwObjects['contact']):
+                $contactFields       = $this->getContactFields();
+                $cwFields['contact'] = $this->setFields($contactFields);
+                break;
+            case isset($cwObjects['company']):
+                $company             = $this->getCompanyFields();
+                $cwFields['company'] = $this->setFields($company);
+                break;
+        }
+
+        return $cwFields;
+    }
+
+    public function setFields($fields)
+    {
+        $cwFields = [];
+
+        foreach ($fields as $fieldName => $field) {
+            $cwFields[$fieldName] = [
+                'type'     => $field['type'],
+                'label'    => $fieldName,
+                'required' => $field['required'],
+            ];
+        }
+
+        return $cwFields;
     }
 
     /**
@@ -226,8 +296,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'contacts' => 'mautic.connectwise.object.contact',
-                        'company'  => 'mautic.connectwise.object.company',
+                        'contact' => 'mautic.connectwise.object.contact',
+                        'company' => 'mautic.connectwise.object.company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -238,5 +308,89 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 ]
             );
         }
+    }
+
+    public function getCompanyFields()
+    {
+        return [
+            'identifier'            => ['type' => 'string', 'required' => true],
+            'name'                  => ['type' => 'string', 'required' => true],
+            'addressLine1'          => ['type' => 'string', 'required' => false],
+            'addressLine2'          => ['type' => 'string', 'required' => false],
+            'city'                  => ['type' => 'string', 'required' => false],
+            'state'                 => ['type' => 'string', 'required' => false],
+            'zip'                   => ['type' => 'string', 'required' => false],
+            'phoneNumber'           => ['type' => 'string', 'required' => false],
+            'faxNumber'             => ['type' => 'string', 'required' => false],
+            'website'               => ['type' => 'string', 'required' => false],
+            'territoryId'           => ['type' => 'string', 'required' => false],
+            'marketId'              => ['type' => 'string', 'required' => false],
+            'accountNumber'         => ['type' => 'string', 'required' => false],
+            'dateAcquired'          => ['type' => 'string', 'required' => false],
+            'annualRevenue'         => ['type' => 'string', 'required' => false],
+            'numberOfEmployees'     => ['type' => 'string', 'required' => false],
+            'leadSource'            => ['type' => 'string', 'required' => false],
+            'leadFlag'              => ['type' => 'boolean', 'required' => false],
+            'unsubscribeFlag'       => ['type' => 'boolean', 'required' => false],
+            'calendarId'            => ['type' => 'string', 'required' => false],
+            'userDefinedField1'     => ['type' => 'string', 'required' => false],
+            'userDefinedField2'     => ['type' => 'string', 'required' => false],
+            'userDefinedField3'     => ['type' => 'string', 'required' => false],
+            'userDefinedField4'     => ['type' => 'string', 'required' => false],
+            'userDefinedField5'     => ['type' => 'string', 'required' => false],
+            'userDefinedField6'     => ['type' => 'string', 'required' => false],
+            'userDefinedField7'     => ['type' => 'string', 'required' => false],
+            'userDefinedField8'     => ['type' => 'string', 'required' => false],
+            'userDefinedField9'     => ['type' => 'string', 'required' => false],
+            'userDefinedField10'    => ['type' => 'string', 'required' => false],
+            'vendorIdentifier'      => ['type' => 'string', 'required' => false],
+            'taxIdentifier'         => ['type' => 'string', 'required' => false],
+            'invoiceToEmailAddress' => ['type' => 'string', 'required' => false],
+            'invoiceCCEmailAddress' => ['type' => 'string', 'required' => false],
+            'deletedFlag'           => ['type' => 'boolean', 'required' => false],
+            'dateDeleted'           => ['type' => 'string', 'required' => false],
+            'deletedBy'             => ['type' => 'string', 'required' => false],
+            //todo 'customFields' => 'array',
+        ];
+    }
+
+    public function getContactFields()
+    {
+        return [
+            'firstName'              => ['type' => 'string', 'required' => true],
+            'lastName'               => ['type' => 'string', 'required' => false],
+            'type'                   => ['type' => 'string', 'required' => false],
+            'company'                => ['type' => 'string', 'required' => false],
+            'addressLine1'           => ['type' => 'string', 'required' => false],
+            'addressLine2'           => ['type' => 'string', 'required' => false],
+            'city'                   => ['type' => 'string', 'required' => false],
+            'state'                  => ['type' => 'string', 'required' => false],
+            'zip'                    => ['type' => 'string', 'required' => false],
+            'country'                => ['type' => 'string', 'required' => false],
+            'inactiveFlag'           => ['type' => 'string', 'required' => false],
+            'securityIdentifier'     => ['type' => 'string', 'required' => false],
+            'managerContactId'       => ['type' => 'string', 'required' => false],
+            'assistantContactId'     => ['type' => 'string', 'required' => false],
+            'title'                  => ['type' => 'string', 'required' => false],
+            'school'                 => ['type' => 'string', 'required' => false],
+            'nickName'               => ['type' => 'string', 'required' => false],
+            'marriedFlag'            => ['type' => 'boolean', 'required' => false],
+            'childrenFlag'           => ['type' => 'boolean', 'required' => false],
+            'significantOther'       => ['type' => 'string', 'required' => false],
+            'portalPassword'         => ['type' => 'string', 'required' => false],
+            'portalSecurityLevel'    => ['type' => 'string', 'required' => false],
+            'disablePortalLoginFlag' => ['type' => 'boolean', 'required' => false],
+            'unsubscribeFlag'        => ['type' => 'boolean', 'required' => false],
+            'gender'                 => ['type' => 'string', 'required' => false],
+            'birthDay'               => ['type' => 'string', 'required' => false],
+            'anniversary'            => ['type' => 'string', 'required' => false],
+            'presence'               => ['type' => 'string', 'required' => false],
+            'mobileGuid'             => ['type' => 'string', 'required' => false],
+            'facebookUrl'            => ['type' => 'string', 'required' => false],
+            'twitterUrl'             => ['type' => 'string', 'required' => false],
+            'linkedInUrl'            => ['type' => 'string', 'required' => false],
+            'defaultBillingFlag'     => ['type' => 'boolean', 'required' => false],
+            //todo 'communicationItems' => [ 'type' => 'array', 'required' => false ]
+        ];
     }
 }
