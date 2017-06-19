@@ -11,6 +11,7 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Doctrine\ORM\EntityManager;
 use Joomla\Http\HttpFactory;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -32,11 +33,15 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class AbstractIntegration.
@@ -57,7 +62,7 @@ abstract class AbstractIntegration
     protected $factory;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -102,7 +107,7 @@ abstract class AbstractIntegration
     protected $logger;
 
     /**
-     * @var \Mautic\CoreBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -154,29 +159,158 @@ abstract class AbstractIntegration
     protected $lastIntegrationError;
 
     /**
-     * @param MauticFactory $factory
-     *
-     * @todo divorce from MauticFactory
+     * AbstractIntegration constructor.
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory = null)
     {
-        $this->factory           = $factory;
-        $this->dispatcher        = $factory->getDispatcher();
-        $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
-        $this->em                = $factory->getEntityManager();
-        $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-        $this->request           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getRequest() : null;
-        $this->router            = $factory->getRouter();
-        $this->translator        = $factory->getTranslator();
-        $this->logger            = $factory->getLogger();
-        $this->encryptionHelper  = $factory->getHelper('encryption');
-        $this->leadModel         = $factory->getModel('lead');
-        $this->companyModel      = $factory->getModel('lead.company');
-        $this->pathsHelper       = $factory->getHelper('paths');
-        $this->notificationModel = $factory->getModel('core.notification');
-        $this->fieldModel        = $factory->getModel('lead.field');
+        /*
+         * @deprecated: 2.8.2 To be removed in 3.0
+         *            This keeps BC with 3rd party plugins that
+         *            don't use the container for the
+         *            integration pass to set all of these properties
+         */
+        if ($factory) {
+            $this->factory           = $factory;
+            $this->dispatcher        = $factory->getDispatcher();
+            $this->cache             = $this->dispatcher->getContainer()->get('mautic.helper.cache_storage')->getCache($this->getName());
+            $this->em                = $factory->getEntityManager();
+            $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
+            $this->request           = $factory->getRequest();
+            $this->router            = $factory->getRouter();
+            $this->translator        = $factory->getTranslator();
+            $this->logger            = $factory->getLogger();
+            $this->encryptionHelper  = $factory->getHelper('encryption');
+            $this->leadModel         = $factory->getModel('lead');
+            $this->companyModel      = $factory->getModel('lead.company');
+            $this->pathsHelper       = $factory->getHelper('paths');
+            $this->notificationModel = $factory->getModel('core.notification');
+            $this->fieldModel        = $factory->getModel('lead.field');
+        }
 
         $this->init();
+    }
+
+    /**
+     * @param MauticFactory $factory
+     *
+     * @deprecated 2.8.2 To be removed in 3.0. Use constructor arguments
+     *             to set dependencies instead
+     */
+    public function setFactory(MauticFactory $factory)
+    {
+        $this->factory = $factory;
+    }
+
+    /**
+     * @param FieldModel $fieldModel
+     */
+    public function setFieldModel(FieldModel $fieldModel)
+    {
+        $this->fieldModel = $fieldModel;
+    }
+
+    /**
+     * @param NotificationModel $notificationModel
+     */
+    public function setNotificationModel(NotificationModel $notificationModel)
+    {
+        $this->notificationModel = $notificationModel;
+    }
+
+    /**
+     * @param PathsHelper $pathsHelper
+     */
+    public function setPathsHelper(PathsHelper $pathsHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+    }
+
+    /**
+     * @param CompanyModel $companyModel
+     */
+    public function setCompanyModel(CompanyModel $companyModel)
+    {
+        $this->companyModel = $companyModel;
+    }
+
+    /**
+     * @param LeadModel $leadModel
+     */
+    public function setLeadModel(LeadModel $leadModel)
+    {
+        $this->leadModel = $leadModel;
+    }
+
+    /**
+     * @param EncryptionHelper $encryptionHelper
+     */
+    public function setEncryptionHelper(EncryptionHelper $encryptionHelper)
+    {
+        $this->encryptionHelper = $encryptionHelper;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function setTranslator(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param Router $router
+     */
+    public function setRouter(Router $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * @param RequestStack $requestStack
+     */
+    public function setRequest(RequestStack $requestStack)
+    {
+        $this->request = !defined('IN_MAUTIC_CONSOLE') ? $requestStack->getCurrentRequest() : null;
+    }
+
+    /**
+     * @param Session|null $session
+     */
+    public function setSession(Session $session = null)
+    {
+        $this->session = !defined('IN_MAUTIC_CONSOLE') ? $session : null;
+    }
+
+    /**
+     * @param EntityManager $em
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
+    /**
+     * @param CacheStorageHelper $cacheStorageHelper
+     */
+    public function setCache(CacheStorageHelper $cacheStorageHelper)
+    {
+        $this->cache = $cacheStorageHelper->getCache($this->getName());
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -197,6 +331,9 @@ abstract class AbstractIntegration
 
     /**
      * Called on construct.
+     *
+     * @deprecated 2.8.2 To be removed in 3.0
+     *             Setup your integration in the class constructor instead
      */
     public function init()
     {
@@ -303,6 +440,21 @@ abstract class AbstractIntegration
      * @return array
      */
     public function getSupportedFeatures()
+    {
+        return [];
+    }
+
+    /**
+     * Get a list of tooltips for the specified supported features.
+     * This allows you to add detail / informational tooltips to your
+     * supported feature checkbox group.
+     *
+     * Example:
+     *  'cloud_storage' => 'mautic.integration.form.features.cloud_storage.tooltip'
+     *
+     * @return array
+     */
+    public function getSupportedFeatureTooltips()
     {
         return [];
     }
@@ -2242,5 +2394,35 @@ abstract class AbstractIntegration
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * Function used to format unformated fields coming from FieldsTypeTrait
+     * (usually used in campaign actions).
+     *
+     * @param $fields
+     *
+     * @return array
+     */
+    public function formatMatchedFields($fields)
+    {
+        $formattedFields = [];
+
+        if (isset($fields['m_1'])) {
+            $xfields = count($fields) / 3;
+            for ($i = 1; $i < $xfields; ++$i) {
+                if (isset($fields['i_'.$i]) && isset($fields['m_'.$i])) {
+                    $formattedFields[$fields['i_'.$i]] = $fields['m_'.$i];
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if (!empty($formattedFields)) {
+            $fields = $formattedFields;
+        }
+
+        return $fields;
     }
 }

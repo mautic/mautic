@@ -531,7 +531,7 @@ class Campaign extends FormEntity
      *
      * @param Contact $contact
      *
-     * @return \Doctrine\Common\Collections\Collection|static|\Mautic\CampaignBundle\Entity\Contact[]
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getContactMembership(Contact $contact)
     {

@@ -378,7 +378,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
@@ -574,12 +574,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         $columns = array_merge(
             [
@@ -601,12 +601,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the command where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command                 = $filter->command;
         $string                  = $filter->string;
@@ -923,6 +923,36 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $result;
+    }
+
+    /**
+     * Check lead owner.
+     *
+     * @param Lead  $lead
+     * @param array $ownerIds
+     *
+     * @return array|false
+     */
+    public function checkLeadOwner(Lead $lead, $ownerIds = [])
+    {
+        if (empty($ownerIds)) {
+            return false;
+        }
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('u.id')
+            ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
+            ->join('u', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.owner_id = u.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('u.id', ':ownerIds'),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('ownerIds', implode(',', $ownerIds))
+            ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**
