@@ -81,6 +81,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $limit       = $input->getOption('limit');
         $leads       = $contacts       = $processed       = 0;
 
+        defined('MAUTIC_CONSOLE_VERBOSITY') or define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
+
         if (!$interval) {
             $interval = '15 minutes';
         }
