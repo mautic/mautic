@@ -30,7 +30,7 @@ $img = $view['lead_avatar']->getAvatar($contact);
             </div>
             <div class="col-xs-8 va-t">
                 <div class="panel-body">
-                    <?php if (!$contact->getDoNotContact()->isEmpty()) : ?>
+                    <?php if (in_array($contact->getId(), array_keys($noContactList)))  : ?>
                         <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                     <?php endif; ?>
                     <h4 class="fw-sb mb-xs ellipsis">

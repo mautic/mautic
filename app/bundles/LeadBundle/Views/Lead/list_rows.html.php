@@ -66,7 +66,7 @@
                 </td>
                 <td>
                     <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
-                        <?php if (!$item->getDoNotContact()->isEmpty()) : ?>
+                        <?php if (in_array($item->getId(), array_keys($noContactList)))  : ?>
                             <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                         <?php endif; ?>
                         <div><?php echo ($item->isAnonymous()) ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier(); ?></div>

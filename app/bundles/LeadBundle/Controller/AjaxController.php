@@ -549,10 +549,11 @@ class AjaxController extends CommonAjaxController
                 $dataArray['leads'] = $this->factory->getTemplating()->render(
                     "MauticLeadBundle:Lead:{$template}.html.php",
                     [
-                        'items'       => $results['results'],
-                        'permissions' => $permissions,
-                        'security'    => $this->get('mautic.security'),
-                        'highlight'   => true,
+                        'items'         => $results['results'],
+                        'noContactList' => $emailRepo->getDoNotEmailList(array_keys($results['results'])),
+                        'permissions'   => $permissions,
+                        'security'      => $this->get('mautic.security'),
+                        'highlight'     => true,
                     ]
                 );
                 $dataArray['indexMode'] = $indexMode;
