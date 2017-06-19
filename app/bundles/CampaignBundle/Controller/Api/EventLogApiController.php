@@ -225,9 +225,8 @@ class EventLogApiController extends CommonApiController
                 $errors[$key] = $this->returnError($result, Codes::HTTP_CONFLICT);
             } else {
                 list($log, $created) = $result;
+                $event->addContactLog($log);
             }
-
-            $event->addContactLog($log);
         }
 
         $payload = [

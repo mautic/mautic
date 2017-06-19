@@ -110,6 +110,9 @@ Mautic.generatePageTitle = function(route){
             currentModuleItem = mQuery('.page-header h3').text();
         }
 
+        // Encoded entites are decoded by this process and can cause a XSS
+        currentModuleItem = mQuery('<div>'+currentModuleItem+'</div>').text();
+
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
         //loading basic title
@@ -265,7 +268,26 @@ Mautic.onPageLoad = function (container, response, inModal) {
     });
 
     //initialize tooltips
-    mQuery(container + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
+    var pageTooltips = mQuery(container + " *[data-toggle='tooltip']");
+    pageTooltips.tooltip({html: true, container: 'body'});
+
+    // Enable tooltips on checkbox & radio input's to
+    // show when hovering their parent LABEL element
+    pageTooltips.each(function(i) {
+        var thisTooltip   = mQuery(pageTooltips.get(i));
+        var elementParent = thisTooltip.parent();
+
+        if (elementParent.get(0).tagName === 'LABEL') {
+            elementParent.append('<i class="fa fa-question-circle"></i>');
+
+            elementParent.hover(function () {
+                thisTooltip.tooltip('show')
+            }, function () {
+                thisTooltip.tooltip('hide');
+            });
+        }
+    });
+
 
     //initialize sortable lists
     mQuery(container + " *[data-toggle='sortablelist']").each(function (index) {

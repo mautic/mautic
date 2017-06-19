@@ -138,10 +138,11 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 }
             }
 
-            $supportsValue = !in_array($operator, ['empty', '!empty']);
+            $supportsValue   = !in_array($operator, ['empty', '!empty']);
+            $supportsChoices = !in_array($operator, ['empty', '!empty', 'regexp', '!regexp']);
 
             // Display selectbox for a field with choices, textbox for others
-            if (!empty($fieldValues)) {
+            if (!empty($fieldValues) && $supportsChoices) {
                 $form->add(
                     'value',
                     'choice',

@@ -447,7 +447,7 @@ class ReportModel extends FormModel
                                         //set the header
                                         $header[] = $k;
                                     }
-                                    $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+                                    $row[] = htmlspecialchars_decode($formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
                                 }
 
                                 if ($count === 0) {
@@ -674,6 +674,12 @@ class ReportModel extends FormModel
             $debugData['query_time'] = (isset($queryTime)) ? $queryTime : 'N/A';
         }
 
+        foreach ($data as $keys => $lead) {
+            foreach ($lead as $key => $field) {
+                $data[$keys][$key] = html_entity_decode($field, ENT_QUOTES);
+            }
+        }
+
         return [
             'totalResults'    => $totalResults,
             'data'            => $data,
@@ -736,8 +742,11 @@ class ReportModel extends FormModel
                     //set the header
                     $header[] = $k;
                 }
-
-                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+                if ($type = $reportData['columns'][$reportData['dataColumns'][$k]]['type'] !== 'string') {
+                    $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+                } else {
+                    $row[] = $v;
+                }
             }
 
             if ($page === 1 && $count === 0) {

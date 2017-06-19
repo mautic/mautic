@@ -167,6 +167,44 @@ return [
                 ],
             ],
         ],
+        'integrations' => [
+            'mautic.integration.facebook' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.foursquare' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.googleplus' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Integration\GooglePlusIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.instagram' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.linkedin' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Integration\LinkedInIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.twitter' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+        ],
     ],
     'menu' => [
         'main' => [
