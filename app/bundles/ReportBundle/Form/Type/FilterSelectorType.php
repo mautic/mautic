@@ -12,6 +12,7 @@
 namespace Mautic\ReportBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -90,6 +91,22 @@ class FilterSelectorType extends AbstractType
         );
 
         $builder->add(
+            'glue',
+            ChoiceType::class,
+            [
+                'label'      => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control filter-glue not-chosen'],
+                'required'   => false,
+                'choices'    => [
+                    'and' => 'mautic.report.report.glue.choice.and',
+                    'or'  => 'mautic.report.report.glue.choice.or',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
             'value',
             'text',
             [
@@ -146,6 +163,7 @@ class FilterSelectorType extends AbstractType
                 'filterList'    => [],
                 'operatorList'  => [],
                 'operatorGroup' => 'default',
+                'glueList'      => [],
             ]
         );
     }
