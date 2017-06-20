@@ -376,14 +376,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 $result           = $this->getApiHelper()->getLeads($query, $sugarObject);
                 $params['offset'] = $result['next_offset'];
-                if (isset($result['total_count'])) {
-                    $count = $result['total_count'];
-                } //Sugar 6
-                else {
-                    $count = count($result['records']);
-                } //Sugar 7
                 $executed += $this->amendLeadDataBeforeMauticPopulate($result, $sugarObject);
-                if ($count > $params['offset']) {
+                if (
+                    (isset($result['total_count']) && $result['total_count'] > $params['offset'])   //Sugar 6
+                        || (!isset($result['total_count']) && $params['offset'] > -1)) {            //Sugar 7
                     $result = null;
                     $executed += $this->getCompanies($params, null, $executed);
                 }
@@ -654,14 +650,10 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 if ($object !== 'Activity' and $object !== 'company') {
                     $result           = $this->getApiHelper()->getLeads($query, $object);
                     $params['offset'] = $result['next_offset'];
-                    if (isset($result['total_count'])) {
-                        $count = $result['total_count'];
-                    } //Sugar 6
-                    else {
-                        $count = count($result['records']);
-                    } //Sugar 7
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);
-                    if ($count > $params['offset']) {
+                    if (
+                    (isset($result['total_count']) && $result['total_count'] > $params['offset'])   //Sugar 6
+                        || (!isset($result['total_count']) && $params['offset'] > -1)) {            //Sugar 7
                         $params['object'] = $object;
                         $executed += $this->getLeads($params, null, $executed, [], $object);
                     }
