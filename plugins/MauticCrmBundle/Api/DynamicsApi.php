@@ -28,35 +28,45 @@ class DynamicsApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'contact', $settings = [])
+    protected function request($operation, array $parameters = [], $method = 'GET', $moduleobject = 'contacts', $settings = [])
     {
-        if (0 === strpos($operation, 'EntityDefinitions')) {
-            $url = sprintf('%s/%s', $this->getUrl(), $operation);
-        } else {
-            $moduleobject .= 's'; // pluralize object
-            $url = sprintf('%s/%s/%s', $this->getUrl(), $moduleobject, $operation);
-            if ('POST' === $method) {
-                $url = sprintf('%s/%s', $this->getUrl(), $moduleobject);
-            }
+        if ('company' === $moduleobject) {
+            $moduleobject = 'accounts';
         }
-        $keys     = $this->integration->getKeys();
+
+        if ('' === $operation) {
+            $operation = $moduleobject;
+        }
+
+        $url = sprintf('%s/%s', $this->getUrl(), $operation);
+
+        if (isset($parameters['request_settings'])) {
+            $settings = array_merge($settings, $parameters['request_settings']);
+            unset($parameters['request_settings']);
+        }
+
         $settings = array_merge($settings, [
             'encode_parameters' => 'json',
             'return_raw'        => 'true', // needed to get the HTTP status code in the response
+            'curl_options'      => [
+                CURLOPT_CONNECTTIMEOUT_MS => 0,
+                CURLOPT_CONNECTTIMEOUT    => 0,
+                CURLOPT_TIMEOUT           => 30,
+            ],
         ]);
 
         /** @var Response $response */
         $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
 
-        if (204 === $response->code) {
-            return '';
+        if ('POST' === $method && (!is_object($response) || 204 !== $response->code)) {
+            throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response));
         }
 
-        if (property_exists($response, 'body')) {
+        if (is_object($response) && property_exists($response, 'body')) {
             return json_decode($response->body, true);
         }
 
-        return [];
+        return $response;
     }
 
     /**
@@ -66,16 +76,18 @@ class DynamicsApi extends CrmApi
      *
      * @return mixed
      */
-    public function getLeadFields($object = 'contact')
+    public function getLeadFields($object = 'contacts')
     {
         if ('company' === $object) {
-            $object = 'account'; // Dynamics object name
+            $object = 'accounts'; // Dynamics object name
         }
 
-        $operation  = sprintf('EntityDefinitions(LogicalName=\'%s\')/Attributes', $object);
+        $logicalName = rtrim($object, 's'); // singularize object name
+
+        $operation  = sprintf('EntityDefinitions(LogicalName=\'%s\')/Attributes', $logicalName);
         $parameters = [
-            'filter'  => 'AttributeOf eq null', // ignore system fields
-            '$select' => 'RequiredLevel,LogicalName,AttributeType,DisplayName,IsValidForUpdate', // select only miningful columns
+            '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Boolean", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null', // ignore system fields
+            '$select' => 'RequiredLevel,LogicalName,DisplayName', // select only miningful columns
         ];
 
         return $this->request($operation, $parameters, 'GET', $object);
@@ -88,36 +100,30 @@ class DynamicsApi extends CrmApi
      *
      * @return array
      */
-    public function createLead($data, $lead, $object = 'contact')
+    public function createLead($data, $lead, $object = 'contacts')
     {
+        // TODO: use integration_entity and the OData-EntityId header to track entities
+        // OData-EntityId: https://clientname.crm.dynamics.com/api/data/v8.2/contacts(9844333b-c955-e711-80f1-c4346bad526c)
         return $this->request('', $data, 'POST', $object);
     }
 
     /**
-     * gets Zoho leads.
+     * gets leads.
      *
      * @param array  $params
      * @param string $object
      *
      * @return mixed
      */
-    public function getLeads(array $params, $object)
+    public function getLeads(array $params)
     {
-        if (!isset($params['selectColumns'])) {
-            $params['selectColumns'] = 'All';
-            $params['newFormat']     = 1;
-        }
-
-        $data = $this->request('getRecords', $params, 'GET', $object);
-        if (isset($data['response'], $data['response']['result'])) {
-            $data = $data['response']['result'];
-        }
+        $data = $this->request('', $params, 'GET', 'contacts');
 
         return $data;
     }
 
     /**
-     * gets Zoho companies.
+     * gets companies.
      *
      * @param array  $params
      * @param string $id
@@ -126,20 +132,11 @@ class DynamicsApi extends CrmApi
      */
     public function getCompanies(array $params, $id = null)
     {
-        if (!isset($params['selectColumns'])) {
-            $params['selectColumns'] = 'All';
-        }
-
         if ($id) {
-            $params['id'] = $id;
-
-            $data = $this->request('getRecordById', $params, 'GET', 'Accounts');
+            $operation = sprintf('accounts(%s)', $id);
+            $data      = $this->request($operation, $params, 'GET');
         } else {
-            $data = $this->request('getRecords', $params, 'GET', 'Accounts');
-        }
-
-        if (isset($data['response'], $data['response']['result'])) {
-            $data = $data['response']['result'];
+            $data = $this->request('', $params, 'GET', 'accounts');
         }
 
         return $data;

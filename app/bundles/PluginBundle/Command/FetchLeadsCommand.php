@@ -79,7 +79,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $endDate     = $input->getOption('end-date');
         $interval    = $input->getOption('time-interval');
         $limit       = $input->getOption('limit');
-        $leads       = $contacts       = $processed       = 0;
+        $leads       = $contacts       = $processed       = $companies       = 0;
 
         defined('MAUTIC_CONSOLE_VERBOSITY') or define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
 
@@ -111,39 +111,59 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     if (strtotime($startDate) > strtotime('-30 days')) {
-                        if (in_array('Lead', $config['objects'])) {
-                            $processed = intval($integrationObject->getLeads($params, null, $leads, [], 'Lead'));
-                        }
-                        if (in_array('Contact', $config['objects'])) {
-                            $processed += intval($integrationObject->getLeads($params, null, $contacts, [], 'Contact'));
-                        }
-
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
+
+                        $list = ['leads' => [], 'contacts' => []];
+                        foreach ($config['objects'] as $object) {
+                            foreach (array_keys($list) as $key) {
+                                if (strtolower($object) === $key || strtolower($object.'s') === $key) {
+                                    $processed += (int) $integrationObject->getLeads($params, null, $leads, $list[$object], $object);
+                                    if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                                        foreach ($list[$object] as $item) {
+                                            $output->writeln($object.': '.$item);
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
                     } else {
                         $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
                     }
                 }
-            }
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']) && in_array('company', $config['objects'])) {
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
+                if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']) && in_array('company', $config['objects'])) {
+                    $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
 
-                if (strtotime($startDate) > strtotime('-30 days')) {
-                    $processed = intval($integrationObject->getCompanies($params));
+                    if (strtotime($startDate) > strtotime('-30 days')) {
+                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
 
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
+                        $list      = [];
+                        $processed = (int) $integrationObject->getCompanies($params, null, $companies, $list);
 
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed]).'</comment>'."\n");
-                } else {
-                    $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            foreach ($list as $item) {
+                                $output->writeln('Company: '.$item);
+                            }
+                        }
+
+                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                    } else {
+                        $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                    }
                 }
             }
 
-            if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
+            if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures) && $integrationObject !== null && method_exists($integrationObject, 'pushLeads')) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
-                $result = $integrationObject->pushLeads($params);
+                $list   = [];
+                $result = $integrationObject->pushLeads($params, $list);
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    foreach ($list as $item) {
+                        $output->writeln('Lead: '.$item);
+                    }
+                }
                 if (3 === count($result)) {
                     list($updated, $created, $errored) = $result;
                 } else {
