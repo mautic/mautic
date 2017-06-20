@@ -62,7 +62,7 @@ class oAuthHelper
         //Get standard OAuth headers
         $headers = $this->getOauthHeaders();
 
-        if (!empty($this->settings['include_verifier']) && $this->request->query->has('oauth_verifier')) {
+        if (!empty($this->settings['include_verifier']) && $this->request && $this->request->query->has('oauth_verifier')) {
             $headers['oauth_verifier'] = $this->request->query->get('oauth_verifier');
         }
 
