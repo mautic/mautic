@@ -54,9 +54,8 @@ class FocusCampaignRepository extends CommonRepository
 
         return (!empty($result)) ? true : false;
     }
-    
+
     /**
-     * 
      * @return type
      */
     public function focusIdsInCampaign()
@@ -69,11 +68,12 @@ class FocusCampaignRepository extends CommonRepository
 
         return (!empty($result)) ? array_column($result, 'focusid') : false;
     }
-    
+
     /**
-     * 
      * @param type $focusid
      * @param type $leadid
+     *
+     * @return type
      */
     public function eventLogFromFocusLeads($focusid, $leadid)
     {
