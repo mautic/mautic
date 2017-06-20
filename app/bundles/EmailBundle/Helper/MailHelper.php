@@ -1374,13 +1374,13 @@ class MailHelper
                 }
             }
         } else {
-            // Validate if it is email string
-            if ($fieldType == 'email') {
-                if (filter_var($source, FILTER_VALIDATE_EMAIL)) {
-                    $validLeadField = $source;
-                }
-            } else {
-                $validLeadField = $source;
+            $validLeadField = $source;
+        }
+
+        // Validate if fieldType is 'email'
+        if ($fieldType == 'email') {
+            if (filter_var($validLeadField, FILTER_VALIDATE_EMAIL) === false) {
+                $validLeadField = null;
             }
         }
 
@@ -1409,20 +1409,28 @@ class MailHelper
         $this->setSubject($subject);
 
         // Add To_addresses
-        $toAddress = $this->getValidLeadField($email->getToAddress(), 'email');
+        $toAddress = $email->getToAddress();
         if (!empty($toAddress)) {
-            $addresses = array_fill_keys(array_map('trim', explode(',', $toAddress)), null);
-            foreach ($addresses as $toAddress => $name) {
-                $this->setTo($toAddress, $name);
+            $addresses = array_fill_keys(array_map('trim', preg_split('/[;,]/', $toAddress)), null);
+            $this->message->setTo([]);
+            $this->queuedRecipients = [];
+            foreach ($addresses as $address => $name) {
+                $toAddress = $this->getValidLeadField($address, 'email');
+                if (!empty($toAddress)) {
+                    $this->addTo($toAddress, $name);
+                }
             }
         }
 
         // Add CC_addresses
-        $ccAddress = $this->getValidLeadField($email->getCcAddress(), 'email');
+        $ccAddress = $email->getCcAddress();
         if (!empty($ccAddress)) {
-            $addresses = array_fill_keys(array_map('trim', explode(',', $ccAddress)), null);
+            $addresses = array_fill_keys(array_map('trim', preg_split('/[;,]/', $ccAddress)), null);
             foreach ($addresses as $ccAddress => $name) {
-                $this->addCc($ccAddress, $name);
+                $ccAddress = $this->getValidLeadField($ccAddress, 'email');
+                if (!empty($ccAddress)) {
+                    $this->addCc($ccAddress, $name);
+                }
             }
         }
 
@@ -1453,7 +1461,7 @@ class MailHelper
         if ($allowBcc) {
             $bccAddress = $email->getBccAddress();
             if (!empty($bccAddress)) {
-                $addresses = array_fill_keys(array_map('trim', explode(',', $bccAddress)), null);
+                $addresses = array_fill_keys(array_map('trim', preg_split('/[;,]/', $bccAddress)), null);
                 foreach ($addresses as $bccAddress => $name) {
                     $bccAddress = $this->getValidLeadField($bccAddress, 'email');
                     $this->addBcc($bccAddress, $name);

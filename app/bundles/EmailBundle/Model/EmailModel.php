@@ -1324,6 +1324,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                 $mailer->setSource($channel);
                 $emailConfigured = $mailer->setEmail($emailEntity, true, $useSettings['slots'], $assetAttachments);
+                $email           = $mailer->getEmail();
+                $toAddress       = $email->getToAddress();
+                $isToEmpty       = true;
+
+                // Check if to address is default value or customized
+                if (!empty($toAddress)) {
+                    $addresses = array_fill_keys(array_map('trim', preg_split('/[;,]/', $toAddress)), null);
+                    foreach ($addresses as $toAddress => $name) {
+                        $toAddress = $this->mailHelper->getValidLeadField($toAddress, 'email');
+                        if (!empty($toAddress)) {
+                            $isToEmpty = false;
+                            break;
+                        }
+                    }
+                }
 
                 if (!empty($customHeaders)) {
                     $mailer->setCustomHeaders($customHeaders);
@@ -1347,28 +1362,30 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $mailer->setLead($contact);
                     $mailer->setIdHash($idHash);
 
-                    try {
-                        if (!$mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
-                            // Clear the errors so it doesn't stop the next send
-                            $errorMessages[$contact['id']] = $mailer->getErrors();
+                    if ($isToEmpty == true) {
+                        try {
+                            if (!$mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
+                                // Clear the errors so it doesn't stop the next send
+                                $errorMessages[$contact['id']] = $mailer->getErrors();
 
-                            // Bad email so note and continue
-                            $errors[$contact['id']]    = $contact['email'];
-                            $badEmails[$contact['id']] = $contact['email'];
-                            continue;
-                        }
-                    } catch (BatchQueueMaxException $e) {
-                        // Queue full so flush then try again
-                        $flushQueue(false);
+                                // Bad email so note and continue
+                                $errors[$contact['id']]    = $contact['email'];
+                                $badEmails[$contact['id']] = $contact['email'];
+                                continue;
+                            }
+                        } catch (BatchQueueMaxException $e) {
+                            // Queue full so flush then try again
+                            $flushQueue(false);
 
-                        if (!$mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
-                            // Clear the errors so it doesn't stop the next send
-                            $errorMessages[$contact['id']] = $mailer->getErrors();
+                            if (!$mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
+                                // Clear the errors so it doesn't stop the next send
+                                $errorMessages[$contact['id']] = $mailer->getErrors();
 
-                            // Bad email so note and continue
-                            $errors[$contact['id']]    = $contact['email'];
-                            $badEmails[$contact['id']] = $contact['email'];
-                            continue;
+                                // Bad email so note and continue
+                                $errors[$contact['id']]    = $contact['email'];
+                                $badEmails[$contact['id']] = $contact['email'];
+                                continue;
+                            }
                         }
                     }
 
@@ -1491,7 +1508,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         //get email settings
         $emailSettings = &$this->getEmailSettings($email, false);
 
-        //noone to send to so bail
+        //none to send to so bail
         if (empty($users)) {
             return false;
         }
