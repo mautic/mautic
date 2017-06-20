@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Symfony\Component\Form\Form;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class DynamicsIntegration extends CrmAbstractIntegration
 {
@@ -160,6 +160,31 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param $url
+     * @param $parameters
+     * @param $method
+     * @param $settings
+     * @param $authType
+     *
+     * @return array
+     */
+    public function prepareRequest($url, $parameters, $method, $settings, $authType)
+    {
+        if ($authType == 'oauth2' && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
+
+            // Append the access token as the oauth-token header
+            $headers = [
+                'Content-Type: application/json',
+                "Authorization: Bearer {$this->keys['access_token']}",
+            ];
+
+            return [$parameters, $headers];
+        } else {
+            return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return bool
@@ -206,108 +231,17 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array      $params
-     * @param null|array $query
+     * @param $lead
+     * @param $config
      *
-     * @return int|null
+     * @return string
      */
-    public function getLeads($params = [], $query = null, &$executed = null, &$result = [], $object = 'contact')
+    public function populateLeadData($lead, $config = [])
     {
-        //        if ('Lead' === $object || 'Contact' === $object) {
-//            $object .= 's'; // pluralize object name for Zoho
-//        }
-//        $executed = 0;
-//        try {
-//            if ($this->isAuthorized()) {
-//                $config           = $this->mergeConfigToFeatureSettings();
-//                $fields           = $config['leadFields'];
-//                $config['object'] = $object;
-//                $aFields          = $this->getAvailableLeadFields($config);
-//                $mappedData       = [];
-//                foreach (array_keys($fields) as $k) {
-//                    if (isset($aFields[$object][$k])) {
-//                        $mappedData[] = $aFields[$object][$k]['dv'];
-//                    }
-//                }
-//                $fields                  = implode(',', $mappedData);
-//                $params['selectColumns'] = $object.'('.$fields.')';
-//                $params['toIndex']       = 200; // maximum number of records
-//                $data                    = $this->getApiHelper()->getLeads($params, $object);
-//                $result                  = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-//                $executed += count($result);
-//            }
-//        } catch (\Exception $e) {
-//            $this->logIntegrationError($e);
-//        }
+        $config['object'] = 'contact';
+        $mappedData       = parent::populateLeadData($lead, $config);
 
-//        return $executed;
-    }
-    /**
-     * @param array      $params
-     * @param null|array $query
-     *
-     * @return int|null
-     */
-    public function getCompanies($params = [], $query = null, &$executed = null, &$result = [])
-    {
-        //        $executed = 0;
-//        $object   = 'company';
-//        try {
-//            if ($this->isAuthorized()) {
-//                $config           = $this->mergeConfigToFeatureSettings();
-//                $fields           = $config['companyFields'];
-//                $config['object'] = $object;
-//                $aFields          = $this->getAvailableLeadFields($config);
-//                $mappedData       = [];
-//                if (isset($aFields['company'])) {
-//                    $aFields = $aFields['company'];
-//                }
-//                foreach (array_keys($fields) as $k) {
-//                    $mappedData[] = $aFields[$k]['dv'];
-//                }
-//                $fields                  = implode(',', $mappedData);
-//                $params['selectColumns'] = 'Accounts('.$fields.')';
-//                $params['toIndex']       = 200; // maximum number of records
-//                $data                    = $this->getApiHelper()->getCompanies($params);
-//                $result                  = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-//                $executed += count($result);
-
-//                return $executed;
-//            }
-//        } catch (\Exception $e) {
-//            $this->logIntegrationError($e);
-//        }
-
-//        return $executed;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param array $data
-     * @param array $config
-     * @param null  $object
-     *
-     * @return array
-     */
-    public function populateMauticLeadData($data, $config = [], $object = 'contact')
-    {
-        // Match that data with mapped lead fields
-//        $aFields       = $this->getAvailableLeadFields($config);
-//        $matchedFields = [];
-//        $fieldsName    = ('company' === $object) ? 'companyFields' : 'leadFields';
-//        if (isset($aFields[$object])) {
-//            $aFields = $aFields[$object];
-//        }
-//        foreach ($aFields as $k => $v) {
-//            foreach ($data as $dk => $dv) {
-//                if ($dk === $v['dv']) {
-//                    $matchedFields[$config[$fieldsName][$k]] = $dv;
-//                }
-//            }
-//        }
-
-//        return $matchedFields;
+        return $mappedData;
     }
 
     /**
@@ -366,17 +300,16 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         if (null === $leadObject || (isset($leadObject['response']) && isset($leadObject['response']['error']))) {
                             return [];
                         }
-                        $objKey = 'company' === $dynamicsObject ? 'account' : $dynamicsObject;
                         /** @var array $opts */
                         $fields = $leadObject['value'];
                         foreach ($fields as $field) {
                             if (!(bool) $field['IsValidForUpdate'] || in_array($field['AttributeType'], ['Virtual', 'Uniqueidentifier', 'Picklist', 'Lookup', 'Boolean', 'Owner', 'Customer'], true)) {
                                 continue;
                             }
-                            $dynamicsFields[$dynamicsObject][$field['SchemaName']] = [
+                            $dynamicsFields[$dynamicsObject][$field['LogicalName']] = [
                                 'type'     => 'string',
                                 'label'    => $field['DisplayName']['UserLocalizedLabel']['Label'],
-                                'dv'       => $field['SchemaName'],
+                                'dv'       => $field['LogicalName'],
                                 'required' => 'ApplicationRequired' === $field['RequiredLevel']['Value'],
                             ];
                         }

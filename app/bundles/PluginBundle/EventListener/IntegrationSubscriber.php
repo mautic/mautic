@@ -61,6 +61,7 @@ class IntegrationSubscriber extends CommonSubscriber
             $this->logger->alert('INTEGRATION REQUEST: '.$event->getMethod().' '.$event->getUrl());
             $this->logger->alert("REQUEST HEADERS: \n".$headers);
             $this->logger->alert("REQUEST PARAMS: \n".$params);
+            $this->logger->alert("REQUEST SETTINGS: \n".json_encode($event->getSettings(), JSON_PRETTY_PRINT));
         }
     }
 
