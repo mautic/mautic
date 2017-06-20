@@ -29,6 +29,15 @@ class MessengerIntegration extends AbstractIntegration
         return 'Messenger';
     }
 
+    /**
+     * @return string
+     */
+    public function getIcon()
+    {
+        return 'plugins//MauticMessengerBundle/Assets/img/facebook-messenger.svg';
+    }
+
+
 
     /**
      * @return array
@@ -74,19 +83,6 @@ class MessengerIntegration extends AbstractIntegration
             /* @var FormBuilder $builder */
 
             $builder->add(
-                'messenger_app_id',
-                TextType::class,
-                [
-                    'label' => 'mautic.integration.messenger.app.id',
-                    'required' => false,
-                    'attr' => [
-                        'tooltip' => 'mautic.integration.messenger.app.id.tooltip',
-                        'class' => 'form-control',
-                    ],
-                ]
-            );
-
-            $builder->add(
                 'messenger_callback_verify_token',
                 TextType::class,
                 [
@@ -112,6 +108,19 @@ class MessengerIntegration extends AbstractIntegration
                         'readonly' => 'readonly',
                     ],
                     'data' => $this->router->generate('messenger_callback', [], true),
+                ]
+            );
+
+            $builder->add(
+                'messenger_app_id',
+                TextType::class,
+                [
+                    'label' => 'mautic.integration.messenger.app.id',
+                    'required' => false,
+                    'attr' => [
+                        'tooltip' => 'mautic.integration.messenger.app.id.tooltip',
+                        'class' => 'form-control',
+                    ],
                 ]
             );
 
