@@ -44,14 +44,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getSecretKeys()
-    {
-        return ['client_secret', 'password'];
-    }
-
-    /**
      * Return array of key => label elements that will be converted to inputs to
      * obtain from the user.
      *
@@ -63,8 +55,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
             'resource'      => 'mautic.integration.dynamics.resource',
             'client_id'     => 'mautic.integration.dynamics.client_id',
             'client_secret' => 'mautic.integration.dynamics.client_secret',
-            'username'      => 'mautic.integration.dynamics.username',
-            'password'      => 'mautic.integration.dynamics.password',
         ];
     }
 
@@ -96,17 +86,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => false,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function sortFieldsAlphabetically()
@@ -115,11 +94,31 @@ class DynamicsIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * Get the array key for the auth token.
+     *
+     * @return string
+     */
+    public function getAuthTokenKey()
+    {
+        return 'access_token';
+    }
+
+    /**
+     * Get the keys for the refresh token and expiry.
+     *
+     * @return array
+     */
+    public function getRefreshTokenKeys()
+    {
+        return ['refresh_token', ''];
+    }
+
+    /**
      * @return string
      */
     public function getApiUrl()
     {
-        return 'https://login.microsoftonline.com/common';
+        return $this->keys['resource'];
     }
 
     /**
@@ -129,7 +128,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getAccessTokenUrl()
     {
-        return $this->getApiUrl().'/oauth2/token';
+        return 'https://login.microsoftonline.com/common/oauth2/token';
     }
 
     /**
@@ -137,74 +136,34 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return string
      */
+    public function getAuthenticationUrl()
+    {
+        return 'https://login.microsoftonline.com/common/oauth2/authorize';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAuthLoginUrl()
     {
-        return $this->router->generate('mautic_integration_auth_callback', ['integration' => $this->getName()]);
-    }
+        $url = parent::getAuthLoginUrl();
+        $url .= '&resource='.urlencode($this->keys['resource']);
 
-    /**
-     * Retrieves and stores tokens returned from oAuthLogin.
-     *
-     * @param array $settings
-     * @param array $parameters
-     *
-     * @return array
-     */
-    public function authCallback($settings = [], $parameters = [])
-    {
-        $settings = array_merge($settings, [
-            'grant_type'         => 'password',
-            'ignore_redirecturi' => true,
-        ]);
-        $parameters = array_merge($parameters, [
-            'username'      => $this->keys['username'],
-            'password'      => $this->keys['password'],
-            'client_id'     => $this->keys['client_id'],
-            'client_secret' => $this->keys['client_secret'],
-            'resource'      => $this->keys['resource'],
-        ]);
-
-        return parent::authCallback($settings, $parameters);
-    }
-
-    /**
-     * @param $url
-     * @param $parameters
-     * @param $method
-     * @param $settings
-     * @param $authType
-     *
-     * @return array
-     */
-    public function prepareRequest($url, $parameters, $method, $settings, $authType)
-    {
-        if ($authType == 'oauth2' && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
-
-            // Append the access token as the oauth-token header
-            $headers = [
-                'Content-Type: application/json',
-                "Authorization: Bearer {$this->keys['access_token']}",
-            ];
-
-            return [$parameters, $headers];
-        } else {
-            return parent::prepareRequest($url, $parameters, $method, $settings, $authType);
-        }
+        return $url;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @return bool
+     * @param bool $inAuthorization
      */
-    public function isAuthorized()
+    public function getBearerToken($inAuthorization = false)
     {
-        if ($this->isConfigured()) {
-            // Dynamics also uses password grant type so login each time to ensure session is valid
-            $this->authCallback();
+        if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
+            return $this->keys[$this->getAuthTokenKey()];
         }
 
-        return parent::isAuthorized();
+        return false;
     }
 
     /**

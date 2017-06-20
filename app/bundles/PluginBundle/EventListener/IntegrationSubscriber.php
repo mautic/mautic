@@ -112,7 +112,7 @@ class IntegrationSubscriber extends CommonSubscriber
             if ('' !== $headers) {
                 $this->logger->alert("RESPONSE HEADERS: \n".$headers.PHP_EOL);
             }
-            if ('' !== $json && '' !== $xml && '' !== $response->body) {
+            if ('' !== $json || '' !== $xml || '' !== $response->body) {
                 $this->logger->alert('RESPONSE BODY:');
                 if ($isJson) {
                     $this->logger->alert($json."\n");
