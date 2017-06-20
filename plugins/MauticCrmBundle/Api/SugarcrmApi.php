@@ -271,7 +271,7 @@ class SugarcrmApi extends CrmApi
                         $fields = $leadFields['contents'];
                         if ($leadFields['status'] != 200) {
                             $result = ['ko' => true,
-                                'error'         => $leadFields['error'].' '.$leadFields['error_message'], ];
+                                'error'     => $leadFields['error'].' '.$leadFields['error_message'], ];
                         } else {
                             $result = ['reference_id' => $all_ids[$k]['reference_id'],
                                     'id'              => $fields['id'],
@@ -331,12 +331,12 @@ class SugarcrmApi extends CrmApi
                     } else {
                         $rec[] = ['name' => 'lead_id_c', 'value' => $sugarId];
                     }
-                    $set_name_value_lists[]                     = $rec; //Sugar 6
-                    $s7_record                                  = [];
+                    $set_name_value_lists[] = $rec; //Sugar 6
+                    $s7_record              = [];
                     foreach ($rec as $r) {
                         $s7_record[$r['name']] = $r['value'];
                     }
-                    $s7_records[]                               = $s7_record;
+                    $s7_records[] = $s7_record;
                 }
             }
 
