@@ -332,19 +332,46 @@ class IntegrationEntityRepository extends CommonRepository
         if ($fromDate) {
             if ($toDate) {
                 $q->andWhere(
-                    $q->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                    $q->expr()->orX(
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('l.date_modified'),
+                            $q->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
+                        ),
+                        $q->expr()->andX(
+                            $q->expr()->isNull('l.date_modified'),
+                            $q->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                        )
+                    )
                 )
                     ->setParameter('dateFrom', $fromDate)
                     ->setParameter('dateTo', $toDate);
             } else {
                 $q->andWhere(
-                    $q->expr()->gte('l.date_added', ':dateFrom')
+                    $q->expr()->orX(
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('l.date_modified'),
+                            $q->expr()->gte('l.date_modified', ':dateFrom')
+                        ),
+                        $q->expr()->andX(
+                            $q->expr()->isNull('l.date_modified'),
+                            $q->expr()->gte('l.date_added', ':dateFrom')
+                        )
+                    )
                 )
                     ->setParameter('dateFrom', $fromDate);
             }
         } elseif ($toDate) {
             $q->andWhere(
-                $q->expr()->lte('l.date_added', ':dateTo')
+                $q->expr()->orX(
+                    $q->expr()->andX(
+                        $q->expr()->isNotNull('l.date_modified'),
+                        $q->expr()->lte('l.date_modified', ':dateTo')
+                    ),
+                    $q->expr()->andX(
+                        $q->expr()->isNull('l.date_modified'),
+                        $q->expr()->lte('l.date_added', ':dateTo')
+                    )
+                )
             )
                 ->setParameter('dateTo', $toDate);
         }

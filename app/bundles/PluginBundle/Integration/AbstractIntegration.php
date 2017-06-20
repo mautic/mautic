@@ -13,6 +13,7 @@ namespace Mautic\PluginBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
 use Joomla\Http\HttpFactory;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -2573,12 +2574,21 @@ abstract class AbstractIntegration
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        if (isset($params['start']) && $entity && !$ignoreEntityChanges) {
+        if (!$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
+            /** @var FormEntity $entity */
             $changes = $entity->getChanges(true);
-            if (isset($changes['dateModified'])) {
-                $originalDateModified = \DateTime::createFromFormat(\DateTime::ISO8601, $changes['dateModified'][0]);
-                $startSyncDate        = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
+            if (empty($changes) || isset($changes['dateModified'])) {
+                $startSyncDate = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
+                $entityDateModified = $entity->getDateModified();
+
+                if (isset($changes['dateModified'])) {
+                    $originalDateModified = \DateTime::createFromFormat(\DateTime::ISO8601, $changes['dateModified'][0]);
+                } elseif ($entityDateModified) {
+                    $originalDateModified = $entityDateModified;
+                } else {
+                    $originalDateModified = $entity->getDateAdded();
+                }
 
                 if ($originalDateModified >= $startSyncDate) {
                     // Return null so that the push sync catches

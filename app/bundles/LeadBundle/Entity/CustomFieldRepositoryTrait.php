@@ -298,6 +298,15 @@ trait CustomFieldRepositoryTrait
 
         //loop over results to put fields in something that can be assigned to the entities
         foreach ($values as $k => $r) {
+            switch ($fields[$k]['type']) {
+                case 'number':
+                    $r = (float) $r;
+                    break;
+                case 'boolean':
+                    $r = (int) $r;
+                    break;
+            }
+
             if (isset($fields[$k])) {
                 if ($byGroup) {
                     $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
