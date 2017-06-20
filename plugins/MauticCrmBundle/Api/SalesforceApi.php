@@ -108,11 +108,11 @@ class SalesforceApi extends CrmApi
      */
     public function getPerson(array $data)
     {
-        $config          = $this->integration->mergeConfigToFeatureSettings([]);
-        $queryUrl        = $this->integration->getQueryUrl();
+        $config    = $this->integration->mergeConfigToFeatureSettings([]);
+        $queryUrl  = $this->integration->getQueryUrl();
         $sfRecords = [
             'Contact' => [],
-            'Lead'    => []
+            'Lead'    => [],
         ];
 
         //try searching for lead as this has been changed before in updated done to the plugin

@@ -102,7 +102,7 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
-     * Create/edit entity then detach to preserve RAM
+     * Create/edit entity then detach to preserve RAM.
      *
      * @param      $entity
      * @param bool $unlock
