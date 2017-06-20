@@ -13,11 +13,8 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use GuzzleHttp\Client;
-use Spinen\ConnectWise\Api\Client as ConnectWiseClient;
-use Spinen\ConnectWise\Api\Token;
 use Spinen\ConnectWise\Models\Company\Company;
 use Spinen\ConnectWise\Models\Company\Contact;
-use Spinen\ConnectWise\Support\ModelResolver;
 
 /**
  * Class ConnectwiseIntegration.
@@ -51,8 +48,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'companyid' => 'mautic.connectwise.form.companyid',
-            'memberid'  => 'mautic.connectwise.form.memberid',
             'username'  => 'mautic.connectwise.form.integrator',
             'password'  => 'mautic.connectwise.form.privatekey',
             'site'      => 'mautic.connectwise.form.site',
@@ -77,16 +72,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     public function getCompanyIdKey()
     {
         return 'companyid';
-    }
-
-    /**
-     * Get the array key for member id.
-     *
-     * @return string
-     */
-    public function getMemberIdKey()
-    {
-        return 'memberid';
     }
 
     /**
@@ -132,6 +117,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return string
+     */
+    public function getApiUrl()
+    {
+        return sprintf('%s/v4_6_release/apis/3.0/', $this->keys['site']);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -150,53 +143,28 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'requires_authorization' => true,
         ];
     }
-
-    /**
-     * Get the API helper.
-     *
-     * @return ConnectWiseClient
-     */
-    public function getApiHelper()
-    {
-        static $client;
-        static $token;
-
-        if (empty($client)) {
-            $token    = new Token();
-            $guzzle   = new Client();
-            $resolver = new ModelResolver();
-            $client   = new ConnectWiseClient($token, $guzzle, $resolver);
-        }
-        $token
-            ->setCompanyId($this->keys[$this->getCompanyIdKey()])
-            ->setMemberId($this->keys[$this->getMemberIdKey()]);
-
-        $client->setIntegrator($this->keys[$this->getIntegrator()])
-        ->setPassword($this->keys[$this->getClientSecretKey()])
-        ->setUrl($this->keys[$this->getConnectwiseUrl()]);
-
-        return $client;
-    }
     /**
      * @return bool
      */
     public function authCallback($settings = [], $parameters = [])
     {
-        $client = $this->getApiHelper();
-
+        $url   = $this->getApiUrl();
+        $error = false;
         try {
-            $client
-                ->setIntegrator($this->keys[$this->getIntegrator()])
-                ->setPassword($this->keys[$this->getClientSecretKey()])
-                ->setUrl($this->keys[$this->getConnectwiseUrl()]);
+            $response = $this->makeRequest($url.'system/members/', $parameters, 'GET', $settings);
+
+            if (isset($response['message'])) {
+                $error = $response['message'];
+                $this->extractAuthKeys($response);
+            } else {
+                $data = ['username' => $this->keys['username'], 'password' => $this->keys['password']];
+                $this->extractAuthKeys($data, 'username');
+            }
         } catch (RequestException $e) {
             return $e->getMessage();
         }
-        if (empty($client->buildAuth()[1])) {
-            return 'error';
-        } else {
-            $this->extractAuthKeys(['username' => $this->keys[$this->getIntegrator()], 'password' => $this->keys[$this->getClientSecretKey()]], 'username');
-        }
+
+        return $error;
     }
 
     /**
@@ -246,13 +214,15 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
+        $cwFields = [];
         if (isset($settings['feature_settings']['objects'])) {
             $cwObjects = $settings['feature_settings']['objects'];
         } else {
             $cwObjects[] = 'contact';
         }
-
-        $client = $this->getApiHelper();
+        if (!$this->isAuthorized()) {
+            return [];
+        }
 
         switch ($cwObjects) {
             case isset($cwObjects['contact']):
