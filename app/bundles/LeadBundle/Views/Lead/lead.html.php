@@ -21,6 +21,22 @@ $leadName       = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryI
 $leadActualName = $lead->getName();
 $leadCompany    = $lead->getCompany();
 
+$ipDetails          = $lead->getIpAddresses()->getValues();
+$organizations      = [];
+$isps               = [];
+foreach($ipDetails as $ip){
+    $ip_values = $ip->getIpDetails();
+    if(!empty($ip_values['organization'])) {
+        array_push($organizations, $ip_values['organization']);
+    }
+    if(!empty($ip_values['isp'])) {
+        array_push($isps, $ip_values['isp']);
+    }
+}
+
+$leadOrganization   = implode(', ', $organizations);
+$leadIsp            = implode(', ', $isps);
+
 $view['slots']->set('mauticContent', 'lead');
 
 $avatar = '';
@@ -211,6 +227,8 @@ $view['slots']->set(
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
+                                        <tr><td><span class="fw-b">Organization</span></td><td><?php echo $leadOrganization; ?></td></tr>
+                                        <tr><td><span class="fw-b">ISP</span></td><td><?php echo $leadIsp; ?></td></tr>
                                         </tbody>
                                     </table>
                                 </div>
