@@ -46,7 +46,7 @@ class ExceptionController extends CommonController
                 strpos($request->getUri(), '/api') !== false ||
                 (!defined('MAUTIC_AJAX_VIEW') && strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json') !== false)
             ) {
-                $message = ('dev' === MAUTIC_ENV) ? $exception->getMessage() : $this->get('translator')->trans('mautic.core.error.generic', ['%code%' => $code]);
+                $message   = ('dev' === MAUTIC_ENV) ? $exception->getMessage() : $this->get('translator')->trans('mautic.core.error.generic', ['%code%' => $code]);
                 $dataArray = [
                     'errors' => [
                         [

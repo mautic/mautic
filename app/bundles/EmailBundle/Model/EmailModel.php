@@ -1214,8 +1214,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $statEntities    = [];
         $statBatchCount  = 0;
         $emailSentCounts = [];
-        $badEmails     = [];
-        $errorMessages = [];
+        $badEmails       = [];
+        $errorMessages   = [];
 
         // Setup the mailer
         $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
@@ -1232,14 +1232,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     if (!empty($sendFailures['failures'])) {
                         $failures = $sendFailures;
                         unset($sendFailures['failures']);
-                        $error = implode("; ", $sendFailures);
+                        $error = implode('; ', $sendFailures);
 
                         // Prevent the stat from saving
                         foreach ($failures as $failedEmail) {
                             /** @var Stat $stat */
                             $stat = $statEntities[$failedEmail];
                             // Add lead ID to list of failures
-                            $errors[$stat->getLead()->getId()] = $failedEmail;
+                            $errors[$stat->getLead()->getId()]        = $failedEmail;
                             $errorMessages[$stat->getLead()->getId()] = $error;
                             // Down sent counts
                             $emailId = $stat->getEmail()->getId();
@@ -1251,7 +1251,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                             unset($statEntities[$failedEmail], $saveEntities[$failedEmail]);
                         }
                     } elseif ($singleEmail) {
-                        $error                       = implode("; ", $sendFailures);
+                        $error                       = implode('; ', $sendFailures);
                         $errorMessages[$singleEmail] = $error;
                     }
                 }

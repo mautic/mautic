@@ -22,7 +22,7 @@ class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
         $q     = $this
@@ -276,7 +276,7 @@ class LeadEventLogRepository extends CommonRepository
                     ];
                 }
 
-                $key = (int) $l['non_action_path_taken'] ? 0 : 1;
+                $key                          = (int) $l['non_action_path_taken'] ? 0 : 1;
                 $return[$l['event_id']][$key] = (int) $l['lead_count'];
             } else {
                 $return[$l['event_id']] = (int) $l['lead_count'];

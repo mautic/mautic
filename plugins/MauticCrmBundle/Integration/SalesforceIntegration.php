@@ -179,7 +179,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getBearerToken($inAuthorization = false)
     {
-        if (!$inAuthorization) {
+        if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
             return $this->keys[$this->getAuthTokenKey()];
         }
 

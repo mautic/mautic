@@ -131,8 +131,16 @@ return [
         ],
         'other' => [
             'mautic.helper.integration' => [
-                'class'     => 'Mautic\PluginBundle\Helper\IntegrationHelper',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,
+                'arguments' => [
+                    'kernel',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.paths',
+                    'mautic.helper.bundle',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.templating',
+                    'mautic.plugin.model.plugin',
+                ],
             ],
         ],
         'models' => [
