@@ -37,7 +37,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return ['push_lead', 'pull_lead'];
+        return ['push_lead', 'pull_lead', 'get_leads'];
     }
 
     /**
@@ -196,7 +196,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        return $this->getFormFieldsByObject('company', $settings);
+        return $this->getFormFieldsByObject('Company', $settings);
     }
 
     /**
@@ -206,7 +206,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        return $this->getFormFieldsByObject('contact', $settings);
+        return $this->getFormFieldsByObject('Contact', $settings);
     }
 
     /**
@@ -218,20 +218,21 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if (isset($settings['feature_settings']['objects'])) {
             $cwObjects = $settings['feature_settings']['objects'];
         } else {
-            $cwObjects[] = 'contact';
+            $cwObjects[] = 'Contact';
         }
         if (!$this->isAuthorized()) {
             return [];
         }
 
         switch ($cwObjects) {
-            case isset($cwObjects['contact']):
+            case isset($cwObjects['
+            Contact']):
                 $contactFields       = $this->getContactFields();
-                $cwFields['contact'] = $this->setFields($contactFields);
+                $cwFields['Contact'] = $this->setFields($contactFields);
                 break;
-            case isset($cwObjects['company']):
+            case isset($cwObjects['Company']):
                 $company             = $this->getCompanyFields();
-                $cwFields['company'] = $this->setFields($company);
+                $cwFields['Company'] = $this->setFields($company);
                 break;
         }
 
@@ -266,8 +267,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'contact' => 'mautic.connectwise.object.contact',
-                        'company' => 'mautic.connectwise.object.company',
+                        'Contact' => 'mautic.connectwise.object.contact',
+                        'Company' => 'mautic.connectwise.object.company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -280,6 +281,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @return array of company fields for connectwise
+     */
     public function getCompanyFields()
     {
         return [
@@ -324,6 +328,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         ];
     }
 
+    /**
+     * @return array of contact fields for connectwise
+     */
     public function getContactFields()
     {
         return [
@@ -360,7 +367,100 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'twitterUrl'             => ['type' => 'string', 'required' => false],
             'linkedInUrl'            => ['type' => 'string', 'required' => false],
             'defaultBillingFlag'     => ['type' => 'boolean', 'required' => false],
-            //todo 'communicationItems' => [ 'type' => 'array', 'required' => false ]
+            'communicationItems'     => ['type' => 'array', 'required' => false,
+                'items'                         => ['name' => ['type' => 'name'], 'value' => 'value'],
+            ],
         ];
+    }
+
+    /**
+     * Get Contacts from connectwise.
+     *
+     * @param array $params
+     * @param null  $query
+     */
+    public function getLeads($params = [], $query = null)
+    {
+        $executed = null;
+
+        try {
+            if ($this->isAuthorized()) {
+                $config = $this->mergeConfigToFeatureSettings();
+                $fields = $config['leadFields'];
+
+                $data = $this->getApiHelper()->getContacts($params);
+
+                if (!empty($data)) {
+                    foreach ($data as $contact) {
+                        if (is_array($contact)) {
+                            $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Contacts');
+                            $contact     = $this->getMauticLead($contactData);
+                            if ($contact) {
+                                ++$executed;
+                            }
+                        }
+                    }
+                    if ($data['has-more']) {
+                        $params['vidOffset']  = $data['vid-offset'];
+                        $params['timeOffset'] = $data['time-offset'];
+                        $this->getLeads($params);
+                    }
+                }
+
+                return $executed;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return $executed;
+    }
+
+    /**
+     * Ammend mapped lead data before creating to Mautic.
+     *
+     * @param $data
+     * @param $object
+     */
+    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    {
+        if (empty($data)) {
+            return [];
+        }
+        $contactFields = $this->getContactFields();
+
+        foreach ($data as $key => $field) {
+            if (isset($contactFields[$key])) {
+                $name = $key;
+                if ($contactFields[$key]['type'] == 'array') {
+                    $items = $contactFields[$key]['items'];
+                    foreach ($field as $item) {
+                        if (is_array($item[key($items['name'])])) {
+                            foreach ($item[key($items['name'])] as $nameKey => $nameField) {
+                                print_r($nameKey);
+                                print_r(array_values($items['name']));
+                                if ($nameKey == $items['name']) {
+                                    $name = $nameField;
+                                }
+                            }
+                        }
+                        $fieldsValues[$name] = $item[$items['value']];
+                    }
+                } else {
+                    $fieldsValues[$name] = $field;
+                }
+            }
+        }
+
+        print_r($fieldsValues);
+        if ($object == 'Contacts' && !isset($fieldsValues['email'])) {
+            foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
+                if ($identifiedProfile['type'] == 'EMAIL') {
+                    $fieldsValues['email'] = $identifiedProfile['value'];
+                }
+            }
+        }
+
+        return $fieldsValues;
     }
 }

@@ -105,6 +105,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $params['start'] = $startDate;
             $params['end']   = $endDate;
             $params['limit'] = $limit;
+
             if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');

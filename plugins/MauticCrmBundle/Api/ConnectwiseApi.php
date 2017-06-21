@@ -60,7 +60,7 @@ class ConnectwiseApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getLeads()
+    public function getContacts()
     {
         return $this->request('company/contacts');
     }
