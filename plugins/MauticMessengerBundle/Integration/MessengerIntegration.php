@@ -100,10 +100,10 @@ class MessengerIntegration extends AbstractIntegration
                 'messenger_callback_verify_url',
                 TextType::class,
                 [
-                    'label' => 'mautic.integration.messenger.url.token',
+                    'label' => 'mautic.integration.messenger.callback.url',
                     'required' => false,
                     'attr' => [
-                        'tooltip' => 'mautic.integration.messenger.verify.url.tooltip',
+                        'tooltip' => 'autic.integration.messenger.callback.url.tooltip',
                         'class' => 'form-control',
                         'readonly' => 'readonly',
                     ],

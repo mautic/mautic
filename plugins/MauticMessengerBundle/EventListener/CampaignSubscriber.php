@@ -11,7 +11,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use MauticPlugin\MauticSocialBundle\Entity\Lead;
+use MauticPlugin\MauticMessengerBundle\MessengerEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Doctrine\DBAL\Connection;
@@ -89,7 +89,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-//            MessengerEvents::MESSENGER_ON_SEND => array('onCampaignTriggerDecision', 0),
+            MessengerEvents::MESSENGER_ON_SEND => array('onCampaignTriggerAction', 0),
 
         ];
     }
@@ -105,13 +105,13 @@ class CampaignSubscriber extends CommonSubscriber
     {
 
         $action = [
-            'label' => 'plugin.messenger.send_messange',
+            'label' => 'plugin.messenger.send_to_messanger',
             'eventName' => MessengerEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType' => 'messengerevent_send_message',
+            'formType' => 'messengerevent_send_to_messenger',
             'channel' => 'messenger',
             'channelIdField' => 'id',
         ];
-        $event->addAction('messanger.send_message', $action);
+        $event->addAction('messanger.send_to_messanger', $action);
 
     }
 

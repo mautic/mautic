@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use MauticPlugin\MauticMessengerBundle\Helper\MessengerHelper;
 
 class MessengerController extends FormController
 {
@@ -38,27 +39,20 @@ class MessengerController extends FormController
 
     }
 
-
     public function checkboxAction()
     {
-        $integration = $this->get('mautic.helper.integration')->getIntegrationObject('Messenger');
-
-        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
-            return;
-        }
-
-        $settings        = $integration->getIntegrationSettings();
-        $featureSettings = $settings->getFeatureSettings();
-
-        $content = '';
-        $html = $this->get('mautic.helper.templating')->getTemplating()->render(
-            'MauticMessengerBundle:Plugin:checkbox_plugin.html.php',
-            [
-                'lead' => $this->getModel('lead')->getCurrentLead(),
-                'featureSettings'=>$featureSettings
-            ]
-        );
-die($html);
-        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($html);
+        $content = $this->get('mautic.plugin.helper.messenger')->getTemplateContent();
+        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($content);
     }
+
+    public function checkboxJsAction()
+    {
+        $content = $this->get('mautic.plugin.helper.messenger')->getTemplateContent(
+            'MauticMessengerBundle:Plugin:checkbox_plugin_js.html.php'
+        );
+        return empty($content) ? new Response('', Response::HTTP_NO_CONTENT) : new Response($content);
+
+    }
+
+
 }

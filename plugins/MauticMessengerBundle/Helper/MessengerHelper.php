@@ -15,9 +15,18 @@ use Mautic\CoreBundle\Exception as MauticException;
 use Joomla\Http\Http;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use  Mautic\CoreBundle\Helper\TemplatingHelper;
 
 class MessengerHelper
 {
+
+    /**
+     * @var array
+     */
+    protected static $cache = [];
+
     /**
      * @var Http $connector ;
      */
@@ -33,15 +42,36 @@ class MessengerHelper
      */
     protected $coreParameterHelper;
 
+    /**
+     * @var LeadModel $leadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var TemplatingHelper $templateHelper
+     */
+    protected $templateHelper;
+
+    /**
+     * @var IntegrationHelper $integrationHelper
+     */
+    protected $integrationHelper;
+
 
     public function __construct(
         Http $connector,
         RequestStack $request,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        LeadModel $leadModel,
+        IntegrationHelper $integrationHelper,
+        TemplatingHelper $templatingHelper
     ) {
         $this->connector = $connector;
         $this->request = $request->getCurrentRequest();
         $this->coreParameterHelper = $coreParametersHelper;
+        $this->leadModel = $leadModel;
+        $this->integrationHelper = $integrationHelper;
+        $this->templateHelper = $templatingHelper;
     }
 
     public function subscribeApp()
@@ -54,7 +84,7 @@ class MessengerHelper
                 [],
                 10
             );
-            if($data->success == true){
+            if ($data->success == true) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -64,5 +94,34 @@ class MessengerHelper
         return false;
     }
 
+    public function getTemplateContent($template = 'MauticMessengerBundle:Plugin:checkbox_plugin.html.php')
+    {
+        $integration = $this->integrationHelper->getIntegrationObject('Messenger');
+
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+        $settings = $integration->getIntegrationSettings();
+        $featureSettings = $settings->getFeatureSettings();
+
+        return $this->templateHelper->getTemplating()->render(
+            $template,
+            [
+                'userRef' => $this->getUserRef(),
+                'featureSettings' => $featureSettings,
+            ]
+        );
+    }
+
+    private function getUserRef()
+    {
+        if (!isset(self::$cache['userRef'])) {
+            $lead = $this->leadModel->getCurrentLead();
+            $userRef = $lead->getId().time().mt_rand();
+            self::$cache['userRef'] = $userRef;
+        }
+
+        return self::$cache['userRef'];
+    }
 
 }
