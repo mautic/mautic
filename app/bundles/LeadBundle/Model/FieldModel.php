@@ -383,16 +383,20 @@ class FieldModel extends FormModel
         if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
             $schemaDefinition = self::getSchemaDefinition($alias, $type, $isUnique);
             $leadsSchema->addColumn(
-                    $schemaDefinition
-                );
+                $schemaDefinition
+            );
 
             try {
                 $leadsSchema->executeChanges();
                 $isCreated = true;
             } catch (DriverException $e) {
                 $this->logger->addWarning($e->getMessage());
-                $isCreated = false;
-                throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
+                if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
+                    $isCreated = false;
+                    throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
+                } else {
+                    throw $e;
+                }
             }
 
             if ($isCreated === true) {
@@ -423,7 +427,11 @@ class FieldModel extends FormModel
                     }
                     $modifySchema->executeChanges();
                 } catch (DriverException $e) {
-                    $this->logger->addWarning($e->getMessage());
+                    if ($e->getErrorCode() === 1069 /* ER_TOO_MANY_KEYS */) {
+                        $this->logger->addWarning($e->getMessage());
+                    } else {
+                        throw $e;
+                    }
                 }
             }
         }
