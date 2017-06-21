@@ -50,9 +50,13 @@ class ConnectwiseApi extends CrmApi
         }
     }
 
-    public function getCompanies()
+    public function getCompanies($params)
     {
-        return $this->request('company/companies');
+        $lastUpdated = [];
+       // if (isset($params['start'])) {
+        //   $lastUpdated = ['conditions' => 'lastUpdated > ['. $params['start'] .']'];
+        //}
+        return $this->request('company/companies', $lastUpdated);
     }
 
     /**
@@ -60,8 +64,13 @@ class ConnectwiseApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function getContacts()
+    public function getContacts($params)
     {
-        return $this->request('company/contacts');
+        $lastUpdated = [];
+        if (isset($params['start'])) {
+            $lastUpdated = ['conditions' => 'lastUpdated > ['.$params['start'].']'];
+        }
+
+        return $this->request('company/contacts', $lastUpdated);
     }
 }

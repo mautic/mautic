@@ -12,7 +12,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use GuzzleHttp\Client;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Spinen\ConnectWise\Models\Company\Company;
 use Spinen\ConnectWise\Models\Company\Contact;
 
@@ -382,27 +383,49 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getLeads($params = [], $query = null)
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact')
     {
-        $executed = null;
+        return $this->getRecords($params, $object);
+    }
 
+    /**
+     * Get Companies from connectwise.
+     *
+     * @param array $params
+     * @param null  $query
+     */
+    public function getCompanies($params = [], $query = null, $executed = null)
+    {
+        return $this->getRecords($params, 'company');
+    }
+
+    public function getRecords($params, $object)
+    {
+        //todo data priority
+        $executed            = null;
+        $integrationEntities = [];
         try {
             if ($this->isAuthorized()) {
-                $config = $this->mergeConfigToFeatureSettings();
-                $fields = $config['leadFields'];
-
-                $data = $this->getApiHelper()->getContacts($params);
-
+                $data                  = ($object == 'Contact') ? $this->getApiHelper()->getContacts($params) : $this->getApiHelper()->getCompanies($params);
+                $mauticReferenceObject = ($object == 'Contact') ? 'lead' : 'company';
                 if (!empty($data)) {
-                    foreach ($data as $contact) {
-                        if (is_array($contact)) {
-                            $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Contacts');
-                            $contact     = $this->getMauticLead($contactData);
-                            if ($contact) {
+                    foreach ($data as $record) {
+                        if (is_array($record)) {
+                            $id            = $record['id'];
+                            $formattedData = $this->amendLeadDataBeforeMauticPopulate($record, $object);
+                            $entity        = ($object == 'Contact') ? $this->getMauticLead($formattedData) : $this->getMauticCompany($formattedData);
+                            if ($entity) {
+                                $integrationEntities[] = $this->saveSyncedData($entity, $object, $mauticReferenceObject, $id);
+                                $this->em->detach($entity);
+                                unset($entity);
                                 ++$executed;
                             }
                         }
                     }
+                }
+                if ($integrationEntities) {
+                    $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+                    $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
                 }
 
                 return $executed;
@@ -413,7 +436,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         return $executed;
     }
-
     /**
      * Ammend mapped lead data before creating to Mautic.
      *
@@ -427,13 +449,17 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if (empty($data)) {
             return $fieldsValues;
         }
-        $contactFields = $this->getContactFields();
+        if ($object == 'Contact') {
+            $fields = $this->getContactFields();
+        } else {
+            $fields = $this->getCompanyFields();
+        }
 
         foreach ($data as $key => $field) {
-            if (isset($contactFields[$key])) {
+            if (isset($fields[$key])) {
                 $name = $key;
-                if ($contactFields[$key]['type'] == 'array') {
-                    $items = $contactFields[$key]['items'];
+                if ($fields[$key]['type'] == 'array') {
+                    $items = $fields[$key]['items'];
                     foreach ($field as $item) {
                         if (is_array($item[key($items['name'])])) {
                             foreach ($item[key($items['name'])] as $nameKey => $nameField) {
@@ -444,8 +470,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         }
                         $fieldsValues[$name] = $item[$items['value']];
                     }
-                } elseif ($contactFields[$key]['type'] == 'ref') {
-                    $fieldsValues[$name] = $field[$contactFields[$key]['value']];
+                } elseif ($fields[$key]['type'] == 'ref') {
+                    $fieldsValues[$name] = $field[$fields[$key]['value']];
                 } else {
                     $fieldsValues[$name] = $field;
                 }
@@ -453,5 +479,133 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         return $fieldsValues;
+    }
+
+    public function saveSyncedData($entity, $object, $mauticObjectReference, $id)
+    {
+        $integrationEntity = null;
+
+        /** @var IntegrationEntityRepository $integrationEntityRepo */
+        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationId         = $integrationEntityRepo->getIntegrationsEntityId(
+            $this->getName(),
+            $object,
+            $mauticObjectReference,
+            $entity->getId()
+        );
+
+        if ($integrationId == null) {
+            $integrationEntity = new IntegrationEntity();
+            $integrationEntity->setDateAdded(new \DateTime());
+            $integrationEntity->setIntegration($this->getName());
+            $integrationEntity->setIntegrationEntity($object);
+            $integrationEntity->setIntegrationEntityId($id);
+            $integrationEntity->setInternalEntity($mauticObjectReference);
+            $integrationEntity->setInternalEntityId($entity->getId());
+            $integrationEntities[] = $integrationEntity;
+        } else {
+            $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
+            $integrationEntity->setLastSyncDate(new \DateTime());
+            $integrationEntities[] = $integrationEntity;
+        }
+
+        return $integrationEntity;
+    }
+
+    /**
+     * @param \Mautic\LeadBundle\Entity\Lead $lead
+     * @param array                          $config
+     *
+     * @return array|bool
+     */
+    public function pushLead($lead, $config = [])
+    {
+        $config = $this->mergeConfigToFeatureSettings($config);
+
+        if (empty($config['leadFields'])) {
+            return [];
+        }
+
+        $object = 'Contact';
+
+        $leadFields = $this->getContactFields();
+
+        $fieldsToUpdateInCW  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $leadFields          = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
+        $mappedData[$object] = $this->populateLeadData(
+            $lead,
+            ['leadFields' => $leadFields, 'object' => $object, 'feature_settings' => ['objects' => $config['objects']]]
+        );
+
+        if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
+            $contactFields         = $this->getContactFields();
+            $mappedData['Contact'] = $this->populateLeadData(
+                $lead,
+                ['leadFields' => $contactFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']]]
+            );
+            $this->amendLeadDataBeforePush($mappedData['Contact']);
+        }
+        if (empty($mappedData)) {
+            return false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Match lead data with integration fields.
+     *
+     * @param $lead
+     * @param $config
+     *
+     * @return array
+     */
+    public function populateLeadData($lead, $config = [])
+    {
+        if ($lead instanceof Lead) {
+            $fields = $lead->getFields(true);
+            $leadId = $lead->getId();
+        } else {
+            $fields = $lead;
+            $leadId = $lead['id'];
+        }
+
+        $leadFields      = $config['leadFields'];
+        $availableFields = $this->getAvailableLeadFields($config);
+
+        $unknown = $this->translator->trans('mautic.integration.form.lead.unknown');
+        $matched = [];
+
+        foreach ($availableFields as $key => $field) {
+            $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
+            if (is_array($integrationKey)) {
+                list($integrationKey, $matchIntegrationKey) = $integrationKey;
+            }
+
+            if (isset($leadFields[$integrationKey])) {
+                if ($leadFields[$integrationKey] == 'mauticContactTimelineLink') {
+                    $this->pushContactLink  = true;
+                    $mauticContactLinkField = $integrationKey;
+                    continue;
+                }
+                $mauticKey = $leadFields[$integrationKey];
+                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
+                    $matched[$matchIntegrationKey] = $this->cleanPushData($fields[$mauticKey]['value']);
+                }
+            }
+
+            if (!empty($field['required']) && empty($matched[$matchIntegrationKey])) {
+                $matched[$matchIntegrationKey] = $unknown;
+            }
+        }
+        if ($this->pushContactLink) {
+            $matched[$mauticContactLinkField] = $this->router->generate(
+                'mautic_plugin_timeline_view',
+                ['integration' => $this->getName(), 'leadId' => $leadId],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+        }
+        //todo finish here
+        return $matched;
     }
 }
