@@ -11,9 +11,16 @@
 $defaultInputClass = $containerType = 'freehtml';
 include __DIR__.'/field_helper.php';
 
+if ($inBuilder) {
+    $htmlContent = $view['content']->showScriptTags($properties['text']);
+} else {
+    $htmlContent = $properties['text'];
+}
+// $e = new \Exception;
+// var_dump($e->getTraceAsString());die;
 $label = (!$field['showLabel']) ? '' :
     <<<HTML
-    
+
                 <h3 $labelAttr>
                     {$field['label']}
                 </h3>
@@ -23,7 +30,7 @@ $html = <<<HTML
 
             <div $containerAttr>{$label}
                 <div $inputAttr>
-                    {$properties['text']}
+                    {$htmlContent}
                 </div>
             </div>
 
