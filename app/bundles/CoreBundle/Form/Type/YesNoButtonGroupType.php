@@ -55,7 +55,7 @@ class YesNoButtonGroupType extends AbstractType
                         return null;
                     }
 
-                    return (int) $choiceKey;
+                    return $choiceKey;
                 },
                 'expanded'    => true,
                 'multiple'    => false,
