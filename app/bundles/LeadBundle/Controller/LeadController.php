@@ -184,7 +184,7 @@ class LeadController extends FormController
                     'currentList'      => $list,
                     'security'         => $this->get('mautic.security'),
                     'inSingleList'     => $inSingleList,
-                    'noContactList'    => $emailRepo->getDoNotEmailList(array_keys($leads)),
+                    'noContactList'    => $emailRepo->getDoNotEmailList(),
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
                 ],
