@@ -196,7 +196,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        return $this->getFormFieldsByObject('Company', $settings);
+        return $this->getFormFieldsByObject('company', $settings);
     }
 
     /**
@@ -223,16 +223,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if (!$this->isAuthorized()) {
             return [];
         }
-
         switch ($cwObjects) {
-            case isset($cwObjects['
-            Contact']):
+            case isset($cwObjects['Contact']):
                 $contactFields       = $this->getContactFields();
                 $cwFields['Contact'] = $this->setFields($contactFields);
                 break;
-            case isset($cwObjects['Company']):
+            case isset($cwObjects['company']):
                 $company             = $this->getCompanyFields();
-                $cwFields['Company'] = $this->setFields($company);
+                $cwFields['company'] = $this->setFields($company);
                 break;
         }
 
@@ -244,11 +242,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $cwFields = [];
 
         foreach ($fields as $fieldName => $field) {
-            $cwFields[$fieldName] = [
-                'type'     => $field['type'],
-                'label'    => $fieldName,
-                'required' => $field['required'],
-            ];
+            if ($field['type'] == 'string' || $field['type'] == 'boolean') {
+                $cwFields[$fieldName] = [
+                    'type'     => $field['type'],
+                    'label'    => ucfirst($fieldName),
+                    'required' => $field['required'],
+                ];
+            }
         }
 
         return $cwFields;
@@ -268,7 +268,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 [
                     'choices' => [
                         'Contact' => 'mautic.connectwise.object.contact',
-                        'Company' => 'mautic.connectwise.object.company',
+                        'company' => 'mautic.connectwise.object.company',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -337,7 +337,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'firstName'              => ['type' => 'string', 'required' => true],
             'lastName'               => ['type' => 'string', 'required' => false],
             'type'                   => ['type' => 'string', 'required' => false],
-            'company'                => ['type' => 'string', 'required' => false],
+            'company'                => ['type' => 'ref', 'required' => false, 'value' => 'name'],
             'addressLine1'           => ['type' => 'string', 'required' => false],
             'addressLine2'           => ['type' => 'string', 'required' => false],
             'city'                   => ['type' => 'string', 'required' => false],
@@ -370,6 +370,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'communicationItems'     => ['type' => 'array', 'required' => false,
                 'items'                         => ['name' => ['type' => 'name'], 'value' => 'value'],
             ],
+            'Direct' => ['type' => 'string', 'required' => false],
+            'Cell'   => ['type' => 'string', 'required' => false],
+            'Email'  => ['type' => 'string', 'required' => true],
         ];
     }
 
@@ -400,11 +403,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                             }
                         }
                     }
-                    if ($data['has-more']) {
-                        $params['vidOffset']  = $data['vid-offset'];
-                        $params['timeOffset'] = $data['time-offset'];
-                        $this->getLeads($params);
-                    }
                 }
 
                 return $executed;
@@ -424,8 +422,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
+        $fieldsValues = [];
+
         if (empty($data)) {
-            return [];
+            return $fieldsValues;
         }
         $contactFields = $this->getContactFields();
 
@@ -437,26 +437,17 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     foreach ($field as $item) {
                         if (is_array($item[key($items['name'])])) {
                             foreach ($item[key($items['name'])] as $nameKey => $nameField) {
-                                print_r($nameKey);
-                                print_r(array_values($items['name']));
-                                if ($nameKey == $items['name']) {
+                                if ($nameKey == $items['name'][key($items['name'])]) {
                                     $name = $nameField;
                                 }
                             }
                         }
                         $fieldsValues[$name] = $item[$items['value']];
                     }
+                } elseif ($contactFields[$key]['type'] == 'ref') {
+                    $fieldsValues[$name] = $field[$contactFields[$key]['value']];
                 } else {
                     $fieldsValues[$name] = $field;
-                }
-            }
-        }
-
-        print_r($fieldsValues);
-        if ($object == 'Contacts' && !isset($fieldsValues['email'])) {
-            foreach ($data['identity-profiles'][0]['identities'] as $identifiedProfile) {
-                if ($identifiedProfile['type'] == 'EMAIL') {
-                    $fieldsValues['email'] = $identifiedProfile['value'];
                 }
             }
         }
