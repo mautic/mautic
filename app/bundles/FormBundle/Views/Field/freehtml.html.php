@@ -16,8 +16,7 @@ if ($inBuilder) {
 } else {
     $htmlContent = $properties['text'];
 }
-// $e = new \Exception;
-// var_dump($e->getTraceAsString());die;
+
 $label = (!$field['showLabel']) ? '' :
     <<<HTML
 
