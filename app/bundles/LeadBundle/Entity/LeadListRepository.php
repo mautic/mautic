@@ -1394,8 +1394,15 @@ class LeadListRepository extends CommonRepository
                             if ($details['type'] == 'multiselect') {
                                 foreach ($details['filter'] as $filter) {
                                     $filter = trim($filter, "'");
+
+                                    if (substr($func, 0, 3) === 'not') {
+                                        $operator = 'NOT REGEXP';
+                                    } else {
+                                        $operator = 'REGEXP';
+                                    }
+
                                     $groupExpr->add(
-                                        $field." REGEXP '\\\\|?$filter\\\\|?'"
+                                        $field." $operator '\\\\|?$filter\\\\|?'"
                                     );
                                 }
                             } else {
