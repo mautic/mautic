@@ -116,7 +116,7 @@ class CoreSubscriber extends CommonSubscriber
      */
     public function onKernelRequestAddGlobalJS(FilterControllerEvent $event)
     {
-        if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest || !$event->isMasterRequest()) {
+        if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMasterRequest()) {
             return;
         }
 
