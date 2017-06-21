@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -387,10 +389,10 @@ class FieldModel extends FormModel
             try {
                 $leadsSchema->executeChanges();
                 $isCreated = true;
-            } catch (\Exception $e) {
+            } catch (DriverException $e) {
                 $this->logger->addWarning($e->getMessage());
                 $isCreated = false;
-                throw new \ErrorException($this->translator->trans('mautic.core.error.max.field'));
+                throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
             }
 
             if ($isCreated === true) {
@@ -420,7 +422,7 @@ class FieldModel extends FormModel
                         $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
                     }
                     $modifySchema->executeChanges();
-                } catch (\Exception $e) {
+                } catch (DriverException $e) {
                     $this->logger->addWarning($e->getMessage());
                 }
             }
