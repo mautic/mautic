@@ -31,16 +31,19 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     const OPERATORS = [
         'default' => [
-            'eq'       => 'mautic.core.operator.equals',
-            'gt'       => 'mautic.core.operator.greaterthan',
-            'gte'      => 'mautic.core.operator.greaterthanequals',
-            'lt'       => 'mautic.core.operator.lessthan',
-            'lte'      => 'mautic.core.operator.lessthanequals',
-            'neq'      => 'mautic.core.operator.notequals',
-            'like'     => 'mautic.core.operator.islike',
-            'notLike'  => 'mautic.core.operator.isnotlike',
-            'empty'    => 'mautic.core.operator.isempty',
-            'notEmpty' => 'mautic.core.operator.isnotempty',
+            'eq'         => 'mautic.core.operator.equals',
+            'gt'         => 'mautic.core.operator.greaterthan',
+            'gte'        => 'mautic.core.operator.greaterthanequals',
+            'lt'         => 'mautic.core.operator.lessthan',
+            'lte'        => 'mautic.core.operator.lessthanequals',
+            'neq'        => 'mautic.core.operator.notequals',
+            'like'       => 'mautic.core.operator.islike',
+            'notLike'    => 'mautic.core.operator.isnotlike',
+            'empty'      => 'mautic.core.operator.isempty',
+            'notEmpty'   => 'mautic.core.operator.isnotempty',
+            'contains'   => 'mautic.core.operator.contains',
+            'startsWith' => 'mautic.core.operator.starts.with',
+            'endsWith'   => 'mautic.core.operator.ends.with',
         ],
         'bool' => [
             'eq'  => 'mautic.core.operator.equals',
@@ -63,12 +66,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
             'neq' => 'mautic.core.operator.notequals',
         ],
         'text' => [
-            'eq'       => 'mautic.core.operator.equals',
-            'neq'      => 'mautic.core.operator.notequals',
-            'empty'    => 'mautic.core.operator.isempty',
-            'notEmpty' => 'mautic.core.operator.isnotempty',
-            'like'     => 'mautic.core.operator.islike',
-            'notLike'  => 'mautic.core.operator.isnotlike',
+            'eq'         => 'mautic.core.operator.equals',
+            'neq'        => 'mautic.core.operator.notequals',
+            'empty'      => 'mautic.core.operator.isempty',
+            'notEmpty'   => 'mautic.core.operator.isnotempty',
+            'like'       => 'mautic.core.operator.islike',
+            'notLike'    => 'mautic.core.operator.isnotlike',
+            'contains'   => 'mautic.core.operator.contains',
+            'startsWith' => 'mautic.core.operator.starts.with',
+            'endsWith'   => 'mautic.core.operator.ends.with',
         ],
     ];
 
@@ -394,6 +400,25 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'int':
                             case 'integer':
                                 $columnValue = (int) $filter['value'];
+                                break;
+
+                            case 'string':
+                                switch ($exprFunction) {
+                                    case 'startsWith':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = $filter['value'].'%';
+                                        break;
+                                    case 'endsWith':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = '%'.$filter['value'];
+                                        break;
+                                    case 'contains':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = '%'.$filter['value'].'%';
+                                        break;
+                                }
+
+                                $queryBuilder->setParameter($paramName, $filter['value']);
                                 break;
 
                             default:

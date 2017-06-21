@@ -905,7 +905,18 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'source':
                 case 'url_title':
-                    $operand = in_array($func, ['eq', 'like', 'regexp', 'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
+                    $operand = in_array(
+                        $func,
+                        [
+                            'eq',
+                            'like',
+                            'regexp',
+                            'notRegexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
+                        ]
+                    ) ? 'EXISTS' : 'NOT EXISTS';
 
                     $column = $details['field'];
                     if ($column == 'hit_url') {
@@ -926,16 +937,6 @@ class LeadListRepository extends CommonRepository
                                 )
                             );
                             break;
-                        case 'like':
-                        case '!like':
-                            $parameters[$parameter] = '%'.$details['filter'].'%';
-                        $subqb->where(
-                                $q->expr()->andX(
-                                    $q->expr()->like($alias.'.'.$column, $exprParameter),
-                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
-                                )
-                            );
-                            break;
                         case 'regexp':
                         case 'notRegexp':
                             $parameters[$parameter] = $details['filter'];
@@ -947,6 +948,36 @@ class LeadListRepository extends CommonRepository
                                 )
                             );
                             break;
+                        case 'like':
+                        case '!like':
+                        case 'startsWith':
+                        case 'endsWith':
+                        case 'contains':
+                            $subqbFunc        = $func === '!like' ? 'notLike' : 'like';
+                            $ignoreAutoFilter = true;
+
+                            switch ($func) {
+                                case 'like':
+                                case '!like':
+                                case 'contains':
+                                    $parameters[$parameter] = '%'.$details['filter'].'%';
+                                    break;
+                                case 'startsWith':
+                                    $parameters[$parameter] = $details['filter'].'%';
+                                    break;
+                                case 'endsWith':
+                                    $parameters[$parameter] = '%'.$details['filter'];
+                                    break;
+                            }
+
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->$subqbFunc($alias.'.'.$column, $exprParameter),
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                )
+                            );
+                            break;
+
                     }
                     // Specific lead
                     if (!empty($leadId)) {
@@ -1420,6 +1451,27 @@ class LeadListRepository extends CommonRepository
                             $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                             $groupExpr->add(
                                 $field.$not.' REGEXP '.$exprParameter
+                            );
+                            break;
+                        case 'startsWith':
+                            $parameters[$parameter] = $details['filter'].'%';
+
+                            $groupExpr->add(
+                                $this->generateFilterExpression($q, $field, 'like', $exprParameter, null)
+                            );
+                            break;
+                        case 'endsWith':
+                            $parameters[$parameter] = '%'.$details['filter'];
+
+                            $groupExpr->add(
+                                $this->generateFilterExpression($q, $field, 'like', $exprParameter, null)
+                            );
+                            break;
+                        case 'contains':
+                            $parameters[$parameter] = '%'.$details['filter'].'%';
+
+                            $groupExpr->add(
+                                $this->generateFilterExpression($q, $field, 'like', $exprParameter, null)
                             );
                             break;
                         default:
