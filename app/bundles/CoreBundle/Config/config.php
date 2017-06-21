@@ -841,6 +841,14 @@ return [
             'display_name' => 'IP2Location Local Bin File',
             'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationBinLookup',
         ],
+        'ip2locationlocaldb7bin' => [
+            'display_name' => 'IP2Location Local Bin File (DB7BIN)',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationBinLookupDB7',
+        ],
+        'ip2locationlocaldb4bin' => [
+            'display_name' => 'IP2Location Local Bin File (DB4BIN)',
+            'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationBinLookupDB4',
+        ],
         'ip2loctionapi' => [
             'display_name' => 'IP2Location Web Service',
             'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationAPILookup',
