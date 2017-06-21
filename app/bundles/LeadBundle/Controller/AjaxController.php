@@ -550,7 +550,7 @@ class AjaxController extends CommonAjaxController
                     "MauticLeadBundle:Lead:{$template}.html.php",
                     [
                         'items'         => $results['results'],
-                        'noContactList' => $emailRepo->getDoNotEmailList(array_keys($results['results'])),
+                        'noContactList' => $emailRepo->getDoNotEmailList(),
                         'permissions'   => $permissions,
                         'security'      => $this->get('mautic.security'),
                         'highlight'     => true,
