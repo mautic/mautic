@@ -50,7 +50,7 @@ class IP2LocationBinLookupDB7 extends AbstractLocalDataLookup
             $data['productcode'] = 'DB7BIN';
             $queryString         = http_build_query($data);
             // the system gets the file name from end of remove file path url so use hardedcoded name
-            $queryString .= '&filename=/ip2location.zip';
+            $queryString .= '&filename=/ip2locaion.zip';
 
             return 'https://www.ip2location.com/download?'.$queryString;
         } else {
@@ -71,12 +71,8 @@ class IP2LocationBinLookupDB7 extends AbstractLocalDataLookup
                 $this->country      = $record['countryName'];
                 $this->region       = $record['regionName'];
                 $this->city         = $record['cityName'];
-                $this->latitude     = $record['latitude'];
-                $this->longitude    = $record['longitude'];
-                $this->zipcode      = $record['zipCode'];
                 $this->isp          = $record['isp'];
-                $this->timezone     = $record['timeZone'];
-                $this->organization = $record['domain'];
+                $this->organization = $record['domainName'];
             }
         } catch (\Exception $exception) {
             if ($this->logger) {
