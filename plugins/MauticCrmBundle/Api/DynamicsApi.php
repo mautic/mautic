@@ -51,7 +51,7 @@ class DynamicsApi extends CrmApi
             'curl_options'      => [
                 CURLOPT_CONNECTTIMEOUT_MS => 0,
                 CURLOPT_CONNECTTIMEOUT    => 0,
-                CURLOPT_TIMEOUT           => 30,
+                CURLOPT_TIMEOUT           => 0,
             ],
         ]);
 
@@ -62,7 +62,7 @@ class DynamicsApi extends CrmApi
             throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response));
         }
 
-        if (is_object($response) && property_exists($response, 'body')) {
+        if ('GET' === $method && is_object($response) && property_exists($response, 'body')) {
             return json_decode($response->body, true);
         }
 
@@ -98,20 +98,29 @@ class DynamicsApi extends CrmApi
      * @param Lead $lead
      * @param $object
      *
-     * @return array
+     * @return Response
      */
     public function createLead($data, $lead, $object = 'contacts')
     {
-        // TODO: use integration_entity and the OData-EntityId header to track entities
-        // OData-EntityId: https://clientname.crm.dynamics.com/api/data/v8.2/contacts(9844333b-c955-e711-80f1-c4346bad526c)
         return $this->request('', $data, 'POST', $object);
+    }
+
+    /**
+     * @param $data
+     * @param $objectId
+     *
+     * @return Response
+     */
+    public function updateLead($data, $objectId)
+    {
+        $settings['headers']['If-Match'] = '*'; // prevent create new contact
+        return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', $settings);
     }
 
     /**
      * gets leads.
      *
-     * @param array  $params
-     * @param string $object
+     * @param array $params
      *
      * @return mixed
      */
