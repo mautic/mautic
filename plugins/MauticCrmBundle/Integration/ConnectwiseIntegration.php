@@ -578,8 +578,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if ($e instanceof ApiErrorException) {
                 $e->setContact($lead);
             }
-
-            $this->logIntegrationError($e);
         }
 
         return false;
