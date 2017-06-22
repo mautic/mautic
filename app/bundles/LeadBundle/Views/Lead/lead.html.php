@@ -17,9 +17,9 @@ $isAnonymous = $lead->isAnonymous();
 
 $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
 
-$leadName           = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
-$leadActualName     = $lead->getName();
-$leadCompany        = $lead->getCompany();
+$leadName       = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
+$leadActualName = $lead->getName();
+$leadCompany    = $lead->getCompany();
 
 $fields['core']['isp']['value'] = $lead->getIsp();
 $fields['core']['isp']['alias'] = 'ip-isp';
@@ -27,7 +27,6 @@ $fields['core']['isp']['label'] = $view['translator']->trans('mautic.lead.field.
 $fields['core']['organization']['value'] = $lead->getOrganization();
 $fields['core']['organization']['alias'] = 'ip-organization';
 $fields['core']['organization']['label'] = $view['translator']->trans('mautic.lead.field.ip-organization');
-
 
 $view['slots']->set('mauticContent', 'lead');
 
