@@ -100,7 +100,7 @@ class TagRepository extends CommonRepository
                         $q->expr()->eq('l.id', ':leadId')
                     )
                 )
-                ->setParameter('tags', $tags, 'array')
+                ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
                 ->setParameter('leadId', $lead->getId());
 
         return (bool) $q->execute()->fetchColumn();
