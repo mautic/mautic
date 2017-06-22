@@ -21,6 +21,11 @@ trait CustomFieldRepositoryTrait
     protected $useDistinctCount = false;
 
     /**
+     * @var array
+     */
+    protected $customFieldList = [];
+
+    /**
      * @param      $object
      * @param      $args
      * @param null $resultsCallback
@@ -127,7 +132,7 @@ trait CustomFieldRepositoryTrait
                 $q->orderBy('ORD', 'ASC');
 
                 $results = $q->getQuery()
-                             ->getResult();
+                    ->getResult();
 
                 //assign fields
                 foreach ($results as $r) {
@@ -159,8 +164,6 @@ trait CustomFieldRepositoryTrait
      */
     public function getFieldValues($id, $byGroup = true, $object = 'lead')
     {
-        list($fields, $fixedFields) = $this->getCustomFieldList($object);
-
         //use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();
 
@@ -173,37 +176,8 @@ trait CustomFieldRepositoryTrait
 
         $q->where($this->getTableAlias().'.id = '.(int) $id);
         $values = $q->execute()->fetch();
-        $this->removeNonFieldColumns($values, $fixedFields);
 
-        // Reorder leadValues based on field order
-        $values = array_merge(array_flip(array_keys($fields)), $values);
-
-        $fieldValues = [];
-
-        //loop over results to put fields in something that can be assigned to the entities
-        foreach ($values as $k => $r) {
-            if (isset($fields[$k])) {
-                if ($byGroup) {
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
-                } else {
-                    $fieldValues[$fields[$k]['alias']]          = $fields[$k];
-                    $fieldValues[$fields[$k]['alias']]['value'] = $r;
-                }
-            }
-        }
-
-        if ($byGroup) {
-            //make sure each group key is present
-            $groups = $this->getFieldGroups();
-            foreach ($groups as $g) {
-                if (!isset($fieldValues[$g])) {
-                    $fieldValues[$g] = [];
-                }
-            }
-        }
-
-        return $fieldValues;
+        return $this->formatFieldValues($values, $byGroup, $object);
     }
 
     /**
@@ -222,8 +196,8 @@ trait CustomFieldRepositoryTrait
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $col   = $this->getTableAlias().'.'.$field;
         $q     = $this->getEntityManager()->getConnection()->createQueryBuilder()
-                      ->select("DISTINCT $col")
-                      ->from($table, 'l');
+            ->select("DISTINCT $col")
+            ->from($table, 'l');
 
         $q->where(
             $q->expr()->andX(
@@ -234,14 +208,14 @@ trait CustomFieldRepositoryTrait
 
         if (!empty($search)) {
             $q->andWhere("$col LIKE :search")
-              ->setParameter('search', "{$search}%");
+                ->setParameter('search', "{$search}%");
         }
 
         $q->orderBy($col);
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
-              ->setMaxResults($limit);
+                ->setMaxResults($limit);
         }
 
         $results = $q->execute()->fetchAll();
@@ -309,33 +283,88 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
+     * @return array
+     */
+    protected function formatFieldValues($values, $byGroup = true, $object = 'lead')
+    {
+        list($fields, $fixedFields) = $this->getCustomFieldList($object);
+
+        $this->removeNonFieldColumns($values, $fixedFields);
+
+        // Reorder leadValues based on field order
+        $values = array_merge(array_flip(array_keys($fields)), $values);
+
+        $fieldValues = [];
+
+        //loop over results to put fields in something that can be assigned to the entities
+        foreach ($values as $k => $r) {
+            switch ($fields[$k]['type']) {
+                case 'number':
+                    $r = (float) $r;
+                    break;
+                case 'boolean':
+                    $r = (int) $r;
+                    break;
+            }
+
+            if (isset($fields[$k])) {
+                if ($byGroup) {
+                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
+                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
+                } else {
+                    $fieldValues[$fields[$k]['alias']]          = $fields[$k];
+                    $fieldValues[$fields[$k]['alias']]['value'] = $r;
+                }
+
+                unset($fields[$k]);
+            }
+        }
+
+        if ($byGroup) {
+            //make sure each group key is present
+            $groups = $this->getFieldGroups();
+            foreach ($groups as $g) {
+                if (!isset($fieldValues[$g])) {
+                    $fieldValues[$g] = [];
+                }
+            }
+        }
+
+        return $fieldValues;
+    }
+
+    /**
      * @param $object
      *
      * @return array [$fields, $fixedFields]
      */
     private function getCustomFieldList($object)
     {
-        //Get the list of custom fields
-        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed')
-           ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-           ->where('f.is_published = :published')
-           ->andWhere($fq->expr()->eq('object', ':object'))
-           ->setParameter('published', true, 'boolean')
-           ->setParameter('object', $object);
-        $results = $fq->execute()->fetchAll();
+        if (empty($this->customFieldList)) {
+            //Get the list of custom fields
+            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+                ->where('f.is_published = :published')
+                ->andWhere($fq->expr()->eq('object', ':object'))
+                ->setParameter('published', true, 'boolean')
+                ->setParameter('object', $object);
+            $results = $fq->execute()->fetchAll();
 
-        $fields      = [];
-        $fixedFields = [];
-        foreach ($results as $r) {
-            $fields[$r['alias']] = $r;
-            if ($r['is_fixed']) {
-                $fixedFields[$r['alias']] = $r['alias'];
+            $fields      = [];
+            $fixedFields = [];
+            foreach ($results as $r) {
+                $fields[$r['alias']] = $r;
+                if ($r['is_fixed']) {
+                    $fixedFields[$r['alias']] = $r['alias'];
+                }
             }
+
+            unset($results);
+
+            $this->customFieldList = [$fields, $fixedFields];
         }
 
-        unset($results);
-
-        return [$fields, $fixedFields];
+        return $this->customFieldList;
     }
 }

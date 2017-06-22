@@ -41,7 +41,7 @@ class ConnectwiseApi extends CrmApi
         } elseif (is_array($response) && !empty($response['errors'])) {
             $errors = [];
             foreach ($response['errors'] as $error) {
-                $errors[] = $error['error'];
+                $errors[] = $error['message'];
             }
 
             throw new ApiErrorException(implode(' ', $errors));
@@ -53,9 +53,10 @@ class ConnectwiseApi extends CrmApi
     public function getCompanies($params)
     {
         $lastUpdated = [];
-       // if (isset($params['start'])) {
-        //   $lastUpdated = ['conditions' => 'lastUpdated > ['. $params['start'] .']'];
-        //}
+        if (isset($params['start'])) {
+            $lastUpdated = ['conditions' => 'lastUpdated > ['.$params['start'].']'];
+        }
+
         return $this->request('company/companies', $lastUpdated);
     }
 
@@ -68,9 +69,32 @@ class ConnectwiseApi extends CrmApi
     {
         $lastUpdated = [];
         if (isset($params['start'])) {
-            $lastUpdated = ['conditions' => 'lastUpdated > ['.$params['start'].']'];
+            $conditions = ['conditions' => 'lastUpdated > ['.$params['start'].']'];
+        }
+        if (isset($params['Email'])) {
+            $conditions = ['childconditions' => 'communicationItems/value = "'.$params['Email'].'" AND communicationItems/communicationType="Email"'];
         }
 
-        return $this->request('company/contacts', $lastUpdated);
+        return $this->request('company/contacts', $conditions);
+    }
+
+    /**
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function createContact($params)
+    {
+        return $this->request('company/contacts', $params, 'POST');
+    }
+
+    /**
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function updateContact($params, $id)
+    {
+        return $this->request('company/contacts/'.$id, $params, 'PATCH');
     }
 }
