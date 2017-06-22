@@ -62,7 +62,7 @@ $indexCount = 1;
             if ($child->vars['name'] == 'label_'.$indexCount):
                 if ($isRequired):
                     $name = $child->vars['full_name'];
-                    echo '<input type="hidden" value="'.$child->vars['value'].'" name="'.$name.'" />';
+                    echo '<input type="hidden" value="'.$child->vars['attr']['data-label'].'" name="'.$name.'" />';
                 endif;
                 ?>
                 <div class="pl-xs pr-xs <?php echo $class; ?><?php if ($isRequired): echo ' has-error'; endif; ?>">
@@ -71,7 +71,7 @@ $indexCount = 1;
                                id="<?php echo $child->vars['id']; ?>"
                                name="<?php echo $child->vars['full_name']; ?>"
                                class="<?php echo $child->vars['attr']['class']; ?>"
-                               value="<?php echo $child->vars['value']; ?>"
+                               value="<?php echo $child->vars['attr']['data-label']; ?>"
                                readonly />
                     </div>
                 </div>
@@ -87,7 +87,6 @@ $indexCount = 1;
                                     <input type="radio"
                                            id="<?php echo $child->vars['id']; ?>_0"
                                            name="<?php echo $child->vars['full_name']; ?>"
-                                           data-toggle="tooltip"
                                            title=""
                                            autocomplete="false"
                                            value="0"
@@ -99,7 +98,6 @@ $indexCount = 1;
                                 <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
                                     <input type="radio" id="<?php echo $child->vars['id']; ?>_1"
                                            name="<?php echo $child->vars['full_name']; ?>"
-                                           data-toggle="tooltip"
                                            title=""
                                            autocomplete="false"
                                            value="1"

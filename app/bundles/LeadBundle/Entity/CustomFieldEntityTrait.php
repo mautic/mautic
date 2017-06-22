@@ -139,7 +139,7 @@ trait CustomFieldEntityTrait
             $value = implode('|', $value);
         }
 
-        if ($oldValue !== $value) {
+        if ($oldValue !== $value && !(('' === $oldValue && null === $value) || (null === $oldValue && '' === $value))) {
             $this->addChange('fields', [$alias => [$oldValue, $value]]);
             $this->updatedFields[$alias] = $value;
         }

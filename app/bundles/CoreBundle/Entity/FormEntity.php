@@ -243,6 +243,7 @@ class FormEntity extends CommonEntity
      */
     public function setDateModified($dateModified)
     {
+        $this->isChanged('dateModified', $dateModified);
         $this->dateModified = $dateModified;
 
         return $this;

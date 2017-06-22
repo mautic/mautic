@@ -27,8 +27,8 @@ class Version20170303000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        $table = $schema->getTable(MAUTIC_TABLE_PREFIX.'leads');
-        if ($table->hasIndex('date_added_country_index')) {
+        $table = $schema->getTable("{$this->prefix}leads");
+        if ($table->hasIndex("{$this->prefix}date_added_country_index")) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
