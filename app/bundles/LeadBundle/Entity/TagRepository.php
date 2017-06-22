@@ -96,10 +96,11 @@ class TagRepository extends CommonRepository
                 ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
                 ->where(
                     $q->expr()->andX(
-                        $q->expr()->in('t.tag', "'".implode("','", $tags)."'"),
+                        $q->expr()->in('t.tag', ':tags'),
                         $q->expr()->eq('l.id', ':leadId')
                     )
                 )
+                ->setParameter('tags', $tags, 'array')
                 ->setParameter('leadId', $lead->getId());
 
         return (bool) $q->execute()->fetchColumn();

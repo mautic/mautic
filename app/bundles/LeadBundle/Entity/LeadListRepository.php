@@ -226,11 +226,10 @@ class LeadListRepository extends CommonRepository
         $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'x', 'l.id = x.lead_id')
             ->where(
                 $q->expr()->andX(
-                    $q->expr()->in('x.leadlist_id', ':ids'),
+                    $q->expr()->in('x.leadlist_id', $ids),
                     $q->expr()->eq('l.id', ':leadId')
                 )
             )
-            ->setParameter('ids', implode(',', $ids))
             ->setParameter('leadId', $lead->getId());
 
         return  (bool) $q->execute()->fetchColumn();
