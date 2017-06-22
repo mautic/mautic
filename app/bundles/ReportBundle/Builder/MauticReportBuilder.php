@@ -213,23 +213,27 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build GROUP BY
         if ($groupByOptions = $this->entity->getGroupBy()) {
+            $groupByColumns = [];
+
             foreach ($groupByOptions as $groupBy) {
                 if (isset($options['columns'][$groupBy])) {
                     $fieldOptions = $options['columns'][$groupBy];
-                    $columns[]    = (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
+
+                    if (isset($fieldOptions['groupByFormula'])) {
+                        $groupByColumns[] = $fieldOptions['groupByFormula'];
+                    } elseif (isset($fieldOptions['formula'])) {
+                        $groupByColumns[] = $fieldOptions['formula'];
+                    } else {
+                        $groupByColumns[] = $groupBy;
+                    }
                 }
             }
-            $groupByColumns = implode(',', $columns);
+
             $queryBuilder->addGroupBy($groupByColumns);
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
-            if (is_array($options['groupby'])) {
-                foreach ($options['groupby'] as $groupBy) {
-                    $queryBuilder->addGroupBy($groupBy);
-                }
-            } else {
-                $queryBuilder->groupBy($options['groupby']);
-            }
+            $queryBuilder->addGroupBy($options['groupby']);
         }
+
         // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
@@ -249,36 +253,58 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Generate a count query in case a formula needs total number
         $countQuery = clone $queryBuilder;
         $countQuery->select('COUNT(*) as count');
-        $countSql = sprintf('(%s)', $countQuery->getSQL());
+
+        $countSql      = sprintf('(%s)', $countQuery->getSQL());
+        $selectColumns = [];
 
         // Build SELECT clause
-        if (!$selectColumns = $event->getSelectColumns()) {
-            $fields = $this->entity->getColumns();
+        if (!$selectOptions = $event->getSelectColumns()) {
+            $fields         = $this->entity->getColumns();
+            $groupByColumns = $queryBuilder->getQueryPart('groupBy');
+
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
                     $fieldOptions = $options['columns'][$field];
-                    $select       = '';
 
                     if (array_key_exists('channelData', $fieldOptions)) {
-                        $select .= $this->buildCaseSelect($fieldOptions['channelData']);
+                        $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
                     } else {
-                        $select .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $field;
+                        // If there is a group by, and this field has groupByFormula
+                        if (isset($groupByColumns) && isset($fieldOptions['groupByFormula'])) {
+                            $selectText = $fieldOptions['groupByFormula'];
+                        } elseif (isset($fieldOptions['formula'])) {
+                            $selectText = $fieldOptions['formula'];
+                        } else {
+                            $selectText = $field;
+                        }
                     }
 
-                    if (strpos($select, '{{count}}')) {
-                        $select = str_replace('{{count}}', $countSql, $select);
+                    /*
+                     * Make sure all group by fields are in the select as well,
+                     * to avoid MySQL 5.7.5 only_full_group_by error
+                     */
+                    if (!in_array($selectText, $groupByColumns)) {
+                        $queryBuilder->addGroupBy($selectText);
                     }
 
-                    if (isset($fieldOptions['alias'])) {
-                        $select .= ' AS '.$fieldOptions['alias'];
+                    if (!empty($selectText) && isset($fieldOptions['alias'])) {
+                        $selectText .= ' AS '.$fieldOptions['alias'];
                     }
 
-                    $selectColumns[] = $select;
+                    $selectColumns[] = $selectText;
                 }
             }
         }
 
-        $queryBuilder->addSelect(implode(', ', $selectColumns));
+        // Replace {{count}} with the count query
+        array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql) {
+            if (strpos($columnValue, '{{count}}')) {
+                $columnValue = str_replace('{{count}}', $countSql, $columnValue);
+            }
+        });
+
+        $queryBuilder->addSelect($selectColumns);
+
         // Add Aggregators
         $aggregators = $this->entity->getAggregators();
         if ($aggregators && $groupByOptions) {
