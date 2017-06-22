@@ -15,8 +15,8 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
-use Spinen\ConnectWise\Models\Company\Company;
-use Spinen\ConnectWise\Models\Company\Contact;
+use Mautic\PluginBundle\Exception\ApiErrorException;
+use Symfony\Component\Form\FormBuilder;
 
 /**
  * Class ConnectwiseIntegration.
@@ -162,7 +162,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $data = ['username' => $this->keys['username'], 'password' => $this->keys['password']];
                 $this->extractAuthKeys($data, 'username');
             }
-        } catch (RequestException $e) {
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
 
@@ -386,9 +386,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact')
+    public function getLeads($params = [])
     {
-        return $this->getRecords($params, $object);
+        return $this->getRecords($params, 'Contact');
     }
 
     /**
@@ -397,7 +397,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getCompanies($params = [], $query = null, $executed = null)
+    public function getCompanies(array $params = [])
     {
         return $this->getRecords($params, 'company');
     }
@@ -484,7 +484,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
-    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationId)
+    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId)
     {
         $integrationEntity = null;
 
@@ -502,7 +502,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $integrationEntity->setDateAdded(new \DateTime());
             $integrationEntity->setIntegration($this->getName());
             $integrationEntity->setIntegrationEntity($object);
-            $integrationEntity->setIntegrationEntityId($integrationId);
+            $integrationEntity->setIntegrationEntityId($integrationEntityId);
             $integrationEntity->setInternalEntity($mauticObjectReference);
             $integrationEntity->setInternalEntityId($entity->getId());
             $integrationEntities[] = $integrationEntity;
@@ -521,7 +521,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead(Lead $lead, $config = [])
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
@@ -618,11 +618,11 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
             if ($integrationKey == 'communicationItems') {
                 $communicationItems = [];
-                foreach ($field['items']['keys'] as $key => $item) {
+                foreach ($field['items']['keys'] as $keyItem => $item) {
                     if (isset($leadFields[$item])) {
                         $mauticKey = $leadFields[$item];
                         if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                            $communicationItems[] = ['type' => ['id' => $key + 1], 'value' => $this->cleanPushData($fields[$mauticKey]['value'])];
+                            $communicationItems[] = ['type' => ['id' => $keyItem + 1], 'value' => $this->cleanPushData($fields[$mauticKey]['value'])];
                         }
                     }
                 }
