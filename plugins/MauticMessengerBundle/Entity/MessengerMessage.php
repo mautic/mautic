@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\DynamicContentBundle\Entity;
+namespace MauticPlugin\MauticMessengerBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -23,14 +23,14 @@ use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
+class MessengerMessage extends FormEntity implements VariantEntityInterface, TranslationEntityInterface
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
 
     /**
      * @var int
-     */y
+     */
     private $id;
 
     /**
@@ -74,7 +74,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $stats;
 
     /**
-     * DynamicContent constructor.
+     * MessengerMessage constructor.
      */
     public function __construct()
     {
@@ -110,8 +110,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('dynamic_content')
-            ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\DynamicContentRepository');
+        $builder->setTable('messenger_message')
+            ->setCustomRepositoryClass('MauticPlugin\MauticMessengerBundle\Entity\MessengerMessageRepository');
 
         $builder->addIdColumns();
 
@@ -130,7 +130,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         $builder->createOneToMany('stats', 'Stat')
             ->setIndexBy('id')
-            ->mappedBy('dynamicContent')
+            ->mappedBy('messengerMessage')
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
@@ -152,7 +152,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('dwc')
+        $metadata->setGroupPrefix('messenger')
             ->addListProperties([
                 'id',
                 'name',

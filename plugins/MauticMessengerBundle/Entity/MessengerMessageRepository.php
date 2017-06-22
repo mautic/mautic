@@ -9,15 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\DynamicContentBundle\Entity;
+namespace MauticPlugin\MauticMessengerBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * DynamicContentRepository.
+ * MessengerMessageRepository.
  */
-class DynamicContentRepository extends CommonRepository
+class MessengerMessageRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
@@ -31,7 +31,7 @@ class DynamicContentRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from('MauticDynamicContentBundle:DynamicContent', 'e', 'e.id');
+            ->from('MauticMessengerBundle:MessengerMessage', 'e', 'e.id');
 
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');
@@ -138,7 +138,7 @@ class DynamicContentRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content')
+        $q->update(MAUTIC_TABLE_PREFIX.'messenger_message')
             ->set('sent_count', 'sent_count + '.(int) $increaseBy)
             ->where('id = '.(int) $id);
 
@@ -184,8 +184,8 @@ class DynamicContentRepository extends CommonRepository
         }
 
         if (!empty($ignoreIds)) {
-            $q->andWhere($q->expr()->notIn('e.id', ':dwc_ids'))
-                ->setParameter('dwc_ids', $ignoreIds);
+            $q->andWhere($q->expr()->notIn('e.id', ':messenger_ids'))
+                ->setParameter('messenger_ids', $ignoreIds);
         }
 
         $q->orderBy('e.name');
@@ -210,7 +210,7 @@ class DynamicContentRepository extends CommonRepository
         $qb->select('ce.properties')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'ce')
             ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = ce.campaign_id')
-            ->andWhere($qb->expr()->eq('ce.type', $qb->expr()->literal('dwc.decision')))
+            ->andWhere($qb->expr()->eq('ce.type', $qb->expr()->literal('messenger.decision')))
             ->andWhere($qb->expr()->like('ce.properties', ':slot'))
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
@@ -220,11 +220,11 @@ class DynamicContentRepository extends CommonRepository
         foreach ($result as $item) {
             $properties = unserialize($item['properties']);
 
-            if (isset($properties['dynamicContent'])) {
-                $dwc = $this->getEntity($properties['dynamicContent']);
+            if (isset($properties['messengerMessage'])) {
+                $messengerMessage = $this->getEntity($properties['messengerMessage']);
 
-                if ($dwc instanceof DynamicContent) {
-                    return $dwc;
+                if ($messengerMessage instanceof MessengerMessage) {
+                    return $messengerMessage;
                 }
             }
         }
