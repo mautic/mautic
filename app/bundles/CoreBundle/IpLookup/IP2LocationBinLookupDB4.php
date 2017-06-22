@@ -15,7 +15,6 @@ use IP2Location\Database;
 
 class IP2LocationBinLookupDB4 extends AbstractLocalDataLookup
 {
-
     /**
      * Return attribution HTML displayed in the configuration UI.
      *
