@@ -42,9 +42,8 @@ class LoadPageData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $factory = $this->container->get('mautic.factory');
-        $repo    = $factory->getModel('page.page')->getRepository();
-        $pages   = CsvHelper::csv_to_array(__DIR__.'/fakepagedata.csv');
+        $repo  = $this->container->get('mautic.page.model.page')->getRepository();
+        $pages = CsvHelper::csv_to_array(__DIR__.'/fakepagedata.csv');
         foreach ($pages as $count => $rows) {
             $page = new Page();
             $key  = $count + 1;

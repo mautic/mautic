@@ -35,8 +35,6 @@ class CampaignSubscriber extends CommonSubscriber
     public function __construct(MauticFactory $factory, CampaignEventHelper $helper)
     {
         $this->helper = $helper;
-
-        parent::__construct($factory);
     }
 
     /**

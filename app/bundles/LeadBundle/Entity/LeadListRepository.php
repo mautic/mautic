@@ -424,6 +424,7 @@ class LeadListRepository extends CommonRepository
                     $expr = $this->generateSegmentExpression($filters, $parameters, $sq, $q);
 
                     if ($this->hasCompanyFilter || $expr->count()) {
+                        $sq->andWhere($expr);
                         $mainExpr->add(
                             sprintf('l.id NOT IN (%s)', $sq->getSQL())
                         );
@@ -1390,9 +1391,25 @@ class LeadListRepository extends CommonRepository
                                     InputHelper::clean($value)
                                 );
                             }
-                            $groupExpr->add(
-                                $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
-                            );
+                            if ($details['type'] == 'multiselect') {
+                                foreach ($details['filter'] as $filter) {
+                                    $filter = trim($filter, "'");
+
+                                    if (substr($func, 0, 3) === 'not') {
+                                        $operator = 'NOT REGEXP';
+                                    } else {
+                                        $operator = 'REGEXP';
+                                    }
+
+                                    $groupExpr->add(
+                                        $field." $operator '\\\\|?$filter\\\\|?'"
+                                    );
+                                }
+                            } else {
+                                $groupExpr->add(
+                                    $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
+                                );
+                            }
                             $ignoreAutoFilter = true;
                             break;
 
@@ -1481,12 +1498,12 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -1499,12 +1516,12 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\DBAL\Query\QueryBuilder|\Doctrine\ORM\QueryBuilder $q
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
         if ($expr) {
