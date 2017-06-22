@@ -278,7 +278,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                      * Make sure all group by fields are in the select as well,
                      * to avoid MySQL 5.7.5 only_full_group_by error
                      */
-                    if (!in_array($selectText, $groupByColumns)) {
+                    if (!empty($groupByColumns) && !in_array($selectText, $groupByColumns)) {
                         $queryBuilder->addGroupBy($selectText);
                     }
 
