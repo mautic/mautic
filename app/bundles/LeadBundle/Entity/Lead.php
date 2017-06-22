@@ -773,7 +773,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         }
 
         return implode(', ', $organizations);
-
     }
 
     /**
