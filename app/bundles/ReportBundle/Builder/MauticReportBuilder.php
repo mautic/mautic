@@ -331,27 +331,36 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)
     {
-        $expr       = $queryBuilder->expr();
-        $filterExpr = $expr->andX();
+        $expr      = $queryBuilder->expr();
+        $groups    = [];
+        $groupExpr = $queryBuilder->expr()->andX();
 
         if (count($filters)) {
-            foreach ($filters as $filter) {
+            foreach ($filters as $i => $filter) {
                 $exprFunction = isset($filter['expr']) ? $filter['expr'] : $filter['condition'];
-                $paramName    = InputHelper::alphanum($filter['column']);
+                $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
+
+                if (array_key_exists('glue', $filter) && $filter['glue'] === 'or') {
+                    if ($groupExpr->count()) {
+                        $groups[]  = $groupExpr;
+                        $groupExpr = $queryBuilder->expr()->andX();
+                    }
+                }
+
                 switch ($exprFunction) {
                     case 'notEmpty':
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->isNotNull($filter['column'])
                         );
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->neq($filter['column'], $expr->literal(''))
                         );
                         break;
                     case 'empty':
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->isNull($filter['column'])
                         );
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->eq($filter['column'], $expr->literal(''))
                         );
                         break;
@@ -391,11 +400,30 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
 
-                    $filterExpr->add(
-                        $expr->{$exprFunction}($filter['column'], $columnValue)
-                    );
+                        $groupExpr->add(
+                            $expr->{$exprFunction}($filter['column'], $columnValue)
+                        );
                 }
             }
+        }
+
+        // Get the last of the filters
+        if ($groupExpr->count()) {
+            $groups[] = $groupExpr;
+        }
+
+        if (count($groups) === 1) {
+            // Only one andX expression
+            $filterExpr = $groups[0];
+        } elseif (count($groups) > 1) {
+            // Sets of expressions grouped by OR
+            $orX = $queryBuilder->expr()->orX();
+            $orX->addMultiple($groups);
+
+            // Wrap in a andX for other functions to append
+            $filterExpr = $queryBuilder->expr()->andX($orX);
+        } else {
+            $filterExpr = $groupExpr;
         }
 
         if ($filterExpr->count()) {

@@ -1391,9 +1391,25 @@ class LeadListRepository extends CommonRepository
                                     InputHelper::clean($value)
                                 );
                             }
-                            $groupExpr->add(
-                                $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
-                            );
+                            if ($details['type'] == 'multiselect') {
+                                foreach ($details['filter'] as $filter) {
+                                    $filter = trim($filter, "'");
+
+                                    if (substr($func, 0, 3) === 'not') {
+                                        $operator = 'NOT REGEXP';
+                                    } else {
+                                        $operator = 'REGEXP';
+                                    }
+
+                                    $groupExpr->add(
+                                        $field." $operator '\\\\|?$filter\\\\|?'"
+                                    );
+                                }
+                            } else {
+                                $groupExpr->add(
+                                    $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
+                                );
+                            }
                             $ignoreAutoFilter = true;
                             break;
 
