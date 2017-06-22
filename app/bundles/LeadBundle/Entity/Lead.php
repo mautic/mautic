@@ -758,6 +758,43 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
+     * @return string
+     */
+    public function getOrganization()
+    {
+        $ipDetails          = $this->getIpAddresses()->getValues();
+        $organizations      = [];
+
+        foreach($ipDetails as $ip){
+            $ip_values = $ip->getIpDetails();
+            if(!empty($ip_values['organization'])) {
+                array_push($organizations, $ip_values['organization']);
+            }
+        }
+
+        return implode(', ', $organizations);
+
+    }
+
+    /**
+     * @return string
+     */
+    public function getIsp()
+    {
+        $ipDetails  = $this->getIpAddresses()->getValues();
+        $isps       = [];
+
+        foreach($ipDetails as $ip) {
+            $ip_values = $ip->getIpDetails();
+            if (!empty($ip_values['isp'])) {
+                array_push($isps, $ip_values['isp']);
+            }
+        }
+
+        return implode(', ', $isps);
+    }
+
+    /**
      * @param int    $points
      * @param string $operator
      *

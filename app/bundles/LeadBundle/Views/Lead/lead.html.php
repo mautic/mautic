@@ -17,25 +17,11 @@ $isAnonymous = $lead->isAnonymous();
 
 $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
 
-$leadName       = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
-$leadActualName = $lead->getName();
-$leadCompany    = $lead->getCompany();
-
-$ipDetails          = $lead->getIpAddresses()->getValues();
-$organizations      = [];
-$isps               = [];
-foreach($ipDetails as $ip){
-    $ip_values = $ip->getIpDetails();
-    if(!empty($ip_values['organization'])) {
-        array_push($organizations, $ip_values['organization']);
-    }
-    if(!empty($ip_values['isp'])) {
-        array_push($isps, $ip_values['isp']);
-    }
-}
-
-$leadOrganization   = implode(', ', $organizations);
-$leadIsp            = implode(', ', $isps);
+$leadName           = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryIdentifier()) : $lead->getPrimaryIdentifier();
+$leadActualName     = $lead->getName();
+$leadCompany        = $lead->getCompany();
+$leadOrganization   = $lead->getOrganization();
+$leadIsp            = $lead->getIsp();
 
 $view['slots']->set('mauticContent', 'lead');
 
