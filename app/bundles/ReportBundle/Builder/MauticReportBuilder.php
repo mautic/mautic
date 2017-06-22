@@ -250,11 +250,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        // Generate a count query in case a formula needs total number
-        $countQuery = clone $queryBuilder;
-        $countQuery->select('COUNT(*) as count');
-
-        $countSql      = sprintf('(%s)', $countQuery->getSQL());
         $selectColumns = [];
 
         // Build SELECT clause
@@ -296,9 +291,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
+        // Generate a count query in case a formula needs total number
+        $countQuery = clone $queryBuilder;
+        $countQuery->select('COUNT(*) as count');
+
+        $countSql = sprintf('(%s)', $countQuery->getSQL());
+
         // Replace {{count}} with the count query
         array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql) {
-            if (strpos($columnValue, '{{count}}')) {
+            if (strpos($columnValue, '{{count}}') !== false) {
                 $columnValue = str_replace('{{count}}', $countSql, $columnValue);
             }
         });
