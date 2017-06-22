@@ -21,9 +21,9 @@ $leadName       = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryI
 $leadActualName = $lead->getName();
 $leadCompany    = $lead->getCompany();
 
-$fields['core']['isp']['value'] = $lead->getIsp();
-$fields['core']['isp']['alias'] = 'ip-isp';
-$fields['core']['isp']['label'] = $view['translator']->trans('mautic.lead.field.ip-isp');
+$fields['core']['isp']['value']          = $lead->getIsp();
+$fields['core']['isp']['alias']          = 'ip-isp';
+$fields['core']['isp']['label']          = $view['translator']->trans('mautic.lead.field.ip-isp');
 $fields['core']['organization']['value'] = $lead->getOrganization();
 $fields['core']['organization']['alias'] = 'ip-organization';
 $fields['core']['organization']['label'] = $view['translator']->trans('mautic.lead.field.ip-organization');
@@ -179,8 +179,8 @@ $view['slots']->set(
                     <?php foreach ($groups as $g): ?>
                         <?php if (!empty($fields[$g])): ?>
                             <li class="<?php if ($step === 0) {
-                                echo 'active';
-                            } ?>">
+    echo 'active';
+} ?>">
                                 <a href="#<?php echo $g; ?>" class="group" data-toggle="tab">
                                     <?php echo $view['translator']->trans('mautic.lead.field.group.'.$g); ?>
                                 </a>
@@ -448,8 +448,8 @@ $view['slots']->set(
                     <?php if (!empty($fields['core']['address2']['value'])) : echo $fields['core']['address2']['value']
                         .'<br>'; endif ?>
                     <?php echo $lead->getLocation(); ?> <?php if (isset($fields['core']['zipcode'])) {
-                        echo $fields['core']['zipcode']['value'];
-                    } ?><br>
+                            echo $fields['core']['zipcode']['value'];
+                        } ?><br>
                 </address>
 
                 <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.core.type.email'); ?></h6>

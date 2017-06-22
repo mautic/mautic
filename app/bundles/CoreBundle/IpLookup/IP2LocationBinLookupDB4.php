@@ -65,10 +65,10 @@ class IP2LocationBinLookupDB4 extends AbstractLocalDataLookup
             $record = $reader->lookup($this->ip, Database::ALL);
 
             if (isset($record['countryName'])) {
-                $this->country      = $record['countryName'];
-                $this->region       = $record['regionName'];
-                $this->city         = $record['cityName'];
-                $this->isp          = $record['isp'];
+                $this->country = $record['countryName'];
+                $this->region  = $record['regionName'];
+                $this->city    = $record['cityName'];
+                $this->isp     = $record['isp'];
             }
         } catch (\Exception $exception) {
             if ($this->logger) {
