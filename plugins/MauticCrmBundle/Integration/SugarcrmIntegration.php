@@ -1306,7 +1306,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             foreach ($sugarLead['entry_list'] as $k => $record) {
                 $sugarLeadRecord                = [];
                 $sugarLeadRecord['id']          = $record['id'];
-                $sugarLeadRecord['name_module'] = $record['name_module'];
+                $sugarLeadRecord['module_name'] = $record['module_name'];
                 foreach ($record['name_value_list'] as $item) {
                     $sugarLeadRecord[$item['name']] = $item['value'];
                 }
@@ -1456,6 +1456,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     protected function processCompositeResponse($response, array $sugarcrmIdMapping = [])
     {
         $created = 0;
+        $errored = 0;
         $updated = 0;
         $object  = 'Lead';
         if (is_array($response)) {
@@ -1490,6 +1491,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $integrationEntity->setInternalEntityId($contactId);
 
                         $persistEntities[] = $integrationEntity;
+                        ++$errored;
                     }
                 } elseif (!$item['ko']) {
                     if ($item['new']) {
@@ -1538,6 +1540,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
         }
 
-        return [$updated, $created];
+        return [$updated, $created, $errored];
     }
 }
