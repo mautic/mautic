@@ -1425,7 +1425,8 @@ class MailHelper
      * @param Email $email
      * @param $lead
      */
-    public function setCustomToAddress(Email $email, $lead) {
+    public function setCustomToAddress(Email $email, $lead)
+    {
         $this->customToAddress = [];
 
         $toAddress = $email->getToAddress();
@@ -1443,7 +1444,8 @@ class MailHelper
     /**
      * @return array $customToAddress
      */
-    public function getCustomToAddress() {
+    public function getCustomToAddress()
+    {
         return $this->customToAddress;
     }
 
@@ -1451,7 +1453,8 @@ class MailHelper
      * @param Email $email
      * @param $lead
      */
-    public function setCustomCcAddress(Email $email, $lead) {
+    public function setCustomCcAddress(Email $email, $lead)
+    {
         $this->customCcAddress = [];
 
         $ccAddress = $email->getCcAddress();
@@ -1470,7 +1473,8 @@ class MailHelper
     /**
      * @return array $customCcAddress
      */
-    public function getCustomCcAddress() {
+    public function getCustomCcAddress()
+    {
         return $this->customCcAddress;
     }
 
@@ -1478,7 +1482,8 @@ class MailHelper
      * @param Email $email
      * @param $lead
      */
-    public function setCustomFrom(Email $email, $lead) {
+    public function setCustomFrom(Email $email, $lead)
+    {
         $this->customFromName = null;
 
         $fromName  = $this->getValidLeadField($lead, $email->getFromName());
@@ -1500,14 +1505,16 @@ class MailHelper
     /**
      * @return string $customFromName
      */
-    public function getCustomFromName() {
+    public function getCustomFromName()
+    {
         return $this->customFromName;
     }
 
     /**
      * @return string $customFromAddress
      */
-    public function getCustomFromAddress() {
+    public function getCustomFromAddress()
+    {
         return $this->customFromAddress;
     }
 
@@ -1515,7 +1522,8 @@ class MailHelper
      * @param Email $email
      * @param $lead
      */
-    public function setCustomReplyTo(Email $email, $lead) {
+    public function setCustomReplyTo(Email $email, $lead)
+    {
         $this->customReplyTo = null;
 
         $replyTo = $this->getValidLeadField($lead, $email->getReplyToAddress(), 'email');
@@ -1528,7 +1536,8 @@ class MailHelper
     /**
      * @return string $customReplyTo
      */
-    public function getCustomReplyTo() {
+    public function getCustomReplyTo()
+    {
         return $this->customReplyTo;
     }
 
@@ -1536,7 +1545,8 @@ class MailHelper
      * @param Email $email
      * @param $lead
      */
-    public function setCustomBccAddress(Email $email, $lead) {
+    public function setCustomBccAddress(Email $email, $lead)
+    {
         $this->customBccAddress = [];
 
         $bccAddress = $email->getBccAddress();
@@ -1555,7 +1565,8 @@ class MailHelper
     /**
      * @return array $customBccAddress
      */
-    public function getCustomBccAddress() {
+    public function getCustomBccAddress()
+    {
         return $this->customBccAddress;
     }
 

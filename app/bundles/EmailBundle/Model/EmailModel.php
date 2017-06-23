@@ -1386,8 +1386,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                         }
                     }
 
-
-
                     //queue or send the message
                     list($queued, $queueErrors) = $mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
                     if (!$queued) {
