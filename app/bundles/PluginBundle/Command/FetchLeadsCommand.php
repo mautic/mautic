@@ -127,8 +127,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         }
                         $output->writeln('');
                     }
-                    if (in_array('Contact', $config['objects'])) {
-                        $results = $integrationObject->getLeads($params, null, $contactsExecuted, [], 'Contact');
+                    if (in_array('Contact', $config['objects']) || in_array('contacts', $config['objects'])) {
+                        $outContacts = [];
+                        $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $outContacts, 'Contact');
                         if (is_array($results)) {
                             list($justUpdated, $justCreated) = $results;
                             $updated += intval($justUpdated);
