@@ -959,7 +959,7 @@ class LeadListRepository extends CommonRepository
                         case 'contains':
                             switch ($func) {
                                 case 'like':
-                                case '!like':
+                                case 'notLike':
                                 case 'contains':
                                     $parameters[$parameter] = '%'.$details['filter'].'%';
                                     break;
@@ -1471,12 +1471,15 @@ class LeadListRepository extends CommonRepository
                                     }
                                     break;
                                 case 'startsWith':
+                                    $func                   = 'like';
                                     $parameters[$parameter] = $details['filter'].'%';
                                     break;
                                 case 'endsWith':
+                                    $func                   = 'like';
                                     $parameters[$parameter] = '%'.$details['filter'];
                                     break;
                                 case 'contains':
+                                    $func                   = 'like';
                                     $parameters[$parameter] = '%'.$details['filter'].'%';
                                     break;
                             }
