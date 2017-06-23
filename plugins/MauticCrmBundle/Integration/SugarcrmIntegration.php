@@ -1246,33 +1246,37 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $ownerAssignedUserIdByEmail = $this->getApiHelper()->getIdBySugarEmail(['emails' => array_unique($leadOwnerEmails)]);
         $deletedSugarLeads          = [];
         $sugarIdMapping             = [];
-        foreach ($checkEmailsInSugar as $object => $objectEmails) {
-            list($checkEmailsInSugar, $deletedSugarLeads) = $this->getObjectDataToUpdate($objectEmails, $mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $ownerAssignedUserIdByEmail, $object);
-        }
+
+        list($checkEmailsUpdatedInSugar, $deletedSugarLeads) = $this->getObjectDataToUpdate($checkEmailsInSugar, $mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $ownerAssignedUserIdByEmail, $object);
+
         //recheck synced records that might have been deleted in Sugar (deleted records don't come back in the query)
-        foreach ($checkEmailsInSugar as $key => $deletedSugarRedords) {
+        foreach ($checkEmailsUpdatedInSugar as $key => $deletedSugarRedords) {
             if (isset($deletedSugarRedords['integration_entity_id']) && $deletedSugarRedords['integration_entity_id']) {
                 $deletedSugarLeads[] = $deletedSugarRedords['integration_entity_id'];
             }
-            unset($checkEmailsInSugar[$key]);
+            unset($checkEmailsUpdatedInSugar[$key]);
         }
-
+        if (!empty($checkEmailsUpdatedInSugar)) {
+            $checkEmailsInSugar = array_merge($checkEmailsUpdatedInSugar, $checkEmailsInSugar);
+        }
         // If there are any deleted, mark it as so to prevent them from being queried over and over or recreated
         if ($deletedSugarLeads) {
             $integrationEntityRepo->markAsDeleted($deletedSugarLeads, $this->getName(), 'lead');
         }
-
         // Create any left over
         if ($checkEmailsInSugar) {
-            foreach ($checkEmailsInSugar as $lead) {
-                $this->buildCompositeBody(
-                    $mauticData,
-                    $availableFields,
-                    $leadSugarFieldsToCreate, //use all matched fields when creating new records in Sugar
-                    'Leads',
-                    $lead,
-                    $ownerAssignedUserIdByEmail
-                );
+            list($checkEmailsInSugar, $deletedSugarLeads) = $this->getObjectDataToUpdate($checkEmailsInSugar, $mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $ownerAssignedUserIdByEmail, $object);
+            foreach ($checkEmailsInSugar as $leadEmail) {
+                foreach ($leadEmail as $lead) {
+                    $this->buildCompositeBody(
+                        $mauticData,
+                        $availableFields,
+                        $leadSugarFieldsToCreate, //use all matched fields when creating new records in Sugar
+                        'Leads',
+                        $lead,
+                        $ownerAssignedUserIdByEmail
+                    );
+                }
             }
         }
 
