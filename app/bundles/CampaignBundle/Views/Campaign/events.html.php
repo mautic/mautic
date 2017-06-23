@@ -28,7 +28,7 @@
                     <h5 class="fw-sb text-primary mb-xs">
                         <?php echo $event['name']; ?>
                         <?php if ('action' !== $event['eventType']): ?>
-                        <small class="text-muted"><?php echo $event['percent']; ?> %</small>
+                        <small class="text-muted"><?php echo $event['percent']; ?>%</small>
                         <?php endif; ?>
 
                     </h5>
