@@ -263,7 +263,6 @@ class MailHelper
      */
     private $customBccAddress = [];
 
-
     /**
      * @param MauticFactory $factory
      * @param               $mailer
