@@ -212,7 +212,7 @@ class EmailSubscriber extends CommonSubscriber
     {
         $payload = $event->getPayload();
         $request = $payload['request'];
-        $idHash = $payload['idHash'];
+        $idHash  = $payload['idHash'];
         $this->emailModel->hitEmail($idHash, $request);
         $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
     }

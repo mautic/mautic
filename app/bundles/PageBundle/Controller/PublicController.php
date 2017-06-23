@@ -44,7 +44,7 @@ class PublicController extends CommonFormController
     public function indexAction($slug, Request $request)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model = $this->getModel('page');
+        $model    = $this->getModel('page');
         $security = $this->get('mautic.security');
         /** @var Page $entity */
         $entity = $model->getEntityBySlugs($slug);
@@ -71,20 +71,20 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $lead = null;
+            $lead  = null;
             $query = null;
             if (!$userAccess) {
                 /** @var LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
                 // Extract the lead from the request so it can be used to determine language if applicable
                 $query = $model->getHitQuery($this->request, $entity);
-                $lead = $leadModel->getContactFromRequest($query);
+                $lead  = $leadModel->getContactFromRequest($query);
             }
 
             // Correct the URL if it doesn't match up
             if (!$request->attributes->get('ignore_mismatch', 0)) {
                 // Make sure URLs match up
-                $url = $model->generateUrl($entity, false);
+                $url        = $model->generateUrl($entity, false);
                 $requestUri = $this->request->getRequestUri();
 
                 // Remove query when comparing
@@ -116,16 +116,16 @@ class PublicController extends CommonFormController
             if (!$userAccess) {
                 // Check to see if a variant should be shown versus the parent but ignore if a user is previewing
                 if (count($childrenVariants)) {
-                    $variants = [];
+                    $variants      = [];
                     $variantWeight = 0;
-                    $totalHits = $entity->getVariantHits();
+                    $totalHits     = $entity->getVariantHits();
 
                     foreach ($childrenVariants as $id => $child) {
                         if ($child->isPublished()) {
                             $variantSettings = $child->getVariantSettings();
-                            $variants[$id] = [
+                            $variants[$id]   = [
                                 'weight' => ($variantSettings['weight'] / 100),
-                                'hits' => $child->getVariantHits(),
+                                'hits'   => $child->getVariantHits(),
                             ];
                             $variantWeight += $variantSettings['weight'];
 
@@ -134,7 +134,7 @@ class PublicController extends CommonFormController
                             /** @var Page $translation */
                             foreach ($translations as $translation) {
                                 if ($translation->isPublished()) {
-                                    $variants[$id]['hits'] += (int)$translation->getVariantHits();
+                                    $variants[$id]['hits'] += (int) $translation->getVariantHits();
                                 }
                             }
 
@@ -157,7 +157,7 @@ class PublicController extends CommonFormController
                             // Add parent weight
                             $variants[$entity->getId()] = [
                                 'weight' => ((100 - $variantWeight) / 100),
-                                'hits' => $entity->getVariantHits(),
+                                'hits'   => $entity->getVariantHits(),
                             ];
 
                             // Count translations for the parent as well
@@ -165,7 +165,7 @@ class PublicController extends CommonFormController
                             /** @var Page $translation */
                             foreach ($translations as $translation) {
                                 if ($translation->isPublished()) {
-                                    $variants[$entity->getId()]['hits'] += (int)$translation->getVariantHits();
+                                    $variants[$entity->getId()]['hits'] += (int) $translation->getVariantHits();
                                 }
                             }
                             $totalHits += $variants[$id]['hits'];
@@ -235,7 +235,7 @@ class PublicController extends CommonFormController
             $analytics = $this->get('mautic.helper.template.analytics')->getCode();
 
             $BCcontent = $entity->getContent();
-            $content = $entity->getCustomHtml();
+            $content   = $entity->getCustomHtml();
             // This condition remains so the Mautic v1 themes would display the content
             if (empty($content) && !empty($BCcontent)) {
                 /**
@@ -243,7 +243,7 @@ class PublicController extends CommonFormController
                  */
                 $template = $entity->getTemplate();
                 //all the checks pass so display the content
-                $slots = $this->factory->getTheme($template)->getSlots('page');
+                $slots   = $this->factory->getTheme($template)->getSlots('page');
                 $content = $entity->getContent();
 
                 $this->processSlots($slots, $entity);
@@ -258,11 +258,11 @@ class PublicController extends CommonFormController
                 $response = $this->render(
                     $logicalName,
                     [
-                        'slots' => $slots,
-                        'content' => $content,
-                        'page' => $entity,
+                        'slots'    => $slots,
+                        'content'  => $content,
+                        'page'     => $entity,
                         'template' => $template,
-                        'public' => true,
+                        'public'   => true,
                     ]
                 );
 
@@ -297,38 +297,44 @@ class PublicController extends CommonFormController
     /**
      * @param PageModel $model
      * @param $page
-     * @param Request $request
-     * @param string $code
+     * @param Request   $request
+     * @param string    $code
      * @param Lead|null $lead
-     * @param array $query
+     * @param array     $query
      */
     private function hitPage(PageModel $model, $page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
         $ipLookupHelper = $this->get('mautic.helper.ip_lookup');
-        $ipAddress = $ipLookupHelper->getIpAddress();
+        $ipAddress      = $ipLookupHelper->getIpAddress();
 
-        list($hit, $trackingNewlyGenerated) = $model->generateHit($page, $request, $ipAddress, $code, $lead, $query);
+        list($hitId, $trackingNewlyGenerated) = $model->generateHit(
+            $page,
+            $request,
+            $ipAddress,
+            $code,
+            $lead,
+            $query
+        );
 
         //save hit to the cookie to use to update the exit time
         $cookieHelper = $this->get('mautic.helper.cookie');
-        $cookieHelper->setCookie('mautic_referer_id', $hit ? $hit->getId() : null);
+        $cookieHelper->setCookie('mautic_referer_id', $hitId ?: null);
 
-        $logger = $this->get('monolog.logger.mautic');
+        $logger       = $this->get('monolog.logger.mautic');
         $queueService = $this->get('mautic.queue.service');
         if ($queueService->isQueueEnabled()) {
             $logger->log('info', 'using the queue');
             $msg = [
-                'hit'     => $hit,
-                'page'    => $page,
+                'hitId'   => $hitId,
+                'pageId'  => $page->getId(),
                 'request' => $request,
                 'isNew'   => $trackingNewlyGenerated,
             ];
             $queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
         } else {
             $logger->log('info', 'not using the queue');
-            $model->hitPage($hit, $page, $request, $trackingNewlyGenerated);
+            $model->hitPage($hitId, $page, $request, $trackingNewlyGenerated);
         }
-
     }
 
     /**

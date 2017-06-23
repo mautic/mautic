@@ -11,7 +11,6 @@
 
 namespace Mautic\QueueBundle\Form\Type;
 
-
 use Mautic\QueueBundle\Event\QueueConfigEvent;
 use Mautic\QueueBundle\QueueEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,6 +26,7 @@ class ConfigType extends AbstractType
 
     /**
      * ConfigType constructor.
+     *
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(EventDispatcherInterface $eventDispatcher)
@@ -36,14 +36,14 @@ class ConfigType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $event = new QueueConfigEvent($options);
         $this->eventDispatcher->dispatch(QueueEvents::BUILD_CONFIG, $event);
 
-        $protocolChoices = array_merge([ '' => 'mautic.queue.config.protocol.disabled' ], $event->getProtocolChoices());
+        $protocolChoices = array_merge(['' => 'mautic.queue.config.protocol.disabled'], $event->getProtocolChoices());
         $builder->add(
             'queue_protocol',
             'choice',
@@ -52,7 +52,7 @@ class ConfigType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'data'       => $options['data']['queue_protocol'],
                 'choices'    => $protocolChoices,
-                'attr' => [
+                'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.queue.config.protocol',
                 ],
@@ -60,7 +60,7 @@ class ConfigType extends AbstractType
             ]
         );
 
-        foreach($event->getFormFields() as $formField) {
+        foreach ($event->getFormFields() as $formField) {
             $builder->add($formField['child'], $formField['type'], $formField['options']);
         }
     }

@@ -12,10 +12,10 @@
 namespace Mautic\QueueBundle\Queue;
 
 /**
- * Class QueueProtocol
+ * Class QueueProtocol.
  */
 class QueueProtocol
 {
     const BEANSTALKD = 'beanstalkd';
-    const RABBITMQ = 'rabbitmq';
+    const RABBITMQ   = 'rabbitmq';
 }

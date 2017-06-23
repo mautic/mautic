@@ -14,7 +14,7 @@ return [
         'events' => [
             'mautic.queue.rabbitmq.subscriber' => [
                 'class'     => 'Mautic\QueueBundle\EventListener\RabbitMqSubscriber',
-                'arguments' => 'service_container'
+                'arguments' => 'service_container',
             ],
             'mautic.queue.beanstalkd.subscriber' => [
                 'class'     => 'Mautic\QueueBundle\EventListener\BeanstalkdSubscriber',
@@ -52,14 +52,14 @@ return [
         ],
     ],
     'parameters' => [
-        'queue_protocol'       => '',
-        'rabbitmq_host'        => 'localhost',
-        'rabbitmq_port'        => '5672',
-        'rabbitmq_vhost'       => '/',
-        'rabbitmq_user'        => 'guest',
-        'rabbitmq_password'    => 'guest',
-        'beanstalkd_host'      => 'localhost',
-        'beanstalkd_port'      => '11300',
-        'beanstalkd_timeout'   => '60',
+        'queue_protocol'     => '',
+        'rabbitmq_host'      => 'localhost',
+        'rabbitmq_port'      => '5672',
+        'rabbitmq_vhost'     => '/',
+        'rabbitmq_user'      => 'guest',
+        'rabbitmq_password'  => 'guest',
+        'beanstalkd_host'    => 'localhost',
+        'beanstalkd_port'    => '11300',
+        'beanstalkd_timeout' => '60',
     ],
 ];

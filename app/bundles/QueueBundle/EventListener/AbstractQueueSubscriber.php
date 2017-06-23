@@ -17,7 +17,7 @@ use Mautic\QueueBundle\QueueEvents;
 
 abstract class AbstractQueueSubscriber extends CommonSubscriber
 {
-    protected $protocol = '';
+    protected $protocol              = '';
     protected $protocolUiTranslation = '';
 
     abstract public function publishMessage(Events\QueueEvent $event);

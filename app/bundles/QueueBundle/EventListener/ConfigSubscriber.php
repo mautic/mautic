@@ -18,7 +18,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 /**
- * Class ConfigSubscriber
+ * Class ConfigSubscriber.
  */
 class ConfigSubscriber extends CommonSubscriber
 {
@@ -71,7 +71,7 @@ class ConfigSubscriber extends CommonSubscriber
         // Don't erase password if someone doesn't provide it
         foreach ($data as $key => $value) {
             if (empty($value) && strpos($key, 'password') !== false) {
-                $data[$key] = $this->coreParametersHelper->getParameter($key);;
+                $data[$key] = $this->coreParametersHelper->getParameter($key);
             }
         }
 

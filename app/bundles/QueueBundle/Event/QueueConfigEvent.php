@@ -14,7 +14,7 @@ namespace Mautic\QueueBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 /**
- * Class QueueConfigEvent
+ * Class QueueConfigEvent.
  */
 class QueueConfigEvent extends CommonEvent
 {
@@ -35,6 +35,7 @@ class QueueConfigEvent extends CommonEvent
 
     /**
      * QueueConfigEvent constructor.
+     *
      * @param array $options
      */
     public function __construct(array $options)
@@ -67,9 +68,9 @@ class QueueConfigEvent extends CommonEvent
     }
 
     /**
-     * @param string $child
+     * @param string      $child
      * @param string|null $type
-     * @param array $options
+     * @param array       $options
      */
     public function addFormField($child, $type = null, array $options = [])
     {
@@ -82,7 +83,7 @@ class QueueConfigEvent extends CommonEvent
 
     /**
      * @param string $protocol
-     * @param array $uiTranslation
+     * @param array  $uiTranslation
      */
     public function addProtocolChoice($protocol, $uiTranslation)
     {

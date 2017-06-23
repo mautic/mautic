@@ -24,8 +24,10 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
         </div>
 
-        <?php foreach($fields as $fieldname => $field): ?>
-            <?php if($fieldname === 'queue_protocol') { continue; } ?>
+        <?php foreach ($fields as $fieldname => $field): ?>
+            <?php if ($fieldname === 'queue_protocol') {
+    continue;
+} ?>
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, $fieldname, $template); ?>
             </div>

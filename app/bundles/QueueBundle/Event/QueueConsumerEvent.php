@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 
 /**
- * Class QueueConsumerEvent
+ * Class QueueConsumerEvent.
  */
 class QueueConsumerEvent extends CommonEvent
 {
@@ -29,10 +29,10 @@ class QueueConsumerEvent extends CommonEvent
      */
     private $result;
 
-    public function __construct($payload=[])
+    public function __construct($payload = [])
     {
         $this->payload = $payload;
-        $this->result = QueueConsumerResults::DO_NOT_ACKNOWLEDGE;
+        $this->result  = QueueConsumerResults::DO_NOT_ACKNOWLEDGE;
     }
 
     /**

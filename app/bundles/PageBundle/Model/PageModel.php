@@ -496,7 +496,6 @@ class PageModel extends FormModel
         $hit->setTrackingId($trackingId);
 
         $this->leadModel->saveEntity($lead);
-        $hit->setLead($lead);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
@@ -513,7 +512,7 @@ class PageModel extends FormModel
             }
         }
 
-        return [$hit, $trackingNewlyGenerated];
+        return [$hit->getId(), $trackingNewlyGenerated];
     }
 
     /**
@@ -540,36 +539,24 @@ class PageModel extends FormModel
     /**
      * Record page hit.
      *
-     * @param Hit|null $hit
+     * @param int|null $hitId
      * @param $page
      * @param Request $request
      * @param bool    $trackingNewlyGenerated
      *
      * @throws \Exception
      */
-    public function hitPage($hit, $page, Request $request, $trackingNewlyGenerated)
+    public function hitPage($hitId, $page, Request $request, $trackingNewlyGenerated)
     {
         // Don't skew results with user hits
-        if (null == $hit || !$this->security->isAnonymous()) {
+        if (null == $hitId || !$this->security->isAnonymous()) {
             return;
         }
 
-        // Reload hit and page from repo so that they are persisted.  Needed for async processing.
-        if (!$this->em->contains($hit) || (null !== $page && !$this->em->contains($page))) {
-            /** @var Hit $hit */
-            $hit = $this->getHitRepository()->find($hit->getId());
-
-            if ($page instanceof Page) {
-                $pageRepo = $this->em->getRepository('MauticPageBundle:Page');
-                $page     = $pageRepo->find($page->getId());
-            } elseif ($page instanceof Redirect) {
-                $redirectRepo = $this->em->getRepository('MauticPageBundle:Redirect');
-                $page         = $redirectRepo->find($page->getId());
-            }
-        }
-
-        $lead  = $hit->getLead();
-        $query = $hit->getQuery() ? $hit->getQuery() : [];
+        $hitRepo = $this->getHitRepository();
+        $hit     = $hitRepo->find($hitId);
+        $lead    = $hit->getLead();
+        $query   = $hit->getQuery() ? $hit->getQuery() : [];
 
         $isUnique   = $trackingNewlyGenerated;
         $trackingId = $hit->getTrackingId();

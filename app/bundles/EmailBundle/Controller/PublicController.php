@@ -102,7 +102,7 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction($idHash)
     {
-        $logger = $this->get('monolog.logger.mautic');
+        $logger       = $this->get('monolog.logger.mautic');
         $queueService = $this->get('mautic.queue.service');
         if ($queueService->isQueueEnabled()) {
             $logger->log('info', 'using the queue');

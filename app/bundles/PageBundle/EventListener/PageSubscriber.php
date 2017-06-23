@@ -60,8 +60,7 @@ class PageSubscriber extends CommonSubscriber
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         PageModel $pageModel
-    )
-    {
+    ) {
         $this->assetsHelper   = $assetsHelper;
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
@@ -167,12 +166,13 @@ class PageSubscriber extends CommonSubscriber
 
     public function onPageHit(QueueConsumerEvent $event)
     {
-        $payload = $event->getPayload();
-        $hit                    = $payload['hit'];
-        $page                   = $payload['page'];
+        $payload                = $event->getPayload();
+        $hitId                  = $payload['hitId'];
+        $pageId                 = $payload['pageId'];
         $request                = $payload['request'];
         $trackingNewlyGenerated = $payload['isNew'];
-        $this->pageModel->hitPage($hit, $page, $request, $trackingNewlyGenerated);
+        $page                   = $this->pageModel->getRepository()->find($pageId);
+        $this->pageModel->hitPage($hitId, $page, $request, $trackingNewlyGenerated);
         $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
     }
 }
