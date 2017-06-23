@@ -310,7 +310,7 @@ class IntegrationEntityRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->innerJoin('l', MAUTIC_TABLE_PREFIX.'integration_entity', 'i', 'i.internal_entity_id = l.id and i.integration = ');
+            ->innerJoin('l', MAUTIC_TABLE_PREFIX.'integration_entity', 'i', 'i.internal_entity_id = l.id and i.integration = :integration');
 
         if (false === $limit) {
             $q->select('count(*) as total');
@@ -325,10 +325,6 @@ class IntegrationEntityRepository extends CommonRepository
         }
         $q->where('l.date_identified is not null')
             ->andWhere('l.email is not null')
-            ->andWhere(
-                'not exists (select null from '.MAUTIC_TABLE_PREFIX
-                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id )'
-            )
             ->andWhere('not exists (select null from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id '.$extra.')')
             ->setParameter('integration', $integration);
 

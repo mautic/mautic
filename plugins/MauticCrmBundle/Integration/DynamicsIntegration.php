@@ -556,8 +556,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $fields          = 'l.'.$fields;
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['contacts']]]);
         $progress        = false;
-        $totalToUpdate   = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, false, ['contacts']));
-        $totalToCreate   = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, false, 'i.last_sync_date is not null');
+        $totalToUpdate   = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, false, null, null, ['contacts']));
+        $totalToCreate   = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, false, null, null, 'i.last_sync_date is not null');
         $totalCount      = $totalToCreate + $totalToUpdate;
         if (defined('IN_MAUTIC_CONSOLE')) {
             // start with update
@@ -571,7 +571,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $leadsToCreate       = [];
         $integrationEntities = [];
         // Fetch them separately so we can determine which oneas are already there
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $limit, 'contacts', [])['contacts'];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $limit, null, null, 'contacts', [])['contacts'];
         $totalCount -= count($toUpdate);
         $totalUpdated += count($toUpdate);
         foreach ($toUpdate as $lead) {
@@ -581,7 +581,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             }
         }
         unset($toUpdate);
-        $toCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, $limit, 'i.last_sync_date is not null');
+        $toCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, $limit, null, null, 'i.last_sync_date is not null');
         $totalCount -= count($toCreate);
         $totalCreated += count($toCreate);
         foreach ($toCreate as $lead) {
