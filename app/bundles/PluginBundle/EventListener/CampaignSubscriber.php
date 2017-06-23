@@ -84,8 +84,8 @@ class CampaignSubscriber extends CommonSubscriber
         $errors   = [];
 
         /**
-         * @var  $name
-         * @var  AbstractIntegration $s
+         * @var
+         * @var AbstractIntegration $s
          */
         foreach ($services as $name => $s) {
             $settings = $s->getIntegrationSettings();
@@ -109,7 +109,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         if (count($errors)) {
-            $event->setFailed(implode("<br />", $errors));
+            $event->setFailed(implode('<br />', $errors));
         }
 
         return $event->setResult($success);

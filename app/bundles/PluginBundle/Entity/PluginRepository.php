@@ -39,7 +39,7 @@ class PluginRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this->_em->createQueryBuilder();
         $q->select($this->getTableAlias())
