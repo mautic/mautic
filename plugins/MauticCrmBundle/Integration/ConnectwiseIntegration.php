@@ -521,7 +521,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead(Lead $lead, $config = [])
+    public function pushLead(Lead $lead,  array $config = [])
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
