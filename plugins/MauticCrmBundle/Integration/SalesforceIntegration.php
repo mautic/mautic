@@ -1443,7 +1443,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $object = 'CampaignMember';
                 }
                 if (isset($item['body'][0]['errorCode'])) {
-                    $exception = new ApiErrorException($item['body'][0]['message']);
+                    $exception = new ApiErrorException($this->cleanErrorMessage($item['body'][0]['message']));
                     if ($object == 'Contact' || $object = 'Lead') {
                         $exception->setContactId($contactId);
                     }
@@ -1494,10 +1494,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $error = 'http status code '.$item['httpStatusCode'];
                     switch (true) {
                         case !empty($item['body'][0]['message']['message']):
-                            $error = $item['body'][0]['message']['message'];
+                            $error = $this->cleanErrorMessage($item['body'][0]['message']['message']);
                             break;
                         case !empty($item['body']['message']):
-                            $error = $item['body']['message'];
+                            $error = $this->cleanErrorMessage($item['body']['message']);
                             break;
                     }
 
@@ -1866,5 +1866,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $this->processCompositeResponse($result['compositeResponse'], $salesforceIdMapping);
+    }
+
+    /**
+     * Cleans up the error message for use in the notifications.
+     *
+     * @param string $message
+     *
+     * @return string
+     */
+    protected function cleanErrorMessage($message)
+    {
+        // Strip out <script> tags from the message
+        $message = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $message);
+
+        // Encode Entities
+        $message = htmlentities($message);
+
+        return $message;
     }
 }
