@@ -1324,21 +1324,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                 $mailer->setSource($channel);
                 $emailConfigured = $mailer->setEmail($emailEntity, true, $useSettings['slots'], $assetAttachments);
-                $email           = $mailer->getEmail();
-                $toAddress       = $email->getToAddress();
-                $isToEmpty       = true;
-
-                // Check if to address is default value or customized
-                if (!empty($toAddress)) {
-                    $addresses = array_fill_keys(array_map('trim', preg_split('/[;,]/', $toAddress)), null);
-                    foreach ($addresses as $toAddress => $name) {
-                        $toAddress = $this->mailHelper->getValidLeadField($toAddress, 'email');
-                        if (!empty($toAddress)) {
-                            $isToEmpty = false;
-                            break;
-                        }
-                    }
-                }
 
                 if (!empty($customHeaders)) {
                     $mailer->setCustomHeaders($customHeaders);
@@ -1362,7 +1347,19 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $mailer->setLead($contact);
                     $mailer->setIdHash($idHash);
 
-                    if ($isToEmpty == true) {
+                    // Set custom header fields
+                    $mailer->setCustomToAddress($email, $contact);
+                    $mailer->setCustomCcAddress($email, $contact);
+                    $mailer->setCustomFrom($email, $contact);
+                    $mailer->setCustomReplyTo($email, $contact);
+                    $mailer->setCustomBccAddress($email, $contact);
+
+                    $customTo = $mailer->getCustomToAddress();
+                    if (!empty($customTo)) {
+                        foreach ($customTo as $c) {
+                            $mailer->addTo($c);
+                        }
+                    } else {
                         try {
                             if (!$mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
                                 // Clear the errors so it doesn't stop the next send
@@ -1388,6 +1385,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                             }
                         }
                     }
+
+
 
                     //queue or send the message
                     list($queued, $queueErrors) = $mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);

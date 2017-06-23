@@ -26,11 +26,11 @@ class Version20170616132829 extends AbstractMauticMigration
     {
         $table = $schema->getTable($this->prefix.'emails');
 
-        if ($table->hasColumn('to_address') && $table->getColumn('to_address')->getNotNull() === false) {
+        if ($table->hasColumn('to_address')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
 
-        if ($table->hasColumn('cc_address') && $table->getColumn('cc_address')->getNotNull() === false) {
+        if ($table->hasColumn('cc_address')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -41,7 +41,7 @@ class Version20170616132829 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         // Please modify to your needs
-        $this->addSql('ALTER TABLE '.$this->prefix.'emails ADD to_address VARCHAR(255);');
-        $this->addSql('ALTER TABLE '.$this->prefix.'emails ADD cc_address VARCHAR(255);');
+        $this->addSql('ALTER TABLE '.$this->prefix.'emails ADD to_address VARCHAR(255) DEFAULT NULL;');
+        $this->addSql('ALTER TABLE '.$this->prefix.'emails ADD cc_address VARCHAR(255) DEFAULT NULL;');
     }
 }
