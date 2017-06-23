@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -144,11 +145,28 @@ class EmailRepository extends CommonRepository
             if (empty($args['ignoreListJoin']) && (!isset($args['email_type']) || $args['email_type'] == 'list')) {
                 $q->leftJoin('e.lists', 'l');
             }
+            $q->leftJoin('e.stats', 'es');
+            $q->addSelect('MAX(es.dateSent) AS max_date_sent');
+            $q->addGroupBy('e.id');
         }
 
         $args['qb'] = $q;
 
-        return parent::getEntities($args);
+        $result = parent::getEntities($args);
+
+        // @todo Replace with resultSetMapping or something.
+        $new = [];
+        foreach ($result as $key => $value) {
+            /** @var Email $item */
+            $item        = reset($value);
+            $maxDateSent = $value['max_date_sent'];
+            $item->setMaxDateSent($maxDateSent);
+            $new[$key] = $item;
+        }
+        $result = $new;
+        unset($new);
+
+        return $result;
     }
 
     /**

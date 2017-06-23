@@ -174,6 +174,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $sessionId;
 
+    private $maxDateSent;
+
     public function __clone()
     {
         $this->id               = null;
@@ -185,6 +187,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->variantStartDate = null;
         $this->emailType        = null;
         $this->sessionId        = 'new_'.hash('sha1', uniqid(mt_rand()));
+        $this->maxDateSent      = null;
         $this->clearTranslations();
         $this->clearVariants();
 
@@ -455,6 +458,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'unsubscribeForm',
                     'dynamicContent',
                     'lists',
+                    'maxDateSent',
                 ]
             )
             ->build();
@@ -1025,6 +1029,18 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getAssetAttachments()
     {
         return $this->assetAttachments;
+    }
+
+    public function getMaxDateSent()
+    {
+        return $this->maxDateSent;
+    }
+
+    public function setMaxDateSent($maxDateSent)
+    {
+        $this->maxDateSent = $maxDateSent;
+
+        return $this;
     }
 
     /**

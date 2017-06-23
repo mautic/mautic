@@ -34,10 +34,29 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'email',
+                        'orderBy'    => 'max_date_sent',
+                        'text'       => 'mautic.email.date_sent',
+                        'class'      => 'col-email-name',
+                        'default'    => true,
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
                         'orderBy'    => 'e.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-email-name',
-                        'default'    => true,
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'email',
+                        'orderBy'    => 'e.subject',
+                        'text'       => 'mautic.email.subject',
                     ]
                 );
 
@@ -115,6 +134,9 @@ if ($tmpl == 'index') {
                         );
                         ?>
                     </td>
+                    <td class="visible-md visible-lg">
+                        <?php echo $item->getMaxDateSent(); ?>
+                    </td>
                     <td>
                         <div>
                             <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $item, 'model' => 'email']); ?>
@@ -150,6 +172,9 @@ if ($tmpl == 'index') {
                                 <small><?php echo $description; ?></small>
                             </div>
                         <?php endif; ?>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        <span style="white-space: nowrap;"><?php echo $item->getSubject(); ?></span>
                     </td>
                     <td class="visible-md visible-lg">
                         <?php $category = $item->getCategory(); ?>
