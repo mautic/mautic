@@ -1264,6 +1264,8 @@ Mautic.initSlotListeners = function() {
             } else {
                 params.slot.find('img').closest('div').css('text-align', values[params.field.val()]);
             }
+        } else if (fieldParam === 'border-radius') {
+            params.slot.find('a').css(fieldParam, params.field.val() + 'px');
         } else if (fieldParam === 'button-size') {
             var bg_clr = params.slot.attr('data-param-background-color');
             var values = [
