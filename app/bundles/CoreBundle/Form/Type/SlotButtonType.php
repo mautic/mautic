@@ -52,7 +52,7 @@ class SlotButtonType extends SlotType
             ],
         ]);
 
-        $builder->add('radius', 'text', [
+        $builder->add('href', 'text', [
             'label'      => 'mautic.core.button.link',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
