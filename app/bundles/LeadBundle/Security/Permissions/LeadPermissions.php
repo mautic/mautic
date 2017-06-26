@@ -121,6 +121,6 @@ class LeadPermissions extends AbstractPermissions
             }
         }
 
-        return [$name, $level];
+        return parent::getSynonym($name, $level);
     }
 }
