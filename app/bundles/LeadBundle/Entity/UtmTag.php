@@ -416,19 +416,24 @@ class UtmTag
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getFieldSetterList()
     {
         // available fields and it's setter.
-        return ['utm_campaign' => 'setUtmCampaign',
-                 'utm_source'  => 'setUtmSource',
-                 'utm_medium'  => 'setUtmMedium',
-                 'utm_content' => 'setUtmContent',
-                 'utm_term'    => 'setUtmTerm',
-                 'user_agent'  => 'setUserAgent',
-                 'url'         => 'setUrl',
-                 'referer'     => 'setReferer',
-                 'query'       => 'setQuery',
-                 'remote_host' => 'setRemoteHost',
-                 'date_added'  => 'setDateAdded', ];
+        return [
+            'utm_campaign' => 'setUtmCampaign',
+            'utm_source'   => 'setUtmSource',
+            'utm_medium'   => 'setUtmMedium',
+            'utm_content'  => 'setUtmContent',
+            'utm_term'     => 'setUtmTerm',
+            'user_agent'   => 'setUserAgent',
+            'url'          => 'setUrl',
+            'referer'      => 'setReferer',
+            'query'        => 'setQuery',
+            'remote_host'  => 'setRemoteHost',
+            'date_added'   => 'setDateAdded',
+        ];
     }
 }
