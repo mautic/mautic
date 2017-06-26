@@ -32,6 +32,7 @@ class ModelPass implements CompilerPassInterface
             $definition->addMethodCall('setDispatcher', [new Reference('event_dispatcher')]);
             $definition->addMethodCall('setTranslator', [new Reference('translator')]);
             $definition->addMethodCall('setUserHelper', [new Reference('mautic.helper.user')]);
+            $definition->addMethodCall('setCoreParametersHelper', [new Reference('mautic.helper.core_parameters')]);
 
             $modelClass = $definition->getClass();
             $reflected  = new \ReflectionClass($modelClass);
