@@ -64,7 +64,16 @@ class NotificationController extends FormController
         $search = $this->request->get('search', $session->get('mautic.notification.filter', ''));
         $session->set('mautic.notification.filter', $search);
 
-        $filter = ['string' => $search];
+        $filter = [
+            'string' => $search,
+            'where'  => [
+                [
+                    'expr' => 'eq',
+                    'col'  => 'mobile',
+                    'val'  => 0,
+                ],
+            ],
+        ];
 
         if (!$permissions['notification:notifications:viewother']) {
             $filter['force'][] =

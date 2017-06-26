@@ -200,7 +200,7 @@ return [
             ],
             'mautic.form.type.campaignconfig' => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'translator',
                 'alias'     => 'campaignconfig',
             ],
         ],
@@ -231,6 +231,7 @@ return [
                 'arguments' => [
                     'mautic.campaign.model.event',
                     'mautic.campaign.model.campaign',
+                    'mautic.helper.ip_lookup',
                 ],
             ],
         ],

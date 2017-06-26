@@ -88,8 +88,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $col = 'l.'.$field;
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-                  ->select('l.id')
-                  ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+            ->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         if ($field == 'email') {
             // Prevent emails from being case sensitive
@@ -108,7 +108,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             );
         } else {
             $q->where("$col = :search")
-              ->setParameter('search', $value);
+                ->setParameter('search', $value);
         }
 
         if ($ignoreId) {
@@ -139,12 +139,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of lead entities.
      *
-     * @param      $uniqueFieldsWithData
-     * @param null $leadId
+     * @param     $uniqueFieldsWithData
+     * @param int $leadId
+     * @param int $limit
      *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
     {
         // get the list of IDs
         $idList = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
@@ -173,6 +174,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         )
             ->setParameter('ids', $ids)
             ->orderBy('l.dateAdded', 'DESC');
+
+        if ($limit) {
+            $q->setMaxResults($limit);
+        }
 
         $results = $q->getQuery()->getResult();
 
@@ -302,8 +307,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $contactId = (int) $id['id'];
             } else {
                 $q->select('l, u, i')
-                ->leftJoin('l.ipAddresses', 'i')
-                ->leftJoin('l.owner', 'u');
+                    ->leftJoin('l.ipAddresses', 'i')
+                    ->leftJoin('l.owner', 'u');
                 $contactId = $id;
             }
             $q->andWhere($this->getTableAlias().'.id = '.(int) $contactId);
@@ -350,7 +355,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $primary = null;
 
                 foreach ($companies as $company) {
-                    if ($company['is_primary'] == 1) {
+                    if (isset($company['is_primary']) && $company['is_primary'] == 1) {
                         $primary = $company;
                     }
                 }
@@ -373,7 +378,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
@@ -386,14 +391,15 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
         );
 
-        if (!empty($args['withPrimaryCompany']) || !empty($args['withChannelRules'])) {
+        $contactCount = isset($contacts['results']) ? count($contacts['results']) : count($contacts);
+        if ($contactCount && (!empty($args['withPrimaryCompany']) || !empty($args['withChannelRules']))) {
+            $withTotalCount = (array_key_exists('withTotalCount', $args) && $args['withTotalCount']);
+            /** @var Lead[] $tmpContacts */
+            $tmpContacts = ($withTotalCount) ? $contacts['results'] : $contacts;
+
             $withCompanies   = !empty($args['withPrimaryCompany']);
             $withPreferences = !empty($args['withChannelRules']);
-
-            $withTotalCount = array_key_exists('withTotalCount', $args);
-            /** @var Lead[] $tmpContacts */
-            $tmpContacts = ($withTotalCount && $args['withTotalCount']) ? $contacts['results'] : $contacts;
-            $contactIds  = array_keys($tmpContacts);
+            $contactIds      = array_keys($tmpContacts);
 
             if ($withCompanies) {
                 $companies = $this->getEntityManager()->getRepository('MauticLeadBundle:Company')->getCompaniesForContacts($contactIds);
@@ -445,7 +451,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 }
             }
 
-            if ($withTotalCount && $args['withTotalCount']) {
+            if ($withTotalCount) {
                 $contacts['results'] = $tmpContacts;
             } else {
                 $contacts = $tmpContacts;
@@ -568,12 +574,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         $columns = array_merge(
             [
@@ -595,12 +601,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the command where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command                 = $filter->command;
         $string                  = $filter->string;
@@ -917,6 +923,36 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $result;
+    }
+
+    /**
+     * Check lead owner.
+     *
+     * @param Lead  $lead
+     * @param array $ownerIds
+     *
+     * @return array|false
+     */
+    public function checkLeadOwner(Lead $lead, $ownerIds = [])
+    {
+        if (empty($ownerIds)) {
+            return false;
+        }
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('u.id')
+            ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
+            ->join('u', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.owner_id = u.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('u.id', ':ownerIds'),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('ownerIds', implode(',', $ownerIds))
+            ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**

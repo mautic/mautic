@@ -34,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 7;
+    const MINOR_VERSION = 9;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 1;
+    const PATCH_VERSION = 0;
 
     /**
      * Extra version identifier.
@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '';
+    const EXTRA_VERSION = '-dev';
 
     /**
      * @var array
@@ -181,6 +181,7 @@ class AppKernel extends Kernel
             new Mautic\WebhookBundle\MauticWebhookBundle(),
             new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
             new LightSaml\SpBundle\LightSamlSpBundle(),
+            new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
         ];
 
         //dynamically register Mautic Plugin Bundles

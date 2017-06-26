@@ -115,6 +115,7 @@ class Message extends FormEntity
                     'publishUp',
                     'publishDown',
                     'channels',
+                    'category',
                 ]
             )
             ->build();

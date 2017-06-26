@@ -105,42 +105,47 @@ class MailchimpIntegration extends EmailAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
-        if ($fields = parent::getAvailableLeadFields($settings)) {
-            return $fields;
+        if (isset($settings['list'])) {
+            // Ajax update
+            $listId = $settings['list'];
+        } elseif (!empty($settings['feature_settings']['list_settings']['list'])) {
+            // Form load
+            $listId = $settings['feature_settings']['list_settings']['list'];
+        } elseif (!empty($settings['list_settings']['list'])) {
+            // Push action
+            $listId = $settings['list_settings']['list'];
         }
 
-        static $leadFields = [];
-
-        if (empty($leadFields)) {
-            if (isset($settings['list'])) {
-                // Ajax update
-                $listId = $settings['list'];
-            } elseif (!empty($settings['feature_settings']['list_settings']['list'])) {
-                // Form load
-                $listId = $settings['feature_settings']['list_settings']['list'];
-            } elseif (!empty($settings['list_settings']['list'])) {
-                // Push action
-                $listId = $settings['list_settings']['list'];
+        if (!empty($listId)) {
+            $settings['cache_suffix'] = $cacheSuffix = '.'.$listId;
+            if ($fields = parent::getAvailableLeadFields($settings)) {
+                return $fields;
             }
 
-            if (!empty($listId)) {
-                $fields = $this->getApiHelper()->getCustomFields($listId);
+            $fields = $this->getApiHelper()->getCustomFields($listId);
 
-                if (!empty($fields['data'][0]['merge_vars']) && count($fields['data'][0]['merge_vars'])) {
-                    foreach ($fields['data'][0]['merge_vars'] as $field) {
-                        $leadFields[$field['tag']] = [
-                            'label'    => $field['name'],
-                            'type'     => 'string',
-                            'required' => $field['req'],
-                        ];
-                    }
+            if (!empty($fields['merge_fields']) && count($fields['merge_fields'])) {
+                foreach ($fields['merge_fields'] as $field) {
+                    $leadFields[$field['tag']] = [
+                        'label'    => $field['name'],
+                        'type'     => 'string',
+                        'required' => $field['required'],
+                    ];
                 }
             }
+
+            $leadFields['EMAIL'] = [
+                'label'    => 'Email',
+                'type'     => 'string',
+                'required' => true,
+            ];
+
+            $this->cache->set('leadFields'.$cacheSuffix, $leadFields);
+
+            return $leadFields;
         }
 
-        $this->cache->set('leadFields', $leadFields);
-
-        return $leadFields;
+        return [];
     }
 
     /**
@@ -151,8 +156,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
      */
     public function pushLead($lead, $config = [])
     {
-        $config = $this->mergeConfigToFeatureSettings($config);
-
+        $config     = $this->mergeConfigToFeatureSettings($config);
         $mappedData = $this->populateLeadData($lead, $config);
 
         if (empty($mappedData)) {

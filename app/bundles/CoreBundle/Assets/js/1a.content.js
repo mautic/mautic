@@ -110,6 +110,9 @@ Mautic.generatePageTitle = function(route){
             currentModuleItem = mQuery('.page-header h3').text();
         }
 
+        // Encoded entites are decoded by this process and can cause a XSS
+        currentModuleItem = mQuery('<div>'+currentModuleItem+'</div>').text();
+
         mQuery('title').html( currentModule[0].toUpperCase() + currentModule.slice(1) + ' | ' + currentModuleItem + ' | Mautic' );
     } else {
         //loading basic title
@@ -265,7 +268,26 @@ Mautic.onPageLoad = function (container, response, inModal) {
     });
 
     //initialize tooltips
-    mQuery(container + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
+    var pageTooltips = mQuery(container + " *[data-toggle='tooltip']");
+    pageTooltips.tooltip({html: true, container: 'body'});
+
+    // Enable tooltips on checkbox & radio input's to
+    // show when hovering their parent LABEL element
+    pageTooltips.each(function(i) {
+        var thisTooltip   = mQuery(pageTooltips.get(i));
+        var elementParent = thisTooltip.parent();
+
+        if (elementParent.get(0).tagName === 'LABEL') {
+            elementParent.append('<i class="fa fa-question-circle"></i>');
+
+            elementParent.hover(function () {
+                thisTooltip.tooltip('show')
+            }, function () {
+                thisTooltip.tooltip('hide');
+            });
+        }
+    });
+
 
     //initialize sortable lists
     mQuery(container + " *[data-toggle='sortablelist']").each(function (index) {
@@ -517,7 +539,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
 
             if (textarea.hasClass('editor-dynamic-content')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage'];
+                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
             }
 
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
@@ -602,6 +624,31 @@ Mautic.onPageLoad = function (container, response, inModal) {
         contentSpecific = response.mauticContent;
     } else if (container == 'body') {
         contentSpecific = mauticContent;
+    }
+
+    if (response && response.sidebar) {
+        var sidebarContent = mQuery('.app-sidebar.sidebar-left');
+        var newSidebar     = mQuery(response.sidebar);
+        var nav            = sidebarContent.find('li');
+
+        if (nav.length) {
+            var openNavIndex;
+
+            nav.each(function(i, el) {
+                var $el = mQuery(el);
+
+                if ($el.hasClass('open')) {
+                    openNavIndex = i;
+                }
+            });
+
+            var openNav = mQuery(newSidebar.find('li')[openNavIndex]);
+
+            openNav.addClass('open');
+            openNav.find('ul').removeClass('collapse');
+        }
+
+        sidebarContent.html(newSidebar);
     }
 
     if (container == '#app-content' || container == 'body') {
@@ -808,7 +855,8 @@ Mautic.ajaxifyLink = function (el, event) {
  *
  * @param el
  */
-Mautic.activateChosenSelect = function(el, ignoreGlobal) {
+Mautic.activateChosenSelect = function(el, ignoreGlobal, jQueryVariant) {
+    var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (mQuery(el).parents('.no-chosen').length && !ignoreGlobal) {
         // Globally ignored chosens because they are handled manually due to hidden elements, etc
         return;

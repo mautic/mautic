@@ -14,6 +14,8 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
 /**
  * Class LeadEventLog.
@@ -31,7 +33,7 @@ class LeadEventLog
     private $event;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var LeadEntity
      */
     private $lead;
 
@@ -96,6 +98,11 @@ class LeadEventLog
     private $rotation = 1;
 
     /**
+     * @var FailedLeadEventLog
+     */
+    private $failedLog;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -152,9 +159,16 @@ class LeadEventLog
         $builder->createField('channel', 'string')
                 ->nullable()
                 ->build();
+
         $builder->addNamedField('channelId', 'integer', 'channel_id', true);
 
         $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
+
+        $builder->createOneToOne('failedLog', 'FailedLeadEventLog')
+            ->mappedBy('log')
+            ->fetchExtraLazy()
+            ->cascadeAll()
+            ->build();
     }
 
     /**
@@ -217,18 +231,22 @@ class LeadEventLog
     }
 
     /**
-     * @param \DateTime $dateTriggered
+     * @param \DateTime|null $dateTriggered
+     *
+     * @return $this
      */
-    public function setDateTriggered($dateTriggered)
+    public function setDateTriggered(\DateTime $dateTriggered = null)
     {
         $this->dateTriggered = $dateTriggered;
         if (null !== $dateTriggered) {
             $this->setIsScheduled(false);
         }
+
+        return $this;
     }
 
     /**
-     * @return \Mautic\CoreBundle\Entity\IpAddress
+     * @return IpAddress
      */
     public function getIpAddress()
     {
@@ -236,15 +254,19 @@ class LeadEventLog
     }
 
     /**
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
+     * @param IpAddress $ipAddress
+     *
+     * @return $this
      */
-    public function setIpAddress($ipAddress)
+    public function setIpAddress(IpAddress $ipAddress)
     {
         $this->ipAddress = $ipAddress;
+
+        return $this;
     }
 
     /**
-     * @return mixed
+     * @return LeadEntity
      */
     public function getLead()
     {
@@ -252,11 +274,11 @@ class LeadEventLog
     }
 
     /**
-     * @param $lead
+     * @param LeadEntity $lead
      *
      * @return $this
      */
-    public function setLead($lead)
+    public function setLead(LeadEntity $lead)
     {
         $this->lead = $lead;
 
@@ -330,11 +352,11 @@ class LeadEventLog
     }
 
     /**
-     * @param $triggerDate
+     * @param \DateTime $triggerDate
      *
      * @return $this
      */
-    public function setTriggerDate($triggerDate)
+    public function setTriggerDate(\DateTime $triggerDate = null)
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);
@@ -351,11 +373,11 @@ class LeadEventLog
     }
 
     /**
-     * @param $campaign
+     * @param Campaign $campaign
      *
      * @return $this
      */
-    public function setCampaign($campaign)
+    public function setCampaign(Campaign $campaign)
     {
         $this->campaign = $campaign;
 
@@ -485,5 +507,43 @@ class LeadEventLog
         $this->rotation = (int) $rotation;
 
         return $this;
+    }
+
+    /**
+     * @return FailedLeadEventLog
+     */
+    public function getFailedLog()
+    {
+        return $this->failedLog;
+    }
+
+    /**
+     * @param FailedLeadEventLog $log
+     *
+     * return $this
+     */
+    public function setFailedLog(FailedLeadEventLog $log = null)
+    {
+        $this->failedLog = $log;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFailed()
+    {
+        $log = $this->getFailedLog();
+
+        return !empty($log);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSuccess()
+    {
+        return !$this->isFailed();
     }
 }

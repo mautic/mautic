@@ -243,20 +243,20 @@ class StatRepository extends CommonRepository
     public function getSentCounts($notificationIds = [], \DateTime $fromDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('e.email_id, count(e.id) as sentcount')
-            ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 'e')
+        $q->select('s.notification_id, count(n.id) as sentcount')
+            ->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 's')
             ->where(
-                $q->expr()->in('e.notification_id', $notificationIds)
+                $q->expr()->in('s.notification_id', $notificationIds)
             );
 
         if ($fromDate !== null) {
             //make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(
-                $q->expr()->gte('e.date_read', $q->expr()->literal($dt->toUtcString()))
+                $q->expr()->gte('s.date_read', $q->expr()->literal($dt->toUtcString()))
             );
         }
-        $q->groupBy('e.notification_id');
+        $q->groupBy('s.notification_id');
 
         //get a total number of sent notifications first
         $results = $q->execute()->fetchAll();

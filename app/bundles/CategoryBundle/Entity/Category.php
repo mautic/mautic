@@ -117,10 +117,6 @@ class Category extends FormEntity
                     'alias',
                     'description',
                     'color',
-                ]
-            )
-            ->addProperties(
-                [
                     'bundle',
                 ]
             )

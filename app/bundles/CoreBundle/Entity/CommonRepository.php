@@ -301,7 +301,7 @@ class CommonRepository extends EntityRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
 
@@ -719,10 +719,13 @@ class CommonRepository extends EntityRepository
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
+        $i         = 0;
+
         foreach ($entities as $k => $entity) {
+            ++$i;
             $this->saveEntity($entity, false);
 
-            if ((($k + 1) % $batchSize) === 0) {
+            if ($i % $batchSize === 0) {
                 $this->getEntityManager()->flush();
             }
         }
@@ -740,6 +743,7 @@ class CommonRepository extends EntityRepository
     public function saveEntity($entity, $flush = true)
     {
         $this->getEntityManager()->persist($entity);
+
         if ($flush) {
             $this->getEntityManager()->flush($entity);
         }
@@ -870,12 +874,12 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param array                      $filters
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addAdvancedSearchWhereClause(&$qb, $filters)
+    protected function addAdvancedSearchWhereClause($qb, $filters)
     {
         $parseFilters = [];
         if (isset($filters->root[0])) {
@@ -905,12 +909,12 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $qb
-     * @param array                      $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$qb, $filter)
+    protected function addCatchAllWhereClause($qb, $filter)
     {
         foreach (['name', 'title'] as $column) {
             if ($this->getClassMetadata()->hasField($column)) {
@@ -965,12 +969,12 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param $q
-     * @param $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command = $filter->command;
         $expr    = false;
