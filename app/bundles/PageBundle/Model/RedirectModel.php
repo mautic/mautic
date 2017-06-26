@@ -76,6 +76,7 @@ class RedirectModel extends FormModel
         );
 
         if (!empty($utmTags)) {
+            $utmTags   = $this->getUtmTagsForUrl($utmTags);
             $query     = parse_url($url, PHP_URL_QUERY);
             $urlString = http_build_query($utmTags, '', '&');
             if ($query) {
@@ -90,6 +91,21 @@ class RedirectModel extends FormModel
         }
 
         return $url;
+    }
+
+    /**
+     * Generate UTMs params for url.
+     *
+     * @return array
+     */
+    public function getUtmTagsForUrl($rawUtmTags)
+    {
+        $utmTags = [];
+        foreach ($rawUtmTags as $utmTag => $value) {
+            $utmTags[str_replace('utm', 'utm_', strtolower($utmTag))] = $value;
+        }
+
+        return $utmTags;
     }
 
     /**
