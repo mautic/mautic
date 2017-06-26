@@ -24,7 +24,7 @@ class InesIntegration extends CrmAbstractIntegration
     /**
      * string.
      */
-    protected $stopSyncAtmtKey = 'ines_stop_sync';
+    protected $stopSyncMauticKey = 'ines_stop_sync';
 
     /**
      * @return string
@@ -333,7 +333,7 @@ class InesIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Returns the raw mapping from the mapping form as an associative array: ines_key => atmt_key
+     * Returns the raw mapping from the mapping form as an associative array: ines_key => mautic_key
           * Automatically mapped fields are not included.
      *
      * @return array
@@ -351,17 +351,17 @@ class InesIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Returns the identifier of the Automation field containing the "do not synchronize" flag.
+     * Returns the identifier of the Mautic field containing the "do not synchronize" flag.
      *
      * @return string
      */
-    public function getDontSyncAtmtKey()
+    public function getDontSyncMauticKey()
     {
         // Le champ custom existe-t-il ?
         $repo         = $this->em->getRepository('MauticLeadBundle:LeadField');
-        $searchResult = $repo->findByAlias($this->stopSyncAtmtKey);
+        $searchResult = $repo->findByAlias($this->stopSyncMauticKey);
 
-        return empty($searchResult) ? '' : $this->stopSyncAtmtKey;
+        return empty($searchResult) ? '' : $this->stopSyncMauticKey;
     }
 
     /**
@@ -373,12 +373,12 @@ class InesIntegration extends CrmAbstractIntegration
      */
     public function getDontSyncFlag(Lead $lead)
     {
-        $dontSyncAtmtKey = $this->getDontSyncAtmtKey();
+        $dontSyncMauticKey = $this->getDontSyncMauticKey();
 
         // Search "don't sync" field
         $fields = $lead->getProfileFields();
         foreach ($fields as $key => $value) {
-            if ($key == $dontSyncAtmtKey) {
+            if ($key == $dontSyncMauticKey) {
                 return (bool) $value;
             }
         }
@@ -459,7 +459,7 @@ class InesIntegration extends CrmAbstractIntegration
                     'concept'       => $field['concept'],
                     'inesFieldKey'  => $field['inesKey'],
                     'isCustomField' => $field['isCustomField'] ? 1 : 0,
-                    'atmtFieldKey'  => $field['autoMapping'],
+                    'mauticFieldKey'  => $field['autoMapping'],
                     'isEcrasable'   => in_array($internalKey, $notEcrasableFields) ? 0 : 1,
                 ];
             }
@@ -467,14 +467,14 @@ class InesIntegration extends CrmAbstractIntegration
 
         // Field mapped by user
         $rawMapping = $this->getRawMapping();
-        foreach ($rawMapping as $internalKey => $atmtKey) {
+        foreach ($rawMapping as $internalKey => $mauticKey) {
             list($concept, $inesKey) = explode('_', $internalKey);
 
             $mappedFields[] = [
                 'concept'       => $concept,
                 'inesFieldKey'  => $inesKey,
                 'isCustomField' => in_array($internalKey, $customFields) ? 1 : 0,
-                'atmtFieldKey'  => $atmtKey,
+                'mauticFieldKey'  => $mauticKey,
                 'isEcrasable'   => in_array($internalKey, $notEcrasableFields) ? 0 : 1,
             ];
         }
@@ -498,14 +498,14 @@ class InesIntegration extends CrmAbstractIntegration
     {
         $fieldsToUpdate = [];
 
-        // Search for dedicated ATMT fields to store these keys
+        // Search for dedicated Mautic fields to store these keys
         $mapping = $this->getMapping();
         foreach ($mapping as $mappingItem) {
             if ($mappingItem['inesFieldKey'] == 'InternalContactRef') {
-                $fieldsToUpdate[ $mappingItem['atmtFieldKey'] ] = $internalContactRef;
+                $fieldsToUpdate[ $mappingItem['mauticFieldKey'] ] = $internalContactRef;
             }
             if ($mappingItem['inesFieldKey'] == 'InternalCompanyRef') {
-                $fieldsToUpdate[ $mappingItem['atmtFieldKey'] ] = $internalCompanyRef;
+                $fieldsToUpdate[ $mappingItem['mauticFieldKey'] ] = $internalCompanyRef;
             }
         }
 
@@ -518,7 +518,7 @@ class InesIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Returns INES contact and client keys saved in an ATMT lead.
+     * Returns INES contact and client keys saved in an Mautic lead.
      *
      * @param Mautic\LeadBundle\Entity\Lead $lead
      *
@@ -528,23 +528,23 @@ class InesIntegration extends CrmAbstractIntegration
     {
         $fields = $lead->getProfileFields();
 
-        // ATMT fields containing the INES keys
-        $atmtFieldsKeys = $this->getApiHelper()->getAtmtFieldsKeysFromInesFieldsKeys(['InternalContactRef', 'InternalCompanyRef']);
+        // Mautic fields containing the INES keys
+        $mauticFieldsKeys = $this->getApiHelper()->getMauticFieldsKeysFromInesFieldsKeys(['InternalContactRef', 'InternalCompanyRef']);
 
         // Values for these 2 fields (contactRef and clientRef) if they are defined
         $contactRef = false;
-        if (isset($atmtFieldsKeys['InternalContactRef'])) {
-            $inesContactAtmtKey = $atmtFieldsKeys['InternalContactRef'];
-            if (isset($fields[$inesContactAtmtKey]) && $fields[$inesContactAtmtKey]) {
-                $contactRef = $fields[$inesContactAtmtKey];
+        if (isset($mauticFieldsKeys['InternalContactRef'])) {
+            $inesContactMauticKey = $mauticFieldsKeys['InternalContactRef'];
+            if (isset($fields[$inesContactMauticKey]) && $fields[$inesContactMauticKey]) {
+                $contactRef = $fields[$inesContactMauticKey];
             }
         }
 
         $clientRef = false;
-        if (isset($atmtFieldsKeys['InternalCompanyRef'])) {
-            $inesCompanyAtmtKey = $atmtFieldsKeys['InternalCompanyRef'];
-            if (isset($fields[$inesCompanyAtmtKey]) && $fields[$inesCompanyAtmtKey]) {
-                $clientRef = $fields[$inesCompanyAtmtKey];
+        if (isset($mauticFieldsKeys['InternalCompanyRef'])) {
+            $inesCompanyMauticKey = $mauticFieldsKeys['InternalCompanyRef'];
+            if (isset($fields[$inesCompanyMauticKey]) && $fields[$inesCompanyMauticKey]) {
+                $clientRef = $fields[$inesCompanyMauticKey];
             }
         }
 
@@ -616,7 +616,7 @@ class InesIntegration extends CrmAbstractIntegration
                 $company = $this->getLeadMainCompany($lead->getId());
 
                 if ($action == 'UPDATE') {
-                    // If UPDATE : reference = ATMT contact ID
+                    // If UPDATE : reference = Mautic contact ID
                     $refId = $lead->getId();
                 } else {
                     // If DELETE : reference = INES contact ref
@@ -672,13 +672,13 @@ class InesIntegration extends CrmAbstractIntegration
             return 0;
         }
 
-        // Search for ATMT keys containing INES contact and client keys
-        $atmtFieldsKeys = $this->getApiHelper()->getAtmtFieldsKeysFromInesFieldsKeys(
+        // Search for Mautic keys containing INES contact and client keys
+        $mauticFieldsKeys = $this->getApiHelper()->getMauticFieldsKeysFromInesFieldsKeys(
             ['InternalContactRef', 'InternalCompanyRef']
         );
-        if (isset($atmtFieldsKeys['InternalContactRef']) && isset($atmtFieldsKeys['InternalCompanyRef'])) {
-            $inesContactAtmtKey = $atmtFieldsKeys['InternalContactRef'];
-            $inesClientAtmtKey  = $atmtFieldsKeys['InternalCompanyRef'];
+        if (isset($mauticFieldsKeys['InternalContactRef']) && isset($mauticFieldsKeys['InternalCompanyRef'])) {
+            $inesContactMauticKey = $mauticFieldsKeys['InternalContactRef'];
+            $inesClientMauticKey  = $mauticFieldsKeys['InternalCompanyRef'];
         } else {
             return 0;
         }
@@ -692,12 +692,12 @@ class InesIntegration extends CrmAbstractIntegration
              ->innerJoin('cl', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = cl.lead_id')
              ->where(
                 'l.email <> "" AND ('.
-                    'l.'.$inesContactAtmtKey.' IS NULL OR '.
-                    'l.'.$inesContactAtmtKey.' <= 0 OR '.
-                    'l.'.$inesContactAtmtKey.' LIKE "" OR '.
-                    'l.'.$inesClientAtmtKey.' IS NULL OR '.
-                    'l.'.$inesClientAtmtKey.' <= 0 OR '.
-                    'l.'.$inesClientAtmtKey.' LIKE "" '.
+                    'l.'.$inesContactMauticKey.' IS NULL OR '.
+                    'l.'.$inesContactMauticKey.' <= 0 OR '.
+                    'l.'.$inesContactMauticKey.' LIKE "" OR '.
+                    'l.'.$inesClientMauticKey.' IS NULL OR '.
+                    'l.'.$inesClientMauticKey.' <= 0 OR '.
+                    'l.'.$inesClientMauticKey.' LIKE "" '.
                 ')'
              )
              ->setFirstResult(0)
@@ -869,23 +869,23 @@ class InesIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * Creates or updates, in ATMT, the custom fiels that the user may need for mapping
+     * Creates or updates, in Mautic, the custom fiels that the user may need for mapping
      * Each field has a type (int, bool, list, ...) and a configuration (list of values, etc.)
      * The config of certain fields is fixed, and for others it is read via a WS INES.
      */
-    public function updateAtmtCustomFieldsDefinitions()
+    public function updateMauticCustomFieldsDefinitions()
     {
         $model = $this->dispatcher->getContainer()->get('mautic.lead.model.field');
         $repo  = $model->getRepository();
 
-        $this->log('Check ATMT custom fields');
+        $this->log('Check Mautic custom fields');
 
-        // List of fields that must exist in ATMT and must be checked
+        // List of fields that must exist in Mautic and must be checked
         $fieldsToCheck = [];
         $inesFields    = $this->getApiHelper()->getLeadFields();
         foreach ($inesFields as $inesField) {
-            if ($inesField['atmtCustomFieldToCreate'] !== false) {
-                $fieldToCheck         = $inesField['atmtCustomFieldToCreate'];
+            if ($inesField['mauticCustomFieldToCreate'] !== false) {
+                $fieldToCheck         = $inesField['mauticCustomFieldToCreate'];
                 $fieldToCheck['name'] = $inesField['inesLabel'];
 
                 $fieldsToCheck[] = $fieldToCheck;
@@ -896,7 +896,7 @@ class InesIntegration extends CrmAbstractIntegration
         $fieldsToCheck[] = [
             'name'  => 'Stop Synchro INES',
             'type'  => 'boolean',
-            'alias' => $this->stopSyncAtmtKey,
+            'alias' => $this->stopSyncMauticKey,
         ];
 
         // Check each field

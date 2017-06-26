@@ -45,11 +45,11 @@ class InesApi extends CrmApi
         $fieldKeys = array(
             'concept', 'inesKey', 'inesLabel', 'isCustomField',
             'isMappingRequired', 'autoMapping', 'excludeFromEcrasableConfig',
-            'atmtCustomFieldToCreate',
+            'mauticCustomFieldToCreate',
         );
 
         /////// STEP 1
-        // All standard INES fields that can be mapped with ATMT
+        // All standard INES fields that can be mapped with Mautic
         // Not included: Contact score and Unsubscribe flag (DNC) because managed off-mapping
         // Warning: the e-mail field must not be auto-mapped, otherwise the sync may not be triggered by CrmAbstractIntegration :: pushLead
 
@@ -123,23 +123,23 @@ class InesApi extends CrmApi
             if (is_array($inesConfig[$conceptLabel.'CustomFields'])) {
                 foreach($inesConfig[$conceptLabel.'CustomFields'] as $field) {
 
-                    // Conversion of INES field type to ATMT field type
+                    // Conversion of INES field type to Mautic field type
                     if (!isset($availableCustomFieldTypes[$field['Type']])) {
                         continue;
                     }
-                    $atmtType = $availableCustomFieldTypes[$field['Type']];
+                    $mauticType = $availableCustomFieldTypes[$field['Type']];
 
-                    $atmtCustomFieldToCreate = [
+                    $mauticCustomFieldToCreate = [
                         'alias' => 'ines_'.$concept.'_custom_'.$field['InesID'],
-                        'type' => $atmtType
+                        'type' => $mauticType
                     ];
 
                     // Type INES "user"
                     if ($field['Type'] == 'user') {
-                        $atmtCustomFieldToCreate['valuesFromWS'] = 'GetUserInfoFromUserRef';
+                        $mauticCustomFieldToCreate['valuesFromWS'] = 'GetUserInfoFromUserRef';
                     }
                     // List of values with same keys
-                    else if ($atmtType == 'select') {
+                    else if ($mauticType == 'select') {
 
                         $values = end($field['ValueList']);
 
@@ -149,7 +149,7 @@ class InesApi extends CrmApi
                         });
 
                         // For these lists of values, only the keys are used: the labels are blank
-                        $atmtCustomFieldToCreate['values'] = array_combine(
+                        $mauticCustomFieldToCreate['values'] = array_combine(
                             array_values($values),
                             array_fill(0, count($values), "")
                         );
@@ -159,7 +159,7 @@ class InesApi extends CrmApi
 
                     $inesFields[] = array_combine(
                         $fieldKeys,
-                        [$concept, $field['InesID'], $inesLabel, true, false, false, false, $atmtCustomFieldToCreate]
+                        [$concept, $field['InesID'], $inesLabel, true, false, false, false, $mauticCustomFieldToCreate]
                     );
                 }
             }
@@ -172,16 +172,16 @@ class InesApi extends CrmApi
         foreach($inesFields as $k => $field) {
 
             // If current field is concerned...
-            if ($field['atmtCustomFieldToCreate'] !== false && isset($field['atmtCustomFieldToCreate']['valuesFromWS'])) {
+            if ($field['mauticCustomFieldToCreate'] !== false && isset($field['mauticCustomFieldToCreate']['valuesFromWS'])) {
 
                 // Does the requested WS exist in the config?
-                $wsName = $field['atmtCustomFieldToCreate']['valuesFromWS'];
+                $wsName = $field['mauticCustomFieldToCreate']['valuesFromWS'];
                 if (isset($inesConfig['ValuesFromWS'][$wsName])) {
 
                     // If yes, use the keys / values read in this WS for the current field
                     $values = $inesConfig['ValuesFromWS'][$wsName];
-                    $inesFields[$k]['atmtCustomFieldToCreate']['values'] = $values;
-                    unset($inesFields[$k]['atmtCustomFieldToCreate']['ValuesFromWS']);
+                    $inesFields[$k]['mauticCustomFieldToCreate']['values'] = $values;
+                    unset($inesFields[$k]['mauticCustomFieldToCreate']['ValuesFromWS']);
                 }
                 else {
                     $this->integration->log("INEW WS not found : $wsName");
@@ -239,10 +239,10 @@ class InesApi extends CrmApi
         $dontSyncToInes = $this->integration->getDontSyncFlag($lead);
 
         if ($syncTriggeredFromPushLead) {
-            $addLeadDescription = "Lead Automation - ".$this->integration->getLastTimelineEvent($lead);
+            $addLeadDescription = "Lead Mautic - ".$this->integration->getLastTimelineEvent($lead);
         }
         else {
-            $addLeadDescription = "Lead Automation";
+            $addLeadDescription = "Lead Mautic";
         }
 
         if ( !isset($company['companyname']) || empty($company['companyname']) || $dontSyncToInes) {
@@ -285,11 +285,11 @@ class InesApi extends CrmApi
             // Lead value for the current field
             // If not defined, it is not stored in the mapped data
             // Special case: company
-            if ($mappingItem['atmtFieldKey'] == 'company') {
+            if ($mappingItem['mauticFieldKey'] == 'company') {
                 $leadValue = $company['companyname'];
             // General case
             } else {
-                $leadValue = $fieldsValues[ $mappingItem['atmtFieldKey'] ];
+                $leadValue = $fieldsValues[ $mappingItem['mauticFieldKey'] ];
                 if ($leadValue == null) {
                     continue;
                 }
@@ -314,7 +314,7 @@ class InesApi extends CrmApi
 
 
         // Read the INES references for the contact and the company
-        // If it is a new lead, they are unknown, otherwise they must have been previously stored in ATMT
+        // If it is a new lead, they are unknown, otherwise they must have been previously stored in Mautic
         $internalContactRef = isset($mappedDatas['contact']['standardFields']['InternalContactRef']) ? $mappedDatas['contact']['standardFields']['InternalContactRef'] : 0;
         $internalCompanyRef = isset($mappedDatas['contact']['standardFields']['InternalCompanyRef']) ? $mappedDatas['contact']['standardFields']['InternalCompanyRef'] : 0;
 
@@ -340,13 +340,13 @@ class InesApi extends CrmApi
                 $datas['client']['Type'] = $inesConfig['SocieteType'];
             }
 
-            // Contact ID in ATMT
-            $datas['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $leadId;
+            // Contact ID in Mautic
+            $datas['client']['Contacts']['ContactInfoAuto'][0]['MauticRef'] = $leadId;
 
-            // ATMT score
+            // Mautic score
             $datas['client']['Contacts']['ContactInfoAuto'][0]['Scoring'] = $leadPoints;
 
-            // ATMT DNC flag
+            // Mautic DNC flag
             $datas['client']['Contacts']['ContactInfoAuto'][0]['Desabo'] = $leadDesaboFlag;
 
             // SOAP request: create client + contact at INES
@@ -364,7 +364,7 @@ class InesApi extends CrmApi
                 return false;
             }
 
-            // Save INES references into dedicated ATMT fields
+            // Save INES references into dedicated Mautic fields
             $this->integration->setInesKeysToLead($lead, $internalCompanyRef, $internalContactRef);
 
             // If a lead channel has been configured at INES, the creation of the contact must be followed by the writing of a weblead (in the INES sense of the term)
@@ -436,7 +436,7 @@ class InesApi extends CrmApi
                     // Update contact
                     else {
                         $wsDatas['contact']['ModificationDate'] = date("Y-m-d\TH:i:s");
-                        $wsDatas['contact']['AutomationRef'] = $leadId;
+                        $wsDatas['contact']['MauticRef'] = $leadId;
                         $wsDatas['contact']['Scoring'] = $leadPoints;
                         $wsDatas['contact']['Desabo'] = $leadDesaboFlag;
                         $wsDatas['contact']['IsNew'] = false;
@@ -489,7 +489,7 @@ class InesApi extends CrmApi
             // Read, through WS, the current fields of INES
             $currentCustomFields = $this->getCurrentCustomFields($concept, $inesRef);
 
-            // Automation fields to be updated
+            // Mautic fields to be updated
             foreach($mappedDatas[$concept]['customFields'] as $inesFieldKey => $fieldValue) {
 
                 $datas = array(
@@ -583,11 +583,11 @@ class InesApi extends CrmApi
      */
     public function deleteContact($inesRef)
     {
-        $response = $this->request('ws/wsAutomationsync.asmx', 'DeleteAutomationContact', array(
+        $response = $this->request('ws/wsAutomationsync.asmx', 'DeleteMauticContact', array(
             'InesRef' => $inesRef
         ), true, true);
 
-        return (isset($response['DeleteAutomationContactResult']) && $response['DeleteAutomationContactResult'] == 'Success');
+        return (isset($response['DeleteMauticContactResult']) && $response['DeleteMauticContactResult'] == 'Success');
     }
 
 
@@ -638,15 +638,15 @@ class InesApi extends CrmApi
 
 
     /**
-     * Searches, from field mapping, Automation fields that correspond to a list of INES fields
+     * Searches, from field mapping, Mautic fields that correspond to a list of INES fields
      *
      * @param array $inesFieldsKeys
      *
-     * @return array List of ATMT fields identifiers founded
+     * @return array List of Mautic fields identifiers founded
      */
-    public function getAtmtFieldsKeysFromInesFieldsKeys($inesFieldsKeys)
+    public function getMauticFieldsKeysFromInesFieldsKeys($inesFieldsKeys)
     {
-        $atmtFields = array();
+        $mauticFields = array();
         $mapping = $this->integration->getMapping();
 
         foreach($mapping as $mappingItem) {
@@ -654,10 +654,10 @@ class InesApi extends CrmApi
             $inesFieldKey = $mappingItem['inesFieldKey'];
 
             if (in_array($inesFieldKey, $inesFieldsKeys)) {
-                $atmtFields[$inesFieldKey] = $mappingItem['atmtFieldKey'];
+                $mauticFields[$inesFieldKey] = $mappingItem['mauticFieldKey'];
             }
         }
-        return $atmtFields;
+        return $mauticFields;
     }
 
 
@@ -857,8 +857,8 @@ class InesApi extends CrmApi
             // Save for later
             $this->integration->setCurrentSyncConfig($syncConfig);
 
-            // Whenever the config is regenerated, we check that the custom fields are up-to-date in ATMT
-            $this->integration->updateAtmtCustomFieldsDefinitions();
+            // Whenever the config is regenerated, we check that the custom fields are up-to-date in Mautic
+            $this->integration->updateMauticCustomFieldsDefinitions();
         }
 
         return $syncConfig;
@@ -981,7 +981,7 @@ class InesApi extends CrmApi
             'Delivery' => 0,
             'Billing' => 0,
             'IsNew' => true,
-            'AutomationRef' => 0, /* don't fill because ATMT company concept isn't managed by the plugin */
+            'MauticRef' => 0, /* don't fill because Mautic company concept isn't managed by the plugin */
             'InternalRef' => 0
         );
     }
@@ -1026,7 +1026,7 @@ class InesApi extends CrmApi
             'Desabo' => '',
             'NPai' => '',
             'InternalRef' => 0,
-            'AutomationRef' => 0,
+            'MauticRef' => 0,
             'Scoring' => 0
         );
     }

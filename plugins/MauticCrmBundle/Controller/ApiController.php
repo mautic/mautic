@@ -18,7 +18,7 @@ class ApiController extends CommonApiController
 {
     /**
      * API end-point : /api/ines/getMapping
-     * Returns the list of INES fields mapped with the ATMT fields
+     * Returns the list of INES fields mapped with the Mautic fields
      * To test, use the Mautic test API : https://github.com/mautic/api-library/tree/master/apitester.
      *
      * @return JsonResponse(array)
@@ -28,7 +28,7 @@ class ApiController extends CommonApiController
         $inesIntegration = $this->container->get('mautic.helper.integration')->getIntegrationObject('Ines');
 
         $mappedFields     = $inesIntegration->getMapping();
-        $dontSyncFieldKey = $inesIntegration->getDontSyncAtmtKey();
+        $dontSyncFieldKey = $inesIntegration->getDontSyncMauticKey();
 
         return new JsonResponse([
             'mapping'          => $mappedFields,
