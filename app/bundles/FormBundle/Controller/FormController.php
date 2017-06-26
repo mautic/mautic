@@ -451,6 +451,7 @@ class FormController extends CommonFormController
                     'activeForm'     => $entity,
                     'form'           => $form->createView(),
                     'contactFields'  => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'inBuilder'      => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
                 'passthroughVars' => [
@@ -804,6 +805,7 @@ class FormController extends CommonFormController
                     'form'               => $form->createView(),
                     'forceTypeSelection' => $forceTypeSelection,
                     'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'inBuilder'          => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
                 'passthroughVars' => [
