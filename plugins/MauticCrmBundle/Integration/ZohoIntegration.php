@@ -76,13 +76,23 @@ class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return string
+     */
+    public function getDatacenter()
+    {
+        $featureSettings = $this->getKeys();
+
+        return $featureSettings['datacenter'] ?? 'zoho.com';
+    }
+
+    /**
      * @param bool $isJson
      *
      * @return string
      */
     public function getApiUrl($isJson = true)
     {
-        return 'https://crm.zoho.com/crm/private/'.($isJson ? 'json' : 'xml');
+        return sprintf('https://crm.%s/crm/private/%s', $this->getDatacenter(), $isJson ? 'json' : 'xml');
     }
 
     /**
@@ -350,7 +360,26 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ('features' === $formArea) {
+        if ($formArea === 'keys') {
+            $builder->add(
+                'datacenter',
+                'choice',
+                [
+                    'choices' => [
+                        'zoho.com'    => 'mautic.plugin.zoho.zone_us',
+                        'zoho.eu'     => 'mautic.plugin.zoho.zone_europe',
+                        'zoho.co.jp'  => 'mautic.plugin.zoho.zone_japan',
+                        'zoho.com.cn' => 'mautic.plugin.zoho.zone_china',
+                    ],
+                    'label'       => 'mautic.plugin.zoho.zone_select',
+                    'empty_value' => false,
+                    'required'    => true,
+                    'attr'        => [
+                        'tooltip' => 'mautic.plugin.zoho.zone.tooltip',
+                    ],
+                ]
+            );
+        } elseif ('features' === $formArea) {
             $builder->add(
                 'objects',
                 'choice',
@@ -381,14 +410,14 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function authCallback($settings = [], $parameters = [])
     {
-        $request_url = 'https://accounts.zoho.com/apiauthtoken/nb/create';
+        $request_url = sprintf('https://accounts.%s/apiauthtoken/nb/create', $this->getDatacenter());
         $parameters  = array_merge($parameters, [
             'SCOPE'    => 'ZohoCRM/crmapi',
             'EMAIL_ID' => $this->keys[$this->getClientIdKey()],
             'PASSWORD' => $this->keys[$this->getClientSecretKey()],
         ]);
 
-        $response = $this->makeRequest($request_url, $parameters, 'GET', ['authorize_session' => true]);
+        $response = $this->makeRequest($request_url, $parameters, 'POST', ['authorize_session' => true]);
 
         if ($response['RESULT'] == 'FALSE') {
             return $this->translator->trans('mautic.zoho.auth_error', ['%cause%' => (isset($response['CAUSE']) ? $response['CAUSE'] : 'UNKNOWN')]);
