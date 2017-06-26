@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
@@ -398,30 +399,33 @@ class LeadModel extends FormModel
         //check to see if we can glean information from ip address
         if (!$entity->imported && count($ips = $entity->getIpAddresses())) {
             $details = $ips->first()->getIpDetails();
-            if (!empty($details['city']) && empty($fields['core']['city']['value'])) {
-                $entity->addUpdatedField('city', $details['city']);
-                $companyFieldMatches['city'] = $details['city'];
-            }
+            // Only update with IP details if none of the following are set to prevent wrong combinations
+            if (empty($fields['core']['city']['value']) && empty($fields['core']['state']['value']) && empty($fields['core']['country']['value']) && empty($fields['core']['zipcode']['value'])) {
+                if (!empty($details['city'])) {
+                    $entity->addUpdatedField('city', $details['city']);
+                    $companyFieldMatches['city'] = $details['city'];
+                }
 
-            if (!empty($details['region']) && empty($fields['core']['state']['value'])) {
-                $entity->addUpdatedField('state', $details['region']);
-                $companyFieldMatches['state'] = $details['region'];
-            }
+                if (!empty($details['region'])) {
+                    $entity->addUpdatedField('state', $details['region']);
+                    $companyFieldMatches['state'] = $details['region'];
+                }
 
-            if (!empty($details['country']) && empty($fields['core']['country']['value'])) {
-                $entity->addUpdatedField('country', $details['country']);
-                $companyFieldMatches['country'] = $details['country'];
-            }
+                if (!empty($details['country'])) {
+                    $entity->addUpdatedField('country', $details['country']);
+                    $companyFieldMatches['country'] = $details['country'];
+                }
 
-            if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
-                $entity->addUpdatedField('zipcode', $details['zipcode']);
+                if (!empty($details['zipcode'])) {
+                    $entity->addUpdatedField('zipcode', $details['zipcode']);
+                }
             }
         }
 
         $updatedFields = $entity->getUpdatedFields();
         if (isset($updatedFields['company'])) {
-            $companyFieldMatches['company'] = $updatedFields['company'];
-            list($company, $leadAdded)      = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+            $companyFieldMatches['company']            = $updatedFields['company'];
+            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
@@ -433,8 +437,10 @@ class LeadModel extends FormModel
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
-            $this->companyModel->addLeadToCompany($company['id'], $entity, true);
+            $this->companyModel->addLeadToCompany($companyEntity, $entity, true);
+            $this->em->detach($companyEntity);
         }
+        $this->em->clear(CompanyChangeLog::class);
     }
 
     /**
@@ -484,16 +490,18 @@ class LeadModel extends FormModel
             }
         }
 
-        $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
-        $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+        if (isset($data['stage'])) {
+            $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
+            $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
 
-        if (isset($data['stage']) && $data['stage'] !== $currentLeadStage) {
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
-            $lead->stageChangeLogEntry(
-                $stage,
-                $stage->getId().':'.$stage->getName(),
-                $this->translator->trans('mautic.stage.event.changed')
-            );
+            if ($data['stage'] !== $currentLeadStage) {
+                $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
+                $lead->stageChangeLogEntry(
+                    $stage,
+                    $stage->getId().':'.$stage->getName(),
+                    $this->translator->trans('mautic.stage.event.changed')
+                );
+            }
         }
 
         //save the field values
