@@ -32,6 +32,7 @@ return [
                 'class'     => 'Mautic\NotificationBundle\EventListener\BuildJsSubscriber',
                 'arguments' => [
                     'mautic.helper.notification',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.notification.notificationbundle.subscriber' => [
@@ -143,6 +144,11 @@ return [
                 'arguments' => [
                     'mautic.page.model.trackable',
                 ],
+            ],
+        ],
+        'integrations' => [
+            'mautic.integration.onesignal' => [
+                'class' => \Mautic\NotificationBundle\Integration\OneSignalIntegration::class,
             ],
         ],
     ],

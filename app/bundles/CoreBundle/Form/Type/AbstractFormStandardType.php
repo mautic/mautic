@@ -51,7 +51,7 @@ abstract class AbstractFormStandardType extends AbstractType
             throw new \Exception('$options[\'data\'] must be defined');
         }
 
-        $masks = ['description' => 'html'];
+        $masks = ['description' => 'strict_html'];
         if (isset($options['clean_masks'])) {
             $masks = array_merge($masks, $options['clean_masks']);
         }

@@ -49,7 +49,10 @@ return [
     'services' => [
         'events' => [
             'mautic.config.subscriber' => [
-                'class' => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber',
+                'class'     => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
         ],
 

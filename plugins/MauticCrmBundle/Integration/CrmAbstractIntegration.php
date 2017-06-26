@@ -60,7 +60,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param Lead  $lead
+     * @param array $config
+     *
+     * @return array|bool
      */
     public function pushLead($lead, $config = [])
     {
@@ -92,7 +95,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param $lead
+     * @param array $params
      */
     public function getLeads($params = [])
     {
@@ -134,9 +137,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * Amend mapped lead data before creating to Mautic.
+     * Ammend mapped lead data before creating to Mautic.
      *
-     * @param $mappedData
+     * @param $data
+     * @param $object
      */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
@@ -284,8 +288,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel           = $this->factory->getModel('lead');
-        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $leadModel           = $this->leadModel;
+        $uniqueLeadFields    = $this->fieldModel->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
 
         foreach ($matchedFields as $leadField => $value) {
@@ -304,17 +308,16 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
+            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
-
             if (!empty($existingLeads)) {
-                $lead = array_shift($existingLeads);
+                $lead          = array_shift($existingLeads);
+                $existingLeads = true;
             }
         }
 
-        //use direction of fields only when updating existing lead
-        $fieldsToUpdateInMautic = (isset($config['update_mautic']) && empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
-        if (!empty($fieldsToUpdateInMautic)) {
+        $fieldsToUpdateInMautic = (isset($config['update_mautic']) && !empty($existingLeads)) ? array_keys($config['update_mautic'], 0) : [];
+        if (!empty($fieldsToUpdateInMautic) && !empty($existingLeads)) {
             $fieldsToUpdateInMautic = array_diff_key($config['leadFields'], array_flip($fieldsToUpdateInMautic));
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
         }

@@ -103,6 +103,11 @@ return [
                 ],
             ],
         ],
+        'integrations' => [
+            'mautic.integration.twilio' => [
+                'class' => \Mautic\SmsBundle\Integration\TwilioIntegration::class,
+            ],
+        ],
     ],
     'routes' => [
         'main' => [
