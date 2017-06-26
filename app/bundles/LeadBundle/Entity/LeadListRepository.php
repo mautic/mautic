@@ -1328,8 +1328,6 @@ class LeadListRepository extends CommonRepository
                             break;
                     }
 
-                    $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
-
                     break;
                 case 'integration_campaigns':
                     $operand = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
