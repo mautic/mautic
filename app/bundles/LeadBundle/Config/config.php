@@ -504,7 +504,7 @@ return [
                 'alias'     => 'campaignevent_lead_field_value',
             ],
             'mautic.form.type.campaignevent_lead_tags' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType::class',
+                'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType::class,
                 'arguments' => ['translator'],
                 'alias'     => 'campaignevent_lead_tags',
             ],
