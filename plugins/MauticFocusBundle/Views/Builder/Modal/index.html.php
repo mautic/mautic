@@ -28,7 +28,7 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
 } ?>>x</a>
             </div>
             <div class="mf-content">
-                <?php if ($focus['htmlMode'] || $focus['html_mode']): ?>
+                <?php if (!empty($focus['htmlMode']) || !empty($focus['html_mode'])): ?>
                     <?php echo html_entity_decode($focus['html']); ?>
                 <?php else: ?>
                 <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
