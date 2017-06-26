@@ -154,6 +154,7 @@ class FieldController extends CommonFormController
                     'id'            => $keyId,
                     'formId'        => $formId,
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'inBuilder'     => true,
                 ]
             );
         }
@@ -295,6 +296,7 @@ class FieldController extends CommonFormController
                     'id'            => $objectId,
                     'formId'        => $formId,
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'inBuilder'     => true,
                 ]
             );
 
