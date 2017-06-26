@@ -719,10 +719,13 @@ class CommonRepository extends EntityRepository
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
+        $i         = 0;
+
         foreach ($entities as $k => $entity) {
+            ++$i;
             $this->saveEntity($entity, false);
 
-            if ((($k + 1) % $batchSize) === 0) {
+            if ($i % $batchSize === 0) {
                 $this->getEntityManager()->flush();
             }
         }
@@ -740,6 +743,7 @@ class CommonRepository extends EntityRepository
     public function saveEntity($entity, $flush = true)
     {
         $this->getEntityManager()->persist($entity);
+
         if ($flush) {
             $this->getEntityManager()->flush($entity);
         }
