@@ -80,8 +80,8 @@ class InesSyncLogModel extends FormModel
     /**
      * Returns X pending leads waiting for sync.
      *
-     * @param 	$action 	string 	'UPDATE' | 'DELETE'
-     * @param 	$limit 		int
+     * @param $action string 'UPDATE' | 'DELETE'
+     * @param $limit     int
      *
      * @return array
      */
@@ -102,7 +102,7 @@ class InesSyncLogModel extends FormModel
     /**
      * Checks whether the queue is empty or not.
      *
-     * @param 	$action 	string 	'UPDATE' | 'DELETE'
+     * @param $action string 'UPDATE' | 'DELETE'
      *
      * @return bool
      */
@@ -116,7 +116,7 @@ class InesSyncLogModel extends FormModel
     /**
      * Returns queue history, by decreasing update date.
      *
-     * @param 	$limit 		int
+     * @param  $limit int
      *
      * @return array
      */

@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Controller\FormController;
 class InesController extends FormController
 {
     /**
-     * Page : INES sync log for full-sync mode.
+     * INES CRM integration log page
      *
      * @return string
      */

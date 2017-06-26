@@ -17,9 +17,10 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * INES : Check connection to INES web service, used by the test button of the plugin's config tab.
+     * Check the connection to the INES web service, used by the test button
+     * of the plugin's config tab.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request Do not fill this argument
+     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse string
      */

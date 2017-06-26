@@ -32,7 +32,7 @@ return [
             ],
         ],
 
-        /* Page : INES CRM sync log **/
+        /* INES CRM integration log page */
         'main' => [
             'ines_logs' => [
                 'path'       => '/ines/logs',
@@ -40,7 +40,7 @@ return [
             ],
         ],
 
-        /* Adding an End-Point to the Mautic API to retrieve INES plugin mapping and config **/
+        /* Mautic API endpoint to retrieve INES mapping and config */
         'api' => [
             'plugin_crm_bundle_ines_get_mapping_api' => [
                 'path'       => '/ines/getMapping',

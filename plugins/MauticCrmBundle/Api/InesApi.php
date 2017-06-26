@@ -17,33 +17,35 @@ use Mautic\LeadBundle\Entity\Lead;
 class InesApi extends CrmApi
 {
 
-	/**
-	 * Forces the deletion / update of the session ID of the web service
+    /**
+     * Forces the deletion / update of the session ID of the web service
      * Used by the "Test Connection" button on the config tab
-	 *
-	 * @return	int (id de session)
-	 * @throws 	ApiErrorException
-	 */
+     *
+     * @return int Session ID
+     * @throws ApiErrorException
+     */
     public function refreshSessionID()
-	{
-		$this->integration->unsetWebServiceCurrentSessionID();
-		$newSessionID = $this->getSessionID();
-		return $newSessionID;
-	}
+    {
+        $this->integration->unsetWebServiceCurrentSessionID();
+        $newSessionID = $this->getSessionID();
+        return $newSessionID;
+    }
 
 
-	/**
-	 * Returns the list of fields available at INES
-	 *
-	 * @return array
-	 */
-	public function getLeadFields()
-	{
-		$inesConfig = $this->getInesSyncConfig();
+    /**
+     * Returns the list of fields available at INES
+     *
+     * @return array
+     */
+    public function getLeadFields()
+    {
+        $inesConfig = $this->getInesSyncConfig();
 
         // Keys that will be mapped to the values below
-		$fieldKeys = array(
-            'concept', 'inesKey', 'inesLabel', 'isCustomField', 'isMappingRequired', 'autoMapping', 'excludeFromEcrasableConfig', 'atmtCustomFieldToCreate'
+        $fieldKeys = array(
+            'concept', 'inesKey', 'inesLabel', 'isCustomField',
+            'isMappingRequired', 'autoMapping', 'excludeFromEcrasableConfig',
+            'atmtCustomFieldToCreate',
         );
 
         /////// STEP 1
@@ -52,9 +54,9 @@ class InesApi extends CrmApi
         // Warning: the e-mail field must not be auto-mapped, otherwise the sync may not be triggered by CrmAbstractIntegration :: pushLead
 
         $defaultInesFields = array();
-		$defaultInesFields[] = array('contact', 'InternalContactRef', 'mautic.ines.field.internalcontactref', false, true, 'ines_contact_ref', true, ['alias' => "ines_contact_ref", 'type' => "number"]);
-		$defaultInesFields[] = array('contact', 'InternalCompanyRef', 'mautic.ines.field.internalcompanyref', false, true, 'ines_client_ref', true, ['alias' => "ines_client_ref", 'type' => "number"]);
-		$defaultInesFields[] = array('contact', 'PrimaryMailAddress', 'mautic.ines.field.primarymailaddress', false, true, false, true, false);
+        $defaultInesFields[] = array('contact', 'InternalContactRef', 'mautic.ines.field.internalcontactref', false, true, 'ines_contact_ref', true, ['alias' => "ines_contact_ref", 'type' => "number"]);
+        $defaultInesFields[] = array('contact', 'InternalCompanyRef', 'mautic.ines.field.internalcompanyref', false, true, 'ines_client_ref', true, ['alias' => "ines_client_ref", 'type' => "number"]);
+        $defaultInesFields[] = array('contact', 'PrimaryMailAddress', 'mautic.ines.field.primarymailaddress', false, true, false, true, false);
         $defaultInesFields[] = array('contact', 'Genre', 'mautic.ines.field.genre.contact', false, false, false, false, ['alias' => "ines_contact_civilite"]);
         $defaultInesFields[] = array('contact', 'LastName', 'mautic.ines.field.lastname.contact', false, false, 'lastname', false, false);
         $defaultInesFields[] = array('contact', 'FirstName', 'mautic.ines.field.firstname.contact', false, false, 'firstname', false, false);
@@ -102,11 +104,11 @@ class InesApi extends CrmApi
         $defaultInesFields[] = array('client', 'Scoring', 'mautic.ines.field.scoring.company', false, false, false, false, ['alias' => "ines_client_score"]);
 
         $inesFields = array();
-		foreach($defaultInesFields as $field) {
+        foreach($defaultInesFields as $field) {
             $inesField = array_combine($fieldKeys, $field);
             $inesField['inesLabel'] = $this->integration->getTranslator()->trans($inesField['inesLabel']);
-			$inesFields[] = $inesField;
-		}
+            $inesFields[] = $inesField;
+        }
 
 
         /////// STEP 2
@@ -122,7 +124,7 @@ class InesApi extends CrmApi
                 foreach($inesConfig[$conceptLabel.'CustomFields'] as $field) {
 
                     // Conversion of INES field type to ATMT field type
-                    if ( !isset($availableCustomFieldTypes[$field['Type']])) {
+                    if (!isset($availableCustomFieldTypes[$field['Type']])) {
                         continue;
                     }
                     $atmtType = $availableCustomFieldTypes[$field['Type']];
@@ -172,7 +174,7 @@ class InesApi extends CrmApi
             // If current field is concerned...
             if ($field['atmtCustomFieldToCreate'] !== false && isset($field['atmtCustomFieldToCreate']['valuesFromWS'])) {
 
-                // Does the requested WS exist in the config ?
+                // Does the requested WS exist in the config?
                 $wsName = $field['atmtCustomFieldToCreate']['valuesFromWS'];
                 if (isset($inesConfig['ValuesFromWS'][$wsName])) {
 
@@ -187,51 +189,53 @@ class InesApi extends CrmApi
             }
         }
 
-		return $inesFields;
-	}
+        return $inesFields;
+    }
 
 
-	/**
-	 * Called by "push lead to integration", out of a FORM, a CAMPAIGN ...
-	 *
-	 * @param 	array 							$mappedData		These data are not used
-	 * @param 	Mautic\LeadBundle\Entity\Lead	$lead
-	 */
-	public function createLead($mappedData, Lead $lead)
-	{
-		$leadId = $lead->getId();
-		$company = $this->integration->getLeadMainCompany($leadId);
+    /**
+     * Called by "push lead to integration", out of a FORM, a CAMPAIGN ...
+     *
+     * @param array                         $mappedData These data are not used
+     * @param Mautic\LeadBundle\Entity\Lead $lead
+     */
+    public function createLead($mappedData, Lead $lead)
+    {
+        $leadId = $lead->getId();
+        $company = $this->integration->getLeadMainCompany($leadId);
 
-		// A lead is synchronized only if it has at least an email and a company
-		if ( !empty($lead->getEmail()) && !empty($company)) {
-			try {
-				$this->syncLeadToInes($lead, true);
+        // A lead is synchronized only if it has at least an email and a company
+        if ( !empty($lead->getEmail()) && !empty($company)) {
+            try {
+                $this->syncLeadToInes($lead, true);
 
                 // If a lead is synchronized by a "push contact to integaration" direct action,
                 // it is removed from the sync queue, dedicated to asynchronous sync via a CRONJOB
-				$this->integration->dequeuePendingLead($lead->getId());
-			}
-			catch (\Exception $e) {
-				$this->integration->logIntegrationError($e);
-			}
-		}
-	}
+                $this->integration->dequeuePendingLead($lead->getId());
+            }
+            catch (\Exception $e) {
+                $this->integration->logIntegrationError($e);
+            }
+        }
+    }
 
 
-	/**
-	 * Push any lead to INES CRM
-	 *
-	 * @param 	Mautic\LeadBundle\Entity\Lead	$lead
-     * @param   bool    $syncTriggeredFromPushLead    Indicates whether the sync is from a "push lead to integration" action
-	 *
-	 * @return 	bool	Success or failure of sync
-	 */
-	public function syncLeadToInes(Lead $lead, $syncTriggeredFromPushLead = false)
-	{
-		$leadId = $lead->getId();
-		$leadPoints = $lead->getPoints();
+    /**
+     * Push any lead to INES CRM
+     *
+     * @param Lead $lead
+     * @param bool $syncTriggeredFromPushLead Indicates whether the sync is
+     *                                        from a "push lead to integration"
+     *                                        action
+     *
+     * @return bool Success or failure of sync
+     */
+    public function syncLeadToInes(Lead $lead, $syncTriggeredFromPushLead = false)
+    {
+        $leadId = $lead->getId();
+        $leadPoints = $lead->getPoints();
         $leadDesaboFlag = empty($lead->getDoNotContact()->toArray()) ? 0 : 1;
-		$company = $this->integration->getLeadMainCompany($leadId, false);
+        $company = $this->integration->getLeadMainCompany($leadId, false);
         $dontSyncToInes = $this->integration->getDontSyncFlag($lead);
 
         if ($syncTriggeredFromPushLead) {
@@ -241,102 +245,103 @@ class InesApi extends CrmApi
             $addLeadDescription = "Lead Automation";
         }
 
-		if ( !isset($company['companyname']) || empty($company['companyname']) || $dontSyncToInes) {
-			return false;
-		}
+        if ( !isset($company['companyname']) || empty($company['companyname']) || $dontSyncToInes) {
+            return false;
+        }
 
-		// Read all the current lead fields
-		$rawFields = $lead->getFields();
-		$fieldsValues = array();
-		foreach($rawFields as $fieldGroup => $localFields) {
-			foreach($localFields as $fieldKey => $field) {
-				$fieldsValues[$fieldKey] = $field['value'];
-			}
-		}
+        // Read all the current lead fields
+        $rawFields = $lead->getFields();
+        $fieldsValues = array();
+        foreach($rawFields as $fieldGroup => $localFields) {
+            foreach($localFields as $fieldKey => $field) {
+                $fieldsValues[$fieldKey] = $field['value'];
+            }
+        }
 
         // Applying mapping to the current lead
         // Disassociating information from the contact and the company
         // as well as standard and custom fields (at INES)
-		$mappedDatas = array(
-			'contact' => array(
-				'standardFields' => array(),
-				'customFields' => array()
-			),
-			'client' => array(
-				'standardFields' => array(),
-				'customFields' => array()
-			)
-		);
+        $mappedDatas = array(
+            'contact' => array(
+                'standardFields' => array(),
+                'customFields' => array()
+            ),
+            'client' => array(
+                'standardFields' => array(),
+                'customFields' => array()
+            )
+        );
 
-		// Structure for storing non-erasable fields
-		$inesProtectedFields = array(
-			'contact' => array(),
-			'client' => array()
-		);
+        // Structure for storing non-erasable fields
+        $inesProtectedFields = array(
+            'contact' => array(),
+            'client' => array()
+        );
 
-		$mapping = $this->integration->getMapping();
+        $mapping = $this->integration->getMapping();
 
-		foreach($mapping as $mappingItem) {
+        foreach($mapping as $mappingItem) {
 
             // Lead value for the current field
             // If not defined, it is not stored in the mapped data
-            if ($mappingItem['atmtFieldKey'] == 'company') { // Cas particulier : société
+            // Special case: company
+            if ($mappingItem['atmtFieldKey'] == 'company') {
                 $leadValue = $company['companyname'];
+            // General case
+            } else {
+                $leadValue = $fieldsValues[ $mappingItem['atmtFieldKey'] ];
+                if ($leadValue == null) {
+                    continue;
+                }
             }
-            else { // General case
-				$leadValue = $fieldsValues[ $mappingItem['atmtFieldKey'] ];
-				if ($leadValue == null) {
-					continue;
-				}
-			}
 
-			// Field key at INES
-			$inesFieldKey = $mappingItem['inesFieldKey'];
+            // Field key in INES
+            $inesFieldKey = $mappingItem['inesFieldKey'];
 
-			// Concept : contact or client
-			$concept = $mappingItem['concept'];
+            // Concept: contact or client
+            $concept = $mappingItem['concept'];
 
-			// If the field is not erasable, it is stored: will be useful during the UPDATE (see below)
-			if ( !$mappingItem['isEcrasable']) {
-				array_push($inesProtectedFields[$concept], $inesFieldKey);
-			}
+            // If the field is not erasable, it is stored: will be useful during the UPDATE (see below)
+            if ( !$mappingItem['isEcrasable']) {
+                array_push($inesProtectedFields[$concept], $inesFieldKey);
+            }
 
-			// Standard or custom field (at INES) ?
-			$fieldCategory = ($mappingItem['isCustomField'] == 0) ? 'standardFields' : 'customFields';
+            // Standard or custom field (in INES) ?
+            $fieldCategory = ($mappingItem['isCustomField'] == 0) ? 'standardFields' : 'customFields';
 
-			$mappedDatas[$concept][$fieldCategory][$inesFieldKey] = $leadValue;
-		}
+            $mappedDatas[$concept][$fieldCategory][$inesFieldKey] = $leadValue;
+        }
 
 
         // Read the INES references for the contact and the company
         // If it is a new lead, they are unknown, otherwise they must have been previously stored in ATMT
-		$internalContactRef = isset($mappedDatas['contact']['standardFields']['InternalContactRef']) ? $mappedDatas['contact']['standardFields']['InternalContactRef'] : 0;
-		$internalCompanyRef = isset($mappedDatas['contact']['standardFields']['InternalCompanyRef']) ? $mappedDatas['contact']['standardFields']['InternalCompanyRef'] : 0;
+        $internalContactRef = isset($mappedDatas['contact']['standardFields']['InternalContactRef']) ? $mappedDatas['contact']['standardFields']['InternalContactRef'] : 0;
+        $internalCompanyRef = isset($mappedDatas['contact']['standardFields']['InternalCompanyRef']) ? $mappedDatas['contact']['standardFields']['InternalCompanyRef'] : 0;
 
-		//// CREATE
-		if ( !$internalCompanyRef || !$internalContactRef) {
+        //// CREATE
+        if ( !$internalCompanyRef || !$internalContactRef) {
 
-			// Get INES datas template for WS
-			$datas = $this->getClientWithContactsTemplate();
+            // Get INES datas template for WS
+            $datas = $this->getClientWithContactsTemplate();
 
-			// Hydratation of the standard fields (concept : client)
-			foreach($mappedDatas['client']['standardFields'] as $inesFieldKey => $fieldValue) {
-				$datas['client'][$inesFieldKey] = $fieldValue;
-			}
+            // Hydratation of the standard fields (concept: client)
+            foreach($mappedDatas['client']['standardFields'] as $inesFieldKey => $fieldValue) {
+                $datas['client'][$inesFieldKey] = $fieldValue;
+            }
 
-			// Hydratation of the standard fields (concept : contact)
-			foreach($mappedDatas['contact']['standardFields'] as $inesFieldKey => $fieldValue) {
-				$datas['client']['Contacts']['ContactInfoAuto'][0][$inesFieldKey] = $fieldValue;
-			}
+            // Hydratation of the standard fields (concept: contact)
+            foreach($mappedDatas['contact']['standardFields'] as $inesFieldKey => $fieldValue) {
+                $datas['client']['Contacts']['ContactInfoAuto'][0][$inesFieldKey] = $fieldValue;
+            }
 
             // If not specified, the field "Company type" is imposed by the config defined by INES
-			if ( !isset($datas['client']['Type']) || $datas['client']['Type'] == 0) {
+            if ( !isset($datas['client']['Type']) || $datas['client']['Type'] == 0) {
                 $inesConfig = $this->getInesSyncConfig();
                 $datas['client']['Type'] = $inesConfig['SocieteType'];
             }
 
-            // Contact ID at ATMT
-			$datas['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $leadId;
+            // Contact ID in ATMT
+            $datas['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $leadId;
 
             // ATMT score
             $datas['client']['Contacts']['ContactInfoAuto'][0]['Scoring'] = $leadPoints;
@@ -344,241 +349,237 @@ class InesApi extends CrmApi
             // ATMT DNC flag
             $datas['client']['Contacts']['ContactInfoAuto'][0]['Desabo'] = $leadDesaboFlag;
 
-			// SOAP request : create client + contact at INES
-			$response = $this->request('ws/wsAutomationsync.asmx', 'AddClientWithContacts', $datas, true, true);
+            // SOAP request: create client + contact at INES
+            $response = $this->request('ws/wsAutomationsync.asmx', 'AddClientWithContacts', $datas, true, true);
 
-			if ( !isset($response['AddClientWithContactsResult']['InternalRef']) ||
-				 !isset($response['AddClientWithContactsResult']['Contacts']['ContactInfoAuto']['InternalRef'])
-			) {
-				return false;
-			}
+            if (!isset($response['AddClientWithContactsResult']['InternalRef'])
+             || !isset($response['AddClientWithContactsResult']['Contacts']['ContactInfoAuto']['InternalRef'])) {
+                return false;
+            }
 
-			// and retrieving a contact and client key
-			$internalCompanyRef = $response['AddClientWithContactsResult']['InternalRef'];
-			$internalContactRef = $response['AddClientWithContactsResult']['Contacts']['ContactInfoAuto']['InternalRef'];
-			if ( !$internalCompanyRef || !$internalContactRef) {
-				return false;
-			}
+            // and retrieving a contact and client key
+            $internalCompanyRef = $response['AddClientWithContactsResult']['InternalRef'];
+            $internalContactRef = $response['AddClientWithContactsResult']['Contacts']['ContactInfoAuto']['InternalRef'];
+            if ( !$internalCompanyRef || !$internalContactRef) {
+                return false;
+            }
 
-			// Save INES references into dedicated ATMT fields
-			$this->integration->setInesKeysToLead($lead, $internalCompanyRef, $internalContactRef);
+            // Save INES references into dedicated ATMT fields
+            $this->integration->setInesKeysToLead($lead, $internalCompanyRef, $internalContactRef);
 
-			// If a lead channel has been configured at INES, the creation of the contact must be followed by the writing of a weblead (in the INES sense of the term)
-			$inesConfig = $this->getInesSyncConfig();
-			if (isset($inesConfig['LeadRef']) && $inesConfig['LeadRef'] >= 0) {
-				$this->addLeadToInesContact(
-					$internalContactRef,
-					$internalCompanyRef,
-					$datas['client']['Contacts']['ContactInfoAuto'][0]['PrimaryMailAddress'],
-					$inesConfig['LeadRef'],
+            // If a lead channel has been configured at INES, the creation of the contact must be followed by the writing of a weblead (in the INES sense of the term)
+            $inesConfig = $this->getInesSyncConfig();
+            if (isset($inesConfig['LeadRef']) && $inesConfig['LeadRef'] >= 0) {
+                $this->addLeadToInesContact(
+                    $internalContactRef,
+                    $internalCompanyRef,
+                    $datas['client']['Contacts']['ContactInfoAuto'][0]['PrimaryMailAddress'],
+                    $inesConfig['LeadRef'],
                     $addLeadDescription
-				);
-			}
-		}
+                );
+            }
+        //// UPDATE
+        } else {
 
-		//// UPDATE
-		else {
-
-			// Before any update, we retrieve the existing data from INES
-			$clientWithContact = array(
-				'contact' => $this->getContactFromInes($internalContactRef),
-				'client' => $this->getClientFromInes($internalCompanyRef)
-			);
+            // Before any update, we retrieve the existing data from INES
+            $clientWithContact = array(
+                'contact' => $this->getContactFromInes($internalContactRef),
+                'client' => $this->getClientFromInes($internalCompanyRef)
+            );
 
             // If the contact or the customer no longer exist at INES, it is because they have been deleted
             // It is therefore necessary to erase locally the known INES references and sync again this lead
-			if ($clientWithContact['contact'] === false || $clientWithContact['client'] === false) {
-				$lead = $this->integration->setInesKeysToLead($lead, 0, 0);
-				return $this->syncLeadToInes($lead);
-			}
+            if ($clientWithContact['contact'] === false || $clientWithContact['client'] === false) {
+                $lead = $this->integration->setInesKeysToLead($lead, 0, 0);
+                return $this->syncLeadToInes($lead);
+            }
 
-			// Update the contact, if necessary, and then the client, if necessary
-			foreach($clientWithContact as $concept => $conceptDatas) {
+            // Update the contact, if necessary, and then the client, if necessary
+            foreach($clientWithContact as $concept => $conceptDatas) {
 
-				$updateNeeded = false;
-				foreach($mappedDatas[$concept]['standardFields'] as $inesFieldKey => $fieldValue) {
+                $updateNeeded = false;
+                foreach($mappedDatas[$concept]['standardFields'] as $inesFieldKey => $fieldValue) {
 
-					if ( !isset($conceptDatas[$inesFieldKey])) {
-						continue;
-					}
+                    if ( !isset($conceptDatas[$inesFieldKey])) {
+                        continue;
+                    }
 
-					$currentFieldValue = $conceptDatas[$inesFieldKey];
+                    $currentFieldValue = $conceptDatas[$inesFieldKey];
 
-					$isProtectedField = in_array($inesFieldKey, $inesProtectedFields[$concept]);
+                    $isProtectedField = in_array($inesFieldKey, $inesProtectedFields[$concept]);
 
-					// A field is updated if it has changed, and provided it is not non-erasable, unless it is empty at INES
-					if ($currentFieldValue != $fieldValue &&
-						( !$isProtectedField || empty($currentFieldValue))
-					){
-						$conceptDatas[$inesFieldKey] = $fieldValue;
-						$updateNeeded = true;
-					}
-				}
+                    // A field is updated if it has changed, and provided it is not non-erasable, unless it is empty at INES
+                    if ($currentFieldValue != $fieldValue &&
+                        ( !$isProtectedField || empty($currentFieldValue))
+                    ){
+                        $conceptDatas[$inesFieldKey] = $fieldValue;
+                        $updateNeeded = true;
+                    }
+                }
 
-				// Call WS only if necessary
-				if ($updateNeeded) {
+                // Call WS only if necessary
+                if ($updateNeeded) {
 
-					$wsDatas = array($concept => $conceptDatas);
+                    $wsDatas = array($concept => $conceptDatas);
 
-					// Update client
-					if ($concept == 'client') {
+                    // Update client
+                    if ($concept == 'client') {
 
-						$wsDatas['client']['ModifiedDate'] = date("Y-m-d\TH:i:s");
+                        $wsDatas['client']['ModifiedDate'] = date("Y-m-d\TH:i:s");
 
                         $response = $this->request('ws/wsicm.asmx', 'UpdateClient', $wsDatas, true, true);
 
                         if ( !isset($response['UpdateClientResult']['InternalRef'])) {
-							return false;
-						}
-					}
-					// Update contact
-					else {
+                            return false;
+                        }
+                    }
+                    // Update contact
+                    else {
                         $wsDatas['contact']['ModificationDate'] = date("Y-m-d\TH:i:s");
-						$wsDatas['contact']['AutomationRef'] = $leadId;
-						$wsDatas['contact']['Scoring'] = $leadPoints;
+                        $wsDatas['contact']['AutomationRef'] = $leadId;
+                        $wsDatas['contact']['Scoring'] = $leadPoints;
                         $wsDatas['contact']['Desabo'] = $leadDesaboFlag;
-						$wsDatas['contact']['IsNew'] = false;
+                        $wsDatas['contact']['IsNew'] = false;
 
-						// Filtering fields: only those requested by the WS
-						$contactDatas = $this->getContactTemplate();
-						foreach($contactDatas as $key => $value) {
-							if (isset($wsDatas['contact'][$key])) {
-								$contactDatas[$key] = $wsDatas['contact'][$key];
-							}
-						}
-						$wsDatas['contact'] = $contactDatas;
+                        // Filtering fields: only those requested by the WS
+                        $contactDatas = $this->getContactTemplate();
+                        foreach($contactDatas as $key => $value) {
+                            if (isset($wsDatas['contact'][$key])) {
+                                $contactDatas[$key] = $wsDatas['contact'][$key];
+                            }
+                        }
+                        $wsDatas['contact'] = $contactDatas;
 
-						$response = $this->request('ws/wsAutomationsync.asmx', 'UpdateContact', $wsDatas, true, true);
+                        $response = $this->request('ws/wsAutomationsync.asmx', 'UpdateContact', $wsDatas, true, true);
 
-						if ( !isset($response['UpdateContactResult']) || $response['UpdateContactResult'] != $wsDatas['contact']['InternalRef']) {
-							return false;
-						}
-					}
-				}
-			}
+                        if ( !isset($response['UpdateContactResult']) || $response['UpdateContactResult'] != $wsDatas['contact']['InternalRef']) {
+                            return false;
+                        }
+                    }
+                }
+            }
 
             // If "push lead to integration" action, add a weblead to INES
             if ($syncTriggeredFromPushLead) {
                 $inesConfig = $this->getInesSyncConfig();
-    			if (isset($inesConfig['LeadRef']) && $inesConfig['LeadRef'] >= 0) {
-    				$this->addLeadToInesContact(
-    					$internalContactRef,
-    					$internalCompanyRef,
+                if (isset($inesConfig['LeadRef']) && $inesConfig['LeadRef'] >= 0) {
+                    $this->addLeadToInesContact(
+                        $internalContactRef,
+                        $internalCompanyRef,
                         $clientWithContact['contact']['PrimaryMailAddress'],
-    					$inesConfig['LeadRef'],
+                        $inesConfig['LeadRef'],
                         $addLeadDescription
-    				);
-    			}
+                    );
+                }
             }
-		}
+        }
 
-		// Processing of INES custom fields, if any
-		$concepts = array('contact', 'client');
-		foreach($concepts as $concept) {
+        // Processing of INES custom fields, if any
+        $concepts = array('contact', 'client');
+        foreach($concepts as $concept) {
 
-			if (empty($mappedDatas[$concept]['customFields'])) {
-				continue;
-			}
+            if (empty($mappedDatas[$concept]['customFields'])) {
+                continue;
+            }
 
-			$inesRef = ($concept == 'contact') ? $internalContactRef : $internalCompanyRef;
-			$inesRefKey = ($concept == 'contact') ? 'ctRef' : 'clRef';
-			$wsConcept = ($concept == 'contact') ? 'Contact' : 'Company';
+            $inesRef = ($concept == 'contact') ? $internalContactRef : $internalCompanyRef;
+            $inesRefKey = ($concept == 'contact') ? 'ctRef' : 'clRef';
+            $wsConcept = ($concept == 'contact') ? 'Contact' : 'Company';
 
-			// Read, through WS, the current fields of INES
-			$currentCustomFields = $this->getCurrentCustomFields($concept, $inesRef);
+            // Read, through WS, the current fields of INES
+            $currentCustomFields = $this->getCurrentCustomFields($concept, $inesRef);
 
-			// Automation fields to be updated
-			foreach($mappedDatas[$concept]['customFields'] as $inesFieldKey => $fieldValue) {
+            // Automation fields to be updated
+            foreach($mappedDatas[$concept]['customFields'] as $inesFieldKey => $fieldValue) {
 
-				$datas = array(
-					$inesRefKey => $inesRef,
-					'chdefRef' => $inesFieldKey,
-					'chpValue' => $fieldValue
-				);
+                $datas = array(
+                    $inesRefKey => $inesRef,
+                    'chdefRef' => $inesFieldKey,
+                    'chpValue' => $fieldValue
+                );
 
-				$ws = false;
+                $ws = false;
 
-				// If the field does not yet exist in INES: INSERT
-				if ( !isset($currentCustomFields[$inesFieldKey])) {
-					$ws = 'Insert'.$wsConcept.'CF';
-					$datas['chvLies'] = 0;
-					$datas['chvGroupeAssoc'] = 0;
-				}
-				// If the field already exists and the value has changed: UPDATE
-				else if ($currentCustomFields[$inesFieldKey]['chpValue'] != $fieldValue) {
+                // If the field does not yet exist in INES: INSERT
+                if ( !isset($currentCustomFields[$inesFieldKey])) {
+                    $ws = 'Insert'.$wsConcept.'CF';
+                    $datas['chvLies'] = 0;
+                    $datas['chvGroupeAssoc'] = 0;
+                }
+                // If the field already exists and the value has changed: UPDATE
+                else if ($currentCustomFields[$inesFieldKey]['chpValue'] != $fieldValue) {
 
-					$isProtectedField = in_array($inesFieldKey, $inesProtectedFields[$concept]);
-					if ( !$isProtectedField) {
-						$ws = 'Update'.$wsConcept.'CF';
+                    $isProtectedField = in_array($inesFieldKey, $inesProtectedFields[$concept]);
+                    if ( !$isProtectedField) {
+                        $ws = 'Update'.$wsConcept.'CF';
 
-						// Updating a field refers to its INES identifier, previously read
-						$datas['chpRef'] = $currentCustomFields[$inesFieldKey]['chpRef'];
-					}
-				}
+                        // Updating a field refers to its INES identifier, previously read
+                        $datas['chpRef'] = $currentCustomFields[$inesFieldKey]['chpRef'];
+                    }
+                }
 
-				if ($ws) {
-					// WS call to create or update a custom field
-					$response = $this->request('ws/wscf.asmx', $ws, $datas, true, true);
-					if ( !isset($response[$ws.'Result'])) {
-						return false;
-					}
-				}
-			}
-		}
+                if ($ws) {
+                    // WS call to create or update a custom field
+                    $response = $this->request('ws/wscf.asmx', $ws, $datas, true, true);
+                    if ( !isset($response[$ws.'Result'])) {
+                        return false;
+                    }
+                }
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 
-	/**
-	 * Write to INES a new weblead relative to a contact
-	 *
-	 * @param 	int 			$internalContactRef
-	 * @param 	int 			$internalCompanyRef
-	 * @param 	string 			$email
-	 * @param 	int 			$LeadRef	// Lead channel, defined in the INES config
-	 *
-	 * @return 	bool
-	 */
-	public function addLeadToInesContact($internalContactRef, $internalCompanyRef, $email, $leadRef, $description)
-	{
+    /**
+     * Write to INES a new weblead relative to a contact
+     *
+     * @param int    $internalContactRef
+     * @param int    $internalCompanyRef
+     * @param string $email
+     * @param int    $LeadRef Lead channel, defined in the INES config
+     *
+     * @return bool
+     */
+    public function addLeadToInesContact($internalContactRef, $internalCompanyRef, $email, $leadRef, $description)
+    {
         try {
-    		$response = $this->request('ws/wsAutomationsync.asmx', 'AddLead', array(
-    			'info' => array(
-    				'ClRef' => $internalCompanyRef,
-    				'CtRef' => $internalContactRef,
-    				'MailExpe' => $email,
-    				'DescriptionCourte' => $description,
-    				'ReclaDescDetail' => '',
-    				'FileRef' => $leadRef,
-    				'CriticiteRef' => 0,
-    				'TypeRef' => 0,
-    				'EtatRef' => 0,
-    				'OrigineRef' => 0,
-    				'DossierRef' => 0,
-    				'CampagneRef' => 0,
-    				'ArticleRef' => 0,
-    				'ReclaMere' => 0,
-    				'Propietaire' => 0,
-    				'Gestionnaire' => 0
-    			)
-    		), true, true);
+            $response = $this->request('ws/wsAutomationsync.asmx', 'AddLead', array(
+                'info' => array(
+                    'ClRef' => $internalCompanyRef,
+                    'CtRef' => $internalContactRef,
+                    'MailExpe' => $email,
+                    'DescriptionCourte' => $description,
+                    'ReclaDescDetail' => '',
+                    'FileRef' => $leadRef,
+                    'CriticiteRef' => 0,
+                    'TypeRef' => 0,
+                    'EtatRef' => 0,
+                    'OrigineRef' => 0,
+                    'DossierRef' => 0,
+                    'CampagneRef' => 0,
+                    'ArticleRef' => 0,
+                    'ReclaMere' => 0,
+                    'Propietaire' => 0,
+                    'Gestionnaire' => 0
+                )
+            ), true, true);
 
             return isset($response['AddLeadResult']);
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->integration->logIntegrationError($e);
             return false;
         }
-	}
+    }
 
 
     /**
      * Removes a contact from INES (set a flag "no longer synchronize")
      *
-     * @param 	int  $inesRef    // INES contact reference
+     * @param int $inesRef INES contact reference
      *
-     * @return 	bool
+     * @return bool
      */
     public function deleteContact($inesRef)
     {
@@ -590,179 +591,179 @@ class InesApi extends CrmApi
     }
 
 
-	/**
-	 * Search a contact at INES, from its ID
-	 *
-	 * @param 	int 			$internalContactRef
-	 *
-	 * @return 	array | false
-	 */
-	public function getContactFromInes($internalContactRef)
-	{
-		$response = $this->request('ws/wsicm.asmx', 'GetContact', array(
-			'reference' => $internalContactRef
-		), true, true);
+    /**
+     * Search a contact at INES, from its ID
+     *
+     * @param int $internalContactRef
+     *
+     * @return array | false
+     */
+    public function getContactFromInes($internalContactRef)
+    {
+        $response = $this->request('ws/wsicm.asmx', 'GetContact', array(
+            'reference' => $internalContactRef
+        ), true, true);
 
-		if (isset($response['GetContactResult']['InternalRef']) &&
-			$response['GetContactResult']['InternalRef'] == $internalContactRef
-		){
-			return $response['GetContactResult'];
-		}
+        if (isset($response['GetContactResult']['InternalRef']) &&
+            $response['GetContactResult']['InternalRef'] == $internalContactRef
+        ){
+            return $response['GetContactResult'];
+        }
 
-		return false;
-	}
-
-
-	/**
-	 * Search a company at INES, from its ID
-	 *
-	 * @param 	int 			$internalCompanyRef
-	 *
-	 * @return 	array | false
-	 */
-	public function getClientFromInes($internalCompanyRef)
-	{
-		$response = $this->request('ws/wsicm.asmx', 'GetClient', array(
-			'reference' => $internalCompanyRef
-		), true, true);
-
-		if (isset($response['GetClientResult']['InternalRef']) &&
-			$response['GetClientResult']['InternalRef'] == $internalCompanyRef
-		){
-			return $response['GetClientResult'];
-		}
-
-		return false;
-	}
+        return false;
+    }
 
 
-	/**
-	 * Searches, from field mapping, Automation fields that correspond to a list of INES fields
-	 *
-	 * @param 	array 	$inesFieldsKeys
-	 *
-	 * @return 	array 	List of ATMT fields identifiers founded
-	 */
-	public function getAtmtFieldsKeysFromInesFieldsKeys($inesFieldsKeys)
-	{
-		$atmtFields = array();
-		$mapping = $this->integration->getMapping();
+    /**
+     * Search a company at INES, from its ID
+     *
+     * @param int $internalCompanyRef
+     *
+     * @return array | false
+     */
+    public function getClientFromInes($internalCompanyRef)
+    {
+        $response = $this->request('ws/wsicm.asmx', 'GetClient', array(
+            'reference' => $internalCompanyRef
+        ), true, true);
 
-		foreach($mapping as $mappingItem) {
+        if (isset($response['GetClientResult']['InternalRef']) &&
+            $response['GetClientResult']['InternalRef'] == $internalCompanyRef
+        ){
+            return $response['GetClientResult'];
+        }
 
-			$inesFieldKey = $mappingItem['inesFieldKey'];
-
-			if (in_array($inesFieldKey, $inesFieldsKeys)) {
-				$atmtFields[$inesFieldKey] = $mappingItem['atmtFieldKey'];
-			}
-		}
-		return $atmtFields;
-	}
-
-
-	/**
-	 * Returns custom fields already present at INES for a contact or a client / company
-	 *
-	 * @param 	array 	$concept 	// contact | client alias company
-	 * @param 	array 	$inesRef	// contactID or clientID
-	 *
-	 * @return 	array | false
-	 */
-	public function getCurrentCustomFields($concept, $inesRef)
-	{
-		$concept = ucfirst($concept);
-		if ($concept == 'Client') {
-			$concept = 'Company';
-		}
-
-		// Call WS: Read Fields
-		$response = $this->request('ws/wscf.asmx', 'Get'.$concept.'CF', array('reference' => $inesRef), true, true);
-
-		if ( !isset($response['Get'.$concept.'CFResult']['Values'])) {
-			return false;
-		}
-
-		$customFields = array();
-		$values = $response['Get'.$concept.'CFResult']['Values'];
-		if ( !empty($values)) {
-			foreach($values as $value_item) {
-
-				// If several values exist for a single field, we are interested in the last element only
-				if ( !isset($value_item['DefinitionRef'])) {
-					$value_item = end($value_item);
-				}
-
-				$chdefRef = $value_item['DefinitionRef'];
-
-				$customFields[$chdefRef] = array(
-					'chpRef' => $value_item['Ref'],
-					'chpValue' => $value_item['Value']
-				);
-			}
-		}
-
-		return $customFields;
-	}
+        return false;
+    }
 
 
-	/**
-	 * Returns a session ID required for INES web-services calls
+    /**
+     * Searches, from field mapping, Automation fields that correspond to a list of INES fields
+     *
+     * @param array $inesFieldsKeys
+     *
+     * @return array List of ATMT fields identifiers founded
+     */
+    public function getAtmtFieldsKeysFromInesFieldsKeys($inesFieldsKeys)
+    {
+        $atmtFields = array();
+        $mapping = $this->integration->getMapping();
+
+        foreach($mapping as $mappingItem) {
+
+            $inesFieldKey = $mappingItem['inesFieldKey'];
+
+            if (in_array($inesFieldKey, $inesFieldsKeys)) {
+                $atmtFields[$inesFieldKey] = $mappingItem['atmtFieldKey'];
+            }
+        }
+        return $atmtFields;
+    }
+
+
+    /**
+     * Returns custom fields already present at INES for a contact or a client / company
+     *
+     * @param array $concept contact | client alias company
+     * @param array $inesRef contactID or clientID
+     *
+     * @return     array | false
+     */
+    public function getCurrentCustomFields($concept, $inesRef)
+    {
+        $concept = ucfirst($concept);
+        if ($concept == 'Client') {
+            $concept = 'Company';
+        }
+
+        // Call WS: Read Fields
+        $response = $this->request('ws/wscf.asmx', 'Get'.$concept.'CF', array('reference' => $inesRef), true, true);
+
+        if ( !isset($response['Get'.$concept.'CFResult']['Values'])) {
+            return false;
+        }
+
+        $customFields = array();
+        $values = $response['Get'.$concept.'CFResult']['Values'];
+        if ( !empty($values)) {
+            foreach($values as $value_item) {
+
+                // If several values exist for a single field, we are interested in the last element only
+                if ( !isset($value_item['DefinitionRef'])) {
+                    $value_item = end($value_item);
+                }
+
+                $chdefRef = $value_item['DefinitionRef'];
+
+                $customFields[$chdefRef] = array(
+                    'chpRef' => $value_item['Ref'],
+                    'chpValue' => $value_item['Value']
+                );
+            }
+        }
+
+        return $customFields;
+    }
+
+
+    /**
+     * Returns a session ID required for INES web-services calls
      * From cache if exists
      * Otherwise request one from INES (via the WS)
-	 *
-	 * @return	int (session ID)
-	 * @throws 	ApiErrorException
-	 */
-	protected function getSessionID()
-	{
-		// If a session already exists in cache, it is used
-		$sessionID = $this->integration->getWebServiceCurrentSessionID();
+     *
+     * @return    int (session ID)
+     * @throws     ApiErrorException
+     */
+    protected function getSessionID()
+    {
+        // If a session already exists in cache, it is used
+        $sessionID = $this->integration->getWebServiceCurrentSessionID();
 
         // Otherwise we ask for one
-		if ( !$sessionID) {
+        if ( !$sessionID) {
             $this->integration->log('Refresh session ID');
 
-			$args = array(
-				'request' => $this->integration->getDecryptedApiKeys()
-			);
+            $args = array(
+                'request' => $this->integration->getDecryptedApiKeys()
+            );
 
-			$response = $this->request('wslogin/login.asmx', 'authenticationWs', $args, false);
+            $response = $this->request('wslogin/login.asmx', 'authenticationWs', $args, false);
 
-			if (
-				is_object($response) &&
-				isset($response->authenticationWsResult->codeReturn) &&
-				$response->authenticationWsResult->codeReturn == 'ok'
-			){
-				$sessionID = $response->authenticationWsResult->idSession;
+            if (
+                is_object($response) &&
+                isset($response->authenticationWsResult->codeReturn) &&
+                $response->authenticationWsResult->codeReturn == 'ok'
+            ){
+                $sessionID = $response->authenticationWsResult->idSession;
 
-				// And it is saved for later
-				$this->integration->setWebServiceCurrentSessionID($sessionID);
-			}
-			else {
-				throw new ApiErrorException("INES WS : Can't get session ID");
-			}
-		}
+                // And it is saved for later
+                $this->integration->setWebServiceCurrentSessionID($sessionID);
+            }
+            else {
+                throw new ApiErrorException("INES WS : Can't get session ID");
+            }
+        }
 
-		return $sessionID;
-	}
+        return $sessionID;
+    }
 
 
-	/**
-	 * Read the sync configuration defined in the INES CRM: custom fields to map, lead channel to use, type of company to use
-	 */
-	protected function getInesSyncConfig()
-	{
-		$syncConfig = $this->integration->getCurrentSyncConfig();
-		if ( !$syncConfig) {
+    /**
+     * Read the sync configuration defined in the INES CRM: custom fields to map, lead channel to use, type of company to use
+     */
+    protected function getInesSyncConfig()
+    {
+        $syncConfig = $this->integration->getCurrentSyncConfig();
+        if ( !$syncConfig) {
 
             $this->integration->log('Refresh sync config');
 
-			// WS call
-			$response = $this->request('Ws/WSAutomationSync.asmx', 'GetSyncInfo', array(), true);
-			$results = isset($response->GetSyncInfoResult) ? $response->GetSyncInfoResult : false;
-			if ($results === false) {
-				throw new ApiErrorException("INES WS : Can't get sync config");
-			}
+            // WS call
+            $response = $this->request('Ws/WSAutomationSync.asmx', 'GetSyncInfo', array(), true);
+            $results = isset($response->GetSyncInfoResult) ? $response->GetSyncInfoResult : false;
+            if ($results === false) {
+                throw new ApiErrorException("INES WS : Can't get sync config");
+            }
 
             $companyCustomFields = json_decode(json_encode($results->CompanyCustomFields), true);
             $companyCustomFields = isset($companyCustomFields['CustomFieldToAuto']) ? $companyCustomFields['CustomFieldToAuto'] : [];
@@ -770,13 +771,13 @@ class InesApi extends CrmApi
             $contactCustomFields = json_decode(json_encode($results->ContactCustomFields), true);
             $contactCustomFields = isset($contactCustomFields['CustomFieldToAuto']) ? $contactCustomFields['CustomFieldToAuto'] : [];
 
-			$syncConfig = array(
-				'LeadRef' => isset($results->LeadRef) ? $results->LeadRef : 0,
-				'SocieteType' => isset($results->SocieteType) ? $results->SocieteType : 0,
-				'CompanyCustomFields' => $companyCustomFields,
-				'ContactCustomFields' => $contactCustomFields,
+            $syncConfig = array(
+                'LeadRef' => isset($results->LeadRef) ? $results->LeadRef : 0,
+                'SocieteType' => isset($results->SocieteType) ? $results->SocieteType : 0,
+                'CompanyCustomFields' => $companyCustomFields,
+                'ContactCustomFields' => $contactCustomFields,
                 'ValuesFromWS' => []
-			);
+            );
 
 
             ///////// Reading all keys / values via the WS
@@ -853,88 +854,88 @@ class InesApi extends CrmApi
             asort($values);
             $syncConfig['ValuesFromWS']['GetUserInfoFromRHRef'] = $values;
 
-			// Save for later
-			$this->integration->setCurrentSyncConfig($syncConfig);
+            // Save for later
+            $this->integration->setCurrentSyncConfig($syncConfig);
 
             // Whenever the config is regenerated, we check that the custom fields are up-to-date in ATMT
             $this->integration->updateAtmtCustomFieldsDefinitions();
-		}
+        }
 
-		return $syncConfig;
-	}
+        return $syncConfig;
+    }
 
 
 
-	/**
-	 * Request to an INES web-service
-	 *
-	 * @param 	string	$ws_relative_url	Example : wslogin/login.asmx
-	 * @param	string	$method				SOAP method. Example : 'authenticationWs'
-	 * @param	array 	$args
-	 * @param 	bool 	$auth_needed		true if a session ID is required
-	 * @param 	bool	$return_as_array	true to convert output from object to array
-	 *
-	 * @return 	Object
-	 *
-	 * @throws Exception
-	 */
+    /**
+     * Request to an INES web-service
+     *
+     * @param string  $ws_relative_url Example : wslogin/login.asmx
+     * @param string  $method          SOAP method. Example : 'authenticationWs'
+     * @param array   $args
+     * @param bool    $auth_needed     true if a session ID is required
+     * @param bool    $return_as_array true to convert output from object to array
+     *
+     * @return Object
+     *
+     * @throws Exception
+     */
     protected function request($ws_relative_url, $method, $args, $auth_needed = true, $return_as_array = false)
-	{
-		$client_url = ($auth_needed ? 'https' : 'http') . '://webservices.inescrm.com/';
-		$client_url .= ltrim($ws_relative_url, '/') . '?wsdl';
+    {
+        $client_url = ($auth_needed ? 'https' : 'http') . '://webservices.inescrm.com/';
+        $client_url .= ltrim($ws_relative_url, '/') . '?wsdl';
 
-		// SOAP header with session ID, if auth needed
-		if ($auth_needed) {
+        // SOAP header with session ID, if auth needed
+        if ($auth_needed) {
 
-			$sessionID = $this->getSessionID();
+            $sessionID = $this->getSessionID();
 
-			$settings = array(
-				'soapHeader' => array(
-					'namespace' => 'http://webservice.ines.fr',
-					'name' => 'SessionID',
-					'datas' => array('ID' => $sessionID)
-				)
-			);
-		}
-		else {
-			$settings = false;
-		}
+            $settings = array(
+                'soapHeader' => array(
+                    'namespace' => 'http://webservice.ines.fr',
+                    'name' => 'SessionID',
+                    'datas' => array('ID' => $sessionID)
+                )
+            );
+        }
+        else {
+            $settings = false;
+        }
 
-		try {
-			$response = $this->integration->makeRequest($client_url, $args, $method, $settings);
-		} catch (\Exception $e) {
+        try {
+            $response = $this->integration->makeRequest($client_url, $args, $method, $settings);
+        } catch (\Exception $e) {
 
             // If a request that requires a sessionID fails, the session may have expired
             // So we try to refresh this ID before a second try
-			if ($auth_needed) {
-				try {
-					$this->refreshSessionID();
-					$response = $this->integration->makeRequest($client_url, $args, $method, $settings);
-				} catch (\Exception $e) {
-					throw $e;
-				}
-			}
-			else {
-				throw $e;
-			}
-		}
+            if ($auth_needed) {
+                try {
+                    $this->refreshSessionID();
+                    $response = $this->integration->makeRequest($client_url, $args, $method, $settings);
+                } catch (\Exception $e) {
+                    throw $e;
+                }
+            }
+            else {
+                throw $e;
+            }
+        }
 
-		if ($return_as_array) {
-			$response = json_decode(json_encode($response), true);
-		}
+        if ($return_as_array) {
+            $response = json_decode(json_encode($response), true);
+        }
 
-		return $response;
-	}
+        return $response;
+    }
 
 
-	/**
-	 * Returns the minimum parameters to request an INES WS using the concept of client (= ines company)
-	 *
-	 * @return 	Array 	List of fields
-	 */
-	protected function getClientTemplate()
-	{
-		return array(
+    /**
+     * Returns the minimum parameters to request an INES WS using the concept of client (= ines company)
+     *
+     * @return     Array     List of fields
+     */
+    protected function getClientTemplate()
+    {
+        return array(
             'Confidentiality' => 'Undefined',
             'CompanyName' => '',
             'Type' => 0, /* filled from INES config : company type */
@@ -982,18 +983,18 @@ class InesApi extends CrmApi
             'IsNew' => true,
             'AutomationRef' => 0, /* don't fill because ATMT company concept isn't managed by the plugin */
             'InternalRef' => 0
-		);
-	}
+        );
+    }
 
 
-	/**
-	 * Returns the minimal parameters to request a WS INES using the concept of contact
-	 *
-	 * @return 	Array 	List of fields
-	 */
-	protected function getContactTemplate()
-	{
-		return array(
+    /**
+     * Returns the minimal parameters to request a WS INES using the concept of contact
+     *
+     * @return     Array     List of fields
+     */
+    protected function getContactTemplate()
+    {
+        return array(
             'Author' => 0,
             'BusinessAddress' => '',
             'BussinesTelephone' => '',
@@ -1027,37 +1028,37 @@ class InesApi extends CrmApi
             'InternalRef' => 0,
             'AutomationRef' => 0,
             'Scoring' => 0
-		);
-	}
+        );
+    }
 
 
-	/**
-	 * Returns the minimum parameters to request an INES WS using the concept of "client with contacts"
-	 *
-	 * @param 	int		$nbContacts
-	 *
-	 * @return 	Array 	List of fields
-	 */
-	protected function getClientWithContactsTemplate($nbContacts = 1)
-	{
-		// client template
-		$datas = array(
-			'client' => $this->getClientTemplate()
-		);
+    /**
+     * Returns the minimum parameters to request an INES WS using the concept of "client with contacts"
+     *
+     * @param int $nbContacts
+     *
+     * @return array List of fields
+     */
+    protected function getClientWithContactsTemplate($nbContacts = 1)
+    {
+        // client template
+        $datas = array(
+            'client' => $this->getClientTemplate()
+        );
 
-		$datas['client']['Contacts'] = array(
-			'ContactInfoAuto' => array()
-		);
+        $datas['client']['Contacts'] = array(
+            'ContactInfoAuto' => array()
+        );
 
-		$contactTemplate = $this->getContactTemplate();
-		for($i=0; $i<$nbContacts; $i++) {
-			array_push(
-				$datas['client']['Contacts']['ContactInfoAuto'],
-				$contactTemplate
-			);
-		}
+        $contactTemplate = $this->getContactTemplate();
+        for($i=0; $i<$nbContacts; $i++) {
+            array_push(
+                $datas['client']['Contacts']['ContactInfoAuto'],
+                $contactTemplate
+            );
+        }
 
-		return $datas;
-	}
+        return $datas;
+    }
 
 }

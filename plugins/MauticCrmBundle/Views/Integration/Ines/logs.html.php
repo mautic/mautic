@@ -49,7 +49,7 @@ $view['slots']->set("headerTitle",
 						<?php foreach($items as $item) { ?>
 							<tr>
 								<td>
-				                	<?php echo $item->getDateAdded()->format('d-m-Y à H:i') ?>
+				                	<?php echo $item->getDateAdded()->format('Y-m-d H:i') ?>
 				                </td>
 								<td>
 				                	<?php echo $item->getAction() ?>
@@ -67,7 +67,7 @@ $view['slots']->set("headerTitle",
 				                	<?php echo $item->getCounter() ?>
 				                </td>
 								<td>
-				                	<?php echo $item->getDateLastUpdate()->format('d-m-Y à H:i') ?>
+				                	<?php echo $item->getDateLastUpdate()->format('Y-m-d H:i') ?>
 				                </td>
 				        	</tr>
 						<?php } ?>
@@ -81,7 +81,6 @@ $view['slots']->set("headerTitle",
 
 
 <style>
-
 	#ines-sync-logs table tr th {
 		vertical-align:top;
 	}

@@ -31,7 +31,7 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * If the "INES full-sync" mode is enabled :
-          * Enqueue a lead in sync queue.
+     * Enqueue a lead in sync queue.
      *
      * @param Events\LeadEvent $event
      */

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Commande CLI : Synchronizing ATMT leads to INES CRM.
+ * CLI command to synchronize Mautic leads with INES CRM.
  *
  * php app/console crm:ines [--number-of-leads-to-process=]
  */

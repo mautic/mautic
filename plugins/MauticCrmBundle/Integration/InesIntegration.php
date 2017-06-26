@@ -17,12 +17,12 @@ use Mautic\LeadBundle\Entity\LeadField;
 class InesIntegration extends CrmAbstractIntegration
 {
     /**
-     * Array   Mapping returned by integration.
+     * array   Mapping returned by integration.
      */
     protected $mapping = false;
 
     /**
-     * String.
+     * string.
      */
     protected $stopSyncAtmtKey = 'ines_stop_sync';
 
@@ -47,7 +47,7 @@ class InesIntegration extends CrmAbstractIntegration
     /**
      * Integration supports "push lead to integration" action.
      *
-     * return 	array(string)
+     * @return array(string)
      */
     public function getSupportedFeatures()
     {
@@ -95,7 +95,7 @@ class InesIntegration extends CrmAbstractIntegration
         // For example, adding a custom field.
         $this->unsetCurrentSyncConfig();
 
-        // Onglet Enabled/Auth
+        // Tab Enabled/Auth
         if ($formArea == 'keys') {
 
             // Add a button to check auth
@@ -104,25 +104,25 @@ class InesIntegration extends CrmAbstractIntegration
                 'attr'  => [
                     'class'   => 'btn btn-primary',
                     'onclick' => "
-						var btn = mQuery(this);
-						btn.next('.message').remove();
-						Mautic.postForm(mQuery('form[name=\"integration_details\"]'), function (response) {
-							if (response.newContent) {
-						        Mautic.processModalContent(response, '#IntegrationEditModal');
-						    } else {
-								mQuery.ajax({
-							        url: mauticAjaxUrl,
-							        type: 'POST',
-							        data: 'action=plugin:mauticCrm:inesCheckConnexion',
-							        dataType: 'json',
-							        success: function (response) {
-										btn.after('<span class=\"message\" style=\"font-weight:bold; margin-left:10px;\">' + response.message + '</span>');
-							        },
-							        error: Mautic.processAjaxError,
-							        complete: Mautic.stopIconSpinPostEvent
-							    });
-							}
-						});",
+                        var btn = mQuery(this);
+                        btn.next('.message').remove();
+                        Mautic.postForm(mQuery('form[name=\"integration_details\"]'), function (response) {
+                            if (response.newContent) {
+                                Mautic.processModalContent(response, '#IntegrationEditModal');
+                            } else {
+                                mQuery.ajax({
+                                    url: mauticAjaxUrl,
+                                    type: 'POST',
+                                    data: 'action=plugin:mauticCrm:inesCheckConnexion',
+                                    dataType: 'json',
+                                    success: function (response) {
+                                        btn.after('<span class=\"message\" style=\"font-weight:bold; margin-left:10px;\">' + response.message + '</span>');
+                                    },
+                                    error: Mautic.processAjaxError,
+                                    complete: Mautic.stopIconSpinPostEvent
+                                });
+                            }
+                        });",
                     'icon' => 'fa fa-check',
                 ],
                 'required' => false,
@@ -132,7 +132,7 @@ class InesIntegration extends CrmAbstractIntegration
         // Features tab
         elseif ($formArea == 'features') {
 
-            // checkbox : full sync mode ?
+            // checkbox : full sync mode?
             $builder->add(
                 'full_sync',
                 'choice',
@@ -158,7 +158,7 @@ class InesIntegration extends CrmAbstractIntegration
                 ]
             );
 
-            // Button : open sync log
+            // Button: open sync log
             $logsUrl = $this->dispatcher->getContainer()->get('router')->generate('ines_logs');
             $builder->add('goto_logs_button', 'standalone_button', [
                 'label' => 'mautic.ines.form.gotologs.btn',
@@ -169,7 +169,7 @@ class InesIntegration extends CrmAbstractIntegration
                 'required' => false,
             ]);
 
-            // List of fields available at INES and available for the "eraseble field" option
+            // List of fields available at INES and available for the "erasable field" option
             try {
                 if ($this->isAuthorized()) {
                     $inesFields = $this->getApiHelper()->getLeadFields();
@@ -658,7 +658,7 @@ class InesIntegration extends CrmAbstractIntegration
      * Adds in the queue a batch of leads that have never been synchronized, only if the queue is empty.
      * Allows to automatically and progressively manage the 1st sync when the full-sync mode is enable.
      *
-     * @param 	$limit
+     * @param $limit
      *
      * @return $enqueuedCounter Number of leads added
      */
@@ -740,7 +740,7 @@ class InesIntegration extends CrmAbstractIntegration
 
         foreach ($pendingItems as $item) {
 
-            // Current lead ?
+            // Current lead?
             $leadId = $item->getLeadId();
             $lead   = $leadModel->getEntity($leadId);
 
@@ -774,14 +774,14 @@ class InesIntegration extends CrmAbstractIntegration
                 $item->setStatus($itemStatus);
                 $inesSyncLogModel->saveEntity($item);
             }
-            // If not found : FAILED
+            // If not found: FAILED
             else {
                 $item->setStatus('FAILED');
                 $inesSyncLogModel->saveEntity($item);
             }
         }
 
-        // STEP 2 : DELETE a batch of leads
+        // STEP 2: DELETE a batch of leads
         $pendingDeletingItems = $inesSyncLogModel->getPendingEntities('DELETE', $numberToProcess);
         foreach ($pendingDeletingItems as $item) {
             $inesRefId = $item->getLeadId();
@@ -823,7 +823,7 @@ class InesIntegration extends CrmAbstractIntegration
      * @param int  $leadId
      * @param bool $onlyName
      *
-     * @return mixed : string | array | false
+     * @return string | array | false
      */
     public function getLeadMainCompany($leadId, $onlyName = true)
     {
@@ -870,8 +870,8 @@ class InesIntegration extends CrmAbstractIntegration
 
     /**
      * Creates or updates, in ATMT, the custom fiels that the user may need for mapping
-          * Each field has a type (int, bool, list, ...) and a configuration (list of values, etc.)
-          * The config of certain fields is fixed, and for others it is read via a WS INES.
+     * Each field has a type (int, bool, list, ...) and a configuration (list of values, etc.)
+     * The config of certain fields is fixed, and for others it is read via a WS INES.
      */
     public function updateAtmtCustomFieldsDefinitions()
     {
