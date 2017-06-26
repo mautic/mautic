@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 trait FieldsTypeTrait
 {
@@ -35,11 +36,12 @@ trait FieldsTypeTrait
         array $mauticFields,
         $fieldObject,
         $limit,
-        $start
+        $start,
+        TranslatorInterface $translator
     ) {
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start) {
+            function (FormEvent $event) use ($options, $integrationFields, $mauticFields, $fieldObject, $limit, $start, $translator) {
                 $form = $event->getForm();
                 $index = 0;
                 $choices = [];
@@ -47,7 +49,6 @@ trait FieldsTypeTrait
                 $optionalFields = [];
                 $group = [];
                 $fieldData = $event->getData();
-
                 // First loop to build options
                 foreach ($integrationFields as $field => $details) {
                     $groupName = '0default';
@@ -71,7 +72,7 @@ trait FieldsTypeTrait
                         $optionalFields[$groupName] = [];
                     }
 
-                    if (is_array($details) && !empty($details['required'])) {
+                    if (is_array($details) && (!empty($details['required']) || $choices[$field] == 'Email')) {
                         $requiredFields[$groupName][$field] = $details;
                     } else {
                         $optionalFields[$groupName][$field] = $details;
@@ -111,15 +112,22 @@ trait FieldsTypeTrait
                 }
 
                 // Ensure that fields aren't hidden
-                if ($start > count($fields)) {
+                if ($start > count($fields) || $options['page'] == 0) {
                     $start = 0;
                 }
+
                 $paginatedFields = array_slice($fields, $start, $limit);
+                $fieldsName = 'leadFields';
+                if ($fieldObject) {
+                    $fieldsName = $fieldObject.'Fields';
+                }
+                if (isset($fieldData[$fieldsName])) {
+                    $fieldData[$fieldsName] = $options['integration_object']->formatMatchedFields($fieldData[$fieldsName]);
+                }
 
                 foreach ($paginatedFields as $field => $details) {
-                    $matched = isset($fieldData[$field]);
-                    $required = (int) !empty($integrationFields[$field]['required']);
-
+                    $matched = isset($fieldData[$fieldsName][$field]);
+                    $required = (int) (!empty($integrationFields[$field]['required']) || $choices[$field] == 'Email');
                     ++$index;
                     $form->add(
                         'label_'.$index,
@@ -140,6 +148,7 @@ trait FieldsTypeTrait
                     );
                     if (isset($options['enable_data_priority']) and $options['enable_data_priority']) {
                         $updateName = 'update_mautic';
+
                         if ($fieldObject) {
                             $updateName .= '_'.$fieldObject;
                         }
@@ -152,7 +161,7 @@ trait FieldsTypeTrait
                                     '<btn class="btn-nospin fa fa-arrow-circle-right"></btn>',
                                 ],
                                 'label'       => false,
-                                'data'        => isset($options[$updateName][$field]) ? (int) $options[$updateName][$field] : 1,
+                                'data'        => isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1,
                                 'empty_value' => false,
                                 'attr'        => [
                                     'data-toggle' => 'tooltip',
@@ -161,6 +170,10 @@ trait FieldsTypeTrait
                             ]
                         );
                     }
+                    if (!$fieldObject) {
+                        $contactLink['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
+                        $mauticFields = array_merge($mauticFields, $contactLink);
+                    }
 
                     $form->add(
                         'm_'.$index,
@@ -168,13 +181,13 @@ trait FieldsTypeTrait
                         [
                             'choices'    => $mauticFields,
                             'label'      => false,
-                            'data'       => $matched ? $fieldData[$field] : '',
+                            'data'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                             'label_attr' => ['class' => 'control-label'],
                             'attr'       => [
                                 'class'            => 'field-selector',
                                 'data-placeholder' => ' ',
                                 'data-required'    => $required,
-                                'data-value'       => $matched ? $fieldData[$field] : '',
+                                'data-value'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
                                 'data-choices'     => $mauticFields,
                             ],
                         ]
@@ -186,6 +199,7 @@ trait FieldsTypeTrait
                             'data' => $field,
                             'attr' => [
                                 'data-required' => $required,
+                                'data-value'    => $field,
                             ],
                         ]
                     );
@@ -196,6 +210,7 @@ trait FieldsTypeTrait
                             'data' => $index,
                             'attr' => [
                                 'data-required' => $required,
+                                'data-value'    => $index,
                             ],
                         ]
                     );

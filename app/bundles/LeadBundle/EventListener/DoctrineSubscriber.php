@@ -116,6 +116,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 switch ($object) {
                     case 'lead':
                         $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
+                        $table->addIndex(['date_added', 'country'], MAUTIC_TABLE_PREFIX.'date_added_country_index');
                         break;
                     case 'company':
                         $table->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');

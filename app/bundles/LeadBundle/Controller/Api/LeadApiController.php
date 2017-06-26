@@ -62,12 +62,9 @@ class LeadApiController extends CommonApiController
     public function editEntityAction($id)
     {
         $existingLeads = $this->getExistingLeads();
-        if (!empty($existingLeads)) {
+        if (isset($existingLeads[0]) && $existingLeads[0] instanceof Lead) {
             $entity = $this->model->getEntity($id);
-            if ($existingLeads[0]->getId() == $entity->getId()) {
-                array_shift($existingLeads);
-            }
-            if (isset($existingLeads[0])) {
+            if ($entity instanceof Lead && $existingLeads[0]->getId() != $entity->getId()) {
                 $this->model->mergeLeads($existingLeads[0], $entity, false);
             }
         }

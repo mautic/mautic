@@ -795,6 +795,8 @@ Mautic.initSlots = function(slotContainers) {
             mQuery('#builder-template-content', Mautic.parentDocument).attr('scrolling', 'yes');
             // check if it is initialized first to prevent error
             if (slotContainers.data('sortable')) slotContainers.sortable('option', 'scroll', true);
+            // this fixes an issue where after reopening the builder and trying to drag a slot, it leaves a clone behind
+            parent.mQuery('.ui-draggable-dragging').remove();
         }
     }).disableSelection();
 
@@ -840,7 +842,6 @@ Mautic.cloneFocusForm = function(decId, removeFroala) {
     // reattach DEC
     if (typeof Mautic.activeDEC !== 'undefined') {
         var element = Mautic.activeDEC.detach();
-        element.hide();
         Mautic.activeDECParent.append(element);
     }
     var focusForm = parent.mQuery('#emailform_dynamicContent_' + decId);
@@ -850,7 +851,6 @@ Mautic.cloneFocusForm = function(decId, removeFroala) {
     // remove delete default button
     focusForm.find('.tab-pane:first').find('.remove-item').hide();
     var element =focusForm.detach();
-    element.show();
     Mautic.activeDEC = element;
     return element;
 };
@@ -888,7 +888,6 @@ Mautic.removeAddVariantButton = function() {
     // reattach DEC
     if (typeof Mautic.activeDEC !== 'undefined') {
         var element = Mautic.activeDEC.detach();
-        element.hide();
         Mautic.activeDECParent.append(element);
     }
 };
@@ -1134,7 +1133,7 @@ Mautic.initSlotListeners = function() {
                 }
 
                 parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
-                    var slotHtml = mQuery('<div/>').append(parent.mQuery(theEditor).froalaEditor('html.get'));
+                    var slotHtml = mQuery('<div/>').append(editor.html.get());
                     // replace DEC with content from the first editor
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
@@ -1553,7 +1552,6 @@ Mautic.convertDynamicContentSlotsToTokens = function (builderHtml) {
     if (dynConSlots.length) {
         dynConSlots.each(function(i) {
             var $this    = mQuery(this);
-            // if ($this.parents('[data-slot]').length == 0) return; // prevent affecting standalone DEC slots
             var dynConId = $this.attr('data-param-dec-id');
 
             dynConId = '#emailform_dynamicContent_'+dynConId;
@@ -1561,6 +1559,11 @@ Mautic.convertDynamicContentSlotsToTokens = function (builderHtml) {
             var dynConTarget = mQuery(dynConId);
             var dynConName   = dynConTarget.find(dynConId+'_tokenName').val();
             var dynConToken  = '{dynamiccontent="'+dynConName+'"}';
+
+            // Add the dynamic content tokens
+            if (!Mautic.builderTokens.hasOwnProperty(dynConToken)) {
+                Mautic.builderTokens[dynConToken] = dynConName;
+            }
 
             builderHtml = builderHtml.replace(this.outerHTML, dynConToken);
 

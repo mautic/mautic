@@ -57,7 +57,7 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.notification.config.form.notification.trackingpage.enabled',
                 'data'  => (bool) $options['data']['notification_tracking_page_enabled'],
                 'attr'  => [
-                    'tooltip' => 'mautic.notification.config.form.notification.trackingpage.enabled.tooltip',
+                    'tooltip'      => 'mautic.notification.config.form.notification.trackingpage.enabled.tooltip',
                     'data-show-on' => '{"config_notificationconfig_notification_enabled_1":"checked"}',
                 ],
             ]

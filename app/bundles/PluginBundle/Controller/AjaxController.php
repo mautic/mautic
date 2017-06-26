@@ -86,6 +86,7 @@ class AjaxController extends CommonAjaxController
                         isset($featureSettings[$object.'Fields']) ? $featureSettings[$object.'Fields'] : [],
                         [
                             'mautic_fields'        => $mauticFields,
+                            'data'                 => $featureSettings,
                             'integration_fields'   => $integrationFields,
                             'csrf_protection'      => false,
                             'integration_object'   => $integrationObject,
@@ -119,9 +120,8 @@ class AjaxController extends CommonAjaxController
                         $idPrefix = substr($idPrefix, 0, -1);
                     }
 
-                    $html = preg_replace('/'.$formType.'\[(.*?)\]/', $prefix.'[$1]', $html);
-                    $html = str_replace($formType, $idPrefix, $html);
-
+                    $html                 = preg_replace('/'.$formType.'\[(.*?)\]/', $prefix.'[$1]', $html);
+                    $html                 = str_replace($formType, $idPrefix, $html);
                     $dataArray['success'] = 1;
                     $dataArray['html']    = $html;
                 }
@@ -342,8 +342,7 @@ class AjaxController extends CommonAjaxController
         $integration_object = $helper->getIntegrationObject($integration);
         $entity             = $integration_object->getIntegrationSettings();
         $featureSettings    = $entity->getFeatureSettings();
-
-        $doNotMatchField = ($mautic_field === '-1');
+        $doNotMatchField    = ($mautic_field === '-1' || $mautic_field === '');
         if ($object == 'lead') {
             $fields       = 'leadFields';
             $updateFields = 'update_mautic';
@@ -364,15 +363,18 @@ class AjaxController extends CommonAjaxController
             $newFeatureSettings[$integration_field] = $update_mautic;
             if (isset($featureSettings[$updateFields])) {
                 $featureSettings[$updateFields] = array_merge($featureSettings[$updateFields], $newFeatureSettings);
+            } else {
+                $featureSettings[$updateFields] = $newFeatureSettings;
             }
             $newFeatureSettings[$integration_field] = $mautic_field;
             if (isset($featureSettings[$fields])) {
                 $featureSettings[$fields] = array_merge($featureSettings[$fields], $newFeatureSettings);
+            } else {
+                $featureSettings[$fields] = $newFeatureSettings;
             }
 
             $dataArray = ['success' => 1];
         }
-
         $entity->setFeatureSettings($featureSettings);
 
         $this->getModel('plugin')->saveFeatureSettings($entity);

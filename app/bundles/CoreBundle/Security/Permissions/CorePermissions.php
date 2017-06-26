@@ -444,7 +444,7 @@ class CorePermissions
     {
         $userEntity = $this->userHelper->getUser();
 
-        return ($userEntity instanceof User && $userEntity->getId()) ? false : true;
+        return ($userEntity instanceof User && !$userEntity->isGuest()) ? false : true;
     }
 
     /**

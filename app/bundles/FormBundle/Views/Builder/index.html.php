@@ -22,6 +22,11 @@ $header = ($activeForm->getId())
 $view['slots']->set('headerTitle', $header);
 
 $formId = $form['sessionId']->vars['data'];
+
+if (!isset($inBuilder)) {
+    $inBuilder = false;
+}
+
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -77,6 +82,7 @@ $formId = $form['sessionId']->vars['data'];
                                                                     'type'         => $fieldType,
                                                                     'tmpl'         => 'field',
                                                                     'formId'       => $formId,
+                                                                    'inBuilder'    => $inBuilder,
                                                                 ]
                                                             ); ?>">     <?php echo $field; ?></option>
 
@@ -103,6 +109,7 @@ $formId = $form['sessionId']->vars['data'];
                                             'id'            => $field['id'],
                                             'formId'        => $formId,
                                             'contactFields' => $contactFields,
+                                            'inBuilder'     => $inBuilder,
                                         ]
                                     ); ?>
                                 <?php endif; ?>

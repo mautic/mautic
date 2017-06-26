@@ -12,11 +12,10 @@
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
  * Class PageSubscriber.
@@ -24,25 +23,25 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class PageSubscriber extends CommonSubscriber
 {
     /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
      * @var AssetsHelper
      */
     protected $assetsHelper;
 
     /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
      * PageSubscriber constructor.
      *
-     * @param AssetsHelper         $assetsHelper
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param AssetsHelper      $assetsHelper
+     * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(AssetsHelper $assetsHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(AssetsHelper $assetsHelper, IntegrationHelper $integrationHelper)
     {
-        $this->assetsHelper         = $assetsHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->assetsHelper      = $assetsHelper;
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -60,9 +59,12 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(PageDisplayEvent $event)
     {
+        $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');
+        $settings          = $integrationObject->getIntegrationSettings();
+        $features          = $settings->getFeatureSettings();
 
         $script = '';
-        if (!$this->coreParametersHelper->getParameter('notification_landing_page_enabled')) {
+        if (!in_array('landing_page_enabled', $features)) {
             $script = 'disable_notification = true;';
         }
 
