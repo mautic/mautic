@@ -11,6 +11,7 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
@@ -21,6 +22,14 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
  */
 class CampaignListType extends AbstractType
 {
+    /**
+     * @var string
+     */
+    protected $thisString;
+
+    /**
+     * @var CampaignModel
+     */
     private $model;
 
     /**

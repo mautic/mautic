@@ -121,6 +121,10 @@ trait FieldsTypeTrait
                 if ($fieldObject) {
                     $fieldsName = $fieldObject.'Fields';
                 }
+                if (isset($fieldData[$fieldsName])) {
+                    $fieldData[$fieldsName] = $options['integration_object']->formatMatchedFields($fieldData[$fieldsName]);
+                }
+
                 foreach ($paginatedFields as $field => $details) {
                     $matched = isset($fieldData[$fieldsName][$field]);
                     $required = (int) (!empty($integrationFields[$field]['required']) || $choices[$field] == 'Email');

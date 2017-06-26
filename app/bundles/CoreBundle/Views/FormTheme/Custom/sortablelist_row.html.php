@@ -1,7 +1,7 @@
 <?php
 $list            = $form->children['list'];
 $parentHasErrors = $view['form']->containsErrors($form->parent);
-if ($parentHasErrors && empty($list->vars['value'])) {
+if ($parentHasErrors && empty($list->vars['value']) && isset($form->parent->children['properties']['list'])) {
     // Work around for Symfony bug not repopulating values
     $list = $form->parent->children['properties']['list'];
 }
