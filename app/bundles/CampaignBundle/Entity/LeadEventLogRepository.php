@@ -22,7 +22,7 @@ class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
         $q     = $this
@@ -92,8 +92,8 @@ class LeadEventLogRepository extends CommonRepository
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
                       ->where('ll.lead_id = '.(int) $leadId)
-                      ->andWhere('e.event_type = :eventType')
-                      ->setParameter('eventType', 'action');
+                      ->andWhere('e.event_type != :eventType')
+                      ->setParameter('eventType', 'decision');
 
         if (isset($options['scheduledState'])) {
             if ($options['scheduledState']) {
@@ -176,8 +176,14 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if (isset($options['eventType'])) {
-            $query->andwhere('e.event_type = :eventType')
-                ->setParameter('eventType', $options['eventType']);
+            if (is_array($options['eventType'])) {
+                $query->andWhere(
+                    $query->expr()->in('e.event_type', array_map([$query->expr(), 'literal'], $options['eventType']))
+                );
+            } else {
+                $query->andwhere('e.event_type = :eventTypes')
+                    ->setParameter('eventTypes', $options['eventType']);
+            }
         }
 
         if (isset($options['limit'])) {
@@ -206,10 +212,9 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-                       ->select('o.event_id, count(o.lead_id) as lead_count')
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
                        ->innerJoin(
                            'o',
@@ -219,12 +224,22 @@ class LeadEventLogRepository extends CommonRepository
                        );
 
         $expr = $q->expr()->andX(
-            $q->expr()->eq('o.campaign_id', (int) $campaignId),
-            $q->expr()->orX(
-                $q->expr()->isNull('o.non_action_path_taken'),
-                $q->expr()->eq('o.non_action_path_taken', ':false')
-            )
+            $q->expr()->eq('o.campaign_id', (int) $campaignId)
         );
+
+        $groupBy = 'o.event_id';
+        if ($excludeNegative) {
+            $q->select('o.event_id, count(o.lead_id) as lead_count');
+            $expr->add(
+                $q->expr()->orX(
+                    $q->expr()->isNull('o.non_action_path_taken'),
+                    $q->expr()->eq('o.non_action_path_taken', ':false')
+                )
+            );
+        } else {
+            $q->select('o.event_id, count(o.lead_id) as lead_count, o.non_action_path_taken');
+            $groupBy .= ', o.non_action_path_taken';
+        }
 
         if ($excludeScheduled) {
             $expr->add(
@@ -232,9 +247,20 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
+        // Exclude failed events
+        $failedSq = $this->_em->getConnection()->createQueryBuilder();
+        $failedSq->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
+            ->where(
+                $failedSq->expr()->eq('fe.log_id', 'o.id')
+            );
+        $expr->add(
+            sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
+        );
+
         $q->where($expr)
           ->setParameter('false', false, 'boolean')
-          ->groupBy('o.event_id');
+          ->groupBy($groupBy);
 
         $results = $q->execute()->fetchAll();
 
@@ -242,7 +268,19 @@ class LeadEventLogRepository extends CommonRepository
 
         //group by event id
         foreach ($results as $l) {
-            $return[$l['event_id']] = $l['lead_count'];
+            if (!$excludeNegative) {
+                if (!isset($return[$l['event_id']])) {
+                    $return[$l['event_id']] = [
+                        0 => 0,
+                        1 => 0,
+                    ];
+                }
+
+                $key                          = (int) $l['non_action_path_taken'] ? 0 : 1;
+                $return[$l['event_id']][$key] = (int) $l['lead_count'];
+            } else {
+                $return[$l['event_id']] = (int) $l['lead_count'];
+            }
         }
 
         return $return;

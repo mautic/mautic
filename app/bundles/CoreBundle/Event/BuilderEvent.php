@@ -47,14 +47,16 @@ class BuilderEvent extends Event
      * @param $icon
      * @param $content
      * @param $form
-     * @param $priority
+     * @param int   $priority
+     * @param array $params
      */
-    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0)
+    public function addSlotType($key, $header, $icon, $content, $form, $priority = 0, array $params = [])
     {
         $this->slotTypes[$key] = [
             'header'   => $this->translator->trans($header),
             'icon'     => $icon,
             'content'  => $content,
+            'params'   => $params,
             'form'     => $form,
             'priority' => $priority,
         ];
@@ -74,6 +76,12 @@ class BuilderEvent extends Event
         }
 
         array_multisort($sort['priority'], SORT_DESC, $sort['header'], SORT_ASC, $this->slotTypes);
+
+        foreach ($this->slotTypes as $i => $slot) {
+            $slot['header'] = str_replace(' ', '<br />', $slot['header']);
+
+            $this->slotTypes[$i] = $slot;
+        }
 
         return $this->slotTypes;
     }

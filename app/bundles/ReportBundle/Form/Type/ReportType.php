@@ -133,6 +133,7 @@ class ReportType extends AbstractType
                 }
 
                 $columns           = $model->getColumnList($source);
+                $groupByColumns    = $model->getColumnList($source, true);
                 $filters           = $model->getFilterList($source);
                 $filterDefinitions = htmlspecialchars(json_encode($filters->definitions), ENT_QUOTES, 'UTF-8');
                 $operatorHtml      = htmlspecialchars(json_encode($filters->operatorHtml), ENT_QUOTES, 'UTF-8');
@@ -163,6 +164,25 @@ class ReportType extends AbstractType
                     ]
                 );
 
+                // Build the columns selector
+                $form->add(
+                    'groupBy',
+                    'choice',
+                    [
+                        'choices'    => $groupByColumns->choices,
+                        'label'      => false,
+                        'label_attr' => ['class' => 'control-label'],
+                        'required'   => false,
+                        'multiple'   => true,
+                        'expanded'   => false,
+                        'attr'       => [
+                            'class'         => 'form-control multiselect',
+                            'data-sortable' => 'true',
+                            'onchange'      => 'Mautic.checkSelectedGroupBy()',
+                        ],
+                    ]
+                );
+
                 // Build the filter selector
                 $form->add(
                     'filters',
@@ -185,6 +205,24 @@ class ReportType extends AbstractType
                         ],
                         'filters' => $filters->definitions,
                         'report'  => $formData,
+                    ]
+                );
+
+                // Build the filter selector
+                $form->add(
+                    'aggregators',
+                    'collection',
+                    [
+                        'type'    => 'aggregator',
+                        'label'   => false,
+                        'options' => [
+                            'columnList' => $groupByColumns->choices,
+                            'required'   => false,
+                        ],
+                        'allow_add'    => true,
+                        'allow_delete' => true,
+                        'prototype'    => true,
+                        'required'     => false,
                     ]
                 );
 

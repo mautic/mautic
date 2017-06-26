@@ -33,5 +33,25 @@ return [
                 'alias'     => 'emailmarketing_icontact',
             ],
         ],
+        'integrations' => [
+            'mautic.integration.constantcontact' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.icontact' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.mailchimp' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+        ],
     ],
 ];

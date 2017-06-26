@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class FieldsType.
@@ -24,13 +25,23 @@ class FieldsType extends AbstractType
 {
     use FieldsTypeTrait;
 
+    private $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['lead_fields']);
+        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['mautic_fields'], '', $options['limit'], $options['start'], $this->translator);
     }
 
     /**
@@ -38,16 +49,7 @@ class FieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_fields', 'lead_fields']);
-        $resolver->setDefined(['update_mautic']);
-        $resolver->setDefaults(
-            [
-                'special_instructions' => '',
-                'alert_type'           => '',
-                'allow_extra_fields'   => true,
-                'enable_data_priority' => false,
-            ]
-        );
+        $this->configureFieldOptions($resolver, 'lead');
     }
 
     /**
@@ -63,7 +65,6 @@ class FieldsType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['specialInstructions'] = $options['special_instructions'];
-        $view->vars['alertType']           = $options['alert_type'];
+        $this->buildFieldView($view,  $options, 'lead');
     }
 }

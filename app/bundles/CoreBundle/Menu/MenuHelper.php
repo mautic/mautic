@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Menu;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -43,17 +44,24 @@ class MenuHelper
     protected $mauticParameters;
 
     /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
      * MenuHelper constructor.
      *
-     * @param CorePermissions $security
-     * @param RequestStack    $requestStack
-     * @param array           $mauticParameters
+     * @param CorePermissions   $security
+     * @param RequestStack      $requestStack
+     * @param array             $mauticParameters
+     * @param IntegrationHelper $integrationHelper
      */
-    public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters)
+    public function __construct(CorePermissions $security, RequestStack $requestStack, array $mauticParameters, IntegrationHelper $integrationHelper)
     {
-        $this->security         = $security;
-        $this->mauticParameters = $mauticParameters;
-        $this->request          = $requestStack->getCurrentRequest();
+        $this->security          = $security;
+        $this->mauticParameters  = $mauticParameters;
+        $this->request           = $requestStack->getCurrentRequest();
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -71,40 +79,10 @@ class MenuHelper
                 continue;
             }
 
-            // Check to see if menu is restricted
-            if (isset($i['access'])) {
-                if ($i['access'] == 'admin') {
-                    if (!$this->security->isAdmin()) {
-                        unset($items[$k]);
-                        continue;
-                    }
-                } elseif (!$this->security->isGranted($i['access'], 'MATCH_ONE')) {
-                    unset($items[$k]);
-                    continue;
-                }
-            }
-
-            if (isset($i['checks'])) {
-                $passChecks = true;
-                foreach ($i['checks'] as $checkGroup => $checks) {
-                    foreach ($checks as $name => $value) {
-                        if ($checkGroup == 'parameters') {
-                            if ($this->getParameter($name) != $value) {
-                                $passChecks = false;
-                                break;
-                            }
-                        } elseif ($checkGroup == 'request') {
-                            if ($this->request->get($name) != $value) {
-                                $passChecks = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (!$passChecks) {
-                    unset($items[$k]);
-                    continue;
-                }
+            // Remove the item if the checks fail
+            if ($this->handleChecks($i) === false) {
+                unset($items[$k]);
+                continue;
             }
 
             //Set ID to route name
@@ -275,5 +253,113 @@ class MenuHelper
     protected function getParameter($name)
     {
         return isset($this->mauticParameters[$name]) ? $this->mauticParameters[$name] : false;
+    }
+
+    /**
+     * @param string $integrationName
+     * @param array  $config
+     *
+     * @return bool
+     */
+    protected function handleIntegrationChecks($integrationName, array $config)
+    {
+        $integration = $this->integrationHelper->getIntegrationObject($integrationName);
+
+        if (!$integration) {
+            return false;
+        }
+
+        $settings = $integration->getIntegrationSettings();
+
+        $passChecks = true;
+
+        foreach ($config as $key => $value) {
+            switch ($key) {
+                case 'enabled':
+                    $passChecks = $settings->getIsPublished() == $value;
+                    break;
+                case 'features':
+                    $supportedFeatures = $settings->getSupportedFeatures();
+
+                    foreach ($value as $featureName) {
+                        if (!in_array($featureName, $supportedFeatures)) {
+                            $passChecks = false;
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        return $passChecks;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return bool
+     */
+    protected function handleParametersChecks($name, $value)
+    {
+        return $this->getParameter($name) == $value;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return bool
+     */
+    protected function handleRequestChecks($name, $value)
+    {
+        return $this->request->get($name) == $value;
+    }
+
+    /**
+     * @param $accessLevel
+     *
+     * @return bool
+     */
+    protected function handleAccessCheck($accessLevel)
+    {
+        switch ($accessLevel) {
+            case 'admin':
+                return $this->security->isAdmin();
+            default:
+                return $this->security->isGranted($accessLevel, 'MATCH_ONE');
+        }
+    }
+
+    /**
+     * Handle access check and other checks for menu items.
+     *
+     * @param array $menuItem
+     *
+     * @return bool Returns false if the item fails the access check or any other checks
+     */
+    protected function handleChecks(array $menuItem)
+    {
+        if (isset($menuItem['access']) && $this->handleAccessCheck($menuItem['access']) === false) {
+            return false;
+        }
+
+        if (isset($menuItem['checks']) && is_array($menuItem['checks'])) {
+            foreach ($menuItem['checks'] as $checkGroup => $checkConfig) {
+                $checkMethod = 'handle'.ucfirst($checkGroup).'Checks';
+
+                if (!method_exists($this, $checkMethod)) {
+                    continue;
+                }
+
+                foreach ($checkConfig as $name => $value) {
+                    if ($this->$checkMethod($name, $value) === false) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }
