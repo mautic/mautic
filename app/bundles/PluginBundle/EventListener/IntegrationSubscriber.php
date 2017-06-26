@@ -42,20 +42,31 @@ class IntegrationSubscriber extends CommonSubscriber
      */
     public function onRequest(PluginIntegrationRequestEvent $event)
     {
+        $headers = (count($event->getHeaders())) ? implode(PHP_EOL, array_map(function ($k, $v) {
+            return "$k: $v";
+        }, array_keys($event->getHeaders()), array_values($event->getHeaders()))) : '';
+
+        $params = (count($event->getParameters())) ? implode(PHP_EOL, array_map(function ($k, $v) {
+            return "$k=$v";
+        }, array_keys($event->getParameters()), array_values($event->getParameters()))) : '';
+
         if (defined('IN_MAUTIC_CONSOLE') && defined('MAUTIC_CONSOLE_VERBOSITY') && MAUTIC_CONSOLE_VERBOSITY >= ConsoleOutput::VERBOSITY_VERY_VERBOSE) {
             $output = new ConsoleOutput();
             $output->writeln('<fg=magenta>REQUEST:</>');
             $output->writeln('<fg=white>'.$event->getMethod().' '.$event->getUrl().'</>');
-            if (count($event->getHeaders())) {
-                $output->writeln('<fg=cyan>'.implode(PHP_EOL, array_map(function ($k, $v) {
-                    return "$k: $v";
-                }, array_keys($event->getHeaders()), array_values($event->getHeaders()))).'</>');
-                $output->writeln('');
+            $output->writeln('<fg=cyan>'.$headers.'</>');
+            $output->writeln('');
+            $output->writeln('<fg=cyan>'.$params.'</>');
+        } elseif ('dev' === MAUTIC_ENV) {
+            $this->logger->alert('INTEGRATION REQUEST: '.$event->getMethod().' '.$event->getUrl());
+            if ('' !== $headers) {
+                $this->logger->alert("REQUEST HEADERS: \n".$headers.PHP_EOL);
             }
-            if (count($event->getParameters())) {
-                $output->writeln('<fg=cyan>'.implode(PHP_EOL, array_map(function ($k, $v) {
-                    return "$k=$v";
-                }, array_keys($event->getParameters()), array_values($event->getParameters()))).'</>');
+            if ('' !== $params) {
+                $this->logger->alert("REQUEST PARAMS: \n".$params.PHP_EOL);
+            }
+            if (!empty($event->getSettings())) {
+                $this->logger->alert("REQUEST SETTINGS: \n".json_encode($event->getSettings(), JSON_PRETTY_PRINT).PHP_EOL);
             }
         }
     }
@@ -65,31 +76,51 @@ class IntegrationSubscriber extends CommonSubscriber
      */
     public function onResponse(PluginIntegrationRequestEvent $event)
     {
+        /** @var Response $response */
+        $response = $event->getResponse();
+        $isJson   = isset($response->headers['Content-Type']) && preg_match('/application\/json/', $response->headers['Content-Type']);
+        $json     = $isJson ? str_replace('    ', '  ', json_encode(json_decode($response->body), JSON_PRETTY_PRINT)) : '';
+        $xml      = '';
+        $isXml    = isset($response->headers['Content-Type']) && preg_match('/text\/xml/', $response->headers['Content-Type']);
+        if ($isXml) {
+            $doc                     = new DomDocument('1.0');
+            $doc->preserveWhiteSpace = false;
+            $doc->formatOutput       = true;
+            $doc->loadXML($response->body);
+            $xml = $doc->saveXML();
+        }
+
+        $headers = implode(PHP_EOL, array_map(function ($k, $v) {
+            return "$k: $v";
+        }, array_keys($response->headers), array_values($response->headers)));
+
         if (defined('IN_MAUTIC_CONSOLE') && defined('MAUTIC_CONSOLE_VERBOSITY') && MAUTIC_CONSOLE_VERBOSITY >= ConsoleOutput::VERBOSITY_VERY_VERBOSE) {
             $output = new ConsoleOutput();
-            $output->writeln('<fg=magenta>RESPONSE:</>');
-            /** @var Response $response */
-            $response = $event->getResponse();
-            $isJson   = false;
-            $isXml    = false;
-            if (count($response->headers)) {
-                $output->writeln('<fg=cyan>'.implode(PHP_EOL, array_map(function ($k, $v) {
-                    return "$k: $v";
-                }, array_keys($response->headers), array_values($response->headers))).'</>');
-                $output->writeln('');
-                $isJson = isset($response->headers['Content-Type']) && preg_match('/application\/json/', $response->headers['Content-Type']);
-                $isXml  = isset($response->headers['Content-Type']) && preg_match('/text\/xml/', $response->headers['Content-Type']);
-            }
+            $output->writeln(sprintf('<fg=magenta>RESPONSE: %d</>', $response->code));
+            $output->writeln('<fg=cyan>'.$headers.'</>');
+            $output->writeln('');
+
             if ($isJson) {
-                $output->writeln('<fg=cyan>'.str_replace('    ', '  ', json_encode(json_decode($response->body), JSON_PRETTY_PRINT)).'</>');
+                $output->writeln('<fg=cyan>'.$json.'</>');
             } elseif ($isXml) {
-                $doc                     = new DomDocument('1.0');
-                $doc->preserveWhiteSpace = false;
-                $doc->formatOutput       = true;
-                $doc->loadXML($response->body);
-                $output->writeln('<fg=cyan>'.$doc->saveXML().'</>');
+                $output->writeln('<fg=cyan>'.$xml.'</>');
             } else {
                 $output->writeln('<fg=cyan>'.$response->body.'</>');
+            }
+        } elseif ('dev' === MAUTIC_ENV) {
+            $this->logger->alert('RESPONSE CODE: '.$response->code);
+            if ('' !== $headers) {
+                $this->logger->alert("RESPONSE HEADERS: \n".$headers.PHP_EOL);
+            }
+            if ('' !== $json || '' !== $xml || '' !== $response->body) {
+                $this->logger->alert('RESPONSE BODY:');
+                if ($isJson) {
+                    $this->logger->alert($json."\n");
+                } elseif ($isXml) {
+                    $this->logger->alert($xml."\n");
+                } else {
+                    $this->logger->alert($response->body."\n");
+                }
             }
         }
     }
