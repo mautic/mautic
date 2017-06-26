@@ -56,7 +56,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 abstract class AbstractIntegration
 {
     const FIELD_TYPE_STRING = 'string';
-    const FIELD_TYPE_BOOL = 'boolean';
+    const FIELD_TYPE_BOOL   = 'boolean';
     const FIELD_TYPE_NUMBER = 'number';
 
     /**
@@ -2441,14 +2441,14 @@ abstract class AbstractIntegration
      *
      * @return bool|float|string
      */
-    public function cleanPushData($value, $fieldType = AbstractIntegration::FIELD_TYPE_STRING)
+    public function cleanPushData($value, $fieldType = self::FIELD_TYPE_STRING)
     {
         $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
 
         switch ($fieldType) {
-            case AbstractIntegration::FIELD_TYPE_BOOL:
+            case self::FIELD_TYPE_BOOL:
                 return (bool) $clean;
-            case AbstractIntegration::FIELD_TYPE_NUMBER:
+            case self::FIELD_TYPE_NUMBER:
                 return (float) $clean;
             default:
                 return $clean;
@@ -2468,6 +2468,7 @@ abstract class AbstractIntegration
      * @param bool  $error
      *
      * @return int Number ignored due to being duplicates
+     *
      * @throws ApiErrorException
      * @throws \Exception
      */
@@ -2518,7 +2519,7 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param array $mapping     array of [$mauticId => ['entity' => FormEntity, 'integration_entity_id' => $integrationId]]
+     * @param array $mapping           array of [$mauticId => ['entity' => FormEntity, 'integration_entity_id' => $integrationId]]
      * @param       $integrationEntity
      * @param       $internalEntity
      * @param array $params
@@ -2579,7 +2580,7 @@ abstract class AbstractIntegration
             /** @var FormEntity $entity */
             $changes = $entity->getChanges(true);
             if (empty($changes) || isset($changes['dateModified'])) {
-                $startSyncDate = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
+                $startSyncDate      = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
                 $entityDateModified = $entity->getDateModified();
 
                 if (isset($changes['dateModified'])) {

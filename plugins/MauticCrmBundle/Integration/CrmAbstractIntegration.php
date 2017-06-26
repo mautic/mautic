@@ -255,8 +255,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed       $data    Profile data from integration
-     * @param bool|true   $persist Set to false to not persist lead to the database in this method
+     * @param mixed       $data        Profile data from integration
+     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
      * @param mixed||null $identifiers
      * @param string|null $object
@@ -378,7 +378,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param        $config
-     * @param null   $entityObject Possibly used by the CRM
+     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
@@ -393,7 +393,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param        $config
-     * @param null   $entityObject Possibly used by the CRM
+     * @param null   $entityObject   Possibly used by the CRM
      * @param string $priorityObject
      *
      * @return array
