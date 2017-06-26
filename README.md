@@ -221,8 +221,8 @@ Marketing automation has historically been a difficult tool to implement in a bu
 ### Contact Info
 
 * <a href="https://www.mautic.org">https://www.mautic.org</a>
-* <a href="https://twitter.com/mautic">@mautic</a> [Twitter]
-* <a href="https://facebook.com/trymautic">@trymautic</a> [Facebook]
+* <a href="https://twitter.com/MauticCommunity">@MauticCommunity</a> [Twitter]
+* <a href="https://www.facebook.com/MauticCommunity/">@MauticCommunity</a> [Facebook]
 * <a href="https://plus.google.com/+MauticOrg">+MauticOrg</a> [Google+]
 
 ### Developers

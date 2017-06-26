@@ -13,6 +13,7 @@ namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -24,22 +25,27 @@ class Event
      * @var int
      */
     private $id;
+
     /**
      * @var Webhook
      */
     private $webhook;
+
     /**
      * @var ArrayCollection
      */
     private $queues;
+
     /**
      * @var string
      */
-    private $event_type;
+    private $eventType;
+
     public function __construct()
     {
         $this->queues = new ArrayCollection();
     }
+
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -47,24 +53,41 @@ class Event
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_events')
-            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\EventRepository');
-        // id columns
+            ->setCustomRepositoryClass(EventRepository::class);
+
         $builder->addId();
-        // M:1 for webhook
+
         $builder->createManyToOne('webhook', 'Webhook')
             ->inversedBy('events')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
-        // 1:M for queues
+
         $builder->createOneToMany('queues', 'WebhookQueue')
             ->mappedBy('event')
             ->build();
-        // event type field
-        $builder->createField('event_type', 'string')
+
+        $builder->createField('eventType', 'string')
             ->columnName('event_type')
             ->length(50)
             ->build();
     }
+
+    /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('event')
+            ->addListProperties(
+                [
+                    'eventType',
+                ]
+            )
+            ->build();
+    }
+
     /**
      * @return mixed
      */
@@ -72,15 +95,7 @@ class Event
     {
         return $this->id;
     }
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
 
-        return $this;
-    }
     /**
      * @return mixed
      */
@@ -88,6 +103,7 @@ class Event
     {
         return $this->webhook;
     }
+
     /**
      * @param mixed $webhook
      */
@@ -97,19 +113,21 @@ class Event
 
         return $this;
     }
+
     /**
      * @return mixed
      */
     public function getEventType()
     {
-        return $this->event_type;
+        return $this->eventType;
     }
+
     /**
-     * @param mixed $event_type
+     * @param mixed $eventType
      */
-    public function setEventType($event_type)
+    public function setEventType($eventType)
     {
-        $this->event_type = $event_type;
+        $this->eventType = $eventType;
 
         return $this;
     }
