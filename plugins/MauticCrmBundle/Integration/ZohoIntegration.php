@@ -531,7 +531,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                         /** @var array $opts */
                         $opts = $leadObject[$objKey]['section'];
                         foreach ($opts as $optgroup) {
-                            //$zohoFields[$optgroup['dv']] = array();
                             if (!array_key_exists(0, $optgroup['FL'])) {
                                 $optgroup['FL'] = [$optgroup['FL']];
                             }
@@ -581,11 +580,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function convertLeadFieldKey($key, $field)
     {
-        if (is_array($field) && array_key_exists('dv', $field)) {
-            return $this->getFieldKey($field['dv']);
-        }
-
-        return $key;
+        return [$key, $field['dv']];
     }
 
     /**
