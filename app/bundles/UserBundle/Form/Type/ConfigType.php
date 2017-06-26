@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
 
 /**
@@ -32,13 +33,19 @@ class ConfigType extends AbstractType
     protected $parameters;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * ConfigType constructor.
      *
      * @param CoreParametersHelper $parametersHelper
      */
-    public function __construct(CoreParametersHelper $parametersHelper)
+    public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
     {
         $this->parameters = $parametersHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -51,9 +58,9 @@ class ConfigType extends AbstractType
             'saml_idp_metadata',
             ConfigFileType::class,
             [
-                'label'      => 'mautic.user.config.form.saml.idp.metadata',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'label'       => 'mautic.user.config.form.saml.idp.metadata',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.user.config.form.saml.idp.metadata.tooltip',
                     'rows'    => 10,
@@ -74,9 +81,9 @@ class ConfigType extends AbstractType
             'saml_idp_own_certificate',
             ConfigFileType::class,
             [
-                'label'      => 'mautic.user.config.form.saml.idp.own_certificate',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'label'       => 'mautic.user.config.form.saml.idp.own_certificate',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.user.config.form.saml.idp.own_certificate.tooltip',
                 ],
@@ -96,9 +103,9 @@ class ConfigType extends AbstractType
             'saml_idp_own_private_key',
             ConfigFileType::class,
             [
-                'label'      => 'mautic.user.config.form.saml.idp.own_private_key',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'label'       => 'mautic.user.config.form.saml.idp.own_private_key',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.user.config.form.saml.idp.own_private_key.tooltip',
                 ],
@@ -124,7 +131,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.user.config.form.saml.idp.own_password.tooltip',
                 ],
-                'required' => false,
+                'required'   => false,
             ]
         );
 
@@ -150,7 +157,7 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'required' => false,
+                'required'   => false,
             ]
         );
 
@@ -184,13 +191,15 @@ class ConfigType extends AbstractType
             'saml_idp_default_role',
             'role_list',
             [
-                'label'      => 'mautic.user.config.form.saml.idp.default_role',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
+                'label'       => 'mautic.user.config.form.saml.idp.default_role',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'            => 'form-control',
+                    'data-placeholder' => $this->translator->trans('mautic.user.config.form.saml.idp.disable_creation'),
+                    'tooltip'          => 'mautic.user.config.form.saml.idp.default_role.tooltip',
                 ],
-                'required'    => true,
-                'empty_value' => false,
+                'required'    => false,
+                'empty_value' => '',
             ]
         );
     }
