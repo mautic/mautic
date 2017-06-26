@@ -410,7 +410,8 @@ class SugarcrmApi extends CrmApi
             $res = [];
             if (isset($data['entry_list'])) {
                 foreach ($data['entry_list'] as $key => $record) {
-                    $fields = [];
+                    $fields       = [];
+                    $fields['id'] = $record['id'];
                     foreach ($record['name_value_list'] as $item) {
                         $fields[$item['name']] = $item['value'];
                     }
@@ -418,6 +419,8 @@ class SugarcrmApi extends CrmApi
                         $res[$fields['id']] = $fields['email1'];
                     } elseif (isset($fields['email1'])) {
                         $res[$fields['email1']] = $fields['id'];
+                    } elseif ($type == 'BYEMAIL' && !isset($fields['email1'])) {
+                        $res[$query['emails'][0]] = $fields['id'];
                     }
                 }
             }
