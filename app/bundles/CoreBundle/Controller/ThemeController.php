@@ -59,14 +59,24 @@ class ThemeController extends FormController
                         $themeName = basename($fileName, '.zip');
 
                         if (!empty($fileData)) {
-                            try {
-                                $fileData->move($dir, $fileName);
-                                $themeHelper->install($dir.'/'.$fileName);
-                                $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
-                            } catch (\Exception $e) {
+                            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+
+                            if ($extension === 'zip') {
+                                try {
+                                    $fileData->move($dir, $fileName);
+                                    $themeHelper->install($dir.'/'.$fileName);
+                                    $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
+                                } catch (\Exception $e) {
+                                    $form->addError(
+                                        new FormError(
+                                            $this->translator->trans($e->getMessage(), [], 'validators')
+                                        )
+                                    );
+                                }
+                            } else {
                                 $form->addError(
                                     new FormError(
-                                        $this->translator->trans($e->getMessage(), [], 'validators')
+                                        $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
                                     )
                                 );
                             }

@@ -24,7 +24,7 @@ class PostCountRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         return parent::getEntities($args);
     }

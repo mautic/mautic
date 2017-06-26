@@ -24,7 +24,6 @@ class SlotDynamicContentType extends SlotType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        parent::buildForm($builder, $options);
     }
 
     /**

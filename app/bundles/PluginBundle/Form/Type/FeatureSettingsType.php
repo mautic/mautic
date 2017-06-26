@@ -21,7 +21,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class FeatureSettingsType.
@@ -39,11 +38,6 @@ class FeatureSettingsType extends AbstractType
     protected $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
@@ -53,17 +47,14 @@ class FeatureSettingsType extends AbstractType
      *
      * @param Session              $session
      * @param CoreParametersHelper $coreParametersHelper
-     * @param TranslatorInterface  $translator
      */
     public function __construct(
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator,
         LoggerInterface $logger
     ) {
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
         $this->logger               = $logger;
     }
 
@@ -126,13 +117,7 @@ class FeatureSettingsType extends AbstractType
                 $fields = $integrationCompanyFields = [];
             }
 
-            $enableDataPriority = !empty($formSettings['enable_data_priority']);
-
-            $leadFields['-1'] = '';
-
-            $leadFields['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
-
-            $leadFields['-1'] = '';
+            $enableDataPriority = $integrationObject->getDataPriority();
 
             $form->add(
                 'leadFields',
@@ -141,8 +126,7 @@ class FeatureSettingsType extends AbstractType
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
                     'mautic_fields'        => $leadFields,
-                    'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : [],
-                    'update_mautic'        => isset($data['update_mautic']) && !empty($data['update_mautic']) ? $data['update_mautic'] : [],
+                    'data'                 => $data,
                     'integration_fields'   => $fields,
                     'enable_data_priority' => $enableDataPriority,
                     'integration'          => $integrationObject->getName(),
@@ -161,12 +145,10 @@ class FeatureSettingsType extends AbstractType
                     'companyFields',
                     'integration_company_fields',
                     [
-                        'label'                 => 'mautic.integration.comapanyfield_matches',
-                        'required'              => false,
-                        'mautic_fields'         => $companyFields,
-                        'data'                  => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
-                        'update_mautic_company' => isset($data['update_mautic_company']) && !empty($data['update_mautic_company'])
-                            ? $data['update_mautic_company'] : [],
+                        'label'                => 'mautic.integration.comapanyfield_matches',
+                        'required'             => true,
+                        'mautic_fields'        => $companyFields,
+                        'data'                 => $data,
                         'integration_fields'   => $integrationCompanyFields,
                         'enable_data_priority' => $enableDataPriority,
                         'integration'          => $integrationObject->getName(),

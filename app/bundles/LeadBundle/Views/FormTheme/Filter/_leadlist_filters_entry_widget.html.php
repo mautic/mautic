@@ -13,6 +13,9 @@ $filterType  = $form['field']->vars['value'];
 $inGroup     = $form->vars['data']['glue'] === 'and';
 $object      = (isset($form->vars['data']['object'])) ? $form->vars['data']['object'] : 'lead';
 $class       = (isset($form->vars['data']['object']) && $form->vars['data']['object'] == 'company') ? 'fa-building' : 'fa-user';
+if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
+    return;
+}
 ?>
 
 <div class="panel<?php echo ($inGroup && $first === false) ? ' in-group' : ''; ?>">

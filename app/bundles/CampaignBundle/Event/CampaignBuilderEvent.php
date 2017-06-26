@@ -43,6 +43,13 @@ class CampaignBuilderEvent extends Event
     private $translator;
 
     /**
+     * Holds info if some property has been already sorted or not.
+     *
+     * @var array
+     */
+    private $sortCache = [];
+
+    /**
      * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
      */
     public function __construct($translator)
@@ -84,7 +91,7 @@ class CampaignBuilderEvent extends Event
         );
 
         $decision['label']       = $this->translator->trans($decision['label']);
-        $decision['description'] = (isset($action['description'])) ? $this->translator->trans($decision['description']) : '';
+        $decision['description'] = (isset($decision['description'])) ? $this->translator->trans($decision['description']) : '';
 
         $this->decisions[$key] = $decision;
     }
@@ -96,22 +103,7 @@ class CampaignBuilderEvent extends Event
      */
     public function getDecisions()
     {
-        static $sorted = false;
-
-        if (empty($sorted)) {
-            uasort(
-                $this->decisions,
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
-            );
-            $sorted = true;
-        }
-
-        return $this->decisions;
+        return $this->sort('decisions');
     }
 
     /**
@@ -181,22 +173,7 @@ class CampaignBuilderEvent extends Event
      */
     public function getConditions()
     {
-        static $sorted = false;
-
-        if (empty($sorted)) {
-            uasort(
-                $this->conditions,
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
-            );
-            $sorted = true;
-        }
-
-        return $this->conditions;
+        return $this->sort('conditions');
     }
 
     /**
@@ -268,11 +245,21 @@ class CampaignBuilderEvent extends Event
      */
     public function getActions()
     {
-        static $sorted = false;
+        return $this->sort('actions');
+    }
 
-        if (empty($sorted)) {
+    /**
+     * Sort internal actions, decisions and conditions arrays.
+     *
+     * @param string $property name
+     *
+     * @return array
+     */
+    protected function sort($property)
+    {
+        if (empty($this->sortCache[$property])) {
             uasort(
-                $this->actions,
+                $this->{$property},
                 function ($a, $b) {
                     return strnatcasecmp(
                         $a['label'],
@@ -280,9 +267,9 @@ class CampaignBuilderEvent extends Event
                     );
                 }
             );
-            $sorted = true;
+            $this->sortCache[$property] = true;
         }
 
-        return $this->actions;
+        return $this->{$property};
     }
 }

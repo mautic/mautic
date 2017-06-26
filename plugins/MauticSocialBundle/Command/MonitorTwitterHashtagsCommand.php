@@ -41,7 +41,7 @@ class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
         $searchUrl = $this->twitter->getApiUrl('search/tweets');
 
         if (!array_key_exists('hashtag', $params)) {
-            $this->output->writeln('no hashtag was found!');
+            $this->output->writeln('No hashtag was found!');
 
             return false;
         }

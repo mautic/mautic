@@ -232,7 +232,7 @@ trait FilterTrait
 
         if (in_array($data['operator'], ['empty', '!empty'])) {
             $attr['disabled'] = 'disabled';
-        } else {
+        } elseif ($data['operator']) {
             $customOptions['constraints'] = [
                 new NotBlank(
                     [
@@ -257,6 +257,13 @@ trait FilterTrait
                 ]
             );
         } else {
+            if (isset($customOptions['constraints']) && is_array($customOptions['constraints'])) {
+                foreach ($customOptions['constraints'] as $i => $constraint) {
+                    if (get_class($constraint) === 'NotBlank') {
+                        array_splice($customOptions['constraints'], $i, 1);
+                    }
+                }
+            }
             $form->add(
                 'filter',
                 $type,

@@ -25,7 +25,7 @@ class LeadDeviceRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
@@ -67,7 +67,7 @@ class LeadDeviceRepository extends CommonRepository
         }
 
         if ($deviceNames !== null) {
-            if(!is_array($deviceNames)){
+            if (!is_array($deviceNames)) {
                 $deviceNames[] = $deviceNames;
             }
             foreach ($deviceNames as $key => $deviceName) {
@@ -101,7 +101,6 @@ class LeadDeviceRepository extends CommonRepository
                     ->setParameter('deviceModel'.$key, $deviceModel);
             }
         }
-
 
         if ($deviceOss !== null) {
             if (!is_array($deviceOss)) {

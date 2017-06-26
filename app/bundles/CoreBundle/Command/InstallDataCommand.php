@@ -109,8 +109,8 @@ EOT
         //now populate the tables with fixture
         $command = $this->getApplication()->find('doctrine:fixtures:load');
         $args    = [
-            '--append' => true,
             'command'  => 'doctrine:fixtures:load',
+            '--append' => true,
             '--env'    => $env,
             '--quiet'  => true,
         ];
@@ -121,6 +121,7 @@ EOT
         }
         $input      = new ArrayInput($args);
         $returnCode = $command->run($input, $output);
+
         if ($returnCode !== 0) {
             return $returnCode;
         }
@@ -145,25 +146,43 @@ EOT
         $fixtures      = [];
         $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
         foreach ($mauticBundles as $bundle) {
-            //parse the namespace into a filepath
             $fixturesDir = $bundle['directory'].'/DataFixtures/ORM';
 
             if (file_exists($fixturesDir)) {
-                if ($returnClassNames) {
-                    //get files within the directory
-                    $finder = new Finder();
-                    $finder->files()->in($fixturesDir)->name('*.php');
-                    foreach ($finder as $file) {
-                        //add the file to be loaded
-                        $class      = str_replace('.php', '', $file->getFilename());
-                        $fixtures[] = 'Mautic\\'.$bundle['bundle'].'\\DataFixtures\\ORM\\'.$class;
-                    }
-                } else {
-                    $fixtures[] = $fixturesDir;
-                }
+                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\DataFixtures\\ORM\\';
+                $this->populateFixturesFromDirectory($fixturesDir, $fixtures, $classPrefix, $returnClassNames);
+            }
+
+            $testFixturesDir = $bundle['directory'].'/Tests/DataFixtures/ORM';
+
+            if (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV && file_exists($testFixturesDir)) {
+                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\Tests\\DataFixtures\\ORM\\';
+                $this->populateFixturesFromDirectory($testFixturesDir, $fixtures, $classPrefix, $returnClassNames);
             }
         }
 
         return $fixtures;
+    }
+
+    /**
+     * @param string $fixturesDir
+     * @param array  $fixtures
+     * @param string $classPrefix
+     * @param bool   $returnClassNames
+     */
+    private function populateFixturesFromDirectory($fixturesDir, array &$fixtures, $classPrefix = null, $returnClassNames = false)
+    {
+        if ($returnClassNames) {
+            //get files within the directory
+            $finder = new Finder();
+            $finder->files()->in($fixturesDir)->name('*.php');
+            foreach ($finder as $file) {
+                //add the file to be loaded
+                $class      = str_replace('.php', '', $file->getFilename());
+                $fixtures[] = $classPrefix.$class;
+            }
+        } else {
+            $fixtures[] = $fixturesDir;
+        }
     }
 }

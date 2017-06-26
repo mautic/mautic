@@ -657,6 +657,7 @@ return [
                     'mautic.security',
                     'request_stack',
                     '%mautic.parameters%',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.menu_renderer' => [
@@ -897,5 +898,6 @@ return [
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'max_entity_lock_time'      => 0,
     ],
 ];

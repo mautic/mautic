@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
@@ -54,6 +55,11 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         ],
     ];
 
+    public function setUp()
+    {
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+    }
+
     /**
      * @expectedException \Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException
      */
@@ -74,12 +80,15 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         $swiftMailer = new \Swift_Mailer(new BatchTransport());
 
-        $mailer = new \Mautic\EmailBundle\Helper\MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
         // Enable queue mode
         $mailer->enableQueue();
         $mailer->addTo('somebody@somewhere.com');
         $mailer->addTo('somebodyelse@somewhere.com');
+        $mailer->addTo('somebodyelse2@somewhere.com');
+        $mailer->addTo('somebodyelse3@somewhere.com');
+        $mailer->addTo('somebodyelse4@somewhere.com');
     }
 
     public function testQueueModeDisabledDoesNotThrowsExceptionWhenBatchLimitHit()
@@ -99,7 +108,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         $swiftMailer = new \Swift_Mailer(new BatchTransport());
 
-        $mailer = new \Mautic\EmailBundle\Helper\MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
 
         // Enable queue mode
         try {
@@ -120,7 +129,8 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $transport   = new BatchTransport();
         $swiftMailer = new \Swift_Mailer($transport);
 
-        $mailer = new \Mautic\EmailBundle\Helper\MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
 
         $email = new Email();
         $email->setFromAddress('override@nowhere.com');
@@ -129,7 +139,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $mailer->setEmail($email);
 
         foreach ($this->contacts as $contact) {
-            $mailer->setTo($contact['email']);
+            $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
             $mailer->queue();
         }
@@ -142,7 +152,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         $mailer->reset();
         foreach ($this->contacts as $contact) {
-            $mailer->setTo($contact['email']);
+            $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
             $mailer->queue();
         }
@@ -153,6 +163,37 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(count($from) === 1);
     }
 
+    public function testBatchMode()
+    {
+        $mockFactory = $this->getMockFactory(false);
+
+        $transport   = new BatchTransport(true);
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
+
+        $email = new Email();
+        $email->setSubject('Hello');
+        $mailer->setEmail($email);
+
+        $mailer->addTo($this->contacts[0]['email']);
+        $mailer->setLead($this->contacts[0]);
+        $mailer->queue();
+        $mailer->flushQueue();
+        $errors = $mailer->getErrors();
+        $this->assertEmpty($errors['failures'], var_export($errors, true));
+
+        $mailer->reset(false);
+        $mailer->setEmail($email);
+        $mailer->addTo($this->contacts[1]['email']);
+        $mailer->setLead($this->contacts[1]);
+        $mailer->queue();
+        $mailer->flushQueue();
+        $errors = $mailer->getErrors();
+        $this->assertEmpty($errors['failures'], var_export($errors, true));
+    }
+
     public function testQueuedOwnerAsMailer()
     {
         $mockFactory = $this->getMockFactory();
@@ -160,15 +201,20 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $transport   = new BatchTransport();
         $swiftMailer = new \Swift_Mailer($transport);
 
-        $mailer = new \Mautic\EmailBundle\Helper\MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
+
+        $mailer->setSubject('Hello');
 
         foreach ($this->contacts as $contact) {
-            $mailer->setTo($contact['email']);
+            $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
             $mailer->queue();
         }
 
         $mailer->flushQueue();
+
+        $this->assertEmpty($mailer->getErrors()['failures']);
 
         $fromAddresses = $transport->getFromAddresses();
         $metadatas     = $transport->getMetadatas();
@@ -210,11 +256,11 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $transport   = new SmtpTransport();
         $swiftMailer = new \Swift_Mailer($transport);
 
-        $mailer = new \Mautic\EmailBundle\Helper\MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
         $mailer->setBody('{signature}');
 
         foreach ($this->contacts as $key => $contact) {
-            $mailer->setTo($contact['email']);
+            $mailer->addTo($contact['email']);
             $mailer->setLead($contact);
             $mailer->send();
 
@@ -229,6 +275,88 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 $this->assertEquals('{signature}', $body);
             }
         }
+    }
+
+    public function testValidateValidEmails()
+    {
+        $helper    = $this->mockEmptyMailHelper();
+        $addresses = [
+            'john@doe.com',
+            'john@doe.email',
+            'john.doe@email.com',
+            'john+doe@email.com',
+            'john@doe.whatevertldtheycomewithinthefuture',
+        ];
+
+        foreach ($addresses as $address) {
+            // will throw Swift_RfcComplianceException if it will find the address invalid
+            $helper::validateEmail($address);
+        }
+    }
+
+    public function testValidateEmailWithoutTld()
+    {
+        $heper = $this->mockEmptyMailHelper();
+        $this->setExpectedException(\Swift_RfcComplianceException::class);
+        $heper::validateEmail('john@doe');
+    }
+
+    public function testValidateEmailWithSpaceInIt()
+    {
+        $heper = $this->mockEmptyMailHelper();
+        $this->setExpectedException(\Swift_RfcComplianceException::class);
+        $heper::validateEmail('jo hn@doe.email');
+    }
+
+    public function testValidateEmailWithCaretInIt()
+    {
+        $heper = $this->mockEmptyMailHelper();
+        $this->setExpectedException(\Swift_RfcComplianceException::class);
+        $heper::validateEmail('jo^hn@doe.email');
+    }
+
+    public function testValidateEmailWithApostropheInIt()
+    {
+        $heper = $this->mockEmptyMailHelper();
+        $this->setExpectedException(\Swift_RfcComplianceException::class);
+        $heper::validateEmail('jo\'hn@doe.email');
+    }
+
+    public function testValidateEmailWithSemicolonInIt()
+    {
+        $heper = $this->mockEmptyMailHelper();
+        $this->setExpectedException(\Swift_RfcComplianceException::class);
+        $heper::validateEmail('jo;hn@doe.email');
+    }
+
+    public function testValidateEmailWithAmpersandInIt()
+    {
+        $heper = $this->mockEmptyMailHelper();
+        $this->setExpectedException(\Swift_RfcComplianceException::class);
+        $heper::validateEmail('jo&hn@doe.email');
+    }
+
+    public function testValidateEmailWithStarInIt()
+    {
+        $heper = $this->mockEmptyMailHelper();
+        $this->setExpectedException(\Swift_RfcComplianceException::class);
+        $heper::validateEmail('jo*hn@doe.email');
+    }
+
+    public function testValidateEmailWithPercentInIt()
+    {
+        $heper = $this->mockEmptyMailHelper();
+        $this->setExpectedException(\Swift_RfcComplianceException::class);
+        $heper::validateEmail('jo%hn@doe.email');
+    }
+
+    protected function mockEmptyMailHelper()
+    {
+        $mockFactory = $this->getMockFactory();
+        $transport   = new SmtpTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        return new MailHelper($mockFactory, $swiftMailer);
     }
 
     protected function getMockFactory($mailIsOwner = true)
