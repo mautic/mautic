@@ -11,12 +11,49 @@ Mautic.emailOnLoad = function (container, response) {
     Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
     Mautic.initSelectTheme(mQuery('#emailform_template'));
     Mautic.initEmailDynamicContent();
+
+    if (mQuery('table.email-list').length) {
+        mQuery('td.col-stats').each(function() {
+           var id = mQuery(this).attr('data-stats');
+           // Process the request one at a time or the xhr will cancel the previous
+            Mautic.ajaxActionRequest(
+                'email:getEmailCountStats',
+                {id: id},
+                function (response) {
+                   if (response.success) {
+                       if (response.pending) {
+                           mQuery('#pending-' + id).html(response.pending);
+                       } else {
+                           mQuery('#pending-' + id).addClass('hide');
+                       }
+
+                       if (response.queued) {
+                           mQuery('#queued-' + id).html(response.queued);
+                       } else {
+                           mQuery('#queued-' + id).addClass('hide');
+                       }
+
+                       mQuery('#sent-count-' + id).html(response.sentCount);
+                       mQuery('#read-count-' + id).html(response.readCount);
+                       mQuery('#read-percent-' + id).html(response.readPercent);
+
+                       wait = false;
+                   }
+               },
+                false,
+                true
+            );
+
+        });
+    }
 };
 
 Mautic.emailOnUnload = function(id) {
     if (id === '#app-content') {
         delete Mautic.listCompareChart;
     }
+
+    delete Mautic.ajaxActionXhrQueue['email:getEmailCountStats'];
 };
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
