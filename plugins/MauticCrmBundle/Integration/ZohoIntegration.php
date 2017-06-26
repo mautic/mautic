@@ -82,7 +82,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         $featureSettings = $this->getKeys();
 
-        return $featureSettings['datacenter'] ?? 'zoho.com';
+        return $featureSettings['datacenter'] ? $featureSettings['datacenter'] : 'zoho.com';
     }
 
     /**
