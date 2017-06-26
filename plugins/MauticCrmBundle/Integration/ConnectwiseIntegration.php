@@ -39,7 +39,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return ['push_lead', 'pull_lead', 'get_leads'];
+        return ['push_lead', 'get_leads'];
     }
 
     /**
