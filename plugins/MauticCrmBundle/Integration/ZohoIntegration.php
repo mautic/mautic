@@ -581,7 +581,11 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function convertLeadFieldKey($key, $field)
     {
-        return [$this->getFieldKey($field['dv']), $field['dv']];
+        if (is_array($field) && array_key_exists('dv', $field)) {
+            return $this->getFieldKey($field['dv']);
+        }
+
+        return $key;
     }
 
     /**
@@ -643,8 +647,8 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         $originalLimit = $limit;
         $progress      = false;
-        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, ['Contacts', 'Leads']));
-        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false, 'i.last_sync_date is not null');
+        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, null, null, ['Contacts', 'Leads']));
+        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false, null, null, 'i.last_sync_date is not null');
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -663,7 +667,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $integrationEntities = [];
 
         // Fetch them separately so we can determine which oneas are already there
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $limit, 'Contacts', [])['Contacts'];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $limit, null, null, 'Contacts', [])['Contacts'];
 
         $contactCount = count($toUpdate);
         $totalCount -= count($toUpdate);
@@ -678,7 +682,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         // Switch to Lead
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $limit, 'Leads', [])['Leads'];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $limit, null, null,  'Leads', [])['Leads'];
 
         $leadCount = count($toUpdate);
         $totalCount -= count($toUpdate);
@@ -700,7 +704,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         unset($toUpdate);
 
         //create lead records, including deleted on Zoho side (last_sync = null)
-        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $limit, 'i.last_sync_date is not null');
+        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $limit, null, null, 'i.last_sync_date is not null');
         $totalCount -= count($leadsToCreate);
         $totalCreated += count($leadsToCreate);
         foreach ($leadsToCreate as $lead) {
@@ -754,7 +758,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $xmlData .= '</'.$zObject.'>';
 
             if ($rowid > 1) {
-                $this->getApiHelper()->createLead($xmlData, $zObject);
+                $this->getApiHelper()->createLead($xmlData, null, $zObject);
             }
         }
 

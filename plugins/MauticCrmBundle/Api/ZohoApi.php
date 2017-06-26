@@ -63,12 +63,13 @@ class ZohoApi extends CrmApi
      *
      * @return array
      */
-    public function createLead($data, $object = 'Leads')
+    public function createLead($data, $lead = null, $object = 'Leads')
     {
         $parameters = [
             'xmlData'        => $data,
             'duplicateCheck' => 2, // update if exists
-            'newFormat'      => 1,
+            'newFormat'      => 2, // To include fields with "null" values while inserting data from your CRM account
+            'version'        => 4, // This will trigger duplicate check functionality for multiple records.
         ];
 
         return $this->request('insertRecords', $parameters, 'POST', $object, false);
