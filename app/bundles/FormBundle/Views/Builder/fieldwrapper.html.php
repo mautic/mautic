@@ -8,6 +8,11 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+if (!isset($inBuilder)) {
+    $inBuilder = false;
+}
+
 ?>
 <div class="panel form-field-wrapper" data-sortable-id="mauticform_<?php echo $field['id']; ?>">
     <?php
@@ -28,6 +33,7 @@
             'id'            => $field['id'],
             'formId'        => $formId,
             'contactFields' => (isset($contactFields)) ? $contactFields : [],
+            'inBuilder'     => $inBuilder,
         ]
     ); ?>
     </div>

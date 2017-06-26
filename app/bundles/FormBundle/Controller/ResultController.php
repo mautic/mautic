@@ -80,7 +80,7 @@ class ResultController extends CommonFormController
         }
 
         if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
+            $this->setListFilters($this->request->query->get('name'));
         }
 
         //set limits
