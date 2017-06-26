@@ -531,6 +531,7 @@ class FormModel extends CommonFormModel
                 'formPages'     => $pages,
                 'lastFormPage'  => $lastPage,
                 'style'         => $style,
+                'inBuilder'     => false,
             ]
         );
 

@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Psr\Log\LoggerInterface;
@@ -83,6 +84,11 @@ abstract class AbstractCommonModel
     protected $logger;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * @param EntityManager $em
      */
     public function setEntityManager(EntityManager $em)
@@ -138,6 +144,16 @@ abstract class AbstractCommonModel
     public function setUserHelper(UserHelper $userHelper)
     {
         $this->userHelper = $userHelper;
+    }
+
+    /**
+     * Initialize the CoreParameters parameter.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
