@@ -838,7 +838,7 @@ return [
             'class'        => 'Mautic\CoreBundle\IpLookup\TelizeLookup',
         ],
         'ip2loctionlocal' => [
-            'display_name' => 'IP2Location Local Bin File',
+            'display_name' => 'IP2Location Local Bin File (DB9BIN)',
             'class'        => 'Mautic\CoreBundle\IpLookup\IP2LocationBinLookup',
         ],
         'ip2locationlocaldb7bin' => [
