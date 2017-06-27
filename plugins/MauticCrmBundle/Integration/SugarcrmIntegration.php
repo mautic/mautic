@@ -632,7 +632,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         try {
             if ($this->isAuthorized()) {
                 if ($object !== 'Activity' and $object !== 'company') {
-                    $result           = $this->getApiHelper()->getLeads($query, $object);
+                    $result = $this->getApiHelper()->getLeads($query, $object);
+
                     $params['offset'] = $result['next_offset'];
                     $count            = $result['total_count'];
                     $executed += $this->amendLeadDataBeforeMauticPopulate($result, $object);

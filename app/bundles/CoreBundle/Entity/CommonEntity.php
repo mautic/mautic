@@ -92,6 +92,9 @@ class CommonEntity
                     $current = $current->format('c');
                 } elseif (is_object($current)) {
                     $current = (method_exists($current, 'getId')) ? $current->getId() : (string) $current;
+                } elseif (('' === $current && null === $val) || (null === $current && '' === $val)) {
+                    // Ingore empty conversion (but allow 0 to '' or null)
+                    return;
                 }
 
                 if ($val instanceof \DateTime) {

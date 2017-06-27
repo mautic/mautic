@@ -246,9 +246,18 @@ class FormModel extends AbstractCommonModel
             }
         } else {
             if (method_exists($entity, 'setDateModified')) {
-                $dateModified = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
-                    : new \DateTime();
-                $entity->setDateModified($dateModified);
+                $setDateModified = true;
+                if (method_exists($entity, 'getChanges')) {
+                    $changes = $entity->getChanges();
+                    if (empty($changes)) {
+                        $setDateModified = false;
+                    }
+                }
+                if ($setDateModified) {
+                    $dateModified = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+                        : new \DateTime();
+                    $entity->setDateModified($dateModified);
+                }
             }
 
             if ($this->userHelper->getUser() instanceof User) {

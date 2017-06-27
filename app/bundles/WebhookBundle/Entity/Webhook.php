@@ -103,18 +103,26 @@ class Webhook extends FormEntity
             ->setIndexBy('event_type')
             ->mappedBy('webhook')
             ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
             ->build();
+
         // 1:M for queues
         $builder->createOneToMany('queues', 'WebhookQueue')
             ->mappedBy('webhook')
             ->fetchExtraLazy()
             ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
             ->build();
+
         // 1:M for logs
         $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => 'DESC'])
             ->fetchExtraLazy()
             ->mappedBy('webhook')
             ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
             ->build();
 
         // status code
