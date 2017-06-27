@@ -144,7 +144,7 @@ class NotificationModel extends FormModel
             $datetime = new \DateTime();
         }
         $notification->setDateAdded($datetime);
-        $this->saveEntity($notification);
+        $this->saveAndDetachEntity($notification);
     }
 
     /**

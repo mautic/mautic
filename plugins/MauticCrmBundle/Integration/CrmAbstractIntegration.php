@@ -431,7 +431,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     protected function getFieldsByPriority(array $config, $priorityObject, $direction)
     {
-        return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : [];
+        return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields']);
     }
 
     /**

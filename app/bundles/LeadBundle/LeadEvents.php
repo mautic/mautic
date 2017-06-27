@@ -289,6 +289,46 @@ final class LeadEvents
     const NOTE_POST_DELETE = 'mautic.lead_note_post_delete';
 
     /**
+     * The mautic.lead_import_pre_save event is dispatched right before an import is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_PRE_SAVE = 'mautic.lead_import_pre_save';
+
+    /**
+     * The mautic.lead_import_post_save event is dispatched right after an import is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_POST_SAVE = 'mautic.lead_import_post_save';
+
+    /**
+     * The mautic.lead_import_pre_delete event is dispatched before an import is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_PRE_DELETE = 'mautic.lead_import_pre_delete';
+
+    /**
+     * The mautic.lead_import_post_delete event is dispatched after an import is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_POST_DELETE = 'mautic.lead_import_post_delete';
+
+    /**
      * The mautic.lead_device_pre_save event is dispatched right before a lead device is persisted.
      *
      * The event listener receives a

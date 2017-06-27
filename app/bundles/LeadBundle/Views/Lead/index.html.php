@@ -29,10 +29,18 @@ if ($permissions['lead:leads:create']) {
 
     $pageButtons[] = [
         'attr' => [
-            'href' => $view['router']->path('mautic_contact_action', ['objectAction' => 'import']),
+            'href' => $view['router']->path('mautic_contact_import_action', ['objectAction' => 'new']),
         ],
         'iconClass' => 'fa fa-upload',
         'btnText'   => 'mautic.lead.lead.import',
+    ];
+
+    $pageButtons[] = [
+        'attr' => [
+            'href' => $view['router']->path('mautic_contact_import_index'),
+        ],
+        'iconClass' => 'fa fa-history',
+        'btnText'   => 'mautic.lead.lead.import.index',
     ];
 }
 
