@@ -297,6 +297,8 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
+                
+                <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -336,7 +338,11 @@ $view['slots']->set(
                 </div>
             <?php endif; ?>
             <!--/ #social-container -->
-
+            
+            <!-- custom content -->
+            <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
+            <!-- end: custom content -->
+            
             <!-- #place-container -->
             <?php if ($places): ?>
                 <div class="tab-pane fade bdr-w-0" id="place-container">

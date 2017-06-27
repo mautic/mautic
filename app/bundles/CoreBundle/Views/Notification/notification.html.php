@@ -27,9 +27,9 @@
     <?php endif; ?>
     <div class="media-body">
         <?php if (!empty($n['header'])): ?>
-            <div class="media-heading fw-sb mb-0 text-primary"><?php echo $n['header']; ?></div>
+            <div class="media-heading fw-sb mb-0 text-primary"><?php echo $view['formatter']->_($n['header']); ?></div>
         <?php endif; ?>
-        <div><?php echo $n['message']; ?></div>
+        <div><?php echo $view['formatter']->_($n['message'], 'html'); ?></div>
         <div class="clearfix mt-xs">
             <span class="fa fa-clock-o text-success pull-left mr-xs"></span>
             <span class="fs-10 text-muted pull-left"><?php echo $view['date']->toText($n['dateAdded']); ?></span>
