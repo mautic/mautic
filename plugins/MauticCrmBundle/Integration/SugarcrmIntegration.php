@@ -1363,7 +1363,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $queryParam = ($object == 'Leads') ? 'checkemail' : 'checkemail_contacts';
 
         $sugarLead         = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
-        $deletedSugarLeads = [];
+        $deletedSugarLeads = $sugarLeadRecords = [];
 
         if (isset($sugarLead['entry_list'])) {
             //Sugar 6.X
@@ -1399,8 +1399,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         foreach ($sugarLeadRecords as $sugarLeadRecord) {
             if ((isset($sugarLeadRecord) && $sugarLeadRecord)) {
-                $email = $sugarLeadRecord['email1'];
-                $key   = mb_strtolower($email);
+                $email           = $sugarLeadRecord['email1'];
+                $key             = mb_strtolower($email);
+                $leadOwnerEmails = [];
                 foreach ($checkEmailsInSugar as $emailKey => $mauticRecord) {
                     if ($email == $emailKey) {
                         $isConverted = (isset($sugarLeadRecord['contact_id'])
