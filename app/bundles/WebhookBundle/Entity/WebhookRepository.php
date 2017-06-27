@@ -23,7 +23,7 @@ class WebhookRepository extends CommonRepository
      *
      * @param array $args
      *
-     * @return Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
     public function getEntities(array $args = [])
     {

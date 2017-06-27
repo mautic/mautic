@@ -116,6 +116,19 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
+     * Create/edit entity then detach to preserve RAM.
+     *
+     * @param      $entity
+     * @param bool $unlock
+     */
+    public function saveAndDetachEntity($entity, $unlock = true)
+    {
+        $this->saveEntity($entity, $unlock);
+
+        $this->em->detach($entity);
+    }
+
+    /**
      * Save an array of entities.
      *
      * @param array $entities
@@ -233,7 +246,18 @@ class FormModel extends AbstractCommonModel
             }
         } else {
             if (method_exists($entity, 'setDateModified')) {
-                $entity->setDateModified(new \DateTime());
+                $setDateModified = true;
+                if (method_exists($entity, 'getChanges')) {
+                    $changes = $entity->getChanges();
+                    if (empty($changes)) {
+                        $setDateModified = false;
+                    }
+                }
+                if ($setDateModified) {
+                    $dateModified = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+                        : new \DateTime();
+                    $entity->setDateModified($dateModified);
+                }
             }
 
             if ($this->userHelper->getUser() instanceof User) {

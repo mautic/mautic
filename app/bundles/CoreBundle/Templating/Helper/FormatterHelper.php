@@ -89,12 +89,45 @@ class FormatterHelper extends Helper
             case 'int':
                 $string = (int) $val;
                 break;
+            case 'html':
+                $string = InputHelper::strict_html($val);
+                break;
             default:
                 $string = InputHelper::clean($val);
                 break;
         }
 
         return $string;
+    }
+
+    /**
+     * Converts array to string with provided delimiter
+     * Internally, the method uses conversion to json
+     * instead of simple implode to cover multidimensional arrays.
+     *
+     * @param mixed  $array
+     * @param string $delimiter
+     *
+     * @return string
+     */
+    public function arrayToString($array, $delimiter = ', ')
+    {
+        if (is_array($array)) {
+            $replacements = [
+                '{'    => '(',
+                '}'    => ')',
+                '"'    => '',
+                ','    => $delimiter,
+                '[]'   => 'undefined',
+                'null' => 'undefined',
+                ':'    => ' = ',
+            ];
+            $json = json_encode($array);
+
+            return trim(str_replace(array_keys($replacements), array_values($replacements), $json), '()[]');
+        }
+
+        return $array;
     }
 
     /**
