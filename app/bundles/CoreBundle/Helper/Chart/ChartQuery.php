@@ -229,7 +229,13 @@ class ChartQuery extends AbstractChart
             unset($filters['groupBy']);
         }
         $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
-        $query->select($dateConstruct.' AS date, COUNT('.$countColumn.') AS count')
+
+        if ($countColumn === '*') {
+            $count = 'COUNT('.$countColumn.') AS count';
+        } else {
+            $count = $countColumn.' AS count';
+        }
+        $query->select($dateConstruct.' AS date, '.$count)
             ->groupBy($dateConstruct.$groupBy);
 
         $query->orderBy($dateConstruct, 'ASC')->setMaxResults($limit);
