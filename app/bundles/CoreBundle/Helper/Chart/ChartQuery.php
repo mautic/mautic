@@ -196,13 +196,13 @@ class ChartQuery extends AbstractChart
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*')
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true)
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), 't');
 
-        $this->modifyTimeDataQuery($query, $column, 't', $countColumn);
+        $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
 
@@ -217,7 +217,7 @@ class ChartQuery extends AbstractChart
      * @param string       $tablePrefix
      * @param string       $countColumn
      */
-    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*')
+    public function modifyTimeDataQuery(&$query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
     {
         // Convert time unitst to the right form for current database platform
         $dbUnit  = $this->translateTimeUnit($this->unit);
@@ -230,7 +230,7 @@ class ChartQuery extends AbstractChart
         }
         $dateConstruct = 'DATE_FORMAT('.$tablePrefix.'.'.$column.', \''.$dbUnit.'\')';
 
-        if ($countColumn === '*') {
+        if ($isEnumerable === true) {
             $count = 'COUNT('.$countColumn.') AS count';
         } else {
             $count = $countColumn.' AS count';
