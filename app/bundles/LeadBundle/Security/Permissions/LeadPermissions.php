@@ -35,6 +35,7 @@ class LeadPermissions extends AbstractPermissions
             ],
         ];
         $this->addExtendedPermissions('leads', false);
+        $this->addStandardPermissions('imports');
     }
 
     /**
@@ -80,6 +81,8 @@ class LeadPermissions extends AbstractPermissions
             'bundle' => 'lead',
             'level'  => 'fields',
         ]);
+
+        $this->addExtendedFormFields($this->getName(), 'imports', $builder, $data);
     }
 
     /**

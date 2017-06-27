@@ -207,6 +207,35 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * Check Lead segments by ids.
+     *
+     * @param Lead $lead
+     * @param $ids
+     *
+     * @return bool
+     */
+    public function checkLeadSegmentsByIds(Lead $lead, $ids)
+    {
+        if (empty($ids)) {
+            return false;
+        }
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'x', 'l.id = x.lead_id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('x.leadlist_id', $ids),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('leadId', $lead->getId());
+
+        return  (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
      * Return a list of global lists.
      *
      * @return array

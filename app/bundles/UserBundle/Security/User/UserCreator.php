@@ -77,6 +77,10 @@ class UserCreator implements UserCreatorInterface
      */
     public function createUser(Response $response)
     {
+        if (empty($this->defaultRole)) {
+            throw new BadCredentialsException('User does not exist.');
+        }
+
         $user = $this->userMapper->getUsername($response, true);
         $user->setPassword($this->userModel->checkNewPassword($user, $this->encoder->getEncoder($user), EncryptionHelper::generateKey()));
         $user->setRole($this->entityManager->getReference('MauticUserBundle:Role', $this->defaultRole));
