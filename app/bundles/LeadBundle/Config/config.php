@@ -306,6 +306,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
+                    'mautic.lead.model.list',
                 ],
             ],
             'mautic.lead.reportbundle.subscriber' => [
@@ -501,6 +502,15 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
                 'arguments' => ['mautic.factory'],
                 'alias'     => 'campaignevent_lead_field_value',
+            ],
+            'mautic.form.type.campaignevent_lead_tags' => [
+                'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType::class,
+                'arguments' => ['translator'],
+                'alias'     => 'campaignevent_lead_tags',
+            ],
+            'mautic.form.type.campaignevent_lead_segments' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType',
+                'alias' => 'campaignevent_lead_segments',
             ],
             'mautic.form.type.campaignevent_lead_owner' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadOwnerType',
