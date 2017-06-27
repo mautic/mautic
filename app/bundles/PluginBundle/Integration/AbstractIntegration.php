@@ -56,7 +56,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 abstract class AbstractIntegration
 {
     const FIELD_TYPE_STRING = 'string';
-    const FIELD_TYPE_BOOL = 'boolean';
+    const FIELD_TYPE_BOOL   = 'boolean';
     const FIELD_TYPE_NUMBER = 'number';
 
     /**
@@ -553,7 +553,7 @@ abstract class AbstractIntegration
      *
      * @param            $mergeKeys
      * @param            $withKeys
-     * @param bool|false $return Returns the key array rather than setting them
+     * @param bool|false $return    Returns the key array rather than setting them
      *
      * @return void|array
      */
@@ -931,10 +931,10 @@ abstract class AbstractIntegration
         if ($method == 'GET' && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
-            $url        .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+            $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
-            $url   .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
+            $url .= (strpos($url, '?') === false) ? '?'.$query : '&'.$query;
         }
 
         if (isset($postAppend)) {
@@ -994,8 +994,8 @@ abstract class AbstractIntegration
             foreach ($parseHeaders as $key => $value) {
                 if (strpos($value, ':') !== false) {
                     list($key, $value) = explode(':', $value);
-                    $key   = trim($key);
-                    $value = trim($value);
+                    $key               = trim($key);
+                    $value             = trim($value);
                 }
 
                 $headers[$key] = $value;
@@ -1052,7 +1052,7 @@ abstract class AbstractIntegration
         array $internal = null,
         $persist = true
     ) {
-        $date   = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+        $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
             : new \DateTime();
         $entity = new IntegrationEntity();
         $entity->setDateAdded($date)
@@ -1121,7 +1121,7 @@ abstract class AbstractIntegration
                     break;
                 case 'oauth2':
                     if ($bearerToken = $this->getBearerToken(true)) {
-                        $headers                  = [
+                        $headers = [
                             "Authorization: Basic {$bearerToken}",
                             'Content-Type: application/x-www-form-urlencoded;charset=UTF-8',
                         ];
@@ -1129,13 +1129,13 @@ abstract class AbstractIntegration
                     } else {
                         $defaultGrantType = (!empty($settings['refresh_token'])) ? 'refresh_token'
                             : 'authorization_code';
-                        $grantType        = (!isset($settings['grant_type'])) ? $defaultGrantType
+                        $grantType = (!isset($settings['grant_type'])) ? $defaultGrantType
                             : $settings['grant_type'];
 
                         $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
                         $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey
                             : $settings[$clientSecretKey];
-                        $parameters         = array_merge(
+                        $parameters = array_merge(
                             $parameters,
                             [
                                 $useClientIdKey     => $this->keys[$clientIdKey],
@@ -1650,7 +1650,7 @@ abstract class AbstractIntegration
         $mauticLeadFields['mauticContactTimelineLink'] = '';
 
         //make sure now non-existent aren't saved
-        $settings                                = [
+        $settings = [
             'ignore_field_cache' => false,
         ];
         $settings['feature_settings']['objects'] = $submittedObjects;
@@ -1909,9 +1909,9 @@ abstract class AbstractIntegration
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed      $data    Profile data from integration
-     * @param bool|true  $persist Set to false to not persist lead to the database in this method
-     * @param array|null $socialCache
+     * @param mixed       $data        Profile data from integration
+     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
+     * @param array|null  $socialCache
      * @param mixed||null $identifiers
      *
      * @return Lead
@@ -2112,7 +2112,7 @@ abstract class AbstractIntegration
                             }
                         }
                     }
-                    $fn        = (isset($fieldDetails['fields'][0])) ? $this->matchFieldName(
+                    $fn = (isset($fieldDetails['fields'][0])) ? $this->matchFieldName(
                         $field,
                         $fieldDetails['fields'][0]
                     ) : $field;
@@ -2208,7 +2208,7 @@ abstract class AbstractIntegration
             $this->lastIntegrationError = $errorHeader.': '.$errorMessage;
 
             if ($contactId) {
-                $contactLink  = $this->router->generate(
+                $contactLink = $this->router->generate(
                     'mautic_contact_action',
                     [
                         'objectAction' => 'view',
@@ -2441,14 +2441,14 @@ abstract class AbstractIntegration
      *
      * @return bool|float|string
      */
-    public function cleanPushData($value, $fieldType = AbstractIntegration::FIELD_TYPE_STRING)
+    public function cleanPushData($value, $fieldType = self::FIELD_TYPE_STRING)
     {
         $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
 
         switch ($fieldType) {
-            case AbstractIntegration::FIELD_TYPE_BOOL:
+            case self::FIELD_TYPE_BOOL:
                 return (bool) $clean;
-            case AbstractIntegration::FIELD_TYPE_NUMBER:
+            case self::FIELD_TYPE_NUMBER:
                 return (float) $clean;
             default:
                 return $clean;
@@ -2468,6 +2468,7 @@ abstract class AbstractIntegration
      * @param bool  $error
      *
      * @return int Number ignored due to being duplicates
+     *
      * @throws ApiErrorException
      * @throws \Exception
      */
@@ -2518,7 +2519,7 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param array $mapping     array of [$mauticId => ['entity' => FormEntity, 'integration_entity_id' => $integrationId]]
+     * @param array $mapping           array of [$mauticId => ['entity' => FormEntity, 'integration_entity_id' => $integrationId]]
      * @param       $integrationEntity
      * @param       $internalEntity
      * @param array $params
@@ -2579,7 +2580,7 @@ abstract class AbstractIntegration
             /** @var FormEntity $entity */
             $changes = $entity->getChanges(true);
             if (empty($changes) || isset($changes['dateModified'])) {
-                $startSyncDate = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
+                $startSyncDate      = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
                 $entityDateModified = $entity->getDateModified();
 
                 if (isset($changes['dateModified'])) {

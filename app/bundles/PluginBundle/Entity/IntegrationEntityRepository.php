@@ -11,7 +11,6 @@
 
 namespace Mautic\PluginBundle\Entity;
 
-use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
