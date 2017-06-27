@@ -310,7 +310,7 @@ class IntegrationEntityRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->innerJoin('l', MAUTIC_TABLE_PREFIX.'integration_entity', 'i', 'i.internal_entity_id = l.id and i.integration = :integration');
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'integration_entity', 'i', 'i.internal_entity_id = l.id and i.integration = :integration');
 
         if (false === $limit) {
             $q->select('count(*) as total');

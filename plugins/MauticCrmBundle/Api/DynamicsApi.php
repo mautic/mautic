@@ -54,7 +54,7 @@ class DynamicsApi extends CrmApi
         /** @var Response $response */
         $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
 
-        if ('POST' === $method && (!is_object($response) || 204 !== $response->code)) {
+        if ('POST' === $method && (!is_object($response) || !in_array($response->code, [200, 204], true))) {
             throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response));
         }
 
@@ -145,5 +145,63 @@ class DynamicsApi extends CrmApi
         }
 
         return $data;
+    }
+
+    /**
+     * Batch create leads.
+     *
+     * @param array $data
+     * @param $object
+     *
+     * @return Response
+     */
+    public function createLeads($data, $object = 'contacts', $isUpdate = false)
+    {
+        if (0 === count($data)) {
+            return null;
+        }
+        $batchId  = substr(str_shuffle(uniqid('b', false)), 0, 6);
+        $changeId = substr(str_shuffle(uniqid('c', false)), 0, 6);
+
+        $settings['headers']['Content-Type'] = 'multipart/mixed;boundary=batch_'.$batchId;
+        $settings['headers']['Accept']       = 'application/json';
+
+        $odata = '--batch_'.$batchId.PHP_EOL;
+        $odata .= 'Content-Type: multipart/mixed;boundary=changeset_'.$changeId.PHP_EOL.PHP_EOL;
+
+        $contentId = 0;
+        foreach ($data as $objectId => $lead) {
+            $odata .= '--changeset_'.$changeId.PHP_EOL;
+            $odata .= 'Content-Type: application/http'.PHP_EOL;
+            $odata .= 'Content-Transfer-Encoding:binary'.PHP_EOL;
+            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
+            $method    = $isUpdate ? 'PATCH' : 'POST';
+            $operation = $isUpdate ? sprintf('%s(%s)', $object, $objectId) : $object;
+            $odata .= sprintf('%s %s/%s HTTP/1.1', $method, $this->getUrl(), $operation).PHP_EOL;
+            if ($isUpdate) {
+                $odata .= 'If-Match: *'.PHP_EOL;
+            }
+            $odata .= 'Content-Type: application/json;type=entry'.PHP_EOL.PHP_EOL;
+            $odata .= json_encode($lead).PHP_EOL;
+        }
+        $odata .= '--changeset_'.$changeId.'--'.PHP_EOL.PHP_EOL;
+
+        $odata .= '--batch_'.$batchId.'--'.PHP_EOL;
+
+        $settings['post_data']                  = $odata;
+        $settings['curl_options'][CURLOPT_CRLF] = true;
+
+        return $this->request('$batch', [], 'POST', $object, $settings);
+    }
+
+    /**
+     * @param array $data
+     * @param $object
+     *
+     * @return Response
+     */
+    public function updateLeads($data, $object = 'contacts')
+    {
+        return $this->createLeads($data, $object, true);
     }
 }

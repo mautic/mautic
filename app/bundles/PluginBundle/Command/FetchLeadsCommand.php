@@ -95,6 +95,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $integrationHelper = $container->get('mautic.helper.integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
+            if (!$integrationObject) {
+                return false; // integration is not enabled
+            }
             $config            = $integrationObject->mergeConfigToFeatureSettings();
             $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
