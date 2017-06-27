@@ -229,11 +229,11 @@ class AuditLog
     /**
      * Set details.
      *
-     * @param string $details
+     * @param array $details
      *
      * @return AuditLog
      */
-    public function setDetails($details)
+    public function setDetails(array $details)
     {
         $this->details = $details;
 
@@ -243,7 +243,7 @@ class AuditLog
     /**
      * Get details.
      *
-     * @return string
+     * @return array
      */
     public function getDetails()
     {

@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -32,6 +33,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -98,6 +100,11 @@ class LeadModel extends FormModel
     protected $leadFieldModel;
 
     /**
+     * @var array
+     */
+    protected $leadFields = [];
+
+    /**
      * @var ListModel
      */
     protected $leadListModel;
@@ -128,20 +135,26 @@ class LeadModel extends FormModel
     protected $trackByIp = false;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * LeadModel constructor.
      *
-     * @param RequestStack      $requestStack
-     * @param CookieHelper      $cookieHelper
-     * @param IpLookupHelper    $ipLookupHelper
-     * @param PathsHelper       $pathsHelper
-     * @param IntegrationHelper $integrationHelper
-     * @param FieldModel        $leadFieldModel
-     * @param ListModel         $leadListModel
-     * @param FormFactory       $formFactory
-     * @param CompanyModel      $companyModel
-     * @param CategoryModel     $categoryModel
-     * @param ChannelListHelper $channelListHelper
-     * @param                   $trackByIp
+     * @param RequestStack         $requestStack
+     * @param CookieHelper         $cookieHelper
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param PathsHelper          $pathsHelper
+     * @param IntegrationHelper    $integrationHelper
+     * @param FieldModel           $leadFieldModel
+     * @param ListModel            $leadListModel
+     * @param FormFactory          $formFactory
+     * @param CompanyModel         $companyModel
+     * @param CategoryModel        $categoryModel
+     * @param ChannelListHelper    $channelListHelper
+     * @param                      $trackByIp
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         RequestStack $requestStack,
@@ -155,20 +168,22 @@ class LeadModel extends FormModel
         CompanyModel $companyModel,
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
-        $trackByIp
+        $trackByIp,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->request           = $requestStack->getCurrentRequest();
-        $this->cookieHelper      = $cookieHelper;
-        $this->ipLookupHelper    = $ipLookupHelper;
-        $this->pathsHelper       = $pathsHelper;
-        $this->integrationHelper = $integrationHelper;
-        $this->leadFieldModel    = $leadFieldModel;
-        $this->leadListModel     = $leadListModel;
-        $this->companyModel      = $companyModel;
-        $this->formFactory       = $formFactory;
-        $this->categoryModel     = $categoryModel;
-        $this->channelListHelper = $channelListHelper;
-        $this->trackByIp         = $trackByIp;
+        $this->request              = $requestStack->getCurrentRequest();
+        $this->cookieHelper         = $cookieHelper;
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->pathsHelper          = $pathsHelper;
+        $this->integrationHelper    = $integrationHelper;
+        $this->leadFieldModel       = $leadFieldModel;
+        $this->leadListModel        = $leadListModel;
+        $this->companyModel         = $companyModel;
+        $this->formFactory          = $formFactory;
+        $this->categoryModel        = $categoryModel;
+        $this->channelListHelper    = $channelListHelper;
+        $this->trackByIp            = $trackByIp;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -237,6 +252,16 @@ class LeadModel extends FormModel
     public function getDeviceRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:LeadDevice');
+    }
+
+    /**
+     * Get the lead event log repository.
+     *
+     * @return \Mautic\LeadBundle\Entity\LeadEventLogRepository
+     */
+    public function getEventLogRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadEventLog');
     }
 
     /**
@@ -874,6 +899,10 @@ class LeadModel extends FormModel
 
         if (is_array($clickthrough) && !empty($clickthrough['lead'])) {
             $lead = $this->getEntity($clickthrough['lead']);
+            // identify contact from link
+            if ($this->coreParametersHelper->getParameter('track_by_tracking_url') && !isset($queryFields['email']) && $lead && $email = $lead->getEmail()) {
+                $queryFields['email'] = $email;
+            }
             $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
         }
 
@@ -1624,18 +1653,19 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param      $fields
-     * @param      $data
-     * @param null $owner
-     * @param null $list
-     * @param null $tags
-     * @param bool $persist
+     * @param array        $fields
+     * @param array        $data
+     * @param null         $owner
+     * @param null         $list
+     * @param null         $tags
+     * @param bool         $persist
+     * @param LeadEventLog $eventLog
      *
-     * @return array|bool|null
+     * @return bool|null
      *
      * @throws \Exception
      */
-    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true)
+    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
     {
         // Let's check for an existing lead by email
         $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
@@ -1789,9 +1819,8 @@ class LeadModel extends FormModel
             }
         }
 
-        static $leadFields;
-        if (null === $leadFields) {
-            $leadFields = $this->leadFieldModel->getEntities(
+        if (empty($this->leadFields)) {
+            $this->leadFields = $this->leadFieldModel->getEntities(
                 [
                     'filter' => [
                         'force' => [
@@ -1812,8 +1841,18 @@ class LeadModel extends FormModel
             );
         }
 
-        foreach ($leadFields as $leadField) {
+        $fieldErrors = [];
+
+        foreach ($this->leadFields as $leadField) {
             if (isset($fieldData[$leadField['alias']])) {
+                $fieldData[$leadField['alias']] = InputHelper::clean($fieldData[$leadField['alias']]);
+
+                if ('NULL' === $fieldData[$leadField['alias']]) {
+                    $fieldData[$leadField['alias']] = null;
+
+                    continue;
+                }
+
                 try {
                     switch ($leadField['type']) {
                         // Adjust the boolean values from text to boolean
@@ -1851,9 +1890,12 @@ class LeadModel extends FormModel
                                 $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
                             }
                             break;
+                        case 'number':
+                            $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
+                            break;
                     }
                 } catch (\Exception $exception) {
-                    // We tried; let the form handle the mal-formed data
+                    $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
 
                 // Skip if the value is in the CSV row
@@ -1865,45 +1907,24 @@ class LeadModel extends FormModel
             }
         }
 
-        $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false, 'allow_extra_fields' => true]);
-
-        // Unset stage and owner from the form because it's already been handled
-        unset($form['stage'], $form['owner'], $form['tags']);
-
-        $form->submit($fieldData);
-
-        if (!$form->isValid()) {
-            $fieldErrors = [];
-            $formErrors  = $form->getErrors();
-            if (count($formErrors)) {
-                foreach ($formErrors as $error) {
-                    $fieldErrors[] = $error->getMessage();
-                }
-            }
-            foreach ($form as $formField) {
-                $errors = $formField->getErrors(true);
-                if (count($errors)) {
-                    $errorString = $formField->getConfig()->getOption('label').': ';
-                    foreach ($errors as $error) {
-                        $errorString .= " {$error->getMessage()}";
-                    }
-                    $fieldErrors[] = $errorString;
-                }
-            }
-
+        if ($fieldErrors) {
             $fieldErrors = implode("\n", $fieldErrors);
+
             throw new \Exception($fieldErrors);
-        } else {
-            // All clear
-            foreach ($fieldData as $field => $value) {
-                if (isset($form[$field])) {
-                    $value = $form[$field]->getData();
-                    $lead->addUpdatedField($field, $value);
-                }
-            }
+        }
+
+        // All clear
+        foreach ($fieldData as $field => $value) {
+            $lead->addUpdatedField($field, $value);
         }
 
         $lead->imported = true;
+
+        if ($eventLog) {
+            $action = $merged ? 'updated' : 'inserted';
+            $eventLog->setAction($action);
+            $lead->addEventLog($eventLog);
+        }
 
         if ($persist) {
             $this->saveEntity($lead);
