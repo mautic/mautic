@@ -158,7 +158,7 @@ class DynamicsApi extends CrmApi
     public function createLeads($data, $object = 'contacts', $isUpdate = false)
     {
         if (0 === count($data)) {
-            return null;
+            return [];
         }
 
         $returnIds = [];
