@@ -27,7 +27,7 @@
     <?php endif; ?>
     <div class="media-body">
         <?php if (!empty($n['header'])): ?>
-            <div class="media-heading fw-sb mb-0 text-primary"><?php $view['formatter']->_(echo $n['header']); ?></div>
+            <div class="media-heading fw-sb mb-0 text-primary"><?php echo $view['formatter']->_($n['header']); ?></div>
         <?php endif; ?>
         <div><?php echo $view['formatter']->_($n['message'], 'html'); ?></div>
         <div class="clearfix mt-xs">
