@@ -23,14 +23,12 @@ Mautic.emailOnLoad = function (container, response) {
                    if (response.success) {
                        if (response.pending) {
                            mQuery('#pending-' + id).html(response.pending);
-                       } else {
-                           mQuery('#pending-' + id).addClass('hide');
+                           mQuery('#pending-' + id).removeClass('hide');
                        }
 
                        if (response.queued) {
                            mQuery('#queued-' + id).html(response.queued);
-                       } else {
-                           mQuery('#queued-' + id).addClass('hide');
+                           mQuery('#queued-' + id).removeClass('hide');
                        }
 
                        mQuery('#sent-count-' + id).html(response.sentCount);

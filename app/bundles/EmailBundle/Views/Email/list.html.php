@@ -161,26 +161,30 @@ if ($tmpl == 'index') {
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="<?php echo $item->getId(); ?>">
                         <?php  ?>
-                        <span class="mt-xs label label-default"
+                        <span class="mt-xs label label-default hide"
                               id="pending-<?php echo $item->getId(); ?>"
                               data-toggle="tooltip"
                               title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">
-                            <i class="fa fa-spin fa-spinner"></i>
                         </span>
-                        <span class="mt-xs label label-default"
+                        <span class="mt-xs label label-default hide"
                               id="queued-<?php echo $item->getId(); ?>"
                               data-toggle="tooltip"
                               title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>">
-                            <i class="fa fa-spin fa-spinner"></i>
                         </span>
                         <span class="mt-xs label label-warning" id="sent-count-<?php echo $item->getId(); ?>">
-                            <i class="fa fa-spin fa-spinner"></i>
+                            <div style="width: 50px;">
+                                <i class="fa fa-spin fa-spinner"></i>
+                            </div>
                         </span>
                         <span class="mt-xs label label-success" id="read-count-<?php echo $item->getId(); ?>">
-                            <i class="fa fa-spin fa-spinner"></i>
+                            <div style="width: 50px;">
+                                <i class="fa fa-spin fa-spinner"></i>
+                            </div>
                         </span>
                         <span class="mt-xs label label-primary" id="read-percent-<?php echo $item->getId(); ?>">
-                            <i class="fa fa-spin fa-spinner"></i>
+                            <div style="width: 50px;">
+                                <i class="fa fa-spin fa-spinner"></i>
+                            </div>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                     </td>
