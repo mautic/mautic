@@ -192,6 +192,7 @@ return [
                 'alias'     => 'userconfig',
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'translator',
                 ],
             ],
         ],
