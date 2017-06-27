@@ -54,11 +54,12 @@ class SugarcrmApi extends CrmApi
                 return $response;
             }
         } else {
-            $request_url = sprintf('%s/rest/v10/%s', $tokenData['sugarcrm_url'], $sMethod);
-            $response    = $this->integration->makeRequest($request_url, $data, $method);
+            $request_url                 = sprintf('%s/rest/v10/%s', $tokenData['sugarcrm_url'], $sMethod);
+            $settings['request_timeout'] = 50;
+            $response                    = $this->integration->makeRequest($request_url, $data, $method, $settings);
 
             if (isset($response['error'])) {
-                throw new ApiErrorException($response['error_message'], ($response['error'] == 'invalid_grant') ? 1 : 500);
+                throw new ApiErrorException(isset($response['error_message']) ? $response['error_message'] : $response['error']['message'], ($response['error'] == 'invalid_grant') ? 1 : 500);
             }
 
             return $response;
