@@ -57,6 +57,9 @@ class MauticCoreExtension extends Extension
                         case 'models':
                             $defaultTag = 'mautic.model';
                             break;
+                        case 'integrations':
+                            $defaultTag = 'mautic.integration';
+                            break;
                         default:
                             $defaultTag = false;
                             break;

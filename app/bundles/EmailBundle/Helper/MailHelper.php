@@ -27,6 +27,11 @@ use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
  */
 class MailHelper
 {
+    const QUEUE_RESET_TO          = 'RESET_TO';
+    const QUEUE_FULL_RESET        = 'FULL_RESET';
+    const QUEUE_DO_NOTHING        = 'DO_NOTHING';
+    const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
+    const QUEUE_RETURN_ERRORS     = 'RETURN_ERRORS';
     /**
      * @var MauticFactory
      */
@@ -96,6 +101,11 @@ class MailHelper
      * @var null
      */
     protected $idHash = null;
+
+    /**
+     * @var bool
+     */
+    protected $idHashState = true;
 
     /**
      * @var bool
@@ -375,11 +385,12 @@ class MailHelper
                         $this->message->addMetadata(
                             $email,
                             [
-                                'leadId'  => (!empty($this->lead)) ? $this->lead['id'] : null,
-                                'emailId' => (!empty($this->email)) ? $this->email->getId() : null,
-                                'hashId'  => $this->idHash,
-                                'source'  => $this->source,
-                                'tokens'  => $tokens,
+                                'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+                                'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
+                                'hashId'      => $this->idHash,
+                                'hashIdState' => $this->idHashState,
+                                'source'      => $this->source,
+                                'tokens'      => $tokens,
                             ]
                         );
                     }
@@ -464,17 +475,17 @@ class MailHelper
      * Otherwise, the message will be sent to the transport immediately.
      *
      * @param bool   $dispatchSendEvent
-     * @param string $immediateSendMessageHandling If tokenization is not supported by the mailer, this argument determines
-     *                                             what should happen to $this->message after the email send is attempted.
-     *                                             Options are:
-     *                                             RESET_TO           resets the to recipients and resets errors
-     *                                             FULL_RESET         creates a new MauticMessage instance and resets errors
-     *                                             DO_NOTHING         leaves the current errors array and MauticMessage instance intact
-     *                                             NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
+     * @param string $returnMode        What should happen post send/queue to $this->message after the email send is attempted.
+     *                                  Options are:
+     *                                  RESET_TO           resets the to recipients and resets errors
+     *                                  FULL_RESET         creates a new MauticMessage instance and resets errors
+     *                                  DO_NOTHING         leaves the current errors array and MauticMessage instance intact
+     *                                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
+     *                                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
      *
      * @return bool
      */
-    public function queue($dispatchSendEvent = false, $immediateSendMessageHandling = 'RESET_TO')
+    public function queue($dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
     {
         if ($this->tokenizationEnabled) {
 
@@ -506,11 +517,12 @@ class MailHelper
 
                 $this->metadata[$fromKey]['contacts'][$email] =
                     [
-                        'leadId'  => (!empty($this->lead)) ? $this->lead['id'] : null,
-                        'emailId' => (!empty($this->email)) ? $this->email->getId() : null,
-                        'hashId'  => $this->idHash,
-                        'source'  => $this->source,
-                        'tokens'  => $tokens,
+                        'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
+                        'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
+                        'hashId'      => $this->idHash,
+                        'hashIdState' => $this->idHashState,
+                        'source'      => $this->source,
+                        'tokens'      => $tokens,
                     ];
             }
 
@@ -518,7 +530,7 @@ class MailHelper
             $this->queuedRecipients = [];
 
             // Assume success
-            return true;
+            return (self::QUEUE_RETURN_ERRORS) ? [true, []] : true;
         } else {
             $success = $this->send($dispatchSendEvent);
 
@@ -526,24 +538,31 @@ class MailHelper
             $this->queuedRecipients = [];
 
             // Reset message
-            switch (ucwords($immediateSendMessageHandling)) {
-                case 'RESET_TO':
+            switch (ucwords($returnMode)) {
+                case self::QUEUE_RESET_TO:
                     $this->message->setTo([]);
                     $this->clearErrors();
                     break;
-                case 'NOTHING_IF_FAILED':
+                case self::QUEUE_NOTHING_IF_FAILED:
                     if ($success) {
                         $this->message->setTo([]);
                         $this->clearErrors();
                     }
 
                     break;
-                case 'FULL_RESET':
+                case self::QUEUE_FULL_RESET:
                     $this->message        = $this->getMessageInstance();
                     $this->attachedAssets = [];
                     $this->clearErrors();
                     break;
-                case 'DO_NOTHING':
+                case self::QUEUE_RETURN_ERRORS:
+                    $this->message->setTo([]);
+                    $errors = $this->getErrors();
+
+                    $this->clearErrors();
+
+                    return [$success, $errors];
+                case self::QUEUE_DO_NOTHING:
                 default:
                     // Nada
 
@@ -611,6 +630,7 @@ class MailHelper
 
                 // Clear queued to recipients
                 $this->queuedRecipients = [];
+                $this->metadata         = [];
 
                 foreach ($resetEmailTypes as $type) {
                     $type = ucfirst($type);
@@ -639,6 +659,7 @@ class MailHelper
         $this->eventTokens  = $this->queuedRecipients  = $this->errors  = [];
         $this->lead         = $this->idHash         = $this->contentHash         = null;
         $this->internalSend = $this->fatal = false;
+        $this->idHashState  = true;
 
         $this->logger->clear();
 
@@ -1231,17 +1252,18 @@ class MailHelper
      */
     public static function validateEmail($address)
     {
-        static $grammer;
+        $invalidChar = strpbrk($address, '\'^&*%');
 
-        if ($grammer === null) {
-            $grammer = new \Swift_Mime_Grammar();
+        if ($invalidChar !== false) {
+            throw new \Swift_RfcComplianceException(
+                'Email address ['.$address.
+                '] contains this invalid character: '.substr($invalidChar, 0, 1)
+            );
         }
 
-        if (!preg_match('/^'.$grammer->getDefinition('addr-spec').'$/D',
-            $address)) {
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
             throw new \Swift_RfcComplianceException(
-                'Address in mailbox given ['.$address.
-                '] does not comply with RFC 2822, 3.6.2.'
+                'Email address ['.$address.'] is invalid'
             );
         }
     }
@@ -1253,14 +1275,16 @@ class MailHelper
 
     /**
      * @param null $idHash
+     * @param bool $statToBeGenerated Pass false if a stat entry is not to be created
      */
-    public function setIdHash($idHash = null)
+    public function setIdHash($idHash = null, $statToBeGenerated = true)
     {
         if ($idHash === null) {
             $idHash = uniqid();
         }
 
-        $this->idHash = $idHash;
+        $this->idHash      = $idHash;
+        $this->idHashState = $statToBeGenerated;
 
         // Append pixel to body before send
         $this->appendTrackingPixel = true;
@@ -1585,9 +1609,15 @@ class MailHelper
     protected function logError($error, $context = null)
     {
         if ($error instanceof \Exception) {
-            $error = $error->getMessage();
+            $errorMessage = $error->getMessage();
+            $error        = ('dev' === MAUTIC_ENV) ? (string) $error : $errorMessage;
+
+            // Clean up the error message
+            $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
 
             $this->fatal = true;
+        } else {
+            $errorMessage = trim($error);
         }
 
         $logDump = $this->logger->dump();
@@ -1599,7 +1629,7 @@ class MailHelper
             $error .= " ($context)";
         }
 
-        $this->errors[] = $error;
+        $this->errors[] = $errorMessage;
 
         $this->logger->clear();
 
