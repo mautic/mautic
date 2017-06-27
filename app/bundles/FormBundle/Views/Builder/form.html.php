@@ -13,6 +13,10 @@ if (!isset($fields)) {
     $fields = $form->getFields();
 }
 $pageCount = 1;
+
+if (!isset($inBuilder)) {
+    $inBuilder = false;
+}
 ?>
 
 <?php echo $style; ?>
@@ -56,6 +60,7 @@ $pageCount = 1;
                             'formName'      => $formName,
                             'fieldPage'     => ($pageCount - 1), // current page,
                             'contactFields' => $contactFields,
+                            'inBuilder'     => $inBuilder,
                         ]
                     );
                 endif;
