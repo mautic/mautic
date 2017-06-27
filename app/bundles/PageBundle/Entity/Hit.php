@@ -279,6 +279,7 @@ class Hit
         $metadata->setGroupPrefix('hit')
             ->addProperties(
                 [
+                    'id',
                     'dateHit',
                     'dateLeft',
                     'page',
