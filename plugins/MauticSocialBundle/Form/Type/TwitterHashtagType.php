@@ -30,6 +30,20 @@ class TwitterHashtagType extends TwitterAbstractType
             ],
         ]);
 
+        $builder->add('checknames', 'choice', [
+            'choices' => [
+                '0' => 'No',
+                '1' => 'Yes',
+            ],
+            'label'       => 'mautic.social.monitoring.twitter.checknames',
+            'required'    => false,
+            'empty_value' => false,
+            'label_attr'  => ['class' => 'control-label'],
+            'attr'        => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.social.monitoring.twitter.checknames.tooltip', ],
+        ]);
+
         // pull in the parent type's form builder
         parent::buildForm($builder, $options);
     }
