@@ -41,7 +41,7 @@ class FormatterHelper extends Helper
      * @param $val
      * @param $type
      */
-    public function _($val, $type, $textOnly = false, $round = 1)
+    public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
         if (empty($val)) {
             return $val;
