@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 
 /**
  * Class CustomFieldRepositoryTrait.
@@ -80,6 +81,16 @@ trait CustomFieldRepositoryTrait
                 //unset all the columns that are not fields
                 $this->removeNonFieldColumns($result, $fixedFields);
 
+                //use DBAL to get entity fields
+                $q          = $this->getLeadFieldsDbalQueryBuilder();
+                $charValues = $q->execute()->fetchAll();
+
+                $charValues = array_map(function ($charValue) {
+                    return [$charValue['alias'] => $charValue['value']];
+                }, $charValues);
+
+                $result = array_replace($result, ...$charValues);
+
                 foreach ($result as $k => $r) {
                     if (isset($fields[$k])) {
                         $fieldValues[$id][$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
@@ -134,6 +145,12 @@ trait CustomFieldRepositoryTrait
                     $id = $r->getId();
                     $r->setFields($fieldValues[$id]);
 
+                    foreach ($r->getCharLeadFields() as $charLeadField) {
+                        $alias = $charLeadField->getLeadField()->getAlias();
+                        $value = $charLeadField->getValue();
+                        $r->{'set'.ucfirst($alias)}($value);
+                    }
+
                     if (is_callable($resultsCallback)) {
                         $resultsCallback($r);
                     }
@@ -175,8 +192,20 @@ trait CustomFieldRepositoryTrait
         $values = $q->execute()->fetch();
         $this->removeNonFieldColumns($values, $fixedFields);
 
+        //use DBAL to get entity fields
+        $q          = $this->getLeadFieldsDbalQueryBuilder();
+        $charValues = $q->execute()->fetchAll();
+
+        $charValues = array_map(function ($charValue) {
+            return [$charValue['alias'] => $charValue['value']];
+        }, $charValues);
+
+        $values = array_replace($values, ...$charValues);
+
         // Reorder leadValues based on field order
-        $values = array_merge(array_flip(array_keys($fields)), $values);
+        $values = array_merge(array_map(function ($_) {
+            return null; // Remove the indices from the flipped array keys
+        }, array_flip(array_keys($fields))), $values);
 
         $fieldValues = [];
 
@@ -276,7 +305,7 @@ trait CustomFieldRepositoryTrait
             $this->getEntityManager()->flush($entity);
         }
 
-        // Includes prefix
+            // Includes prefix
         $table  = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $fields = $entity->getUpdatedFields();
         if (method_exists($entity, 'getChanges')) {
@@ -287,7 +316,19 @@ trait CustomFieldRepositoryTrait
         }
 
         if (!empty($fields)) {
-            $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
+            /** @var EntityManager $em */
+            $em = $this->getEntityManager();
+            foreach ($entity->getCharLeadFields() as $charLeadField) {
+                $alias = $charLeadField->getLeadField()->getAlias();
+                $value = $entity->{'get'.ucfirst($alias)}();
+                if ($value === null || $value === '') {
+                    $em->remove($charLeadField);
+                } else {
+                    $charLeadField->setValue($value);
+                    $em->persist($charLeadField);
+                }
+            }
+            $em->flush();
         }
     }
 

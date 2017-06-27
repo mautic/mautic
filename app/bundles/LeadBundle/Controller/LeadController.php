@@ -360,7 +360,7 @@ class LeadController extends FormController
                     'places'            => $this->getPlaces($lead),
                     'permissions'       => $permissions,
                     'events'            => $this->getEngagements($lead),
-                    'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
+                    'upcomingEvents'    => [], // $this->getScheduledCampaignEvents($lead)
                     'engagementData'    => $this->getEngagementData($lead),
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
