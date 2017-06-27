@@ -388,7 +388,7 @@ class Monitoring extends FormEntity
             $this->setProperties(
                 [
                     'handle'     => $property['handle'],
-                    'matchnames' => $property['matchnames'],
+                    'checknames' => $property['checknames'],
                 ]
             );
         }
@@ -398,7 +398,7 @@ class Monitoring extends FormEntity
             $this->setProperties(
                 [
                     'hashtag'    => $property['hashtag'],
-                    'matchnames' => $property['matchnames'],
+                    'checknames' => $property['checknames'],
                 ]
             );
         }
