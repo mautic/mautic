@@ -1524,7 +1524,9 @@ class LeadController extends FormController
                     case 2:
                         // Save matched fields
                         $matchedFields = $form->getData();
-
+                        if (!$valid) {
+                            break;
+                        }
                         if (empty($matchedFields)) {
                             $this->resetImport($fullPath);
 
