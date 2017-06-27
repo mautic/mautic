@@ -29,6 +29,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class TriggerModel extends CommonFormModel
 {
+    protected $triggers = [];
+
     /**
      * @deprecated Remove in 2.0
      *
@@ -430,13 +432,11 @@ class TriggerModel extends CommonFormModel
      */
     public function getColorForLeadPoints($points)
     {
-        static $triggers;
-
-        if (!is_array($triggers)) {
-            $triggers = $this->getRepository()->getTriggerColors();
+        if (!$this->triggers) {
+            $this->triggers = $this->getRepository()->getTriggerColors();
         }
 
-        foreach ($triggers as $trigger) {
+        foreach ($this->triggers as $trigger) {
             if ($points >= $trigger['points']) {
                 return $trigger['color'];
             }
