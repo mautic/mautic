@@ -35,7 +35,7 @@ class WebhookController extends AbstractFormController
     /**
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function indexAction($page = 1)
     {
@@ -45,7 +45,7 @@ class WebhookController extends AbstractFormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function newAction()
     {
@@ -58,7 +58,7 @@ class WebhookController extends AbstractFormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -70,7 +70,7 @@ class WebhookController extends AbstractFormController
      *
      * @param $objectId
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function viewAction($objectId)
     {
@@ -82,7 +82,7 @@ class WebhookController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function cloneAction($objectId)
     {

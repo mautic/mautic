@@ -74,4 +74,35 @@ class TagRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Check Lead tags by Ids.
+     *
+     * @param Lead $lead
+     * @param $tags
+     *
+     * @return bool
+     */
+    public function checkLeadByTags(Lead $lead, $tags)
+    {
+        if (empty($tags)) {
+            return false;
+        }
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
+                ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
+                ->where(
+                    $q->expr()->andX(
+                        $q->expr()->in('t.tag', ':tags'),
+                        $q->expr()->eq('l.id', ':leadId')
+                    )
+                )
+                ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+                ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
+    }
 }

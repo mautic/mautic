@@ -89,6 +89,9 @@ class FormatterHelper extends Helper
             case 'int':
                 $string = (int) $val;
                 break;
+            case 'html':
+                $string = InputHelper::strict_html($val);
+                break;
             default:
                 $string = InputHelper::clean($val);
                 break;

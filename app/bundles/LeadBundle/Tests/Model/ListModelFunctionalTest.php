@@ -13,11 +13,15 @@ class ListModelFunctionalTest extends MauticWebTestCase
         $segmentTest1Ref = $this->fixtures->getReference('segment-test-1');
         $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
         $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
+        $segmentTest4Ref = $this->fixtures->getReference('segment-test-4');
+        $segmentTest5Ref = $this->fixtures->getReference('segment-test-5');
 
         $segmentContacts = $repo->getLeadsByList([
             $segmentTest1Ref->getId(),
             $segmentTest2Ref->getId(),
             $segmentTest3Ref->getId(),
+            $segmentTest4Ref->getId(),
+            $segmentTest5Ref->getId(),
         ], ['countOnly' => true]);
 
         $this->assertEquals(
@@ -36,6 +40,18 @@ class ListModelFunctionalTest extends MauticWebTestCase
             0,
             $segmentContacts[$segmentTest3Ref->getId()]['count'],
             'There should be 0 contacts in the segment-test-3 segment because the segment has not been built yet.'
+        );
+
+        $this->assertEquals(
+            1,
+            $segmentContacts[$segmentTest4Ref->getId()]['count'],
+            'There should be 1 contacts in the segment-test-4 segment.'
+        );
+
+        $this->assertEquals(
+            49,
+            $segmentContacts[$segmentTest5Ref->getId()]['count'],
+            'There should be 49 contacts in the segment-test-5 segment.'
         );
     }
 
