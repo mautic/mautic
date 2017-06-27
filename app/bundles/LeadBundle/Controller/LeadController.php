@@ -426,6 +426,7 @@ class LeadController extends FormController
                     }
 
                     $companies = [];
+
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
@@ -433,14 +434,13 @@ class LeadController extends FormController
 
                     $modelCompany = $this->getModel('lead.company');
                     $companyItems = [];
+
                     foreach ($companies as $compId) {
-                        $_company       = $modelCompany->getEntity($compId);
-                        $companyItems[] = ['id' => $compId, 'name' => $_company->getName()];
+                        $company        = $modelCompany->getEntity($compId);
+                        $companyItems[] = ['id' => $compId, 'name' => $company->getName()];
                     }
 
-                    if (!empty($companyItems)) {
-                        $data['company'] = json_encode($companyItems);
-                    }
+                    $data['companies'] = $companyItems;
 
                     $model->setFieldValues($lead, $data, true);
 
