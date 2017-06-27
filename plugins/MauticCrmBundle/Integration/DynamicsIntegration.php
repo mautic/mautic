@@ -599,6 +599,12 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
         unset($toCreate);
 
+        if ($integrationEntities) {
+            // Persist updated entities if applicable
+            $integrationEntityRepo->saveEntities($integrationEntities);
+            $this->em->clear(IntegrationEntity::class);
+        }
+
         // update leads
         $leadData = [];
         foreach ($leadsToUpdate as $email => $lead) {
@@ -641,24 +647,22 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-            $leadData[$lead->getId()] = $mappedData;
+            $leadData[$lead['internal_entity_id']] = $mappedData;
         }
 
+        /** @var array $ids */
         $ids = $this->getApiHelper()->createLeads($leadData, $object);
-        foreach ($ids as $id) {
+        foreach ($ids as $iid => $lid) {
             $integrationEntity = new IntegrationEntity();
             $integrationEntity->setDateAdded(new \DateTime());
             $integrationEntity->setIntegration('Dynamics');
             $integrationEntity->setIntegrationEntity($object);
-            $integrationEntity->setIntegrationEntityId($id);
+            $integrationEntity->setIntegrationEntityId($iid);
             $integrationEntity->setInternalEntity('lead');
-            $integrationEntity->setInternalEntityId($lead->getId());
-        }
-
-        if ($integrationEntities) {
-            // Persist updated entities if applicable
-            $integrationEntityRepo->saveEntities($integrationEntities);
-            $this->em->clear(IntegrationEntity::class);
+            $integrationEntity->setInternalEntityId($lid);
+            $integrationEntity->setLastSyncDate(new \DateTime());
+            $this->em->persist($integrationEntity);
+            $this->em->flush($integrationEntity);
         }
 
         if (defined('IN_MAUTIC_CONSOLE')) {
