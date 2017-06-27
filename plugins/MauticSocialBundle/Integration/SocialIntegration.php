@@ -226,6 +226,10 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     protected function getContactAccessToken(&$socialCache)
     {
+        if (!$this->session) {
+            return null;
+        }
+
         if (!$this->session->isStarted()) {
             return (isset($socialCache['accessToken'])) ? $this->decryptApiKeys($socialCache['accessToken']) : null;
         }

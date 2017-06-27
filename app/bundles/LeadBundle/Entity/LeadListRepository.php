@@ -207,6 +207,35 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * Check Lead segments by ids.
+     *
+     * @param Lead $lead
+     * @param $ids
+     *
+     * @return bool
+     */
+    public function checkLeadSegmentsByIds(Lead $lead, $ids)
+    {
+        if (empty($ids)) {
+            return false;
+        }
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'x', 'l.id = x.lead_id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('x.leadlist_id', $ids),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('leadId', $lead->getId());
+
+        return  (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
      * Return a list of global lists.
      *
      * @return array
@@ -905,16 +934,19 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'source':
                 case 'url_title':
-                    $operand = in_array($func, ['eq', 'like', 'regexp', 'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
+                    $ignoreAutoFilter = true;
+                    $operand          = in_array($func, ['eq', 'like', 'regexp', 'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
+                    $column           = $details['field'];
 
-                    $column = $details['field'];
                     if ($column == 'hit_url') {
                         $column = 'url';
                     }
+
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select('id')
                         ->from(MAUTIC_TABLE_PREFIX.'page_hits', $alias);
+
                     switch ($func) {
                         case 'eq':
                         case 'neq':
@@ -927,9 +959,9 @@ class LeadListRepository extends CommonRepository
                             );
                             break;
                         case 'like':
-                        case '!like':
+                        case 'notLike':
                             $parameters[$parameter] = '%'.$details['filter'].'%';
-                        $subqb->where(
+                            $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->like($alias.'.'.$column, $exprParameter),
                                     $q->expr()->eq($alias.'.lead_id', 'l.id')
@@ -953,6 +985,7 @@ class LeadListRepository extends CommonRepository
                         $subqb->andWhere($subqb->expr()
                             ->eq($alias.'.lead_id', $leadId));
                     }
+
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
                 case 'hit_url_date':
@@ -1279,26 +1312,50 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 case 'stage':
-                    $operand = ($func === 'eq') ? 'EXISTS' : 'NOT EXISTS';
+                    // A note here that SQL EXISTS is being used for the eq and neq cases.
+                    // I think this code might be inefficient since the sub-query is rerun
+                    // for every row in the outer query's table. This might have to be refactored later on
+                    // if performance is desired.
 
                     $subQb = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select('null')
                         ->from(MAUTIC_TABLE_PREFIX.'stages', $alias);
+
                     switch ($func) {
+                        case 'empty':
+                            $groupExpr->add(
+                               $q->expr()->isNull('l.stage_id')
+                            );
+                            break;
+                        case 'notEmpty':
+                            $groupExpr->add(
+                               $q->expr()->isNotNull('l.stage_id')
+                            );
+                            break;
                         case 'eq':
-                        case 'neq':
                             $parameters[$parameter] = $details['filter'];
+
                             $subQb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.id', 'l.stage_id'),
                                     $q->expr()->eq($alias.'.id', ":$parameter")
                                 )
                             );
+                            $groupExpr->add(sprintf('EXISTS (%s)', $subQb->getSQL()));
+                            break;
+                        case 'neq':
+                            $parameters[$parameter] = $details['filter'];
+
+                            $subQb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->eq($alias.'.id', 'l.stage_id'),
+                                    $q->expr()->eq($alias.'.id', ":$parameter")
+                                )
+                            );
+                            $groupExpr->add(sprintf('NOT EXISTS (%s)', $subQb->getSQL()));
                             break;
                     }
-
-                    $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
 
                     break;
                 case 'integration_campaigns':
@@ -1391,9 +1448,25 @@ class LeadListRepository extends CommonRepository
                                     InputHelper::clean($value)
                                 );
                             }
-                            $groupExpr->add(
-                                $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
-                            );
+                            if ($details['type'] == 'multiselect') {
+                                foreach ($details['filter'] as $filter) {
+                                    $filter = trim($filter, "'");
+
+                                    if (substr($func, 0, 3) === 'not') {
+                                        $operator = 'NOT REGEXP';
+                                    } else {
+                                        $operator = 'REGEXP';
+                                    }
+
+                                    $groupExpr->add(
+                                        $field." $operator '\\\\|?$filter\\\\|?'"
+                                    );
+                                }
+                            } else {
+                                $groupExpr->add(
+                                    $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
+                                );
+                            }
                             $ignoreAutoFilter = true;
                             break;
 
