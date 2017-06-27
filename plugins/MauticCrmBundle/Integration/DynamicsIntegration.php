@@ -394,7 +394,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         $mappedData[] = $aFields[$object][$k]['dv'];
                     }
                 }
-                $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$params['limit'] ?? 100;
+                $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$params['limit'] ? $params['limit'] : 100;
                 $oparams['$select']                               = implode(',', $mappedData);
                 $data                                             = $this->getApiHelper()->getLeads($oparams);
                 $populate                                         = $this->amendLeadDataBeforeMauticPopulate($data, $object);
@@ -436,7 +436,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 foreach (array_keys($fields) as $k) {
                     $mappedData[] = $aFields[$k]['dv'];
                 }
-                $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$params['limit'] ?? 100;
+                $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$params['limit'] ? $params['limit'] : 100;
                 $oparams['$select']                               = implode(',', $mappedData);
                 $data                                             = $this->getApiHelper()->getCompanies($oparams);
                 $populate                                         = $this->amendLeadDataBeforeMauticPopulate($data, $object);
