@@ -113,10 +113,9 @@ class FocusType extends AbstractType
                 'label'      => 'mautic.focus.form.html',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'        => 'form-control',
+                    'class'        => 'form-control editor editor-basic',
                     'rows'         => 12,
                     'data-show-on' => '{"focus_html_mode_1":"checked"}',
-                    'onblur'       => 'Mautic.focusUpdatePreview()',
                 ],
                 'required' => false,
             ]

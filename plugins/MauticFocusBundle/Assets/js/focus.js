@@ -171,6 +171,10 @@ Mautic.focusOnLoad = function () {
                 Mautic.launchFocusBuilder(true);
             }
         });
+
+        mQuery('#focus_html').on('froalaEditor.contentChanged', function (e, editor) {
+            mQuery('.mf-content').html(editor.html.get());
+        });
     } else {
         Mautic.initDateRangePicker();
     }

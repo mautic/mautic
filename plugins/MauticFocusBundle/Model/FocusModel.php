@@ -207,7 +207,7 @@ class FocusModel extends FormModel
         } elseif (isset($focus['unlockId'])) {
             $fid = $focus['unlockId'];
         }
-        if (isset($fid) && $focus['htmlMode'] && $focus['html']) {
+        if (isset($fid) && !empty($focus['htmlMode']) && $focus['html']) {
             $lead       = $this->leadModel->getCurrentLead();
             $tokenEvent = new TokenReplacementEvent($focus['html'], $lead, ['focus_id' => $fid]);
             $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
