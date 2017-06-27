@@ -152,6 +152,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $pushIds;
 
     /**
+     * @var ArrayCollection
+     */
+    private $eventLog;
+
+    /**
      * @var \DateTime
      */
     private $lastActive;
@@ -244,6 +249,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         $this->ipAddresses      = new ArrayCollection();
         $this->pushIds          = new ArrayCollection();
+        $this->eventLog         = new ArrayCollection();
         $this->doNotContact     = new ArrayCollection();
         $this->pointsChangeLog  = new ArrayCollection();
         $this->tags             = new ArrayCollection();
@@ -322,6 +328,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createOneToMany('eventLog', LeadEventLog::class)
+                ->mappedBy('lead')
+                ->cascadePersist()
+                ->cascadeMerge()
+                ->cascadeDetach()
+                ->fetchExtraLazy()
+                ->build();
 
         $builder->createField('lastActive', 'datetime')
             ->columnName('last_active')
@@ -1014,6 +1028,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function getPushIDs()
     {
         return $this->pushIds;
+    }
+
+    /**
+     * @param LeadEventLog $eventLog
+     *
+     * @return $this
+     */
+    public function addEventLog(LeadEventLog $log)
+    {
+        $this->eventLog[] = $log;
+        $log->setLead($this);
+
+        return $this;
+    }
+
+    /**
+     * @param LeadEventLog $eventLog
+     */
+    public function removeEventLog(LeadEventLog $eventLog)
+    {
+        $this->eventLog->removeElement($eventLog);
     }
 
     /**
