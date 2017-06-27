@@ -20,7 +20,7 @@ Mautic.emailOnLoad = function (container, response) {
                 'email:getEmailCountStats',
                 {id: id},
                 function (response) {
-                   if (response.success) {
+                   if (response.success && mQuery('#sent-count-' + id + ' div').length) {
                        if (response.pending) {
                            mQuery('#pending-' + id).html(response.pending);
                            mQuery('#pending-' + id).removeClass('hide');
@@ -34,8 +34,6 @@ Mautic.emailOnLoad = function (container, response) {
                        mQuery('#sent-count-' + id).html(response.sentCount);
                        mQuery('#read-count-' + id).html(response.readCount);
                        mQuery('#read-percent-' + id).html(response.readPercent);
-
-                       wait = false;
                    }
                },
                 false,
@@ -719,5 +717,3 @@ Mautic.convertDynamicContentFilterInput = function(el, jQueryVariant) {
         Mautic.activateChosenSelect(filterEl, false, mQuery);
     }
 };
-
-
