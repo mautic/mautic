@@ -27,7 +27,7 @@ class Version20170621082116 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->getTable("{$this->prefix}page_hits")->hasIndex('date_hit_left_index')) {
+        if ($schema->getTable("{$this->prefix}page_hits")->hasIndex("{$this->prefix}date_hit_left_index")) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
