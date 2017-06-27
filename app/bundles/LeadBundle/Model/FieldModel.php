@@ -29,6 +29,14 @@ class FieldModel extends FormModel
 {
     public static $coreFields = [
         // Listed according to $order for installation
+        'id' => [
+            'type'     => 'number',
+            'fixed'    => true,
+            'unique'   => true,
+            'short'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
         'title' => [
             'type'       => 'lookup',
             'properties' => ['list' => 'Mr|Mrs|Miss'],
