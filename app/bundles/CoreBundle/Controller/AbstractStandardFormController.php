@@ -676,6 +676,26 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
+     * Provide the name of the column which is used for default ordering.
+     *
+     * @return string
+     */
+    protected function getDefaultOrderColumn()
+    {
+        return 'name';
+    }
+
+    /**
+     * Provide the direction for default ordering.
+     *
+     * @return string
+     */
+    protected function getDefaultOrderDirection()
+    {
+        return 'ASC';
+    }
+
+    /**
      * @param null $objectId
      *
      * @return mixed
@@ -882,8 +902,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $filter['force'] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.name');
-        $orderByDir = $session->get('mautic.'.$this->getSessionBase().'.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
+        $orderByDir = $session->get('mautic.'.$this->getSessionBase().'.orderbydir', $this->getDefaultOrderDirection());
 
         list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 

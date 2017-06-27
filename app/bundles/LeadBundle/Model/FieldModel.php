@@ -131,6 +131,11 @@ class FieldModel extends FormModel
             'listable' => true,
             'object'   => 'lead',
         ],
+        'points' => [
+            'type'   => 'number',
+            'fixed'  => true,
+            'object' => 'lead',
+        ],
         'facebook' => [
             'listable' => true,
             'group'    => 'social',

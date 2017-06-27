@@ -116,6 +116,7 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
+        // 1:M for queues
         $builder->createOneToMany('queues', 'WebhookQueue')
             ->mappedBy('webhook')
             ->fetchExtraLazy()
@@ -124,6 +125,7 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
+        // 1:M for logs
         $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => 'DESC'])
             ->fetchExtraLazy()
             ->mappedBy('webhook')

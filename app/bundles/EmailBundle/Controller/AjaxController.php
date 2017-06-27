@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
+use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -282,5 +284,36 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @param Request $request
+     */
+    protected function getEmailCountStatsAction(Request $request)
+    {
+        /** @var EmailModel $model */
+        $model = $this->getModel('email');
+
+        $data = [];
+        if ($id = $request->get('id')) {
+            if ($email = $model->getEntity($id)) {
+                $pending = $model->getPendingLeads($email, null, true);
+                $queued  = $model->getQueuedCounts($email);
+
+                $data = [
+                    'success' => 1,
+                    'pending' => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
+                        'mautic.email.stat.leadcount',
+                        ['%count%' => $pending]
+                    ) : 0,
+                    'queued'      => ($queued) ? $this->translator->trans('mautic.email.stat.queued', ['%count%' => $queued]) : 0,
+                    'sentCount'   => $this->translator->trans('mautic.email.stat.sentcount', ['%count%' => $email->getSentCount(true)]),
+                    'readCount'   => $this->translator->trans('mautic.email.stat.readcount', ['%count%' => $email->getReadCount(true)]),
+                    'readPercent' => $this->translator->trans('mautic.email.stat.readpercent', ['%count%' => $email->getReadPercentage(true)]),
+                ];
+            }
+        }
+
+        return new JsonResponse($data);
     }
 }
