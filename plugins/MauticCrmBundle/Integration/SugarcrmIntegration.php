@@ -893,7 +893,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             }
                         }
                         $mauticObjectReference = 'lead';
-                        $entity                = $this->getMauticLead($dataObject, true, null, null);
+                        $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
 
                         $company = null;
                         if ($entity && isset($dataObject['account_id'.$newName]) && trim($dataObject['account_id'.$newName]) != '') {
@@ -1545,5 +1545,41 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         return [$updated, $created, $errored];
+    }
+    /**
+     * @param       $fieldsToUpdate
+     * @param array $objects
+     *
+     * @return array
+     */
+    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    {
+        if (null === $objects) {
+            $objects = ['Leads', 'Contacts'];
+        }
+
+        if (isset($fieldsToUpdate['leadFields'])) {
+            // Pass in the whole config
+            $fields = $fieldsToUpdate['leadFields'];
+        } else {
+            $fields = array_flip($fieldsToUpdate);
+        }
+
+        $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
+
+        return $fieldsToUpdate;
+    }
+    /**
+     * @param        $config
+     * @param null   $object
+     * @param string $priorityObject
+     *
+     * @return mixed
+     */
+    protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
+    {
+        $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
+
+        return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
     }
 }
