@@ -2302,7 +2302,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Validate if we have a company for this Mautic contact
-                if (!empty($sfEntityRecord['Company'])) {
+                if (!empty($sfEntityRecord['Company'])
+                    && $sfEntityRecord['Company'] !== $this->translator->trans(
+                        'mautic.integration.form.lead.unknown'
+                    )
+                ) {
                     $company = IdentifyCompanyHelper::identifyLeadsCompany(
                         ['company' => $sfEntityRecord['Company']],
                         null,
