@@ -598,11 +598,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
             }
         }
         unset($toCreate);
-        if ($integrationEntities) {
-            // Persist updated entities if applicable
-            $integrationEntityRepo->saveEntities($integrationEntities);
-            $this->em->clear(IntegrationEntity::class);
-        }
 
         // update leads
         $leadData = [];
@@ -646,10 +641,25 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-            $leadData[] = $mappedData;
+            $leadData[$lead->getId()] = $mappedData;
         }
 
-        $this->getApiHelper()->createLeads($leadData, $object);
+        $ids = $this->getApiHelper()->createLeads($leadData, $object);
+        foreach ($ids as $id) {
+            $integrationEntity = new IntegrationEntity();
+            $integrationEntity->setDateAdded(new \DateTime());
+            $integrationEntity->setIntegration('Dynamics');
+            $integrationEntity->setIntegrationEntity($object);
+            $integrationEntity->setIntegrationEntityId($id);
+            $integrationEntity->setInternalEntity('lead');
+            $integrationEntity->setInternalEntityId($lead->getId());
+        }
+
+        if ($integrationEntities) {
+            // Persist updated entities if applicable
+            $integrationEntityRepo->saveEntities($integrationEntities);
+            $this->em->clear(IntegrationEntity::class);
+        }
 
         if (defined('IN_MAUTIC_CONSOLE')) {
             if ($progress) {

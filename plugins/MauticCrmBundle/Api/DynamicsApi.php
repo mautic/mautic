@@ -160,6 +160,7 @@ class DynamicsApi extends CrmApi
         if (0 === count($data)) {
             return null;
         }
+
         $batchId  = substr(str_shuffle(uniqid('b', false)), 0, 6);
         $changeId = substr(str_shuffle(uniqid('c', false)), 0, 6);
 
@@ -175,11 +176,15 @@ class DynamicsApi extends CrmApi
             $odata .= 'Content-Type: application/http'.PHP_EOL;
             $odata .= 'Content-Transfer-Encoding:binary'.PHP_EOL;
             $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
-            $method    = $isUpdate ? 'PATCH' : 'POST';
-            $operation = $isUpdate ? sprintf('%s(%s)', $object, $objectId) : $object;
-            $odata .= sprintf('%s %s/%s HTTP/1.1', $method, $this->getUrl(), $operation).PHP_EOL;
+            if (!$isUpdate) {
+                $objectId = sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
+            }
+            $operation = sprintf('%s(%s)', $object, $objectId);
+            $odata .= sprintf('PATCH %s/%s HTTP/1.1', $this->getUrl(), $operation).PHP_EOL;
             if ($isUpdate) {
                 $odata .= 'If-Match: *'.PHP_EOL;
+            } else {
+                $odata .= 'If-None-Match: *'.PHP_EOL;
             }
             $odata .= 'Content-Type: application/json;type=entry'.PHP_EOL.PHP_EOL;
             $odata .= json_encode($lead).PHP_EOL;
@@ -191,7 +196,10 @@ class DynamicsApi extends CrmApi
         $settings['post_data']                  = $odata;
         $settings['curl_options'][CURLOPT_CRLF] = true;
 
-        return $this->request('$batch', [], 'POST', $object, $settings);
+        $response = $this->request('$batch', [], 'POST', $object, $settings);
+        $newIds   = $this->parseRawHttpResponse($response);
+
+        return $response;
     }
 
     /**
@@ -203,5 +211,58 @@ class DynamicsApi extends CrmApi
     public function updateLeads($data, $object = 'contacts')
     {
         return $this->createLeads($data, $object, true);
+    }
+
+    /**
+     * @link https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
+     *
+     * @param Response $response
+     *
+     * @return array
+     */
+    public function parseRawHttpResponse(Response $response)
+    {
+        $a_data      = [];
+        $input       = $response->body;
+        $contentType = $response->headers['Content-Type'];
+        // grab multipart boundary from content type header
+        preg_match('/boundary=(.*)$/', $contentType, $matches);
+        $boundary = $matches[1];
+
+        // split content by boundary and get rid of last -- element
+        $a_blocks = preg_split("/-+$boundary/", $input);
+        array_pop($a_blocks);
+
+        // there is only one batchresponse
+        $input                = array_pop($a_blocks);
+        list($header, $input) = explode("\r\n\r\n", $input, 2);
+        foreach (explode("\r\n", $header) as $r) {
+            if (stripos($r, 'Content-Type:') === 0) {
+                list($headername, $contentType) = explode(':', $r, 2);
+            }
+        }
+
+        // grab multipart boundary from content type header
+        preg_match('/boundary=(.*)$/', $contentType, $matches);
+        $boundary = $matches[1];
+
+        // split content by boundary and get rid of last -- element
+        $a_blocks = preg_split("/-+$boundary/", $input);
+        array_pop($a_blocks);
+
+        // loop data blocks
+        foreach ($a_blocks as $id => $block) {
+            if (empty($block)) {
+                continue;
+            }
+
+            if (false !== stripos($block, 'OData-EntityId:')) {
+                // OData-EntityId: https://virlatinus.crm.dynamics.com/api/data/v8.2/contacts(2725f27c-2058-e711-8111-c4346bac1938)
+                preg_match('/OData-EntityId: .*\(([^\)]*)\)/', $block, $matches);
+                $a_data[] = $matches[1];
+            }
+        }
+
+        return $a_data;
     }
 }
