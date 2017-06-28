@@ -14,11 +14,14 @@ namespace Mautic\PluginBundle\Controller;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,14 +71,15 @@ class PluginController extends FormController
 
         foreach ($integrationObjects as $name => $object) {
             $settings = $object->getIntegrationSettings();
-            $pluginId = $settings->getPlugin()->getId();
-            if (isset($plugins[$pluginId])) {
+            $plugin   = $settings->getPlugin();
+            $pluginId = $plugin ? $plugin->getId() : $name;
+            if (isset($plugins[$pluginId]) || $pluginId === $name) {
                 $integrations[$name] = [
                     'name'     => $object->getName(),
                     'display'  => $object->getDisplayName(),
                     'icon'     => $integrationHelper->getIconPath($object),
                     'enabled'  => $settings->isPublished(),
-                    'plugin'   => $settings->getPlugin()->getId(),
+                    'plugin'   => $pluginId,
                     'isBundle' => false,
                 ];
             }
@@ -153,6 +157,7 @@ class PluginController extends FormController
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
+        /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
 
         // Verify that the requested integration exists
@@ -160,24 +165,17 @@ class PluginController extends FormController
             throw $this->createNotFoundException($this->get('translator')->trans('mautic.core.url.error.404'));
         }
 
-        $limit = $session->get('mautic.plugin.'.$name.'.lead.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $object = ('leadFieldsContainer' === $activeTab) ? 'lead' : 'company';
+        $limit  = $this->coreParametersHelper->getParameter('default_pagelimit');
+        $start  = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
-        //set what page currently on so that we can return here after form submission/cancellation
-        if ($activeTab == 'leadFieldsContainer') {
-            $session->set('mautic.plugin.'.$name.'.lead.start', $start);
-            $session->set('mautic.plugin.'.$name.'.lead.page', $page);
-        }
-        if ($activeTab == 'companyFieldsContainer') {
-            $session->set('mautic.plugin.'.$name.'.company.start', $start);
-            $session->set('mautic.plugin.'.$name.'.company.lead.page', $page);
-        }
+        $session->set('mautic.plugin.'.$name.'.'.$object.'.start', $start);
+        $session->set('mautic.plugin.'.$name.'.'.$object.'.page', $page);
 
         /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
+        $pluginModel   = $this->getModel('plugin');
         $leadFields    = $pluginModel->getLeadFields();
         $companyFields = $pluginModel->getCompanyFields();
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
@@ -200,12 +198,12 @@ class PluginController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
                 $currentFeatureSettings = $entity->getFeatureSettings();
+                $valid                  = $this->isFormValid($form);
 
-                if ($valid = $this->isFormValid($form)) {
+                if ($authorize || $valid) {
                     $em          = $this->get('doctrine.orm.entity_manager');
                     $integration = $entity->getName();
-                    // Merge keys
-                    $keys = $form['apiKeys']->getData();
+                    $keys        = $form['apiKeys']->getData();
 
                     // Prevent merged keys
                     $secretKeys = $integrationObject->getSecretKeys();
@@ -219,92 +217,61 @@ class PluginController extends FormController
                     if (!$authorize) {
                         $features = $entity->getSupportedFeatures();
                         if (in_array('public_profile', $features) || in_array('push_lead', $features)) {
-                            //make sure now non-existent aren't saved
-                            $featureSettings        = $entity->getFeatureSettings();
-                            $submittedObjects       = $this->request->get('integration_details[featureSettings][objects]', [], true);
-                            $submittedFields        = $this->request->get('integration_details[featureSettings][leadFields]', [], true);
-                            $submittedCompanyFields = $this->request->request->get('integration_details[featureSettings][companyFields]', [], true);
-                            //make sure now non-existent aren't saved
-                            $settings = [
-                                'ignore_field_cache' => false,
-                            ];
-                            $settings['feature_settings']['objects'] = $submittedObjects;
-                            $newIntegrationFields                    = $integrationObject->getAvailableLeadFields($settings);
-                            $leadNewIntegrationFields                = [];
-                            $removeCompanyFields                     = [];
-                            if (isset($newIntegrationFields['Lead'])) {
-                                $leadNewIntegrationFields = $newIntegrationFields['Lead'];
+                            // Ungroup the fields
+                            $mauticLeadFields = [];
+                            foreach ($leadFields as $group => $groupFields) {
+                                $mauticLeadFields = array_merge($mauticLeadFields, $groupFields);
                             }
-                            if (isset($newIntegrationFields['Contact'])) {
-                                $leadNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['Contact']);
+                            $mauticCompanyFields = [];
+                            foreach ($companyFields as $group => $groupFields) {
+                                $mauticCompanyFields = array_merge($mauticCompanyFields, $groupFields);
                             }
 
-                            if (!isset($currentFeatureSettings['leadFields'])) {
-                                $currentFeatureSettings['leadFields'] = [];
-                            }
-                            $removeLeadFields = array_diff_key($currentFeatureSettings['leadFields'], $leadNewIntegrationFields);
+                            if ($missing = $integrationObject->cleanUpFields($entity, $mauticLeadFields, $mauticCompanyFields)) {
+                                if ($entity->getIsPublished()) {
+                                    // Only fail validation if the integration is enabled
+                                    if (!empty($missing['leadFields'])) {
+                                        $valid = false;
 
-                            foreach ($removeLeadFields as $key => $removeLeadField) {
-                                unset($currentFeatureSettings['leadFields'][$key]);
-                                if (isset($currentFeatureSettings['update_mautic'])) {
-                                    unset($currentFeatureSettings['update_mautic'][$key]);
-                                }
-                            }
+                                        $form->get('featureSettings')->get('leadFields')->addError(
+                                            new FormError(
+                                                $this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
+                                            )
+                                        );
+                                    }
 
-                            if (!isset($currentFeatureSettings['companyFields'])) {
-                                $currentFeatureSettings['companyFields'] = [];
-                            }
-                            if (isset($newIntegrationFields['company'])) {
-                                $companyNewIntegrationFields = array_merge($leadNewIntegrationFields, $newIntegrationFields['company']);
-                                $removeCompanyFields         = array_diff_key($currentFeatureSettings['companyFields'], $companyNewIntegrationFields);
-                            }
+                                    if (!empty($missing['companyFields'])) {
+                                        $valid = false;
 
-                            foreach ($removeCompanyFields as $key => $removeCompanyField) {
-                                unset($currentFeatureSettings['companyFields'][$key]);
-                                if (isset($currentFeatureSettings['update_mautic_company'])) {
-                                    unset($currentFeatureSettings['update_mautic_company'][$key]);
+                                        $form->get('featureSettings')->get('companyFields')->addError(
+                                            new FormError(
+                                                $this->get('translator')->trans('mautic.plugin.field.required_mapping_missing', [], 'validators')
+                                            )
+                                        );
+                                    }
                                 }
                             }
-
-                            if (!empty($submittedFields)) {
-                                if (isset($currentFeatureSettings['leadFields'])) {
-                                    $featureSettings['leadFields'] = $currentFeatureSettings['leadFields'];
-                                } else {
-                                    $featureSettings['leadFields'] = [];
-                                }
-                                if (isset($currentFeatureSettings['update_mautic'])) {
-                                    $featureSettings['update_mautic'] = $currentFeatureSettings['update_mautic'];
-                                } else {
-                                    $featureSettings['update_mautic'] = [];
-                                }
-                            }
-
-                            if (!empty($submittedCompanyFields)) {
-                                if (isset($currentFeatureSettings['companyFields'])) {
-                                    $featureSettings['companyFields'] = $currentFeatureSettings['companyFields'];
-                                } else {
-                                    $featureSettings['companyFields'] = [];
-                                }
-                                if (isset($currentFeatureSettings['update_mautic_company'])) {
-                                    $featureSettings['update_mautic_company'] = $currentFeatureSettings['update_mautic_company'];
-                                } else {
-                                    $featureSettings['update_mautic_company'] = [];
-                                }
-                            }
-                            $entity->setFeatureSettings($featureSettings);
                         }
                     } else {
                         //make sure they aren't overwritten because of API connection issues
                         $entity->setFeatureSettings($currentFeatureSettings);
                     }
 
-                    $dispatcher = $this->get('event_dispatcher');
-                    if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                        $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, new PluginIntegrationEvent($integrationObject));
-                    }
+                    if ($valid || $authorize) {
+                        $dispatcher = $this->get('event_dispatcher');
+                        $this->get('logger')->info('Dispatching integration config save event.');
+                        if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
+                            $this->get('logger')->info('Event dispatcher has integration config save listeners.');
+                            $event = new PluginIntegrationEvent($integrationObject);
 
-                    $em->persist($entity);
-                    $em->flush();
+                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
+
+                            $entity = $event->getEntity();
+                        }
+
+                        $em->persist($entity);
+                        $em->flush();
+                    }
 
                     if ($authorize) {
                         //redirect to the oauth URL
@@ -338,6 +305,7 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
+                        'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
                     ]
                 );
             }
@@ -357,14 +325,19 @@ class PluginController extends FormController
         $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
 
         $formNotes    = [];
-        $noteSections = ['authorization', 'features', 'feature_settings'];
+        $noteSections = ['authorization', 'features', 'feature_settings', 'custom'];
         foreach ($noteSections as $section) {
-            list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
-            if (!empty($specialInstructions)) {
-                $formNotes[$section] = [
-                    'note' => $specialInstructions,
-                    'type' => $alertType,
-                ];
+            if ('custom' === $section) {
+                $formNotes[$section] = $integrationObject->getFormNotes($section);
+            } else {
+                list($specialInstructions, $alertType) = $integrationObject->getFormNotes($section);
+
+                if (!empty($specialInstructions)) {
+                    $formNotes[$section] = [
+                        'note' => $specialInstructions,
+                        'type' => $alertType,
+                    ];
+                }
             }
         }
 
@@ -383,6 +356,7 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
+                    'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
                 ],
             ]
         );
@@ -458,10 +432,10 @@ class PluginController extends FormController
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
-            $namespace = $meta->fullyQualifiedClassName('');
+            $namespace = $meta->namespace;
 
             if (strpos($namespace, 'MauticPlugin') !== false) {
-                $bundleName = str_replace('\Entity\\', '', $namespace);
+                $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginMetadata[$bundleName])) {
                     $pluginMetadata[$bundleName] = [];
                 }
@@ -592,8 +566,11 @@ class PluginController extends FormController
             // Call the install callback
             $callback        = $plugin['bundleClass'];
             $metadata        = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
-            $installedSchema = (isset($pluginInstalledSchemas[$plugin['namespace']]))
-                ? $pluginInstalledSchemas[$plugin['namespace']] : null;
+            $installedSchema = null;
+
+            if (isset($pluginInstalledSchemas[$plugin['namespace']]) && count($pluginInstalledSchemas[$plugin['namespace']]->getTables()) !== 0) {
+                $installedSchema = true;
+            }
 
             $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
 

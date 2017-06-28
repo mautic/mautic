@@ -3586,12 +3586,16 @@
     }
     if (clickInGutter(cm, e)) return;
     var start = posFromMouse(cm, e);
-    window.focus();
+    var codeMode = typeof Mautic != 'undefined' && Mautic.codeMode === true;
+
+    if (!codeMode) {
+      window.focus();
+    }
 
     switch (e_button(e)) {
     case 1:
       // #3261: make sure, that we're not starting a second selection
-      if (cm.state.selectingText)
+      if (cm.state.selectingText && !codeMode)
         cm.state.selectingText(e);
       else if (start)
         leftButtonDown(cm, e, start);

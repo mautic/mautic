@@ -55,6 +55,11 @@ class PageModel extends FormModel
     protected $catInUrl;
 
     /**
+     * @var bool
+     */
+    protected $trackByFingerprint;
+
+    /**
      * @var CookieHelper
      */
     protected $cookieHelper;
@@ -117,6 +122,14 @@ class PageModel extends FormModel
     public function setCatInUrl($catInUrl)
     {
         $this->catInUrl = $catInUrl;
+    }
+
+    /**
+     * @param $trackByFingerprint
+     */
+    public function setTrackByFingerprint($trackByFingerprint)
+    {
+        $this->trackByFingerprint = $trackByFingerprint;
     }
 
     /**
@@ -453,7 +466,7 @@ class PageModel extends FormModel
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
+            $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
         }
 
         if ($lead && !$lead->getId()) {
@@ -884,19 +897,23 @@ class PageModel extends FormModel
      */
     public function getNewVsReturningPieChartData($dateFrom, $dateTo, $filters = [], $canViewOthers = true)
     {
-        $chart   = new PieChart();
-        $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
-        $allQ    = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
-        $uniqueQ = $query->getCountQuery('page_hits', 'lead_id', 'date_hit', $filters, ['getUnique' => true, 'selectAlso' => ['t.page_id']]);
+        $chart              = new PieChart();
+        $query              = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
+        $allQ               = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $filters['lead_id'] = [
+            'expression' => 'isNull',
+        ];
+        $returnQ = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($allQ);
-            $this->limitQueryToCreator($uniqueQ);
+            $this->limitQueryToCreator($returnQ);
         }
 
-        $all       = $query->fetchCount($allQ);
-        $unique    = $query->fetchCount($uniqueQ);
-        $returning = $all - $unique;
+        $all = $query->fetchCount($allQ);
+//        $unique    = $query->fetchCount($uniqueQ);
+        $returning = $query->fetchCount($returnQ);
+        $unique    = $all - $returning;
         $chart->setDataset($this->translator->trans('mautic.page.unique'), $unique);
         $chart->setDataset($this->translator->trans('mautic.page.graph.pie.new.vs.returning.returning'), $returning);
 

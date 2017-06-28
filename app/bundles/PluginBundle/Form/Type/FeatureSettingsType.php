@@ -11,8 +11,8 @@
 
 namespace Mautic\PluginBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -20,8 +20,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class FeatureSettingsType.
@@ -39,19 +38,24 @@ class FeatureSettingsType extends AbstractType
     protected $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var LoggerInterface
      */
-    private $translator;
+    protected $logger;
 
     /**
-     * @param MauticFactory $factory
+     * FeatureSettingsType constructor.
+     *
+     * @param Session              $session
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(MauticFactory $factory, Session $session, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
-    {
-        $this->factory              = $factory;
+    public function __construct(
+        Session $session,
+        CoreParametersHelper $coreParametersHelper,
+        LoggerInterface $logger
+    ) {
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
+        $this->logger               = $logger;
     }
 
     /**
@@ -75,31 +79,26 @@ class FeatureSettingsType extends AbstractType
                 'mautic.plugin.'.$integrationName.'.lead.limit',
                 $this->coreParametersHelper->getParameter('default_pagelimit')
             );
-            $page  = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
-            $start = $session->get('mautic.plugin.'.$integrationName.'.lead.start', 1);
-
-            $companyPage  = $session->get('mautic.plugin.'.$integrationName.'.company.lead.page', 1);
-            $companyStart = $session->get('mautic.plugin.'.$integrationName.'.company.start', 1);
+            $page        = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
+            $companyPage = $session->get('mautic.plugin.'.$integrationName.'.company.page', 1);
 
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => ($page == 1) ? true : false,
+                'ignore_field_cache' => ($page == 1 && 'POST' !== $_SERVER['REQUEST_METHOD']) ? true : false,
             ];
-            $totalFields = 0;
+
             try {
                 if (empty($fields)) {
                     $fields = $integrationObject->getFormLeadFields($settings);
                     $fields = (isset($fields[0])) ? $fields[0] : $fields;
                     unset($fields['company']);
                 }
-                $totalFields = count($fields);
 
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
                     if (empty($integrationCompanyFields)) {
                         $integrationCompanyFields = $integrationObject->getFormCompanyFields($settings);
                     }
-                    $totalCompanyFields = count($integrationCompanyFields);
                     if (isset($integrationCompanyFields['company'])) {
                         $integrationCompanyFields = $integrationCompanyFields['company'];
                     }
@@ -110,75 +109,54 @@ class FeatureSettingsType extends AbstractType
                 }
                 $error = '';
             } catch (\Exception $e) {
-                $fields = [];
-                $error  = $e->getMessage();
-            }
-            list($specialInstructions, $alertType) = $integrationObject->getFormNotes('leadfield_match');
-            /**
-             * Auto Match Integration Fields with Mautic Fields.
-             */
-            $flattenLeadFields = [];
-            foreach (array_values($leadFields) as $fieldsWithoutGroups) {
-                $flattenLeadFields = array_merge($flattenLeadFields, $fieldsWithoutGroups);
-            }
-            $integrationFields  = array_keys($fields);
-            $flattenLeadFields  = array_keys($flattenLeadFields);
-            $fieldsIntersection = array_uintersect($integrationFields, $flattenLeadFields, 'strcasecmp');
-            $enableDataPriority = false;
-            if (isset($formSettings['enable_data_priority'])) {
-                $enableDataPriority = $formSettings['enable_data_priority'];
+                $error = $e->getMessage();
+                $this->logger->error($e);
+
+                // Prevent pagination from confusing things by using the cache
+                $page   = 1;
+                $fields = $integrationCompanyFields = [];
             }
 
-            $autoMatchedFields = [];
-            foreach ($fieldsIntersection as $field) {
-                $autoMatchedFields[$field] = strtolower($field);
-            }
-            $leadFields['-1'] = '';
-            $extraPage        = ($totalFields % $limit > 0 && $totalFields % $limit < ($limit / 2)) ? 1 : 0;
+            $enableDataPriority = $integrationObject->getDataPriority();
+
             $form->add(
                 'leadFields',
                 'integration_fields',
                 [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
-                    'lead_fields'          => $leadFields,
-                    'data'                 => isset($data['leadFields']) && !empty($data['leadFields']) ? $data['leadFields'] : $autoMatchedFields,
-                    'update_mautic'        => isset($data['update_mautic']) && !empty($data['update_mautic']) ? $data['update_mautic'] : [],
+                    'mautic_fields'        => $leadFields,
+                    'data'                 => $data,
                     'integration_fields'   => $fields,
-                    'special_instructions' => $specialInstructions,
-                    'alert_type'           => $alertType,
                     'enable_data_priority' => $enableDataPriority,
                     'integration'          => $integrationObject->getName(),
-                    'totalFields'          => $totalFields,
-                    'page'                 => $page,
+                    'integration_object'   => $integrationObject,
                     'limit'                => $limit,
-                    'start'                => $start,
-                    'fixedPageNum'         => round($totalFields / $limit) + $extraPage,
+                    'page'                 => $page,
+                    'mapped'               => false,
+                    'error_bubbling'       => false,
                 ]
             );
+
             if (!empty($integrationCompanyFields)) {
-                $extraPage           = ($totalCompanyFields % $limit > 0 && $totalCompanyFields % $limit < ($limit / 2)) ? 1 : 0;
-                $companyFields['-1'] = '';
+                list($specialInstructions, $alertType) = $integrationObject->getFormNotes('leadfield_match');
+
                 $form->add(
                     'companyFields',
                     'integration_company_fields',
                     [
-                        'label'                 => 'mautic.integration.comapanyfield_matches',
-                        'required'              => false,
-                        'company_fields'        => $companyFields,
-                        'data'                  => isset($data['companyFields']) && !empty($data['companyFields']) ? $data['companyFields'] : [],
-                        'update_mautic_company' => isset($data['update_mautic_company']) && !empty($data['update_mautic_company'])
-                            ? $data['update_mautic_company'] : [],
-                        'integration_company_fields' => $integrationCompanyFields,
-                        'special_instructions'       => $specialInstructions,
-                        'alert_type'                 => $alertType,
-                        'enable_data_priority'       => $enableDataPriority,
-                        'integration'                => $integrationObject->getName(),
-                        'totalFields'                => $totalCompanyFields,
-                        'page'                       => $companyPage,
-                        'limit'                      => $limit,
-                        'start'                      => $companyStart,
-                        'fixedPageNum'               => (round($totalCompanyFields / $limit)) + $extraPage,
+                        'label'                => 'mautic.integration.comapanyfield_matches',
+                        'required'             => true,
+                        'mautic_fields'        => $companyFields,
+                        'data'                 => $data,
+                        'integration_fields'   => $integrationCompanyFields,
+                        'enable_data_priority' => $enableDataPriority,
+                        'integration'          => $integrationObject->getName(),
+                        'integration_object'   => $integrationObject,
+                        'limit'                => $limit,
+                        'page'                 => $companyPage,
+                        'mapped'               => false,
+                        'error_bubbling'       => false,
                     ]
                 );
             }
@@ -207,7 +185,7 @@ class FeatureSettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['integration', 'integration_object', 'lead_fields', 'company_fields']);
     }

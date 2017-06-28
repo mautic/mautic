@@ -22,6 +22,11 @@ $header = ($activeForm->getId())
 $view['slots']->set('headerTitle', $header);
 
 $formId = $form['sessionId']->vars['data'];
+
+if (!isset($inBuilder)) {
+    $inBuilder = false;
+}
+
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -61,27 +66,29 @@ $formId = $form['sessionId']->vars['data'];
                     <div class="tab-pane fade bdr-w-0" id="fields-container">
                         <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
                         <div id="mauticforms_fields">
-                            <div class="available-fields mb-md">
-                                <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
-                                <div class="dropdown">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                        <?php echo $view['translator']->trans('mautic.form.field.add'); ?>
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu">
-                                        <?php foreach ($fields as $fieldType => $field): ?>
-                                            <li id="field_<?php echo $fieldType; ?>">
-                                                <a class="list-group-item" data-toggle="ajaxmodal" data-target="#formComponentModal" href="<?php echo $view['router']->path(
-                                                    'mautic_formfield_action',
-                                                    ['objectAction' => 'new', 'type' => $fieldType, 'tmpl' => 'field', 'formId' => $formId]
-                                                ); ?>">
-                                                    <div>
-                                                        <?php echo $field; ?>
-                                                    </div>
-                                                </a>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    </ul>
+                            <div class="row">
+                                <div class="available-fields mb-md col-sm-8">
+                                            <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                                            <select class="chosen form-control" id="available_fields">
+                                                <option value=""></option>
+                                                <?php foreach ($fields as $fieldType => $field): ?>
+
+                                                    <option class="list-group-item" data-toggle="ajaxmodal"
+                                                            data-target="#formComponentModal"
+                                                            data-href="<?php echo $view['router']->path(
+                                                                'mautic_formfield_action',
+                                                                [
+                                                                    'objectAction' => 'new',
+                                                                    'type'         => $fieldType,
+                                                                    'tmpl'         => 'field',
+                                                                    'formId'       => $formId,
+                                                                    'inBuilder'    => $inBuilder,
+                                                                ]
+                                                            ); ?>">     <?php echo $field; ?></option>
+
+                                                <?php endforeach; ?>
+
+                                            </select>
                                 </div>
                             </div>
                             <div class="drop-here">
@@ -102,6 +109,7 @@ $formId = $form['sessionId']->vars['data'];
                                             'id'            => $field['id'],
                                             'formId'        => $formId,
                                             'contactFields' => $contactFields,
+                                            'inBuilder'     => $inBuilder,
                                         ]
                                     ); ?>
                                 <?php endif; ?>

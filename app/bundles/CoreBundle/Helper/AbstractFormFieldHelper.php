@@ -139,7 +139,7 @@ abstract class AbstractFormFieldHelper
 
         $choices = [];
 
-        if ($list) {
+        if (is_array($list)) {
             foreach ($list as $val => $label) {
                 if (is_array($label)) {
                     $val   = $label['value'];
@@ -152,7 +152,7 @@ abstract class AbstractFormFieldHelper
                     $label = $val;
                 }
 
-                $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim($label);
+                $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($val, ENT_QUOTES));
             }
         }
 

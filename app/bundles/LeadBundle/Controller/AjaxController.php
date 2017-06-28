@@ -103,7 +103,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0];
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $leadField = InputHelper::clean($request->query->get('field'));
+        $leadField = InputHelper::alphanum($request->query->get('field'));
         if (!empty($leadField)) {
             if (strpos($leadField, 'company') === 0) {
                 $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$leadField, $filter]);
@@ -120,7 +120,7 @@ class AjaxController extends CommonAjaxController
                             'id'    => $r['id'],
                         ];
                     }
-                } elseif ($leadField == 'hit_url') {
+                } elseif (in_array($leadField, ['hit_url', 'referer', 'url_title', 'source'])) {
                     $dataArray[] = [
                         'value' => '',
                     ];
@@ -550,7 +550,7 @@ class AjaxController extends CommonAjaxController
                     "MauticLeadBundle:Lead:{$template}.html.php",
                     [
                         'items'         => $results['results'],
-                        'noContactList' => $emailRepo->getDoNotEmailList(),
+                        'noContactList' => $emailRepo->getDoNotEmailList(array_keys($results['results'])),
                         'permissions'   => $permissions,
                         'security'      => $this->get('mautic.security'),
                         'highlight'     => true,
@@ -824,7 +824,12 @@ class AjaxController extends CommonAjaxController
             switch ($operator) {
                 case 'empty':
                 case '!empty':
-                    $disabled = true;
+                    $disabled             = true;
+                    $dataArray['options'] = null;
+                    break;
+                case 'regexp':
+                case '!regexp':
+                    $dataArray['options'] = null;
                     break;
             }
             $dataArray['disabled'] = $disabled;

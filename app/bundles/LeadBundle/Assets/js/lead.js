@@ -186,23 +186,43 @@ Mautic.getLeadId = function() {
 }
 
 Mautic.leadEmailOnLoad = function(container, response) {
+    // Some hacky editations made on every form submit because of Froala (more at: https://github.com/froala/wysiwyg-editor/issues/1372)
     mQuery('[name="lead_quickemail"]').on('click.ajaxform', function() {
         var emailHtml = mQuery('.fr-iframe').contents();
         var textarea = mQuery(this).find('#lead_quickemail_body');
         mQuery.each(emailHtml.find('td, th, table'), function() {
             var td = mQuery(this);
+
+            // Bring back element's class names.
             if (td.attr('fr-original-class')) {
                 td.attr('class', td.attr('fr-original-class'));
                 td.removeAttr('fr-original-class');
             }
+
+            // Bring back element's class inline styles.
             if (td.attr('fr-original-style')) {
                 td.attr('style', td.attr('fr-original-style'));
                 td.removeAttr('fr-original-style');
             }
+
+            // Remove Froala's border.
             if (td.css('border') === '1px solid rgb(221, 221, 221)') {
                 td.css('border', '');
             }
         });
+
+        // Prevents contenteditable in sent e-mail.
+        emailHtml.find('body').removeAttr('contenteditable');
+        // Prevents unscrollable sent e-mail.
+        emailHtml.find('body').css('overflow', 'initial');
+
+        // Prevents unscrollable e-mail also in style tag.
+        var styleElement = emailHtml.find('style[data-fr-style]'); // We hope, that there's no other style with this attribute...
+        var style = styleElement.text();
+        style = style.replace(/overflow:\s*hidden\s*;\s*/, ''); // ...and we hope, that no other element will have `overflow: hidden` before `body`. This replaces only first occurence.
+        styleElement.get(0).innerHTML = style;
+
+        // Rewrites value of the body textarea.
         textarea.val(emailHtml.find('html').get(0).outerHTML);
     });
 }
@@ -242,13 +262,20 @@ Mautic.leadlistOnLoad = function(container) {
 };
 
 Mautic.convertLeadFilterInput = function(el) {
+    var prefix = 'leadlist';
+
+    var parent = mQuery(el).parents('.dynamic-content-filter');
+    if (parent.length) {
+        prefix = parent.attr('id');
+    }
+
     var operator = mQuery(el).val();
 
     // Extract the filter number
-    var regExp    = /leadlist_filters_(\d+)_operator/;
+    var regExp    = /_filters_(\d+)_operator/;
     var matches   = regExp.exec(mQuery(el).attr('id'));
     var filterNum = matches[1];
-    var filterId  = '#leadlist_filters_' + filterNum + '_filter';
+    var filterId  = '#' + prefix + '_filters_' + filterNum + '_filter';
 
     // Reset has-error
     if (mQuery(filterId).parent().hasClass('has-error')) {
@@ -257,7 +284,7 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 
     var disabled = (operator == 'empty' || operator == '!empty');
-    mQuery(filterId+', #leadlist_filters_' + filterNum + '_display').prop('disabled', disabled);
+    mQuery(filterId+', #' + prefix + '_filters_' + filterNum + '_display').prop('disabled', disabled);
 
     if (disabled) {
         mQuery(filterId).val('');
@@ -339,7 +366,7 @@ Mautic.addLeadListFilter = function (elId) {
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
     var fieldObject = mQuery(filterId).data('field-object');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale', 'globalcategory']) != -1);
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'lead_email_sent', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale', 'globalcategory']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);

@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -26,6 +27,7 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
@@ -66,6 +68,16 @@ class ReportModel extends FormModel
     protected $session;
 
     /**
+     * @var FieldModel
+     */
+    protected $fieldModel;
+
+    /**
+     * @var ReportHelper
+     */
+    protected $reportHelper;
+
+    /**
      * ReportModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -77,12 +89,16 @@ class ReportModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         FormatterHelper $formatterHelper,
         TemplatingHelper $templatingHelper,
-        ChannelListHelper $channelListHelper
+        ChannelListHelper $channelListHelper,
+        FieldModel $fieldModel,
+        ReportHelper $reportHelper
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->getParameter('default_pagelimit');
         $this->formatterHelper   = $formatterHelper;
         $this->templatingHelper  = $templatingHelper;
         $this->channelListHelper = $channelListHelper;
+        $this->fieldModel        = $fieldModel;
+        $this->reportHelper      = $reportHelper;
     }
 
     /**
@@ -209,7 +225,8 @@ class ReportModel extends FormModel
             } else {
                 //build them
                 $eventContext = ($context == 'all') ? '' : $context;
-                $event        = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext);
+
+                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
                 $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
 
                 $tables = $event->getTables();
@@ -268,7 +285,7 @@ class ReportModel extends FormModel
      *
      * @return \stdClass ['choices' => [], 'choiceHtml' => '', definitions => []]
      */
-    public function getColumnList($context)
+    public function getColumnList($context, $isGroupBy = false)
     {
         $tableData           = $this->getTableData($context);
         $columns             = isset($tableData['columns']) ? $tableData['columns'] : [];
@@ -278,6 +295,9 @@ class ReportModel extends FormModel
         $return->definitions = [];
 
         foreach ($columns as $column => $data) {
+            if ($isGroupBy && ($column == 'unsubscribed' || $column == 'unsubscribed_ratio' || $column == 'unique_ratio')) {
+                continue;
+            }
             if (isset($data['label'])) {
                 $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
                 $return->choices[$column]     = $data['label'];
@@ -363,7 +383,7 @@ class ReportModel extends FormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, $report, $reportData)
+    public function exportResults($format, $report, $reportData, $handle = null, $page = null)
     {
         $formatter = $this->formatterHelper;
         $date      = (new DateTimeHelper())->toLocalString();
@@ -371,47 +391,28 @@ class ReportModel extends FormModel
 
         switch ($format) {
             case 'csv':
-                $response = new StreamedResponse(
-                    function () use ($reportData, $report, $formatter) {
-                        $handle = fopen('php://output', 'r+');
-                        $header = [];
-
-                        //build the data rows
-                        foreach ($reportData['data'] as $count => $data) {
-                            $row = [];
-                            foreach ($data as $k => $v) {
-                                if ($count === 0) {
-                                    //set the header
-                                    $header[] = $k;
-                                }
-
-                                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
-                            }
-
-                            if ($count === 0) {
-                                //write the column names row
-                                fputcsv($handle, $header);
-                            }
-
-                            //write the row
-                            fputcsv($handle, $row);
-
-                            //free memory
-                            unset($row, $reportData['data'][$count]);
+                //build the data rows
+                if (is_null($handle)) {
+                    $response = new StreamedResponse(
+                        function () use ($reportData, $formatter) {
+                            $handle = fopen('php://output', 'r+');
+                            $this->exportCSV($formatter, $reportData, $handle, 0);
+                            fclose($handle);
                         }
+                    );
+                    $response->headers->set('Content-Type', 'application/force-download');
+                    $response->headers->set('Content-Type', 'application/octet-stream');
+                    $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
+                    $response->headers->set('Expires', 0);
+                    $response->headers->set('Cache-Control', 'must-revalidate');
+                    $response->headers->set('Pragma', 'public');
 
-                        fclose($handle);
-                    }
-                );
+                    return $response;
+                } else {
+                    $this->exportCSV($formatter, $reportData, $handle, $page);
 
-                $response->headers->set('Content-Type', 'application/force-download');
-                $response->headers->set('Content-Type', 'application/octet-stream');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', 0);
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
-
-                return $response;
+                    return;
+                }
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
@@ -427,6 +428,7 @@ class ReportModel extends FormModel
                 )->getContent();
 
                 return new Response($content);
+
             case 'xlsx':
                 if (class_exists('PHPExcel')) {
                     $response = new StreamedResponse(
@@ -445,18 +447,16 @@ class ReportModel extends FormModel
                                         //set the header
                                         $header[] = $k;
                                     }
-                                    $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+                                    $row[] = htmlspecialchars_decode($formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true), ENT_QUOTES);
                                 }
 
                                 if ($count === 0) {
                                     //write the column names row
                                     $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
                                 }
-
                                 //write the row
                                 $rowCount = $count + 2;
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-
                                 //free memory
                                 unset($row, $reportData['data'][$count]);
                             }
@@ -478,6 +478,7 @@ class ReportModel extends FormModel
                     return $response;
                 }
                 throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+
             default:
                 return new Response();
         }
@@ -535,6 +536,11 @@ class ReportModel extends FormModel
         // Prepare the query builder
         $tableDetails = $this->getTableData($entity->getSource());
 
+        $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
+
+        foreach ($aggregatorColumns as $aggregatorColumn) {
+            $selectedColumns[] = $aggregatorColumn['column'];
+        }
         // Build a reference for column to data column (without table prefix)
         $dataColumns = [];
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
@@ -604,9 +610,13 @@ class ReportModel extends FormModel
         }
 
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
-            if ($paginate) {
+            if ($paginate && !$entity->getGroupBy()) {
                 // Build the options array to pass into the query
                 $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                if (!empty($options['limit'])) {
+                    $limit      = $options['limit'];
+                    $reportPage = $options['page'];
+                }
                 $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
                 if ($start < 0) {
                     $start = 0;
@@ -643,7 +653,7 @@ class ReportModel extends FormModel
                 $queryTime .= 'ms';
             }
 
-            if (!$paginate) {
+            if (!$paginate || $entity->getGroupBy()) {
                 $totalResults = count($data);
             }
 
@@ -662,6 +672,12 @@ class ReportModel extends FormModel
             }
 
             $debugData['query_time'] = (isset($queryTime)) ? $queryTime : 'N/A';
+        }
+
+        foreach ($data as $keys => $lead) {
+            foreach ($lead as $key => $field) {
+                $data[$keys][$key] = html_entity_decode($field, ENT_QUOTES);
+            }
         }
 
         return [
@@ -715,5 +731,29 @@ class ReportModel extends FormModel
         }
 
         return $options;
+    }
+
+    private function exportCSV($formatter, $reportData, $handle, $page)
+    {
+        foreach ($reportData['data'] as $count => $data) {
+            $row = [];
+            foreach ($data as $k => $v) {
+                if ($count == 0) {
+                    //set the header
+                    $header[] = $k;
+                }
+                if ($type = $reportData['columns'][$reportData['dataColumns'][$k]]['type'] !== 'string') {
+                    $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+                } else {
+                    $row[] = $v;
+                }
+            }
+
+            if ($page === 1 && $count === 0) {
+                fputcsv($handle, $header);
+            }
+            fputcsv($handle, $row);
+            unset($row, $reportData['data'][$count]);
+        }
     }
 }

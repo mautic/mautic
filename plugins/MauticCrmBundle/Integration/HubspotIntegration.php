@@ -12,6 +12,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\StageBundle\Entity\Stage;
@@ -22,6 +23,23 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * HubspotIntegration constructor.
+     *
+     * @param UserHelper $userHelper
+     */
+    public function __construct(UserHelper $userHelper)
+    {
+        $this->userHelper = $userHelper;
+
+        parent::__construct();
+    }
+
     /**
      * {@inheritdoc}
      *
@@ -166,8 +184,6 @@ class HubspotIntegration extends CrmAbstractIntegration
             }
         }
 
-        $this->cache->set('leadFields', $hubsFields);
-
         return $hubsFields;
     }
 
@@ -198,7 +214,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             //put mautic timeline link
             $formattedLeadData['properties'][] = [
                 'property' => 'mautic_timeline',
-                'value'    => $this->factory->getRouter()->generate(
+                'value'    => $this->router->generate(
                     'mautic_plugin_timeline_view',
                     ['integration' => 'Hubspot', 'leadId' => $lead->getId()],
                     UrlGeneratorInterface::ABSOLUTE_URL),
@@ -256,6 +272,9 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
+        if (!isset($data['properties'])) {
+            return [];
+        }
         foreach ($data['properties'] as $key => $field) {
             $fieldsValues[$key] = $field['value'];
         }
@@ -355,10 +374,11 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
      * @param mixed||null $identifiers
+     * @param string|null $object
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -387,8 +407,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel           = $this->factory->getModel('lead');
-        $uniqueLeadFields    = $this->factory->getModel('lead.field')->getUniqueIdentiferFields();
+        $leadModel           = $this->leadModel;
+        $uniqueLeadFields    = $this->fieldModel->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
 
         foreach ($matchedFields as $leadField => $value) {
@@ -402,7 +422,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')
+            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
 
             if (!empty($existingLeads)) {
@@ -446,7 +466,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
 
         if (isset($stageName)) {
-            $stage = $this->factory->getEntityManager()->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
+            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
 
             if (empty($stage)) {
                 $stage = new Stage();
@@ -462,10 +482,10 @@ class HubspotIntegration extends CrmAbstractIntegration
                 $log->setEventName($stage->getId().':'.$stage->getName());
                 $log->setLead($lead);
                 $log->setActionName(
-                    $this->factory->getTranslator()->trans(
+                    $this->translator->trans(
                         'mautic.stage.import.action.name',
                         [
-                            '%name%' => $this->factory->getUser()->getUsername(),
+                            '%name%' => $this->userHelper->getUser()->getUsername(),
                         ]
                     )
                 );
@@ -480,7 +500,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             try {
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
-                $this->factory->getLogger()->addWarning($exception->getMessage());
+                $this->logger->addWarning($exception->getMessage());
 
                 return;
             }

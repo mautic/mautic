@@ -142,6 +142,8 @@ div[data-slot-toolbar] .btn .fa {
 
 div[data-slot], [data-section-wrapper] {
     position: relative;
+    font-size: initial;
+    line-height: initial;
 }
 
 div[data-slot^="image"] {
@@ -206,8 +208,11 @@ div[data-slot].ui-sortable-helper {
     float: left;
     width: 111px;
     margin: 2px;
-    height: 62px;
-    padding: 10px;
+    height: 75px;
+    padding-left:5px;
+    padding-right:5px;
+    text-align:center;
+    word-wrap: break-word;
 }
 
 .slot-type-handle.ui-draggable-dragging, .section-type-handle.ui-draggable-dragging{
@@ -232,4 +237,8 @@ div[data-slot].ui-sortable-helper {
     .select-theme-selected {
         margin-top:5px;
     }
+}
+
+[data-slot="dynamicContent"] {
+    z-index:50;
 }
