@@ -43,7 +43,6 @@ if ($props['bar']['allow_hide']): ?>
                     echo ' mf-bar-collapser-sticky';
                 } ?> mf-bar-collapser-<?php echo $focus['id']; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>; color: #<?php echo $props['colors']['text']; ?>;">
         <style scoped>
-            <?php echo html_entity_decode($focus['css']);  ?>
             .mf-bar-collapser-icon {
                 color: #<?php  echo $color; ?>;
             }

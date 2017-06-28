@@ -37,17 +37,17 @@ class Focus extends FormEntity
     /**
      * @var string
      */
+    private $editor;
+
+    /**
+     * @var string
+     */
     private $html;
 
     /**
      * @var string
      */
     private $htmlMode;
-
-    /**
-     * @var string
-     */
-    private $css;
 
     /**
      * @var string
@@ -169,12 +169,12 @@ class Focus extends FormEntity
 
         $builder->addNullableField('cache', 'text');
 
-        $builder->addNullableField('css', 'text');
-
-        $builder->createField('htmlMode', 'boolean')
+        $builder->createField('htmlMode', 'string')
             ->columnName('html_mode')
             ->nullable()
             ->build();
+
+        $builder->addNullableField('editor', 'text');
 
         $builder->addNullableField('html', 'text');
     }
@@ -207,7 +207,7 @@ class Focus extends FormEntity
                     'form',
                     'htmlMode',
                     'html',
-                    'css',
+                    'editor',
                     'cache',
                 ]
             )
@@ -255,21 +255,21 @@ class Focus extends FormEntity
     /**
      * @return mixed
      */
-    public function getCss()
+    public function getEditor()
     {
-        return $this->css;
+        return $this->editor;
     }
 
     /**
-     * @param mixed $css
+     * @param mixed $setHtml
      *
      * @return Focus
      */
-    public function setCss($css)
+    public function setEditor($editor)
     {
-        $this->isChanged('css', $css);
+        $this->isChanged('editor', $editor);
 
-        $this->css = $css;
+        $this->editor = $editor;
 
         return $this;
     }

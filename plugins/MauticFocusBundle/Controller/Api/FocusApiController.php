@@ -13,10 +13,8 @@ namespace MauticPlugin\MauticFocusBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Mautic\CoreBundle\Helper\InputHelper;
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class FocusApiController.
@@ -27,21 +25,22 @@ class FocusApiController extends CommonApiController
     {
         parent::initialize($event);
 
-        $this->model            = $this->getModel('focus');
-        $this->entityClass      = 'MauticPlugin\MauticFocusBundle\Entity\Focus';
-        $this->entityNameOne    = 'focus';
-        $this->entityNameMulti  = 'focus';
+        $this->model           = $this->getModel('focus');
+        $this->entityClass     = 'MauticPlugin\MauticFocusBundle\Entity\Focus';
+        $this->entityNameOne   = 'focus';
+        $this->entityNameMulti = 'focus';
         $this->permissionBase  = 'plugin:focus:items';
-        $this->dataInputMasks   = [
-            'html'     => 'html',
+        $this->dataInputMasks  = [
+            'html'   => 'html',
+            'editor' => 'html',
         ];
     }
 
-    public function generateJsAction($id){
+    public function generateJsAction($id)
+    {
         $focus = $this->model->getEntity($id);
-        $view = $this->view(['js' => $this->model->generateJavascript($focus)], Codes::HTTP_OK);
+        $view  = $this->view(['js' => $this->model->generateJavascript($focus)], Codes::HTTP_OK);
+
         return $this->handleView($view);
     }
-
-
 }

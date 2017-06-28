@@ -207,11 +207,11 @@ class FocusModel extends FormModel
         } elseif (isset($focus['unlockId'])) {
             $fid = $focus['unlockId'];
         }
-        if (isset($fid) && !empty($focus['htmlMode']) && $focus['html']) {
+        if (isset($fid) && !empty($focus['htmlMode']) && in_array($focus['htmlMode'], ['editor', 'html'])) {
             $lead       = $this->leadModel->getCurrentLead();
-            $tokenEvent = new TokenReplacementEvent($focus['html'], $lead, ['focus_id' => $fid]);
+            $tokenEvent = new TokenReplacementEvent($focus[$focus['htmlMode']], $lead, ['focus_id' => $fid]);
             $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
-            $focus['html'] = $tokenEvent->getContent();
+            $focus[$focus['htmlMode']] = $tokenEvent->getContent();
         }
 
         if ($preview) {

@@ -172,7 +172,7 @@ Mautic.focusOnLoad = function () {
             }
         });
 
-        mQuery('#focus_html').on('froalaEditor.contentChanged', function (e, editor) {
+        mQuery('#focus_editor').on('froalaEditor.contentChanged', function (e, editor) {
             mQuery('.mf-content').html(editor.html.get());
         });
     } else {

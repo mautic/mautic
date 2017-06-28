@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -79,30 +80,31 @@ class FocusType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'css',
-            'textarea',
-            [
-                'label' => 'mautic.focus.form.css',
-                'attr'  => [
-                    'class'  => 'form-control',
-                    'rows'   => 12,
-                    'onblur' => 'Mautic.focusUpdatePreview()',
-                ],
-                'required' => false,
-            ]
-        );
+        $builder->add('html_mode', 'button_group', [
+            'label'      => 'mautic.focus.form.html_mode',
+            'label_attr' => ['class' => 'control-label'],
+            'data'       => !empty($options['data']->getHtmlMode()) ? $options['data']->getHtmlMode() : 'basic',
+            'attr'       => [
+                'class'    => 'form-control',
+                'onchange' => 'Mautic.focusUpdatePreview()',
+            ],
+            'choice_list' => new ChoiceList(
+                ['basic', 'editor', 'html'],
+                ['mautic.focus.form.basic', 'mautic.focus.form.editor', 'mautic.focus.form.html']
+            ),
+        ]);
 
         $builder->add(
-            'html_mode',
-            'yesno_button_group',
+            'editor',
+            'textarea',
             [
-                'label' => 'mautic.focus.form.html_mode',
-                'data'  => $options['data']->getHtmlMode() ?: false,
-                'attr'  => [
-                    'tooltip'  => 'mautic.focus.form.html_mode.tooltip',
-                    'onchange' => 'Mautic.focusUpdatePreview()',
+                'label'      => 'mautic.focus.form.editor',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control editor editor-basic',
+                    'data-show-on' => '{"focus_html_mode_1":"checked"}',
                 ],
+                'required' => false,
             ]
         );
 
@@ -113,9 +115,10 @@ class FocusType extends AbstractType
                 'label'      => 'mautic.focus.form.html',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'        => 'form-control editor editor-basic',
+                    'class'        => 'form-control',
                     'rows'         => 12,
-                    'data-show-on' => '{"focus_html_mode_1":"checked"}',
+                    'data-show-on' => '{"focus_html_mode_2":"checked"}',
+                    'onchange'     => 'Mautic.focusUpdatePreview()',
                 ],
                 'required' => false,
             ]
