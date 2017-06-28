@@ -284,14 +284,14 @@ abstract class AbstractCommonModel
      * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
+     * @param array $utmTags
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [], $utmTags = [])
     {
         $url = $this->router->generate($route, $routeParams, $absolute);
         $url .= (!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '';
-
         return $url;
     }
 

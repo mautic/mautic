@@ -1354,7 +1354,7 @@ Mautic.initSlotListeners = function() {
             // remove new DEC if name is empty
             var dynConId = params.slot.attr('data-param-dec-id');
             dynConId = '#emailform_dynamicContent_'+dynConId;
-            if (Mautic.activeDEC.attr('id') === dynConId.substr(1)) {
+            if (Mautic.activeDEC && Mautic.activeDEC.attr('id') === dynConId.substr(1)) {
                 delete Mautic.activeDEC;
                 delete Mautic.activeDECParent;
             }

@@ -1681,6 +1681,14 @@ abstract class AbstractIntegration
                 }
             }
 
+            // Check that the remaining fields have an updateKey set
+            foreach ($mappedFields as $field => $mauticField) {
+                if (!isset($featureSettings[$updateKey][$field])) {
+                    // Assume it's mapped to Mautic
+                    $featureSettings[$updateKey][$field] = 1;
+                }
+            }
+
             // Check if required fields are missing
             $required = $this->getRequiredFields($integrationFields);
             if (array_diff_key($required, $mappedFields)) {
@@ -1795,7 +1803,7 @@ abstract class AbstractIntegration
                     continue;
                 }
                 $mauticKey = $leadFields[$integrationKey];
-                if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
+                if (isset($fields[$mauticKey]) && $fields[$mauticKey]['value'] !== '' && $fields[$mauticKey]['value'] !== null) {
                     $matched[$matchIntegrationKey] = $this->cleanPushData($fields[$mauticKey]['value'], (isset($field['type'])) ? $field['type'] : 'string');
                 }
             }
@@ -2464,8 +2472,9 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param array $leadsToSync
-     * @param bool  $error
+     * @param                 $leadsToSync
+     * @param                 $totalIgnored
+     * @param bool|\Exception $error
      *
      * @return int Number ignored due to being duplicates
      *
