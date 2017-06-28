@@ -501,10 +501,6 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
-        if ($fields = parent::getAvailableLeadFields($settings)) {
-            return $fields;
-        }
-
         $zohoFields        = [];
         $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
 
