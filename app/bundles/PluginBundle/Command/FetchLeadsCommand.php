@@ -73,23 +73,20 @@ class FetchLeadsCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        $translator  = $container->get('translator');
-        $integration = $input->getOption('integration');
-        $startDate   = $input->getOption('start-date');
-        $endDate     = $input->getOption('end-date');
-        $interval    = $input->getOption('time-interval');
-        $limit       = $input->getOption('limit');
-        $leads       = $contacts       = $processed       = 0;
+        $translator    = $container->get('translator');
+        $integration   = $input->getOption('integration');
+        $startDate     = $input->getOption('start-date');
+        $endDate       = $input->getOption('end-date');
+        $interval      = $input->getOption('time-interval');
+        $limit         = $input->getOption('limit');
+        $leadsExecuted = $contactsExecuted = null;
 
         if (!$interval) {
             $interval = '15 minutes';
         }
-        if (!$startDate) {
-            $startDate = date('c', strtotime('-'.$interval));
-        }
-        if (!$endDate) {
-            $endDate = date('c');
-        }
+        $startDate = !$startDate ? date('c', strtotime('-'.$interval)) : date('c', strtotime($startDate));
+        $endDate   = !$endDate ? date('c') : date('c', strtotime($endDate));
+
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $container->get('mautic.helper.integration');
@@ -102,47 +99,103 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $config['objects'] = [];
             }
 
-            $params['start'] = $startDate;
-            $params['end']   = $endDate;
-            $params['limit'] = $limit;
+            $params['start']  = $startDate;
+            $params['end']    = $endDate;
+            $params['limit']  = $limit;
+            $params['output'] = $output;
+
+            // set this constant to ensure that all contacts have the same date modified time and date synced time to prevent a pull/push loop
+            define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
+
             if (isset($supportedFeatures) && in_array('get_leads', $supportedFeatures)) {
                 if ($integrationObject !== null && method_exists($integrationObject, 'getLeads') && isset($config['objects'])) {
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
-                    if (strtotime($startDate) > strtotime('-30 days')) {
-                        if (in_array('Lead', $config['objects'])) {
-                            $processed = intval($integrationObject->getLeads($params, null, $leads, [], 'Lead'));
-                        }
-                        if (in_array('Contact', $config['objects'])) {
-                            $processed += intval($integrationObject->getLeads($params, null, $contacts, [], 'Contact'));
-                        }
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
-                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
+                    $updated = $created = $processed = 0;
+                    if (in_array('Lead', $config['objects'])) {
+                        $results = $integrationObject->getLeads($params, null, $leadsExecuted, [], 'Lead');
+                        if (is_array($results)) {
+                            list($justUpdated, $justCreated) = $results;
+                            $updated += intval($justUpdated);
+                            $created += intval($justCreated);
+                        } else {
+                            $processed += intval($results);
+                        }
+                        $output->writeln('');
+                    }
+                    if (in_array('Contact', $config['objects'])) {
+                        $results = $integrationObject->getLeads($params, null, $contactsExecuted, [], 'Contact');
+                        if (is_array($results)) {
+                            list($justUpdated, $justCreated) = $results;
+                            $updated += intval($justUpdated);
+                            $created += intval($justCreated);
+                        } else {
+                            $processed += intval($results);
+                        }
+                        $output->writeln('');
+                    }
 
-                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                    if ($processed) {
+                        $output->writeln(
+                            '<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.events_executed', ['%events%' => $processed])
+                            .'</comment>'."\n"
+                        );
                     } else {
-                        $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                        $output->writeln(
+                            '<comment>'.$translator->trans(
+                                'mautic.plugin.command.fetch.leads.events_executed_breakout',
+                                ['%updated%' => $updated, '%created%' => $created]
+                            )
+                            .'</comment>'."\n"
+                        );
                     }
                 }
             }
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects']) && in_array('company', $config['objects'])) {
+            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects'])
+                && in_array(
+                    'company',
+                    $config['objects']
+                )
+            ) {
+                $updated = $created = $processed = 0;
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
+                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
 
-                if (strtotime($startDate) > strtotime('-30 days')) {
-                    $processed = intval($integrationObject->getCompanies($params));
-
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
-
-                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed]).'</comment>'."\n");
+                $results = $integrationObject->getCompanies($params);
+                if (is_array($results)) {
+                    list($justUpdated, $justCreated) = $results;
+                    $updated += intval($justUpdated);
+                    $created += intval($justCreated);
                 } else {
-                    $output->writeln('<error>'.$translator->trans('mautic.plugin.command.fetch.leads.wrong.date').'</error>');
+                    $processed += intval($results);
+                }
+                $output->writeln('');
+                if ($processed) {
+                    $output->writeln(
+                        '<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed])
+                        .'</comment>'."\n"
+                    );
+                } else {
+                    $output->writeln(
+                        '<comment>'.$translator->trans(
+                            'mautic.plugin.command.fetch.companies.events_executed_breakout',
+                            ['%updated%' => $updated, '%created%' => $created]
+                        )
+                        .'</comment>'."\n"
+                    );
                 }
             }
 
             if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
-                $result = $integrationObject->pushLeads($params);
-                if (3 === count($result)) {
+                $result  = $integrationObject->pushLeads($params);
+                $ignored = 0;
+
+                if (4 === count($result)) {
+                    list($updated, $created, $errored, $ignored) = $result;
+                } elseif (3 === count($result)) {
                     list($updated, $created, $errored) = $result;
                 } else {
                     $errored                 = '?';
@@ -155,6 +208,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                             '%updated%' => $updated,
                             '%created%' => $created,
                             '%errored%' => $errored,
+                            '%ignored%' => $ignored,
                         ]
                     )
                     .'</comment>'."\n"

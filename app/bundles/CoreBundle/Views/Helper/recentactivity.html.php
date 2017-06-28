@@ -28,7 +28,7 @@
                 </div>
                 <div class="media-body">
                     <?php echo $view['translator']->trans('mautic.core.'.$log['action'].'.by.past.tense'); ?>
-                    <?php if (isset($log['userId']) && $log['userId']) : ?>
+                    <?php if (!empty($log['userId'])) : ?>
                         <a href="<?php echo $view['router']->path('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $log['userId']]); ?>" data-toggle="ajax">
                             <?php echo $log['userName']; ?>
                         </a>
