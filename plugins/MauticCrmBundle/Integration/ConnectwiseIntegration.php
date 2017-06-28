@@ -245,7 +245,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $cwFields = [];
 
         foreach ($fields as $fieldName => $field) {
-            if ($field['type'] == 'string' || $field['type'] == 'boolean') {
+            if ($field['type'] == 'string' || $field['type'] == 'boolean' || $field['type'] == 'ref') {
                 $cwFields[$fieldName] = [
                     'type'     => $field['type'],
                     'label'    => ucfirst($fieldName),
