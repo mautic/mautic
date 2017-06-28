@@ -11,22 +11,16 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Class CampaignEventLeadDeviceType.
  */
 class CampaignEventLeadDeviceType extends AbstractType
 {
-
     /**
      * {@inheritdoc}
      */
@@ -36,14 +30,14 @@ class CampaignEventLeadDeviceType extends AbstractType
             'device_type',
             'choice',
             [
-                'label'       => 'mautic.lead.campaign.event.device_type',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => true,
-                'choices'     => array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())),
-                'attr'        => [
-                    'class'   => 'form-control'
+                'label'      => 'mautic.lead.campaign.event.device_type',
+                'label_attr' => ['class' => 'control-label'],
+                'multiple'   => true,
+                'choices'    => array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames())),
+                'attr'       => [
+                    'class' => 'form-control',
                 ],
-                'required'    => false,
+                'required' => false,
             ]
         );
 
@@ -51,14 +45,14 @@ class CampaignEventLeadDeviceType extends AbstractType
             'device_brand',
             'choice',
             [
-                'label'       => 'mautic.lead.campaign.event.device_brand',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => true,
-                'choices'     =>  DeviceParser::$deviceBrands,
-                'attr'        => [
-                    'class'   => 'form-control'
+                'label'      => 'mautic.lead.campaign.event.device_brand',
+                'label_attr' => ['class' => 'control-label'],
+                'multiple'   => true,
+                'choices'    => DeviceParser::$deviceBrands,
+                'attr'       => [
+                    'class' => 'form-control',
                 ],
-                'required'    => false,
+                'required' => false,
             ]
         );
 
@@ -66,17 +60,16 @@ class CampaignEventLeadDeviceType extends AbstractType
             'device_os',
             'choice',
             [
-                'label'       => 'mautic.lead.campaign.event.device_os',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => true,
-                'choices'     => array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())),
-                'attr'        => [
-                    'class'   => 'form-control'
+                'label'      => 'mautic.lead.campaign.event.device_os',
+                'label_attr' => ['class' => 'control-label'],
+                'multiple'   => true,
+                'choices'    => array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())),
+                'attr'       => [
+                    'class' => 'form-control',
                 ],
-                'required'    => false,
+                'required' => false,
             ]
         );
-
     }
 
     /**
