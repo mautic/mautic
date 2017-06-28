@@ -152,7 +152,12 @@ class PipedriveIntegration extends CrmAbstractIntegration
     {
         $integrationFields = [];
 
-        if (!$this->isAuthorized() || !$object) {
+        /**
+         * $object as Array comes from clicking "Apply" button on Plugins Configuration form.
+         * I dont't know why its calling again pipedrive API to get fields which are already inside form...
+         * Also i have no idea why is trying to pass some strange object...
+         */
+        if (!$this->isAuthorized() || !$object || is_array($object)) {
             return $integrationFields;
         }
 
