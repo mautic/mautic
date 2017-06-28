@@ -301,15 +301,15 @@ class AjaxController extends CommonAjaxController
                 $queued  = $model->getQueuedCounts($email);
 
                 $data = [
-                    'success'     => 1,
-                    'pending'     => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
+                    'success' => 1,
+                    'pending' => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
                         'mautic.email.stat.leadcount',
                         ['%count%' => $pending]
                     ) : 0,
                     'queued'      => ($queued) ? $this->translator->trans('mautic.email.stat.queued', ['%count%' => $queued]) : 0,
                     'sentCount'   => $this->translator->trans('mautic.email.stat.sentcount', ['%count%' => $email->getSentCount(true)]),
                     'readCount'   => $this->translator->trans('mautic.email.stat.readcount', ['%count%' => $email->getReadCount(true)]),
-                    'readPercent' => $this->translator->trans('mautic.email.stat.readpercent', ['%count%' => $email->getReadPercentage(true)])
+                    'readPercent' => $this->translator->trans('mautic.email.stat.readpercent', ['%count%' => $email->getReadPercentage(true)]),
                 ];
             }
         }

@@ -1,10 +1,10 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved
+
+/*
+ * @package     Mautic
+ * @copyright   2017 Mautic Contributors. All rights reserved.
  * @author      Mautic
- *
  * @link        http://mautic.org
- *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Auto-generated Migration.
  */
-class Version20170303000000 extends AbstractMauticMigration
+class Version20170621082116 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
@@ -27,7 +27,7 @@ class Version20170303000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->getTable("{$this->prefix}audit_log")->hasIndex("{$this->prefix}date_added_index")) {
+        if ($schema->getTable("{$this->prefix}page_hits")->hasIndex("{$this->prefix}date_hit_left_index")) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -37,6 +37,6 @@ class Version20170303000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("CREATE INDEX {$this->prefix}date_added_index ON {$this->prefix}audit_log (date_added)");
+        $this->addSql("CREATE INDEX {$this->prefix}date_hit_left_index ON {$this->prefix}page_hits (date_hit, date_left)");
     }
 }
