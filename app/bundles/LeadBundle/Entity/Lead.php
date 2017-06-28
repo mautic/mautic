@@ -1358,6 +1358,15 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
+     * @param UtmTag $utmTag
+     */
+    public function removeUtmTagEntry(UtmTag $utmTag)
+    {
+        $this->changes['utmtags'] = ['removed', 'UtmTagID:'.$utmTag->getId()];
+        $this->utmtags->removeElement($utmTag);
+    }
+
+    /**
      * Set stage.
      *
      * @param \Mautic\StageBundle\Entity\Stage $stage
