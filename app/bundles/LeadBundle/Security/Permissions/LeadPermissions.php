@@ -114,12 +114,21 @@ class LeadPermissions extends AbstractPermissions
      */
     protected function getSynonym($name, $level)
     {
-        if ($name == 'fields') {
+        if ($name === 'fields') {
             //set some synonyms
             switch ($level) {
                 case 'publishown':
                 case 'publishother':
                     $level = 'full';
+                    break;
+            }
+        }
+
+        if ($name === 'lists') {
+            switch ($level) {
+                case 'view':
+                case 'viewown':
+                    $name = 'leads';
                     break;
             }
         }
