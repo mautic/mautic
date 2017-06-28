@@ -55,7 +55,7 @@ class LeadExport extends AbstractPipedrive
 
             return true;
         } catch (\Exception $e) {
-            $this->logIntegrationError($e);
+            $this->getIntegration()->logIntegrationError($e);
         }
 
         return false;
