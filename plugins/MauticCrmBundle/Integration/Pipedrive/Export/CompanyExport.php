@@ -77,7 +77,7 @@ class CompanyExport extends AbstractPipedrive
 
     public function delete(Company $company)
     {
-        $integrationEntity = $this->getCompanyIntegrationEntity(['internalEntityId' => $company->deletedId]);
+        $integrationEntity = $this->getCompanyIntegrationEntity(['internalEntityId' => $company->getId()]);
 
         if (!$integrationEntity) {
             return true; // company doesn't have integration

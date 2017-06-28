@@ -50,8 +50,8 @@ class CompanySubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
-            LeadEvents::COMPANY_POST_DELETE => ['onCompanyPostDelete', 0],
+            LeadEvents::COMPANY_POST_SAVE  => ['onCompanyPostSave', 0],
+            LeadEvents::COMPANY_PRE_DELETE => ['onCompanyPreDelete', 10],
         ];
     }
 
@@ -73,7 +73,7 @@ class CompanySubscriber extends CommonSubscriber
     /**
      * @param Events\LeadEvent $event
      */
-    public function onCompanyPostDelete(Events\CompanyEvent $event)
+    public function onCompanyPreDelete(Events\CompanyEvent $event)
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
