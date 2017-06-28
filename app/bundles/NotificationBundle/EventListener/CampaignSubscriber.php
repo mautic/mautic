@@ -181,7 +181,8 @@ class CampaignSubscriber extends CommonSubscriber
                 [
                     'notification' => $notification->getId(),
                     'lead'         => $lead->getId(),
-                ]
+                ],
+                $notification
             );
         }
 

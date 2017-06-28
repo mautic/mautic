@@ -360,10 +360,35 @@ class SalesforceApi extends CrmApi
     public function getCampaignMembers($campaignId)
     {
         $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
-        $queryUrl             = $this->integration->getQueryUrl();
-        $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $queryUrl);
+        $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $this->integration->getQueryUrl());
 
         return $result;
+    }
+
+    /**
+     * @param       $campaignId
+     * @param       $object
+     * @param array $presonIds
+     *
+     * @return array
+     */
+    public function checkCampaignMembership($campaignId, $object, array $people)
+    {
+        $campaignMembers = [];
+        if (!empty($people)) {
+            $idField = "{$object}Id";
+            $query   = "Select Id, $idField from CampaignMember where CampaignId = '".$campaignId
+                ."' and $idField in ('".implode("','", $people)."')";
+
+            $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', false, null, $this->integration->getQueryUrl());
+            if (!empty($foundCampaignMembers['records'])) {
+                foreach ($foundCampaignMembers['records'] as $member) {
+                    $campaignMembers[$member[$idField]] = $member[$idField];
+                }
+            }
+        }
+
+        return $campaignMembers;
     }
 
     /**

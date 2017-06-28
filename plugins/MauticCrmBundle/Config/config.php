@@ -97,6 +97,11 @@ return [
                 'arguments' => [
                 ],
             ],
+            'mautic.integration.connectwise' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::class,
+                'arguments' => [
+                ],
+            ],
         ],
         'other' => [
             'mautic_integration.pipedrive.guzzle.client' => [

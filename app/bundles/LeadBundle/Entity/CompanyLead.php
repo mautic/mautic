@@ -37,17 +37,21 @@ class CompanyLead
     /**
      * @var bool
      */
+    private $primary = false;
+
+    /**
+     * @deprecated 2.9 to be removed in 3.0
+     *
+     * @var bool
+     */
     private $manuallyRemoved = false;
 
     /**
+     * @deprecated 2.9 to be removed in 3.0
+     *
      * @var bool
      */
     private $manuallyAdded = false;
-
-    /**
-     * @var bool
-     */
-    private $primary = false;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -68,16 +72,17 @@ class CompanyLead
 
         $builder->addDateAdded();
 
+        $builder->createField('primary', 'boolean')
+            ->columnName('is_primary')
+            ->build();
+
+        // @deprecated 2.9 to be removed in 3.0
         $builder->createField('manuallyRemoved', 'boolean')
             ->columnName('manually_removed')
             ->build();
 
         $builder->createField('manuallyAdded', 'boolean')
             ->columnName('manually_added')
-            ->build();
-
-        $builder->createField('primary', 'boolean')
-            ->columnName('is_primary')
             ->build();
     }
 
@@ -138,54 +143,6 @@ class CompanyLead
     }
 
     /**
-     * @return bool
-     */
-    public function getManuallyRemoved()
-    {
-        return $this->manuallyRemoved;
-    }
-
-    /**
-     * @param bool $manuallyRemoved
-     */
-    public function setManuallyRemoved($manuallyRemoved)
-    {
-        $this->manuallyRemoved = $manuallyRemoved;
-    }
-
-    /**
-     * @return bool
-     */
-    public function wasManuallyRemoved()
-    {
-        return $this->manuallyRemoved;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getManuallyAdded()
-    {
-        return $this->manuallyAdded;
-    }
-
-    /**
-     * @param bool $manuallyAdded
-     */
-    public function setManuallyAdded($manuallyAdded)
-    {
-        $this->manuallyAdded = $manuallyAdded;
-    }
-
-    /**
-     * @return bool
-     */
-    public function wasManuallyAdded()
-    {
-        return $this->manuallyAdded;
-    }
-
-    /**
      * @param bool $primary
      */
     public function setPrimary($primary)
@@ -200,4 +157,66 @@ class CompanyLead
     {
         return $this->primary;
     }
+
+
+    /**
+     * @deprecatd 2.9 to be removed in 3.0
+     *
+     * @return bool
+     */
+    public function getManuallyRemoved()
+    {
+        return $this->manuallyRemoved;
+    }
+
+    /**
+     * @deprecatd 2.9 to be removed in 3.0
+     *
+     * @param bool $manuallyRemoved
+     */
+    public function setManuallyRemoved($manuallyRemoved)
+    {
+        $this->manuallyRemoved = $manuallyRemoved;
+    }
+
+    /**
+     * @deprecatd 2.9 to be removed in 3.0
+     *
+     * @return bool
+     */
+    public function wasManuallyRemoved()
+    {
+        return $this->manuallyRemoved;
+    }
+
+    /**
+     * @deprecatd 2.9 to be removed in 3.0
+     *
+     * @return bool
+     */
+    public function getManuallyAdded()
+    {
+        return $this->manuallyAdded;
+    }
+
+    /**
+     * @deprecatd 2.9 to be removed in 3.0
+     *
+     * @param bool $manuallyAdded
+     */
+    public function setManuallyAdded($manuallyAdded)
+    {
+        $this->manuallyAdded = $manuallyAdded;
+    }
+
+    /**
+     * @deprecatd 2.9 to be removed in 3.0
+     *
+     * @return bool
+     */
+    public function wasManuallyAdded()
+    {
+        return $this->manuallyAdded;
+    }
+
 }
