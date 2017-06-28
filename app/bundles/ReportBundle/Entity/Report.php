@@ -271,7 +271,7 @@ class Report extends FormEntity
     /**
      * Get columns.
      *
-     * @return string
+     * @return array
      */
     public function getColumns()
     {
@@ -296,7 +296,7 @@ class Report extends FormEntity
     /**
      * Get filters.
      *
-     * @return string
+     * @return array
      */
     public function getFilters()
     {

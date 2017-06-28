@@ -403,6 +403,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 break;
 
                             case 'string':
+                            case 'email':
                                 switch ($exprFunction) {
                                     case 'startsWith':
                                         $exprFunction    = 'like';
