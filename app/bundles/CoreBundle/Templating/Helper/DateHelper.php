@@ -206,8 +206,13 @@ class DateHelper extends Helper
                     $formated[] = $this->translator->transChoice(
                         'mautic.core.date.'.$unit,
                         $range->{$key},
-                        ['%count%' => $range->{$key}]);
+                        ['%count%' => $range->{$key}]
+                    );
                 }
+            }
+
+            if (empty($formated)) {
+                return $this->translator->trans('mautic.core.date.less.than.second');
             }
 
             return implode(' ', $formated);

@@ -632,6 +632,8 @@ class ListModel extends FormModel
                         'include' => [
                             '=',
                             '!=',
+                            'empty',
+                            '!empty',
                         ],
                     ]
                 ),
