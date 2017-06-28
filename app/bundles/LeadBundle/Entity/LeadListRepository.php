@@ -453,7 +453,10 @@ class LeadListRepository extends CommonRepository
                     $expr = $this->generateSegmentExpression($filters, $parameters, $sq, $q);
 
                     if ($this->hasCompanyFilter || $expr->count()) {
-                        $sq->andWhere($expr);
+                        if ($expr->count()) {
+                            $sq->andWhere($expr);
+                        }
+
                         $mainExpr->add(
                             sprintf('l.id NOT IN (%s)', $sq->getSQL())
                         );
@@ -585,27 +588,40 @@ class LeadListRepository extends CommonRepository
         }
 
         foreach ($parameters as $k => $v) {
-            switch (true) {
-                case is_bool($v):
-                    $paramType = 'boolean';
-                    break;
-
-                case is_int($v):
-                    $paramType = 'integer';
-                    break;
-
-                case is_float($v):
-                    $paramType = 'float';
-                    break;
-
-                default:
-                    $paramType = null;
-                    break;
-            }
-            $parameterQ->setParameter($k, $v, $paramType);
+            $parameterQ->setParameter($k, $v, $this->getTypeNameFromValue($v));
         }
 
         return $expr;
+    }
+
+    /**
+     * Returns string name of the value type.
+     *
+     * @param mixed $value
+     *
+     * @return string|null
+     */
+    public function getTypeNameFromValue($value)
+    {
+        switch (true) {
+            case is_bool($value):
+                $type = 'boolean';
+                break;
+
+            case is_int($value):
+                $type = 'integer';
+                break;
+
+            case is_float($value):
+                $type = 'float';
+                break;
+
+            default:
+                $type = null;
+                break;
+        }
+
+        return $type;
     }
 
     /**
