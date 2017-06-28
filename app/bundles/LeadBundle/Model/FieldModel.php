@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -133,6 +135,11 @@ class FieldModel extends FormModel
             'type'     => 'url',
             'listable' => true,
             'object'   => 'lead',
+        ],
+        'points' => [
+            'type'   => 'number',
+            'fixed'  => true,
+            'object' => 'lead',
         ],
         'facebook' => [
             'listable' => true,
@@ -265,6 +272,11 @@ class FieldModel extends FormModel
     protected $schemaHelperFactory;
 
     /**
+     * @var array
+     */
+    protected $uniqueIdentifierFields = [];
+
+    /**
      * FieldModel constructor.
      *
      * @param SchemaHelperFactory $schemaHelperFactory
@@ -379,45 +391,61 @@ class FieldModel extends FormModel
             $entity->setIsListable(false);
         }
 
-        $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-        $this->getRepository()->saveEntity($entity);
-        $this->dispatchEvent('post_save', $entity, $isNew, $event);
-
         $isUnique = $entity->getIsUniqueIdentifier();
 
-        if ($entity->getId()) {
-            //create the field as its own column in the leads table
-            $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
-            if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
-                $schemaDefinition = self::getSchemaDefinition($alias, $entity->getType(), $isUnique);
-                $leadsSchema->addColumn(
-                    $schemaDefinition
-                );
+        //create the field as its own column in the leads table
+        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
+        if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
+            $schemaDefinition = self::getSchemaDefinition($alias, $type, $isUnique);
+            $leadsSchema->addColumn(
+                $schemaDefinition
+            );
+
+            try {
                 $leadsSchema->executeChanges();
+                $isCreated = true;
+            } catch (DriverException $e) {
+                $this->logger->addWarning($e->getMessage());
+                if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
+                    $isCreated = false;
+                    throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
+                } else {
+                    throw $e;
+                }
+            }
 
-                // Update the unique_identifier_search index and add an index for this field
-                /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-                $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
-                if ('string' == $schemaDefinition['type']) {
-                    try {
-                        $modifySchema->addIndex([$alias], $alias.'_search');
-                        $modifySchema->allowColumn($alias);
-                        if ($isUnique) {
-                            // Get list of current uniques
-                            $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
+            if ($isCreated === true) {
+                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
+                $this->getRepository()->saveEntity($entity);
+                $this->dispatchEvent('post_save', $entity, $isNew, $event);
+            }
 
-                            // Always use email
-                            $indexColumns   = ['email'];
-                            $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                            $indexColumns[] = $alias;
+            // Update the unique_identifier_search index and add an index for this field
+            /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
+            $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
+            if ('string' == $schemaDefinition['type']) {
+                try {
+                    $modifySchema->addIndex([$alias], $alias.'_search');
+                    $modifySchema->allowColumn($alias);
+                    if ($isUnique) {
+                        // Get list of current uniques
+                        $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
 
-                            // Only use three to prevent max key length errors
-                            $indexColumns = array_slice($indexColumns, 0, 3);
-                            $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
-                        }
-                        $modifySchema->executeChanges();
-                    } catch (\Exception $e) {
+                        // Always use email
+                        $indexColumns   = ['email'];
+                        $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
+                        $indexColumns[] = $alias;
+
+                        // Only use three to prevent max key length errors
+                        $indexColumns = array_slice($indexColumns, 0, 3);
+                        $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
+                    }
+                    $modifySchema->executeChanges();
+                } catch (DriverException $e) {
+                    if ($e->getErrorCode() === 1069 /* ER_TOO_MANY_KEYS */) {
                         $this->logger->addWarning($e->getMessage());
+                    } else {
+                        throw $e;
                     }
                 }
             }
@@ -804,23 +832,28 @@ class FieldModel extends FormModel
      */
     public function getUniqueIdentiferFields($filters = [])
     {
+        return $this->getUniqueIdentifierFields($filters);
+    }
+
+    /**
+     * Retrieves a list of published fields that are unique identifers.
+     *
+     * @param array $filters
+     *
+     * @return mixed
+     */
+    public function getUniqueIdentifierFields($filters = [])
+    {
         $filters['isPublished']       = isset($filters['isPublished']) ? $filters['isPublished'] : true;
         $filters['isUniqueIdentifer'] = isset($filters['isUniqueIdentifer']) ? $filters['isUniqueIdentifer'] : true;
         $filters['object']            = isset($filters['object']) ? $filters['object'] : 'lead';
 
-        $fields = $this->getFieldList(false, true, $filters);
+        $key = base64_encode(json_encode($filters));
+        if (!isset($this->uniqueIdentifierFields[$key])) {
+            $this->uniqueIdentifierFields[$key] = $this->getFieldList(false, true, $filters);
+        }
 
-        return $fields;
-    }
-
-    /**
-     * Wrapper for misspelled getUniqueIdentiferFields.
-     *
-     * @return array
-     */
-    public function getUniqueIdentifierFields($filters = [])
-    {
-        return $this->getUniqueIdentiferFields($filters);
+        return $this->uniqueIdentifierFields[$key];
     }
 
     /**

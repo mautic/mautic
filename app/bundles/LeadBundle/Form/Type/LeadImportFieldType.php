@@ -241,17 +241,27 @@ class LeadImportFieldType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'buttons',
-            'form_buttons',
-            [
-                'apply_text'  => false,
+        $buttons = ['cancel_icon' => 'fa fa-times'];
+
+        if (empty($options['line_count_limit'])) {
+            $buttons = array_merge($buttons, [
+                'apply_text'  => 'mautic.lead.import.in.background',
+                'apply_class' => 'btn btn-success',
+                'apply_icon'  => 'fa fa-history',
                 'save_text'   => 'mautic.lead.import.start',
                 'save_class'  => 'btn btn-primary',
-                'save_icon'   => 'fa fa-user-plus',
-                'cancel_icon' => 'fa fa-times',
-            ]
-        );
+                'save_icon'   => 'fa fa-upload',
+            ]);
+        } else {
+            $buttons = array_merge($buttons, [
+                'apply_text' => false,
+                'save_text'  => 'mautic.lead.import',
+                'save_class' => 'btn btn-primary',
+                'save_icon'  => 'fa fa-upload',
+            ]);
+        }
+
+        $builder->add('buttons', 'form_buttons', $buttons);
     }
 
     /**
@@ -260,6 +270,7 @@ class LeadImportFieldType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setRequired(['lead_fields', 'import_fields']);
+        $resolver->setDefaults(['line_count_limit' => 0]);
     }
 
     /**
