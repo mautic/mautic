@@ -80,7 +80,7 @@ class LeadDeviceRepository extends CommonRepository
 
         if ($deviceBrands !== null) {
             if (!is_array($deviceBrands)) {
-                $deviceBrands[] = $deviceBrands;
+                $deviceBrands = [$deviceBrands];
             }
             foreach ($deviceBrands as $key => $deviceBrand) {
                 $sq->andWhere(
@@ -92,7 +92,7 @@ class LeadDeviceRepository extends CommonRepository
 
         if ($deviceModels !== null) {
             if (!is_array($deviceModels)) {
-                $deviceModels[] = $deviceModels;
+                $deviceModels = [$deviceModels];
             }
             foreach ($deviceModels as $key => $deviceModel) {
                 $sq->andWhere(
@@ -104,7 +104,7 @@ class LeadDeviceRepository extends CommonRepository
 
         if ($deviceOss !== null) {
             if (!is_array($deviceOss)) {
-                $deviceOss[] = $deviceOss;
+                $deviceOss = [$deviceOss];
             }
             foreach ($deviceOss as $key => $deviceOs) {
                 $sq->andWhere(

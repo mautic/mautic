@@ -369,16 +369,21 @@ class CampaignSubscriber extends CommonSubscriber
             $deviceOs     = $event->getConfig()['device_os'];
 
             if (!empty($deviceType)) {
+                $result = false;
                 if (!empty($deviceRepo->getDevice($lead, $deviceType))) {
                     $result = true;
                 }
             }
-            if (!$result && !empty($deviceBrands)) {
+
+            if (!empty($deviceBrands)) {
+                $result = false;
                 if (!empty($deviceRepo->getDevice($lead, null, $deviceBrands))) {
                     $result = true;
                 }
             }
-            if (!$result && !empty($deviceOs)) {
+
+            if (!empty($deviceOs)) {
+                $result = false;
                 if (!empty($deviceRepo->getDevice($lead, null, null, null, $deviceOs))) {
                     $result = true;
                 }
