@@ -11,6 +11,7 @@
 if (!isset($preview)) {
     $preview = false;
 }
+
 ob_start();
 ?>
 .mf-bar-iframe {
