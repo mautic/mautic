@@ -134,38 +134,22 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                                 <?php echo $view['form']->widget($form['assetAttachments']); ?>
                             </div>
                         </div>
+
                         <br>
-                        <br>
-                        <fieldset>
-                            <legend><?php echo $view['translator']->trans('mautic.email.utm_tags');?></legend>
-                            <div class="row">
-                                <?php
-                                foreach ($form['utmTags'] as $i => $utmTag) {
-                                    ?>
-                                    <div class="form-group col-md-6">
-                                        <?php echo $view['form']->label($utmTag); ?>
-                                        <?php echo $view['form']->widget($utmTag); ?>
-                                    </div>
-                                    <?php
-                                }
-                                ?>
-                            </div>
-                        </fieldset>
-                        <br>
-                        <fieldset>
-                            <legend><?php echo $view['translator']->trans('mautic.email.form.plaintext');?></legend>
-                            <p>
-                                <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
-                                <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
-                            </p>
                         <div class="row">
                             <div class="col-md-12">
+                                <div class="pull-left">
+                                    <?php echo $view['form']->label($form['plainText']); ?>
+                                </div>
+                                <div class="text-right pr-10">
+                                    <i class="fa fa-spinner fa-spin ml-2 plaintext-spinner hide"></i>
+                                    <a class="small" onclick="Mautic.autoGeneratePlaintext();"><?php echo $view['translator']->trans('mautic.email.plaintext.generate'); ?></a>
+                                </div>
+                                <div class="clearfix"></div>
                                 <?php echo $view['form']->widget($form['plainText']); ?>
                             </div>
                         </div>
-                            </fieldset>
                     </div>
-
                     <div class="tab-pane fade bdr-w-0" id="dynamic-content-container">
                         <div class="row">
                             <div class="col-md-12">
@@ -228,6 +212,13 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
             <?php endif; ?>
 
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
+
+            <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+            <?php
+            foreach ($form['utmTags'] as $i => $utmTag):
+                echo $view['form']->row($utmTag);
+            endforeach;
+            ?>
         </div>
         <div class="hide">
             <?php echo $view['form']->rest($form); ?>

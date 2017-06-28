@@ -67,22 +67,6 @@ $integrationSettings = $integration->getIntegrationSettings()->getFeatureSetting
                                 <?php echo $view['form']->row($form['message']); ?>
                             </div>
                         </div>
-                        <br>
-                        <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
-                        <br>
-                        <div class="row">
-                            <?php
-                            foreach ($form['utmTags'] as $i => $utmTag) {
-                                ?>
-                                <div class="form-group col-md-6">
-                                    <?php echo $view['form']->label($utmTag); ?>
-                                    <?php echo $view['form']->widget($utmTag); ?>
-                                </div>
-                                <?php
-
-                            }
-                            ?>
-                        </div>
                     </div>
                     <div class="tab-pane fade in bdr-w-0" id="data-notification-container">
                         <div class="row">
@@ -100,11 +84,17 @@ $integrationSettings = $integration->getIntegrationSettings()->getFeatureSetting
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
+
+            <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+            <?php
+            foreach ($form['utmTags'] as $i => $utmTag):
+                echo $view['form']->row($utmTag);
+            endforeach;
+            ?>
             <div class="hide">
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
-
                 <?php echo $view['form']->rest($form); ?>
             </div>
         </div>
