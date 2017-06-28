@@ -30,14 +30,15 @@ class CompanyLeadRepository extends CommonRepository
             $contacts[$contactId] = $contactId;
             $entity->setPrimary(true);
         }
+        if ($contactId) {
+            $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+                ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
+                ->set('is_primary', 0);
 
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->update(MAUTIC_TABLE_PREFIX.'companies_leads')
-            ->set('is_primary', 0);
-
-        $qb->where(
-            $qb->expr()->in('lead_id', $contactId)
-        )->execute();
+            $qb->where(
+                $qb->expr()->in('lead_id', $contactId)
+            )->execute();
+        }
 
         return parent::saveEntities($entities);
     }
