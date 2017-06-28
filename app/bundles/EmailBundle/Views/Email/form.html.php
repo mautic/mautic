@@ -212,8 +212,9 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
             <?php endif; ?>
 
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
-
+            <hr />
             <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+            <br />
             <?php
             foreach ($form['utmTags'] as $i => $utmTag):
                 echo $view['form']->row($utmTag);
