@@ -114,6 +114,11 @@ class ZohoIntegration extends CrmAbstractIntegration
         return ['push_lead', 'get_leads', 'push_leads'];
     }
 
+    /**
+     * @param $rows
+     *
+     * @return array
+     */
     protected function formatZohoData($rows)
     {
         if (isset($rows['FL'])) {
