@@ -49,7 +49,9 @@ Mautic.emailOnUnload = function(id) {
         delete Mautic.listCompareChart;
     }
 
-    delete Mautic.ajaxActionXhrQueue['email:getEmailCountStats'];
+    if (typeof Mautic.ajaxActionXhrQueue !== 'undefined') {
+        delete Mautic.ajaxActionXhrQueue['email:getEmailCountStats'];
+    }
 };
 
 Mautic.insertEmailBuilderToken = function(editorId, token) {
