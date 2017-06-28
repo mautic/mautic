@@ -416,7 +416,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         if (is_array($record)) {
                             $id            = $record['id'];
                             $formattedData = $this->amendLeadDataBeforeMauticPopulate($record, $object);
-                            $entity        = ($object == 'Contact') ? $this->getMauticLead($formattedData) : $this->getMauticCompany($formattedData);
+                            $entity        = ($object == 'Contact') ? $this->getMauticLead($formattedData) : $this->getMauticCompany($formattedData, 'company');
                             if ($entity) {
                                 $integrationEntities[] = $this->saveSyncedData($entity, $object, $mauticReferenceObject, $id);
                                 $this->em->detach($entity);
@@ -578,6 +578,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if ($e instanceof ApiErrorException) {
                 $e->setContact($lead);
             }
+            $this->logIntegrationError($e);
         }
 
         return false;
@@ -657,4 +658,44 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         return $matched;
     }
+    /**
+     * @param       $fieldsToUpdate
+     * @param array $objects
+     *
+     * @return array
+     */
+    protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
+    {
+        if (null === $objects) {
+            $objects = ['Leads', 'Contacts'];
+        }
+        if (isset($fieldsToUpdate['leadFields']) && is_array($objects)) {
+            // Pass in the whole config
+            $fields = $fieldsToUpdate['leadFields'];
+        } else {
+            $fields = array_flip($fieldsToUpdate);
+        }
+
+        $fieldsToUpdate = $this->prepareFieldsForSync($fields, $fieldsToUpdate, $objects);
+
+        return $fieldsToUpdate;
+    }
+     /**
+      * @param        $config
+      * @param null   $object
+      * @param string $priorityObject
+      *
+      * @return mixed
+      */
+     protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
+     {
+         if ($object == 'company') {
+             $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');
+             $fields   = array_intersect_key($config['companyFields'], $priority);
+         } else {
+             $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
+         }
+
+         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
+     }
 }
