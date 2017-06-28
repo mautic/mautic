@@ -17,6 +17,9 @@
         <testsuite name="Project Test Suite">
             <directory>bundles/*Bundle/Tests</directory>
         </testsuite>
+        <testsuite name="Plugin tests">
+            <directory>./../plugins/*Bundle/Tests</directory>
+        </testsuite>
     </testsuites>
 
     <!-- Set these in your phpunit.xml to your local test db
