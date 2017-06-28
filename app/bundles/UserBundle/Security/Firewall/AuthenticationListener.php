@@ -205,6 +205,6 @@ class AuthenticationListener implements ListenerInterface
 
         $token->setUser($user);
 
-        $this->tokenStorage->setToken($user);
+        $this->tokenStorage->setToken($token);
     }
 }
