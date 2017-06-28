@@ -199,6 +199,8 @@ $container->loadFromExtension('framework', [
     )*/
 ]);
 
+$container->setParameter('mautic.famework.csrf_protection', true);
+
 //Doctrine Configuration
 $dbalSettings = [
     'driver'   => '%mautic.db_driver%',
