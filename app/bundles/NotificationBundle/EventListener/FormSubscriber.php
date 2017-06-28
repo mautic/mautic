@@ -144,7 +144,8 @@ class FormSubscriber extends CommonSubscriber
                 [
                     'notification' => $notification->getId(),
                     'lead'         => $lead->getId(),
-                ]
+                ],
+                $notification
             );
         }
 

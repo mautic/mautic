@@ -85,11 +85,11 @@ abstract class AbstractNotificationApi
      *
      * @return string
      */
-    public function convertToTrackedUrl($url, array $clickthrough = [])
+    public function convertToTrackedUrl($url, array $clickthrough, Notification $notification)
     {
         /* @var \Mautic\PageBundle\Entity\Redirect $redirect */
         $trackable = $this->trackableModel->getTrackableByUrl($url, 'notification', $clickthrough['notification']);
 
-        return $this->trackableModel->generateTrackableUrl($trackable, $clickthrough);
+        return $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, [], $notification->getUtmTags());
     }
 }
