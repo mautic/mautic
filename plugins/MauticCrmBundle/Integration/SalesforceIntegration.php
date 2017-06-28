@@ -627,8 +627,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 );
 
                 $personFound = false;
+                $personData  = [];
                 foreach (['Contact', 'Lead'] as $object) {
-                    $personData = [];
                     if (!empty($existingPersons[$object])) {
                         $personFound = true;
                         if (!empty($mappedData[$object]['update'])) {
@@ -657,7 +657,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                return (isset($personData) && !empty($personData['Id'])) ? $personData['Id'] : false;
+                // Return success if any Contact or Lead was updated or created
+                return (!empty($personData['Id'])) ? $personData['Id'] : false;
             }
         } catch (\Exception $e) {
             if ($e instanceof ApiErrorException) {
