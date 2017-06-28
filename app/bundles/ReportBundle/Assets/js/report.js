@@ -29,6 +29,7 @@ Mautic.reportOnLoad = function (container) {
             })
         })
     }
+    Mautic.updateReportGlueTriggers();
     Mautic.checkSelectedGroupBy();
     Mautic.initDateRangePicker();
 };
@@ -43,8 +44,10 @@ Mautic.addReportRow = function (elId) {
     // Fetch the index
     var index = parseInt(prototypeHolder.attr('data-index'));
     if (!index) {
-        index = 1;
+        index = 0;
     }
+
+    index++;
 
     // Fetch the prototype markup
     var prototype = prototypeHolder.data('prototype');
@@ -53,7 +56,7 @@ Mautic.addReportRow = function (elId) {
     var output = prototype.replace(/__name__/g, index);
 
     // Increase the index for the next row
-    prototypeHolder.attr('data-index', index + 1);
+    prototypeHolder.attr('data-index', index);
 
     // Render the new row
     prototypeHolder.append(output);
@@ -65,10 +68,14 @@ Mautic.addReportRow = function (elId) {
             mQuery(newColumnId).html(Mautic.reportPrototypeFilterOptions);
         }
 
+        // Add `in-group` class by default
+        mQuery('#report_filters_' + index + '_container').addClass('in-group');
+
         mQuery(newColumnId).on('change', function () {
             Mautic.updateReportFilterValueInput(this);
         });
         Mautic.updateReportFilterValueInput(newColumnId);
+        Mautic.updateReportGlueTriggers();
     } else if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
         // Update the column options if applicable
         mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions);
@@ -77,6 +84,22 @@ Mautic.addReportRow = function (elId) {
     Mautic.activateChosenSelect(mQuery('#' + elId + '_' + index + '_column'));
     mQuery("#" + elId + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
 
+};
+
+Mautic.updateReportGlueTriggers = function () {
+    var filterContainer = mQuery('#report_filters');
+    var glueEl = filterContainer.find('.filter-glue');
+
+    glueEl.off('change');
+    glueEl.on('change', function () {
+        var $this = mQuery(this);
+
+        if ($this.val() === 'and') {
+            $this.parents('.panel').addClass('in-group');
+        } else {
+            $this.parents('.panel').removeClass('in-group');
+        }
+    });
 };
 
 Mautic.updateReportFilterValueInput = function (filterColumn, setup) {

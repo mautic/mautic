@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\PluginEvents;
 
 /**
@@ -75,26 +76,44 @@ class CampaignSubscriber extends CommonSubscriber
 
         $integration             = (!empty($config['integration'])) ? $config['integration'] : null;
         $integrationCampaign     = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
-        $integrationMemberStatus = (!empty($config['campaign_member_status']['campaign_member_status'])) ? $config['campaign_member_status']['campaign_member_status'] : null;
-        $feature                 = (!empty($integration) && empty($integrationCampaign)) ? 'push_lead' : 'push_to_campaign';
+        $integrationMemberStatus = (!empty($config['campaign_member_status']['campaign_member_status']))
+            ? $config['campaign_member_status']['campaign_member_status'] : null;
+        $services                = $this->integrationHelper->getIntegrationObjects($integration);
+        $success                 = true;
+        $errors                  = [];
 
-        $services = $this->integrationHelper->getIntegrationObjects($integration);
-        $success  = false;
+        /**
+         * @var
+         * @var AbstractIntegration $s
+         */
         foreach ($services as $name => $s) {
             $settings = $s->getIntegrationSettings();
             if (!$settings->isPublished()) {
                 continue;
             }
-            if (method_exists($s, 'pushLead') && $feature == 'push_lead') {
-                if ($s->pushLead($lead, $config)) {
-                    $success = true;
+
+            $personIds = null;
+            if (method_exists($s, 'pushLead')) {
+                if (!$personIds = $s->resetLastIntegrationError()->pushLead($lead, $config)) {
+                    $success = false;
+                    if ($error = $s->getLastIntegrationError()) {
+                        $errors[] = $error;
+                    }
                 }
             }
-            if (method_exists($s, 'pushLeadToCampaign') && $feature == 'push_to_campaign') {
-                if ($s->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus)) {
-                    $success = true;
+
+            if ($success && $integrationCampaign && method_exists($s, 'pushLeadToCampaign')) {
+                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus, $personIds)) {
+                    $success = false;
+                    if ($error = $s->getLastIntegrationError()) {
+                        $errors[] = $error;
+                    }
                 }
             }
+        }
+
+        if (count($errors)) {
+            $event->setFailed(implode('<br />', $errors));
         }
 
         return $event->setResult($success);

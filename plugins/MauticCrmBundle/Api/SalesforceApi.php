@@ -15,6 +15,7 @@ class SalesforceApi extends CrmApi
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
+    protected $apiRequestCounter = 0;
 
     public function __construct(CrmAbstractIntegration $integration)
     {
@@ -42,18 +43,23 @@ class SalesforceApi extends CrmApi
         if (!$object) {
             $object = $this->object;
         }
-        $notificactionModel = $this->integration->getNotificationModel();
-        if (!$queryUrl) {
-            $queryUrl   = $this->integration->getApiUrl();
-            $requestUrl = sprintf($queryUrl.'/%s/%s', $object, $operation);
-        } else {
-            $requestUrl = sprintf($queryUrl.'/%s', $operation);
+
+        $requestUrl = (!$queryUrl) ? sprintf($this->integration->getApiUrl().'/%s/%s', $object, $operation) : sprintf($queryUrl.'/%s', $operation);
+        $settings   = $this->requestSettings;
+        if ($method == 'PATCH') {
+            $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
-        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $this->requestSettings);
+        if (isset($queryUrl)) {
+            // Query commands can have long wait time while SF builds response as the offset increases
+            $settings['request_timeout'] = 300;
+        }
+
+        // Wrap in a isAuthorized to refresh token if applicable
+        $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
+        ++$this->apiRequestCounter;
 
         if (!empty($response['errors'])) {
-            $notificactionModel->addNotification(implode(', ', $response['errors']), 'Salesforce', false, $this->integration->getName().':');
             throw new ApiErrorException(implode(', ', $response['errors']));
         } elseif (is_array($response)) {
             $errors = [];
@@ -64,11 +70,12 @@ class SalesforceApi extends CrmApi
                         $refreshError = $this->integration->authCallback(['use_refresh_token' => true]);
 
                         if (empty($refreshError)) {
-                            return $this->request($operation, $elementData, $method, true);
+                            return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
+                        } else {
+                            $errors[] = $refreshError;
                         }
                     }
                     $errors[] = $r['message'];
-                    $notificactionModel->addNotification($r['message'], 'Salesforce', false, $this->integration->getName().':');
                 }
             }
 
@@ -95,6 +102,42 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public function getPerson(array $data)
+    {
+        $config    = $this->integration->mergeConfigToFeatureSettings([]);
+        $queryUrl  = $this->integration->getQueryUrl();
+        $sfRecords = [
+            'Contact' => [],
+            'Lead'    => [],
+        ];
+
+        //try searching for lead as this has been changed before in updated done to the plugin
+        if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
+            $findContact = 'select Id from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
+            $response    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+
+            if (!empty($response['records'])) {
+                $sfRecords['Contact'] = $response['records'];
+            }
+        }
+
+        if (!empty($data['Lead']['Email'])) {
+            $findLead = 'select Id from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
+            $response = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+
+            if (!empty($response['records'])) {
+                $sfRecords['Lead'] = $response['records'];
+            }
+        }
+
+        return $sfRecords;
+    }
+
+    /**
      * Creates Salesforce lead.
      *
      * @param array $data
@@ -104,50 +147,49 @@ class SalesforceApi extends CrmApi
     public function createLead(array $data)
     {
         $createdLeadData = [];
-        $createLead      = true;
-        $config          = $this->integration->mergeConfigToFeatureSettings([]);
-        //if not found then go ahead and make an API call to find all the records with that email
 
-        $queryUrl            = $this->integration->getQueryUrl();
-        $sfRecord['records'] = [];
-        //try searching for lead as this has been changed before in updated done to the plugin
-        if (isset($config['objects']) && array_search('Contact', $config['objects']) && isset($data['Contact']['Email'])) {
-            $sfObject    = 'Contact';
-            $findContact = 'select Id from Contact where email = \''.$data['Contact']['Email'].'\'';
-            $sfRecord    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
+        if (isset($data['Email'])) {
+            $createdLeadData = $this->createObject($data, 'Lead');
         }
-
-        if (empty($sfRecord['records']) && isset($data['Lead']['Email'])) {
-            $sfObject = 'Lead';
-            $findLead = 'select Id, ConvertedContactId from Lead where email = \''.$data['Lead']['Email'].'\'';
-            $sfRecord = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
-        }
-        $sfLeadRecords = $sfRecord['records'];
-
-        if (!empty($sfLeadRecords)) {
-            foreach ($sfLeadRecords as $sfLeadRecord) {
-                $createLead = false;
-                $sfLeadId   = $sfLeadRecord['Id'];
-                //update the converted contact if found and not the Lead because it will error in SF
-                if (isset($sfLeadRecord['ConvertedContactId']) && $sfLeadRecord['ConvertedContactId'] != null) {
-                    if (isset($config['objects']) && array_search('Contact', $config['objects'])) {
-                        $createdLeadData[] = $this->request('', $data['Contact'], 'PATCH', false, 'Contact/'.$sfLeadRecord['ConvertedContactId']);
-                    } elseif (count($sfLeadRecords) <= 1) {
-                        $createLead = true;
-                    }
-                } else {
-                    $createdLeadData[] = $this->request('', $data[$sfObject], 'PATCH', false, $sfObject.'/'.$sfLeadId);
-                }
-            }
-        }
-
-        if ($createLead && isset($data['Lead']['Email'])) {
-            $createdLeadData = $this->request('', $data['Lead'], 'POST', false, 'Lead');
-        }
-
-        //todo: check if push activities is selected in config
 
         return $createdLeadData;
+    }
+
+    /**
+     * @param array $data
+     * @param       $sfObject
+     *
+     * @return mixed|string
+     */
+    public function createObject(array $data, $sfObject)
+    {
+        $objectData = $this->request('', $data, 'POST', false, $sfObject);
+        $this->integration->getLogger()->debug('SALESFORCE: POST createObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
+
+        if (isset($objectData['id'])) {
+            // Salesforce is inconsistent it seems
+            $objectData['Id'] = $objectData['id'];
+        }
+
+        return $objectData;
+    }
+
+    /**
+     * @param array $data
+     * @param       $sfObject
+     * @param       $sfObjectId
+     *
+     * @return array
+     */
+    public function updateObject(array $data, $sfObject, $sfObjectId)
+    {
+        $objectData = $this->request('', $data, 'PATCH', false, $sfObject.'/'.$sfObjectId);
+        $this->integration->getLogger()->debug('SALESFORCE: PATCH updateObject '.$sfObject.' '.var_export($data, true).var_export($objectData, true));
+
+        // Salesforce is inconsistent it seems
+        $objectData['Id'] = $objectData['id'] = $sfObjectId;
+
+        return $objectData;
     }
 
     /**
@@ -170,7 +212,8 @@ class SalesforceApi extends CrmApi
      */
     public function createLeadActivity(array $activity, $object)
     {
-        $config = $this->integration->getIntegrationSettings()->getFeatureSettings();
+        $config   = $this->integration->getIntegrationSettings()->getFeatureSettings();
+        $contacts = $leads = [];
 
         $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
         $mActivityObjectName = $namespace.'mautic_timeline__c';
@@ -210,42 +253,6 @@ class SalesforceApi extends CrmApi
                     $queryUrl
                 );
 
-                $newRecordData = [];
-                if ($results['hasErrors']) {
-                    foreach ($results['results'] as $result) {
-                        if ($result['errors'][0]['statusCode'] == 'CANNOT_UPDATE_CONVERTED_LEAD') {
-                            $references   = explode('-', $result['referenceId']);
-                            $SF_leadIds[] = $references[1];
-
-                            $leadIds = implode("','", $SF_leadIds);
-                            $query   = 'select Id, ConvertedContactId from '.$object." where id in ('".$leadIds."')";
-
-                            $contacts = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
-
-                            foreach ($contacts['records'] as $contact) {
-                                foreach ($activityData['records'] as $key => $record) {
-                                    if ($record[$namespace.'WhoId__c'] == $contact['Id']) {
-                                        unset($record[$namespace.'WhoId__c']);
-                                        $record[$namespace.'contact_id__c'] = $contact['ConvertedContactId'];
-                                        $newRecordData['records'][]         = $record;
-                                        unset($activityData['records'][$key]);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (!empty($newRecordData)) {
-                        $results = $this->request(
-                            'composite/tree/'.$mActivityObjectName,
-                            $newRecordData,
-                            'POST',
-                            false,
-                            null,
-                            $queryUrl
-                        );
-                    }
-                }
-
                 return $results;
             }
 
@@ -265,6 +272,7 @@ class SalesforceApi extends CrmApi
     {
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
         $queryUrl                = $this->integration->getQueryUrl();
+        $ignoreConvertedLeads    = '';
         if (isset($query['start'])) {
             if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
                 $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
@@ -289,8 +297,11 @@ class SalesforceApi extends CrmApi
                     }
                 }
         }
-        $result = [];
-        if (!empty($fields) and isset($query['start'])) {
+
+        if (!empty($query['nextUrl'])) {
+            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
+            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
+        } elseif (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
 
@@ -298,12 +309,12 @@ class SalesforceApi extends CrmApi
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
                 $fields = 'Owner.Name, Owner.Email, '.$fields;
             }
+            if ($object == 'Lead') {
+                $ignoreConvertedLeads = ' and ConvertedContactId = NULL';
+            }
 
-            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'];
+            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'].$ignoreConvertedLeads;
             $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } elseif (isset($query['nextUrl'])) {
-            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
-            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
         } else {
             $result = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
         }
@@ -328,6 +339,9 @@ class SalesforceApi extends CrmApi
         return $organizationCreatedDate;
     }
 
+    /**
+     * @return mixed|string
+     */
     public function getCampaigns()
     {
         $campaignQuery = 'Select Id, Name from Campaign where isDeleted = false';
@@ -338,15 +352,50 @@ class SalesforceApi extends CrmApi
         return $result;
     }
 
+    /**
+     * @param $campaignId
+     *
+     * @return mixed|string
+     */
     public function getCampaignMembers($campaignId)
     {
         $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
-        $queryUrl             = $this->integration->getQueryUrl();
-        $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $queryUrl);
+        $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $this->integration->getQueryUrl());
 
         return $result;
     }
 
+    /**
+     * @param       $campaignId
+     * @param       $object
+     * @param array $presonIds
+     *
+     * @return array
+     */
+    public function checkCampaignMembership($campaignId, $object, array $people)
+    {
+        $campaignMembers = [];
+        if (!empty($people)) {
+            $idField = "{$object}Id";
+            $query   = "Select Id, $idField from CampaignMember where CampaignId = '".$campaignId
+                ."' and $idField in ('".implode("','", $people)."')";
+
+            $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', false, null, $this->integration->getQueryUrl());
+            if (!empty($foundCampaignMembers['records'])) {
+                foreach ($foundCampaignMembers['records'] as $member) {
+                    $campaignMembers[$member[$idField]] = $member[$idField];
+                }
+            }
+        }
+
+        return $campaignMembers;
+    }
+
+    /**
+     * @param $campaignId
+     *
+     * @return mixed|string
+     */
     public function getCampaignMemberStatus($campaignId)
     {
         $campaignQuery = "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='".$campaignId."'";
@@ -355,5 +404,16 @@ class SalesforceApi extends CrmApi
         $result = $this->request('query', ['q' => $campaignQuery], 'GET', false, null, $queryUrl);
 
         return $result;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRequestCounter()
+    {
+        $count                   = $this->apiRequestCounter;
+        $this->apiRequestCounter = 0;
+
+        return $count;
     }
 }

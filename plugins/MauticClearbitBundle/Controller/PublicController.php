@@ -42,11 +42,15 @@ class PublicController extends FormController
      */
     public function callbackAction()
     {
+        $logger = $this->get('monolog.logger.mautic');
+
         if (!$this->request->request->has('body') || !$this->request->request->has('id')
             || !$this->request->request->has('type')
             || !$this->request->request->has('status')
             || 200 !== $this->request->request->get('status')
         ) {
+            $logger->log('error', 'ERROR on Clearbit callback: Malformed request variables: '.json_encode($this->request->request->all(), JSON_PRETTY_PRINT));
+
             return new Response('ERROR');
         }
 
@@ -56,11 +60,12 @@ class PublicController extends FormController
         $validatedRequest = $this->get('mautic.plugin.clearbit.lookup_helper')->validateRequest($oid, $this->request->request->get('type'));
 
         if (!$validatedRequest || !is_array($result)) {
+            $logger->log('error', 'ERROR on Clearbit callback: Wrong body or id in request: id='.$oid.' body='.json_encode($result, JSON_PRETTY_PRINT));
+
             return new Response('ERROR');
         }
 
         $notify = $validatedRequest['notify'];
-        $logger = $this->get('monolog.logger.mautic');
 
         try {
             if ('person' === $this->request->request->get('type')) {

@@ -30,7 +30,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
      */
     public function __construct($host, Http $httpClient)
     {
-        parent::__construct($host, 587, 'tls');
+        parent::__construct($host, 2587, 'tls');
         $this->setAuthMode('login');
         $this->httpClient = $httpClient;
     }

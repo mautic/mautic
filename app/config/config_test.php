@@ -1,5 +1,7 @@
 <?php
 
+use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -21,7 +23,14 @@ $container->loadFromExtension('framework', [
     'translator' => [
         'enabled' => false,
     ],
+    'csrf_protection' => [
+        'enabled' => false,
+    ],
 ]);
+
+$container->setParameter('mautic.famework.csrf_protection', false);
+
+$container->register('mautic_integration.pipedrive.guzzle.client', Client::class);
 
 $container->loadFromExtension('web_profiler', [
     'toolbar'             => false,
@@ -37,8 +46,20 @@ $container->loadFromExtension('doctrine', [
         'default_connection' => 'default',
         'connections'        => [
             'default' => [
-                'driver' => 'pdo_sqlite',
-                'path'   => '%kernel.root_dir%/cache/test.db',
+                'driver'   => 'pdo_mysql',
+                'host'     => isset($_SERVER['DB_HOST']) ? $_SERVER['DB_HOST'] : '%mautic.db_host%',
+                'port'     => isset($_SERVER['DB_PORT']) ? $_SERVER['DB_PORT'] : '%mautic.db_port%',
+                'dbname'   => isset($_SERVER['DB_NAME']) ? $_SERVER['DB_NAME'] : '%mautic.db_name%',
+                'user'     => isset($_SERVER['DB_USER']) ? $_SERVER['DB_USER'] : '%mautic.db_user%',
+                'password' => isset($_SERVER['DB_PASSWD']) ? $_SERVER['DB_PASSWD'] : '%mautic.db_password%',
+                'charset'  => 'UTF8',
+                // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
+                'mapping_types' => [
+                    'enum'  => 'string',
+                    'point' => 'string',
+                    'bit'   => 'string',
+                ],
+
             ],
         ],
     ],
@@ -86,3 +107,6 @@ $loader->import('security_test.php');
 if (file_exists(__DIR__.'/config_override.php')) {
     $loader->import('config_override.php');
 }
+
+//Add required parameters
+$container->setParameter('mautic.secret_key', '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0');

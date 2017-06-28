@@ -775,13 +775,27 @@ var Mautic = {
      * @param data
      * @param successClosure
      * @param showLoadingBar
+     * @param failureClosure
      */
-    ajaxActionRequest: function (action, data, successClosure, showLoadingBar) {
+    ajaxActionRequest: function (action, data, successClosure, showLoadingBar, queue) {
+        if (typeof Mautic.ajaxActionXhrQueue == 'undefined') {
+            Mautic.ajaxActionXhrQueue = {};
+        }
         if (typeof Mautic.ajaxActionXhr == 'undefined') {
             Mautic.ajaxActionXhr = {};
         } else if (typeof Mautic.ajaxActionXhr[action] != 'undefined') {
-            Mautic.removeLabelLoadingIndicator();
-            Mautic.ajaxActionXhr[action].abort();
+            if (queue) {
+                if (typeof Mautic.ajaxActionXhrQueue[action] == 'undefined') {
+                    Mautic.ajaxActionXhrQueue[action] = [];
+                }
+
+                Mautic.ajaxActionXhrQueue[action].push({action: action, data: data, successClosure: successClosure, showLoadingBar: showLoadingBar});
+
+                return;
+            } else {
+                Mautic.removeLabelLoadingIndicator();
+                Mautic.ajaxActionXhr[action].abort();
+            }
         }
 
         if (typeof showLoadingBar == 'undefined') {
@@ -803,6 +817,12 @@ var Mautic = {
             },
             complete: function () {
                 delete Mautic.ajaxActionXhr[action];
+
+                if (typeof Mautic.ajaxActionXhrQueue[action] !== 'undefined' && Mautic.ajaxActionXhrQueue[action].length) {
+                    var next = Mautic.ajaxActionXhrQueue[action].shift();
+
+                    Mautic.ajaxActionRequest(next.action, next.data, next.successClosure, next.showLoadingBar, false);
+                }
             }
         });
     }

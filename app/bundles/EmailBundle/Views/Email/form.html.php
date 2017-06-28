@@ -8,12 +8,25 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Symfony\Component\Form\FormView;
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'email');
 
 $dynamicContentPrototype = $form['dynamicContent']->vars['prototype'];
-$filterBlockPrototype    = $form['dynamicContent']->children[0]['filters']->vars['prototype'];
-$filterSelectPrototype   = $form['dynamicContent']->children[0]['filters']->children[0]['filters']->vars['prototype'];
+
+if (empty($form['dynamicContent']->children[0]['filters']->vars['prototype'])) {
+    $filterBlockPrototype = null;
+} else {
+    $filterBlockPrototype = $form['dynamicContent']->children[0]['filters']->vars['prototype'];
+}
+
+if (empty($form['dynamicContent']->children[0]['filters']->children[0]['filters']->vars['prototype'])) {
+    $filterSelectPrototype = null;
+} else {
+    $filterSelectPrototype = $form['dynamicContent']->children[0]['filters']->children[0]['filters']->vars['prototype'];
+}
 
 $variantParent = $email->getVariantParent();
 $isExisting    = $email->getId();
@@ -68,7 +81,7 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
                             <?php echo $view['translator']->trans('mautic.core.advanced'); ?>
                         </a>
                     </li>
-                    <li id="dynamic-content-tab" class="hidden">
+                    <li id="dynamic-content-tab" <?php echo (!$isCodeMode) ? 'class="hidden"' : ''; ?>>
                         <a href="#dynamic-content-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?>
                         </a>
@@ -211,8 +224,12 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
 <?php echo $view['form']->end($form); ?>
 
 <div id="dynamicContentPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($dynamicContentPrototype)); ?>"></div>
+<?php if ($filterBlockPrototype instanceof FormView) : ?>
 <div id="filterBlockPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterBlockPrototype)); ?>"></div>
+<?php endif; ?>
+<?php if ($filterSelectPrototype instanceof FormView) : ?>
 <div id="filterSelectPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterSelectPrototype)); ?>"></div>
+<?php endif; ?>
 
 <div class="hide" id="templates">
     <?php foreach ($templates as $dataKey => $template): ?>

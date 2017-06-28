@@ -218,6 +218,8 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         if (!$isGrouped) {
+            // fix for array_count_values error when there are null values
+            $prepped = array_replace($prepped, array_fill_keys(array_keys($prepped, null), ''));
             // Same labels will cause options to be merged with Symfony 2.8+ so ensure labels are unique
             $counts     = array_count_values($prepped);
             $duplicates = array_filter(
