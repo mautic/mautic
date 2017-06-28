@@ -156,7 +156,12 @@ class FormApiController extends CommonApiController
 
                 $fieldEntityArray           = $fieldEntity->convertToArray();
                 $fieldEntityArray['formId'] = $formId;
-                $fieldEntityArray['alias']  = $fieldParams['alias']  = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
+
+                if (!in_array($fieldEntityArray['alias'], $aliases)) {
+                    $fieldEntityArray['alias'] = $fieldParams['alias'];
+                } else {
+                    $fieldEntityArray['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
+                }
 
                 $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
                 $fieldForm->submit($fieldParams, 'PATCH' !== $method);
