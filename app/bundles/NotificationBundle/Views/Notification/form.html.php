@@ -40,22 +40,6 @@ $view['slots']->set('headerTitle', $header);
                                 <?php echo $view['form']->row($form['message']); ?>
                             </div>
                         </div>
-                        <br>
-                            <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
-                        <br>
-                            <div class="row">
-                                <?php
-                                foreach ($form['utmTags'] as $i => $utmTag) {
-                                    ?>
-                                    <div class="form-group col-md-6">
-                                        <?php echo $view['form']->label($utmTag); ?>
-                                        <?php echo $view['form']->widget($utmTag); ?>
-                                    </div>
-                                    <?php
-
-                                }
-                                ?>
-                            </div>
                     </div>
                 </div>
             </div>
@@ -69,7 +53,12 @@ $view['slots']->set('headerTitle', $header);
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
-
+                <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+                <?php
+                foreach ($form['utmTags'] as $i => $utmTag):
+                    echo $view['form']->row($utmTag);
+                endforeach;
+                ?>
                 <?php echo $view['form']->rest($form); ?>
             </div>
         </div>
