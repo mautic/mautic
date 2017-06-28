@@ -550,7 +550,7 @@ class CommonRepository extends EntityRepository
         $q        = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(*)')
-          ->from($table, $alias);
+            ->from($table, $alias);
 
         // Join associations for permission filtering
         $this->buildDbalJoinsFromAssociations($q, $metadata->getAssociationMappings(), $alias, $allowedJoins);
@@ -583,6 +583,31 @@ class CommonRepository extends EntityRepository
             'total'   => $count,
             'results' => $results,
         ];
+    }
+
+    /**
+     * Returns a single value for a single row.
+     *
+     * @param int    $id
+     * @param string $column
+     *
+     * @return string|null
+     */
+    public function getValue($id, $column)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select($this->getTableAlias().'.'.$column)
+            ->from($this->getClassMetadata()->getTableName(), $this->getTableAlias())
+            ->where($this->getTableAlias().'.id = :id')
+            ->setParameter('id', $id);
+
+        $result = $q->execute()->fetch();
+
+        if (isset($result[$column])) {
+            return $result[$column];
+        }
+
+        return null;
     }
 
     /**
@@ -1329,13 +1354,13 @@ class CommonRepository extends EntityRepository
     {
         $isOrm = $q instanceof QueryBuilder;
         if (isset($args['select'])) {
+
             // Build a custom select
-            if (!is_array($args['select'])) {
-                $args['select'] = [$args['select']];
+            if (is_string($args['select'])) {
+                $args['select'] = explode(',', $args['select']);
             }
 
-            $selects        = [];
-            $args['select'] = explode(',', $args['select']);
+            $selects = [];
             foreach ($args['select'] as $select) {
                 if (strpos($select, '.') !== false) {
                     list($alias, $select) = explode('.', $select);
@@ -1371,12 +1396,16 @@ class CommonRepository extends EntityRepository
             if ($partials) {
                 $newSelect = implode(', ', $partials);
                 $select    = ($isOrm) ? $q->getDQLPart('select') : $q->getQueryPart('select');
-                if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
+                if ($isOrm) {
                     $q->select($newSelect);
-                } elseif (strpos($select, $this->getTableAlias().',') !== false) {
-                    $q->select(str_replace($this->getTableAlias().',', $newSelect.','));
-                } elseif (strpos($select, $this->getTableAlias().'.*,') !== false) {
-                    $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.','));
+                } else {
+                    if (!$select || $this->getTableAlias() === $select || $this->getTableAlias().'.*' === $select) {
+                        $q->select($newSelect);
+                    } elseif (strpos($select, $this->getTableAlias().',') !== false) {
+                        $q->select(str_replace($this->getTableAlias().',', $newSelect.','));
+                    } elseif (strpos($select, $this->getTableAlias().'.*,') !== false) {
+                        $q->select(str_replace($this->getTableAlias().'.*,', $newSelect.','));
+                    }
                 }
             }
         }

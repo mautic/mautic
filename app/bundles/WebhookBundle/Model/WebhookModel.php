@@ -19,6 +19,7 @@ use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
 use Mautic\WebhookBundle\Entity\Log;
 use Mautic\WebhookBundle\Entity\LogRepository;
@@ -240,6 +241,8 @@ class WebhookModel extends FormModel
         if ($this->queueMode == 'immediate_process') {
             $this->processWebhooks($webhookList);
         }
+
+        $this->em->clear(Event::class);
 
         return;
     }
