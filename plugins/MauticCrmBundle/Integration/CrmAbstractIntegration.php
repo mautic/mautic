@@ -142,7 +142,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param $data
      * @param $object
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object = null)
+    public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
         return null;
     }
