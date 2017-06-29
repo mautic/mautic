@@ -48,7 +48,7 @@ class DynamicsApi extends CrmApi
         $settings = array_merge($settings, [
             'encode_parameters' => 'json',
             'return_raw'        => 'true', // needed to get the HTTP status code in the response
-            'request_timeout'   => 30,
+            'request_timeout'   => 300,
         ]);
 
         /** @var Response $response */
