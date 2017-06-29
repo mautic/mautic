@@ -121,7 +121,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
                     $updated = $created = $processed = 0;
-                    if (in_array('Lead', $config['objects'])) {
+                    if (in_array('Lead', $config['objects']) || in_array('Leads', $config['objects'])) {
                         $leadList = [];
                         $results  = $integrationObject->getLeads($params, null, $leadsExecuted, $leadList, 'Lead');
                         if (is_array($results)) {
@@ -131,9 +131,10 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         } else {
                             $processed += (int) $results;
                         }
-                        $output->writeln('');
                     }
-                    if (in_array('Contact', $config['objects'])) {
+                    if (in_array('Contact', $config['objects']) || in_array('Contacts', $config['objects'])) {
+                        $output->writeln('');
+                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                         $contactList = [];
                         $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, 'Contact');
                         if (is_array($results)) {
@@ -143,8 +144,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         } else {
                             $processed += (int) $results;
                         }
-                        $output->writeln('');
                     }
+
+                    $output->writeln('');
 
                     if ($processed) {
                         $output->writeln(

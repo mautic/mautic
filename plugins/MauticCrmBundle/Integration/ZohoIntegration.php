@@ -15,12 +15,14 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -152,6 +154,8 @@ class ZohoIntegration extends CrmAbstractIntegration
     {
         if ('company' === $object) {
             $object = 'Accounts';
+        } elseif ('Lead' === $object || 'Contact' === $object) {
+            $object .= 's'; // pluralize object name for Zoho
         }
 
         $result = [];
@@ -177,11 +181,30 @@ class ZohoIntegration extends CrmAbstractIntegration
                             $mauticObjectReference = 'company';
                         } elseif ('Leads' === $object || 'Contacts' === $object) {
                             $recordId = ('Leads' === $object) ? $entityData['LEADID'] : $entityData['CONTACTID'];
+
                             /** @var Lead $entity */
                             $entity = $this->getMauticLead($entityData);
                             if ($entity) {
                                 $result[] = $entity->getEmail();
                             }
+
+                            if (!empty($entityData['Company'])
+                                && $entityData['Company'] !== $this->translator->trans(
+                                    'mautic.integration.form.lead.unknown'
+                                )
+                            ) {
+                                $company = IdentifyCompanyHelper::identifyLeadsCompany(
+                                    ['company' => $entityData['Company']],
+                                    null,
+                                    $this->companyModel
+                                );
+
+                                if (!empty($company[2])) {
+                                    $syncLead = $this->companyModel->addLeadToCompany($company[2], $entity);
+                                    $this->em->detach($company[2]);
+                                }
+                            }
+
                             $mauticObjectReference = 'lead';
                         } else {
                             $this->logIntegrationError(
@@ -265,6 +288,9 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $params['toIndex']       = 200; // maximum number of records
                 $data                    = $this->getApiHelper()->getLeads($params, $object);
                 $result                  = $this->amendLeadDataBeforeMauticPopulate($data, $object);
+                if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $params['output']->writeln($result);
+                }
                 $executed += count($result);
 //                // TODO: fetch more records using fromIndex and toIndex until exception is thrown
 //                if ($data['has-more']) {
@@ -310,6 +336,9 @@ class ZohoIntegration extends CrmAbstractIntegration
 
                 $data   = $this->getApiHelper()->getCompanies($params);
                 $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
+                if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $params['output']->writeln($result);
+                }
                 $executed += count($result);
 //              //TODO: fetch more records using fromIndex and toIndex until exception is thrown
 //              if (isset($data['hasMore']) && $data['hasMore']) {
