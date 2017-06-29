@@ -85,7 +85,9 @@ $integrationSettings = $integration->getIntegrationSettings()->getFeatureSetting
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
 
+            <hr />
             <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+            <br />
             <?php
             foreach ($form['utmTags'] as $i => $utmTag):
                 echo $view['form']->row($utmTag);
