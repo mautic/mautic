@@ -386,7 +386,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getLeads($params = [])
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
         return $this->getRecords($params, 'Contact');
     }

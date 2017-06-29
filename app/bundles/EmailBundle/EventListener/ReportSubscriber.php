@@ -137,8 +137,9 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'string',
                 ],
                 $prefix.'variant_start_date' => [
-                    'label' => 'mautic.email.report.variant_start_date',
-                    'type'  => 'datetime',
+                    'label'          => 'mautic.email.report.variant_start_date',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$prefix.'variant_start_date)',
                 ],
                 $prefix.'variant_sent_count' => [
                     'label' => 'mautic.email.report.variant_sent_count',
@@ -178,8 +179,9 @@ class ReportSubscriber extends CommonSubscriber
                         'type'  => 'email',
                     ],
                     $statPrefix.'date_sent' => [
-                        'label' => 'mautic.email.report.stat.date_sent',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.email.report.stat.date_sent',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$statPrefix.'date_sent)',
                     ],
                     $statPrefix.'is_read' => [
                         'label' => 'mautic.email.report.stat.is_read',
@@ -194,8 +196,9 @@ class ReportSubscriber extends CommonSubscriber
                         'type'  => 'bool',
                     ],
                     $statPrefix.'date_read' => [
-                        'label' => 'mautic.email.report.stat.date_read',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.email.report.stat.date_read',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$statPrefix.'date_read)',
                     ],
                     $statPrefix.'retry_count' => [
                         'label' => 'mautic.email.report.stat.retry_count',
