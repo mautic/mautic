@@ -38,7 +38,7 @@ class Version20170216221648 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $this->addSql("ALTER TABLE {$this->prefix}focus ADD editor LONGTEXT NULL");
-        $this->addSql('ALTER TABLE '.$this->prefix.'focus ADD html_mode TINYINT(1) DEFAULT 0');
+        $this->addSql('ALTER TABLE '.$this->prefix.'focus ADD html_mode VARCHAR(255) DEFAULT NULL');
         $this->addSql("ALTER TABLE {$this->prefix}focus ADD html LONGTEXT NULL");
         $this->addSql("ALTER TABLE {$this->prefix}focus ADD utm_tags LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
     }
