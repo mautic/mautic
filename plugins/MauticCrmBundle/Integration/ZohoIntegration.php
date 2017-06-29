@@ -786,14 +786,15 @@ class ZohoIntegration extends CrmAbstractIntegration
         $fields = implode(', l.', $leadFields);
         $fields = 'l.'.$fields;
 
-        $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
-        $leadFieldsZ     = array_intersect_key($availableFields['Leads'], array_flip($fieldsToUpdateInZoho));
-        $contactFieldsZ  = array_intersect_key($availableFields['Contacts'], array_flip($fieldsToUpdateInZoho));
+        $availableFields            = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
+        $fieldsToUpdate['Leads']    = array_values(array_intersect(array_keys($availableFields['Leads']), $fieldsToUpdateInZoho));
+        $fieldsToUpdate['Contacts'] = array_values(array_intersect(array_keys($availableFields['Contacts']), $fieldsToUpdateInZoho));
+        $fieldsToUpdate['Leads']    = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Leads']));
+        $fieldsToUpdate['Contacts'] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Contacts']));
 
-        $originalLimit = $limit;
         $progress      = false;
         $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, null, null, ['Contacts', 'Leads']));
-        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false, null, null, 'i.last_sync_date is not null');
+        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false);
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -806,8 +807,8 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         // Start with contacts so we know who is a contact when we go to process converted leads
-        $limit               = $originalLimit;
-        $leadsToSync         = [];
+        $leadsToCreateInZ    = [];
+        $leadsToUpdateInZ    = [];
         $isContact           = [];
         $integrationEntities = [];
 
@@ -820,9 +821,10 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         foreach ($toUpdate as $lead) {
             if (isset($lead['email']) && !empty($lead['email'])) {
-                $key               = mb_strtolower($this->cleanPushData($lead['email']));
-                $leadsToSync[$key] = $lead;
-                $isContact[$key]   = $lead['id'];
+                $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                $lead['integration_entity'] = 'Contacts';
+                $leadsToUpdateInZ[$key]     = $lead;
+                $isContact[$key]            = $lead['id'];
             }
         }
 
@@ -841,7 +843,8 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $integrationEntity     = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
                     $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
                 } else {
-                    $leadsToSync[$key] = $lead;
+                    $lead['integration_entity'] = 'Leads';
+                    $leadsToUpdateInZ[$key]     = $lead;
                 }
             }
         }
@@ -850,25 +853,74 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         //create lead records, including deleted on Zoho side (last_sync = null)
         /** @var array $leadsToCreate */
-        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $limit, null, null, 'i.last_sync_date is not null');
+        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $limit, null, null);
         $totalCount -= count($leadsToCreate);
         $totalCreated += count($leadsToCreate);
         foreach ($leadsToCreate as $lead) {
             if (isset($lead['email']) && !empty($lead['email'])) {
                 $key                        = mb_strtolower($this->cleanPushData($lead['email']));
                 $lead['integration_entity'] = 'Leads';
-                $leadsToSync[$key]          = $lead;
-                /** @var IntegrationEntity $integrationEntity */
-                $integrationEntity     = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
-                $integrationEntities[] = $integrationEntity->setLastSyncDate(new \DateTime());
+                $leadsToCreateInZ[$key]     = $lead;
+                // TODO: Add new integrationentity after
             }
         }
         unset($leadsToCreate);
 
-        if ($integrationEntities) {
+        if (count($integrationEntities)) {
             // Persist updated entities if applicable
             $integrationEntityRepo->saveEntities($integrationEntities);
             $this->em->clear(IntegrationEntity::class);
+        }
+
+        // TODO: if leadsToUpdateZ can't be updated in Zoho is because is a converted lead, change internal_entity
+        // update leads and contacts
+        foreach (['Leads', 'Contacts'] as $zObject) {
+            $rowid      = 1;
+            $mappedData = [];
+            $xmlData    = '<'.$zObject.'>';
+            foreach ($leadsToUpdateInZ as $email => $lead) {
+                if ($zObject !== $lead['integration_entity']) {
+                    continue;
+                }
+                if ($progress) {
+                    $progress->advance();
+                }
+                // check if record exists
+                $result = $this->getApiHelper()->getLeads([], $zObject, $lead['integration_entity_id']);
+                if (!isset($result['response'], $result['response']['result'])) {
+                    // We already know this is a converted contact so just ignore it
+                    /** @var IntegrationEntity $integrationEntity */
+                    $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
+                    $integrationEntity->setInternalEntity('lead-converted');
+                    $integrationEntityRepo->saveEntity($integrationEntity);
+                    $this->em->clear(IntegrationEntity::class);
+                    continue;
+                }
+                $mappedData['Id'] = $lead['integration_entity_id'];
+                $xmlData .= '<row no="'.($rowid++).'">';
+                // Match that data with mapped lead fields
+                foreach ($fieldsToUpdate[$zObject] as $k => $v) {
+                    foreach ($lead as $dk => $dv) {
+                        if ($v === $dk) {
+                            if ($dv) {
+                                if (isset($availableFields[$zObject][$k])) {
+                                    $mappedData[$availableFields[$zObject][$k]['dv']] = $dv;
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach ($mappedData as $name => $value) {
+                    $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $this->cleanPushData($value));
+                }
+                $xmlData .= '</row>';
+            }
+            $xmlData .= '</'.$zObject.'>';
+
+            if ($rowid > 1) {
+                $this->logger->debug($xmlData);
+                $this->getApiHelper()->updateLead($xmlData, null, $zObject);
+            }
         }
 
         // create leads and contacts
@@ -876,7 +928,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $rowid      = 1;
             $mappedData = [];
             $xmlData    = '<'.$zObject.'>';
-            foreach ($leadsToSync as $email => $lead) {
+            foreach ($leadsToCreateInZ as $email => $lead) {
                 if ($zObject !== $lead['integration_entity']) {
                     continue;
                 }
@@ -904,6 +956,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $xmlData .= '</'.$zObject.'>';
 
             if ($rowid > 1) {
+                $this->logger->debug($xmlData);
                 $this->getApiHelper()->createLead($xmlData, null, $zObject);
             }
         }

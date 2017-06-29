@@ -76,21 +76,49 @@ class ZohoApi extends CrmApi
     }
 
     /**
+     * @param $data
+     * @param $object
+     *
+     * @return array
+     */
+    public function updateLead($data, $lead = null, $object = 'Leads')
+    {
+        $parameters = [
+            'xmlData'   => $data,
+            'newFormat' => 2, // To include fields with "null" values while inserting data from your CRM account
+            'version'   => 4, // This will trigger duplicate check functionality for multiple records.
+        ];
+
+        return $this->request('updateRecords', $parameters, 'POST', $object, false);
+    }
+
+    /**
      * gets Zoho leads.
      *
-     * @param array  $params
-     * @param string $object
+     * @param array     $params
+     * @param string    $object
+     * @param array|int $id
      *
      * @return mixed
      */
-    public function getLeads(array $params, $object)
+    public function getLeads(array $params, $object, $id = null)
     {
         if (!isset($params['selectColumns'])) {
             $params['selectColumns'] = 'All';
             $params['newFormat']     = 1;
         }
 
-        $data = $this->request('getRecords', $params, 'GET', $object);
+        if ($id) {
+            if (is_array($id)) {
+                $params['id'] = implode(';', $id);
+            } else {
+                $params['id'] = $id;
+            }
+
+            $data = $this->request('getRecordById', $params, 'GET', $object);
+        } else {
+            $data = $this->request('getRecords', $params, 'GET', $object);
+        }
         if (isset($data['response'], $data['response']['result'])) {
             $data = $data['response']['result'];
         }
