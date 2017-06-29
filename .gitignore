@@ -47,6 +47,7 @@
 !/media/files/.htaccess
 /media/images/*
 !/media/images/flags
+!/media/images/mejs
 !/media/images/apple-touch-icon.png
 !/media/images/avatar.png
 !/media/images/favicon.ico
