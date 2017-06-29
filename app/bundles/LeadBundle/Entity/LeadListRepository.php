@@ -694,14 +694,13 @@ class LeadListRepository extends CommonRepository
                 $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
             }
 
-            //DBAL does not have a not() function so we have to use the opposite
-            $func = (!$not)
-                ? $options[$details['operator']]['expr']
-                :
-                $options[$details['operator']]['negate_expr'];
-            if ($object == 'lead') {
+            // DBAL does not have a not() function so we have to use the opposite
+            $operatorDetails = $options[$details['operator']];
+            $func            = $not ? $operatorDetails['negate_expr'] : $operatorDetails['expr'];
+
+            if ($object === 'lead') {
                 $field = "l.{$details['field']}";
-            } elseif ($object == 'company') {
+            } elseif ($object === 'company') {
                 $field = "comp.{$details['field']}";
             }
 
@@ -749,26 +748,25 @@ class LeadListRepository extends CommonRepository
             $ignoreAutoFilter = false;
 
             // Special handling of relative date strings
-            if ($details['type'] == 'datetime' || $details['type'] == 'date') {
+            if ($details['type'] === 'datetime' || $details['type'] === 'date') {
                 $relativeDateStrings = $this->getRelativeDateStrings();
                 // Check if the column type is a date/time stamp
-                $isTimestamp = ($details['type'] == 'datetime' || $columnType instanceof UTCDateTimeType);
+                $isTimestamp = ($details['type'] === 'datetime' || $columnType instanceof UTCDateTimeType);
                 $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func, $not) {
                     $key             = array_search($string, $relativeDateStrings);
                     $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
-                    $requiresBetween = (in_array($func, ['eq', 'neq']) && $isTimestamp);
-
-                    $timeframe  = str_replace('mautic.lead.list.', '', $key);
-                    $modifier   = false;
-                    $isRelative = true;
+                    $requiresBetween = in_array($func, ['eq', 'neq']) && $isTimestamp;
+                    $timeframe       = str_replace('mautic.lead.list.', '', $key);
+                    $modifier        = false;
+                    $isRelative      = true;
 
                     switch ($timeframe) {
                         case 'today':
                         case 'tomorrow':
                         case 'yesterday':
-                            if ($timeframe == 'yesterday') {
+                            if ($timeframe === 'yesterday') {
                                 $dtHelper->modify('-1 day');
-                            } elseif ($timeframe == 'tomorrow') {
+                            } elseif ($timeframe === 'tomorrow') {
                                 $dtHelper->modify('+1 day');
                             }
 
@@ -897,11 +895,13 @@ class LeadListRepository extends CommonRepository
                     }
 
                     // check does this match php date params pattern?
-                    if (stristr($string[0], '-') or stristr($string[0], '+')) {
+                    if (stristr($string[0], '-') || stristr($string[0], '+')) {
                         $date = new \DateTime('now');
                         $date->modify($string);
+
                         $dateTime = $date->format('Y-m-d H:i:s');
                         $dtHelper->setDateTime($dateTime, null);
+
                         $isRelative = true;
                     }
 
@@ -920,7 +920,7 @@ class LeadListRepository extends CommonRepository
                                 $dtHelper->modify($modifier);
                             }
 
-                            $details['filter'] = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
+                            $details['filter'] = $isTimestamp ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
                         }
                     }
                 };
@@ -942,8 +942,20 @@ class LeadListRepository extends CommonRepository
                 case 'referer':
                 case 'source':
                 case 'url_title':
+                    $operand = in_array(
+                        $func,
+                        [
+                            'eq',
+                            'like',
+                            'regexp',
+                            'notRegexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
+                        ]
+                    ) ? 'EXISTS' : 'NOT EXISTS';
+
                     $ignoreAutoFilter = true;
-                    $operand          = in_array($func, ['eq', 'like', 'regexp', 'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
                     $column           = $details['field'];
 
                     if ($column == 'hit_url') {
@@ -966,16 +978,6 @@ class LeadListRepository extends CommonRepository
                                 )
                             );
                             break;
-                        case 'like':
-                        case 'notLike':
-                            $parameters[$parameter] = '%'.$details['filter'].'%';
-                            $subqb->where(
-                                $q->expr()->andX(
-                                    $q->expr()->like($alias.'.'.$column, $exprParameter),
-                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
-                                )
-                            );
-                            break;
                         case 'regexp':
                         case 'notRegexp':
                             $parameters[$parameter] = $details['filter'];
@@ -984,6 +986,32 @@ class LeadListRepository extends CommonRepository
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
                                     $alias.'.'.$column.$not.' REGEXP '.$exprParameter
+                                )
+                            );
+                            break;
+                        case 'like':
+                        case 'notLike':
+                        case 'startsWith':
+                        case 'endsWith':
+                        case 'contains':
+                            switch ($func) {
+                                case 'like':
+                                case 'notLike':
+                                case 'contains':
+                                    $parameters[$parameter] = '%'.$details['filter'].'%';
+                                    break;
+                                case 'startsWith':
+                                    $parameters[$parameter] = $details['filter'].'%';
+                                    break;
+                                case 'endsWith':
+                                    $parameters[$parameter] = '%'.$details['filter'];
+                                    break;
+                            }
+
+                            $subqb->where(
+                                $q->expr()->andX(
+                                    $q->expr()->like($alias.'.'.$column, $exprParameter),
+                                    $q->expr()->eq($alias.'.lead_id', 'l.id')
                                 )
                             );
                             break;
@@ -1049,18 +1077,22 @@ class LeadListRepository extends CommonRepository
                     $operand = (in_array($func, ['eq', 'gt', 'lt', 'gte', 'lte', 'between'])) ? 'EXISTS' : 'NOT EXISTS';
                     $table   = 'page_hits';
                     $column  = 'date_hit';
+
                     if ($details['field'] == 'lead_email_read_date') {
                         $column = 'date_read';
                         $table  = 'email_stats';
                     }
+
                     $subqb = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select('id')
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
+
                     switch ($func) {
                         case 'eq':
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
+
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
                                     ->eq($alias.'.'.$column, $exprParameter), $q->expr()
@@ -1075,6 +1107,7 @@ class LeadListRepository extends CommonRepository
                             $exprParameter2          = ":$parameter2";
                             $ignoreAutoFilter        = true;
                             $field                   = $column;
+
                             if ($func == 'between') {
                                 $subqb->where($q->expr()
                                     ->andX(
@@ -1093,6 +1126,7 @@ class LeadListRepository extends CommonRepository
                             break;
                         default:
                             $parameters[$parameter] = $details['filter'];
+
                             $subqb->where($q->expr()
                                 ->andX($q->expr()
                                     ->$func($alias.'.'.$column, $exprParameter), $q->expr()
@@ -1141,6 +1175,7 @@ class LeadListRepository extends CommonRepository
                         $subqb->andWhere($subqb->expr()
                             ->eq($alias.'.lead_id', $leadId));
                     }
+
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
                 case 'sessions':
@@ -1148,8 +1183,7 @@ class LeadListRepository extends CommonRepository
                     $column  = $details['field'];
                     $table   = 'page_hits';
                     $select  = 'COUNT(id)';
-
-                    $subqb = $this->_em->getConnection()
+                    $subqb   = $this->_em->getConnection()
                         ->createQueryBuilder()
                         ->select($select)
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
@@ -1168,6 +1202,7 @@ class LeadListRepository extends CommonRepository
                         ));
 
                     $parameters[$parameter] = $details['filter'];
+
                     $subqb->where($q->expr()
                         ->andX($q->expr()
                             ->eq($alias.'.lead_id', 'l.id'), $q->expr()
@@ -1547,8 +1582,28 @@ class LeadListRepository extends CommonRepository
 
                         case 'like':
                         case 'notLike':
-                            if (strpos($details['filter'], '%') === false) {
-                                $details['filter'] = '%'.$details['filter'].'%';
+                        case 'startsWith':
+                        case 'endsWith':
+                        case 'contains':
+                            switch ($func) {
+                                case 'like':
+                                case 'notLike':
+                                    if (strpos($details['filter'], '%') === false) {
+                                        $parameters[$parameter] = '%'.$details['filter'].'%';
+                                    }
+                                    break;
+                                case 'startsWith':
+                                    $func                   = 'like';
+                                    $parameters[$parameter] = $details['filter'].'%';
+                                    break;
+                                case 'endsWith':
+                                    $func                   = 'like';
+                                    $parameters[$parameter] = '%'.$details['filter'];
+                                    break;
+                                case 'contains':
+                                    $func                   = 'like';
+                                    $parameters[$parameter] = '%'.$details['filter'].'%';
+                                    break;
                             }
 
                             $groupExpr->add(

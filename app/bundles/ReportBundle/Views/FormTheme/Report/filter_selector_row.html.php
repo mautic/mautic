@@ -1,6 +1,6 @@
 <?php
 $labelClass = (empty($form->vars['label_attr']['class'])) ? 'control-label' : $form->vars['label_attr']['class'];
-$inGroup    = $form->vars['data']['glue'] === 'and';
+$inGroup    = !isset($form->vars['data']['glue']) || (isset($form->vars['data']['glue']) && $form->vars['data']['glue'] === 'and');
 ?>
 <div class="panel<?php echo $inGroup ? ' in-group' : ''; ?>" id="<?php echo $form->vars['id']; ?>_container">
     <div class="panel-heading">
