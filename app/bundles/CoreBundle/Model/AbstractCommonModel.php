@@ -292,6 +292,7 @@ abstract class AbstractCommonModel
     {
         $url = $this->router->generate($route, $routeParams, $absolute);
         $url .= (!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '';
+
         return $url;
     }
 

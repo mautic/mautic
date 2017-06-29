@@ -3,30 +3,30 @@
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\PointEventHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class PointEventHelperTest extends \PHPUnit_Framework_TestCase
+class PointEventHelper extends \PHPUnit_Framework_TestCase
 {
     public function testSendEmail()
     {
-        $helper = new PointEventHelper();
-        $lead = new Lead();
+        $helper = new self();
+        $lead   = new Lead();
         $lead->setFields([
             'core' => [
                 'email' => [
-                    'value' => 'test@test.com'
-                ]
-            ]
+                    'value' => 'test@test.com',
+                ],
+            ],
         ]);
         $event = [
-            'id' => 1,
+            'id'         => 1,
             'properties' => [
-                'email' => 1
-            ]
+                'email' => 1,
+            ],
         ];
 
         $result = $helper->sendEmail($event, $lead, $this->getMockMauticFactory());
@@ -45,6 +45,7 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $published
      * @param bool $success
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getMockMauticFactory($published = true, $success = true)
@@ -57,7 +58,7 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
 
         $mock->expects($this->any())
             ->method('getModel')
-            ->willReturnCallback(function ($model) use ($published, $success){
+            ->willReturnCallback(function ($model) use ($published, $success) {
                 switch ($model) {
                     case 'email':
                         return $this->getMockEmail($published, $success);
@@ -90,6 +91,7 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @param bool $published
      * @param bool $success
+     *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function getMockEmail($published = true, $success = true)
@@ -117,5 +119,4 @@ class PointEventHelperTest extends \PHPUnit_Framework_TestCase
 
         return $mock;
     }
-
 }
