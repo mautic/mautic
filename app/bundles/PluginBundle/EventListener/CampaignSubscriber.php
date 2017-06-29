@@ -78,9 +78,9 @@ class CampaignSubscriber extends CommonSubscriber
         $integrationCampaign     = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
         $integrationMemberStatus = (!empty($config['campaign_member_status']['campaign_member_status']))
             ? $config['campaign_member_status']['campaign_member_status'] : null;
-        $services                = $this->integrationHelper->getIntegrationObjects($integration);
-        $success                 = true;
-        $errors                  = [];
+        $services = $this->integrationHelper->getIntegrationObjects($integration);
+        $success  = true;
+        $errors   = [];
 
         /**
          * @var

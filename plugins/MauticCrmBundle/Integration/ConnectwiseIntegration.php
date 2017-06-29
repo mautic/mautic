@@ -404,8 +404,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @param $params
      * @param $object
-     *
-     * @return null
      */
     public function getRecords($params, $object)
     {

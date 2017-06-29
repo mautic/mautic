@@ -291,7 +291,7 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function convertUrlsToTokens(EmailSendEvent $event)
     {
-        if ($event->isInternalSend()|| $this->coreParametersHelper->getParameter('disable_trackable_urls')) {
+        if ($event->isInternalSend() || $this->coreParametersHelper->getParameter('disable_trackable_urls')) {
             // Don't convert urls
             return;
         }

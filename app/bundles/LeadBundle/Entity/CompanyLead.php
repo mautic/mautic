@@ -158,7 +158,6 @@ class CompanyLead
         return $this->primary;
     }
 
-
     /**
      * @deprecatd 2.9 to be removed in 3.0
      *
@@ -218,5 +217,4 @@ class CompanyLead
     {
         return $this->manuallyAdded;
     }
-
 }
