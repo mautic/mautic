@@ -455,7 +455,7 @@ class LeadModel extends FormModel
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
-            $this->companyModel->addLeadToCompany($companyEntity, $entity, true);
+            $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->em->detach($companyEntity);
         }
         $this->em->clear(CompanyChangeLog::class);
@@ -2211,12 +2211,12 @@ class LeadModel extends FormModel
 
         foreach ($leadCompanies as $key => $leadCompany) {
             if (array_search($leadCompany['company_id'], $companies) === false) {
-                $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead, true);
+                $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead);
             }
         }
 
         if (count($companies)) {
-            $this->companyModel->addLeadToCompany($companies, $lead, true);
+            $this->companyModel->addLeadToCompany($companies, $lead);
         } else {
             // update the lead's company name to nothing
             $lead->addUpdatedField('company', '');
@@ -2700,7 +2700,8 @@ class LeadModel extends FormModel
         if (!$newPrimaryCompany) {
             $latestCompany = $this->companyModel->getCompanyLeadRepository()->getLatestCompanyForLead($leadId);
             if (!empty($latestCompany)) {
-                $lead->addUpdatedField('company', $latestCompany['companyname']);
+                $lead->addUpdatedField('company', $latestCompany['companyname'])
+                    ->setDateModified(new \DateTime());
             }
         }
 

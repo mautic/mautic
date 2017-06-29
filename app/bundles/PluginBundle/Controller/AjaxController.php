@@ -79,7 +79,7 @@ class AjaxController extends CommonAjaxController
                     $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
                     $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
                     $formSettings       = $integrationObject->getFormDisplaySettings();
-                    $enableDataPriority = !empty($formSettings['enable_data_priority']);
+                    $enableDataPriority = $integrationObject->getDataPriority();
                     $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
                     $form               = $this->createForm(
                         $formType,
