@@ -24,6 +24,8 @@ use MauticPlugin\MauticFocusBundle\FocusEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class FocusModel extends FormModel
 {
@@ -43,17 +45,23 @@ class FocusModel extends FormModel
     protected $templating;
 
     /**
+     * @var RouterInterface
+     */
+    protected $router;
+
+    /**
      * FocusModel constructor.
      *
      * @param \Mautic\FormBundle\Model\FormModel $formModel
      * @param TrackableModel                     $trackableModel
      * @param TemplatingHelper                   $templating
      */
-    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating)
+    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, RouterInterface $router)
     {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
         $this->templating     = $templating;
+        $this->router         = $router;
     }
 
     /**
@@ -113,6 +121,16 @@ class FocusModel extends FormModel
     public function getStatRepository()
     {
         return $this->em->getRepository('MauticFocusBundle:Stat');
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return \MauticPlugin\MauticFocusBundle\Entity\FocusCampaignRepository
+     */
+    public function getFocusCampaignRepository()
+    {
+        return $this->em->getRepository('MauticFocusBundle:FocusCampaign');
     }
 
     /**
@@ -180,6 +198,17 @@ class FocusModel extends FormModel
         if ($focus instanceof Focus) {
             $focus = $focus->toArray();
         }
+        $inCampaign       = $this->focusInCampaign($focus['id']);
+        $focusCampaignUrl = str_replace(
+            ['http://', 'https://'],
+            '',
+            $this->router->generate('mautic_focus_lead_incampaign', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+        $noticeTraceUrl = str_replace(
+            ['http://', 'https://'],
+            '',
+            $this->router->generate('mautic_focus_track_notice', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
 
         if (!empty($focus['form'])) {
             $form = $this->formModel->getEntity($focus['form']);
@@ -215,11 +244,14 @@ class FocusModel extends FormModel
             $content = $this->templating->getTemplating()->render(
                 'MauticFocusBundle:Builder:generate.js.php',
                 [
-                    'focus'        => $focus,
-                    'form'         => $form,
-                    'preview'      => $preview,
-                    'ignoreMinify' => $ignoreMinify,
-                    'clickUrl'     => $url,
+                    'focus'            => $focus,
+                    'form'             => $form,
+                    'preview'          => $preview,
+                    'ignoreMinify'     => $ignoreMinify,
+                    'clickUrl'         => $url,
+                    'inCampaign'       => $inCampaign,
+                    'focusCampaignUrl' => $focusCampaignUrl,
+                    'noticeTraceUrl'   => $noticeTraceUrl,
                 ]
             );
 
@@ -374,7 +406,7 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Joins the email table and limits created_by to currently logged in user.
+     * Joins the focus table and limits created_by to currently logged in user.
      *
      * @param QueryBuilder $q
      */
@@ -383,5 +415,10 @@ class FocusModel extends FormModel
         $q->join('t', MAUTIC_TABLE_PREFIX.'focus', 'm', 'e.id = t.focus_id')
             ->andWhere('m.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
+    }
+
+    public function focusInCampaign($focusId)
+    {
+        return $this->getFocusCampaignRepository()->checkFocusCampagin($focusId);
     }
 }

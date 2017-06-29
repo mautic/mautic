@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -65,5 +66,38 @@ class PublicController extends CommonController
         $response = TrackingPixelHelper::getResponse($this->request);
 
         return $response;
+    }
+
+    public function campaignLeadAction()
+    {
+        $focusId = $this->request->get('focusid', false);
+        $leadId  = $this->request->get('leadid', false);
+
+        if ($focusId > 0 && $leadId > 0) {
+            /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
+            $model  = $this->getModel('focus');
+            $return = $model->getFocusCampaignRepository()->campaignLeadInFocus($focusId, $leadId);
+
+            return new JsonResponse(['success' => $return], 200, ['Access-Control-Allow-Origin' => '*']);
+        } else {
+            return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
+        }
+    }
+
+    public function trackNoticeAction()
+    {
+        $focusId = $this->request->get('focusid', false);
+        $leadId  = $this->request->get('leadid', false);
+
+        if ($focusId > 0 && $leadId > 0) {
+            $leadeventlog = $this->getModel('focus')->getFocusCampaignRepository()->eventLogFromFocusLeads($focusId, $leadId);
+            if ($leadeventlog) {
+                $this->getModel('campaign.event')->setEventStatus($leadeventlog, true, 'User action:View');
+
+                return new JsonResponse(['success' => 'true'], 200, ['Access-Control-Allow-Origin' => '*']);
+            }
+        }
+
+        return new JsonResponse(['success' => 'false'], 200, ['Access-Control-Allow-Origin' => '*']);
     }
 }

@@ -35,6 +35,14 @@ return [
                 'path'       => '/focus/{id}/viewpixel.gif',
                 'controller' => 'MauticFocusBundle:Public:viewPixel',
             ],
+            'mautic_focus_lead_incampaign' => [
+                'path'       => '/focus/campaign/lead',
+                'controller' => 'MauticFocusBundle:Public:campaignLead',
+            ],
+            'mautic_focus_track_notice' => [
+                'path'       => '/focus/track/notice',
+                'controller' => 'MauticFocusBundle:Public:trackNotice',
+            ],
         ],
     ],
 
@@ -57,6 +65,7 @@ return [
                 'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber',
                 'arguments' => [
                     'mautic.focus.model.focus',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.focus.subscriber.focus' => [
@@ -71,6 +80,12 @@ return [
                 'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.focus.campaignbundle.subscriber' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.campaign.model.event', 'mautic.focus.model.focus',
                 ],
             ],
         ],
@@ -96,6 +111,16 @@ return [
                 'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusPropertiesType',
                 'alias' => 'focus_properties',
             ],
+            'mautic.focus.form.type.focusshow_list' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'focusshow_list',
+            ],
+            'mautic.focus.form.type.focus_list' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'focus_list',
+            ],
         ],
         'models' => [
             'mautic.focus.model.focus' => [
@@ -104,6 +129,7 @@ return [
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
                     'mautic.helper.templating',
+                    'router',
                 ],
             ],
         ],

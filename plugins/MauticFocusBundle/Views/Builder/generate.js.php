@@ -68,6 +68,7 @@ switch ($style) {
         $iframeClass = 'mf-'.$style.'-iframe';
         break;
 }
+
 ?>
 
 (function (window) {
@@ -87,12 +88,53 @@ switch ($style) {
                     console.log('initialize()');
 
                 Focus.insertStyleIntoHead();
-                Focus.registerFocusEvent();
-
+                <?php echo $inCampaign ? 'Focus.inCampaign();' : 'Focus.registerFocusEvent();'; ?>                
                 // Add class to body
                 Focus.addClass(document.getElementsByTagName('body')[0], 'MauticFocus<?php echo ucfirst($style); ?>');
             },
+            inCampaign: function(){
+                var leadId = Focus.cookies.hasItem('mtc_id')?Focus.cookies.getItem('mtc_id'):false;
+                if(!leadId){
+                    setTimeout(function(){
+                        var leadId = Focus.cookies.hasItem('mtc_id')?Focus.cookies.getItem('mtc_id'):false;
+                        if(leadId){
+                            Focus.xhrCampaignCheck(leadId);
+                        }
+                    }, 3000);
+                }else{
+                    Focus.xhrCampaignCheck(leadId);
+                }
+            },
+            xhrCampaignCheck: function(leadId)
+            {
+                var focusId = <?php echo $focus['id']; ?>;
+                var method = 'GET';
+		var query = 'leadid='+leadId+'&focusid='+focusId;
+                var url =(window.location.protocol=='https:'?'https:':'http:')+'//<?php echo $focusCampaignUrl; ?>?'+query;
+                                
+                var xhr = new XMLHttpRequest();
+                if ("withCredentials" in xhr) {
+                    xhr.open(method, url, true);
+                } else if (typeof XDomainRequest != "undefined") {
+                    xhr = new XDomainRequest();
+                    xhr.open(method, url);
+                }
 
+                xhr.onreadystatechange = function (e) {
+                    if (xhr.readyState === XMLHttpRequest.DONE){
+                        response = JSON.parse(xhr.responseText);
+                        if (xhr.status === 200) {
+                            if(response.success==true){
+                                Focus.registerFocusEvent();
+                            }
+                        }
+                    }
+                };
+                
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.withCredentials = true;
+                xhr.send(query);
+            },
             // Register click events for toggling bar, closing windows, etc
             registerClickEvents: function () {
                 <?php if ($style == 'bar'): ?>
@@ -509,10 +551,31 @@ switch ($style) {
                     Focus.toggleBarCollapse(collapser[0], true);
                 }
                 <?php endif; ?>
-
+                <?php if ($inCampaign && $focus['type'] == 'notice'): ?>
+                    Focus.traceNoticeShown();
+                <?php endif; ?>
                 return true;
             },
+            <?php if ($inCampaign && $focus['type'] == 'notice'): ?>
+            traceNoticeShown: function () {
+                var leadId = Focus.cookies.hasItem('mtc_id')?Focus.cookies.getItem('mtc_id'):false;
+                var focusId = <?php echo $focus['id']; ?>;
+                var method = 'GET';
+		var query = 'leadid='+leadId+'&focusid='+focusId;
+                var url =(window.location.protocol=='https:'?'https:':'http:')+'//<?php echo $noticeTraceUrl; ?>?'+query;
 
+                var xhr = new XMLHttpRequest();
+                if ("withCredentials" in xhr) {
+                    xhr.open(method, url, true);
+                } else if (typeof XDomainRequest != "undefined") {
+                    xhr = new XDomainRequest();
+                    xhr.open(method, url);
+                }                
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.withCredentials = true;
+                xhr.send(query);
+            },
+            <?php endif; ?>
             // Enable iframe resizer
             enableIframeResizer: function () {
                 <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>

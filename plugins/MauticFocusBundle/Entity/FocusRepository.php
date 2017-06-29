@@ -95,6 +95,32 @@ class FocusRepository extends CommonRepository
     }
 
     /**
+     * @return array
+     */
+    public function getFocusList($currentId)
+    {
+        $usedFocusIds = $this->_em->getRepository('MauticFocusBundle:FocusCampaign')->focusIdsInCampaign();
+        if ($usedFocusIds) {
+            if ($currentId > 0) {
+                if (($key = array_search($currentId, $usedFocusIds)) !== false) {
+                    unset($usedFocusIds[$key]);
+                }
+            }
+        }
+
+        $q = $this->createQueryBuilder('f');
+        $q->select('partial f.{id, name, description}')
+            ->orderBy('f.name');
+
+        if ($usedFocusIds) {
+            $q->where('f.id NOT IN (:usedFocusIds)')
+                ->setParameter('usedFocusIds', $usedFocusIds);
+        }
+
+        return $q->getQuery()->getArrayResult();
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
