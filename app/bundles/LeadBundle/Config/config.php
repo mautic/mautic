@@ -78,6 +78,14 @@ return [
                     'leadId' => '\d+',
                 ],
             ],
+            'mautic_contact_import_index' => [
+                'path'       => '/contacts/import/{page}',
+                'controller' => 'MauticLeadBundle:Import:index',
+            ],
+            'mautic_contact_import_action' => [
+                'path'       => '/contacts/import/{objectAction}/{objectId}',
+                'controller' => 'MauticLeadBundle:Import:execute',
+            ],
             'mautic_contact_action' => [
                 'path'       => '/contacts/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Lead:execute',
@@ -134,6 +142,16 @@ return [
             'mautic_api_getcontactscompanies' => [
                 'path'       => '/contacts/{id}/companies',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getCompanies',
+            ],
+            'mautic_api_utmcreateevent' => [
+                'path'       => '/contacts/{id}/utm/add',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:addUtmTags',
+                'method'     => 'POST',
+            ],
+            'mautic_api_utmremoveevent' => [
+                'path'       => '/contacts/{id}/utm/{utmid}/remove',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:removeUtmTags',
+                'method'     => 'POST',
             ],
             'mautic_api_getcontactowners' => [
                 'path'       => '/contacts/list/owners',
@@ -361,6 +379,16 @@ return [
             'mautic.lead.button.subscriber' => [
                 'class' => \Mautic\LeadBundle\EventListener\ButtonSubscriber::class,
             ],
+            'mautic.lead.import.subscriber' => [
+                'class'     => Mautic\LeadBundle\EventListener\ImportSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.core.model.auditlog',
+                ],
+            ],
+            'mautic.lead.configbundle.subscriber' => [
+                'class' => Mautic\LeadBundle\EventListener\ConfigSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
@@ -564,6 +592,10 @@ return [
                 'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
                 'alias' => 'scorecontactscompanies_action',
             ],
+            'mautic.form.type.config.form' => [
+                'class' => Mautic\LeadBundle\Form\Type\ConfigType::class,
+                'alias' => 'leadconfig',
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
@@ -635,6 +667,19 @@ return [
                     'session',
                 ],
             ],
+            'mautic.lead.model.import' => [
+                'class'     => Mautic\LeadBundle\Model\ImportModel::class,
+                'arguments' => [
+                    'mautic.helper.paths',
+                    'mautic.lead.model.lead',
+                    'mautic.core.model.notification',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
+    ],
+    'parameters' => [
+        'parallel_import_limit'               => 1,
+        'background_import_if_more_rows_than' => 0,
     ],
 ];

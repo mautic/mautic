@@ -15,7 +15,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Auto-generated Migration.
  */
 class Version20170303000000 extends AbstractMauticMigration
 {
@@ -27,8 +27,7 @@ class Version20170303000000 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        $table = $schema->getTable("{$this->prefix}leads");
-        if ($table->hasIndex("{$this->prefix}date_added_country_index")) {
+        if ($schema->getTable("{$this->prefix}audit_log")->hasIndex("{$this->prefix}date_added_index")) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -38,8 +37,6 @@ class Version20170303000000 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql("CREATE INDEX {$this->prefix}date_added_country_index ON {$this->prefix}leads (date_added, country)");
         $this->addSql("CREATE INDEX {$this->prefix}date_added_index ON {$this->prefix}audit_log (date_added)");
-        $this->addSql("CREATE INDEX {$this->prefix}date_hit_left_index ON {$this->prefix}page_hits (date_hit, date_left)");
     }
 }

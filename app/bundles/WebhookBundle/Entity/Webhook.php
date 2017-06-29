@@ -112,18 +112,26 @@ class Webhook extends FormEntity
             ->setIndexBy('event_type')
             ->mappedBy('webhook')
             ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
             ->build();
 
+        // 1:M for queues
         $builder->createOneToMany('queues', 'WebhookQueue')
             ->mappedBy('webhook')
             ->fetchExtraLazy()
             ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
             ->build();
 
+        // 1:M for logs
         $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => 'DESC'])
             ->fetchExtraLazy()
             ->mappedBy('webhook')
             ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
             ->build();
 
         $builder->createField('webhookUrl', 'string')
@@ -566,8 +574,8 @@ class Webhook extends FormEntity
             }
         } elseif ($prop == 'events') {
             $this->changes[$prop] = [];
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 }

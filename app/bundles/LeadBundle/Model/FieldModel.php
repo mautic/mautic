@@ -74,6 +74,11 @@ class FieldModel extends FormModel
             'listable' => true,
             'object'   => 'lead',
         ],
+        'points' => [
+            'type'   => 'number',
+            'fixed'  => true,
+            'object' => 'lead',
+        ],
         'fax' => [
             'type'     => 'tel',
             'listable' => true,
@@ -260,6 +265,11 @@ class FieldModel extends FormModel
      * @var SchemaHelperFactory
      */
     protected $schemaHelperFactory;
+
+    /**
+     * @var array
+     */
+    protected $uniqueIdentifierFields = [];
 
     /**
      * FieldModel constructor.
@@ -817,23 +827,28 @@ class FieldModel extends FormModel
      */
     public function getUniqueIdentiferFields($filters = [])
     {
+        return $this->getUniqueIdentifierFields($filters);
+    }
+
+    /**
+     * Retrieves a list of published fields that are unique identifers.
+     *
+     * @param array $filters
+     *
+     * @return mixed
+     */
+    public function getUniqueIdentifierFields($filters = [])
+    {
         $filters['isPublished']       = isset($filters['isPublished']) ? $filters['isPublished'] : true;
         $filters['isUniqueIdentifer'] = isset($filters['isUniqueIdentifer']) ? $filters['isUniqueIdentifer'] : true;
         $filters['object']            = isset($filters['object']) ? $filters['object'] : 'lead';
 
-        $fields = $this->getFieldList(false, true, $filters);
+        $key = base64_encode(json_encode($filters));
+        if (!isset($this->uniqueIdentifierFields[$key])) {
+            $this->uniqueIdentifierFields[$key] = $this->getFieldList(false, true, $filters);
+        }
 
-        return $fields;
-    }
-
-    /**
-     * Wrapper for misspelled getUniqueIdentiferFields.
-     *
-     * @return array
-     */
-    public function getUniqueIdentifierFields($filters = [])
-    {
-        return $this->getUniqueIdentiferFields($filters);
+        return $this->uniqueIdentifierFields[$key];
     }
 
     /**

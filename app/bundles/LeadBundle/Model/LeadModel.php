@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use DeviceDetector\DeviceDetector;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -28,10 +29,13 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -96,6 +100,11 @@ class LeadModel extends FormModel
      * @var FieldModel
      */
     protected $leadFieldModel;
+
+    /**
+     * @var array
+     */
+    protected $leadFields = [];
 
     /**
      * @var ListModel
@@ -245,6 +254,16 @@ class LeadModel extends FormModel
     public function getDeviceRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:LeadDevice');
+    }
+
+    /**
+     * Get the lead event log repository.
+     *
+     * @return \Mautic\LeadBundle\Entity\LeadEventLogRepository
+     */
+    public function getEventLogRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:LeadEventLog');
     }
 
     /**
@@ -398,30 +417,33 @@ class LeadModel extends FormModel
         //check to see if we can glean information from ip address
         if (!$entity->imported && count($ips = $entity->getIpAddresses())) {
             $details = $ips->first()->getIpDetails();
-            if (!empty($details['city']) && empty($fields['core']['city']['value'])) {
-                $entity->addUpdatedField('city', $details['city']);
-                $companyFieldMatches['city'] = $details['city'];
-            }
+            // Only update with IP details if none of the following are set to prevent wrong combinations
+            if (empty($fields['core']['city']['value']) && empty($fields['core']['state']['value']) && empty($fields['core']['country']['value']) && empty($fields['core']['zipcode']['value'])) {
+                if (!empty($details['city'])) {
+                    $entity->addUpdatedField('city', $details['city']);
+                    $companyFieldMatches['city'] = $details['city'];
+                }
 
-            if (!empty($details['region']) && empty($fields['core']['state']['value'])) {
-                $entity->addUpdatedField('state', $details['region']);
-                $companyFieldMatches['state'] = $details['region'];
-            }
+                if (!empty($details['region'])) {
+                    $entity->addUpdatedField('state', $details['region']);
+                    $companyFieldMatches['state'] = $details['region'];
+                }
 
-            if (!empty($details['country']) && empty($fields['core']['country']['value'])) {
-                $entity->addUpdatedField('country', $details['country']);
-                $companyFieldMatches['country'] = $details['country'];
-            }
+                if (!empty($details['country'])) {
+                    $entity->addUpdatedField('country', $details['country']);
+                    $companyFieldMatches['country'] = $details['country'];
+                }
 
-            if (!empty($details['zipcode']) && empty($fields['core']['zipcode']['value'])) {
-                $entity->addUpdatedField('zipcode', $details['zipcode']);
+                if (!empty($details['zipcode'])) {
+                    $entity->addUpdatedField('zipcode', $details['zipcode']);
+                }
             }
         }
 
         $updatedFields = $entity->getUpdatedFields();
         if (isset($updatedFields['company'])) {
-            $companyFieldMatches['company'] = $updatedFields['company'];
-            list($company, $leadAdded)      = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
+            $companyFieldMatches['company']            = $updatedFields['company'];
+            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
                 $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
@@ -433,8 +455,10 @@ class LeadModel extends FormModel
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
-            $this->companyModel->addLeadToCompany($company['id'], $entity, true);
+            $this->companyModel->addLeadToCompany($companyEntity, $entity);
+            $this->em->detach($companyEntity);
         }
+        $this->em->clear(CompanyChangeLog::class);
     }
 
     /**
@@ -484,16 +508,18 @@ class LeadModel extends FormModel
             }
         }
 
-        $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
-        $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
+        if (isset($data['stage'])) {
+            $stagesChangeLogRepo = $this->getStagesChangeLogRepository();
+            $currentLeadStage    = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
 
-        if (isset($data['stage']) && $data['stage'] !== $currentLeadStage) {
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
-            $lead->stageChangeLogEntry(
-                $stage,
-                $stage->getId().':'.$stage->getName(),
-                $this->translator->trans('mautic.stage.event.changed')
-            );
+            if ($data['stage'] !== $currentLeadStage) {
+                $stage = $this->em->getRepository('MauticStageBundle:Stage')->find($data['stage']);
+                $lead->stageChangeLogEntry(
+                    $stage,
+                    $stage->getId().':'.$stage->getName(),
+                    $this->translator->trans('mautic.stage.event.changed')
+                );
+            }
         }
 
         //save the field values
@@ -1629,18 +1655,19 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param      $fields
-     * @param      $data
-     * @param null $owner
-     * @param null $list
-     * @param null $tags
-     * @param bool $persist
+     * @param array        $fields
+     * @param array        $data
+     * @param null         $owner
+     * @param null         $list
+     * @param null         $tags
+     * @param bool         $persist
+     * @param LeadEventLog $eventLog
      *
-     * @return array|bool|null
+     * @return bool|null
      *
      * @throws \Exception
      */
-    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true)
+    public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
     {
         // Let's check for an existing lead by email
         $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
@@ -1794,9 +1821,8 @@ class LeadModel extends FormModel
             }
         }
 
-        static $leadFields;
-        if (null === $leadFields) {
-            $leadFields = $this->leadFieldModel->getEntities(
+        if (empty($this->leadFields)) {
+            $this->leadFields = $this->leadFieldModel->getEntities(
                 [
                     'filter' => [
                         'force' => [
@@ -1817,8 +1843,18 @@ class LeadModel extends FormModel
             );
         }
 
-        foreach ($leadFields as $leadField) {
+        $fieldErrors = [];
+
+        foreach ($this->leadFields as $leadField) {
             if (isset($fieldData[$leadField['alias']])) {
+                $fieldData[$leadField['alias']] = InputHelper::clean($fieldData[$leadField['alias']]);
+
+                if ('NULL' === $fieldData[$leadField['alias']]) {
+                    $fieldData[$leadField['alias']] = null;
+
+                    continue;
+                }
+
                 try {
                     switch ($leadField['type']) {
                         // Adjust the boolean values from text to boolean
@@ -1856,9 +1892,12 @@ class LeadModel extends FormModel
                                 $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
                             }
                             break;
+                        case 'number':
+                            $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
+                            break;
                     }
                 } catch (\Exception $exception) {
-                    // We tried; let the form handle the mal-formed data
+                    $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
 
                 // Skip if the value is in the CSV row
@@ -1870,45 +1909,24 @@ class LeadModel extends FormModel
             }
         }
 
-        $form = $this->createForm($lead, $this->formFactory, null, ['fields' => $leadFields, 'csrf_protection' => false, 'allow_extra_fields' => true]);
-
-        // Unset stage and owner from the form because it's already been handled
-        unset($form['stage'], $form['owner'], $form['tags']);
-
-        $form->submit($fieldData);
-
-        if (!$form->isValid()) {
-            $fieldErrors = [];
-            $formErrors  = $form->getErrors();
-            if (count($formErrors)) {
-                foreach ($formErrors as $error) {
-                    $fieldErrors[] = $error->getMessage();
-                }
-            }
-            foreach ($form as $formField) {
-                $errors = $formField->getErrors(true);
-                if (count($errors)) {
-                    $errorString = $formField->getConfig()->getOption('label').': ';
-                    foreach ($errors as $error) {
-                        $errorString .= " {$error->getMessage()}";
-                    }
-                    $fieldErrors[] = $errorString;
-                }
-            }
-
+        if ($fieldErrors) {
             $fieldErrors = implode("\n", $fieldErrors);
+
             throw new \Exception($fieldErrors);
-        } else {
-            // All clear
-            foreach ($fieldData as $field => $value) {
-                if (isset($form[$field])) {
-                    $value = $form[$field]->getData();
-                    $lead->addUpdatedField($field, $value);
-                }
-            }
+        }
+
+        // All clear
+        foreach ($fieldData as $field => $value) {
+            $lead->addUpdatedField($field, $value);
         }
 
         $lead->imported = true;
+
+        if ($eventLog) {
+            $action = $merged ? 'updated' : 'inserted';
+            $eventLog->setAction($action);
+            $lead->addEventLog($eventLog);
+        }
 
         if ($persist) {
             $this->saveEntity($lead);
@@ -1973,7 +1991,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Update a leads tags.
+     * Update a leads UTM tags.
      *
      * @param Lead   $lead
      * @param UtmTag $utmTags
@@ -1983,6 +2001,114 @@ class LeadModel extends FormModel
         $lead->setUtmTags($utmTags);
 
         $this->saveEntity($lead);
+    }
+
+    /**
+     * Add leads UTM tags via API.
+     *
+     * @param Lead  $lead
+     * @param array $params
+     */
+    public function addUTMTags(Lead $lead, $params)
+    {
+        // known "synonym" fields expected
+        $synonyms = ['useragent'  => 'user_agent',
+                     'remotehost' => 'remote_host', ];
+
+        // convert 'query' option to an array if necessary
+        if (isset($params['query']) && !is_array($params['query'])) {
+            // assume it's a query string; convert it to array
+            parse_str($params['query'], $queryResult);
+            if (!empty($queryResult)) {
+                $params['query'] = $queryResult;
+            } else {
+                // Something wrong with, remove it
+                unset($params['query']);
+            }
+        }
+
+        // Fix up known synonym/mismatch field names
+        foreach ($synonyms as $expected => $replace) {
+            if (key_exists($expected, $params) && !isset($params[$replace])) {
+                // add expected key name
+                $params[$replace] = $params[$expected];
+            }
+        }
+
+        // see if active date set, so we can use it
+        $updateLastActive = false;
+        $lastActive       = new \DateTime();
+        // should be: yyyy-mm-ddT00:00:00+00:00
+        if (isset($params['lastActive'])) {
+            $lastActive       = new \DateTime($params['lastActive']);
+            $updateLastActive = true;
+        }
+        $params['date_added'] = $lastActive;
+
+        // New utmTag
+        $utmTags = new UtmTag();
+
+        // get available fields and their setter.
+        $fields = $utmTags->getFieldSetterList();
+
+        // cycle through calling appropriate setter
+        foreach ($fields as $q => $setter) {
+            if (isset($params[$q])) {
+                $utmTags->$setter($params[$q]);
+            }
+        }
+
+        // create device
+        if (key_exists('useragent', $params) && !empty($params['useragent'])) {
+            //device granularity
+            $dd = new DeviceDetector($params['useragent']);
+            $dd->parse();
+
+            $deviceRepo = $this->getDeviceRepository();
+            $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+
+            // Only if it does not exist already
+            if (empty($device)) {
+                $device = new LeadDevice();
+                $device->setClientInfo($dd->getClient());
+                $device->setDevice($dd->getDeviceName());
+                $device->setDeviceBrand($dd->getBrand());
+                $device->setDeviceModel($dd->getModel());
+                $device->setDeviceOs($dd->getOs());
+                $device->setDateAdded($lastActive);
+                $device->setLead($lead);
+                $this->getDeviceRepository()->saveEntity($device);
+            }
+        }
+
+        // add the lead
+        $utmTags->setLead($lead);
+        if ($updateLastActive) {
+            $lead->setLastActive($lastActive);
+        }
+
+        $this->setUtmTags($lead, $utmTags);
+    }
+
+    /**
+     * Removes a UtmTag set from a Lead.
+     *
+     * @param Lead $lead
+     * @param int  $utmId
+     */
+    public function removeUtmTags(Lead $lead, $utmId)
+    {
+        /** @var UtmTag $utmTag */
+        foreach ($lead->getUtmTags() as $utmTag) {
+            if ($utmTag->getId() === $utmId) {
+                $lead->removeUtmTagEntry($utmTag);
+                $this->saveEntity($lead);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -2085,12 +2211,12 @@ class LeadModel extends FormModel
 
         foreach ($leadCompanies as $key => $leadCompany) {
             if (array_search($leadCompany['company_id'], $companies) === false) {
-                $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead, true);
+                $this->companyModel->removeLeadFromCompany([$leadCompany['company_id']], $lead);
             }
         }
 
         if (count($companies)) {
-            $this->companyModel->addLeadToCompany($companies, $lead, true);
+            $this->companyModel->addLeadToCompany($companies, $lead);
         } else {
             // update the lead's company name to nothing
             $lead->addUpdatedField('company', '');
@@ -2574,7 +2700,8 @@ class LeadModel extends FormModel
         if (!$newPrimaryCompany) {
             $latestCompany = $this->companyModel->getCompanyLeadRepository()->getLatestCompanyForLead($leadId);
             if (!empty($latestCompany)) {
-                $lead->addUpdatedField('company', $latestCompany['companyname']);
+                $lead->addUpdatedField('company', $latestCompany['companyname'])
+                    ->setDateModified(new \DateTime());
             }
         }
 
