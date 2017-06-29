@@ -365,8 +365,8 @@ class ZohoIntegration extends CrmAbstractIntegration
                                 $integrationEntity->setInternalEntityId($entity->getId());
                                 $integrationEntities[] = $integrationEntity;
                             } else {
+                                $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
                                 if ($isModified) {
-                                    $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
                                     $integrationEntity->setLastSyncDate(new \DateTime());
                                     $integrationEntities[] = $integrationEntity;
                                 }
@@ -857,7 +857,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $key                        = mb_strtolower($this->cleanPushData($lead['email']));
                 $lead['integration_entity'] = 'Contacts';
                 $leadsToUpdateInZ[$key]     = $lead;
-                $isContact[$key]            = $lead['id'];
+                $isContact[$key]            = $lead;
             }
         }
 
@@ -872,9 +872,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             if (isset($lead['email']) && !empty($lead['email'])) {
                 $key = mb_strtolower($this->cleanPushData($lead['email']));
                 if (isset($isContact[$key])) {
-                    // We already know this is a converted contact so just ignore it
-                    $integrationEntity     = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
-                    $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
+                    $isContact[$key] = $lead;
                 } else {
                     $lead['integration_entity'] = 'Leads';
                     $leadsToUpdateInZ[$key]     = $lead;
@@ -883,6 +881,20 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         unset($toUpdate);
+
+        // convert ignored contacts
+        foreach ($isContact as $email => $lead) {
+            // do not call update
+            unset($leadsToUpdateInZ[$email]);
+            $integrationEntity     = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
+            $integrationEntities[] = $integrationEntity->setLastSyncDate(new \DateTime());
+            $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Zoho', 'Leads', 'lead',
+                $lead['internal_entity_id']);
+            if (count($integrationId)) { // lead exists, then update
+                $integrationEntity     = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
+                $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
+            }
+        }
 
         //create lead records, including deleted on Zoho side (last_sync = null)
         /** @var array $leadsToCreate */
@@ -916,17 +928,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
                 if ($progress) {
                     $progress->advance();
-                }
-                // check if record exists
-                $result = $this->getApiHelper()->getLeads([], $zObject, $lead['integration_entity_id']);
-                if (isset($result['response'], $result['response']['nodata'])) {
-                    // We already know this is a converted contact so just ignore it
-                    /** @var IntegrationEntity $integrationEntity */
-                    $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
-                    $integrationEntity->setInternalEntity('lead-converted');
-                    $integrationEntityRepo->saveEntity($integrationEntity);
-                    $this->em->clear(IntegrationEntity::class);
-                    continue;
                 }
                 $mappedData['Id'] = $lead['integration_entity_id'];
                 $xmlData .= '<row no="'.($rowid++).'">';
