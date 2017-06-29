@@ -768,7 +768,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $progress->advance();
             }
             // Match that data with mapped lead fields
-            foreach ($config['leadFields'] as $k => $v) {
+            foreach ($fieldsToUpdate[$object] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
                     if ($v === $dk) {
                         if ($dv) {
@@ -791,7 +791,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $progress->advance();
             }
             // Match that data with mapped lead fields
-            foreach ($config['leadFields'] as $k => $v) {
+            foreach ($fieldsToUpdate[$object] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
                     if ($v === $dk) {
                         if ($dv) {
