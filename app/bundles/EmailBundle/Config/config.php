@@ -211,8 +211,8 @@ return [
                 'alias'     => 'emailform',
             ],
             'mautic.form.type.email.utm_tags' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\EmailUtmTagsType',
-                'alias'     => 'utm_tags',
+                'class' => 'Mautic\EmailBundle\Form\Type\EmailUtmTagsType',
+                'alias' => 'utm_tags',
             ],
             'mautic.form.type.emailvariant' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\VariantType',
