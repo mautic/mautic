@@ -27,7 +27,14 @@ class Version20170216221648 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->getTable($this->prefix.'focus')->hasColumn('editor') && $schema->getTable($this->prefix.'focus')->hasColumn('html') && $schema->getTable($this->prefix.'focus')->hasColumn('html_mode') && $schema->getTable($this->prefix.'focus')->hasColumn('utm_Tags')) {
+        $focusTable = $schema->getTable($this->prefix.'focus');
+
+        if (
+            $focusTable->hasColumn('editor')
+            && $focusTable->hasColumn('html')
+            && $focusTable->hasColumn('html_mode')
+            && $focusTable->hasColumn('utm_tags')
+        ) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
