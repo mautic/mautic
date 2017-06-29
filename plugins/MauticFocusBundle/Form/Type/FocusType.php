@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -41,7 +42,7 @@ class FocusType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('focus', $options));
 
         $builder->add(
@@ -66,6 +67,70 @@ class FocusType extends AbstractType
         );
 
         $builder->add(
+            'utmTags',
+            'utm_tags',
+            [
+                'label'      => 'mautic.email.utm_tags',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.utm_tags.tooltip',
+                ],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'html_mode',
+            'button_group',
+            [
+                'label'             => 'mautic.focus.form.html_mode',
+                'label_attr'        => ['class' => 'control-label'],
+                'data'              => !empty($options['data']->getHtmlMode()) ? $options['data']->getHtmlMode() : 'basic',
+                'attr'              => [
+                    'class'    => 'form-control',
+                    'onchange' => 'Mautic.focusUpdatePreview()',
+                ],
+                'choices'           => [
+                    'mautic.focus.form.basic'  => 'basic',
+                    'mautic.focus.form.editor' => 'editor',
+                    'mautic.focus.form.html'   => 'html'
+                ],
+                'choices_as_values' => true
+            ]
+        );
+
+        $builder->add(
+            'editor',
+            'textarea',
+            [
+                'label'      => 'mautic.focus.form.editor',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control editor editor-basic',
+                    'data-show-on' => '{"focus_html_mode_1":"checked"}',
+                ],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'html',
+            'textarea',
+            [
+                'label'      => 'mautic.focus.form.html',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'rows'         => 12,
+                    'data-show-on' => '{"focus_html_mode_2":"checked"}',
+                    'onchange'     => 'Mautic.focusUpdatePreview()',
+                ],
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
             'website',
             'url',
             [
@@ -75,7 +140,7 @@ class FocusType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.focus.form.website.tooltip',
                 ],
-                'required' => false,
+                'required'   => false,
             ]
         );
 
@@ -119,8 +184,8 @@ class FocusType extends AbstractType
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
+                'format'     => 'yyyy-MM-dd HH:mm',
+                'required'   => false,
             ]
         );
 
@@ -135,8 +200,8 @@ class FocusType extends AbstractType
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format'   => 'yyyy-MM-dd HH:mm',
-                'required' => false,
+                'format'     => 'yyyy-MM-dd HH:mm',
+                'required'   => false,
             ]
         );
 
@@ -154,7 +219,8 @@ class FocusType extends AbstractType
                 'multiple'    => false,
                 'empty_value' => '',
                 'attr'        => [
-                    'onchange' => 'Mautic.focusUpdatePreview()',
+                    'onchange'     => 'Mautic.focusUpdatePreview()',
+                    'data-show-on' => '{"focus_html_mode_1":""}',
                 ],
             ]
         );

@@ -36,6 +36,19 @@ return [
                 'controller' => 'MauticFocusBundle:Public:viewPixel',
             ],
         ],
+        'api' => [
+            'mautic_api_focusstandard' => [
+                'standard_entity' => true,
+                'name'            => 'focus',
+                'path'            => '/focus',
+                'controller'      => 'MauticFocusBundle:Api\FocusApi',
+            ],
+            'mautic_api_focusjs' => [
+                'path'       => '/focus/{id}/js',
+                'controller' => 'MauticFocusBundle:Api\FocusApi:generateJs',
+                'method'     => 'POST',
+            ],
+        ],
     ],
 
     'services' => [
@@ -65,6 +78,11 @@ return [
                     'router',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.page.model.trackable',
+                    'mautic.page.helper.token',
+                    'mautic.asset.helper.token',
+                    'mautic.form.helper.token',
+                    'mautic.focus.model.focus',
                 ],
             ],
             'mautic.focus.stats.subscriber' => [
@@ -104,6 +122,8 @@ return [
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
                     'mautic.helper.templating',
+                    'event_dispatcher',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],

@@ -33,22 +33,24 @@ if (!isset($preview)) {
 if (!isset($clickUrl)) {
     $clickUrl = $props['content']['link_url'];
 }
+    $cssContent = $view->render(
+        'MauticFocusBundle:Builder:style.less.php',
+        [
+            'preview' => $preview,
+            'focus' => $focus,
+        ]
+    );
+    $cssContent = $view->escape($cssContent, 'js');
 
-$cssContent = $view->render(
-    'MauticFocusBundle:Builder:style.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
-$cssContent = $view->escape($cssContent, 'js');
+    $parentCssContent = $view->render(
+        'MauticFocusBundle:Builder:parent.less.php',
+        [
+            'preview' => $preview,
+        ]
+    );
+    $parentCssContent = $view->escape($parentCssContent, 'js');
 
-$parentCssContent = $view->render(
-    'MauticFocusBundle:Builder:parent.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
-$parentCssContent = $view->escape($parentCssContent, 'js');
+
 
 switch ($style) {
     case 'bar':
@@ -69,7 +71,6 @@ switch ($style) {
         break;
 }
 ?>
-
 (function (window) {
     if (typeof window.MauticFocusParentHeadStyleInserted == 'undefined') {
         window.MauticFocusParentHeadStyleInserted = false;
@@ -105,6 +106,16 @@ switch ($style) {
                 <?php else: ?>
                 var closer = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>-close');
                 var aTag = closer[0].getElementsByTagName('a');
+                var container = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>');
+
+                container.onclick = function(e) {
+                    if (e) { e.stopPropagation(); }
+                    else { window.event.cancelBubble = true; }
+                };
+                document.onclick = function() {
+                    aTag[0].click();
+                };
+
                 aTag[0].addEventListener('click', function (event) {
                     // Prevent multiple engagements for link clicks on exit intent
                     Focus.modalsDismissed["<?php echo $focus['id']; ?>"] = true;
