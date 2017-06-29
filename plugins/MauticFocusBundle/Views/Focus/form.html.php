@@ -52,12 +52,14 @@ echo $view['form']->start($form);
                 echo $view['form']->row($form['publishUp']);
                 echo $view['form']->row($form['publishDown']);
                 ?>
+                <hr />
                 <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
-                    <?php
-                    foreach ($form['utmTags'] as $i => $utmTag):
-                        echo $view['form']->row($utmTag);
-                    endforeach;
-                    ?>
+                <br />
+                <?php
+                foreach ($form['utmTags'] as $i => $utmTag):
+                    echo $view['form']->row($utmTag);
+                endforeach;
+                ?>
             </div>
         </div>
     </div>
