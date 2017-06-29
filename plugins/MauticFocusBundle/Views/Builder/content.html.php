@@ -44,7 +44,7 @@ $props = $focus['properties'];
             echo $view->render('MauticFocusBundle:Builder:style.less.php',
                 [
                     'preview' => true,
-                    'focus' => $focus,
+                    'focus'   => $focus,
                 ]
             );
         endif;

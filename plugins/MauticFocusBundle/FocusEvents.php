@@ -55,7 +55,7 @@ final class FocusEvents
     const POST_DELETE = 'mautic.focus_post_delete';
 
     /**
-     * The mautic.focus_token_replacent event is dispatched after a load content
+     * The mautic.focus_token_replacent event is dispatched after a load content.
      *
      * The event listener receives a MauticPlugin\MauticFocusBundle\Event\FocusEvent instance.
      *
