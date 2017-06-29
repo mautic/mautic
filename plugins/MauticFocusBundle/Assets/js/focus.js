@@ -342,6 +342,14 @@ Mautic.launchFocusBuilder = function (forceFetch) {
 
                 Mautic.ignoreMauticFocusPreviewUpdate = false;
                 Mautic.focusUpdatePreview();
+            } else if (response.disabled) {
+                mQuery('.website-snap-disabled').removeClass('hide');
+                mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);
+
+                // Disable droppers
+                mQuery('.btn-dropper').addClass('disabled');
+
+                Mautic.ignoreMauticFocusPreviewUpdate = false;
             } else {
                 mQuery('.website-placeholder').removeClass('hide');
                 mQuery('#websiteUrlPlaceholderInput').prop('disabled', false);

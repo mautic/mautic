@@ -59,6 +59,22 @@ echo $view['form']->start($form);
     <div class="hide builder focus-builder">
         <div class="builder-content">
             <div class="website-preview">
+                <div class="website-snap-disabled hide well well-lg col-md-6 col-md-offset-3 mt-lg">
+                    <div class="row">
+                        <div class="mautibot-image col-xs-3 text-center">
+                            <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="<?php echo $view['mautibot']->getImage(
+                                'openMouth'
+                            ); ?>"/>
+                        </div>
+                        <div class="col-xs-9">
+                            <h4><i class="fa fa-quote-left"></i> <?php echo $view['translator']->trans('mautic.core.noresults.tip'); ?>
+                                <i class="fa fa-quote-right"></i></h4>
+                            <p class="mt-md">
+                                <?php echo $view['translator']->trans('mautic.focus.website_snap_disabled'); ?>
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3 mt-lg">
                     <div class="row">
                         <div class="mautibot-image col-xs-3 text-center">

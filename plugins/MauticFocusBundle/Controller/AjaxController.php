@@ -39,6 +39,14 @@ class AjaxController extends CommonAjaxController
                 }
 
                 $snapshotUrl = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_url');
+                
+                $canShowPreview = $this->coreParametersHelper->getParameter('focus_allow_preview');
+                if ($canShowPreview == false) { 
+                  $data['success'] = 0;
+                  $data['disabled'] = true;
+                  return $this->sendJsonResponse($data);
+                }
+                
                 $snapshotKey = $this->get('mautic.helper.core_parameters')->getParameter('website_snapshot_key');
 
                 $http     = $this->get('mautic.http.connector');
