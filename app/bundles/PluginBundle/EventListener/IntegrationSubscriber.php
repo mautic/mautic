@@ -72,15 +72,15 @@ class IntegrationSubscriber extends CommonSubscriber
             $output->writeln('');
             $output->writeln('<fg=cyan>'.$settings.'</>');
         } elseif ('dev' === MAUTIC_ENV) {
-            $this->logger->alert('INTEGRATION REQUEST: '.$event->getMethod().' '.$event->getUrl());
+            $this->logger->debug('INTEGRATION REQUEST: '.$event->getMethod().' '.$event->getUrl());
             if ('' !== $headers) {
-                $this->logger->alert("REQUEST HEADERS: \n".$headers.PHP_EOL);
+                $this->logger->debug("REQUEST HEADERS: \n".$headers.PHP_EOL);
             }
             if ('' !== $params) {
-                $this->logger->alert("REQUEST PARAMS: \n".$params.PHP_EOL);
+                $this->logger->debug("REQUEST PARAMS: \n".$params.PHP_EOL);
             }
             if ('' !== $settings) {
-                $this->logger->alert("REQUEST SETTINGS: \n".$settings.PHP_EOL);
+                $this->logger->debug("REQUEST SETTINGS: \n".$settings.PHP_EOL);
             }
         }
     }
@@ -122,18 +122,18 @@ class IntegrationSubscriber extends CommonSubscriber
                 $output->writeln('<fg=cyan>'.$response->body.'</>');
             }
         } elseif ('dev' === MAUTIC_ENV) {
-            $this->logger->alert('RESPONSE CODE: '.$response->code);
+            $this->logger->debug('RESPONSE CODE: '.$response->code);
             if ('' !== $headers) {
-                $this->logger->alert("RESPONSE HEADERS: \n".$headers.PHP_EOL);
+                $this->logger->debug("RESPONSE HEADERS: \n".$headers.PHP_EOL);
             }
             if ('' !== $json || '' !== $xml || '' !== $response->body) {
-                $this->logger->alert('RESPONSE BODY:');
+                $this->logger->debug('RESPONSE BODY:');
                 if ($isJson) {
-                    $this->logger->alert($json."\n");
+                    $this->logger->debug($json."\n");
                 } elseif ($isXml) {
-                    $this->logger->alert($xml."\n");
+                    $this->logger->debug($xml."\n");
                 } else {
-                    $this->logger->alert($response->body."\n");
+                    $this->logger->debug($response->body."\n");
                 }
             }
         }

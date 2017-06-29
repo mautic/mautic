@@ -82,7 +82,7 @@ class DynamicsApi extends CrmApi
 
         $operation  = sprintf('EntityDefinitions(LogicalName=\'%s\')/Attributes', $logicalName);
         $parameters = [
-            '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Boolean", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null', // ignore system fields
+            '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Boolean", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null and LogicalName ne \'parentcustomerid\'', // ignore system fields
             '$select' => 'RequiredLevel,LogicalName,DisplayName', // select only miningful columns
         ];
 
