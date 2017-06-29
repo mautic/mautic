@@ -173,6 +173,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $integrationEntities = [];
                     /** @var array $objects */
                     foreach ($objects as $recordId => $entityData) {
+                        $isModified = false;
                         if ('Accounts' === $object) {
                             $recordId = $entityData['ACCOUNTID'];
                             // first try to find integration entity
@@ -204,8 +205,18 @@ class ZohoIntegration extends CrmAbstractIntegration
                                     }
                                 }
 
-                                $this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
-                                $this->companyModel->saveEntity($entity, false);
+                                // remove unchanged fields
+                                foreach ($newMatchedFields as $k => $v) {
+                                    if ($entity->getFieldValue($k) === $v) {
+                                        unset($newMatchedFields[$k]);
+                                    }
+                                }
+
+                                if (count($newMatchedFields)) {
+                                    $this->companyModel->setFieldValues($entity, $newMatchedFields, false, false);
+                                    $this->companyModel->saveEntity($entity, false);
+                                    $isModified = true;
+                                }
                             } else {
                                 $entity = $this->getMauticCompany($entityData, 'company');
                             }
@@ -239,8 +250,18 @@ class ZohoIntegration extends CrmAbstractIntegration
                                     }
                                 }
 
-                                $this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
-                                $this->leadModel->saveEntity($entity, false);
+                                // remove unchanged fields
+                                foreach ($newMatchedFields as $k => $v) {
+                                    if ($entity->getFieldValue($k) === $v) {
+                                        unset($newMatchedFields[$k]);
+                                    }
+                                }
+
+                                if (count($newMatchedFields)) {
+                                    $this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
+                                    $this->leadModel->saveEntity($entity, false);
+                                    $isModified = true;
+                                }
                             } else {
                                 /** @var Lead $entity */
                                 $entity = $this->getMauticLead($entityData);
@@ -295,8 +316,18 @@ class ZohoIntegration extends CrmAbstractIntegration
                                     }
                                 }
 
-                                $this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
-                                $this->leadModel->saveEntity($entity, false);
+                                // remove unchanged fields
+                                foreach ($newMatchedFields as $k => $v) {
+                                    if ($entity->getFieldValue($k) === $v) {
+                                        unset($newMatchedFields[$k]);
+                                    }
+                                }
+
+                                if (count($newMatchedFields)) {
+                                    $this->leadModel->setFieldValues($entity, $newMatchedFields, false, false);
+                                    $this->leadModel->saveEntity($entity, false);
+                                    $isModified = true;
+                                }
                             } else {
                                 /** @var Lead $entity */
                                 $entity = $this->getMauticLead($entityData);
@@ -334,9 +365,11 @@ class ZohoIntegration extends CrmAbstractIntegration
                                 $integrationEntity->setInternalEntityId($entity->getId());
                                 $integrationEntities[] = $integrationEntity;
                             } else {
-                                $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
-                                $integrationEntity->setLastSyncDate(new \DateTime());
-                                $integrationEntities[] = $integrationEntity;
+                                if ($isModified) {
+                                    $integrationEntity = $integrationEntityRepo->getEntity($integrationId[0]['id']);
+                                    $integrationEntity->setLastSyncDate(new \DateTime());
+                                    $integrationEntities[] = $integrationEntity;
+                                }
                             }
                             $this->em->detach($entity);
                             unset($entity);
@@ -872,7 +905,6 @@ class ZohoIntegration extends CrmAbstractIntegration
             $this->em->clear(IntegrationEntity::class);
         }
 
-        // TODO: if leadsToUpdateZ can't be updated in Zoho is because is a converted lead, change internal_entity
         // update leads and contacts
         foreach (['Leads', 'Contacts'] as $zObject) {
             $rowid      = 1;
@@ -887,7 +919,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
                 // check if record exists
                 $result = $this->getApiHelper()->getLeads([], $zObject, $lead['integration_entity_id']);
-                if (!isset($result['response'], $result['response']['result'])) {
+                if (isset($result['response'], $result['response']['nodata'])) {
                     // We already know this is a converted contact so just ignore it
                     /** @var IntegrationEntity $integrationEntity */
                     $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
