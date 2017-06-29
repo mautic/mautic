@@ -97,7 +97,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param array $params
      */
-    public function getLeads($params = [])
+    public function getLeads($params, $query, &$executed, $result = [],  $object = 'Lead')
     {
         $executed = null;
 
@@ -142,7 +142,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param $data
      * @param $object
      */
-    public function amendLeadDataBeforeMauticPopulate($data, $object)
+    public function amendLeadDataBeforeMauticPopulate($data, $object = null)
     {
         return null;
     }
