@@ -872,10 +872,12 @@ class ZohoIntegration extends CrmAbstractIntegration
             if (isset($lead['email']) && !empty($lead['email'])) {
                 $key = mb_strtolower($this->cleanPushData($lead['email']));
                 if (isset($isContact[$key])) {
-                    $isContact[$key] = $lead;
+                    $isContact[$key] = $lead; // lead-converted
                 } else {
                     $lead['integration_entity'] = 'Leads';
                     $leadsToUpdateInZ[$key]     = $lead;
+                    $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
+                    $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
                 }
             }
         }
