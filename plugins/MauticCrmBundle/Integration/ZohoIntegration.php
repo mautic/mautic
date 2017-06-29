@@ -885,7 +885,6 @@ class ZohoIntegration extends CrmAbstractIntegration
         // convert ignored contacts
         foreach ($isContact as $email => $lead) {
             // do not call update
-            unset($leadsToUpdateInZ[$email]);
             $integrationEntity     = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
             $integrationEntities[] = $integrationEntity->setLastSyncDate(new \DateTime());
             $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Zoho', 'Leads', 'lead',
@@ -893,6 +892,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             if (count($integrationId)) { // lead exists, then update
                 $integrationEntity     = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
                 $integrationEntities[] = $integrationEntity->setInternalEntity('lead-converted');
+                unset($leadsToUpdateInZ[$email]);
             }
         }
 
