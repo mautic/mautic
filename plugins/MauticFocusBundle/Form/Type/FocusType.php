@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -76,7 +75,7 @@ class FocusType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -84,19 +83,20 @@ class FocusType extends AbstractType
             'html_mode',
             'button_group',
             [
-                'label'             => 'mautic.focus.form.html_mode',
-                'label_attr'        => ['class' => 'control-label'],
-                'data'              => !empty($options['data']->getHtmlMode()) ? $options['data']->getHtmlMode() : 'basic',
-                'attr'              => [
+                'label'      => 'mautic.focus.form.html_mode',
+                'label_attr' => ['class' => 'control-label'],
+                'data'       => !empty($options['data']->getHtmlMode()) ? $options['data']->getHtmlMode() : 'basic',
+                'attr'       => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.focusUpdatePreview()',
+                    'tooltip'  => 'mautic.focums.html_mode.tooltip',
                 ],
-                'choices'           => [
+                'choices' => [
                     'mautic.focus.form.basic'  => 'basic',
                     'mautic.focus.form.editor' => 'editor',
-                    'mautic.focus.form.html'   => 'html'
+                    'mautic.focus.form.html'   => 'html',
                 ],
-                'choices_as_values' => true
+                'choices_as_values' => true,
             ]
         );
 
@@ -110,7 +110,7 @@ class FocusType extends AbstractType
                     'class'        => 'form-control editor editor-basic',
                     'data-show-on' => '{"focus_html_mode_1":"checked"}',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -126,7 +126,7 @@ class FocusType extends AbstractType
                     'data-show-on' => '{"focus_html_mode_2":"checked"}',
                     'onchange'     => 'Mautic.focusUpdatePreview()',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -140,7 +140,7 @@ class FocusType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.focus.form.website.tooltip',
                 ],
-                'required'   => false,
+                'required' => false,
             ]
         );
 
@@ -184,8 +184,8 @@ class FocusType extends AbstractType
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false,
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
             ]
         );
 
@@ -200,8 +200,8 @@ class FocusType extends AbstractType
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format'     => 'yyyy-MM-dd HH:mm',
-                'required'   => false,
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
             ]
         );
 
