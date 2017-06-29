@@ -178,16 +178,49 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
+        $standardFilters       = $this->entity->getFilters();
 
-        // Build WHERE clause
-        $filtersApplied = false;
+        // Setup filters
         if (isset($options['dynamicFilters'])) {
-            $filtersApplied = $this->applyFilters($options['dynamicFilters'], $queryBuilder, $options['filters']);
+            $dynamicFilters = $options['dynamicFilters'];
+
+            foreach ($dynamicFilters as $key => $dynamicFilter) {
+                foreach ($standardFilters as $i => $filter) {
+                    if ($filter['column'] === $key && $filter['dynamic']) {
+                        $value     = $dynamicFilter['value'];
+                        $condition = $filter['condition'];
+
+                        switch ($condition) {
+                            case 'startsWith':
+                                $value = $value.'%';
+                                break;
+                            case 'endsWith':
+                                $value = '%'.$value;
+                                break;
+                            case 'like':
+                            case 'notLike':
+                            case 'contains':
+                                if ($condition === 'notLike') {
+                                    $dynamicFilter['expr'] = 'notLike';
+                                }
+
+                                $value = '%'.$value.'%';
+                                break;
+                        }
+
+                        $dynamicFilter['value'] = $value;
+
+                        // Overwrite the standard filter with the dynamic
+                        $standardFilters[$i] = array_merge($filter, $dynamicFilter);
+                    }
+                }
+            }
         }
 
-        if (!$filtersApplied) {
+        // Build WHERE clause
+        if (!empty($standardFilters)) {
             if (!$filterExpr = $event->getFilterExpression()) {
-                $this->applyFilters($this->entity->getFilters(), $queryBuilder, $options['filters']);
+                $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
             } else {
                 $queryBuilder->andWhere($filterExpr);
             }
