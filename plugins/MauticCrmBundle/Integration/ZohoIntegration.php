@@ -158,6 +158,8 @@ class ZohoIntegration extends CrmAbstractIntegration
             $object .= 's'; // pluralize object name for Zoho
         }
 
+        $config = $this->mergeConfigToFeatureSettings([]);
+
         $result = [];
         if (isset($data[$object])) {
             $entity = null;
@@ -173,17 +175,38 @@ class ZohoIntegration extends CrmAbstractIntegration
                     foreach ($objects as $recordId => $entityData) {
                         if ('Accounts' === $object) {
                             $recordId = $entityData['ACCOUNTID'];
-                            /** @var Company $entity */
-                            $entity = $this->getMauticCompany($entityData);
+                            // first try to find integration entity
+                            $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $object, 'company',
+                                null, null, null, false, 0, 0, $recordId);
+                            if ($integrationId) { // company exists, then update
+                                /** @var Company $entity */
+                                $entity        = $this->companyModel->getEntity($integrationId[0]['internal_entity_id']);
+                                $matchedFields = $this->populateMauticLeadData($entityData, $config, 'company');
+                                $this->companyModel->setFieldValues($entity, $matchedFields, false, false);
+                                $this->companyModel->saveEntity($entity, false);
+                            } else {
+                                $entity = $this->getMauticCompany($entityData, 'company');
+                            }
                             if ($entity) {
                                 $result[] = $entity->getName();
                             }
                             $mauticObjectReference = 'company';
-                        } elseif ('Leads' === $object || 'Contacts' === $object) {
-                            $recordId = ('Leads' === $object) ? $entityData['LEADID'] : $entityData['CONTACTID'];
+                        } elseif ('Leads' === $object) {
+                            $recordId = $entityData['LEADID'];
+                            // first try to find integration entity
+                            $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $object, 'lead',
+                                null, null, null, false, 0, 0, $recordId);
+                            if ($integrationId) { // lead exists, then update
+                                /** @var Lead $entity */
+                                $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
+                                $matchedFields = $this->populateMauticLeadData($entityData, $config, $object);
+                                $this->leadModel->setFieldValues($entity, $matchedFields, false, false);
+                                $this->leadModel->saveEntity($entity, false);
+                            } else {
+                                /** @var Lead $entity */
+                                $entity = $this->getMauticLead($entityData);
+                            }
 
-                            /** @var Lead $entity */
-                            $entity = $this->getMauticLead($entityData);
                             if ($entity) {
                                 $result[] = $entity->getEmail();
                             }
@@ -203,6 +226,27 @@ class ZohoIntegration extends CrmAbstractIntegration
                                     $syncLead = $this->companyModel->addLeadToCompany($company[2], $entity);
                                     $this->em->detach($company[2]);
                                 }
+                            }
+
+                            $mauticObjectReference = 'lead';
+                        } elseif ('Contacts' === $object) {
+                            $recordId = $entityData['CONTACTID'];
+
+                            $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $object, 'lead',
+                                null, null, null, false, 0, 0, $recordId);
+                            if ($integrationId) { // contact exists, then update
+                                /** @var Lead $entity */
+                                $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
+                                $matchedFields = $this->populateMauticLeadData($entityData, $config, $object);
+                                $this->leadModel->setFieldValues($entity, $matchedFields, false, false);
+                                $this->leadModel->saveEntity($entity, false);
+                            } else {
+                                /** @var Lead $entity */
+                                $entity = $this->getMauticLead($entityData);
+                            }
+
+                            if ($entity) {
+                                $result[] = $entity->getEmail();
                             }
 
                             $mauticObjectReference = 'lead';
@@ -652,6 +696,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = [])
     {
+        return [0, 0, 0];
         $limit                 = $params['limit'];
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
