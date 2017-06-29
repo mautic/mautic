@@ -383,20 +383,30 @@ class ZohoIntegration extends CrmAbstractIntegration
                     }
                 }
 
-                $fields = implode(',', $mappedData);
+                $fields                   = implode(',', $mappedData);
+                $oparams['selectColumns'] = $object.'('.$fields.')';
+                $oparams['toIndex']       = ($params['limit'] > 200) ? 200 : $params['limit']; // maximum number of records
 
-                $params['selectColumns'] = $object.'('.$fields.')';
-                $params['toIndex']       = 200; // maximum number of records
-                $data                    = $this->getApiHelper()->getLeads($params, $object);
-                $result                  = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-                if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                    $params['output']->writeln($result);
+                while ($executed < $params['limit']) {
+                    // {"response":{"nodata":{"code":"4422","message":"There is no data to show"},"uri":"/crm/private/json/Contacts/getRecords"}}
+                    $data = $this->getApiHelper()->getLeads($oparams, $object);
+                    if (isset($data['response'], $data['response']['nodata'])) {
+                        break; // no more data, exit loop
+                    }
+                    $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
+                    if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                        $params['output']->writeln($result);
+                    }
+                    $executed += count($result);
+
+                    if ($params['limit'] < 200) {
+                        break; // default exit
+                    }
+
+                    // prepare next loop
+                    $oparams['fromIndex'] = $oparams['toIndex'] + 1;
+                    $oparams['toIndex'] += 200;
                 }
-                $executed += count($result);
-//                // TODO: fetch more records using fromIndex and toIndex until exception is thrown
-//                if ($data['has-more']) {
-//                    $executed += $this->getLeads($params, $object);
-//                }
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
@@ -432,19 +442,28 @@ class ZohoIntegration extends CrmAbstractIntegration
 
                 $fields = implode(',', $mappedData);
 
-                $params['selectColumns'] = 'Accounts('.$fields.')';
-                $params['toIndex']       = 200; // maximum number of records
+                $oparams['selectColumns'] = 'Accounts('.$fields.')';
+                $oparams['toIndex']       = ($params['limit'] > 200) ? 200 : $params['limit']; // maximum number of records
 
-                $data   = $this->getApiHelper()->getCompanies($params);
-                $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-                if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                    $params['output']->writeln($result);
+                while ($executed < $params['limit']) {
+                    $data = $this->getApiHelper()->getCompanies($oparams);
+                    if (isset($data['response'], $data['response']['nodata'])) {
+                        break; // no more data, exit loop
+                    }
+                    $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
+                    if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                        $params['output']->writeln($result);
+                    }
+                    $executed += count($result);
+
+                    if ($params['limit'] < 200) {
+                        break; // default exit
+                    }
+
+                    // prepare next loop
+                    $oparams['fromIndex'] = $oparams['toIndex'] + 1;
+                    $oparams['toIndex'] += 200;
                 }
-                $executed += count($result);
-//              //TODO: fetch more records using fromIndex and toIndex until exception is thrown
-//              if (isset($data['hasMore']) && $data['hasMore']) {
-//                  $executed += $this->getCompanies($params);
-//              }
 
                 return $executed;
             }
@@ -753,7 +772,6 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = [])
     {
-        return [0, 0, 0];
         $limit                 = $params['limit'];
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
@@ -831,6 +849,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         unset($toUpdate);
 
         //create lead records, including deleted on Zoho side (last_sync = null)
+        /** @var array $leadsToCreate */
         $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $limit, null, null, 'i.last_sync_date is not null');
         $totalCount -= count($leadsToCreate);
         $totalCreated += count($leadsToCreate);
