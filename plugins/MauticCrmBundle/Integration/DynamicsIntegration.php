@@ -309,7 +309,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead(Lead $lead, array $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -376,7 +376,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return int|null
      */
-    public function getLeads($params = [], $query = null, &$executed = null, &$result = [], $object = 'contacts')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'contacts')
     {
         if ('Contact' === $object) {
             $object = 'contacts';
