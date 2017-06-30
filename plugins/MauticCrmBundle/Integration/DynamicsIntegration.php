@@ -569,7 +569,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     if (count($integrationId)) { // lead exists, then update
                         /** @var Lead $entity */
                         $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
-                        $matchedFields = $this->populateMauticLeadData($entityData, $config, $object);
+                        $matchedFields = $this->populateMauticLeadData($entityData, $config);
 
                         // Match that data with mapped lead fields
                         $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
@@ -801,7 +801,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $progress->advance();
             }
             // Match that data with mapped lead fields
-            foreach ($fieldsToUpdate[$object] as $k => $v) {
+            foreach ($config['leadFields'] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
                     if ($v === $dk) {
                         if ($dv) {
