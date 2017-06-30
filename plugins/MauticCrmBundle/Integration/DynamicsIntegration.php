@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Joomla\Http\Response;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -443,7 +444,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                             $params['output']->writeln($result);
                         } else {
-                            $progress->advance();
+                            $progress->advance(count($result));
                         }
                     }
 
@@ -514,7 +515,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                             $params['output']->writeln($result);
                         } else {
-                            $progress->advance();
+                            $progress->advance(count($result));
                         }
                     }
 
