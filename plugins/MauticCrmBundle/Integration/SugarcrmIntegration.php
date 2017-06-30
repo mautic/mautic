@@ -1273,11 +1273,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = [])
     {
-        $limit                 = $params['limit'];
-        $config                = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $mauticData            = $leadsToUpdate            = $fields            = [];
-        $fieldsToUpdateInSugar = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
+        $limit                   = $params['limit'];
+        $config                  = $this->mergeConfigToFeatureSettings();
+        $integrationEntityRepo   = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $mauticData              = $leadsToUpdate            = $fields            = [];
+        $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
 
         if (!empty($config['leadFields'])) {
             $fields = implode(', l.', $config['leadFields']);
@@ -1297,7 +1298,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
 
             //update lead/contact records
-            $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate($this->getName(), 'lead', $fields, $limit, null, null, ['Contacts', 'Leads']);
+            $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate($this->getName(), 'lead', $fields, $limit, $fromDate, $toDate, ['Contacts', 'Leads']);
         }
         $checkEmailsInSugar = [];
         $deletedSugarLeads  = [];
@@ -1316,7 +1317,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         //create lead records
         if (null === $limit || $limit && !empty($fields)) {
-            $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Sugarcrm', $fields, $limit);
+            $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Sugarcrm', $fields, $limit, $fromDate, $toDate);
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email'])) {
                     $checkEmailsInSugar['Leads'][mb_strtolower($lead['email'])] = $lead;
