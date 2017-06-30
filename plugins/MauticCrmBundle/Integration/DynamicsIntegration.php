@@ -281,8 +281,31 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         /** @var array $opts */
                         $fields = $leadObject['value'];
                         foreach ($fields as $field) {
+                            $type      = 'string';
+                            $fieldType = $field['AttributeTypeName']['Value'];
+                            if (in_array($fieldType, [
+                                'LookupType',
+                                 'OwnerType',
+                                 'PicklistType',
+                                 'StateType',
+                                 'StatusType',
+                                 'UniqueidentifierType',
+                            ], true)) {
+                                continue;
+                            }
+                            if (in_array($fieldType, [
+                                'DoubleType',
+                                 'IntegerType',
+                                 'MoneyType',
+                            ], true)) {
+                                $type = 'int';
+                            } elseif ('Boolean' === $fieldType) {
+                                $type = 'boolean';
+                            } elseif ('DateTimeType' === $fieldType) {
+                                $type = 'datetime';
+                            }
                             $dynamicsFields[$dynamicsObject][$field['LogicalName']] = [
-                                'type'     => 'string',
+                                'type'     => $type,
                                 'label'    => $field['DisplayName']['UserLocalizedLabel']['Label'],
                                 'dv'       => $field['LogicalName'],
                                 'required' => 'ApplicationRequired' === $field['RequiredLevel']['Value'],
