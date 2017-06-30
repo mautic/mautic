@@ -12,12 +12,14 @@ $props   = $focus['properties'];
 $color   = \MauticPlugin\MauticFocusBundle\Model\FocusModel::isLightColor($props['colors']['primary']) ? '000000' : 'ffffff';
 $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 ?>
-
 <div class="mautic-focus mf-bar mf-bar-<?php echo $props['bar']['size']; ?> mf-bar-<?php echo $props['bar']['placement']; ?><?php if ($props['bar']['sticky']) {
     echo ' mf-bar-sticky';
 } ?><?php echo $animate; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>;">
 
     <div class="mf-content">
+        <?php if (!empty($focus['htmlMode']) || !empty($focus['html_mode'])): ?>
+            <?php echo html_entity_decode($focus['html']); ?>
+        <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
         <?php if ($focus['type'] == 'form' && !empty($form)): ?>
             <?php echo $view->render(
@@ -29,12 +31,14 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
                 ? '_new' : '_parent'; ?>">
                 <?php echo $props['content']['link_text']; ?>
             </a>
+            <?php endif; ?>
         <?php endif; ?>
     </div>
 
     <div class="mf-bar-collapse"></div>
 </div>
-<?php if ($props['bar']['allow_hide']): ?>
+<?php
+if ($props['bar']['allow_hide']): ?>
     <div class="mf-copy-to-parent mf-bar-collapser mf-bar-collapser-<?php echo $props['bar']['placement']; ?> mf-bar-collapser-<?php echo $props['bar']['size']; ?><?php if ($props['bar']['sticky']) {
                     echo ' mf-bar-collapser-sticky';
                 } ?> mf-bar-collapser-<?php echo $focus['id']; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>; color: #<?php echo $props['colors']['text']; ?>;">

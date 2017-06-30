@@ -496,7 +496,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead(Lead $lead, array $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

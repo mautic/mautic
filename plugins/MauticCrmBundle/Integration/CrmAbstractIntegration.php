@@ -97,7 +97,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param array $params
      */
-    public function getLeads($params = [])
+    public function getLeads($params, $query, &$executed, $result = [],  $object = 'Lead')
     {
         $executed = null;
 
