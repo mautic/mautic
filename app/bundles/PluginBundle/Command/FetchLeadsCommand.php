@@ -85,6 +85,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $endDate       = $input->getOption('end-date');
         $interval      = $input->getOption('time-interval');
         $limit         = $input->getOption('limit');
+        $fetchAll      = $input->getOption('fetch-all');
         $leadsExecuted = $contactsExecuted = null;
 
         if (!$interval) {
@@ -107,10 +108,11 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $config['objects'] = [];
             }
 
-            $params['start']  = $startDate;
-            $params['end']    = $endDate;
-            $params['limit']  = $limit;
-            $params['output'] = $output;
+            $params['start']    = $startDate;
+            $params['end']      = $endDate;
+            $params['limit']    = $limit;
+            $params['fetchAll'] = $fetchAll;
+            $params['output']   = $output;
 
             // set this constant to ensure that all contacts have the same date modified time and date synced time to prevent a pull/push loop
             define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());

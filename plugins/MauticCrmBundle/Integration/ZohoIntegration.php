@@ -416,33 +416,46 @@ class ZohoIntegration extends CrmAbstractIntegration
                     }
                 }
 
+                $MAX_RECORDS              = 200;
                 $fields                   = implode(',', $mappedData);
                 $oparams['selectColumns'] = $object.'('.$fields.')';
-                $oparams['toIndex']       = ($params['limit'] > 200) ? 200 : $params['limit']; // maximum number of records
+                $oparams['toIndex']       = $MAX_RECORDS; // maximum number of records
+                if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
+                    $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
+                }
 
-                while ($executed < $params['limit']) {
+                if (isset($params['output'])) {
+                    $progress = new ProgressBar($params['output']);
+                    $progress->start();
+                }
+
+                while (true) {
                     // {"response":{"nodata":{"code":"4422","message":"There is no data to show"},"uri":"/crm/private/json/Contacts/getRecords"}}
                     $data = $this->getApiHelper()->getLeads($oparams, $object);
-                    if (isset($data['response'], $data['response']['nodata'])) {
+                    if (!isset($data[$object])) {
                         break; // no more data, exit loop
                     }
                     $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-                    if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                        $params['output']->writeln($result);
-                    }
                     $executed += count($result);
-
-                    if ($params['limit'] < 200) {
-                        break; // default exit
+                    if (isset($params['output'])) {
+                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $params['output']->writeln($result);
+                        } else {
+                            $progress->advance();
+                        }
                     }
 
                     // prepare next loop
                     $oparams['fromIndex'] = $oparams['toIndex'] + 1;
-                    $oparams['toIndex'] += 200;
+                    $oparams['toIndex'] += $MAX_RECORDS;
                 }
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
+        }
+
+        if (isset($params['output'])) {
+            $progress->finish();
         }
 
         return $executed;
@@ -475,27 +488,40 @@ class ZohoIntegration extends CrmAbstractIntegration
 
                 $fields = implode(',', $mappedData);
 
+                $MAX_RECORDS              = 200;
                 $oparams['selectColumns'] = 'Accounts('.$fields.')';
-                $oparams['toIndex']       = ($params['limit'] > 200) ? 200 : $params['limit']; // maximum number of records
+                $oparams['toIndex']       = $MAX_RECORDS; // maximum number of records
+                if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
+                    $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
+                }
 
-                while ($executed < $params['limit']) {
+                if (isset($params['output'])) {
+                    $progress = new ProgressBar($params['output']);
+                    $progress->start();
+                }
+
+                while (true) {
                     $data = $this->getApiHelper()->getCompanies($oparams);
-                    if (isset($data['response'], $data['response']['nodata'])) {
+                    if (!isset($data['Accounts'])) {
                         break; // no more data, exit loop
                     }
                     $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-                    if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                        $params['output']->writeln($result);
-                    }
                     $executed += count($result);
-
-                    if ($params['limit'] < 200) {
-                        break; // default exit
+                    if (isset($params['output'])) {
+                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $params['output']->writeln($result);
+                        } else {
+                            $progress->advance();
+                        }
                     }
 
                     // prepare next loop
                     $oparams['fromIndex'] = $oparams['toIndex'] + 1;
-                    $oparams['toIndex'] += 200;
+                    $oparams['toIndex'] += $MAX_RECORDS;
+                }
+
+                if (isset($params['output'])) {
+                    $progress->finish();
                 }
 
                 return $executed;
@@ -805,7 +831,11 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = [])
     {
-        $limit                 = $params['limit'];
+        $MAX_RECORDS = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
+        if (isset($params['fetchAll']) && $params['fetchAll']) {
+            $params['start'] = null;
+            $params['end']   = null;
+        }
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
@@ -826,8 +856,8 @@ class ZohoIntegration extends CrmAbstractIntegration
         $fieldsToUpdate['Contacts'] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate['Contacts']));
 
         $progress      = false;
-        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, null, null, ['Contacts', 'Leads']));
-        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false);
+        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, $params['start'], $params['end'], ['Contacts', 'Leads']));
+        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false, $params['start'], $params['end']);
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -846,42 +876,44 @@ class ZohoIntegration extends CrmAbstractIntegration
         $integrationEntities = [];
 
         // Fetch them separately so we can determine which oneas are already there
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $limit, null, null, 'Contacts', [])['Contacts'];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, $params['start'], $params['end'], 'Contacts', [])['Contacts'];
 
-        $contactCount = count($toUpdate);
-        $totalCount -= count($toUpdate);
-        $totalUpdated += count($toUpdate);
-
-        foreach ($toUpdate as $lead) {
-            if (isset($lead['email']) && !empty($lead['email'])) {
-                $key                        = mb_strtolower($this->cleanPushData($lead['email']));
-                $lead['integration_entity'] = 'Contacts';
-                $leadsToUpdateInZ[$key]     = $lead;
-                $isContact[$key]            = $lead;
-            }
-        }
-
-        // Switch to Lead
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $limit, null, null,  'Leads', [])['Leads'];
-
-        $leadCount = count($toUpdate);
-        $totalCount -= count($toUpdate);
-        $totalUpdated += count($toUpdate);
-
-        foreach ($toUpdate as $lead) {
-            if (isset($lead['email']) && !empty($lead['email'])) {
-                $key = mb_strtolower($this->cleanPushData($lead['email']));
-                if (isset($isContact[$key])) {
-                    $isContact[$key] = $lead; // lead-converted
-                } else {
-                    $lead['integration_entity'] = 'Leads';
+        if (is_array($toUpdate)) {
+            $contactCount = count($toUpdate);
+            $totalCount -= count($toUpdate);
+            $totalUpdated += count($toUpdate);
+            foreach ($toUpdate as $lead) {
+                if (isset($lead['email']) && !empty($lead['email'])) {
+                    $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead['integration_entity'] = 'Contacts';
                     $leadsToUpdateInZ[$key]     = $lead;
-                    $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
-                    $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
+                    $isContact[$key]            = $lead;
                 }
             }
         }
 
+        // Switch to Lead
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, $params['start'], $params['end'],  'Leads', [])['Leads'];
+
+        if (is_array($toUpdate)) {
+            $leadCount = count($toUpdate);
+            $totalCount -= count($toUpdate);
+            $totalUpdated += count($toUpdate);
+
+            foreach ($toUpdate as $lead) {
+                if (isset($lead['email']) && !empty($lead['email'])) {
+                    $key = mb_strtolower($this->cleanPushData($lead['email']));
+                    if (isset($isContact[$key])) {
+                        $isContact[$key] = $lead; // lead-converted
+                    } else {
+                        $lead['integration_entity'] = 'Leads';
+                        $leadsToUpdateInZ[$key]     = $lead;
+                        $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
+                        $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
+                    }
+                }
+            }
+        }
         unset($toUpdate);
 
         // convert ignored contacts
@@ -900,14 +932,17 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         //create lead records, including deleted on Zoho side (last_sync = null)
         /** @var array $leadsToCreate */
-        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $limit, null, null);
-        $totalCount -= count($leadsToCreate);
-        $totalCreated += count($leadsToCreate);
-        foreach ($leadsToCreate as $lead) {
-            if (isset($lead['email']) && !empty($lead['email'])) {
-                $key                        = mb_strtolower($this->cleanPushData($lead['email']));
-                $lead['integration_entity'] = 'Leads';
-                $leadsToCreateInZ[$key]     = $lead;
+        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false, $params['start'], $params['end']);
+
+        if (is_array($leadsToCreate)) {
+            $totalCount -= count($leadsToCreate);
+            $totalCreated += count($leadsToCreate);
+            foreach ($leadsToCreate as $lead) {
+                if (isset($lead['email']) && !empty($lead['email'])) {
+                    $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead['integration_entity'] = 'Leads';
+                    $leadsToCreateInZ[$key]     = $lead;
+                }
             }
         }
         unset($leadsToCreate);
@@ -950,7 +985,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $xmlData .= '</row>';
 
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
-                if (100 === $rowid) {
+                if ($MAX_RECORDS === $rowid) {
                     $xmlData .= '</'.$zObject.'>';
                     $this->logger->debug($xmlData);
                     $this->getApiHelper()->updateLead($xmlData, null, $zObject);
@@ -998,7 +1033,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $xmlData .= '</row>';
 
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
-                if (100 === $rowid) {
+                if ($MAX_RECORDS === $rowid) {
                     $xmlData .= '</'.$zObject.'>';
                     $this->logger->debug($xmlData);
                     $response = $this->getApiHelper()->createLead($xmlData, null, $zObject);
