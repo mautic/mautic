@@ -986,7 +986,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
                 if ($MAX_RECORDS === $rowid) {
                     $xmlData .= '</'.$zObject.'>';
-                    $this->logger->debug($xmlData);
                     $this->getApiHelper()->updateLead($xmlData, null, $zObject);
                     $xmlData = '<'.$zObject.'>';
                     $rowid   = 1;
@@ -1034,7 +1033,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
                 if ($MAX_RECORDS === $rowid) {
                     $xmlData .= '</'.$zObject.'>';
-                    $this->logger->debug($xmlData);
                     $response = $this->getApiHelper()->createLead($xmlData, null, $zObject);
                     $this->createIntegrationEntityFromResponse($response, $zObject, $integrationEntityRepo);
                     $xmlData = '<'.$zObject.'>';
@@ -1044,7 +1042,6 @@ class ZohoIntegration extends CrmAbstractIntegration
             $xmlData .= '</'.$zObject.'>';
 
             if ($rowid > 1) {
-                $this->logger->debug($xmlData);
                 $response = $this->getApiHelper()->createLead($xmlData, null, $zObject);
                 $this->createIntegrationEntityFromResponse($response, $zObject, $integrationEntityRepo);
             }
