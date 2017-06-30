@@ -449,7 +449,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['fromIndex'] = $oparams['toIndex'] + 1;
                     $oparams['toIndex'] += $MAX_RECORDS;
                 }
-                
+
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress->finish();
                 }
