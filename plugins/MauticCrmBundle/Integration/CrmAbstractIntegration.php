@@ -97,7 +97,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param array $params
      */
-    public function getLeads($params = [])
+    public function getLeads($params, $query, &$executed, $result = [],  $object = 'Lead')
     {
         $executed = null;
 
@@ -443,5 +443,20 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
     {
         return $fieldsToUpdate;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function getSyncTimeframeDates(array $params)
+    {
+        $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
+            : null;
+        $toDate = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
+            : null;
+
+        return [$fromDate, $toDate];
     }
 }
