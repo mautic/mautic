@@ -86,6 +86,9 @@ return [
                     'mautic.plugin.model.plugin',
                 ],
             ],
+            'mautic.plugin.integration.subscriber' => [
+                'class' => 'Mautic\PluginBundle\EventListener\IntegrationSubscriber',
+            ],
         ],
         'forms' => [
             'mautic.form.type.integration.details' => [

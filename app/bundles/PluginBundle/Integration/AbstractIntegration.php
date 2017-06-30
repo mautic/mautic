@@ -1788,12 +1788,10 @@ abstract class AbstractIntegration
 
         foreach ($availableFields as $key => $field) {
             $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
-            if (!isset($config['leadFields'][$integrationKey])) {
-                continue;
-            }
-
             if (is_array($integrationKey)) {
                 list($integrationKey, $matchIntegrationKey) = $integrationKey;
+            } elseif (!isset($config['leadFields'][$integrationKey])) {
+                continue;
             }
 
             if (isset($leadFields[$integrationKey])) {

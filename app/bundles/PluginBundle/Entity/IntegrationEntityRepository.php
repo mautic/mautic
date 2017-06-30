@@ -320,7 +320,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere('l.email is not null')
             ->andWhere(
                 'not exists (select null from '.MAUTIC_TABLE_PREFIX
-                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id )'
+                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id)'
             )
             ->setParameter('integration', $integration);
 

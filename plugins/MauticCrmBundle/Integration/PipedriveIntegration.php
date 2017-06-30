@@ -231,7 +231,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
         return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
     }
 
-    public function pushLead(Lead $lead, array $config = [])
+    public function pushLead($lead, $config = [])
     {
         $leadExport = $this->factory->get('mautic_integration.pipedrive.export.lead');
         $leadExport->setIntegration($this);
