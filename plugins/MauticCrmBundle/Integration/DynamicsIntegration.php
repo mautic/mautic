@@ -284,7 +284,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                             $type      = 'string';
                             $fieldType = $field['AttributeTypeName']['Value'];
                             if (in_array($fieldType, [
-                                'LookupType',
+                                 'LookupType',
                                  'OwnerType',
                                  'PicklistType',
                                  'StateType',
@@ -292,8 +292,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                                  'UniqueidentifierType',
                             ], true)) {
                                 continue;
-                            }
-                            if (in_array($fieldType, [
+                            } elseif (in_array($fieldType, [
                                 'DoubleType',
                                  'IntegerType',
                                  'MoneyType',
