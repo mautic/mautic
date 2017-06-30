@@ -228,7 +228,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field, $object) {
-            return ('email1' === $field['name']) || ($field['name'] != 'id' && $field['required']);
+            switch (true) {
+                case ('Leads' === $object && 'webtolead_email1' === $field['name']):
+                    return true;
+                case ('Contacts' === $object && 'email1' === $field['name']):
+                    return true;
+                case ('id' !== $field['name'] && !empty($field['required'])):
+                    return true;
+                default:
+                    return false;
+            }
         };
 
         try {
@@ -239,17 +248,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $sObject = 'company';
                     }
                     if ($this->isAuthorized()) {
-                        $sObject = trim($sObject);
                         // Check the cache first
-                        $settings['cache_suffix'] = $cacheSuffix = '.'.$sObject;
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.trim($sObject);
                         if ($fields = parent::getAvailableLeadFields($settings)) {
-                            if (('company' === $sObject && isset($fields['id'])) || isset($fields['id__'.$sObject])) {
-                                $sugarFields[$sObject] = $fields;
+                            if (('company' === trim($sObject) && isset($fields['id'])) || isset($fields['id__'.trim($sObject)])) {
+                                $sugarFields[trim($sObject)] = $fields;
                                 continue;
                             }
                         }
-                        if (!isset($sugarFields[$sObject])) {
-                            $fields = $this->getApiHelper()->getLeadFields($sObject);
+                        if (!isset($sugarFields[trim($sObject)])) {
+                            $fields = $this->getApiHelper()->getLeadFields(trim($sObject));
 
                             if ($fields != null && !empty($fields)) {
                                 if (isset($fields['module_fields']) && !empty($fields['module_fields'])) {
@@ -262,30 +270,30 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         )) {
                                             $type      = 'string';
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
-
-                                            if ($sObject !== 'company') {
-                                                $sugarFields[$sObject][$fieldName.'__'.$sObject] = [
+                                            // make these congruent as some come in with colons and some do not
+                                            $label = str_replace(':', '', $fieldInfo['label']);
+                                            if (trim($sObject) !== 'company') {
+                                                $sugarFields[trim($sObject)][$fieldName.'__'.trim($sObject)] = [
                                                     'type'        => $type,
-                                                    'label'       => $sObject.'-'.$fieldInfo['label'],
-                                                    'required'    => $isRequired($fieldInfo, $sObject),
-                                                    'group'       => $sObject,
+                                                    'label'       => trim($sObject).'-'.$label,
+                                                    'required'    => $isRequired($fieldInfo, trim($sObject)),
+                                                    'group'       => trim($sObject),
                                                     'optionLabel' => $fieldInfo['label'],
                                                 ];
                                             } else {
-                                                $sugarFields[$sObject][$fieldName] = [
+                                                $sugarFields[trim($sObject)][$fieldName] = [
                                                     'type'     => $type,
-                                                    'label'    => $fieldInfo['label'],
-                                                    'required' => $isRequired($fieldInfo, $sObject),
+                                                    'label'    => $label,
+                                                    'required' => $isRequired($fieldInfo, trim($sObject)),
                                                 ];
                                             }
                                         }
                                     }
-                                    $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[$sObject]);
+                                    $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[trim($sObject)]);
                                 } elseif (isset($fields['fields']) && !empty($fields['fields'])) {
                                     //7.x
-
                                     foreach ($fields['fields'] as $fieldInfo) {
-                                        if (isset($fieldInfo['name']) && empty($fieldInfo['readonly']) && !empty($fieldInfo['comment'])
+                                        if (isset($fieldInfo['name']) && empty($fieldInfo['readonly'])
                                             && (!in_array(
                                                 $fieldInfo['type'],
                                                 ['id', 'team_list', 'bool', 'link', 'relate']
@@ -294,6 +302,17 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
                                             )
                                         ) {
+
+                                            if (!empty($fieldInfo['comment'])) {
+                                                $label = $fieldInfo['comment'];
+                                            } elseif (!empty($fieldInfo['help'])) {
+                                                $label = $fieldInfo['help'];
+                                            } else {
+                                                $label = ucfirst(str_replace('_', ' ', $fieldInfo['name']));
+                                            }
+                                            // make these congruent as some come in with colons and some do not
+                                            $label = str_replace(':', '', $label);
+
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false)
                                                 ? $fieldInfo['name']
                                                 : str_replace(
@@ -303,19 +322,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                                 );
 
                                             $type = 'string';
-                                            if ($sObject !== 'company') {
-                                                $sugarFields[$sObject][$fieldName.'__'.$sObject] = [
+                                            if (trim($sObject) !== 'company') {
+                                                $sugarFields[trim($sObject)][$fieldName.'__'.trim($sObject)] = [
                                                     'type'        => $type,
-                                                    'label'       => $sObject.'-'.$fieldInfo['comment'],
-                                                    'required'    => $isRequired($fieldInfo, $sObject),
-                                                    'group'       => $sObject,
-                                                    'optionLabel' => $fieldInfo['comment'],
+                                                    'label'       => trim($sObject).'-'.$label,
+                                                    'required'    => $isRequired($fieldInfo, trim($sObject)),
+                                                    'group'       => trim($sObject),
+                                                    'optionLabel' => $label,
                                                 ];
                                             } else {
-                                                $sugarFields[$sObject][$fieldName] = [
+                                                $sugarFields[trim($sObject)][$fieldName] = [
                                                     'type'     => $type,
-                                                    'label'    => $fieldInfo['comment'],
-                                                    'required' => $isRequired($fieldInfo, $sObject),
+                                                    'label'    => $label,
+                                                    'required' => $isRequired($fieldInfo, trim($sObject)),
                                                 ];
                                             }
                                         }
