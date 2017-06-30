@@ -399,7 +399,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['filter'] = sprintf('CreatedOn ge datetime\'%s\'', $params['start']);
+                    $oparams['$filter'] = sprintf('createdon ge %sZ', substr($params['start'], 0, '-6'));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
@@ -431,7 +431,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
                     // prepare next loop
                     $nextLink              = $data['@odata.nextLink'];
-                    $oparams['$skiptoken'] = substr($nextLink, strpos($nextLink, '$skiptoken=') + 11);
+                    $oparams['$skiptoken'] = urldecode(substr($nextLink, strpos($nextLink, '$skiptoken=') + 11));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
@@ -471,7 +471,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['filter'] = sprintf('CreatedOn ge datetime\'%s\'', $params['start']);
+                    $oparams['$filter'] = sprintf('createdon ge %sZ', substr($params['start'], 0, '-6'));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
@@ -502,7 +502,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
                     // prepare next loop
                     $nextLink              = $data['@odata.nextLink'];
-                    $oparams['$skiptoken'] = substr($nextLink, strpos($nextLink, '$skiptoken=') + 11);
+                    $oparams['$skiptoken'] = urldecode(substr($nextLink, strpos($nextLink, '$skiptoken=') + 11));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
