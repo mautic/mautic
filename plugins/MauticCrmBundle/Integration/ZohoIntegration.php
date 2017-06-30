@@ -424,7 +424,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
                 }
 
-                if (isset($params['output'])) {
+                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress = new ProgressBar($params['output']);
                     $progress->start();
                 }
@@ -454,7 +454,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $this->logIntegrationError($e);
         }
 
-        if (isset($params['output'])) {
+        if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
             $progress->finish();
         }
 
@@ -495,7 +495,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['lastModifiedTime'] = date('Y-m-d H:i:s', strtotime($params['start']));
                 }
 
-                if (isset($params['output'])) {
+                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress = new ProgressBar($params['output']);
                     $progress->start();
                 }
@@ -520,7 +520,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $oparams['toIndex'] += $MAX_RECORDS;
                 }
 
-                if (isset($params['output'])) {
+                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
                     $progress->finish();
                 }
 
@@ -876,10 +876,9 @@ class ZohoIntegration extends CrmAbstractIntegration
         $integrationEntities = [];
 
         // Fetch them separately so we can determine which oneas are already there
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, $params['start'], $params['end'], 'Contacts', [])['Contacts'];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'], 'Contacts', [])['Contacts'];
 
         if (is_array($toUpdate)) {
-            $contactCount = count($toUpdate);
             $totalCount -= count($toUpdate);
             $totalUpdated += count($toUpdate);
             foreach ($toUpdate as $lead) {
@@ -893,7 +892,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         }
 
         // Switch to Lead
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, false, $params['start'], $params['end'],  'Leads', [])['Leads'];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Zoho', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'],  'Leads', [])['Leads'];
 
         if (is_array($toUpdate)) {
             $leadCount = count($toUpdate);
@@ -932,7 +931,7 @@ class ZohoIntegration extends CrmAbstractIntegration
 
         //create lead records, including deleted on Zoho side (last_sync = null)
         /** @var array $leadsToCreate */
-        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, false, $params['start'], $params['end']);
+        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Zoho', $fields, $totalToCreate, $params['start'], $params['end']);
 
         if (is_array($leadsToCreate)) {
             $totalCount -= count($leadsToCreate);
