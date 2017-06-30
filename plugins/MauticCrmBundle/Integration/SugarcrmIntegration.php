@@ -228,7 +228,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field, $object) {
-            return ('email' === $field['name']) || ($field['name'] != 'id' && !empty($field['required']));
+            return ('email1' === $field['name']) || ($field['name'] != 'id' && $field['required']);
         };
 
         try {
@@ -1265,11 +1265,17 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $fields = 'l.owner_id,l.'.$fields;
             $result = 0;
 
-            $leadSugarFieldsToCreate = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Leads');
-            $leadSugarFields         = array_diff_key($leadSugarFieldsToCreate, array_flip($fieldsToUpdateInSugar));
-            $contactSugarFields      = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Contacts');
-            $contactSugarFields      = array_diff_key($contactSugarFields, array_flip($fieldsToUpdateInSugar));
-            $availableFields         = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
+            //Leads fields
+            $leadSugarFieldsToCreate    = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Leads');
+            $fieldsToUpdateInLeadsSugar = $this->cleanSugarData($config, $fieldsToUpdateInSugar, 'Leads');
+            $leadSugarFields            = array_diff_key($leadSugarFieldsToCreate, $fieldsToUpdateInLeadsSugar);
+
+            //Contacts fields
+            $contactSugarFields            = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Contacts');
+            $fieldsToUpdateInContactsSugar = $this->cleanSugarData($config, $fieldsToUpdateInSugar, 'Contacts');
+            $contactSugarFields            = array_diff_key($contactSugarFields, $fieldsToUpdateInContactsSugar);
+
+            $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
 
             //update lead/contact records
             $leadsToUpdate = $integrationEntityRepo->findLeadsToUpdate($this->getName(), 'lead', $fields, $limit, null, null, ['Contacts', 'Leads']);
@@ -1649,7 +1655,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     protected function getPriorityFieldsForMautic($config, $object = null, $priorityObject = 'mautic')
     {
-        $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
+        if ($object == 'company') {
+            $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');
+            $fields   = array_intersect_key($config['companyFields'], $priority);
+        } else {
+            $fields = parent::getPriorityFieldsForMautic($config, $object, $priorityObject);
+        }
 
         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
     }

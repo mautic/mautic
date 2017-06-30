@@ -602,7 +602,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead(Lead $lead,  array $config = [])
+    public function pushLead($lead,  $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
