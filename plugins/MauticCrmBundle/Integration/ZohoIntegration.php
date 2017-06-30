@@ -355,7 +355,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                                 $entity->getId()
                             );
 
-                            if ($integrationId == null) {
+                            if (0 === count($integrationId)) {
                                 $integrationEntity = new IntegrationEntity();
                                 $integrationEntity->setDateAdded(new \DateTime());
                                 $integrationEntity->setIntegration('Zoho');
@@ -394,7 +394,7 @@ class ZohoIntegration extends CrmAbstractIntegration
      *
      * @return int|null
      */
-    public function getLeads($params = [], $query = null, &$executed = null, &$result = [], $object = 'Leads')
+    public function getLeads($params, $query, &$executed, $result = [], $object = 'Lead')
     {
         if ('Lead' === $object || 'Contact' === $object) {
             $object .= 's'; // pluralize object name for Zoho
@@ -908,7 +908,6 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $key                        = mb_strtolower($this->cleanPushData($lead['email']));
                 $lead['integration_entity'] = 'Leads';
                 $leadsToCreateInZ[$key]     = $lead;
-                // TODO: Add new integrationentity after
             }
         }
         unset($leadsToCreate);
@@ -949,6 +948,15 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $this->cleanPushData($value));
                 }
                 $xmlData .= '</row>';
+
+                // ONLY 100 RECORDS CAN BE SENT AT A TIME
+                if (100 === $rowid) {
+                    $xmlData .= '</'.$zObject.'>';
+                    $this->logger->debug($xmlData);
+                    $this->getApiHelper()->updateLead($xmlData, null, $zObject);
+                    $xmlData = '<'.$zObject.'>';
+                    $rowid   = 1;
+                }
             }
             $xmlData .= '</'.$zObject.'>';
 
@@ -970,7 +978,8 @@ class ZohoIntegration extends CrmAbstractIntegration
                 if ($progress) {
                     $progress->advance();
                 }
-                $xmlData .= '<row no="'.($rowid++).'">';
+                ++$rowid;
+                $xmlData .= '<row no="'.$lead['internal_entity_id'].'">';
                 // Match that data with mapped lead fields
                 foreach ($config['leadFields'] as $k => $v) {
                     foreach ($lead as $dk => $dv) {
@@ -987,12 +996,23 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $xmlData .= sprintf('<FL val="%s"><![CDATA[%s]]></FL>', $name, $this->cleanPushData($value));
                 }
                 $xmlData .= '</row>';
+
+                // ONLY 100 RECORDS CAN BE SENT AT A TIME
+                if (100 === $rowid) {
+                    $xmlData .= '</'.$zObject.'>';
+                    $this->logger->debug($xmlData);
+                    $response = $this->getApiHelper()->createLead($xmlData, null, $zObject);
+                    $this->createIntegrationEntityFromResponse($response, $zObject, $integrationEntityRepo);
+                    $xmlData = '<'.$zObject.'>';
+                    $rowid   = 1;
+                }
             }
             $xmlData .= '</'.$zObject.'>';
 
             if ($rowid > 1) {
                 $this->logger->debug($xmlData);
-                $this->getApiHelper()->createLead($xmlData, null, $zObject);
+                $response = $this->getApiHelper()->createLead($xmlData, null, $zObject);
+                $this->createIntegrationEntityFromResponse($response, $zObject, $integrationEntityRepo);
             }
         }
 
@@ -1012,5 +1032,38 @@ class ZohoIntegration extends CrmAbstractIntegration
     public function getDataPriority()
     {
         return true;
+    }
+
+    /**
+     * @param array $response
+     * @param $zObject
+     * @param IntegrationEntityRepository $integrationEntityRepo
+     */
+    private function createIntegrationEntityFromResponse($response, $zObject, $integrationEntityRepo)
+    {
+        $text    = preg_replace('/_/', ' ', implode('', array_keys($response))).'='.implode('', array_values($response));
+        $xml     = simplexml_load_string($text);
+        $doc     = json_decode(json_encode((array) $xml), true);
+        $rows    = $doc['result']['row'];
+        $total   = count($rows);
+        $success = 0;
+        foreach ($rows as $row) {
+            if (isset($row['success'])) {
+                $fl = $row['success']['details']['FL'];
+                if (isset($fl[0])) {
+                    ++$success;
+                    $this->logger->debug('CREATE INTEGRATION ENTITY: '.$fl[0]);
+                    $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $zObject,
+                        'lead', null, null, null, false, 0, 0,
+                        "'".$fl[0]."'"
+                    );
+
+                    if (0 === count($integrationId)) {
+                        $leadId = $row['@attributes']['no'];
+                        $this->createIntegrationEntity($zObject, $fl[0], 'lead', $leadId);
+                    }
+                }
+            }
+        }
     }
 }
