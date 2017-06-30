@@ -762,6 +762,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         // update contacts
         $leadData = [];
+        $rowNum   = 0;
         foreach ($leadsToUpdateInD as $email => $lead) {
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
@@ -780,11 +781,20 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 }
             }
             $leadData[$lead['integration_entity_id']] = $mappedData;
+
+            ++$rowNum;
+            // SEND 100 RECORDS AT A TIME
+            if (100 === $rowNum) {
+                $this->getApiHelper()->updateLeads($leadData, $object);
+                $leadData = [];
+                $rowNum   = 0;
+            }
         }
-        $ids = $this->getApiHelper()->updateLeads($leadData, $object);
+        $this->getApiHelper()->updateLeads($leadData, $object);
 
         // create  contacts
         $leadData = [];
+        $rowNum   = 0;
         foreach ($leadsToCreateInD as $email => $lead) {
             $mappedData = [];
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
@@ -803,9 +813,18 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 }
             }
             $leadData[$lead['internal_entity_id']] = $mappedData;
+
+            ++$rowNum;
+            // SEND 100 RECORDS AT A TIME
+            if (100 === $rowNum) {
+                $ids = $this->getApiHelper()->createLeads($leadData, $object);
+                $this->createIntegrationEntities($ids, $object, $integrationEntityRepo);
+                $leadData = [];
+                $rowNum   = 0;
+            }
         }
-        /** @var array $ids */
         $ids = $this->getApiHelper()->createLeads($leadData, $object);
+        $this->createIntegrationEntities($ids, $object, $integrationEntityRepo);
 
         if ($progress) {
             $progress->finish();
@@ -813,5 +832,25 @@ class DynamicsIntegration extends CrmAbstractIntegration
         }
 
         return [$totalUpdated, $totalCreated, $totalErrors];
+    }
+
+    /**
+     * @param array $ids
+     * @param $object
+     * @param IntegrationEntityRepository $integrationEntityRepo
+     */
+    private function createIntegrationEntities($ids, $object, $integrationEntityRepo)
+    {
+        foreach ($ids as $oid => $leadId) {
+            $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);
+            $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Dynamics', $object,
+                'lead', null, null, null, false, 0, 0,
+                "'".$oid."'"
+            );
+
+            if (0 === count($integrationId)) {
+                $this->createIntegrationEntity($object, $oid, 'lead', $leadId);
+            }
+        }
     }
 }

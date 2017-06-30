@@ -150,8 +150,9 @@ class DynamicsApi extends CrmApi
     /**
      * Batch create leads.
      *
-     * @param array $data
-     * @param $object
+     * @param array  $data
+     * @param string $object
+     * @param bool   $isUpdate
      *
      * @return array
      */
@@ -174,10 +175,12 @@ class DynamicsApi extends CrmApi
 
         $contentId = 0;
         foreach ($data as $objectId => $lead) {
+            ++$contentId;
             $odata .= '--changeset_'.$changeId.PHP_EOL;
             $odata .= 'Content-Type: application/http'.PHP_EOL;
             $odata .= 'Content-Transfer-Encoding:binary'.PHP_EOL;
-            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
+            $odata .= 'Content-ID: '.$objectId.PHP_EOL.PHP_EOL;
+//            $odata .= 'Content-ID: '.(++$contentId).PHP_EOL.PHP_EOL;
             $returnIds[$objectId] = $contentId;
             if (!$isUpdate) {
                 $oid                  = $objectId;
@@ -201,9 +204,12 @@ class DynamicsApi extends CrmApi
         $settings['post_data']                  = $odata;
         $settings['curl_options'][CURLOPT_CRLF] = true;
 
-        $this->request('$batch', [], 'POST', $object, $settings);
+        $response = $this->request('$batch', [], 'POST', $object, $settings);
+        if ($isUpdate) {
+            return $returnIds;
+        }
 
-        return $returnIds;
+        return $this->parseRawHttpResponse($response);
     }
 
     /**
@@ -215,5 +221,55 @@ class DynamicsApi extends CrmApi
     public function updateLeads($data, $object = 'contacts')
     {
         return $this->createLeads($data, $object, true);
+    }
+
+    /**
+     * @link https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
+     *
+     * @param Response $response
+     *
+     * @return array
+     */
+    public function parseRawHttpResponse(Response $response)
+    {
+        $a_data      = [];
+        $input       = $response->body;
+        $contentType = $response->headers['Content-Type'];
+        // grab multipart boundary from content type header
+        preg_match('/boundary=(.*)$/', $contentType, $matches);
+        $boundary = $matches[1];
+        // split content by boundary and get rid of last -- element
+        $a_blocks = preg_split("/-+$boundary/", $input);
+        array_pop($a_blocks);
+        // there is only one batchresponse
+        $input                = array_pop($a_blocks);
+        list($header, $input) = explode("\r\n\r\n", $input, 2);
+        foreach (explode("\r\n", $header) as $r) {
+            if (stripos($r, 'Content-Type:') === 0) {
+                list($headername, $contentType) = explode(':', $r, 2);
+            }
+        }
+        // grab multipart boundary from content type header
+        preg_match('/boundary=(.*)$/', $contentType, $matches);
+        $boundary = $matches[1];
+        // split content by boundary and get rid of last -- element
+        $a_blocks = preg_split("/-+$boundary/", $input);
+        array_pop($a_blocks);
+        // loop data blocks
+        foreach ($a_blocks as $id => $block) {
+            if (empty($block)) {
+                continue;
+            }
+            if (false !== stripos($block, 'OData-EntityId:')) {
+                preg_match('/Content-ID: (\d+)/', $block, $matches);
+                $leadId = (count($matches) > 1) ? $matches[1] : 0;
+                // OData-EntityId: https://virlatinus.crm.dynamics.com/api/data/v8.2/contacts(2725f27c-2058-e711-8111-c4346bac1938)
+                preg_match('/OData-EntityId: .*\(([^\)]*)\)/', $block, $matches);
+                $oid          = (count($matches) > 1) ? $matches[1] : '00000000-0000-0000-0000-000000000000';
+                $a_data[$oid] = $leadId;
+            }
+        }
+
+        return $a_data;
     }
 }
