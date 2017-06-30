@@ -318,7 +318,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             return [];
         }
 
-        $mappedData = $this->populateLeadData($lead, $config);
+        $mappedData = $this->populateLeadData($lead, $config, 'contacts');
 
         $this->amendLeadDataBeforePush($mappedData);
 
