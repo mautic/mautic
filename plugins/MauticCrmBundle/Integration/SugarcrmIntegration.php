@@ -228,7 +228,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field, $object) {
-            return $field['name'] != 'id' && !empty($field['required']);
+            return ('email' === $field['name']) || ($field['name'] != 'id' && !empty($field['required']));
         };
 
         try {
