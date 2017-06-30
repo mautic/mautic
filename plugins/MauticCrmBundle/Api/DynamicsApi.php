@@ -109,8 +109,8 @@ class DynamicsApi extends CrmApi
      */
     public function updateLead($data, $objectId)
     {
-        $settings['headers']['If-Match'] = '*'; // prevent create new contact
-        return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', $settings);
+        //        $settings['headers']['If-Match'] = '*'; // prevent create new contact
+        return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', []);
     }
 
     /**
