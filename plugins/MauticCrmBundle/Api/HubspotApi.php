@@ -100,6 +100,12 @@ class HubspotApi extends CrmApi
         return $this->request('v2/companies/recent/modified', $params, 'GET', 'companies');
     }
 
+    /**
+     * @param        $propertyName
+     * @param string $object
+     *
+     * @return mixed|string
+     */
     public function createProperty($propertyName, $object = 'properties')
     {
         return $this->request('v1/contacts/properties', ['name' => $propertyName,  'groupName' => 'contactinformation', 'type' => 'string'], 'POST', $object);

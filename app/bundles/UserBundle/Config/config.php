@@ -257,6 +257,7 @@ return [
                     'monolog.logger',
                     'event_dispatcher',
                     '', // providerKey
+                    'mautic.permission.repository',
                 ],
                 'public' => false,
             ],

@@ -65,7 +65,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead(Lead $lead,  array $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -223,6 +223,19 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $config = $this->mergeConfigToFeatureSettings([]);
 
         // Match that data with mapped lead fields
+        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'company');
+        $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
+        if (!empty($fieldsToUpdateInMautic)) {
+            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
+            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+        } else {
+            $newMatchedFields = $matchedFields;
+        }
+        if (!isset($newMatchedFields['companyname'])) {
+            if (isset($newMatchedFields['companywebsite'])) {
+                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
+            }
+        }
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
 
         // Find unique identifier fields used by the integration
@@ -233,6 +246,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $company         = new Company();
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
+            if (empty($newMatchedFields)) {
+                return;
+            }
             $company = $existingCompany[2];
         }
 

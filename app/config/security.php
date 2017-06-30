@@ -144,6 +144,10 @@ if (!$container->getParameter('mautic.api_enabled')) {
     );
 }
 
+if (!$container->getParameter('mautic.famework.csrf_protection')) {
+    unset($firewalls['main']['simple_form']['csrf_token_generator']);
+}
+
 $container->loadFromExtension(
     'security',
     [
