@@ -726,6 +726,12 @@ class LeadListRepository extends CommonRepository
                     $isRelative = true;
 
                     switch ($timeframe) {
+                        case 'birthday':
+                            $func = 'like';
+                            $isRelative = false;
+                            $details['operator'] = 'like';
+                            $details['filter'] = date('-m-d');
+                            break;
                         case 'today':
                         case 'tomorrow':
                         case 'yesterday':
@@ -860,7 +866,8 @@ class LeadListRepository extends CommonRepository
                     }
 
                     // check does this match php date params pattern?
-                    if (stristr($string[0], '-') or stristr($string[0], '+')) {
+                    if ($timeframe !== 'birthday' && (stristr($string[0], '-')
+                                                   or stristr($string[0], '+'))) {
                         $date = new \DateTime('now');
                         $date->modify($string);
                         $dateTime = $date->format('Y-m-d H:i:s');
@@ -1605,6 +1612,7 @@ class LeadListRepository extends CommonRepository
             'mautic.lead.list.year_last',
             'mautic.lead.list.year_next',
             'mautic.lead.list.year_this',
+            'mautic.lead.list.birthday',
         ];
     }
 
