@@ -19,7 +19,7 @@ $template  = '<div class="col-md-6">{content}</div>';
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-6">
                 <?php echo $view['form']->row($fields['queue_protocol']); ?>
             </div>
         </div>
