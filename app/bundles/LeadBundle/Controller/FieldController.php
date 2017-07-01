@@ -11,13 +11,14 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Doctrine\DBAL\DBALException;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 
-class FieldController extends FormController
+class FieldController extends AbstractFormController
 {
     /**
      * Generate's default list view.
@@ -154,12 +155,22 @@ class FieldController extends FormController
                     }
 
                     if ($valid) {
+                        $flashMessage = 'mautic.core.notice.created';
                         try {
                             //form is valid so process the data
                             $model->saveEntity($field);
-
-                            $this->addFlash(
-                                'mautic.core.notice.created',
+                        } catch (DBALException $ee) {
+                            $flashMessage = $ee->getMessage();
+                        } catch (\Exception $e) {
+                            $form['alias']->addError(
+                                    new FormError(
+                                        $this->get('translator')->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
+                                    )
+                                );
+                            $valid = false;
+                        }
+                        $this->addFlash(
+                                $flashMessage,
                                 [
                                     '%name%'      => $field->getLabel(),
                                     '%menu_link%' => 'mautic_contactfield_index',
@@ -172,14 +183,6 @@ class FieldController extends FormController
                                     ),
                                 ]
                             );
-                        } catch (\Exception $e) {
-                            $form['alias']->addError(
-                                new FormError(
-                                    $this->get('translator')->trans('mautic.lead.field.failed', ['%error%' => $e->getMessage()], 'validators')
-                                )
-                            );
-                            $valid = false;
-                        }
                     }
                 }
             }

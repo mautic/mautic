@@ -43,7 +43,7 @@ class WidgetDetailEvent extends CommonEvent
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
-        $this->startTime  = microtime();
+        $this->startTime  = microtime(true);
     }
 
     /**
@@ -161,7 +161,7 @@ class WidgetDetailEvent extends CommonEvent
     {
         $this->templateData = $templateData;
         $this->widget->setTemplateData($templateData);
-        $this->widget->setLoadTime(abs(microtime() - $this->startTime));
+        $this->widget->setLoadTime(abs(microtime(true) - $this->startTime));
 
         // Store the template data to the cache
         if (!$skipCache && $this->cacheDir && $this->widget->getCacheTimeout() > 0) {

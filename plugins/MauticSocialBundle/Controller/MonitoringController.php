@@ -11,7 +11,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
@@ -19,7 +19,7 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 /**
  * Class MonitoringController.
  */
-class MonitoringController extends FormController
+class MonitoringController extends AbstractFormController
 {
     use EntityContactsTrait;
 

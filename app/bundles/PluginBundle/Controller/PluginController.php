@@ -12,7 +12,7 @@
 namespace Mautic\PluginBundle\Controller;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class PluginController.
  */
-class PluginController extends FormController
+class PluginController extends AbstractFormController
 {
     /**
      * @return JsonResponse|Response
@@ -432,10 +432,10 @@ class PluginController extends FormController
 
         /** @var \Doctrine\ORM\Mapping\ClassMetadata $meta */
         foreach ($allMetadata as $meta) {
-            $namespace = $meta->fullyQualifiedClassName('');
+            $namespace = $meta->namespace;
 
             if (strpos($namespace, 'MauticPlugin') !== false) {
-                $bundleName = str_replace('\Entity\\', '', $namespace);
+                $bundleName = preg_replace('/\\\Entity$/', '', $namespace);
                 if (!isset($pluginMetadata[$bundleName])) {
                     $pluginMetadata[$bundleName] = [];
                 }
@@ -566,8 +566,11 @@ class PluginController extends FormController
             // Call the install callback
             $callback        = $plugin['bundleClass'];
             $metadata        = (isset($pluginMetadata[$plugin['namespace']])) ? $pluginMetadata[$plugin['namespace']] : null;
-            $installedSchema = (isset($pluginInstalledSchemas[$plugin['namespace']]))
-                ? $pluginInstalledSchemas[$plugin['namespace']] : null;
+            $installedSchema = null;
+
+            if (isset($pluginInstalledSchemas[$plugin['namespace']]) && count($pluginInstalledSchemas[$plugin['namespace']]->getTables()) !== 0) {
+                $installedSchema = true;
+            }
 
             $callback::onPluginInstall($entity, $this->factory, $metadata, $installedSchema);
 

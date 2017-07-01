@@ -69,6 +69,11 @@ class Notification extends FormEntity
     private $button;
 
     /**
+     * @var array
+     */
+    private $utmTags = [];
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -172,6 +177,11 @@ class Notification extends FormEntity
             ->build();
 
         $builder->createField('button', 'text')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTags', 'array')
+            ->columnName('utm_tags')
             ->nullable()
             ->build();
 
@@ -280,6 +290,7 @@ class Notification extends FormEntity
             )
             ->addProperties(
                 [
+                    'utmTags',
                     'publishUp',
                     'publishDown',
                     'readCount',
@@ -427,6 +438,25 @@ class Notification extends FormEntity
     {
         $this->isChanged('message', $message);
         $this->message = $message;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
+    }
+
+    /**
+     * @param array $utmTags
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmTags', $utmTags);
+        $this->utmTags = $utmTags;
+
+        return $this;
     }
 
     /**

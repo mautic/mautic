@@ -40,7 +40,7 @@ class AuditLogRepository extends CommonRepository
             ->where('al.object != :category')
             ->setParameter('category', 'category');
 
-        if ($object && $id) {
+        if (null != $object && null !== $id) {
             $query
                 ->andWhere('al.object = :object')
                 ->andWhere('al.objectId = :id')
