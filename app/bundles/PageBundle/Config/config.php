@@ -245,10 +245,13 @@ return [
             'mautic.page.model.page' => [
                 'class'     => 'Mautic\PageBundle\Model\PageModel',
                 'arguments' => [
+                    'mautic.helper.cookie',
+                    'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
+                    'mautic.queue.service',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [

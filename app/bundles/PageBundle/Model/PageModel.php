@@ -17,8 +17,10 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
@@ -35,6 +37,8 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
+use Mautic\QueueBundle\Queue\QueueName;
+use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -57,6 +61,16 @@ class PageModel extends FormModel
      * @var bool
      */
     protected $trackByFingerprint;
+
+    /**
+     * @var CookieHelper
+     */
+    protected $cookieHelper;
+
+    /**
+     * @var IpLookupHelper
+     */
+    protected $ipLookupHelper;
 
     /**
      * @var LeadModel
@@ -84,24 +98,39 @@ class PageModel extends FormModel
     protected $dateTimeHelper;
 
     /**
+     * @var QueueService
+     */
+    protected $queueService;
+
+    /**
      * PageModel constructor.
      *
+     * @param CookieHelper   $cookieHelper
+     * @param IpLookupHelper $ipLookupHelper
      * @param LeadModel      $leadModel
      * @param FieldModel     $leadFieldModel
      * @param RedirectModel  $pageRedirectModel
      * @param TrackableModel $pageTrackableModel
+     * @param QueueService   $queueService
      */
     public function __construct(
+        CookieHelper $cookieHelper,
+        IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
         FieldModel $leadFieldModel,
         RedirectModel $pageRedirectModel,
-        TrackableModel $pageTrackableModel
-    ) {
+        TrackableModel $pageTrackableModel,
+        QueueService $queueService
+    )
+    {
+        $this->cookieHelper       = $cookieHelper;
+        $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
         $this->leadFieldModel     = $leadFieldModel;
         $this->pageRedirectModel  = $pageRedirectModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->dateTimeHelper     = new DateTimeHelper();
+        $this->queueService       = $queueService;
     }
 
     /**
@@ -392,7 +421,7 @@ class PageModel extends FormModel
     /**
      * Generates a basic page hit that can later be fleshed out asynchronously.
      *
-     * @param $page
+     * @param Page|Redirect $page
      * @param Request   $request
      * @param IpAddress $ipAddress
      * @param string    $code
@@ -423,6 +452,15 @@ class PageModel extends FormModel
 
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
+
+        // Store Page/Redirect association
+        if ($page) {
+            if ($page instanceof Page) {
+                $hit->setPage($page);
+            } else {
+                $hit->setRedirect($page);
+            }
+        }
 
         // Set info from request
         $hit->setQuery($query);
@@ -494,6 +532,7 @@ class PageModel extends FormModel
         // Store tracking ID
         list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
         $hit->setTrackingId($trackingId);
+        $hit->setLead($lead);
 
         $this->leadModel->saveEntity($lead);
 
@@ -512,7 +551,7 @@ class PageModel extends FormModel
             }
         }
 
-        return [$hit->getId(), $trackingNewlyGenerated];
+        return [$hit, $trackingNewlyGenerated];
     }
 
     /**
@@ -537,27 +576,71 @@ class PageModel extends FormModel
     }
 
     /**
-     * Record page hit.
+     * @param Page|Redirect $page
+     * @param Request   $request
+     * @param string    $code
+     * @param Lead|null $lead
+     * @param array     $query
+     */
+    public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
+    {
+        $ipAddress                          = $this->ipLookupHelper->getIpAddress();
+        list($hit, $trackingNewlyGenerated) = $this->generateHit(
+            $page,
+            $request,
+            $ipAddress,
+            $code,
+            $lead,
+            $query
+        );
+
+        //save hit to the cookie to use to update the exit time
+        $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId() ?: null);
+
+        if ($this->queueService->isQueueEnabled()) {
+            $msg = [
+                'hitId'   => $hit->getId(),
+                'request' => $request,
+                'isNew'   => $trackingNewlyGenerated,
+            ];
+            $this->queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
+        } else {
+            $this->processPageHit($hit, $page, $request, $trackingNewlyGenerated);
+        }
+    }
+
+    /**
+     * Process page hit.
      *
-     * @param int|null $hitId
+     * @param Hit|int $hit
      * @param $page
      * @param Request $request
      * @param bool    $trackingNewlyGenerated
      *
      * @throws \Exception
      */
-    public function hitPage($hitId, $page, Request $request, $trackingNewlyGenerated)
+    public function processPageHit($hit, Request $request, $trackingNewlyGenerated)
     {
         // Don't skew results with user hits
-        if (null == $hitId || !$this->security->isAnonymous()) {
+        if (null == $hit || !$this->security->isAnonymous()) {
             return;
         }
 
         $hitRepo = $this->getHitRepository();
-        $hit     = $hitRepo->find($hitId);
+        if (!$hit instanceof Hit) {
+            /** @var Hit $hit */
+            if (!$hit = $hitRepo->find((int) $hit)) {
+                return;
+            }
+        }
+
+        // Hydrate $page with appropriate entity association
+        if (!$page = $hit->getPage()) {
+            $page = $hit->getRedirect();
+        }
+
         $lead    = $hit->getLead();
         $query   = $hit->getQuery() ? $hit->getQuery() : [];
-
         $isUnique   = $trackingNewlyGenerated;
         $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
@@ -575,7 +658,6 @@ class PageModel extends FormModel
 
         if (!empty($page)) {
             if ($page instanceof Page) {
-                $hit->setPage($page);
                 $hit->setPageLanguage($page->getLanguage());
 
                 $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
@@ -589,8 +671,6 @@ class PageModel extends FormModel
                     );
                 }
             } elseif ($page instanceof Redirect) {
-                $hit->setRedirect($page);
-
                 try {
                     $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
 
@@ -645,7 +725,7 @@ class PageModel extends FormModel
                 }
             }
 
-            if ($queryHasUtmTags) {
+            if ($queryHasUtmTags && $lead) {
                 $utmTags = new UtmTag();
                 $utmTags->setDateAdded($hit->getDateHit());
                 $utmTags->setUrl($hit->getUrl());
