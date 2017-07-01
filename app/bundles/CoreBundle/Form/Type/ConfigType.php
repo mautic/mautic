@@ -584,6 +584,20 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'max_entity_lock_time',
+            'number',
+            [
+                'label'      => 'mautic.core.config.form.link.max_entity_lock_time',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.link.max_entity_lock_time.tooltip',
+                ],
+                'required' => false,
+            ]
+            );
+
+        $builder->add(
             'cors_restrict_domains',
             'yesno_button_group',
             [

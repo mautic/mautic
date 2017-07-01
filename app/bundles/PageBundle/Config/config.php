@@ -288,11 +288,12 @@ return [
     ],
 
     'parameters' => [
-        'cat_in_page_url'      => false,
-        'google_analytics'     => false,
-        'track_contact_by_ip'  => false,
-        'track_by_fingerprint' => false,
-        'redirect_list_types'  => [
+        'cat_in_page_url'       => false,
+        'google_analytics'      => false,
+        'track_contact_by_ip'   => false,
+        'track_by_fingerprint'  => false,
+        'track_by_tracking_url' => true,
+        'redirect_list_types'   => [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],

@@ -12,6 +12,8 @@
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
+use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Translation\Translator;
@@ -252,7 +254,7 @@ class CorePermissions
             }
 
             if (count($parts) != 3) {
-                throw new \InvalidArgumentException(
+                throw new PermissionBadFormatException(
                     $this->getTranslator()->trans(
                         'mautic.core.permissions.badformat',
                         ['%permission%' => $permission]
@@ -274,7 +276,7 @@ class CorePermissions
                     if ($allowUnknown) {
                         $permissions[$permission] = false;
                     } else {
-                        throw new \InvalidArgumentException(
+                        throw new PermissionNotFoundException(
                             $this->getTranslator()->trans(
                                 'mautic.core.permissions.notfound',
                                 ['%permission%' => $permission]
@@ -304,7 +306,7 @@ class CorePermissions
         } elseif ($mode == 'RETURN_ARRAY') {
             return $permissions;
         } else {
-            throw new \InvalidArgumentException(
+            throw new PermissionNotFoundException(
                 $this->getTranslator()->trans(
                     'mautic.core.permissions.mode.notfound',
                     ['%mode%' => $mode]
@@ -444,7 +446,7 @@ class CorePermissions
     {
         $userEntity = $this->userHelper->getUser();
 
-        return ($userEntity instanceof User && $userEntity->getId()) ? false : true;
+        return ($userEntity instanceof User && !$userEntity->isGuest()) ? false : true;
     }
 
     /**

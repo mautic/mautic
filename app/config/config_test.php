@@ -1,5 +1,7 @@
 <?php
 
+use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
+
 /*
  * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -21,7 +23,14 @@ $container->loadFromExtension('framework', [
     'translator' => [
         'enabled' => false,
     ],
+    'csrf_protection' => [
+        'enabled' => false,
+    ],
 ]);
+
+$container->setParameter('mautic.famework.csrf_protection', false);
+
+$container->register('mautic_integration.pipedrive.guzzle.client', Client::class);
 
 $container->loadFromExtension('web_profiler', [
     'toolbar'             => false,
@@ -98,3 +107,6 @@ $loader->import('security_test.php');
 if (file_exists(__DIR__.'/config_override.php')) {
     $loader->import('config_override.php');
 }
+
+//Add required parameters
+$container->setParameter('mautic.secret_key', '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0');
