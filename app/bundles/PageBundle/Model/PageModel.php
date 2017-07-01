@@ -619,7 +619,7 @@ class PageModel extends FormModel
      *
      * @throws \Exception
      */
-    public function processPageHit($hit, Request $request, $trackingNewlyGenerated)
+    public function processPageHit($hit, Request $request, $trackingNewlyGenerated, $activeRequest = true)
     {
         // Don't skew results with user hits
         if (null == $hit || !$this->security->isAnonymous()) {
@@ -639,7 +639,11 @@ class PageModel extends FormModel
             $page = $hit->getRedirect();
         }
 
-        $lead    = $hit->getLead();
+        $lead = $hit->getLead();
+        if (!$activeRequest) {
+            // Queue is consuming this hit outside of the lead's active request so this must be set in order for listeners to know who the request belongs to
+            $this->leadModel->setSystemCurrentLead($lead);
+        }
         $query   = $hit->getQuery() ? $hit->getQuery() : [];
         $isUnique   = $trackingNewlyGenerated;
         $trackingId = $hit->getTrackingId();

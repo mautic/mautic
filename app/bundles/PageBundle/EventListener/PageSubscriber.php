@@ -173,7 +173,7 @@ class PageSubscriber extends CommonSubscriber
         $hitId                  = $payload['hitId'];
         $request                = $payload['request'];
         $trackingNewlyGenerated = $payload['isNew'];
-        $this->pageModel->processPageHit($hitId, $request, $trackingNewlyGenerated);
+        $this->pageModel->processPageHit($hitId, $request, $trackingNewlyGenerated, false);
         $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
     }
 }
