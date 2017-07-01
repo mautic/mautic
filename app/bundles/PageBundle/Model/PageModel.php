@@ -121,8 +121,7 @@ class PageModel extends FormModel
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel,
         QueueService $queueService
-    )
-    {
+    ) {
         $this->cookieHelper       = $cookieHelper;
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->leadModel          = $leadModel;
@@ -395,7 +394,9 @@ class PageModel extends FormModel
         //should the url include the category
         if ($this->catInUrl) {
             $category = $entity->getCategory();
-            $catSlug  = (!empty($category)) ? $category->getAlias() :
+            $catSlug  = (!empty($category))
+                ? $category->getAlias()
+                :
                 $this->translator->trans('mautic.core.url.uncategorized');
         }
 
@@ -422,11 +423,11 @@ class PageModel extends FormModel
      * Generates a basic page hit that can later be fleshed out asynchronously.
      *
      * @param Page|Redirect $page
-     * @param Request   $request
-     * @param IpAddress $ipAddress
-     * @param string    $code
-     * @param Lead|null $lead
-     * @param array     $query
+     * @param Request       $request
+     * @param IpAddress     $ipAddress
+     * @param string        $code
+     * @param Lead|null     $lead
+     * @param array         $query
      *
      * @return array
      *
@@ -577,14 +578,14 @@ class PageModel extends FormModel
 
     /**
      * @param Page|Redirect $page
-     * @param Request   $request
-     * @param string    $code
-     * @param Lead|null $lead
-     * @param array     $query
+     * @param Request       $request
+     * @param string        $code
+     * @param Lead|null     $lead
+     * @param array         $query
      */
     public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
-        $ipAddress                          = $this->ipLookupHelper->getIpAddress();
+        $ipAddress = $this->ipLookupHelper->getIpAddress();
         list($hit, $trackingNewlyGenerated) = $this->generateHit(
             $page,
             $request,
@@ -613,7 +614,7 @@ class PageModel extends FormModel
      * Process page hit.
      *
      * @param Hit|int $hit
-     * @param $page
+     * @param         $page
      * @param Request $request
      * @param bool    $trackingNewlyGenerated
      *
@@ -644,7 +645,7 @@ class PageModel extends FormModel
             // Queue is consuming this hit outside of the lead's active request so this must be set in order for listeners to know who the request belongs to
             $this->leadModel->setSystemCurrentLead($lead);
         }
-        $query   = $hit->getQuery() ? $hit->getQuery() : [];
+        $query      = $hit->getQuery() ? $hit->getQuery() : [];
         $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
@@ -973,7 +974,7 @@ class PageModel extends FormModel
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char      $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -1039,7 +1040,7 @@ class PageModel extends FormModel
         $filters['lead_id'] = [
             'expression' => 'isNull',
         ];
-        $returnQ = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($allQ);
@@ -1089,7 +1090,7 @@ class PageModel extends FormModel
     /**
      * Get bar chart data of hits.
      *
-     * @param char     $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char     $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param string   $dateFormat
@@ -1129,7 +1130,7 @@ class PageModel extends FormModel
             $label = empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'];
 
             // $data['backgroundColor'][]='rgba(220,220,220,0.5)';
-            $chart->setDataset($label,  $result['count']);
+            $chart->setDataset($label, $result['count']);
         }
 
         return $chart->render();
