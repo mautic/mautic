@@ -18,6 +18,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -110,7 +111,9 @@ class PublicController extends CommonFormController
             ];
             $queueService->publishToQueue(QueueName::EMAIL_HIT, $msg);
         } else {
-            $this->getModel('email')->hitEmail($idHash, $this->request);
+            /** @var EmailModel $model */
+            $model = $this->getModel('email');
+            $model->hitEmail($idHash, $this->request);
         }
 
         return TrackingPixelHelper::getResponse($this->request);
