@@ -320,10 +320,8 @@ class PublicController extends CommonFormController
         $cookieHelper = $this->get('mautic.helper.cookie');
         $cookieHelper->setCookie('mautic_referer_id', $hitId ?: null);
 
-        $logger       = $this->get('monolog.logger.mautic');
         $queueService = $this->get('mautic.queue.service');
         if ($queueService->isQueueEnabled()) {
-            $logger->log('info', 'using the queue');
             $msg = [
                 'hitId'   => $hitId,
                 'pageId'  => $page->getId(),
@@ -332,7 +330,6 @@ class PublicController extends CommonFormController
             ];
             $queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
         } else {
-            $logger->log('info', 'not using the queue');
             $model->hitPage($hitId, $page, $request, $trackingNewlyGenerated);
         }
     }
