@@ -559,6 +559,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $result = [];
         if (isset($data['value'])) {
+            $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
@@ -718,15 +719,14 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     }
                     $this->em->detach($entity);
                     unset($entity);
-                } else {
-                    continue;
                 }
             }
 
-            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+            $integrationEntityRepo->saveEntities($integrationEntities);
             $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+            $this->em->clear();
 
-            unset($integrationEntities);
+            unset($integrationEntityRepo, $integrationEntities);
         }
 
         return $result;
