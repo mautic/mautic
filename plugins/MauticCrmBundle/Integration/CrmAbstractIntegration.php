@@ -444,4 +444,19 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         return $fieldsToUpdate;
     }
+
+    /**
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function getSyncTimeframeDates(array $params)
+    {
+        $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
+            : null;
+        $toDate = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
+            : null;
+
+        return [$fromDate, $toDate];
+    }
 }

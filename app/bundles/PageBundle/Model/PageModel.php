@@ -645,7 +645,6 @@ class PageModel extends FormModel
             $this->leadModel->setSystemCurrentLead($lead);
         }
         $query   = $hit->getQuery() ? $hit->getQuery() : [];
-        $isUnique   = $trackingNewlyGenerated;
         $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
@@ -653,10 +652,10 @@ class PageModel extends FormModel
                 //this is not a new session so update the last hit if applicable with the date/time the user left
                 $this->getHitRepository()->updateHitDateLeft($lastHit);
             }
-
-            // Check if this is a unique page hit
-            $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId);
         }
+
+        // Check if this is a unique page hit
+        $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
         $clickthrough = $this->generateClickThrough($hit);
 

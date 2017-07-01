@@ -11,13 +11,13 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class FocusController.
  */
-class FocusController extends FormController
+class FocusController extends AbstractFormController
 {
     public function __construct()
     {
