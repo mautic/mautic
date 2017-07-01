@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Joomla\Http\Response;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -278,8 +279,30 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         /** @var array $opts */
                         $fields = $leadObject['value'];
                         foreach ($fields as $field) {
+                            $type      = 'string';
+                            $fieldType = $field['AttributeTypeName']['Value'];
+                            if (in_array($fieldType, [
+                                 'LookupType',
+                                 'OwnerType',
+                                 'PicklistType',
+                                 'StateType',
+                                 'StatusType',
+                                 'UniqueidentifierType',
+                            ], true)) {
+                                continue;
+                            } elseif (in_array($fieldType, [
+                                'DoubleType',
+                                 'IntegerType',
+                                 'MoneyType',
+                            ], true)) {
+                                $type = 'int';
+                            } elseif ('Boolean' === $fieldType) {
+                                $type = 'boolean';
+                            } elseif ('DateTimeType' === $fieldType) {
+                                $type = 'datetime';
+                            }
                             $dynamicsFields[$dynamicsObject][$field['LogicalName']] = [
-                                'type'     => 'string',
+                                'type'     => $type,
                                 'label'    => $field['DisplayName']['UserLocalizedLabel']['Label'],
                                 'dv'       => $field['LogicalName'],
                                 'required' => 'ApplicationRequired' === $field['RequiredLevel']['Value'],
@@ -315,7 +338,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             return [];
         }
 
-        $mappedData = $this->populateLeadData($lead, $config);
+        $mappedData = $this->populateLeadData($lead, $config, 'contacts');
 
         $this->amendLeadDataBeforePush($mappedData);
 
@@ -380,7 +403,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             $object = 'contacts';
         }
         $executed    = 0;
-        $MAX_RECORDS = 5000;
+        $MAX_RECORDS = 200; // Default max records is 5000
         try {
             if ($this->isAuthorized()) {
                 $config           = $this->mergeConfigToFeatureSettings();
@@ -393,10 +416,18 @@ class DynamicsIntegration extends CrmAbstractIntegration
                         $mappedData[] = $aFields[$object][$k]['dv'];
                     }
                 }
-                $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.(($params['limit'] > $MAX_RECORDS) ? $MAX_RECORDS : $params['limit']);
+                $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
+                if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
+                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, '-6'));
+                }
 
-                while ($executed < $params['limit']) {
+                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                    $progress = new ProgressBar($params['output']);
+                    $progress->start();
+                }
+
+                while (true) {
                     $data = $this->getApiHelper()->getLeads($oparams);
 
                     if (!isset($data['value'])) {
@@ -404,20 +435,27 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     }
 
                     $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-
-                    if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                        $params['output']->writeln($result);
-                    }
-
                     $executed += array_key_exists('value', $data) ? count($data['value']) : count($result);
 
-                    if ($params['limit'] < $MAX_RECORDS || !isset($data['@odata.nextLink'])) {
+                    if (isset($params['output'])) {
+                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $params['output']->writeln($result);
+                        } else {
+                            $progress->advance(count($result));
+                        }
+                    }
+
+                    if (!isset($data['@odata.nextLink'])) {
                         break; // default exit
                     }
 
                     // prepare next loop
                     $nextLink              = $data['@odata.nextLink'];
-                    $oparams['$skiptoken'] = substr($nextLink, strpos($nextLink, '$skiptoken=') + 11);
+                    $oparams['$skiptoken'] = urldecode(substr($nextLink, strpos($nextLink, '$skiptoken=') + 11));
+                }
+
+                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                    $progress->finish();
                 }
             }
         } catch (\Exception $e) {
@@ -435,7 +473,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
     public function getCompanies($params = [])
     {
         $executed    = 0;
-        $MAX_RECORDS = 5000;
+        $MAX_RECORDS = 200; // Default max records is 5000
         $object      = 'company';
         try {
             if ($this->isAuthorized()) {
@@ -450,28 +488,46 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 foreach (array_keys($fields) as $k) {
                     $mappedData[] = $aFields[$k]['dv'];
                 }
-                $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$params['limit'] ? $params['limit'] : 100;
+                $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
-                while ($executed < $params['limit']) {
+                if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
+                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, '-6'));
+                }
+
+                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                    $progress = new ProgressBar($params['output']);
+                    $progress->start();
+                }
+
+                while (true) {
                     $data = $this->getApiHelper()->getCompanies($oparams);
                     if (!isset($data['value'])) {
                         break; // no more data, exit loop
                     }
+
                     $result = $this->amendLeadDataBeforeMauticPopulate($data, $object);
-                    if (isset($params['output']) && $params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                        $params['output']->writeln($result);
-                    }
                     $executed += count($result);
-                    if ($params['limit'] < $MAX_RECORDS || !isset($data['@odata.nextLink'])) {
+
+                    if (isset($params['output'])) {
+                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $params['output']->writeln($result);
+                        } else {
+                            $progress->advance(count($result));
+                        }
+                    }
+
+                    if (!isset($data['@odata.nextLink'])) {
                         break; // default exit
                     }
 
                     // prepare next loop
                     $nextLink              = $data['@odata.nextLink'];
-                    $oparams['$skiptoken'] = substr($nextLink, strpos($nextLink, '$skiptoken=') + 11);
+                    $oparams['$skiptoken'] = urldecode(substr($nextLink, strpos($nextLink, '$skiptoken=') + 11));
                 }
 
-                return $executed;
+                if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+                    $progress->finish();
+                }
             }
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
@@ -500,6 +556,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
         $result = [];
         if (isset($data['value'])) {
+            $this->em->getConnection()->getConfiguration()->setSQLLogger(null);
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
             $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
@@ -659,15 +716,14 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     }
                     $this->em->detach($entity);
                     unset($entity);
-                } else {
-                    continue;
                 }
             }
 
-            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+            $integrationEntityRepo->saveEntities($integrationEntities);
             $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+            $this->em->clear();
 
-            unset($integrationEntities);
+            unset($integrationEntityRepo, $integrationEntities);
         }
 
         return $result;
@@ -680,8 +736,12 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = [])
     {
+        $MAX_RECORDS = (isset($params['limit']) && $params['limit'] < 100) ? $params['limit'] : 100;
+        if (isset($params['fetchAll']) && $params['fetchAll']) {
+            $params['start'] = null;
+            $params['end']   = null;
+        }
         $object                = 'contacts';
-        $limit                 = $params['limit'];
         $config                = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $fieldsToUpdateInCrm   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
@@ -700,8 +760,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $fieldsToUpdate[$object] = array_intersect_key($config['leadFields'], array_flip($fieldsToUpdate[$object]));
 
         $progress      = false;
-        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, false, null, null, [$object]));
-        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, false);
+        $totalToUpdate = array_sum($integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, false, $params['start'], $params['end'], [$object]));
+        $totalToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, false, $params['start'], $params['end']);
         $totalCount    = $totalToCreate + $totalToUpdate;
 
         if (defined('IN_MAUTIC_CONSOLE')) {
@@ -719,34 +779,33 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $leadsToUpdateInD    = [];
         $integrationEntities = [];
 
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $limit, null, null,  $object, [])[$object];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'],  $object, [])[$object];
 
-        $leadCount = count($toUpdate);
-        $totalCount -= count($toUpdate);
-        $totalUpdated += count($toUpdate);
-
-        foreach ($toUpdate as $lead) {
-            if (isset($lead['email']) && !empty($lead['email'])) {
-                $key                        = mb_strtolower($this->cleanPushData($lead['email']));
-                $lead['integration_entity'] = $object;
-                $leadsToUpdateInD[$key]     = $lead;
-                $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
-                $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
+        if (is_array($toUpdate)) {
+            $totalUpdated += count($toUpdate);
+            foreach ($toUpdate as $lead) {
+                if (isset($lead['email']) && !empty($lead['email'])) {
+                    $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead['integration_entity'] = $object;
+                    $leadsToUpdateInD[$key]     = $lead;
+                    $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
+                    $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
+                }
             }
         }
-
         unset($toUpdate);
 
         //create lead records, including deleted on D side (last_sync = null)
         /** @var array $leadsToCreate */
-        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, $limit, null, null);
-        $totalCount -= count($leadsToCreate);
-        $totalCreated += count($leadsToCreate);
-        foreach ($leadsToCreate as $lead) {
-            if (isset($lead['email']) && !empty($lead['email'])) {
-                $key                        = mb_strtolower($this->cleanPushData($lead['email']));
-                $lead['integration_entity'] = $object;
-                $leadsToCreateInD[$key]     = $lead;
+        $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Dynamics', $fields, $totalToCreate, $params['start'], $params['end']);
+        if (is_array($leadsToCreate)) {
+            $totalCreated += count($leadsToCreate);
+            foreach ($leadsToCreate as $lead) {
+                if (isset($lead['email']) && !empty($lead['email'])) {
+                    $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead['integration_entity'] = $object;
+                    $leadsToCreateInD[$key]     = $lead;
+                }
             }
         }
         unset($leadsToCreate);
@@ -781,7 +840,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
             ++$rowNum;
             // SEND 100 RECORDS AT A TIME
-            if (100 === $rowNum) {
+            if ($MAX_RECORDS === $rowNum) {
                 $this->getApiHelper()->updateLeads($leadData, $object);
                 $leadData = [];
                 $rowNum   = 0;
@@ -813,7 +872,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
             ++$rowNum;
             // SEND 100 RECORDS AT A TIME
-            if (100 === $rowNum) {
+            if ($MAX_RECORDS === $rowNum) {
                 $ids = $this->getApiHelper()->createLeads($leadData, $object);
                 $this->createIntegrationEntities($ids, $object, $integrationEntityRepo);
                 $leadData = [];

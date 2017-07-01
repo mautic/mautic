@@ -82,8 +82,8 @@ class DynamicsApi extends CrmApi
 
         $operation  = sprintf('EntityDefinitions(LogicalName=\'%s\')/Attributes', $logicalName);
         $parameters = [
-            '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Boolean", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null and LogicalName ne \'parentcustomerid\'', // ignore system fields
-            '$select' => 'RequiredLevel,LogicalName,DisplayName', // select only miningful columns
+            '$filter' => 'Microsoft.Dynamics.CRM.NotIn(PropertyName=\'AttributeTypeName\',PropertyValues=["Virtual", "Uniqueidentifier", "Picklist", "Lookup", "Owner", "Customer"]) and IsValidForUpdate eq true and AttributeOf eq null and LogicalName ne \'parentcustomerid\'', // ignore system fields
+            '$select' => 'RequiredLevel,LogicalName,DisplayName,AttributeTypeName', // select only miningful columns
         ];
 
         return $this->request($operation, $parameters, 'GET', $object);
@@ -109,8 +109,8 @@ class DynamicsApi extends CrmApi
      */
     public function updateLead($data, $objectId)
     {
-        $settings['headers']['If-Match'] = '*'; // prevent create new contact
-        return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', $settings);
+        //        $settings['headers']['If-Match'] = '*'; // prevent create new contact
+        return $this->request(sprintf('contacts(%s)', $objectId), $data, 'PATCH', 'contacts', []);
     }
 
     /**

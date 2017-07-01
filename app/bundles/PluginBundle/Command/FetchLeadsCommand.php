@@ -85,6 +85,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $endDate       = $input->getOption('end-date');
         $interval      = $input->getOption('time-interval');
         $limit         = $input->getOption('limit');
+        $fetchAll      = $input->getOption('fetch-all');
         $leadsExecuted = $contactsExecuted = null;
 
         if (!$interval) {
@@ -107,10 +108,11 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $config['objects'] = [];
             }
 
-            $params['start']  = $startDate;
-            $params['end']    = $endDate;
-            $params['limit']  = $limit;
-            $params['output'] = $output;
+            $params['start']    = $startDate;
+            $params['end']      = $endDate;
+            $params['limit']    = $limit;
+            $params['fetchAll'] = $fetchAll;
+            $params['output']   = $output;
 
             // set this constant to ensure that all contacts have the same date modified time and date synced time to prevent a pull/push loop
             define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
@@ -120,10 +122,22 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
+                    //Handle case when integration object are named "Contacts" and "Leads"
+                    $leadObjectName = 'Lead';
+                    if (in_array('Leads', $config['objects'])) {
+                        $leadObjectName = 'Leads';
+                    }
+                    $contactObjectName = 'Contact';
+                    if (in_array(strtolower('Contacts'), array_map(function ($i) {
+                        return strtolower($i);
+                    }, $config['objects']), true)) {
+                        $contactObjectName = 'Contacts';
+                    }
+
                     $updated = $created = $processed = 0;
-                    if (in_array('Lead', $config['objects']) || in_array('Leads', $config['objects'])) {
+                    if (in_array($leadObjectName, $config['objects'])) {
                         $leadList = [];
-                        $results  = $integrationObject->getLeads($params, null, $leadsExecuted, $leadList, 'Lead');
+                        $results  = $integrationObject->getLeads($params, null, $leadsExecuted, $leadList, $leadObjectName);
                         if (is_array($results)) {
                             list($justUpdated, $justCreated) = $results;
                             $updated += (int) $justUpdated;
@@ -132,7 +146,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
                             $processed += (int) $results;
                         }
                     }
-                    if (in_array('Contact', $config['objects']) || in_array('Contacts', $config['objects']) || in_array('contacts', $config['objects'])) {
+                    if (in_array(strtolower($contactObjectName), array_map(function ($i) {
+                        return strtolower($i);
+                    }, $config['objects']), true)) {
                         $output->writeln('');
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                         $contactList = [];
