@@ -253,9 +253,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getAvailableLeadFields($settings = [])
     {
-        if ($fields = parent::getAvailableLeadFields($settings)) {
-            return $fields;
-        }
         $dynamicsFields    = [];
         $silenceExceptions = isset($settings['silence_exceptions']) ? $settings['silence_exceptions'] : true;
         if (isset($settings['feature_settings']['objects'])) {

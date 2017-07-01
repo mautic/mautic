@@ -1303,7 +1303,7 @@ abstract class AbstractIntegration
 
                     if ($state && $state !== $givenState) {
                         $this->session->remove($this->getName().'_csrf_token');
-                        throw new ApiErrorException('mautic.integration.auth.invalid.state');
+                        throw new ApiErrorException($this->translator->trans('mautic.integration.auth.invalid.state'));
                     }
                 }
 
