@@ -11,8 +11,8 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
-use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * Class PageController.
  */
-class PageController extends FormController
+class PageController extends AbstractFormController
 {
     use BuilderControllerTrait;
 

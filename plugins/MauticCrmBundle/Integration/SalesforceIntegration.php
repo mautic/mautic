@@ -602,7 +602,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead( $lead,   $config = [])
+    public function pushLead($lead,  $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -1039,10 +1039,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function pushLeads($params = [])
     {
-        $limit    = (isset($params['limit'])) ? $params['limit'] : 100;
+        $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
         list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
-        $config                = $this->mergeConfigToFeatureSettings($params);
-        $integrationEntityRepo = $this->getIntegrationEntityRepository();
+        $config                  = $this->mergeConfigToFeatureSettings($params);
+        $integrationEntityRepo   = $this->getIntegrationEntityRepository();
 
         $totalUpdated = 0;
         $totalCreated = 0;

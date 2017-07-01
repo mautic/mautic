@@ -12,7 +12,7 @@
 namespace Mautic\PluginBundle\Controller;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class PluginController.
  */
-class PluginController extends FormController
+class PluginController extends AbstractFormController
 {
     /**
      * @return JsonResponse|Response

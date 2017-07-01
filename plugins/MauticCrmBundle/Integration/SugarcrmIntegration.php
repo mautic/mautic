@@ -229,11 +229,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         $isRequired = function (array $field, $object) {
             switch (true) {
-                case ('Leads' === $object && 'webtolead_email1' === $field['name']):
+                case 'Leads' === $object && 'webtolead_email1' === $field['name']:
                     return true;
-                case ('Contacts' === $object && 'email1' === $field['name']):
+                case 'Contacts' === $object && 'email1' === $field['name']:
                     return true;
-                case ('id' !== $field['name'] && !empty($field['required'])):
+                case 'id' !== $field['name'] && !empty($field['required']):
                     return true;
                 default:
                     return false;
@@ -302,7 +302,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
                                             )
                                         ) {
-
                                             if (!empty($fieldInfo['comment'])) {
                                                 $label = $fieldInfo['comment'];
                                             } elseif (!empty($fieldInfo['help'])) {
@@ -1277,7 +1276,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $limit                   = $params['limit'];
         $config                  = $this->mergeConfigToFeatureSettings();
         $integrationEntityRepo   = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $mauticData              = $leadsToUpdate            = $fields            = [];
+        $mauticData              = $leadsToUpdate              = $fields              = [];
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
 
         if (!empty($config['leadFields'])) {

@@ -11,13 +11,13 @@
 
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\Form\Form;
 
 /**
  * Class TweetController.
  */
-class TweetController extends FormController
+class TweetController extends AbstractFormController
 {
     /**
      * @return mixed

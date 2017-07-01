@@ -54,6 +54,14 @@ class IntegrationSubscriber extends CommonSubscriber
             return "$k=$v";
         }, array_keys($event->getParameters()), array_values($event->getParameters()))) : '';
 
+        $settings = (count($event->getSettings())) ? implode(PHP_EOL, array_map(function ($k, $v) {
+            if ($k === 'post_data') {
+                return $v;
+            }
+
+            return "$k=".json_encode($v, JSON_PRETTY_PRINT);
+        }, array_keys($event->getSettings()), array_values($event->getSettings()))) : '';
+
         if (defined('IN_MAUTIC_CONSOLE') && defined('MAUTIC_CONSOLE_VERBOSITY') && MAUTIC_CONSOLE_VERBOSITY >= ConsoleOutput::VERBOSITY_VERY_VERBOSE) {
             $output = new ConsoleOutput();
             $output->writeln('<fg=magenta>REQUEST:</>');
@@ -61,6 +69,8 @@ class IntegrationSubscriber extends CommonSubscriber
             $output->writeln('<fg=cyan>'.$headers.'</>');
             $output->writeln('');
             $output->writeln('<fg=cyan>'.$params.'</>');
+            $output->writeln('');
+            $output->writeln('<fg=cyan>'.$settings.'</>');
         } elseif ('dev' === MAUTIC_ENV) {
             $this->logger->debug('INTEGRATION REQUEST: '.$event->getMethod().' '.$event->getUrl());
             if ('' !== $headers) {
@@ -69,8 +79,8 @@ class IntegrationSubscriber extends CommonSubscriber
             if ('' !== $params) {
                 $this->logger->debug("REQUEST PARAMS: \n".$params.PHP_EOL);
             }
-            if (!empty($event->getSettings())) {
-                $this->logger->debug("REQUEST SETTINGS: \n".json_encode($event->getSettings(), JSON_PRETTY_PRINT).PHP_EOL);
+            if ('' !== $settings) {
+                $this->logger->debug("REQUEST SETTINGS: \n".$settings.PHP_EOL);
             }
         }
     }

@@ -961,6 +961,8 @@ abstract class AbstractIntegration
                         }
                     }
                 }
+            } elseif (isset($settings['post_data'])) {
+                $parameters = $settings['post_data'];
             }
         }
 
@@ -1267,7 +1269,7 @@ abstract class AbstractIntegration
         $defaultUrl = $this->router->generate(
             'mautic_integration_auth_callback',
             ['integration' => $this->getName()],
-            true //absolute
+            UrlGeneratorInterface::ABSOLUTE_URL //absolute
         );
 
         /** @var PluginIntegrationAuthCallbackUrlEvent $event */
@@ -1301,7 +1303,7 @@ abstract class AbstractIntegration
 
                     if ($state && $state !== $givenState) {
                         $this->session->remove($this->getName().'_csrf_token');
-                        throw new ApiErrorException('mautic.integration.auth.invalid.state');
+                        throw new ApiErrorException($this->translator->trans('mautic.integration.auth.invalid.state'));
                     }
                 }
 

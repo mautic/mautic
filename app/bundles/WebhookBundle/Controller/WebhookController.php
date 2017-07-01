@@ -11,12 +11,12 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 
 /**
  * Class WebhookController.
  */
-class WebhookController extends FormController
+class WebhookController extends AbstractFormController
 {
     public function __construct()
     {

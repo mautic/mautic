@@ -11,14 +11,14 @@
 
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
-use Mautic\FormBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicController extends FormController
+class PublicController extends AbstractFormController
 {
     /**
      * Write a notification.

@@ -11,8 +11,8 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
-use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -23,7 +23,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 
-class EmailController extends FormController
+class EmailController extends AbstractFormController
 {
     use BuilderControllerTrait;
 

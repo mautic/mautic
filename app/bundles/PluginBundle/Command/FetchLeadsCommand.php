@@ -128,7 +128,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         $leadObjectName = 'Leads';
                     }
                     $contactObjectName = 'Contact';
-                    if (in_array('Contacts', $config['objects'])) {
+                    if (in_array(strtolower('Contacts'), array_map(function ($i) {
+                        return strtolower($i);
+                    }, $config['objects']), true)) {
                         $contactObjectName = 'Contacts';
                     }
 
@@ -144,7 +146,9 @@ class FetchLeadsCommand extends ContainerAwareCommand
                             $processed += (int) $results;
                         }
                     }
-                    if (in_array($contactObjectName, $config['objects'])) {
+                    if (in_array(strtolower($contactObjectName), array_map(function ($i) {
+                        return strtolower($i);
+                    }, $config['objects']), true)) {
                         $output->writeln('');
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                         $contactList = [];
