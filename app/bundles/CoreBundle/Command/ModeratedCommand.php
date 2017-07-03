@@ -47,6 +47,13 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'If getmypid() is disabled on this system, lock files will be used. This option will assume the process is dead afer the specified number of seconds and will execute anyway. This is disabled by default.',
                 false
+            )
+            ->addOption(
+                '--lock_mode',
+                '-x',
+                InputOption::VALUE_OPTIONAL,
+                'Force use of PID or FILE LOCK for semaphore. Allowed value are "pid" or "file_lock". By default, lock will try with pid, if not available will use file system',
+                null
             );
     }
 
@@ -82,7 +89,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         );
 
         // Check if the command is currently running
-        if (!$this->checkStatus($input->getOption('force'))) {
+        if (!$this->checkStatus($input->getOption('force'), $input->getOption('lock_mode'))) {
             $output->writeln('<error>Script in progress. Can force execution by using --force.</error>');
 
             return false;
@@ -107,14 +114,16 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     /**
      * Determine the moderation mode avaiable to this system. Default is to use a lock file.
      *
-     * @param bool $force
+     * @param bool   $force
+     * @param string $lockMode
      *
      * @return bool
      */
-    private function checkStatus($force = false)
+    private function checkStatus($force = false, $lockMode = null)
     {
+
         // getmypid may be disabled and posix_getpgid is not available on Windows machines
-        if (function_exists('getmypid') && function_exists('posix_getpgid')) {
+        if ((is_null($lockMode) || $lockMode === 'pid') && function_exists('getmypid') && function_exists('posix_getpgid')) {
             $disabled = explode(',', ini_get('disable_functions'));
             if (!in_array('getmypid', $disabled) && !in_array('posix_getpgid', $disabled)) {
                 $this->moderationMode = self::MODE_PID;
@@ -151,6 +160,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
             }
         }
 
+        // in anycase, fallback on file system
         // Accessing PID commands is not available so use a simple lock file mechanism
         $lockHandler = $this->lockHandler = new LockHandler($this->moderationKey, $this->runDirectory);
 
