@@ -1730,14 +1730,15 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param array $fields
+     * @param array  $fields
+     * @param string $fieldType
      *
      * @return array
      */
-    public function getRequiredFields(array $fields, $fieldType)
+    public function getRequiredFields(array $fields, $fieldType = '')
     {
-        //use $fieldType to determine is email should be required. we use email as unique identifier for contacts only,
-        // if any other fieldtype use integrations own field types
+        //use $fieldType to determine if email should be required. we use email as unique identifier for contacts only,
+        // if any other fieldType use integrations own field types
         $requiredFields = [];
         foreach ($fields as $field => $details) {
             if ('leadFields' === $fieldType) {

@@ -11,7 +11,7 @@
 
 namespace Mautic\PluginBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 /**
  * Class AuthController.
  */
-class AuthController extends AbstractFormController
+class AuthController extends FormController
 {
     /**
      * @param string $integration
