@@ -22,7 +22,7 @@ class SalesforceApi extends CrmApi
         parent::__construct($integration);
 
         $this->requestSettings['curl_options'] = [
-            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : CURL_SSLVERSION_TLSv1_1,
+            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : 5,
         ];
     }
 
