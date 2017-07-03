@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class ThemeController.
  */
-class ThemeController extends AbstractFormController
+class ThemeController extends FormController
 {
     /**
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response

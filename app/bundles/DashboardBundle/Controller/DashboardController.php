@@ -11,7 +11,7 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Component\Form\FormError;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * Class DashboardController.
  */
-class DashboardController extends AbstractFormController
+class DashboardController extends FormController
 {
     /**
      * Generates the default view.

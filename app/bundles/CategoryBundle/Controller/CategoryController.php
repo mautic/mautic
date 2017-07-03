@@ -14,10 +14,10 @@ namespace Mautic\CategoryBundle\Controller;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class CategoryController extends AbstractFormController
+class CategoryController extends FormController
 {
     /**
      * @param        $bundle

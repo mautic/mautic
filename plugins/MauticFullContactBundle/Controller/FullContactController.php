@@ -11,13 +11,13 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class FullContactController extends AbstractFormController
+class FullContactController extends FormController
 {
     /**
      * @param string $objectId
