@@ -10,6 +10,10 @@ return [
                 'path' => '/messenger/{page}',
                 'controller' => 'MauticMessengerBundle:Messenger:index',
             ],
+            'mautic_messenger_action' => [
+                'path'       => '/messenger/{objectAction}/{objectId}',
+                'controller' => 'MauticMessengerBundle:Messenger:execute',
+            ],
         ],
         'public' => [
             'messenger_callback' => [
@@ -73,6 +77,14 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.helper.integration',
                     'mautic.helper.templating',
+                ],
+            ],
+        ],
+        'models' => [
+            'mautic.messengerMessage.model.messengerMessage' => [
+                'class'     => 'Mautic\DynamicContentBundle\Model\DynamicContentModel',
+                'arguments' => [
+
                 ],
             ],
         ],
