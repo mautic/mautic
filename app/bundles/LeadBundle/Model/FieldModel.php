@@ -412,10 +412,12 @@ class FieldModel extends FormModel
 
             try {
                 $leadsSchema->executeChanges();
+                $isCreated = true;
             } catch (DriverException $e) {
                 $this->logger->addWarning($e->getMessage());
 
                 if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
+                    $isCreated = false;
                     throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
                 } else {
                     throw $e;
@@ -423,7 +425,7 @@ class FieldModel extends FormModel
             }
 
             // If this is a new contact field, and it was successfully added to the contacts table, save it
-            if ($isNew === false) {
+            if ($isNew === true) {
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
                 $this->getRepository()->saveEntity($entity);
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
