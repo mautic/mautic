@@ -35,9 +35,10 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCal
 
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        // IsTransactional for all non Bulk message https://elasticemail.com/support/guides/unsubscribe/
+        // IsTransactional for all non Bulk message
+        // https://elasticemail.com/support/guides/unsubscribe/
         if($message->getHeaders()->get('Precedence') != 'Bulk'){
-            $message->getHeaders()->addTextHeader('IsTransactional', 'true');
+            $message->getHeaders()->addTextHeader('IsTransactional', 'True');
         }
 
         parent::send($message, $failedRecipients);
