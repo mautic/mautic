@@ -196,6 +196,7 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
 
         $builder->createManyToOne('role', 'Role')
             ->inversedBy('users')
+            ->cascadeMerge()
             ->addJoinColumn('role_id', 'id', false)
             ->build();
 
@@ -365,8 +366,8 @@ class User extends FormEntity implements AdvancedUserInterface, \Serializable, E
                     $val->getName().'('.$val->getId().')',
                 ];
             }
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 
