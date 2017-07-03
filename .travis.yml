@@ -19,9 +19,6 @@ before_install:
   # Create mautictest database
   - mysql -e 'CREATE DATABASE mautictest;'
 
-  # Move phpunit.xml.dist
-  - mv app/phpunit.xml.dist app/phpunit.xml
-
   # turn off XDebug
   - phpenv config-rm xdebug.ini || return
 
