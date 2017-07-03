@@ -136,15 +136,15 @@ class NotificationModel extends FormModel
         $notification = new Notification();
         $notification->setType($type);
         $notification->setIsRead($isRead);
-        $notification->setHeader(EmojiHelper::toHtml(InputHelper::html($header)));
-        $notification->setMessage(EmojiHelper::toHtml(InputHelper::html($message)));
+        $notification->setHeader(EmojiHelper::toHtml(InputHelper::strict_html($header)));
+        $notification->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
         if ($datetime == null) {
             $datetime = new \DateTime();
         }
         $notification->setDateAdded($datetime);
-        $this->saveEntity($notification);
+        $this->saveAndDetachEntity($notification);
     }
 
     /**
@@ -177,7 +177,7 @@ class NotificationModel extends FormModel
      */
     public function getNotificationContent($afterId = null, $includeRead = false, $limit = null)
     {
-        if ($this->userHelper->getUser()->isGuest) {
+        if ($this->userHelper->getUser()->isGuest()) {
             return [[], false, ''];
         }
 

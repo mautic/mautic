@@ -11,12 +11,12 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 
 /**
  * Class ClientController.
  */
-class ClientController extends FormController
+class ClientController extends AbstractFormController
 {
     /**
      * Generate's default client list.

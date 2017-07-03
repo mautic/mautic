@@ -62,11 +62,11 @@ class ConfigBuilderEvent extends Event
     /**
      * Set new form to the forms array.
      *
-     * @param $form
+     * @param array $form
      *
      * @return $this
      */
-    public function addForm($form)
+    public function addForm(array $form)
     {
         if (isset($form['formTheme'])) {
             $this->formThemes[] = $form['formTheme'];
@@ -75,6 +75,24 @@ class ConfigBuilderEvent extends Event
         $this->forms[$form['formAlias']] = $form;
 
         return $this;
+    }
+
+    /**
+     * Remove a form to the forms array.
+     *
+     * @param string $formAlias
+     *
+     * @return bool
+     */
+    public function removeForm($formAlias)
+    {
+        if (isset($this->forms[$formAlias])) {
+            unset($this->forms[$formAlias]);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

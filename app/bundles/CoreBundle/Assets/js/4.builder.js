@@ -351,6 +351,7 @@ Mautic.closeBuilder = function(model) {
             // Trigger slot:destroy event
             document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
 
+            var xs = new XMLSerializer();
             var themeHtml = mQuery('iframe#builder-template-content').contents();
 
             // Remove Mautic's assets
@@ -364,7 +365,7 @@ Mautic.closeBuilder = function(model) {
             // Clear the customize forms
             mQuery('#slot-form-container, #section-form-container').html('');
 
-            customHtml = themeHtml.find('html').get(0).outerHTML
+            customHtml = xs.serializeToString(themeHtml.get(0));
         }
 
         // Convert dynamic slot definitions into tokens
@@ -374,6 +375,7 @@ Mautic.closeBuilder = function(model) {
         mQuery('.builder-html').val(customHtml);
     } catch (error) {
         // prevent from being able to close builder
+        console.error(error);
     }
 
     // Kill the overlay
@@ -1352,7 +1354,7 @@ Mautic.initSlotListeners = function() {
             // remove new DEC if name is empty
             var dynConId = params.slot.attr('data-param-dec-id');
             dynConId = '#emailform_dynamicContent_'+dynConId;
-            if (Mautic.activeDEC.attr('id') === dynConId.substr(1)) {
+            if (Mautic.activeDEC && Mautic.activeDEC.attr('id') === dynConId.substr(1)) {
                 delete Mautic.activeDEC;
                 delete Mautic.activeDECParent;
             }
