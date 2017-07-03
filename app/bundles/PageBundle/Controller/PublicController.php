@@ -61,11 +61,11 @@ class PublicController extends CommonFormController
             if (!$published && !$userAccess) {
                 // If the page has a redirect type, handle it
                 if ($entity->getRedirectType() != null) {
-                    $this->hitPage($model, $entity, $this->request, $entity->getRedirectType());
+                    $model->hitPage($entity, $this->request, $entity->getRedirectType());
 
                     return $this->redirect($entity->getRedirectUrl(), $entity->getRedirectType());
                 } else {
-                    $this->hitPage($model, $entity, $this->request, 401);
+                    $model->hitPage($entity, $this->request, 401);
 
                     return $this->accessDenied();
                 }
@@ -95,7 +95,7 @@ class PublicController extends CommonFormController
 
                 // Redirect if they don't match
                 if ($requestUri != $url) {
-                    $this->hitPage($model, $entity, $this->request, 301, $lead, $query);
+                    $model->hitPage($entity, $this->request, 301, $lead, $query);
 
                     return $this->redirect($url, 301);
                 }
@@ -106,7 +106,7 @@ class PublicController extends CommonFormController
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
             if ($parentVariant != $entity && !$userAccess) {
-                $this->hitPage($model, $entity, $this->request, 301, $lead, $query);
+                $model->hitPage($entity, $this->request, 301, $lead, $query);
                 $url = $model->generateUrl($parentVariant, false);
 
                 return $this->redirect($url, 301);
@@ -223,7 +223,7 @@ class PublicController extends CommonFormController
                     if ($translationParent && $translatedEntity !== $entity) {
                         if (!$this->request->get('ntrd', 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
-                            $this->hitPage($model, $entity, $this->request, 302, $lead, $query);
+                            $model->hitPage($entity, $this->request, 302, $lead, $query);
 
                             return $this->redirect($url, 302);
                         }
@@ -284,57 +284,14 @@ class PublicController extends CommonFormController
             $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
             $content = $event->getContent();
 
-            $this->hitPage($model, $entity, $this->request, 200, $lead, $query);
+            $model->hitPage($entity, $this->request, 200, $lead, $query);
 
             return new Response($content);
         }
 
-        $this->hitPage($model, $entity, $this->request, 404);
+        $model->hitPage($entity, $this->request, 404);
 
         return $this->notFound();
-    }
-
-    /**
-     * @param PageModel $model
-     * @param $page
-     * @param Request   $request
-     * @param string    $code
-     * @param Lead|null $lead
-     * @param array     $query
-     */
-    private function hitPage(PageModel $model, $page, Request $request, $code = '200', Lead $lead = null, $query = [])
-    {
-        $ipLookupHelper = $this->get('mautic.helper.ip_lookup');
-        $ipAddress      = $ipLookupHelper->getIpAddress();
-
-        list($hitId, $trackingNewlyGenerated) = $model->generateHit(
-            $page,
-            $request,
-            $ipAddress,
-            $code,
-            $lead,
-            $query
-        );
-
-        //save hit to the cookie to use to update the exit time
-        $cookieHelper = $this->get('mautic.helper.cookie');
-        $cookieHelper->setCookie('mautic_referer_id', $hitId ?: null);
-
-        $logger       = $this->get('monolog.logger.mautic');
-        $queueService = $this->get('mautic.queue.service');
-        if ($queueService->isQueueEnabled()) {
-            $logger->log('info', 'using the queue');
-            $msg = [
-                'hitId'   => $hitId,
-                'pageId'  => $page->getId(),
-                'request' => $request,
-                'isNew'   => $trackingNewlyGenerated,
-            ];
-            $queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
-        } else {
-            $logger->log('info', 'not using the queue');
-            $model->hitPage($hitId, $page, $request, $trackingNewlyGenerated);
-        }
     }
 
     /**
@@ -408,7 +365,7 @@ class PublicController extends CommonFormController
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $this->hitPage($model, null, $this->request);
+        $model->hitPage(null, $this->request);
 
         return TrackingPixelHelper::getResponse($this->request);
     }
@@ -428,7 +385,7 @@ class PublicController extends CommonFormController
 
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model = $this->getModel('page');
-        $this->hitPage($model, null, $this->request);
+        $model->hitPage(null, $this->request);
 
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
@@ -460,9 +417,9 @@ class PublicController extends CommonFormController
         if (empty($redirect) || !$redirect->isPublished(false)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
         }
-
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
         $pageModel = $this->getModel('page');
-        $this->hitPage($pageModel, $redirect, $this->request);
+        $pageModel->hitPage($redirect, $this->request);
 
         $url = $redirect->getUrl();
 

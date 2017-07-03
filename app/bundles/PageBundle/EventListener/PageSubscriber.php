@@ -164,15 +164,16 @@ class PageSubscriber extends CommonSubscriber
         $event->setContent($content);
     }
 
+    /**
+     * @param QueueConsumerEvent $event
+     */
     public function onPageHit(QueueConsumerEvent $event)
     {
         $payload                = $event->getPayload();
         $hitId                  = $payload['hitId'];
-        $pageId                 = $payload['pageId'];
         $request                = $payload['request'];
         $trackingNewlyGenerated = $payload['isNew'];
-        $page                   = $this->pageModel->getRepository()->find($pageId);
-        $this->pageModel->hitPage($hitId, $page, $request, $trackingNewlyGenerated);
+        $this->pageModel->processPageHit($hitId, $request, $trackingNewlyGenerated, false);
         $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
     }
 }

@@ -648,18 +648,6 @@ class Asset extends FormEntity
     }
 
     /**
-     * @param $prop
-     * @param $val
-     */
-    protected function isChanged($prop, $val)
-    {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-
-        parent::isChanged($prop, $val);
-    }
-
-    /**
      * Constructor.
      */
     public function __construct()

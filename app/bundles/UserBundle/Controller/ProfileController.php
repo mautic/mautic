@@ -11,12 +11,12 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 
 /**
  * Class ProfileController.
  */
-class ProfileController extends FormController
+class ProfileController extends AbstractFormController
 {
     /**
      * Generate's account profile.

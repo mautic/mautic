@@ -12,14 +12,14 @@
 namespace Mautic\AssetBundle\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AssetController.
  */
-class AssetController extends FormController
+class AssetController extends AbstractFormController
 {
     /**
      * @param int $page

@@ -14,6 +14,7 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
@@ -28,10 +29,11 @@ class HitRepository extends CommonRepository
      *
      * @param Page|Redirect $page
      * @param string        $trackingId
+     * @param Lead          $lead
      *
      * @return bool
      */
-    public function isUniquePageHit($page, $trackingId)
+    public function isUniquePageHit($page, $trackingId, Lead $lead = null)
     {
         $q  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q2 = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -39,9 +41,19 @@ class HitRepository extends CommonRepository
         $q2->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
-        $expr = $q2->expr()->andX(
-            $q2->expr()->eq('h.tracking_id', ':id')
-        );
+        $expr = $q2->expr()->andX();
+
+        // If we know the lead, use that to determine uniqueness
+        if ($lead !== null && $lead->getId()) {
+            $expr->add(
+                $q2->expr()->eq('h.lead_id', $lead->getId())
+            );
+        } else {
+            $expr->add(
+                $q2->expr()->eq('h.tracking_id', ':id')
+            );
+            $q->setParameter('id', $trackingId);
+        }
 
         if ($page instanceof Page) {
             $expr->add(
@@ -56,9 +68,7 @@ class HitRepository extends CommonRepository
         $q2->where($expr);
 
         $q->select('u.is_unique')
-            ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u'
-        )
-            ->setParameter('id', $trackingId);
+            ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u');
 
         return (bool) $q->execute()->fetchColumn();
     }

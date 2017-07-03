@@ -54,7 +54,7 @@ class ConfigType extends AbstractType
                 'choices'    => $protocolChoices,
                 'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.queue.config.protocol',
+                    'tooltip' => 'mautic.queue.config.protocol.tooltip',
                 ],
                 'required' => false,
             ]
