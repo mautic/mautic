@@ -11,13 +11,13 @@
 
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class ClearbitController extends AbstractFormController
+class ClearbitController extends FormController
 {
     /**
      * @param string $objectId
