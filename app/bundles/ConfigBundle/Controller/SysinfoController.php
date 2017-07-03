@@ -11,12 +11,12 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 
 /**
  * Class SysinfoController.
  */
-class SysinfoController extends AbstractFormController
+class SysinfoController extends FormController
 {
     /**
      * @param int $page

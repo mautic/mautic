@@ -11,10 +11,10 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\FormError;
 
-class PublicController extends AbstractFormController
+class PublicController extends FormController
 {
     /**
      * Generates a new password for the user and emails it to them.
