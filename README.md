@@ -213,7 +213,7 @@ your test database, then your production database WILL BE TRUNCATED.
 
 The unit tests can be executed in the Mautic root directory with `composer test` command.
 
-If you get the following error when running `compser test`, you need to copy the `app/phpunit.xml.dist` file to `app/phpunit.xml`.
+If you get the following error when running `composer test`, you need to copy the `app/phpunit.xml.dist` file to `app/phpunit.xml`.
 
 ```bash
 <error>Script phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml handling the test event returned with error code 1</error>
