@@ -47,8 +47,8 @@ class IntegrationSubscriber extends CommonSubscriber
         }, array_keys($event->getHeaders()), array_values($event->getHeaders()))) : '';
 
         $params = (count($event->getParameters())) ? implode(PHP_EOL, array_map(function ($k, $v) {
-            if (is_object($v)) {
-                return "$k=(object)";
+            if (is_object($v) || is_array($v)) {
+                return "$k=".json_encode($v, JSON_PRETTY_PRINT);
             }
 
             return "$k=$v";
