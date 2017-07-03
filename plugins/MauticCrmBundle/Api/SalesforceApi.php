@@ -15,9 +15,6 @@ class SalesforceApi extends CrmApi
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
-
-    const CURL_SSLVERSION_TLSv1_1 = 1;
-
     protected $apiRequestCounter = 0;
 
     public function __construct(CrmAbstractIntegration $integration)
@@ -25,7 +22,7 @@ class SalesforceApi extends CrmApi
         parent::__construct($integration);
 
         $this->requestSettings['curl_options'] = [
-            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : CURL_SSLVERSION_TLSv1_1,
+            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : 1,
         ];
     }
 
