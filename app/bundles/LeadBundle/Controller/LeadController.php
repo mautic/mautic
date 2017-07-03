@@ -11,7 +11,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class LeadController extends AbstractFormController
+class LeadController extends FormController
 {
     use LeadDetailsTrait, FrequencyRuleTrait;
 
