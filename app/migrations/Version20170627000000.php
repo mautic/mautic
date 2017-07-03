@@ -1,9 +1,12 @@
 <?php
+
 namespace Mautic\Migrations;
+
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\LeadBundle\Entity\LeadField;
+
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
