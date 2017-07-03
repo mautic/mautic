@@ -11,7 +11,7 @@
 
 namespace Mautic\ReportBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation;
 /**
  * Class ReportController.
  */
-class ReportController extends FormController
+class ReportController extends AbstractFormController
 {
     /**
      * @param int $page

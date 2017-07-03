@@ -361,6 +361,46 @@ class ListModel extends FormModel
                 'operators' => $this->getOperatorsForFieldType('multiselect'),
                 'object'    => 'lead',
             ],
+            'device_type' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.device_type'),
+                'properties' => [
+                    'type' => 'device_type',
+                ],
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
+            ],
+            'device_brand' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.device_brand'),
+                'properties' => [
+                    'type' => 'device_brand',
+                ],
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
+            ],
+            'device_os' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.device_os'),
+                'properties' => [
+                    'type' => 'device_os',
+                ],
+                'operators' => $this->getOperatorsForFieldType('multiselect'),
+                'object'    => 'lead',
+            ],
+            'device_model' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.device_model'),
+                'properties' => [
+                    'type' => 'text',
+                ],
+                'operators' => $this->getOperatorsForFieldType(
+                    [
+                        'include' => [
+                            '=',
+                            'like',
+                            'regexp',
+                        ],
+                    ]
+                ),
+                'object' => 'lead',
+            ],
             'dnc_bounced' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.dnc_bounced'),
                 'properties' => [
@@ -423,6 +463,9 @@ class ListModel extends FormModel
                             '!like',
                             'regexp',
                             '!regexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
                         ],
                     ]
                 ),
@@ -491,6 +534,9 @@ class ListModel extends FormModel
                             '!like',
                             'regexp',
                             '!regexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
                         ],
                     ]
                 ),
@@ -510,6 +556,9 @@ class ListModel extends FormModel
                             '!like',
                             'regexp',
                             '!regexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
                         ],
                     ]
                 ),
@@ -529,6 +578,9 @@ class ListModel extends FormModel
                             '!like',
                             'regexp',
                             '!regexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
                         ],
                     ]
                 ),
@@ -592,6 +644,8 @@ class ListModel extends FormModel
                         'include' => [
                             '=',
                             '!=',
+                            'empty',
+                            '!empty',
                         ],
                     ]
                 ),

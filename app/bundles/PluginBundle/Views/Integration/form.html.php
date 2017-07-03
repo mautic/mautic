@@ -152,7 +152,7 @@ $hasFeatureErrors =
     <?php endif; ?>
     <?php if ($hasCompanyFields): ?>
     <div class="tab-pane fade <?php if (isset($activeTab) && $activeTab == 'companyFieldsContainer'): echo 'in active'; endif; ?> bdr-w-0" id="company-fields-container">
-        <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.comapanyfield_matches'); ?></h4>
+        <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.companyfield_matches'); ?></h4>
         <?php echo $companyFieldHtml; ?>
     </div>
     <?php endif; ?>
