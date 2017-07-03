@@ -11,7 +11,7 @@
 
 namespace Mautic\PointBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\PointBundle\Entity\Trigger;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class TriggerController.
  */
-class TriggerController extends AbstractFormController
+class TriggerController extends FormController
 {
     /**
      * @param int $page

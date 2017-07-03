@@ -11,13 +11,13 @@
 
 namespace Mautic\CalendarBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Class DefaultController.
  */
-class DefaultController extends AbstractFormController
+class DefaultController extends FormController
 {
     /**
      * Generates the default view.
