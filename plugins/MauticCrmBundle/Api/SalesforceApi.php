@@ -15,6 +15,9 @@ class SalesforceApi extends CrmApi
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
+
+    const CURL_SSLVERSION_TLSv1_1 = 1;
+
     protected $apiRequestCounter = 0;
 
     public function __construct(CrmAbstractIntegration $integration)
