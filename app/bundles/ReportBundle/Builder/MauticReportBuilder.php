@@ -31,16 +31,19 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     const OPERATORS = [
         'default' => [
-            'eq'       => 'mautic.core.operator.equals',
-            'gt'       => 'mautic.core.operator.greaterthan',
-            'gte'      => 'mautic.core.operator.greaterthanequals',
-            'lt'       => 'mautic.core.operator.lessthan',
-            'lte'      => 'mautic.core.operator.lessthanequals',
-            'neq'      => 'mautic.core.operator.notequals',
-            'like'     => 'mautic.core.operator.islike',
-            'notLike'  => 'mautic.core.operator.isnotlike',
-            'empty'    => 'mautic.core.operator.isempty',
-            'notEmpty' => 'mautic.core.operator.isnotempty',
+            'eq'         => 'mautic.core.operator.equals',
+            'gt'         => 'mautic.core.operator.greaterthan',
+            'gte'        => 'mautic.core.operator.greaterthanequals',
+            'lt'         => 'mautic.core.operator.lessthan',
+            'lte'        => 'mautic.core.operator.lessthanequals',
+            'neq'        => 'mautic.core.operator.notequals',
+            'like'       => 'mautic.core.operator.islike',
+            'notLike'    => 'mautic.core.operator.isnotlike',
+            'empty'      => 'mautic.core.operator.isempty',
+            'notEmpty'   => 'mautic.core.operator.isnotempty',
+            'contains'   => 'mautic.core.operator.contains',
+            'startsWith' => 'mautic.core.operator.starts.with',
+            'endsWith'   => 'mautic.core.operator.ends.with',
         ],
         'bool' => [
             'eq'  => 'mautic.core.operator.equals',
@@ -63,12 +66,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
             'neq' => 'mautic.core.operator.notequals',
         ],
         'text' => [
-            'eq'       => 'mautic.core.operator.equals',
-            'neq'      => 'mautic.core.operator.notequals',
-            'empty'    => 'mautic.core.operator.isempty',
-            'notEmpty' => 'mautic.core.operator.isnotempty',
-            'like'     => 'mautic.core.operator.islike',
-            'notLike'  => 'mautic.core.operator.isnotlike',
+            'eq'         => 'mautic.core.operator.equals',
+            'neq'        => 'mautic.core.operator.notequals',
+            'empty'      => 'mautic.core.operator.isempty',
+            'notEmpty'   => 'mautic.core.operator.isnotempty',
+            'like'       => 'mautic.core.operator.islike',
+            'notLike'    => 'mautic.core.operator.isnotlike',
+            'contains'   => 'mautic.core.operator.contains',
+            'startsWith' => 'mautic.core.operator.starts.with',
+            'endsWith'   => 'mautic.core.operator.ends.with',
         ],
     ];
 
@@ -172,16 +178,49 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
+        $standardFilters       = $this->entity->getFilters();
 
-        // Build WHERE clause
-        $filtersApplied = false;
+        // Setup filters
         if (isset($options['dynamicFilters'])) {
-            $filtersApplied = $this->applyFilters($options['dynamicFilters'], $queryBuilder, $options['filters']);
+            $dynamicFilters = $options['dynamicFilters'];
+
+            foreach ($dynamicFilters as $key => $dynamicFilter) {
+                foreach ($standardFilters as $i => $filter) {
+                    if ($filter['column'] === $key && $filter['dynamic']) {
+                        $value     = $dynamicFilter['value'];
+                        $condition = $filter['condition'];
+
+                        switch ($condition) {
+                            case 'startsWith':
+                                $value = $value.'%';
+                                break;
+                            case 'endsWith':
+                                $value = '%'.$value;
+                                break;
+                            case 'like':
+                            case 'notLike':
+                            case 'contains':
+                                if ($condition === 'notLike') {
+                                    $dynamicFilter['expr'] = 'notLike';
+                                }
+
+                                $value = '%'.$value.'%';
+                                break;
+                        }
+
+                        $dynamicFilter['value'] = $value;
+
+                        // Overwrite the standard filter with the dynamic
+                        $standardFilters[$i] = array_merge($filter, $dynamicFilter);
+                    }
+                }
+            }
         }
 
-        if (!$filtersApplied) {
+        // Build WHERE clause
+        if (!empty($standardFilters)) {
             if (!$filterExpr = $event->getFilterExpression()) {
-                $this->applyFilters($this->entity->getFilters(), $queryBuilder, $options['filters']);
+                $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
             } else {
                 $queryBuilder->andWhere($filterExpr);
             }
@@ -213,23 +252,27 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build GROUP BY
         if ($groupByOptions = $this->entity->getGroupBy()) {
+            $groupByColumns = [];
+
             foreach ($groupByOptions as $groupBy) {
                 if (isset($options['columns'][$groupBy])) {
                     $fieldOptions = $options['columns'][$groupBy];
-                    $columns[]    = (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
+
+                    if (isset($fieldOptions['groupByFormula'])) {
+                        $groupByColumns[] = $fieldOptions['groupByFormula'];
+                    } elseif (isset($fieldOptions['formula'])) {
+                        $groupByColumns[] = $fieldOptions['formula'];
+                    } else {
+                        $groupByColumns[] = $groupBy;
+                    }
                 }
             }
-            $groupByColumns = implode(',', $columns);
+
             $queryBuilder->addGroupBy($groupByColumns);
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
-            if (is_array($options['groupby'])) {
-                foreach ($options['groupby'] as $groupBy) {
-                    $queryBuilder->addGroupBy($groupBy);
-                }
-            } else {
-                $queryBuilder->groupBy($options['groupby']);
-            }
+            $queryBuilder->addGroupBy($options['groupby']);
         }
+
         // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
@@ -246,39 +289,54 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        // Generate a count query in case a formula needs total number
-        $countQuery = clone $queryBuilder;
-        $countQuery->select('COUNT(*) as count');
-        $countSql = sprintf('(%s)', $countQuery->getSQL());
+        $selectColumns = [];
 
         // Build SELECT clause
-        if (!$selectColumns = $event->getSelectColumns()) {
-            $fields = $this->entity->getColumns();
+        if (!$selectOptions = $event->getSelectColumns()) {
+            $fields         = $this->entity->getColumns();
+            $groupByColumns = $queryBuilder->getQueryPart('groupBy');
+
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
                     $fieldOptions = $options['columns'][$field];
-                    $select       = '';
 
                     if (array_key_exists('channelData', $fieldOptions)) {
-                        $select .= $this->buildCaseSelect($fieldOptions['channelData']);
+                        $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
                     } else {
-                        $select .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $field;
-                    }
-
-                    if (strpos($select, '{{count}}')) {
-                        $select = str_replace('{{count}}', $countSql, $select);
+                        // If there is a group by, and this field has groupByFormula
+                        if (isset($groupByColumns) && isset($fieldOptions['groupByFormula'])) {
+                            $selectText = $fieldOptions['groupByFormula'];
+                        } elseif (isset($fieldOptions['formula'])) {
+                            $selectText = $fieldOptions['formula'];
+                        } else {
+                            $selectText = $field;
+                        }
                     }
 
                     if (isset($fieldOptions['alias'])) {
-                        $select .= ' AS '.$fieldOptions['alias'];
+                        $selectText .= ' AS '.$fieldOptions['alias'];
                     }
 
-                    $selectColumns[] = $select;
+                    $selectColumns[] = $selectText;
                 }
             }
         }
 
-        $queryBuilder->addSelect(implode(', ', $selectColumns));
+        // Generate a count query in case a formula needs total number
+        $countQuery = clone $queryBuilder;
+        $countQuery->select('COUNT(*) as count');
+
+        $countSql = sprintf('(%s)', $countQuery->getSQL());
+
+        // Replace {{count}} with the count query
+        array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql) {
+            if (strpos($columnValue, '{{count}}') !== false) {
+                $columnValue = str_replace('{{count}}', $countSql, $columnValue);
+            }
+        });
+
+        $queryBuilder->addSelect($selectColumns);
+
         // Add Aggregators
         $aggregators = $this->entity->getAggregators();
         if ($aggregators && $groupByOptions) {
@@ -331,27 +389,36 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)
     {
-        $expr       = $queryBuilder->expr();
-        $filterExpr = $expr->andX();
+        $expr      = $queryBuilder->expr();
+        $groups    = [];
+        $groupExpr = $queryBuilder->expr()->andX();
 
         if (count($filters)) {
-            foreach ($filters as $filter) {
+            foreach ($filters as $i => $filter) {
                 $exprFunction = isset($filter['expr']) ? $filter['expr'] : $filter['condition'];
-                $paramName    = InputHelper::alphanum($filter['column']);
+                $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
+
+                if (array_key_exists('glue', $filter) && $filter['glue'] === 'or') {
+                    if ($groupExpr->count()) {
+                        $groups[]  = $groupExpr;
+                        $groupExpr = $queryBuilder->expr()->andX();
+                    }
+                }
+
                 switch ($exprFunction) {
                     case 'notEmpty':
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->isNotNull($filter['column'])
                         );
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->neq($filter['column'], $expr->literal(''))
                         );
                         break;
                     case 'empty':
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->isNull($filter['column'])
                         );
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->eq($filter['column'], $expr->literal(''))
                         );
                         break;
@@ -387,15 +454,54 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 $columnValue = (int) $filter['value'];
                                 break;
 
+                            case 'string':
+                            case 'email':
+                                switch ($exprFunction) {
+                                    case 'startsWith':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = $filter['value'].'%';
+                                        break;
+                                    case 'endsWith':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = '%'.$filter['value'];
+                                        break;
+                                    case 'contains':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = '%'.$filter['value'].'%';
+                                        break;
+                                }
+
+                                $queryBuilder->setParameter($paramName, $filter['value']);
+                                break;
+
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
 
-                    $filterExpr->add(
-                        $expr->{$exprFunction}($filter['column'], $columnValue)
-                    );
+                        $groupExpr->add(
+                            $expr->{$exprFunction}($filter['column'], $columnValue)
+                        );
                 }
             }
+        }
+
+        // Get the last of the filters
+        if ($groupExpr->count()) {
+            $groups[] = $groupExpr;
+        }
+
+        if (count($groups) === 1) {
+            // Only one andX expression
+            $filterExpr = $groups[0];
+        } elseif (count($groups) > 1) {
+            // Sets of expressions grouped by OR
+            $orX = $queryBuilder->expr()->orX();
+            $orX->addMultiple($groups);
+
+            // Wrap in a andX for other functions to append
+            $filterExpr = $queryBuilder->expr()->andX($orX);
+        } else {
+            $filterExpr = $groupExpr;
         }
 
         if ($filterExpr->count()) {

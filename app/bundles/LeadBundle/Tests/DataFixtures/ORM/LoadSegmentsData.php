@@ -98,6 +98,38 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [
+                'name'    => 'Segment Test 4',
+                'alias'   => 'segment-test-4',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'hit_url',
+                        'operator' => 'like',
+                        'filter'   => 'test.com',
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [
+                'name'    => 'Segment Test 5',
+                'alias'   => 'segment-test-5',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'hit_url',
+                        'operator' => '!like',
+                        'filter'   => 'test.com',
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
@@ -131,6 +163,6 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
      */
     public function getOrder()
     {
-        return 6;
+        return 7;
     }
 }

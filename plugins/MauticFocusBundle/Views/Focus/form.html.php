@@ -52,6 +52,14 @@ echo $view['form']->start($form);
                 echo $view['form']->row($form['publishUp']);
                 echo $view['form']->row($form['publishDown']);
                 ?>
+                <hr />
+                <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+                <br />
+                <?php
+                foreach ($form['utmTags'] as $i => $utmTag):
+                    echo $view['form']->row($utmTag);
+                endforeach;
+                ?>
             </div>
         </div>
     </div>
@@ -329,6 +337,7 @@ echo $view['form']->start($form);
                             <div class="hidden-focus-type-notice">
 
                                 <div class="row">
+
                                     <div class="form-group col-xs-12 ">
                                         <?php echo $view['form']->label($form['properties']['colors']['button']); ?>
                                         <div class="input-group">
@@ -372,6 +381,9 @@ echo $view['form']->start($form);
                     </div>
                     <div id="focusContentPanel" class="panel-collapse collapse" role="tabpanel">
                         <div class="panel-body pa-xs">
+                            <?php echo $view['form']->row($form['html_mode']); ?>
+                            <?php echo $view['form']->row($form['editor']); ?>
+                            <?php echo $view['form']->row($form['html']); ?>
                             <?php echo $view['form']->row($form['properties']['content']['headline']); ?>
                             <div class="hidden-focus-style-bar">
                                 <?php echo $view['form']->row($form['properties']['content']['tagline']); ?>
