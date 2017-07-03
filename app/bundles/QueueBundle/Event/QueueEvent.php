@@ -46,7 +46,7 @@ class QueueEvent extends CommonEvent
      * @param array    $payload
      * @param int|null $messages
      */
-    public function __construct($protocol, $queueName, $payload = [], $messages = null)
+    public function __construct($protocol, $queueName, array $payload = [], $messages = null)
     {
         $this->messages  = $messages;
         $this->payload   = $payload;
@@ -65,9 +65,9 @@ class QueueEvent extends CommonEvent
     /**
      * @return array
      */
-    public function getPayload()
+    public function getPayload($returnArray = false)
     {
-        return $this->payload;
+        return ($returnArray) ? $this->payload : json_encode($this->payload);
     }
 
     /**

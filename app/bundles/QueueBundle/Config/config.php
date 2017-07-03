@@ -43,6 +43,7 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'event_dispatcher',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.queue.helper.rabbitmq_consumer' => [

@@ -152,7 +152,7 @@ abstract class AbstractFormFieldHelper
                     $label = $val;
                 }
 
-                $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim($label);
+                $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($val, ENT_QUOTES));
             }
         }
 

@@ -21,9 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessWebhookQueuesCommand extends ContainerAwareCommand
 {
-    /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-    protected $factory;
-
     /**
      * {@inheritdoc}
      */
@@ -45,21 +42,17 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->factory = $this->getContainer()->get('mautic.factory');
-
-        $queueMode = $this->factory->getParameter('queue_mode');
+        /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
+        $model = $this->getContainer()->get('mautic.webhook.model.webhook');
 
         // check to make sure we are in queue mode
-        if ($queueMode != 'command_process') {
+        if ($this->getContainer()->get('mautic.helper.core_parameters')->getParameter('queue_mode') != 'command_process') {
             $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change to command mode.');
 
             return 0;
         }
 
         $id = $input->getOption('webhook-id');
-
-        /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
-        $model = $this->factory->getModel('webhook');
 
         if ($id) {
             $webhook  = $model->getEntity($id);
@@ -84,7 +77,7 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
         if (!count($webhooks)) {
             $output->writeln('<error>No published webhooks found. Try again later.</error>');
 
-            return;
+            return 0;
         }
 
         $output->writeLn('<info>Processing Webhooks</info>');
@@ -93,7 +86,12 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
             $model->processWebhooks($webhooks);
         } catch (\Exception $e) {
             $output->writeLn('<error>'.$e->getMessage().'</error>');
+
+            return 1;
         }
+
         $output->writeLn('<info>Webhook Processing Complete</info>');
+
+        return 0;
     }
 }

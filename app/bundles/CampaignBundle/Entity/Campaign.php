@@ -227,8 +227,8 @@ class Campaign extends FormEntity
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 

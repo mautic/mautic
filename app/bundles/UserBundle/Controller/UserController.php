@@ -11,14 +11,14 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Form\Type as FormType;
 
 /**
  * Class UserController.
  */
-class UserController extends FormController
+class UserController extends AbstractFormController
 {
     /**
      * Generate's default user list.

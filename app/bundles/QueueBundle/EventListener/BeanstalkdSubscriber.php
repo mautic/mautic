@@ -67,7 +67,7 @@ class BeanstalkdSubscriber extends AbstractQueueSubscriber
     {
         $this->container->get('leezy.pheanstalk')
             ->useTube($event->getQueueName())
-            ->put(serialize($event->getPayload()));
+            ->put($event->getPayload());
     }
 
     /**

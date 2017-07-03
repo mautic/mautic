@@ -12,11 +12,13 @@
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -29,9 +31,21 @@ class IcontactType extends AbstractType
      */
     private $factory;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    public function __construct(MauticFactory $factory, Session $session, CoreParametersHelper $coreParametersHelper)
     {
-        $this->factory = $factory;
+        $this->factory              = $factory;
+        $this->session              = $session;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -45,7 +59,14 @@ class IcontactType extends AbstractType
         $helper = $this->factory->getHelper('integration');
 
         /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration $object */
-        $object = $helper->getIntegrationObject('Icontact');
+        $object          = $helper->getIntegrationObject('Icontact');
+        $integrationName = $object->getName();
+        $session         = $this->session;
+        $limit           = $session->get(
+            'mautic.plugin.'.$integrationName.'.lead.limit',
+            $this->coreParametersHelper->getParameter('default_pagelimit')
+        );
+        $page = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
 
         $api = $object->getApiHelper();
         try {
@@ -62,6 +83,7 @@ class IcontactType extends AbstractType
         } catch (\Exception $e) {
             $choices = [];
             $error   = $e->getMessage();
+            $page    = 1;
         }
 
         $builder->add('list', 'choice', [
@@ -92,11 +114,16 @@ class IcontactType extends AbstractType
             $builder->add('leadFields', 'integration_fields', [
                 'label'                => 'mautic.integration.leadfield_matches',
                 'required'             => true,
-                'lead_fields'          => $leadFields,
-                'data'                 => isset($options['data']['leadFields']) ? $options['data']['leadFields'] : [],
+                'mautic_fields'        => $leadFields,
+                'integration'          => $object->getName(),
+                'integration_object'   => $object,
+                'limit'                => $limit,
+                'page'                 => $page,
+                'data'                 => isset($options['data']) ? $options['data'] : [],
                 'integration_fields'   => $fields,
                 'special_instructions' => $specialInstructions,
-                'alert_type'           => $alertType,
+                'mapped'               => true,
+                'error_bubbling'       => false,
             ]);
         }
     }
