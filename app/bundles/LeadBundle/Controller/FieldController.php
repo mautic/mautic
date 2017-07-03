@@ -12,13 +12,13 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 
-class FieldController extends AbstractFormController
+class FieldController extends FormController
 {
     /**
      * Generate's default list view.
