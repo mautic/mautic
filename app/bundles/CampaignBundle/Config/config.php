@@ -125,6 +125,7 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.http.connector',
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber' => [

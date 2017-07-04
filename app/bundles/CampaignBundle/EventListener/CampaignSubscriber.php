@@ -11,8 +11,11 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Joomla\Http\Http;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CampaignBundle\Form\Type\CampaignEventRemoteUrlType;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -33,15 +36,21 @@ class CampaignSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
+     * @var Http
+     */
+    protected $connector;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, Http $connector)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
+        $this->connector      = $connector;
     }
 
     /**
@@ -50,10 +59,49 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_POST_SAVE   => ['onCampaignPostSave', 0],
-            CampaignEvents::CAMPAIGN_POST_DELETE => ['onCampaignDelete', 0],
-            CampaignEvents::CAMPAIGN_ON_BUILD    => ['onCampaignBuild', 0],
+            CampaignEvents::CAMPAIGN_POST_SAVE         => ['onCampaignPostSave', 0],
+            CampaignEvents::CAMPAIGN_POST_DELETE       => ['onCampaignDelete', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD          => ['onCampaignBuild', 0],
+            CampaignEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
         ];
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent
+     */
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    {
+        $lead   = $event->getLead();
+        $config = $event->getConfig();
+
+        $timeout = 10;
+
+        $headers = [];
+        if (!empty($config['authorization_header'])) {
+            if (strpos($config['authorization_header'], ':') !== false) {
+                list($key, $value) = explode(':', $config['authorization_header']);
+            } else {
+                $key   = 'Authorization';
+                $value = $config['authorization_header'];
+            }
+            $headers[trim($key)] = trim($value);
+        }
+
+        try {
+            $response = $this->connector->get(
+                $config['url'],
+                $headers,
+                $timeout
+            );
+            if (in_array($response->code, [200, 201])) {
+                $event->setResult(true);
+            }
+        } catch (\Exception $e) {
+        }
+
+        return $event->setResult(false);
     }
 
     /**
@@ -119,5 +167,15 @@ class CampaignSubscriber extends CommonSubscriber
             'callback' => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead',
         ];
         $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
+
+        //Add action to remote url call
+        $remoteUrlAction = [
+            'label'       => 'mautic.campaign.event.remoteurl',
+            'description' => 'mautic.campaign.event.remoteurl_desc',
+            'formType'    => 'campaignevent_remoteurl',
+            'eventName'   => CampaignEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'formType'    => CampaignEventRemoteUrlType::class,
+        ];
+        $event->addAction('campaign.remoteurl', $remoteUrlAction);
     }
 }
