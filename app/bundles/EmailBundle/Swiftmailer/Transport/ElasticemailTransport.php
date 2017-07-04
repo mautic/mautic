@@ -37,13 +37,12 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCal
     {
         // IsTransactional header for all non bulk messages
         // https://elasticemail.com/support/guides/unsubscribe/
-        if($message->getHeaders()->get('Precedence') != 'Bulk'){
+        if ($message->getHeaders()->get('Precedence') != 'Bulk') {
             $message->getHeaders()->addTextHeader('IsTransactional', 'True');
         }
 
         parent::send($message, $failedRecipients);
     }
-
 
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
