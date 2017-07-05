@@ -159,46 +159,32 @@ if ($tmpl == 'index') {
                             <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span>
                         </span>
                     </td>
-                    <td class="visible-sm visible-md visible-lg col-stats">
-                        <?php $pending = $model->getPendingLeads($item, null, true); ?>
-                        <?php if ($type == 'list' && !empty($pending)): ?>
-                        <span class="mt-xs label label-default"
+                    <td class="visible-sm visible-md visible-lg col-stats" data-stats="<?php echo $item->getId(); ?>">
+                        <?php  ?>
+                        <span class="mt-xs label label-default hide"
+                              id="pending-<?php echo $item->getId(); ?>"
                               data-toggle="tooltip"
                               title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">
-                            <?php echo $view['translator']->trans(
-                                'mautic.email.stat.leadcount',
-                                ['%count%' => $pending]
-                            ); ?>
                         </span>
-                        <?php endif; ?>
-                        <?php $queued = $model->getQueuedCounts($item); ?>
-                        <?php if (!empty($queued)): ?>
-                        <span class="mt-xs label label-default"
+                        <span class="mt-xs label label-default hide"
+                              id="queued-<?php echo $item->getId(); ?>"
                               data-toggle="tooltip"
                               title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>">
-                            <?php echo $view['translator']->trans(
-                                'mautic.email.stat.queued',
-                                ['%count%' => $queued]
-                            ); ?>
                         </span>
-                        <?php endif; ?>
-                        <span class="mt-xs label label-warning">
-                            <?php echo $view['translator']->trans(
-                                'mautic.email.stat.sentcount',
-                                ['%count%' => $item->getSentCount(true)]
-                            ); ?>
+                        <span class="mt-xs label label-warning" id="sent-count-<?php echo $item->getId(); ?>">
+                            <div style="width: 50px;">
+                                <i class="fa fa-spin fa-spinner"></i>
+                            </div>
                         </span>
-                        <span class="mt-xs label label-success">
-                            <?php echo $view['translator']->trans(
-                                'mautic.email.stat.readcount',
-                                ['%count%' => $item->getReadCount(true)]
-                            ); ?>
+                        <span class="mt-xs label label-success" id="read-count-<?php echo $item->getId(); ?>">
+                            <div style="width: 50px;">
+                                <i class="fa fa-spin fa-spinner"></i>
+                            </div>
                         </span>
-                        <span class="mt-xs label label-primary">
-                            <?php echo $view['translator']->trans(
-                                'mautic.email.stat.readpercent',
-                                ['%count%' => $item->getReadPercentage(true)]
-                            ); ?>
+                        <span class="mt-xs label label-primary" id="read-percent-<?php echo $item->getId(); ?>">
+                            <div style="width: 50px;">
+                                <i class="fa fa-spin fa-spinner"></i>
+                            </div>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
                     </td>

@@ -176,7 +176,7 @@ class SchemaHelper
             $mauticTables[$tableName] = $this->generateBackupName($this->dbParams['table_prefix'], $backupPrefix, $tableName);
         }
 
-        $sql = ['SET foreign_key_checks = 0;'];
+        $sql = $this->em->getConnection()->getDatabasePlatform()->getName() === 'sqlite' ? [] : ['SET foreign_key_checks = 0;'];
         if ($this->dbParams['backup_tables']) {
             $sql = array_merge($sql, $this->backupExistingSchema($tables, $mauticTables, $backupPrefix));
         } else {

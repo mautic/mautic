@@ -27,7 +27,7 @@ class EventRepository extends CommonRepository
             ->leftJoin($alias.'.webhook', 'u');
 
         $q->where(
-            $q->expr()->eq($alias.'.event_type', ':type')
+            $q->expr()->eq($alias.'.eventType', ':type')
         )->setParameter('type', $type);
 
         // only find published webhooks

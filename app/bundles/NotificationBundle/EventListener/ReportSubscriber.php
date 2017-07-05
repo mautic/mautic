@@ -133,12 +133,14 @@ class ReportSubscriber extends CommonSubscriber
                 $statPrefix  = 'pns.';
                 $statColumns = [
                     $statPrefix.'date_sent' => [
-                        'label' => 'mautic.mobile_notifications.report.stat.date_sent',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.mobile_notifications.report.stat.date_sent',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$statPrefix.'date_sent)',
                     ],
                     $statPrefix.'date_read' => [
-                        'label' => 'mautic.mobile_notifications.report.stat.date_read',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.mobile_notifications.report.stat.date_read',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$statPrefix.'date_read)',
                     ],
                     $statPrefix.'source' => [
                         'label' => 'mautic.report.field.source',
