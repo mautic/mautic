@@ -77,7 +77,7 @@ class CampaignSubscriber extends CommonSubscriber
         if (!$event->checkContext('campaign.remoteurl')) {
             return;
         }
-        $config = $event->getConfig()['properties'];
+        $config = $event->getConfig();
         $timeout = 10;
         $headers = [];
         if (!empty($config['authorization_header'])) {
@@ -114,6 +114,7 @@ class CampaignSubscriber extends CommonSubscriber
                     $data
                 );
             }
+            echo $response->body .' vysl';
             if (in_array($response->code, [200, 201])) {
                return $event->setResult(true);
             }
