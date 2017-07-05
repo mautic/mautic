@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Form\Type\CampaignEventRemoteUrlType;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 
@@ -73,11 +74,10 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-
         if (!$event->checkContext('campaign.remoteurl')) {
             return;
         }
-        $config = $event->getConfig();
+        $config  = $event->getConfig();
         $timeout = 10;
         $headers = [];
         if (!empty($config['authorization_header'])) {
@@ -92,21 +92,22 @@ class CampaignSubscriber extends CommonSubscriber
 
         try {
             $method = $config['method'];
-            $data = !empty($config['additional_data']['list'])? $config['additional_data']['list']:'';
-            if(in_array($method, ['get', 'trace'])){
+            $data   = !empty($config['additional_data']['list']) ? $config['additional_data']['list'] : '';
+            $data   = array_flip(AbstractFormFieldHelper::parseList($data));
+            if (in_array($method, ['get', 'trace'])) {
                 $response = $this->connector->$method(
                     $config['url'],
                     $headers,
                     $timeout
                 );
-            }elseif(in_array($method, ['post', 'put', 'patch'])){
+            } elseif (in_array($method, ['post', 'put', 'patch'])) {
                 $response = $this->connector->$method(
                     $config['url'],
                     $data,
                     $headers,
                     $timeout
                 );
-            }elseif($method == 'delete'){
+            } elseif ($method == 'delete') {
                 $response = $this->connector->$method(
                     $config['url'],
                     $headers,
@@ -114,9 +115,8 @@ class CampaignSubscriber extends CommonSubscriber
                     $data
                 );
             }
-            echo $response->body .' vysl';
             if (in_array($response->code, [200, 201])) {
-               return $event->setResult(true);
+                return $event->setResult(true);
             }
         } catch (\Exception $e) {
         }
