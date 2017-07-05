@@ -62,7 +62,7 @@ class CampaignSubscriber extends CommonSubscriber
             CampaignEvents::CAMPAIGN_POST_SAVE         => ['onCampaignPostSave', 0],
             CampaignEvents::CAMPAIGN_POST_DELETE       => ['onCampaignDelete', 0],
             CampaignEvents::CAMPAIGN_ON_BUILD          => ['onCampaignBuild', 0],
-            CampaignEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            CampaignEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 1],
         ];
     }
 
@@ -73,11 +73,12 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $lead   = $event->getLead();
-        $config = $event->getConfig();
 
+        if (!$event->checkContext('campaign.remoteurl')) {
+            return;
+        }
+        $config = $event->getConfig()['properties'];
         $timeout = 10;
-
         $headers = [];
         if (!empty($config['authorization_header'])) {
             if (strpos($config['authorization_header'], ':') !== false) {
@@ -90,13 +91,31 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         try {
-            $response = $this->connector->get(
-                $config['url'],
-                $headers,
-                $timeout
-            );
+            $method = $config['method'];
+            $data = !empty($config['additional_data']['list'])? $config['additional_data']['list']:'';
+            if(in_array($method, ['get', 'trace'])){
+                $response = $this->connector->$method(
+                    $config['url'],
+                    $headers,
+                    $timeout
+                );
+            }elseif(in_array($method, ['post', 'put', 'patch'])){
+                $response = $this->connector->$method(
+                    $config['url'],
+                    $data,
+                    $headers,
+                    $timeout
+                );
+            }elseif($method == 'delete'){
+                $response = $this->connector->$method(
+                    $config['url'],
+                    $headers,
+                    $timeout,
+                    $data
+                );
+            }
             if (in_array($response->code, [200, 201])) {
-                $event->setResult(true);
+               return $event->setResult(true);
             }
         } catch (\Exception $e) {
         }
