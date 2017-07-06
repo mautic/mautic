@@ -51,8 +51,8 @@ class FilterType extends AbstractType
             [
                 'label'   => false,
                 'choices' => [
-                    'or'  => 'mautic.lead.list.form.glue.or',
                     'and' => 'mautic.lead.list.form.glue.and',
+                    'or'  => 'mautic.lead.list.form.glue.or',
                 ],
                 'attr' => [
                     'class'    => 'form-control not-chosen glue-select',

@@ -64,10 +64,6 @@
     border-top-right-radius: 0;
 }
 
-.selected-filters .panel.in-group.bottom {
-    margin-top:-15px;
-}
-
 .col-leadpoints-date {
     width: 175px;
 }

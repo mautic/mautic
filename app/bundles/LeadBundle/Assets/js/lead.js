@@ -241,19 +241,6 @@ Mautic.leadlistOnLoad = function(container) {
             }
         });
 
-        // mQuery('#leadlist_filters .panel').each( function (index, el) {
-        //     var $el = mQuery(el);
-        //     var $prevEl = $el.prev();
-        //
-        //     if ($prevEl.length > 0) {
-        //         if ($el.val() === 'and') {
-        //             $nextEl.addClass('in-group bottom');
-        //         } else {
-        //             $nextEl.removeClass('in-group bottom');
-        //         }
-        //     }
-        // });
-
         mQuery('#leadlist_filters .remove-selected').each( function (index, el) {
             mQuery(el).on('click', function () {
                 mQuery(this).closest('.panel').animate(
@@ -400,6 +387,11 @@ Mautic.addLeadListFilter = function (elId) {
         mQuery(template).attr('name', mQuery(template).attr('name').replace(/__name__/g, filterNum));
         mQuery(template).attr('id', mQuery(template).attr('id').replace(/__name__/g, filterNum));
         mQuery(prototype).find('input[name="' + filterBase + '[filter]"]').replaceWith(template);
+    }
+
+    if (mQuery('#leadlist_filters div.panel').length == 0) {
+        // First filter so hide the glue footer
+        mQuery(prototype).find(".panel-heading").addClass('hide');
     }
 
     if (fieldObject == 'company') {
@@ -1210,14 +1202,11 @@ Mautic.initUniqueIdentifierFields = function() {
 Mautic.updateFilterPositioning = function (el) {
     var $el = mQuery(el);
     var $parentEl = $el.closest('.panel');
-    var $nextEl = $parentEl.closest('.row').next().find('.panel').first();
 
-    if ($nextEl.length > 0) {
-        if ($el.val() === 'and') {
-            $nextEl.addClass('in-group bottom');
-        } else {
-            $nextEl.removeClass('in-group bottom');
-        }
+    if ($el.val() == 'and') {
+        $parentEl.addClass('in-group');
+    } else {
+        $parentEl.removeClass('in-group');
     }
 };
 
