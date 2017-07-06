@@ -45,6 +45,7 @@ class CampaignSubscriber extends CommonSubscriber
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
+     * @param Http           $connector
      */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, Http $connector)
     {
@@ -90,25 +91,26 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         try {
+            $url    = $config['url'];
             $method = $config['method'];
             $data   = !empty($config['additional_data']['list']) ? $config['additional_data']['list'] : '';
             $data   = array_flip(AbstractFormFieldHelper::parseList($data));
             if (in_array($method, ['get', 'trace'])) {
                 $response = $this->connector->$method(
-                    $config['url'],
+                    $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($data),
                     $headers,
                     $timeout
                 );
             } elseif (in_array($method, ['post', 'put', 'patch'])) {
                 $response = $this->connector->$method(
-                    $config['url'],
+                    $url,
                     $data,
                     $headers,
                     $timeout
                 );
             } elseif ($method == 'delete') {
                 $response = $this->connector->$method(
-                    $config['url'],
+                    $url,
                     $headers,
                     $timeout,
                     $data
