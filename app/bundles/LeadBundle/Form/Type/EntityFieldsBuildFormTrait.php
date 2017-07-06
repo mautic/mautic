@@ -228,14 +228,15 @@ trait EntityFieldsBuildFormTrait
                             );
                             break;
                     }
-
+                    $attr['data-encoding'] = 'RAW';
                     $builder->add(
                         $alias,
                         $type,
                         [
-                            'required'    => $field['isRequired'],
-                            'label'       => $field['label'],
-                            'label_attr'  => ['class' => 'control-label'],
+                            'required'   => $field['isRequired'],
+                            'label'      => $field['label'],
+                            'label_attr' => ['class' => 'control-label'],
+
                             'attr'        => $attr,
                             'data'        => $value,
                             'mapped'      => $mapped,
