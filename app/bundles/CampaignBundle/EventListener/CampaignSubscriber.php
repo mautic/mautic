@@ -78,7 +78,7 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
         $config  = $event->getConfig();
-        $timeout = 10;
+        $timeout = $config['timeout'];
         $headers = [];
         if (!empty($config['authorization_header'])) {
             if (strpos($config['authorization_header'], ':') !== false) {
