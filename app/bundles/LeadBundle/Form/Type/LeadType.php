@@ -199,7 +199,7 @@ class LeadType extends AbstractType
             );
         }
 
-        $builder->addEventSubscriber(new CleanFormSubscriber(['clean', 'RAW'])); //move this to the end array masks to get form fields make reference hydrate in
+        $builder->addEventSubscriber(new CleanFormSubscriber(['clean', 'raw']));
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

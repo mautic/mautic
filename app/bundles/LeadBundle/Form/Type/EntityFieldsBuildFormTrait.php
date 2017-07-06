@@ -221,14 +221,15 @@ trait EntityFieldsBuildFormTrait
                             break;
                         case 'email':
                             // Enforce a valid email
-                            $constraints[] = new Email(
+                            $attr['data-encoding'] = 'email';
+                            $constraints[]         = new Email(
                                 [
                                     'message' => 'mautic.core.email.required',
                                 ]
                             );
                             break;
                     }
-                    $attr['data-encoding'] = 'RAW';
+                    $attr['data-encoding'] = 'raw';
                     $builder->add(
                         $alias,
                         $type,
