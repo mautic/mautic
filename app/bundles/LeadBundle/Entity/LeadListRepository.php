@@ -417,13 +417,17 @@ class LeadListRepository extends CommonRepository
                         $listOnExpr
                     );
 
-                    $expr->add($q->expr()->isNull('ll.lead_id'));
-
+                    $newExpr = $q->expr()->andX($expr);
+                    $newExpr->add($q->expr()->isNull('ll.lead_id'));
                     if ($batchExpr->count()) {
-                        $expr->add($batchExpr);
+                        $newExpr->add($batchExpr);
                     }
 
-                    $q->andWhere($expr);
+                    if ('AND' === $expr->getType()) {
+                        $q->andWhere($newExpr);
+                    } else {
+                        $q->orWhere($newExpr);
+                    }
                 } elseif ($nonMembersOnly) {
                     // Only leads that are part of the list that no longer match filters and have not been manually removed
                     $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', 'l.id = ll.lead_id');
@@ -453,7 +457,11 @@ class LeadListRepository extends CommonRepository
                     $expr = $this->generateSegmentExpression($filters, $parameters, $sq, $q);
 
                     if ($this->hasCompanyFilter || $expr->count()) {
-                        $sq->andWhere($expr);
+                        if ('AND' === $expr->getType()) {
+                            $sq->andWhere($expr);
+                        } else {
+                            $sq->orWhere($expr);
+                        }
                         $mainExpr->add(
                             sprintf('l.id NOT IN (%s)', $sq->getSQL())
                         );
@@ -735,12 +743,14 @@ class LeadListRepository extends CommonRepository
             }
 
             //the next one will determine the group
-            if ($details['glue'] == 'or') {
-                // Create a new group of andX expressions
-                if ($groupExpr->count()) {
-                    $groups[]  = $groupExpr;
-                    $groupExpr = $q->expr()->andX();
-                }
+            // Create a new group of expressions
+            if ('or' === $details['glue']) {
+                $groupExpr = $q->expr()->orX();
+            } else {
+                $groupExpr = $q->expr()->andX();
+            }
+            if ($groupExpr->count()) {
+                $groups[] = $groupExpr;
             }
 
             $parameter        = $this->generateRandomParameterName();
@@ -1834,14 +1844,18 @@ class LeadListRepository extends CommonRepository
     {
         $joinType = ($this->listFiltersInnerJoinCompany) ? 'join' : 'leftJoin';
         // Join company tables for query optimization
-        $q->$joinType('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'l.id = cl.lead_id')
+        $join = $q->$joinType('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'l.id = cl.lead_id')
             ->$joinType(
                 'cl',
                 MAUTIC_TABLE_PREFIX.'companies',
                 'comp',
                 'cl.company_id = comp.id'
-            )
-            ->andWhere($exprCompany);
+            );
+        if ('AND' === $exprCompany->getType()) {
+            $join->andWhere($exprCompany);
+        } else {
+            $join->orWhere($exprCompany);
+        }
 
         // Return only unique contacts
         $q->groupBy('l.id');

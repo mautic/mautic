@@ -389,11 +389,6 @@ Mautic.addLeadListFilter = function (elId) {
         mQuery(prototype).find('input[name="' + filterBase + '[filter]"]').replaceWith(template);
     }
 
-    if (mQuery('#leadlist_filters div.panel').length == 0) {
-        // First filter so hide the glue footer
-        mQuery(prototype).find(".panel-heading").addClass('hide');
-    }
-
     if (fieldObject == 'company') {
         mQuery(prototype).find(".object-icon").removeClass('fa-user').addClass('fa-building');
     } else {
@@ -1202,11 +1197,14 @@ Mautic.initUniqueIdentifierFields = function() {
 Mautic.updateFilterPositioning = function (el) {
     var $el = mQuery(el);
     var $parentEl = $el.closest('.panel');
+    var $nextEl = $parentEl.closest('.row').next().find('.panel').first();
 
-    if ($el.val() == 'and') {
-        $parentEl.addClass('in-group');
-    } else {
-        $parentEl.removeClass('in-group');
+    if ($nextEl.length > 0) {
+        if ($el.val() === 'and') {
+            $nextEl.addClass('in-group bottom');
+        } else {
+            $nextEl.removeClass('in-group bottom');
+        }
     }
 };
 

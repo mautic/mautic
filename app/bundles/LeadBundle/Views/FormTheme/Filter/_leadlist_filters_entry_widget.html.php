@@ -19,13 +19,6 @@ if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
 ?>
 
 <div class="panel<?php echo ($inGroup && $first === false) ? ' in-group' : ''; ?>">
-    <div class="panel-heading <?php if (!$isPrototype && $form->vars['name'] === '0') {
-    echo ' hide';
-} ?>">
-        <div class="panel-glue col-sm-2 pl-0 ">
-            <?php echo $view['form']->widget($form['glue']); ?>
-        </div>
-    </div>
     <div class="panel-body">
         <div class="col-xs-6 col-sm-3 field-name">
             <i class="object-icon fa <?php echo $class; ?>" aria-hidden="true"></i> <span><?php echo ($isPrototype) ? '__label__' : $fields[$object][$filterType]['label']; ?></span>
@@ -49,5 +42,10 @@ if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
         <?php echo $view['form']->widget($form['field']); ?>
         <?php echo $view['form']->widget($form['type']); ?>
         <?php echo $view['form']->widget($form['object']); ?>
+    </div>
+    <div class="panel-heading" style="padding-bottom: 15px">
+        <div class="panel-glue col-sm-2 pl-0 ">
+            <?php echo $view['form']->widget($form['glue']); ?>
+        </div>
     </div>
 </div>
