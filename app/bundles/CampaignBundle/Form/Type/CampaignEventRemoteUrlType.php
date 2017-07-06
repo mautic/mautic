@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Url;
 
 /**
@@ -21,6 +22,20 @@ use Symfony\Component\Validator\Constraints\Url;
  */
 class CampaignEventRemoteUrlType extends AbstractType
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * ConfigType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -81,7 +96,6 @@ class CampaignEventRemoteUrlType extends AbstractType
                 'required' => false,
             ]
         );
-
         $builder->add(
             'additional_data',
             SortableListType::class,
@@ -90,6 +104,21 @@ class CampaignEventRemoteUrlType extends AbstractType
                 'label'           => 'mautic.campaign.event.remoteurl.data',
                 'option_required' => false,
                 'with_labels'     => true,
+            ]
+        );
+
+        $builder->add(
+            'timeout',
+            'number',
+            [
+                'label'      => 'mautic.campaign.event.remoteurl.timeout',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'          => 'form-control',
+                    'postaddon_text' => $this->translator->trans('mautic.core.time.seconds'),
+                ],
+                'data' => !empty($options['data']['timeout']) ? $options['data']['timeout'] : 10,
+
             ]
         );
     }

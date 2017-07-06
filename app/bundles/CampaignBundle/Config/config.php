@@ -190,6 +190,13 @@ return [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
                 'alias' => 'campaignevent_addremovelead',
             ],
+            'mautic.campaign.type.action.remoteurl' => [
+                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignEventRemoteUrlType',
+                'arguments' => [
+                    'arguments' => 'translator',
+                ],
+                'alias' => 'campaignevent_remoteurl',
+            ],
             'mautic.campaign.type.canvassettings' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
                 'alias' => 'campaignevent_canvassettings',

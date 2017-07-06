@@ -15,7 +15,6 @@ use Joomla\Http\Http;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CampaignBundle\Form\Type\CampaignEventRemoteUrlType;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -194,7 +193,7 @@ class CampaignSubscriber extends CommonSubscriber
             'description' => 'mautic.campaign.event.remoteurl_desc',
             'formType'    => 'campaignevent_remoteurl',
             'eventName'   => CampaignEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'    => CampaignEventRemoteUrlType::class,
+            'formType'    => 'campaignevent_remoteurl',
         ];
         $event->addAction('campaign.remoteurl', $remoteUrlAction);
     }
