@@ -241,6 +241,19 @@ Mautic.leadlistOnLoad = function(container) {
             }
         });
 
+        // mQuery('#leadlist_filters .panel').each( function (index, el) {
+        //     var $el = mQuery(el);
+        //     var $prevEl = $el.prev();
+        //
+        //     if ($prevEl.length > 0) {
+        //         if ($el.val() === 'and') {
+        //             $nextEl.addClass('in-group bottom');
+        //         } else {
+        //             $nextEl.removeClass('in-group bottom');
+        //         }
+        //     }
+        // });
+
         mQuery('#leadlist_filters .remove-selected').each( function (index, el) {
             mQuery(el).on('click', function () {
                 mQuery(this).closest('.panel').animate(
