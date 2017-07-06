@@ -120,10 +120,10 @@ class CampaignSubscriber extends CommonSubscriber
                 return $event->setResult(true);
             }
         } catch (\Exception $e) {
-            return $event->setResult($e->getMessage());
+            return $event->setFailed($e->getMessage());
         }
 
-        return $event->setResult(false);
+        return $event->setFailed('Error code: '.$response->code);
     }
 
     /**
