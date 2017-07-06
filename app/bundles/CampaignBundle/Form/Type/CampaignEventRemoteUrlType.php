@@ -118,7 +118,6 @@ class CampaignEventRemoteUrlType extends AbstractType
                     'postaddon_text' => $this->translator->trans('mautic.core.time.seconds'),
                 ],
                 'data' => !empty($options['data']['timeout']) ? $options['data']['timeout'] : 10,
-
             ]
         );
     }
