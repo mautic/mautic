@@ -50,13 +50,17 @@ class TokenSubscriber extends CommonSubscriber
             $event->setPlainText($plainText);
         }
 
-        $lead                  = $event->getLead();
-        $email                 = $event->getEmail();
-        $tokens                = $event->getTokens();
-        $dynamicContentAsArray = $email instanceof Email ? $email->getDynamicContent() : null;
-
-        if (!empty($dynamicContentAsArray)) {
-            $tokenEvent = new TokenReplacementEvent(null, $lead, ['tokens' => $tokens, 'lead' => null, 'dynamicContent' => $dynamicContentAsArray]);
+        $email = $event->getEmail();
+        if ($dynamicContentAsArray = $email instanceof Email ? $email->getDynamicContent() : null) {
+            $lead       = $event->getLead();
+            $tokens     = $event->getTokens();
+            $tokenEvent = new TokenReplacementEvent(
+                null, $lead, [
+                    'tokens'         => $tokens,
+                    'lead'           => null,
+                    'dynamicContent' => $dynamicContentAsArray
+                ]
+            );
             $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $event->addTokens($tokenEvent->getTokens());
         }

@@ -135,6 +135,9 @@ class DynamicContentSubscriber extends CommonSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
+    /**
+     * @param MauticEvents\TokenReplacementEvent $event
+     */
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
         /** @var Lead $lead */

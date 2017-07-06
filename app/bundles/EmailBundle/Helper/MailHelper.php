@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper.
@@ -1268,6 +1269,9 @@ class MailHelper
         }
     }
 
+    /**
+     * @return null
+     */
     public function getIdHash()
     {
         return $this->idHash;
@@ -1293,6 +1297,9 @@ class MailHelper
         $this->message->leadIdHash = $idHash;
     }
 
+    /**
+     * @return Lead
+     */
     public function getLead()
     {
         return $this->lead;
@@ -1532,6 +1539,14 @@ class MailHelper
     }
 
     /**
+     * @return array
+     */
+    public function getGlobalTokens()
+    {
+        return $this->globalTokens;
+    }
+
+    /**
      * Parses html into basic plaintext.
      *
      * @param string $content
@@ -1595,7 +1610,7 @@ class MailHelper
 
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
-        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens());
+        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
 
         unset($event);
     }
