@@ -86,6 +86,14 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead', 'get_leads'];
+    }
+
+    /**
+     * @return array
+     */
     public function getFormSettings()
     {
         $enableDataPriority = $this->getDataPriority();
