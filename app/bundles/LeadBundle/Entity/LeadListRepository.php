@@ -377,7 +377,7 @@ class LeadListRepository extends CommonRepository
                 }
 
                 if ($newOnly) {
-                    $expr = $this->generateSegmentExpression($filters, $parameters, $q, null);
+                    $expr = $this->generateSegmentExpression($filters, $parameters, $q);
 
                     if (!$this->hasCompanyFilter && !$expr->count()) {
                         // Treat this as if it has no filters since all the filters are now invalid (fields were deleted)
