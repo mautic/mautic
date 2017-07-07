@@ -324,7 +324,7 @@ class LeadListRepository extends CommonRepository
         $limit         = (!array_key_exists('limit', $args)) ? false : $args['limit'];
         $withMinId     = (!array_key_exists('withMinId', $args)) ? false : $args['withMinId'];
 
-        if (!$lists instanceof PersistentCollection && !is_array($lists) || isset($lists['id'])) {
+        if ((!($lists instanceof PersistentCollection) && !is_array($lists)) || isset($lists['id'])) {
             $lists = [$lists];
         }
 
@@ -377,8 +377,7 @@ class LeadListRepository extends CommonRepository
                 }
 
                 if ($newOnly) {
-                    $glueOp = 'and';
-                    $expr   = $this->generateSegmentExpression($filters, $parameters, $q, null, $glueOp);
+                    $expr = $this->generateSegmentExpression($filters, $parameters, $q, null);
 
                     if (!$this->hasCompanyFilter && !$expr->count()) {
                         // Treat this as if it has no filters since all the filters are now invalid (fields were deleted)
@@ -425,11 +424,7 @@ class LeadListRepository extends CommonRepository
                     }
 
                     if ($expr->count()) {
-                        if ($glueOp === 'and') {
-                            $q->andWhere($expr);
-                        } else {
-                            $q->orWhere($expr);
-                        }
+                        $q->andWhere($expr);
                     }
                 } elseif ($nonMembersOnly) {
                     // Only leads that are part of the list that no longer match filters and have not been manually removed
@@ -457,21 +452,14 @@ class LeadListRepository extends CommonRepository
                     $sq->select('l.id')
                         ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-                    $glueOp = 'and';
-                    $expr   = $this->generateSegmentExpression($filters, $parameters, $sq, $q, $glueOp, $glueOp);
+                    $expr = $this->generateSegmentExpression($filters, $parameters, $sq, $q);
 
-                    if ($this->hasCompanyFilter) {
-                        if ($expr->count()) {
-                            if ($glueOp === 'and') {
-                                $sq->andWhere($expr);
-                            } else {
-                                $sq->orWhere($expr);
-                            }
-                        }
-                        $mainExpr->add(
-                            sprintf('l.id NOT IN (%s)', $sq->getSQL())
-                        );
+                    if ($expr->count()) {
+                        $sq->andWhere($expr);
                     }
+                    $mainExpr->add(
+                        sprintf('l.id NOT IN (%s)', $sq->getSQL())
+                    );
 
                     if ($batchExpr->count()) {
                         $mainExpr->add($batchExpr);
@@ -573,34 +561,20 @@ class LeadListRepository extends CommonRepository
      *
      * @return QueryBuilder
      */
-    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, &$glueOp = null)
+    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null)
     {
         if (null === $parameterQ) {
             $parameterQ = $q;
         }
 
-        $objectFilters = $this->arrangeFilters($filters);
+        $objectFilters          = $this->arrangeFilters($filters);
+        $this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0;
 
-        if (isset($objectFilters['lead'])) {
-            $expr = $this->getListFilterExpr($objectFilters['lead'], $parameters, $q, false, null, 'lead');
-        } else {
-            $expr = $q->expr()->andX();
-        }
+        $this->listFiltersInnerJoinCompany = false;
+        $expr                              = $this->getListFilterExprCombined($filters, $parameters, $q);
 
-        $this->hasCompanyFilter = false;
-        $glueOp                 = 'and';
-        if (isset($objectFilters['company'])) {
-            if (count($objectFilters['company'])) {
-                $lastIdx = count($objectFilters['company']) - 1;
-                $glueOp  = $objectFilters['company'][$lastIdx]['glue'];
-            }
-            $this->listFiltersInnerJoinCompany = false;
-            $exprCompany                       = $this->getListFilterExpr($objectFilters['company'], $parameters, $q, false, null, 'company');
-
-            if ($exprCompany->count()) {
-                $this->hasCompanyFilter = true;
-                $this->applyCompanyFieldFilters($q, $exprCompany);
-            }
+        if ($this->hasCompanyFilter) {
+            $this->applyCompanyFieldFilters($q);
         }
 
         foreach ($parameters as $k => $v) {
@@ -665,23 +639,21 @@ class LeadListRepository extends CommonRepository
      * @param              $filters
      * @param              $parameters
      * @param QueryBuilder $q
-     * @param bool         $not
-     * @param null         $leadId
-     * @param string       $object
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null, $object = 'lead')
+    public function getListFilterExprCombined($filters, &$parameters, QueryBuilder $q)
     {
         static $leadTable;
         static $companyTable;
+        $not    = false;
+        $leadId = null;
 
         if (!count($filters)) {
             return $q->expr()->andX();
         }
 
-        $isCompany = ('company' === $object);
-        $schema    = $this->_em->getConnection()->getSchemaManager();
+        $schema = $this->_em->getConnection()->getSchemaManager();
         // Get table columns
         if (null === $leadTable) {
             /** @var \Doctrine\DBAL\Schema\Column[] $leadTable */
@@ -703,8 +675,9 @@ class LeadListRepository extends CommonRepository
         $groupExpr = $q->expr()->andX();
 
         foreach ($filters as $k => $details) {
-            if (isset($details['object']) && $details['object'] != $object) {
-                continue;
+            $object = 'lead';
+            if (!empty($details['object'])) {
+                $object = $details['object'];
             }
 
             if ($object == 'lead') {
@@ -1513,7 +1486,7 @@ class LeadListRepository extends CommonRepository
                         continue;
                     }
 
-                    if ($isCompany) {
+                    if ('company' === $object) {
                         // Must tell getLeadsByList how to best handle the relationship with the companies table
                         if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
                             $this->listFiltersInnerJoinCompany = true;
@@ -1847,9 +1820,8 @@ class LeadListRepository extends CommonRepository
      * be included but the way the relationship is handled needs to be different to optimize best for a posit vs negate.
      *
      * @param $q
-     * @param $exprCompany
      */
-    private function applyCompanyFieldFilters($q, $exprCompany)
+    private function applyCompanyFieldFilters($q)
     {
         $joinType = ($this->listFiltersInnerJoinCompany) ? 'join' : 'leftJoin';
         // Join company tables for query optimization
@@ -1859,8 +1831,7 @@ class LeadListRepository extends CommonRepository
                 MAUTIC_TABLE_PREFIX.'companies',
                 'comp',
                 'cl.company_id = comp.id'
-            )
-            ->andWhere($exprCompany);
+            );
 
         // Return only unique contacts
         $q->groupBy('l.id');
