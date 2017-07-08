@@ -124,7 +124,7 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setFailed($e->getMessage());
         }
 
-        return $event->setFailed('Error code: '.$response->code);
+        return $event->setFailed($this->translator->trans('Error code').': '.$response->code);
     }
 
     /**
