@@ -19,6 +19,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Helper\TokenHelper;
 
 /**
  * Class CampaignSubscriber.
@@ -77,24 +78,24 @@ class CampaignSubscriber extends CommonSubscriber
         if (!$event->checkContext('campaign.remoteurl')) {
             return;
         }
-        $config  = $event->getConfig();
-        $timeout = $config['timeout'];
-        $headers = [];
-        if (!empty($config['authorization_header'])) {
-            if (strpos($config['authorization_header'], ':') !== false) {
-                list($key, $value) = explode(':', $config['authorization_header']);
-            } else {
-                $key   = 'Authorization';
-                $value = $config['authorization_header'];
-            }
-            $headers[trim($key)] = trim($value);
-        }
-
+        $lead   = $event->getLead();
+        $config = $event->getConfig();
         try {
             $url    = $config['url'];
             $method = $config['method'];
             $data   = !empty($config['additional_data']['list']) ? $config['additional_data']['list'] : '';
             $data   = array_flip(AbstractFormFieldHelper::parseList($data));
+            // replace contacts tokens
+            foreach ($data as $key => $value) {
+                $data[$key] = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+            }
+            $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
+            $headers = array_flip(AbstractFormFieldHelper::parseList($headers));
+            foreach ($headers as $key => $value) {
+                $headers[$key] = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+            }
+            $timeout = $config['timeout'];
+
             if (in_array($method, ['get', 'trace'])) {
                 $response = $this->connector->$method(
                     $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($data),

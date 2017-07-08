@@ -84,18 +84,16 @@ class CampaignEventRemoteUrlType extends AbstractType
         );
 
         $builder->add(
-            'authorization_header',
-            'text',
+            'headers',
+            SortableListType::class,
             [
-                'label'      => 'mautic.form.action.repost.authorization_header',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.form.action.repost.authorization_header.tooltip',
-                ],
-                'required' => false,
+                'required'        => false,
+                'label'           => 'mautic.campaign.event.remoteurl.headers',
+                'option_required' => false,
+                'with_labels'     => true,
             ]
         );
+
         $builder->add(
             'additional_data',
             SortableListType::class,
