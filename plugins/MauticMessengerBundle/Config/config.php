@@ -50,6 +50,7 @@ return [
             'mautic.form.type.messenger.send_to_messenger' => [
                 'class' => 'MauticPlugin\MauticMessengerBundle\Form\Type\SendToMessengerType',
                 'alias' => 'messenger_send_to_messenger',
+                'arguments'=> ['mautic.messengerMessage.model.messengerMessage']
             ],
         ],
         'events' => [
@@ -90,9 +91,6 @@ return [
         'models' => [
             'mautic.messengerMessage.model.messengerMessage' => [
                 'class'     => 'MauticPlugin\MauticMessengerBundle\Model\MessengerMessageModel',
-                'arguments' => [
-
-                ],
             ],
         ],
     ],

@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -13,16 +13,13 @@ namespace MauticPlugin\MauticMessengerBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 use MauticPlugin\MauticMessengerBundle\Model\MessengerMessageModel;
 
-
 /**
- * Class FormFieldMessengerCheckboxType.
+ * Class MessengerMessageListType.
  */
-class SendToMessengerType extends AbstractType
+class MessengerMessageListType extends AbstractType
 {
-
     /**
      * @var MessengerMessageModel $messengerMessageModel
      */
@@ -41,26 +38,22 @@ class SendToMessengerType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array $options
+     * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         /** @var \MauticPlugin\MauticMessengerBundle\Entity\MessengerMessageRepository $repo */
-        $lists =  $this->messengerMessageModel->getRepository()->getMessangerMessagesList();
-        $choices = [];
-        foreach ($lists as $l) {
-            $choices[$l['id']] = $l['name'];
-        }
+        $repo =  $this->messengerMessageModel->getRepository();
         $builder->add(
-            'messages',
+            'leadFieldAddress1',
             'choice',
             [
-                'choices' => $choices,
-                'label' => 'mautic.messengerMessage.form.content.choose',
+                'choices' => [],
+                'label' => 'mautic.form.field.form.lead_field',
                 'label_attr' => ['class' => 'control-label'],
                 'attr' => [
                     'class' => 'form-control',
+                    'tooltip' => 'mautic.form.field.help.lead_field',
                 ],
                 'required' => false,
             ]
@@ -68,12 +61,11 @@ class SendToMessengerType extends AbstractType
 
     }
 
-
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getName()
     {
-        return 'messenger_send_to_messenger';
+        return 'messenger_messages_list';
     }
 }

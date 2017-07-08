@@ -26,7 +26,7 @@ class MessengerMessageRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
@@ -48,7 +48,7 @@ class MessengerMessageRepository extends CommonRepository
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
@@ -155,7 +155,7 @@ class MessengerMessageRepository extends CommonRepository
      *
      * @return array
      */
-    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
+    public function getMessangerMessagesList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
@@ -172,8 +172,8 @@ class MessengerMessageRepository extends CommonRepository
         }
 
         if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('e.createdBy', ':id'))
-                ->setParameter('id', $this->currentUser->getId());
+//            $q->andWhere($q->expr()->eq('e.createdBy', ':id'))
+//                ->setParameter('id', $this->currentUser->getId());
         }
 
         if ($topLevel == 'translation') {

@@ -68,7 +68,6 @@ class FormSubscriber extends CommonSubscriber
             'label' => 'mautic.plugin.field.messenger.checkbox',
             'formType' => 'messenger_checkbox',
             'template' => 'MauticMessengerBundle:SubscribedEvents\Field:messenger.checkbox.html.php',
-         //   'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
             'builderOptions' => [
                 'addLeadFieldList' => false,
                 'addIsRequired' => false,

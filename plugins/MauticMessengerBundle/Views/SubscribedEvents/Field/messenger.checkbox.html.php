@@ -18,30 +18,11 @@ $label = (!$field['showLabel']) ? '' : <<<HTML
                 <label $labelAttr>{$field['label']}</label>
 HTML;
 
-$help = (empty($field['helpMessage'])) ? '' : <<<HTML
-
-                <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
-HTML;
-
-if ($containerType == 'textarea'):
+if (!empty($inForm)):
     $textInput = <<<HTML
-
-                <textarea $inputAttr>{$field['defaultValue']}</textarea>
+{$view['translator']->trans('mautic.dynamicContent.timeline.content')}
 HTML;
-
 else:
-    $textInput = <<<HTML
 
-                <input {$inputAttr} type="$containerType" />
-HTML;
 endif;
 
-$html = <<<HTML
-
-            <div $containerAttr>{$label}{$help}{$textInput}
-                <span class="mauticform-errormsg" style="display: none;">$validationMessage</span>
-            </div>
-
-HTML;
-
-echo $html;
