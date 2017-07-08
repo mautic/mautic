@@ -14,8 +14,6 @@ namespace MauticPlugin\MauticMessengerBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Exception as MauticException;
 use Joomla\Http\Http;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use MauticPlugin\MauticMessengerBundle\Helper\MessengerHelper;
@@ -50,7 +48,6 @@ class MessengerController extends FormController
     public function indexAction($page = 1)
     {
         $model = $this->getModel('messengerMessage');
-
         $permissions = $this->getPermissions();
 
         if (!$permissions['messenger:messages:viewown'] && !$permissions['messenger:messages:viewother']) {
@@ -82,7 +79,6 @@ class MessengerController extends FormController
 
         $orderBy    = $this->get('session')->get('mautic.messenger.orderby', 'e.name');
         $orderByDir = $this->get('session')->get('mautic.messenger.orderbydir', 'DESC');
-
         $entities = $model->getEntities(
             [
                 'start'      => $start,
@@ -92,7 +88,6 @@ class MessengerController extends FormController
                 'orderByDir' => $orderByDir,
             ]
         );
-
         //set what page currently on so that we can return here after form submission/cancellation
         $this->get('session')->set('mautic.messenger.page', $page);
 
@@ -407,7 +402,7 @@ class MessengerController extends FormController
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             null,
-            ['dynamic_content_id' => $entity->getId(), 'flag' => 'total_and_unique']
+            ['messenger_message_id' => $entity->getId(), 'flag' => 'total_and_unique']
         );
 
         $trackables = $this->getModel('page.trackable')->getTrackableList('messengerMessage', $entity->getId());

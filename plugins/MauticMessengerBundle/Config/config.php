@@ -82,7 +82,7 @@ return [
         ],
         'models' => [
             'mautic.messengerMessage.model.messengerMessage' => [
-                'class'     => 'Mautic\DynamicContentBundle\Model\DynamicContentModel',
+                'class'     => 'MauticPlugin\MauticMessengerBundle\Model\MessengerMessageModel',
                 'arguments' => [
 
                 ],

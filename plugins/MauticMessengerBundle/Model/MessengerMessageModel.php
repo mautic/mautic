@@ -45,11 +45,11 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
     /**
      * {@inheritdoc}
      *
-     * @return DynamicContentRepository
+     * @return MessengerMessageRepositary
      */
     public function getRepository()
     {
-        /** @var DynamicContentRepository $repo */
+        /** @var MessengerMessageRepositary $repo */
         $repo = $this->em->getRepository('MauticMessengerBundle:MessengerMessage');
 
         $repo->setTranslator($this->translator);
@@ -83,12 +83,12 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
      *
      * @param null $id
      *
-     * @return null|DynamicContent
+     * @return null|MessengerMessage
      */
     public function getEntity($id = null)
     {
         if ($id === null) {
-            return new DynamicContent();
+            return new MessengerMessage();
         }
 
         return parent::getEntity($id);
@@ -108,68 +108,25 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        if (!$entity instanceof DynamicContent) {
-            throw new \InvalidArgumentException('Entity must be of class DynamicContent');
+        if (!$entity instanceof MessengerMessage) {
+            throw new \InvalidArgumentException('Entity must be of class MessengerMessage');
         }
 
         if (!empty($action)) {
             $options['action'] = $action;
         }
 
-        return $formFactory->create('dwc', $entity, $options);
+        return $formFactory->create('msg', $entity, $options);
     }
 
-    /**
-     * @param DynamicContent $dwc
-     * @param Lead           $lead
-     * @param                $slot
-     */
-    public function setSlotContentForLead(DynamicContent $dwc, Lead $lead, $slot)
-    {
-        $qb = $this->em->getConnection()->createQueryBuilder();
-
-        $qb->insert(MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data')
-            ->values([
-                'lead_id'            => $lead->getId(),
-                'dynamic_content_id' => $dwc->getId(),
-                'slot'               => ':slot',
-                'date_added'         => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s')),
-            ])->setParameter('slot', $slot);
-
-        $qb->execute();
-    }
+   
 
     /**
-     * @param            $slot
-     * @param Lead|array $lead
-     *
-     * @return DynamicContent
-     */
-    public function getSlotContentForLead($slot, $lead)
-    {
-        $qb = $this->em->getConnection()->createQueryBuilder();
-
-        $id = $lead instanceof Lead ? $lead->getId() : $lead['id'];
-
-        $qb->select('dc.id, dc.content')
-            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc')
-            ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
-            ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
-            ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
-            ->setParameter('slot', $slot)
-            ->setParameter('lead_id', $id)
-            ->orderBy('dcld.date_added', 'DESC')
-            ->addOrderBy('dcld.id', 'DESC');
-
-        return $qb->execute()->fetch();
-    }
-
-    /**
-     * @param DynamicContent $dynamicContent
+     * @param MessengerMessage $messengerMessage
      * @param Lead|array     $lead
      * @param string         $source
      */
-    public function createStatEntry(DynamicContent $dynamicContent, $lead, $source = null)
+    public function createStatEntry(MessengerMessage $messengerMessage, $lead, $source = null)
     {
         if (is_array($lead)) {
             $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
@@ -178,7 +135,7 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
-        $stat->setDynamicContent($dynamicContent);
+        $stat->setMessengerMessage($messengerMessage);
         $stat->setSource($source);
 
         $this->getStatRepository()->saveEntity($stat);
@@ -196,8 +153,8 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
-        if (!$entity instanceof DynamicContent) {
-            throw new MethodNotAllowedHttpException(['Dynamic Content']);
+        if (!$entity instanceof MessengerMessage) {
+            throw new MethodNotAllowedHttpException(['Messenger']);
         }
 
         switch ($action) {
@@ -219,7 +176,7 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
 
         if ($this->dispatcher->hasListeners($name)) {
             if (empty($event)) {
-                $event = new DynamicContentEvent($entity, $isNew);
+                $event = new MessengerMessageEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
 
@@ -238,7 +195,7 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
-        $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
+        $q->join('t', MAUTIC_TABLE_PREFIX.'messenger_message', 'd', 'd.id = t.dmessenger_message_id')
             ->andWhere('d.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
@@ -268,18 +225,18 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$flag || $flag === 'total_and_unique') {
-            $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
+            $q = $query->prepareTimeDataQuery('messenger_message_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
 
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.dynamicContent.show.total.views'), $data);
+            $chart->setDataset($this->translator->trans('mautic.messengerMessage.show.total.views'), $data);
         }
 
         if ($flag === 'unique' || $flag === 'total_and_unique') {
-            $q = $query->prepareTimeDataQuery('dynamic_content_stats', 'date_sent', $filter);
+            $q = $query->prepareTimeDataQuery('messenger_message_stats', 'date_sent', $filter);
             $q->groupBy('t.lead_id, t.date_sent');
 
             if (!$canViewOthers) {
@@ -287,7 +244,7 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
             }
 
             $data = $query->loadAndBuildTimeData($q);
-            $chart->setDataset($this->translator->trans('mautic.dynamicContent.show.unique.views'), $data);
+            $chart->setDataset($this->translator->trans('mautic.messengerMessage.show.unique.views'), $data);
         }
 
         return $chart->render();
@@ -304,8 +261,8 @@ class MessengerMessageModel extends FormModel implements AjaxLookupModelInterfac
     {
         $results = [];
         switch ($type) {
-            case 'dynamicContent':
-                $entities = $this->getRepository()->getDynamicContentList(
+            case 'messengerMessage':
+                $entities = $this->getRepository()->getMessengerMessageList(
                     $filter,
                     $limit,
                     $start,
