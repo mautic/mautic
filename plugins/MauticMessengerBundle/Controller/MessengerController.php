@@ -17,6 +17,7 @@ use Joomla\Http\Http;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use MauticPlugin\MauticMessengerBundle\Helper\MessengerHelper;
+use MauticPlugin\MauticMessengerBundle\Entity\MessengerMessage;
 
 class MessengerController extends FormController
 {
@@ -126,11 +127,9 @@ class MessengerController extends FormController
         if (!$this->accessGranted('messenger:messages:viewown')) {
             return $this->accessDenied();
         }
-
         if (!$entity instanceof MessengerMessage) {
             $entity = new MessengerMessage();
         }
-
         /** @var \MauticPlugin\MauticMessengerBundle\Model\MessengerMessageModel $model */
         $model  = $this->getModel('messengerMessage');
         $page   = $this->get('session')->get('mautic.messenger.page', 1);

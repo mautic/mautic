@@ -32,6 +32,13 @@ return [
     ],
     'services' => [
         'forms' => [
+            'mautic.form.type.msg' => [
+                'class'     => 'MauticPlugin\MauticMessengerBundle\Form\Type\MessengerMessageType',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+                'alias' => 'msg',
+            ],
             'mautic.form.type.messenger.facebook' => [
                 'class' => 'MauticPlugin\MauticMessengerBundle\Form\Type\MessengerType',
                 'alias' => 'messenger_facebook',

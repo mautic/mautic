@@ -13,7 +13,7 @@
 if (!$isEmbedded) {
     $view->extend('MauticCoreBundle:Default:content.html.php');
 }
-$view['slots']->set('mauticContent', 'dynamicContent');
+$view['slots']->set('mauticContent', 'messengerMessage');
 $view['slots']->set('headerTitle', $entity->getName());
 
 $translationContent = $view->render(
@@ -21,8 +21,8 @@ $translationContent = $view->render(
     [
         'activeEntity' => $entity,
         'translations' => $translations,
-        'model'        => 'dynamicContent',
-        'actionRoute'  => 'mautic_dynamicContent_action',
+        'model'        => 'messengerMessage',
+        'actionRoute'  => 'mautic_messenger_action',
     ]
 );
 $showTranslations = !empty(trim($translationContent));
@@ -38,23 +38,23 @@ if (!$isEmbedded) {
                 'customButtons'   => (isset($customButtons)) ? $customButtons : [],
                 'templateButtons' => [
                     'edit' => $view['security']->hasEntityAccess(
-                        $permissions['dynamiccontent:dynamiccontents:editown'],
-                        $permissions['dynamiccontent:dynamiccontents:editother'],
+                        $permissions['messenger:messages:editown'],
+                        $permissions['messenger:messages:editother'],
                         $entity->getCreatedBy()
                     ),
-                    'clone'  => $permissions['dynamiccontent:dynamiccontents:create'],
+                    'clone'  => $permissions['messenger:messages:create'],
                     'delete' => $view['security']->hasEntityAccess(
-                        $permissions['dynamiccontent:dynamiccontents:deleteown'],
-                        $permissions['dynamiccontent:dynamiccontents:deleteother'],
+                        $permissions['messenger:messages:deleteown'],
+                        $permissions['messenger:messages:deleteother'],
                         $entity->getCreatedBy()
                     ),
                     'close' => $view['security']->hasEntityAccess(
-                        $permissions['dynamiccontent:dynamiccontents:viewown'],
-                        $permissions['dynamiccontent:dynamiccontents:viewother'],
+                        $permissions['messenger:messages:viewown'],
+                        $permissions['messenger:messages:viewother'],
                         $entity->getCreatedBy()
                     ),
                 ],
-                'routeBase' => 'dynamicContent',
+                'routeBase' => 'messenger',
             ]
         )
     );
@@ -77,14 +77,14 @@ if (!$isEmbedded) {
                         <div class="text-muted"><?php echo $entity->getDescription(); ?></div>
                         <?php if ($entity->isVariant(true)): ?>
                             <div class="small">
-                                <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $variants['parent']->getId()]); ?>" data-toggle="ajax">
+                                <a href="<?php echo $view['router']->path('mautic_messenger_action', ['objectAction' => 'view', 'objectId' => $variants['parent']->getId()]); ?>" data-toggle="ajax">
                                     <?php echo $view['translator']->trans('mautic.core.variant_of', ['%parent%' => $variants['parent']->getName()]); ?>
                                 </a>
                             </div>
                         <?php endif; ?>
                         <?php if ($entity->isTranslation(true)): ?>
                             <div class="small">
-                                <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $translations['parent']->getId()]); ?>" data-toggle="ajax">
+                                <a href="<?php echo $view['router']->path('mautic_messenger_action', ['objectAction' => 'view', 'objectId' => $translations['parent']->getId()]); ?>" data-toggle="ajax">
                                     <?php echo $view['translator']->trans('mautic.core.translation_of', ['%parent%' => $translations['parent']->getName()]); ?>
                                 </a>
                             </div>
@@ -131,7 +131,7 @@ if (!$isEmbedded) {
                                 <div class="col-md-3 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-line-chart"></span>
-                                        <?php echo $view['translator']->trans('mautic.dynamicContent.views'); ?>
+                                        <?php echo $view['translator']->trans('mautic.messengerMessage.views'); ?>
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">

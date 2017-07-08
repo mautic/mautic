@@ -10,8 +10,8 @@
  */
 
 $view->extend('MauticCoreBundle:FormTheme:form_simple.html.php');
-$view->addGlobal('translationBase', 'mautic.dynamicContent');
-$view->addGlobal('mauticContent', 'dynamicContent');
+$view->addGlobal('translationBase', 'mautic.messengerMessage');
+$view->addGlobal('mauticContent', 'messengerMessage');
 ?>
 
 <?php $view['slots']->start('primaryFormContent'); ?>
