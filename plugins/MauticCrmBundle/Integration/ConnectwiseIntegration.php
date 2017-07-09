@@ -23,7 +23,6 @@ use Symfony\Component\Form\FormBuilder;
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
-    private $client;
     /**
      * {@inheritdoc}
      *
@@ -386,7 +385,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getLeads($params = [])
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
         return $this->getRecords($params, 'Contact');
     }
@@ -402,6 +401,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->getRecords($params, 'company');
     }
 
+    /**
+     * @param $params
+     * @param $object
+     */
     public function getRecords($params, $object)
     {
         //todo data priority
@@ -439,6 +442,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         return $executed;
     }
+
     /**
      * Ammend mapped lead data before creating to Mautic.
      *
@@ -484,6 +488,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
+    /**
+     * @param $entity
+     * @param $object
+     * @param $mauticObjectReference
+     * @param $integrationEntityId
+     *
+     * @return IntegrationEntity|null|object
+     */
     public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId)
     {
         $integrationEntity = null;
@@ -521,7 +533,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead(Lead $lead,  array $config = [])
+    public function pushLead($lead,  $config = [])
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;

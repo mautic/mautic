@@ -13,10 +13,12 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
@@ -282,7 +284,7 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository
+     * @return LeadFieldRepository
      */
     public function getRepository()
     {
@@ -333,6 +335,8 @@ class FieldModel extends FormModel
      * @param   $entity
      * @param   $unlock
      *
+     * @throws DBALException
+     *
      * @return mixed
      */
     public function saveEntity($entity, $unlock = true)
@@ -341,7 +345,7 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = $entity->getId() ? false : true;
 
         //set some defaults
         $this->setTimestamps($entity, $isNew, $unlock);
@@ -377,30 +381,41 @@ class FieldModel extends FormModel
             if ($testAlias != $alias) {
                 $alias = $testAlias;
             }
+
             $entity->setAlias($alias);
         }
 
         $type = $entity->getType();
+
         if ($type == 'time') {
             //time does not work well with list filters
             $entity->setIsListable(false);
         }
 
-        $isUnique = $entity->getIsUniqueIdentifier();
+        // Save the entity now if it's an existing entity
+        if (!$isNew) {
+            $event = $this->dispatchEvent('pre_save', $entity, $isNew);
+            $this->getRepository()->saveEntity($entity);
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
+        }
 
-        //create the field as its own column in the leads table
+        // Create the field as its own column in the leads table.
+        /** @var ColumnSchemaHelper $leadsSchema */
         $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
-        if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
+        $isUnique    = $entity->getIsUniqueIdentifier();
+
+        // If the column does not exist in the contacts table, add it
+        if (!$leadsSchema->checkColumnExists($alias)) {
             $schemaDefinition = self::getSchemaDefinition($alias, $type, $isUnique);
-            $leadsSchema->addColumn(
-                $schemaDefinition
-            );
+
+            $leadsSchema->addColumn($schemaDefinition);
 
             try {
                 $leadsSchema->executeChanges();
                 $isCreated = true;
             } catch (DriverException $e) {
                 $this->logger->addWarning($e->getMessage());
+
                 if ($e->getErrorCode() === 1118 /* ER_TOO_BIG_ROWSIZE */) {
                     $isCreated = false;
                     throw new DBALException($this->translator->trans('mautic.core.error.max.field'));
@@ -409,7 +424,8 @@ class FieldModel extends FormModel
                 }
             }
 
-            if ($isCreated === true) {
+            // If this is a new contact field, and it was successfully added to the contacts table, save it
+            if ($isNew === true) {
                 $event = $this->dispatchEvent('pre_save', $entity, $isNew);
                 $this->getRepository()->saveEntity($entity);
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
@@ -418,10 +434,12 @@ class FieldModel extends FormModel
             // Update the unique_identifier_search index and add an index for this field
             /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
             $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
+
             if ('string' == $schemaDefinition['type']) {
                 try {
                     $modifySchema->addIndex([$alias], $alias.'_search');
                     $modifySchema->allowColumn($alias);
+
                     if ($isUnique) {
                         // Get list of current uniques
                         $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
@@ -435,6 +453,7 @@ class FieldModel extends FormModel
                         $indexColumns = array_slice($indexColumns, 0, 3);
                         $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
                     }
+
                     $modifySchema->executeChanges();
                 } catch (DriverException $e) {
                     if ($e->getErrorCode() === 1069 /* ER_TOO_MANY_KEYS */) {
@@ -446,7 +465,7 @@ class FieldModel extends FormModel
             }
         }
 
-        //update order of other fields
+        // Update order of the other fields.
         $this->reorderFieldsByEntity($entity);
     }
 

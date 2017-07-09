@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20170628191405 extends AbstractMauticMigration
+class Version20170216221648 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
@@ -27,7 +27,14 @@ class Version20170628191405 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->hasTable($this->prefix.'plugin_crm_pipedrive_owners')) {
+        $focusTable = $schema->getTable($this->prefix.'focus');
+
+        if (
+            $focusTable->hasColumn('editor')
+            && $focusTable->hasColumn('html')
+            && $focusTable->hasColumn('html_mode')
+            && $focusTable->hasColumn('utm_tags')
+        ) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -37,16 +44,9 @@ class Version20170628191405 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $sql = <<<SQL
-CREATE TABLE {$this->prefix}plugin_crm_pipedrive_owners (
-  id INT AUTO_INCREMENT NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  owner_id INT DEFAULT NULL,
-  INDEX {$this->prefix}email (email),
-  INDEX {$this->prefix}owner_id (owner_id),
-  PRIMARY KEY(id)
-) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
-SQL;
-        $this->addSql($sql);
+        $this->addSql("ALTER TABLE {$this->prefix}focus ADD editor LONGTEXT NULL");
+        $this->addSql('ALTER TABLE '.$this->prefix.'focus ADD html_mode VARCHAR(255) DEFAULT NULL');
+        $this->addSql("ALTER TABLE {$this->prefix}focus ADD html LONGTEXT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}focus ADD utm_tags LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
     }
 }

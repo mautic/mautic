@@ -68,8 +68,9 @@ class ReportSubscriber extends CommonSubscriber
                 $pagePrefix        = 'p.';
                 $submissionColumns = [
                     $submissionPrefix.'date_submitted' => [
-                        'label' => 'mautic.form.report.submit.date_submitted',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.form.report.submit.date_submitted',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$submissionPrefix.'date_submitted)',
                     ],
                     $submissionPrefix.'referer' => [
                         'label' => 'mautic.core.referer',

@@ -270,7 +270,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
-                    'label'       => 'mautic.hubspot.form.objects_to_pull_from',
+                    'label'       => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Hubspot']),
                     'label_attr'  => ['class' => ''],
                     'empty_value' => false,
                     'required'    => false,
