@@ -242,8 +242,6 @@ class WebhookModel extends FormModel
             $this->processWebhooks($webhookList);
         }
 
-        $this->em->clear(Event::class);
-
         return;
     }
 

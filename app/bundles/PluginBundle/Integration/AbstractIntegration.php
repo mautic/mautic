@@ -961,6 +961,8 @@ abstract class AbstractIntegration
                         }
                     }
                 }
+            } elseif (isset($settings['post_data'])) {
+                $parameters = $settings['post_data'];
             }
         }
 
@@ -1267,7 +1269,7 @@ abstract class AbstractIntegration
         $defaultUrl = $this->router->generate(
             'mautic_integration_auth_callback',
             ['integration' => $this->getName()],
-            true //absolute
+            UrlGeneratorInterface::ABSOLUTE_URL //absolute
         );
 
         /** @var PluginIntegrationAuthCallbackUrlEvent $event */
@@ -1301,7 +1303,7 @@ abstract class AbstractIntegration
 
                     if ($state && $state !== $givenState) {
                         $this->session->remove($this->getName().'_csrf_token');
-                        throw new ApiErrorException('mautic.integration.auth.invalid.state');
+                        throw new ApiErrorException($this->translator->trans('mautic.integration.auth.invalid.state'));
                     }
                 }
 
@@ -1690,7 +1692,7 @@ abstract class AbstractIntegration
             }
 
             // Check if required fields are missing
-            $required = $this->getRequiredFields($integrationFields);
+            $required = $this->getRequiredFields($integrationFields, $fieldType);
             if (array_diff_key($required, $mappedFields)) {
                 $missingRequiredFields[$fieldType] = true;
             }
@@ -1728,21 +1730,31 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param array $fields
+     * @param array  $fields
+     * @param string $fieldType
      *
      * @return array
      */
-    public function getRequiredFields(array $fields)
+    public function getRequiredFields(array $fields, $fieldType = '')
     {
+        //use $fieldType to determine if email should be required. we use email as unique identifier for contacts only,
+        // if any other fieldType use integrations own field types
         $requiredFields = [];
         foreach ($fields as $field => $details) {
-            if ((is_array($details) && !empty($details['required'])) || 'email' === $field
-                || (isset($details['optionLabel'])
-                    && strtolower(
-                        $details['optionLabel']
-                    ) == 'email')
-            ) {
-                $requiredFields[$field] = $field;
+            if ('leadFields' === $fieldType) {
+                if ((is_array($details) && !empty($details['required'])) || 'email' === $field
+                    || (isset($details['optionLabel'])
+                        && strtolower(
+                            $details['optionLabel']
+                        ) == 'email')
+                ) {
+                    $requiredFields[$field] = $field;
+                }
+            } else {
+                if ((is_array($details) && !empty($details['required']))
+                ) {
+                    $requiredFields[$field] = $field;
+                }
             }
         }
 
@@ -1788,12 +1800,10 @@ abstract class AbstractIntegration
 
         foreach ($availableFields as $key => $field) {
             $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
-            if (!isset($config['leadFields'][$integrationKey])) {
-                continue;
-            }
-
             if (is_array($integrationKey)) {
                 list($integrationKey, $matchIntegrationKey) = $integrationKey;
+            } elseif (!isset($config['leadFields'][$integrationKey])) {
+                continue;
             }
 
             if (isset($leadFields[$integrationKey])) {
