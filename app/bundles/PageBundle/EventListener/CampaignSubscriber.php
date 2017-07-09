@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Model\PageModel;
@@ -37,15 +38,22 @@ class CampaignSubscriber extends CommonSubscriber
     protected $campaignEventModel;
 
     /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param PageModel  $pageModel
      * @param EventModel $campaignEventModel
+     * @param LeadModel  $leadModel
      */
-    public function __construct(PageModel $pageModel, EventModel $campaignEventModel)
+    public function __construct(PageModel $pageModel, EventModel $campaignEventModel, LeadModel $leadModel)
     {
         $this->pageModel          = $pageModel;
         $this->campaignEventModel = $campaignEventModel;
+        $this->leadModel          = $leadModel;
     }
 
     /**
@@ -56,7 +64,10 @@ class CampaignSubscriber extends CommonSubscriber
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
             PageEvents::PAGE_ON_HIT                  => ['onPageHit', 0],
-            PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
+            PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => [
+                ['onCampaignTriggerDecision', 0],
+                ['onCampaignTriggerDecisionDeviceHit', 1],
+            ],
         ];
     }
 
@@ -77,6 +88,17 @@ class CampaignSubscriber extends CommonSubscriber
             'channelIdField' => 'pages',
         ];
         $event->addDecision('page.pagehit', $pageHitTrigger);
+
+        //Add trigger
+        $deviceHitTrigger = [
+            'label'          => 'mautic.page.campaign.event.devicehit',
+            'description'    => 'mautic.page.campaign.event.devicehit_descr',
+            'formType'       => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType',
+            'eventName'      => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+            'channel'        => 'page',
+            'channelIdField' => 'pages',
+        ];
+        $event->addDecision('page.devicehit', $deviceHitTrigger);
     }
 
     /**
@@ -89,15 +111,59 @@ class CampaignSubscriber extends CommonSubscriber
         $hit       = $event->getHit();
         $channel   = 'page';
         $channelId = null;
-
         if ($redirect = $hit->getRedirect()) {
             $channel   = 'page.redirect';
             $channelId = $redirect->getId();
         } elseif ($page = $hit->getPage()) {
             $channelId = $page->getId();
         }
-
         $this->campaignEventModel->triggerEvent('page.pagehit', $hit, $channel, $channelId);
+        $this->campaignEventModel->triggerEvent('page.devicehit', $hit, $channel, $channelId);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerDecisionDeviceHit(CampaignExecutionEvent $event)
+    {
+        $eventDetails = $event->getEventDetails();
+        $config       = $event->getConfig();
+        $lead         = $event->getLead();
+
+        if (!$event->checkContext('page.devicehit')) {
+            return false;
+        }
+
+        $deviceRepo = $this->leadModel->getDeviceRepository();
+        $result     = false;
+
+        $deviceId     = $eventDetails->getDeviceStat() ? $eventDetails->getDeviceStat()->getId() : null;
+        $deviceType   = $config['device_type'];
+        $deviceBrands = $config['device_brand'];
+        $deviceOs     = $config['device_os'];
+
+        if (!empty($deviceType)) {
+            $result = false;
+            if (!empty($deviceRepo->getDevice($lead, $deviceType, null, null, null, $deviceId))) {
+                $result = true;
+            }
+        }
+
+        if (!empty($deviceBrands)) {
+            $result = false;
+            if (!empty($deviceRepo->getDevice($lead, null, $deviceBrands, null, null, $deviceId))) {
+                $result = true;
+            }
+        }
+
+        if (!empty($deviceOs)) {
+            $result = false;
+            if (!empty($deviceRepo->getDevice($lead, null, null, null, $deviceOs, $deviceId))) {
+                $result = true;
+            }
+        }
+
+        return $event->setResult($result);
     }
 
     /**
@@ -108,10 +174,13 @@ class CampaignSubscriber extends CommonSubscriber
         $eventDetails = $event->getEventDetails();
         $config       = $event->getConfig();
 
+        if (!$event->checkContext('page.pagehit')) {
+            return false;
+        }
+
         if ($eventDetails == null) {
             return true;
         }
-
         $pageHit = $eventDetails->getPage();
 
         // Check Landing Pages

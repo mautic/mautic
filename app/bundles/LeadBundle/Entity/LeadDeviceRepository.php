@@ -50,10 +50,11 @@ class LeadDeviceRepository extends CommonRepository
      * @param null $deviceNames
      * @param null $deviceBrands
      * @param null $deviceModels
+     * @param null $deviceId
      *
      * @return array
      */
-    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null)
+    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('es.id as id, es.device as device, es.device_fingerprint')
@@ -68,7 +69,7 @@ class LeadDeviceRepository extends CommonRepository
 
         if ($deviceNames !== null) {
             if (!is_array($deviceNames)) {
-                $deviceNames[] = $deviceNames;
+                $deviceNames = [$deviceNames];
             }
             foreach ($deviceNames as $key => $deviceName) {
                 $sq->andWhere(
@@ -114,7 +115,11 @@ class LeadDeviceRepository extends CommonRepository
             }
         }
 
-        if ($lead !== null) {
+        if ($deviceId !== null) {
+            $sq->andWhere(
+                $sq->expr()->eq('es.id', $deviceId)
+            );
+        } elseif ($lead !== null) {
             $sq->andWhere(
                 $sq->expr()->eq('es.lead_id', $lead->getId())
             );
