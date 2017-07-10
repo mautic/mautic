@@ -15,11 +15,14 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
+use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\StageBundle\Entity\Stage;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 
 /**
  * Class HubspotIntegration.
+ *
+ * @method HubspotApi getApiHelper
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
@@ -85,9 +88,13 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getFormSettings()
     {
+        $enableDataPriority = $this->getDataPriority();
+
         return [
             'requires_callback'      => false,
             'requires_authorization' => false,
+            'default_features'       => [],
+            'enable_data_priority'   => $enableDataPriority,
         ];
     }
     /**
@@ -106,6 +113,16 @@ class HubspotIntegration extends CrmAbstractIntegration
     public function getApiUrl()
     {
         return 'https://api.hubapi.com';
+    }
+
+    /**
+     * Get if data priority is enabled in the integration or not default is false.
+     *
+     * @return string
+     */
+    public function getDataPriority()
+    {
+        return true;
     }
 
     /**
@@ -210,17 +227,6 @@ class HubspotIntegration extends CrmAbstractIntegration
             }
         }
 
-        if ($lead && !empty($lead->getId())) {
-            //put mautic timeline link
-            $formattedLeadData['properties'][] = [
-                'property' => 'mautic_timeline',
-                'value'    => $this->router->generate(
-                    'mautic_plugin_timeline_view',
-                    ['integration' => 'Hubspot', 'leadId' => $lead->getId()],
-                    UrlGeneratorInterface::ABSOLUTE_URL),
-            ];
-        }
-
         return $formattedLeadData;
     }
 
@@ -236,6 +242,9 @@ class HubspotIntegration extends CrmAbstractIntegration
         return isset($keys[$this->getAuthTokenKey()]);
     }
 
+    /**
+     * @return mixed
+     */
     public function getHubSpotApiKey()
     {
         $tokenData = $this->getKeys();
@@ -261,7 +270,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
-                    'label'       => 'mautic.hubspot.form.objects_to_pull_from',
+                    'label'       => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Hubspot']),
                     'label_attr'  => ['class' => ''],
                     'empty_value' => false,
                     'required'    => false,
@@ -270,6 +279,12 @@ class HubspotIntegration extends CrmAbstractIntegration
         }
     }
 
+    /**
+     * @param $data
+     * @param $object
+     *
+     * @return array
+     */
     public function amendLeadDataBeforeMauticPopulate($data, $object)
     {
         if (!isset($data['properties'])) {
@@ -289,15 +304,29 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
-    public function getLeads($params = [], $query = null)
+    /**
+     * @param array  $params
+     * @param null   $query
+     * @param null   $executed
+     * @param array  $result
+     * @param string $object
+     *
+     * @return array|null
+     */
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
-        $executed = null;
-
+        if (!is_array($executed)) {
+            $executed = [
+                0 => 0,
+                1 => 0,
+            ];
+        }
         try {
             if ($this->isAuthorized()) {
                 $config                         = $this->mergeConfigToFeatureSettings();
                 $fields                         = implode('&property=', array_keys($config['leadFields']));
                 $params['post_append_to_query'] = '&property='.$fields.'&property=lifecyclestage';
+                $params['Count']                = 100;
 
                 $data = $this->getApiHelper()->getContacts($params);
                 if (isset($data['contacts'])) {
@@ -305,15 +334,22 @@ class HubspotIntegration extends CrmAbstractIntegration
                         if (is_array($contact)) {
                             $contactData = $this->amendLeadDataBeforeMauticPopulate($contact, 'Lead');
                             $contact     = $this->getMauticLead($contactData);
+                            if ($contact && !$contact->isNewlyCreated()) { //updated
+                                $executed[0] = $executed[0] + 1;
+                            } elseif ($contact && $contact->isNewlyCreated()) { //newly created
+                                $executed[1] = $executed[1] + 1;
+                            }
+
                             if ($contact) {
-                                ++$executed;
+                                $this->em->detach($contact);
                             }
                         }
                     }
                     if ($data['has-more']) {
                         $params['vidOffset']  = $data['vid-offset'];
                         $params['timeOffset'] = $data['time-offset'];
-                        $this->getLeads($params);
+
+                        $this->getLeads($params, $query, $executed);
                     }
                 }
 
@@ -326,13 +362,18 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $executed;
     }
 
-    public function getCompanies($params = [], $id = false)
+    /**
+     * @param array $params
+     * @param bool  $id
+     * @param null  $executed
+     */
+    public function getCompanies($params = [], $id = false, &$executed = null)
     {
-        $executed = 0;
-        $results  = [];
+        $results = [];
         try {
             if ($this->isAuthorized()) {
-                $data = $this->getApiHelper()->getCompanies($params, $id);
+                $params['Count'] = 100;
+                $data            = $this->getApiHelper()->getCompanies($params, $id);
                 if ($id) {
                     $results['results'][] = array_merge($results, $data);
                 } else {
@@ -348,13 +389,15 @@ class HubspotIntegration extends CrmAbstractIntegration
                             }
                             if ($company) {
                                 ++$executed;
+                                $this->em->detach($company);
                             }
                         }
                     }
                     if (isset($data['hasMore']) and $data['hasMore']) {
-                        $params['vidOffset']  = $data['vid-offset'];
-                        $params['timeOffset'] = $data['time-offset'];
-                        $this->getCompanies($params);
+                        $params['offset'] = $data['offset'];
+                        if ($params['offset'] < strtotime($params['start'])) {
+                            $this->getCompanies($params, $id, $executed);
+                        }
                     }
                 }
 
@@ -374,10 +417,11 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
      * @param mixed||null $identifiers
+     * @param string|null $object
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -397,114 +441,119 @@ class HubspotIntegration extends CrmAbstractIntegration
             unset($data['associatedcompanyid']);
         }
 
-        // Match that data with mapped lead fields
-        $matchedFields = $this->populateMauticLeadData($data);
+        if ($lead = parent::getMauticLead($data, false, $socialCache, $identifiers, $object)) {
+            if (isset($stageName)) {
+                $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
 
-        if (empty($matchedFields)) {
-            return;
-        }
+                if (empty($stage)) {
+                    $stage = new Stage();
+                    $stage->setName($stageName);
+                    $stages[$stageName] = $stage;
+                }
+                if (!$lead->getStage() && $lead->getStage() != $stage) {
+                    $lead->setStage($stage);
 
-        // Find unique identifier fields used by the integration
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel           = $this->leadModel;
-        $uniqueLeadFields    = $this->fieldModel->getUniqueIdentiferFields();
-        $uniqueLeadFieldData = [];
-
-        foreach ($matchedFields as $leadField => $value) {
-            if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
-                $uniqueLeadFieldData[$leadField] = $value;
-            }
-        }
-
-        // Default to new lead
-        $lead = new Lead();
-        $lead->setNewlyCreated(true);
-
-        if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')
-                ->getLeadsByUniqueFields($uniqueLeadFieldData);
-
-            if (!empty($existingLeads)) {
-                $lead = array_shift($existingLeads);
-            }
-        }
-
-        $leadModel->setFieldValues($lead, $matchedFields, false, false);
-
-        // Update the social cache
-        $leadSocialCache = $lead->getSocialCache();
-        if (!isset($leadSocialCache[$this->getName()])) {
-            $leadSocialCache[$this->getName()] = [];
-        }
-
-        if (null !== $socialCache) {
-            $leadSocialCache[$this->getName()] = array_merge($leadSocialCache[$this->getName()], $socialCache);
-        }
-
-        // Check for activity while here
-        if (null !== $identifiers && in_array('public_activity', $this->getSupportedFeatures())) {
-            $this->getPublicActivity($identifiers, $leadSocialCache[$this->getName()]);
-        }
-
-        $lead->setSocialCache($leadSocialCache);
-
-        // Update the internal info integration object that has updated the record
-        if (isset($data['internal'])) {
-            $internalInfo                   = $lead->getInternal();
-            $internalInfo[$this->getName()] = $data['internal'];
-            $lead->setInternal($internalInfo);
-        }
-
-        if (isset($company)) {
-            if (!isset($matchedFields['companyname'])) {
-                if (isset($matchedFields['companywebsite'])) {
-                    $matchedFields['companyname'] = $matchedFields['companywebsite'];
+                    //add a contact stage change log
+                    $log = new StagesChangeLog();
+                    $log->setStage($stage);
+                    $log->setEventName($stage->getId().':'.$stage->getName());
+                    $log->setLead($lead);
+                    $log->setActionName(
+                        $this->translator->trans(
+                            'mautic.stage.import.action.name',
+                            [
+                                '%name%' => $this->userHelper->getUser()->getUsername(),
+                            ]
+                        )
+                    );
+                    $log->setDateAdded(new \DateTime());
+                    $lead->stageChangeLog($log);
                 }
             }
-            $leadModel->addToCompany($lead, $company);
-        }
 
-        if (isset($stageName)) {
-            $stage = $this->em->getRepository('MauticStageBundle:Stage')->getStageByName($stageName);
+            if ($persist && !empty($lead->getChanges(true))) {
+                // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
+                try {
+                    $this->leadModel->saveEntity($lead, false);
+                    if (isset($company)) {
+                        $this->leadModel->addToCompany($lead, $company);
+                        $this->em->detach($company);
+                    }
+                } catch (\Exception $exception) {
+                    $this->logger->addWarning($exception->getMessage());
 
-            if (empty($stage)) {
-                $stage = new Stage();
-                $stage->setName($stageName);
-                $stages[$stageName] = $stage;
-            }
-            if (!$lead->getStage() && $lead->getStage() != $stage) {
-                $lead->setStage($stage);
-
-                //add a contact stage change log
-                $log = new StagesChangeLog();
-                $log->setStage($stage);
-                $log->setEventName($stage->getId().':'.$stage->getName());
-                $log->setLead($lead);
-                $log->setActionName(
-                    $this->translator->trans(
-                        'mautic.stage.import.action.name',
-                        [
-                            '%name%' => $this->userHelper->getUser()->getUsername(),
-                        ]
-                    )
-                );
-                $log->setDateAdded(new \DateTime());
-                $lead->stageChangeLog($log);
-            }
-        }
-        $pushData['email'] = $lead->getEmail();
-        $this->getApiHelper()->createLead($pushData, $lead, $updateLink = true);
-        if ($persist) {
-            // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
-            try {
-                $leadModel->saveEntity($lead, false);
-            } catch (\Exception $exception) {
-                $this->logger->addWarning($exception->getMessage());
-
-                return;
+                    return;
+                }
             }
         }
 
         return $lead;
+    }
+
+    /**
+     * @param Lead  $lead
+     * @param array $config
+     *
+     * @return array|bool
+     */
+    public function pushLead($lead, $config = [])
+    {
+        $config = $this->mergeConfigToFeatureSettings($config);
+
+        if (empty($config['leadFields'])) {
+            return [];
+        }
+
+        $object         = 'contacts';
+        $fieldsToUpdate = $this->getPriorityFieldsForIntegration($config);
+        $createFields   = $config['leadFields'];
+
+        //@todo Hubspot's createLead uses createOrUpdate endpoint which means we don't know before we send mapped data if the contact will be updated or created; so we have to send all mapped fields
+        $updateFields = array_intersect_key(
+            $createFields,
+            $fieldsToUpdate
+        );
+
+        $mappedData = $this->populateLeadData(
+            $lead,
+            [
+                'leadFields'       => $createFields,
+                'object'           => $object,
+                'feature_settings' => ['objects' => $config['objects']],
+            ]
+        );
+
+        $this->amendLeadDataBeforePush($mappedData);
+
+        if (empty($mappedData)) {
+            return false;
+        }
+
+        if ($this->isAuthorized()) {
+            $leadData = $this->getApiHelper()->createLead($mappedData, $lead);
+
+            if (!empty($leadData['vid'])) {
+                /** @var IntegrationEntityRepository $integrationEntityRepo */
+                $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                $integrationId         = $integrationEntityRepo->getIntegrationsEntityId($this->getName(), $object, 'lead', $lead->getId());
+                $integrationEntity     = (empty($integrationId)) ?
+                    $this->createIntegrationEntity(
+                        $object,
+                        $leadData['vid'],
+                        'lead',
+                        $lead->getId(),
+                        [],
+                        false
+                    ) : $integrationEntityRepo->getEntity($integrationId[0]['id']);
+
+                $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                $this->getIntegrationEntityRepository()->saveEntity($integrationEntity);
+                $this->em->detach($integrationEntity);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

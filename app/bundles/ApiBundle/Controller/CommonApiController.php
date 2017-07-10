@@ -24,6 +24,8 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
@@ -345,8 +347,12 @@ class CommonApiController extends FOSRestController implements MauticController
         $publishedOnly = $this->request->get('published', 0);
         $minimal       = $this->request->get('minimal', 0);
 
-        if (!$this->security->isGranted($this->permissionBase.':view')) {
-            return $this->accessDenied();
+        try {
+            if (!$this->security->isGranted($this->permissionBase.':view')) {
+                return $this->accessDenied();
+            }
+        } catch (PermissionException $e) {
+            return $this->accessDenied($e->getMessage());
         }
 
         if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
@@ -667,7 +673,7 @@ class CommonApiController extends FOSRestController implements MauticController
      * @param mixed  $entity
      * @param string $action view|create|edit|publish|delete
      *
-     * @return bool
+     * @return bool|Response
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {
@@ -680,7 +686,11 @@ class CommonApiController extends FOSRestController implements MauticController
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $owner);
         }
 
-        return $this->security->isGranted("{$this->permissionBase}:{$action}");
+        try {
+            return $this->security->isGranted("{$this->permissionBase}:{$action}");
+        } catch (PermissionException $e) {
+            return $this->accessDenied($e->getMessage());
+        }
     }
 
     /**

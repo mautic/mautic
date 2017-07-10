@@ -107,7 +107,16 @@ function getTotal($a, $f, $t, $allrows, $ac)
                                     ?>
                                         <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => $objectAction, 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
                                             <?php endif; ?>
-                                            <?php echo $view['formatter']->_($row[$columns[$key]['alias']], $columns[$key]['type']); ?>
+                                            <?php
+                                            $cellType = $columns[$key]['type'];
+                                            $cellVal  = $row[$columns[$key]['alias']];
+
+                                            // For grouping by datetime fields, so we don't get the timestamp on them
+                                            if ($cellType === 'datetime' && strlen($cellVal) === 10) {
+                                                $cellType = 'date';
+                                            }
+                                            ?>
+                                            <?php echo $view['formatter']->_($cellVal, $cellType); ?>
                                             <?php if ($closeLink): ?></a><?php endif; ?>
                                     </td>
                                 <?php endif; ?>

@@ -57,9 +57,10 @@ class ReportSubscriber extends CommonSubscriber
             $columns = [
                 // Log columns
                 $prefix.'date_triggered' => [
-                    'label' => 'mautic.report.campaign.log.date_triggered',
-                    'type'  => 'datetime',
-                    'alias' => $aliasPrefix.'date_triggered',
+                    'label'          => 'mautic.report.campaign.log.date_triggered',
+                    'type'           => 'datetime',
+                    'alias'          => $aliasPrefix.'date_triggered',
+                    'groupByFormula' => 'DATE('.$prefix.'date_triggered)',
                 ],
                 $prefix.'is_scheduled' => [
                     'label' => 'mautic.report.campaign.log.is_scheduled',
@@ -67,9 +68,10 @@ class ReportSubscriber extends CommonSubscriber
                     'alias' => $aliasPrefix.'is_scheduled',
                 ],
                 $prefix.'trigger_date' => [
-                    'label' => 'mautic.report.campaign.log.trigger_date',
-                    'type'  => 'datetime',
-                    'alias' => $aliasPrefix.'trigger_date',
+                    'label'          => 'mautic.report.campaign.log.trigger_date',
+                    'type'           => 'datetime',
+                    'alias'          => $aliasPrefix.'trigger_date',
+                    'groupByFormula' => 'DATE('.$prefix.'trigger_date)',
                 ],
                 $prefix.'system_triggered' => [
                     'label' => 'mautic.report.campaign.log.system_triggered',
@@ -114,9 +116,10 @@ class ReportSubscriber extends CommonSubscriber
                     'alias' => $eventAliasPrefix.'event_type',
                 ],
                 $eventPrefix.'trigger_date' => [
-                    'label' => 'mautic.report.campaign.event.trigger_date',
-                    'type'  => 'datetime',
-                    'alias' => $eventAliasPrefix.'trigger_date',
+                    'label'          => 'mautic.report.campaign.event.trigger_date',
+                    'type'           => 'datetime',
+                    'alias'          => $eventAliasPrefix.'trigger_date',
+                    'groupByFormula' => 'DATE('.$eventPrefix.'trigger_date)',
                 ],
                 $eventPrefix.'trigger_mode' => [
                     'label' => 'mautic.report.campaign.event.trigger_mode',

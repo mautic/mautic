@@ -276,11 +276,7 @@ JS;
         $js = <<<JS
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
-    if (MauticJS.videoElements.length) {
-        MauticJS.videoElements = Array.prototype.filter.call(MauticJS.videoElements, function(videoElements){
-            return null !== videoElements.attributes.getNamedItem('data-form-id');
-        });
-    }
+ 
     if (! MauticJS.videoElements.length) {
         MauticJS.videoElements = null;
         return;
@@ -381,13 +377,17 @@ MauticJS.processGatedVideos = function (videoElements) {
             node.id = 'mautic-player-' + i;
         }
        
-        var cookieName = 'mautic-player-'+i+'-'+node.dataset.formId;
-        if (node.dataset.formId) {
+
             mediaPlayers[i] = [];
             
+            if(node.dataset.formId){
+            var cookieName = 'mautic-player-'+i+'-'+node.dataset.formId;
             MauticJS.makeCORSRequest('GET', '{$mauticBaseUrl}form/embed/' + node.dataset.formId, {}, function (data) {
                 mediaPlayers[i].formHtml = data;
             });
+            }else{
+                mediaPlayers[i].formHtml = '';
+            }
             
             mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features: playerFeatures, alwaysShowControls: true, enableKeyboard: false, success: function (mediaElement, domElement) {
                 mediaPlayers[i].inPoster = false;
@@ -420,7 +420,7 @@ MauticJS.processGatedVideos = function (videoElements) {
                     
                     MauticJS.addVideoView(i, currentTime);
 
-                    if (document.cookie.indexOf(cookieName) == -1 && currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
+                    if (node.dataset.formId && document.cookie.indexOf(cookieName) == -1 && currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
                         if (document.activeElement.tagName == 'IFRAME') {
                             window.mejs.previousActiveElement = document.activeElement;
                             document.activeElement.blur();
@@ -487,7 +487,6 @@ MauticJS.processGatedVideos = function (videoElements) {
             if (node.autoplay) {
                 mediaPlayers[i].player.play();
             }
-        }
     });
 }
 
