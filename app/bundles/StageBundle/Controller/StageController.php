@@ -11,7 +11,7 @@
 
 namespace Mautic\StageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class StageController.
  */
-class StageController extends AbstractFormController
+class StageController extends FormController
 {
     /**
      * @param int $page
