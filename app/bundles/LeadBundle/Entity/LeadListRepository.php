@@ -762,10 +762,10 @@ class LeadListRepository extends CommonRepository
 
                     switch ($timeframe) {
                         case 'birthday':
-                            $func = 'like';
-                            $isRelative = false;
+                            $func                = 'like';
+                            $isRelative          = false;
                             $details['operator'] = 'like';
-                            $details['filter'] = date('-m-d');
+                            $details['filter']   = date('-m-d');
                             break;
                         case 'today':
                         case 'tomorrow':
