@@ -49,7 +49,6 @@ class LeadType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber());
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
         if (!$options['isShortForm']) {
@@ -199,6 +198,8 @@ class LeadType extends AbstractType
                 ]
             );
         }
+
+        $builder->addEventSubscriber(new CleanFormSubscriber(['clean', 'raw', 'email' => 'email']));
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
