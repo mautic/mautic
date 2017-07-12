@@ -814,12 +814,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.stage', [], null, 'en_US'): 
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage', [], null, 'en_US'):
                 $expr = $q->expr()->orX(
                     $q->expr()->$likeExpr('s.name', ':'.$unique)
-                    ); 
+                );
                 $returnParameter = true;
-                break;
+                break; 
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
