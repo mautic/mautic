@@ -46,7 +46,7 @@ trait RequestTrait
                                 break;
                             } catch (\InvalidArgumentException $exception) {
                             }
-                            $params[$name] = (bool) $data;
+                            $params[$name] = $data;
                         }
                         break;
                     case 'choice':
