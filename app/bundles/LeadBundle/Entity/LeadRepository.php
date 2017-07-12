@@ -817,8 +817,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             case $this->translator->trans('mautic.lead.lead.searchcommand.stage', [], null, 'en_US'): 
                 $expr = $q->expr()->orX(
                     $q->expr()->$likeExpr('s.name', ':'.$unique)
-                    
-                ); 
+                    ); 
                 $returnParameter = true;
                 break;
             default:
