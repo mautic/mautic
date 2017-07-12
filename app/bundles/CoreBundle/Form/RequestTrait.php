@@ -33,14 +33,10 @@ trait RequestTrait
                         if (is_object($entity)) {
                             $setter = 'set'.ucfirst($name);
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
-                            $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                            if ($data === null) {
-                                throw new \Exception('boolean: value not accepted');
-                            }
+                            $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
                             $data = (bool) $data;
                             try {
                                 $entity->$setter($data);
-
                                 // Manually handled so remove from form processing
                                 unset($form[$name], $params[$name]);
                                 break;
