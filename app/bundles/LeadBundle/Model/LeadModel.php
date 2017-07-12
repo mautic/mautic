@@ -802,9 +802,17 @@ class LeadModel extends FormModel
             return $this->systemCurrentLead;
         }
 
+        if (!$this->security->isAnonymous()) {
+            // this is a Mautic user that's somehow tracked as a contact which we're going to ignore
+            $this->logger->addDebug('LEAD: In a Mautic user session');
+
+            return new Lead();
+        }
+
         if ($this->request) {
             $this->logger->addDebug('LEAD: Tracking session for '.$this->request->getMethod().' '.$this->request->getRequestUri());
         }
+
         list($trackingId, $generated) = $this->getTrackingCookie();
         $this->logger->addDebug("LEAD: Tracking ID for this contact is {$trackingId} (".(int) $generated.')');
 
