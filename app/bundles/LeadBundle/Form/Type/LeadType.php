@@ -199,7 +199,7 @@ class LeadType extends AbstractType
             );
         }
 
-        $builder->addEventSubscriber(new CleanFormSubscriber(['clean', 'raw']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['clean', 'raw', 'email' => 'email']));
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
