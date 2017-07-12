@@ -1718,6 +1718,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $sfEntityRecords = $this->getSalesforceObjectsByEmails('Contact', $checkEmailsInSF, $fieldMapping['Contact']['required']['string']);
             if (isset($sfEntityRecords['records'])) {
                 foreach ($sfEntityRecords['records'] as $sfContactRecord) {
+                    if (!isset($sfContactRecord['Email'])) {
+                        continue;
+                    }
                     $key                 = $this->getSyncKey($sfContactRecord['Email']);
                     $foundContacts[$key] = $key;
                 }
@@ -2134,7 +2137,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $skipObject = false;
             $syncLead   = false;
             $sfObject   = $sfEntityRecord['attributes']['type'];
-
+            if (!isset($sfEntityRecord['Email'])) {
+                // This is a record we don't recognize so continue
+                return;
+            }
             $key = $this->getSyncKey($sfEntityRecord['Email']);
             if (!isset($sfEntityRecord['Id']) || (!isset($checkEmailsInSF[$key]) && !isset($processedLeads[$key]))) {
                 // This is a record we don't recognize so continue
