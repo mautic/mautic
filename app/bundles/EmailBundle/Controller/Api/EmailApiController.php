@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,9 +21,6 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class EmailApiController.
- *
- * @property EmailModel $model
- *
  */
 class EmailApiController extends CommonApiController
 {
@@ -134,7 +130,7 @@ class EmailApiController extends CommonApiController
             $cleanTokens = [];
 
             foreach ($tokens as $token => $value) {
-                $value =  InputHelper::clean($value);
+                $value = InputHelper::clean($value);
                 if (!preg_match('/^{.*?}$/', $token)) {
                     $token = '{'.$token.'}';
                 }

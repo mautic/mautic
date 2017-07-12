@@ -935,8 +935,6 @@ class MailHelper
 
     /**
      * Set plain text for $this->message, replacing if necessary.
-     *
-     * @return null|string
      */
     protected function setMessagePlainText()
     {
@@ -1270,7 +1268,7 @@ class MailHelper
     }
 
     /**
-     * @return null
+     * @return string|null
      */
     public function getIdHash()
     {

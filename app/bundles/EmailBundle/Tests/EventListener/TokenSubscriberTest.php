@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Test\EventListener;
 
-
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -33,7 +32,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $tokens = [
-            '{test}' => 'value'
+            '{test}' => 'value',
         ];
 
         $mailHelper = new MailHelper($mockFactory, $swiftMailer);
@@ -41,7 +40,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $email = new Email();
         $email->setCustomHtml(
-            <<<CONTENT
+            <<<'CONTENT'
 <html xmlns="http://www.w3.org/1999/xhtml">
     <body style="margin: 0px; cursor: auto;" class="ui-sortable">
         <div data-section-wrapper="1">
@@ -76,17 +75,17 @@ CONTENT
                                 'content' => null,
                                 'filters' => [
 
-                                ]
-                            ]
-                        ]
+                                ],
+                            ],
+                        ],
                     ],
                     [
                         'tokenName' => 'Dynamic Content 2',
                         'content'   => 'DEC {test}',
                         'filters'   => [
 
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             );
         $mailHelper->setEmail($email);

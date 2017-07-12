@@ -58,7 +58,7 @@ class TokenSubscriber extends CommonSubscriber
                 null, $lead, [
                     'tokens'         => $tokens,
                     'lead'           => null,
-                    'dynamicContent' => $dynamicContentAsArray
+                    'dynamicContent' => $dynamicContentAsArray,
                 ]
             );
             $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
