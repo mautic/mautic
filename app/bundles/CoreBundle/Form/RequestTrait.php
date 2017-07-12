@@ -32,8 +32,11 @@ trait RequestTrait
                     case 'yesno_button_group':
                         if (is_object($entity)) {
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
-                            $data          = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
-                            $params[$name] = (int) $data;
+                            $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                            if ($data === null) {
+                                throw new \Exception('Boolean: value not accepted');
+                            }
+                            $params[$name] = $data;
                         }
                         break;
                     case 'choice':
