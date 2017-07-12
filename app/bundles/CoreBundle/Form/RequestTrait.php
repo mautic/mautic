@@ -31,12 +31,22 @@ trait RequestTrait
                 switch ($type) {
                     case 'yesno_button_group':
                         if (is_object($entity)) {
+                            $setter = 'set'.ucfirst($name);
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
                             $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                             if ($data === null) {
-                                throw new \Exception('Boolean: value not accepted');
+                                throw new \Exception('boolean: value not accepted');
                             }
-                            $params[$name] = $data;
+                            $data = (bool) $data;
+                            try {
+                                $entity->$setter($data);
+
+                                // Manually handled so remove from form processing
+                                unset($form[$name], $params[$name]);
+                                break;
+                            } catch (\InvalidArgumentException $exception) {
+                            }
+                            $params[$name] = (bool) $data;
                         }
                         break;
                     case 'choice':
