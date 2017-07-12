@@ -806,7 +806,9 @@ class LeadModel extends FormModel
             // this is a Mautic user that's somehow tracked as a contact which we're going to ignore
             $this->logger->addDebug('LEAD: In a Mautic user session');
 
-            return new Lead();
+            $lead = new Lead();
+
+            return ($returnTracking) ? [$lead, null, false] : $lead;
         }
 
         if ($this->request) {
