@@ -19,10 +19,10 @@
             <div class="progress-bar progress-bar-danger" style="width:<?php echo $event['noPercent']; ?>%; left: <?php echo $event['yesPercent']; ?>%"></div>
             <div class="box-layout">
                 <div class="visible-sm visible-md visible-lg col-stats">
-                    <span class="mt-xs label label-<?php echo $yesClass; ?>"><?php echo $event['yesPercent'].'%'; ?></span> <?php if ('action' !== $event['eventType']): ?>
-                        <span class="label label-danger"><?php echo $event['noPercent'].'%'; ?></span>
+                    <span class="mt-xs label label-<?php echo $yesClass; ?>" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.yes.percent'); ?>"><?php echo $event['yesPercent'].'%'; ?></span> <?php if ('action' !== $event['eventType']): ?>
+                        <span class="label label-danger" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.no.percent'); ?>"><?php echo $event['noPercent'].'%'; ?></span>
                     <?php endif; ?>
-                <span class="mt-xs label label-warning"><?= $event['logCount']; ?> completed</span> <span class="mt-xs label label-default"><?= $event['leadCount'] - $event['logCount']; ?> pending</span>
+                <span class="mt-xs label label-warning" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.completed.actions'); ?>"><?= $event['logCount']; ?></span> <span class="mt-xs label label-default"  data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.report.campaign.pending.actions'); ?>"><?= $event['leadCount'] - $event['logCount']; ?></span>
                 </div>
                     <div class="col-md-5 va-m">
                     <h5 class="fw-sb text-primary mb-xs">
