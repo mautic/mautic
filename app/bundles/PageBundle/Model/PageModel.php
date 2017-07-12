@@ -469,7 +469,7 @@ class PageModel extends FormModel
             $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
         }
 
-        if ($lead && !$lead->getId()) {
+        if (!$lead || !$lead->getId()) {
             // Lead came from a non-trackable IP so ignore
             return;
         }
