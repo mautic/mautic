@@ -250,6 +250,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
+                    'mautic.lead.model.device',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [

@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use DeviceDetector\DeviceDetector;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -34,7 +33,6 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
-use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -142,6 +140,11 @@ class LeadModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var DeviceModel
+     */
+    protected $deviceModel;
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack         $requestStack
@@ -157,6 +160,7 @@ class LeadModel extends FormModel
      * @param ChannelListHelper    $channelListHelper
      * @param                      $trackByIp
      * @param CoreParametersHelper $coreParametersHelper
+     * @param DeviceModel          $deviceModel
      */
     public function __construct(
         RequestStack $requestStack,
@@ -171,7 +175,8 @@ class LeadModel extends FormModel
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
         $trackByIp,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        DeviceModel $deviceModel
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -186,6 +191,7 @@ class LeadModel extends FormModel
         $this->channelListHelper    = $channelListHelper;
         $this->trackByIp            = $trackByIp;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->deviceModel          = $deviceModel;
     }
 
     /**
@@ -247,7 +253,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get the tags repository.
+     * Get the device repository.
      *
      * @return \Mautic\LeadBundle\Entity\LeadDeviceRepository
      */
@@ -2022,8 +2028,10 @@ class LeadModel extends FormModel
     public function addUTMTags(Lead $lead, $params)
     {
         // known "synonym" fields expected
-        $synonyms = ['useragent'  => 'user_agent',
-                     'remotehost' => 'remote_host', ];
+        $synonyms = [
+            'useragent'  => 'user_agent',
+            'remotehost' => 'remote_host',
+        ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -2070,25 +2078,8 @@ class LeadModel extends FormModel
 
         // create device
         if (key_exists('useragent', $params) && !empty($params['useragent'])) {
-            //device granularity
-            $dd = new DeviceDetector($params['useragent']);
-            $dd->parse();
-
-            $deviceRepo = $this->getDeviceRepository();
-            $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
-
-            // Only if it does not exist already
-            if (empty($device)) {
-                $device = new LeadDevice();
-                $device->setClientInfo($dd->getClient());
-                $device->setDevice($dd->getDeviceName());
-                $device->setDeviceBrand($dd->getBrand());
-                $device->setDeviceModel($dd->getModel());
-                $device->setDeviceOs($dd->getOs());
-                $device->setDateAdded($lastActive);
-                $device->setLead($lead);
-                $this->getDeviceRepository()->saveEntity($device);
-            }
+            $device = $this->deviceModel->getContactDeviceFromUserAgent($lead, $params['useragent'], $lastActive);
+            $this->em->detach($device);
         }
 
         // add the lead
@@ -2561,6 +2552,7 @@ class LeadModel extends FormModel
 
         return $event->getEventCounter();
     }
+
     /**
      * @param Lead $lead
      * @param      $company

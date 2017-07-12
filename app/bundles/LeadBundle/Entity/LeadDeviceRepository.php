@@ -51,6 +51,52 @@ class LeadDeviceRepository extends CommonRepository
      * @param null $deviceBrand
      * @param null $deviceModel
      *
+     * @return LeadDevice|null
+     */
+    public function getDeviceEntity(Lead $lead, $deviceName = null, $deviceBrand = null, $deviceModel = null)
+    {
+        $alias = $this->getTableAlias();
+        $qb = $this->createQueryBuilder($alias);
+
+        if ($lead !== null) {
+            $qb->andWhere(
+                $qb->expr()->eq($alias.'.lead', ':lead')
+            )
+                ->setParameter('lead', $lead);
+        }
+
+        if ($deviceName !== null) {
+            $qb->andWhere(
+                $qb->expr()->eq($alias.'.device', ':device')
+            )
+                ->setParameter('device', $deviceName);
+        }
+
+        if ($deviceBrand !== null) {
+            $qb->andWhere(
+                $qb->expr()->eq($alias.'.deviceBrand', ':deviceBrand')
+            )
+                ->setParameter('deviceBrand', $deviceBrand);
+        }
+
+        if ($deviceModel !== null) {
+            $qb->andWhere(
+                $qb->expr()->eq($alias.'.deviceModel', ':deviceModel')
+            )
+                ->setParameter('deviceModel', $deviceModel);
+        }
+
+        $results = $qb->getQuery()->getResult();
+
+        return (count($results)) ? $results[0] : null;
+    }
+
+    /**
+     * @param      $lead
+     * @param null $deviceName
+     * @param null $deviceBrand
+     * @param null $deviceModel
+     *
      * @return array
      */
     public function getDevice($lead, $deviceName = null, $deviceBrand = null, $deviceModel = null)
@@ -58,39 +104,32 @@ class LeadDeviceRepository extends CommonRepository
         $sq = $this->_em->getConnection()->createQueryBuilder();
         $sq->select('es.id as id, es.device as device, es.device_fingerprint')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
-        if (!empty($statIds)) {
-            $inIds = (!is_array($statIds)) ? [(int) $statIds] : $statIds;
 
-            $sq->where(
-                $sq->expr()->in('es.id', $inIds)
+        if ($lead !== null) {
+            $sq->andWhere(
+                $sq->expr()->eq('es.lead_id', $lead->getId())
             );
         }
 
         if ($deviceName !== null) {
-            $sq->where(
+            $sq->andWhere(
                 $sq->expr()->eq('es.device', ':device')
             )
                 ->setParameter('device', $deviceName);
         }
 
         if ($deviceBrand !== null) {
-            $sq->where(
+            $sq->andWhere(
                 $sq->expr()->eq('es.device_brand', ':deviceBrand')
             )
                 ->setParameter('deviceBrand', $deviceBrand);
         }
 
         if ($deviceModel !== null) {
-            $sq->where(
+            $sq->andWhere(
                 $sq->expr()->eq('es.device_model', ':deviceModel')
             )
                 ->setParameter('deviceModel', $deviceModel);
-        }
-
-        if ($lead !== null) {
-            $sq->where(
-                $sq->expr()->eq('es.lead_id', $lead->getId())
-            );
         }
 
         //get totals
