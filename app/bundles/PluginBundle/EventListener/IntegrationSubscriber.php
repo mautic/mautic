@@ -50,6 +50,9 @@ class IntegrationSubscriber extends CommonSubscriber
             if (is_object($v)) {
                 return "$k=(object)";
             }
+            if (is_array($v)) {
+                return "$k=(array)";
+            }
 
             return "$k=$v";
         }, array_keys($event->getParameters()), array_values($event->getParameters()))) : '';
