@@ -246,11 +246,13 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
     if (typeof settings == 'undefined') {
         settings = {};
     }
-    settings.name = mQuery('#campaignevent_properties_integration').attr('name');
-    var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
-    if(typeof mQuery('#campaignevent_properties_integration').val() == 'undefined') {
-        data = {integration:mQuery('#formaction_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
-    }
+
+    // Extract the name and ID prefixes
+    var prefix = mQuery(el).attr('name').split("[")[0];
+
+    settings.name = mQuery('#'+prefix+'_properties_integration').attr('name');
+    var data = {integration:mQuery('#'+prefix+'_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
+
     mQuery('.integration-campaigns-status').html('');
     mQuery('.integration-campaigns-status').removeClass('hide');
     Mautic.ajaxActionRequest('plugin:getIntegrationCampaignStatus', data,

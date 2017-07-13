@@ -456,7 +456,7 @@ class LeadModel extends FormModel
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
-            $this->em->detach($companyEntity);
+            $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
         }
         $this->em->clear(CompanyChangeLog::class);
     }
@@ -806,7 +806,9 @@ class LeadModel extends FormModel
             // this is a Mautic user that's somehow tracked as a contact which we're going to ignore
             $this->logger->addDebug('LEAD: In a Mautic user session');
 
-            return new Lead();
+            $lead = new Lead();
+
+            return ($returnTracking) ? [$lead, null, false] : $lead;
         }
 
         if ($this->request) {
@@ -2682,19 +2684,13 @@ class LeadModel extends FormModel
         $companyLeads = $this->companyModel->getCompanyLeadRepository()->getEntitiesByLead($lead);
 
         foreach ($companyLeads as $companyLead) {
-            $company     = $companyLead->getCompany();
-            $companyLead = $this->companyModel->getCompanyLeadRepository()->findOneBy(
-                [
-                    'lead'    => $lead,
-                    'company' => $company,
-                ]
-            );
+            $company = $companyLead->getCompany();
+
             if ($companyLead) {
-                if ($companyLead->getPrimary()) {
+                if ($companyLead->getPrimary() && !$oldPrimaryCompany) {
                     $oldPrimaryCompany = $companyLead->getCompany()->getId();
                 }
-
-                if ($company->getId() == $companyId and !$companyLead->getPrimary()) {
+                if ($company->getId() === (int) $companyId) {
                     $companyLead->setPrimary(true);
                     $newPrimaryCompany = $companyId;
                     $lead->addUpdatedField('company', $company->getName());
@@ -2715,7 +2711,7 @@ class LeadModel extends FormModel
 
         if (!empty($companyArray)) {
             $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
-            $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray);
+            $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray, false);
         }
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];

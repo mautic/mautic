@@ -378,8 +378,12 @@ return [
             ],
             'mautic.helper.template.analytics' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
-                'arguments' => 'mautic.factory',
                 'alias'     => 'analytics',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.cookie',
+                    'mautic.lead.model.lead',
+                ],
             ],
             'mautic.helper.template.mautibot' => [
                 'class' => 'Mautic\CoreBundle\Templating\Helper\MautibotHelper',
