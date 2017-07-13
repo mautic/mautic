@@ -207,7 +207,17 @@ Every change to Mautic core happens via PRs. Every PR must have 2 successful tes
 
 ## Unit Tests
 
+Before executing unit tests, copy the `app/phpunit.xml.dist` file to `app/phpunit.xml`, then edit that file and update the
+database parameters to point to your test database. If you leave out those credentials, or do not update them to point to
+your test database, then your production database WILL BE TRUNCATED.
+
 The unit tests can be executed in the Mautic root directory with `composer test` command.
+
+If you get the following error when running `composer test`, you need to copy the `app/phpunit.xml.dist` file to `app/phpunit.xml`.
+
+```bash
+<error>Script phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml handling the test event returned with error code 1</error>
+```
 
 ## Static Analysis
 
@@ -221,8 +231,8 @@ Marketing automation has historically been a difficult tool to implement in a bu
 ### Contact Info
 
 * <a href="https://www.mautic.org">https://www.mautic.org</a>
-* <a href="https://twitter.com/mautic">@mautic</a> [Twitter]
-* <a href="https://facebook.com/trymautic">@trymautic</a> [Facebook]
+* <a href="https://twitter.com/MauticCommunity">@MauticCommunity</a> [Twitter]
+* <a href="https://www.facebook.com/MauticCommunity/">@MauticCommunity</a> [Facebook]
 * <a href="https://plus.google.com/+MauticOrg">+MauticOrg</a> [Google+]
 
 ### Developers
