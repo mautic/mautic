@@ -34,7 +34,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 9;
+    const MINOR_VERSION = 10;
 
     /**
      * Patch version number.
@@ -51,7 +51,7 @@ class AppKernel extends Kernel
      *
      * @const string
      */
-    const EXTRA_VERSION = '';
+    const EXTRA_VERSION = '-dev';
 
     /**
      * @var array
