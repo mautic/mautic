@@ -571,7 +571,7 @@ class LeadListRepository extends CommonRepository
         $this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0;
 
         $this->listFiltersInnerJoinCompany = false;
-        $expr                              = $this->getListFilterExprCombined($filters, $parameters, $q);
+        $expr                              = $this->getListFilterExpr($filters, $parameters, $q, false, null);
 
         if ($this->hasCompanyFilter) {
             $this->applyCompanyFieldFilters($q);
@@ -636,18 +636,22 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * This is a public method that can be used by 3rd party.
+     * Do not change the signature.
+     *
      * @param              $filters
      * @param              $parameters
      * @param QueryBuilder $q
+     * @param bool         $not
+     * @param int|null     $leadId
+     * @param string       $object
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    public function getListFilterExprCombined($filters, &$parameters, QueryBuilder $q)
+    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null, $object = 'lead')
     {
         static $leadTable;
         static $companyTable;
-        $not    = false;
-        $leadId = null;
 
         if (!count($filters)) {
             return $q->expr()->andX();
