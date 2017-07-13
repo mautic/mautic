@@ -93,7 +93,7 @@ class ImportController extends FormController
             $importModel->saveEntity($import);
         }
 
-        $this->resetImport($fullPath);
+        $this->resetImport($fullPath, false);
 
         return $this->indexAction();
     }

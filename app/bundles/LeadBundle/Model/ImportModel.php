@@ -150,18 +150,20 @@ class ImportModel extends FormModel
                 ->setStatusInfo($this->translator->trans('mautic.lead.import.ghost.limit.hit', ['%limit%' => $ghostDelay]))
                 ->removeFile();
 
-            $this->notificationModel->addNotification(
-                $this->translator->trans(
-                    'mautic.lead.import.result.info',
-                    ['%import%' => $this->generateLink($import)]
-                ),
-                'info',
-                false,
-                $this->translator->trans('mautic.lead.import.failed'),
-                'fa-download',
-                null,
-                $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
-            );
+            if ($import->getCreatedBy()) {
+                $this->notificationModel->addNotification(
+                    $this->translator->trans(
+                        'mautic.lead.import.result.info',
+                        ['%import%' => $this->generateLink($import)]
+                    ),
+                    'info',
+                    false,
+                    $this->translator->trans('mautic.lead.import.failed'),
+                    'fa-download',
+                    null,
+                    $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+                );
+            }
         }
 
         $this->saveEntities($imports);
@@ -219,18 +221,20 @@ class ImportModel extends FormModel
         // Save the end changes so the user could see it
         $this->saveEntity($import);
 
-        $this->notificationModel->addNotification(
-            $this->translator->trans(
-                'mautic.lead.import.result.info',
-                ['%import%' => $this->generateLink($import)]
-            ),
-            'info',
-            false,
-            $this->translator->trans('mautic.lead.import.completed'),
-            'fa-download',
-            null,
-            $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
-        );
+        if ($import->getCreatedBy()) {
+            $this->notificationModel->addNotification(
+                $this->translator->trans(
+                    'mautic.lead.import.result.info',
+                    ['%import%' => $this->generateLink($import)]
+                ),
+                'info',
+                false,
+                $this->translator->trans('mautic.lead.import.completed'),
+                'fa-download',
+                null,
+                $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+            );
+        }
 
         return true;
     }
