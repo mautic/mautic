@@ -87,12 +87,12 @@ class CampaignSubscriber extends CommonSubscriber
             $data   = array_flip(AbstractFormFieldHelper::parseList($data));
             // replace contacts tokens
             foreach ($data as $key => $value) {
-                $data[$key] = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                $data[$key] = urlencode(TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true));
             }
             $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
             $headers = array_flip(AbstractFormFieldHelper::parseList($headers));
             foreach ($headers as $key => $value) {
-                $headers[$key] = TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true);
+                $headers[$key] = urlencode(TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true));
             }
             $timeout = $config['timeout'];
 
