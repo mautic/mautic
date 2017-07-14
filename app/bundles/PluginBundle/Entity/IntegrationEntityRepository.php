@@ -421,20 +421,22 @@ class IntegrationEntityRepository extends CommonRepository
             $q->select('i.integration, i.integration_entity, i.integration_entity_id, i.date_added, i.last_sync_date, i.internal');
         }
 
-        $q->where(
-            $q->expr()->andX(
-                $q->expr()->eq('i.internal_entity_id', ':internalEntityId'),
-                $q->expr()->eq('i.internal_entity', ':internalEntity')
-            )
-        );
-
-        $q->setParameter('internalEntityId', $leadId);
-        $q->setParameter('internalEntity', 'lead');
+        $q->where('1=1');
 
         if (!empty($integration)) {
             $q->andWhere($q->expr()->eq('i.integration', ':integration'));
             $q->setParameter('integration', $integration);
         }
+
+        $q->andWhere(
+            $q->expr()->andX(
+                $q->expr()->eq('i.internal_entity', ':internalEntity'),
+                $q->expr()->eq('i.internal_entity_id', ':internalEntityId')
+            )
+        );
+
+        $q->setParameter('internalEntity', 'lead');
+        $q->setParameter('internalEntityId', $leadId);
 
         if (!empty($internalEntity)) {
             $q->andWhere($q->expr()->eq('i.internalEntity', ':internalEntity'));
