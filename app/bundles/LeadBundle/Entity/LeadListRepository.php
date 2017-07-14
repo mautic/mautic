@@ -748,7 +748,7 @@ class LeadListRepository extends CommonRepository
                 $relativeDateStrings = $this->getRelativeDateStrings();
                 // Check if the column type is a date/time stamp
                 $isTimestamp = ($details['type'] === 'datetime' || $columnType instanceof UTCDateTimeType);
-                $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func, $not) {
+                $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func) {
                     $key             = array_search($string, $relativeDateStrings);
                     $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
                     $requiresBetween = in_array($func, ['eq', 'neq']) && $isTimestamp;
