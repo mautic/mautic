@@ -160,6 +160,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->build();
 
         $builder->createField('score', 'integer')
+            ->nullable()
             ->build();
 
         self::loadFixedFieldMetadata(
