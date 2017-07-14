@@ -67,7 +67,7 @@ trait CustomFieldEntityTrait
             $fields         = $this->getProfileFields();
 
             if (array_key_exists($fieldRequested, $fields)) {
-                return ($isSetter) ? $this->addUpdatedField($fieldRequested, $arguments[0]) : $this->getFieldValue($name);
+                return ($isSetter) ? $this->addUpdatedField($fieldRequested, $arguments[0]) : $this->getFieldValue($fieldRequested);
             }
         }
 
