@@ -1046,7 +1046,7 @@ class LeadModel extends FormModel
                 }
             } elseif (!$oldLead) {
                 // New lead, set the tracking cookie
-                $this->setLeadCookie($lead->getId(), true);
+                $this->setLeadCookie($lead->getId());
             }
         }
     }
