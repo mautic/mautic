@@ -104,6 +104,27 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $this->adjustPointsTest(10, $this->getLeadChangedArray(150, 15), $lead, 'divide');
     }
 
+    public function testCustomFieldGetterSetters()
+    {
+        $lead = new Lead();
+
+        $fields = [
+            'core' => [
+                'notes' => [
+                    'alias' => 'notes',
+                    'label' => 'Notes',
+                    'type'  => 'textarea',
+                    'value' => 'Blah blah blah'
+                ]
+            ]
+        ];
+
+        $lead->setFields($fields);
+
+        $lead->setNotes('hello');
+        $this->assertEquals('hello', $lead->getNotes());
+    }
+
     /**
      * @param $points
      * @param $expected
