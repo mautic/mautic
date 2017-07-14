@@ -345,7 +345,9 @@ class LeadController extends FormController
 
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
+        $emailRepo       = $this->getModel('email')->getRepository();
+        $em              = $this->factory->getEntityManager();
+        $integrationRepo = $em->getRepository('MauticPluginBundle:IntegrationEntity');
 
         return $this->delegateView(
             [
@@ -362,6 +364,8 @@ class LeadController extends FormController
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
+                    'integrationCount'  => $integrationRepo->getIntegrationEntityCount($lead->getId()),
+                    'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',

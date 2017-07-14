@@ -389,6 +389,65 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
+     * @param $leadId
+     * @param $integration
+     * @param $integrationEntity
+     * @param $internalEntity
+     *
+     * @return int
+     */
+    public function getIntegrationEntityCount($leadId, $integration = null, $integrationEntity = null, $internalEntity = null)
+    {
+        return $this->getIntegrationEntityByLead($leadId, $integration, $integrationEntity, $internalEntity, false);
+    }
+
+    /**
+     * @param $leadId
+     * @param $integration
+     * @param $integrationEntity
+     * @param $internalEntity
+     * @param int|bool $limit
+     *
+     * @return array|int
+     */
+    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, $limit = 100)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
+
+        if (false === $limit) {
+            $q->select('count(*) as total');
+        } else {
+            $q->select('i.integration, i.integration_entity, i.internal_entity, i.integration_entity_id, i.date_added, i.last_sync_date, i.internal');
+        }
+
+        $q->where(
+            $q->expr()->eq('i.internal_entity_id', ':internalEntityId')
+        );
+        $q->setParameter('internalEntityId', $leadId);
+        if (!empty($integration)) {
+            $q->andWhere($q->expr()->eq('i.integration', ':integration'));
+            $q->setParameter('integration', $integration);
+        }
+        if (!empty($internalEntity)) {
+            $q->andWhere($q->expr()->eq('i.internalEntity', ':internalEntity'));
+            $q->setParameter('internalEntity', $internalEntity);
+        }
+        if (!empty($integrationEntity)) {
+            $q->andWhere($q->expr()->eq('i.integrationEntity', ':integrationEntity'));
+            $q->setParameter('integrationEntity', $integrationEntity);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        if (false === $limit && count($results) > 0) {
+            return (int) $results[0]['total'];
+        }
+
+        return $results;
+    }
+
+    /**
      * @param array $integrationIds
      * @param       $integration
      * @param       $internalEntityType

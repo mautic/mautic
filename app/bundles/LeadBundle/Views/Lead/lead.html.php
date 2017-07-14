@@ -287,6 +287,14 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
+                <li class="">
+                    <a href="#integration-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="IntegrationCount">
+                        <?php echo count($integrationCount); ?>
+                    </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.integration'); ?>
+                    </a>
+                </li>
                 <?php if ($places): ?>
                     <li class="">
                         <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
@@ -338,7 +346,21 @@ $view['slots']->set(
                 </div>
             <?php endif; ?>
             <!--/ #social-container -->
-            
+
+            <!-- #integration-container -->
+            <div class="tab-pane fade bdr-w-0" id="integration-container">
+                <?php echo $view->render(
+                    'MauticLeadBundle:Integration:index.html.php',
+                    [
+                        'lead'              => $lead,
+                        'socialProfiles'    => $socialProfiles,
+                        'socialProfileUrls' => $socialProfileUrls,
+                        'integrations'      => $integrations,
+                    ]
+                ); ?>
+            </div>
+            <!--/ #integration-container -->
+
             <!-- custom content -->
             <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
             <!-- end: custom content -->
