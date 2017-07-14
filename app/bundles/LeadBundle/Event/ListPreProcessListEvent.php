@@ -20,10 +20,17 @@ use Mautic\LeadBundle\Entity\LeadList;
 class ListPreProcessListEvent extends CommonEvent
 {
     /**
+     * @var LeadList
+     */
+    protected $list;
+
+    protected $result;
+
+    /**
      * @param LeadList $list
      * @param bool     $isNew
      */
-    public function __construct($list, $isNew = false)
+    public function __construct(LeadList $list, $isNew = false)
     {
         $this->list  = $list;
         $this->isNew = $isNew;
@@ -32,7 +39,7 @@ class ListPreProcessListEvent extends CommonEvent
     /**
      * Returns the List entity.
      *
-     * @return List
+     * @return LeadList
      */
     public function getList()
     {
@@ -40,9 +47,9 @@ class ListPreProcessListEvent extends CommonEvent
     }
 
     /**
-     * Sets the List entity.
+     * Sets the LeadList entity.
      *
-     * @param List $list
+     * @param LeadList $list
      */
     public function setList(LeadList $list)
     {
