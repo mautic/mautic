@@ -254,7 +254,7 @@ class AjaxController extends CommonAjaxController
         $includeEvents = InputHelper::clean($request->request->get('includeEvents', []));
         $excludeEvents = InputHelper::clean($request->request->get('excludeEvents', []));
         $search        = InputHelper::clean($request->request->get('search'));
-        $leadId        = InputHelper::int($request->request->get('leadId'));
+        $leadId        = (int) $request->request->get('leadId');
 
         if (!empty($leadId)) {
             //find the lead
@@ -307,8 +307,8 @@ class AjaxController extends CommonAjaxController
     protected function toggleLeadListAction(Request $request)
     {
         $dataArray = ['success' => 0];
-        $leadId    = InputHelper::int($request->request->get('leadId'));
-        $listId    = InputHelper::int($request->request->get('listId'));
+        $leadId    = (int) $request->request->get('leadId');
+        $listId    = (int) $request->request->get('listId');
         $action    = InputHelper::clean($request->request->get('listAction'));
 
         if (!empty($leadId) && !empty($listId) && in_array($action, ['remove', 'add'])) {
@@ -336,7 +336,7 @@ class AjaxController extends CommonAjaxController
     protected function togglePreferredLeadChannelAction(Request $request)
     {
         $dataArray = ['success' => 0];
-        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $leadId    = (int) $request->request->get('leadId');
         $channel   = InputHelper::clean($request->request->get('channel'));
         $action    = InputHelper::clean($request->request->get('channelAction'));
 
@@ -366,8 +366,8 @@ class AjaxController extends CommonAjaxController
     protected function toggleLeadCampaignAction(Request $request)
     {
         $dataArray  = ['success' => 0];
-        $leadId     = InputHelper::int($request->request->get('leadId'));
-        $campaignId = InputHelper::int($request->request->get('campaignId'));
+        $leadId     = (int) $request->request->get('leadId');
+        $campaignId = (int) $request->request->get('campaignId');
         $action     = InputHelper::clean($request->request->get('campaignAction'));
 
         if (!empty($leadId) && !empty($campaignId) && in_array($action, ['remove', 'add'])) {
@@ -395,8 +395,8 @@ class AjaxController extends CommonAjaxController
     protected function toggleCompanyLeadAction(Request $request)
     {
         $dataArray = ['success' => 0];
-        $leadId    = InputHelper::int($request->request->get('leadId'));
-        $companyId = InputHelper::int($request->request->get('companyId'));
+        $leadId    = (int) $request->request->get('leadId');
+        $companyId = (int) $request->request->get('companyId');
         $action    = InputHelper::clean($request->request->get('companyAction'));
 
         if (!empty($leadId) && !empty($companyId) && in_array($action, ['remove', 'add'])) {
@@ -738,8 +738,8 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0];
         $order     = InputHelper::clean($request->request->get('field'));
-        $page      = InputHelper::int($request->get('page'));
-        $limit     = InputHelper::int($request->get('limit'));
+        $page      = (int) $request->get('page');
+        $limit     = (int) $request->get('limit');
 
         if (!empty($order)) {
             /** @var \Mautic\LeadBundle\Model\FieldModel $model */
