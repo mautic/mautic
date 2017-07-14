@@ -78,18 +78,9 @@ trait FrequencyRuleTrait
 
         $method = $this->request->getMethod();
         if ('GET' !== $method) {
-            $isCancelled = method_exists($this, 'isFormCancelled') ? $this->isFormCancelled($form) : false;
-            if (!$isCancelled) {
-                if (method_exists($this, 'isFormValid')) {
-                    $valid = $this->isFormValid($form);
-                } else {
-                    $form->submit($data, 'PATCH' !== $method);
-                    $valid = $form->isValid();
-                }
-
-                if ($valid) {
-                    $data = $form->getData();
-                    $this->persistFrequencyRuleFormData($lead, $data, $allChannels, $leadChannels);
+            if (!$this->isFormCancelled($form)) {
+                if ($this->isFormValid($form, $data, $method)) {
+                    $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels);
 
                     return true;
                 }

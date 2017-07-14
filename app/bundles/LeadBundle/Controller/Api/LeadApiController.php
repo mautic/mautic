@@ -641,4 +641,30 @@ class LeadApiController extends CommonApiController
 
         $this->setCustomFieldValues($entity, $form, $parameters);
     }
+
+    /**
+     * Helper method to be used in FrequencyRuleTrait.
+     *
+     * @return bool
+     */
+    protected function isFormCancelled()
+    {
+        return false;
+    }
+
+    /**
+     * Helper method to be used in FrequencyRuleTrait.
+     *
+     * @param Form   $form
+     * @param array  $data
+     * @param string $method
+     *
+     * @return bool
+     */
+    protected function isFormValid(Form $form, array $data, $method)
+    {
+        $form->submit($data, 'PATCH' !== $method);
+
+        return $form->isValid();
+    }
 }
