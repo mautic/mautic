@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\LeadBundle\Tests;
+namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
