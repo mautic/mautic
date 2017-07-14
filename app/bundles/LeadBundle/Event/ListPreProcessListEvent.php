@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\LeadBundle\Entity\LeadList;
 
 /**
  * Class ListPreProcessListEvent.
@@ -20,17 +19,17 @@ use Mautic\LeadBundle\Entity\LeadList;
 class ListPreProcessListEvent extends CommonEvent
 {
     /**
-     * @var LeadList
+     * @var array
      */
     protected $list;
 
     protected $result;
 
     /**
-     * @param LeadList $list
-     * @param bool     $isNew
+     * @param array $list
+     * @param bool  $isNew
      */
-    public function __construct(LeadList $list, $isNew = false)
+    public function __construct(array $list, $isNew = false)
     {
         $this->list  = $list;
         $this->isNew = $isNew;
@@ -39,7 +38,7 @@ class ListPreProcessListEvent extends CommonEvent
     /**
      * Returns the List entity.
      *
-     * @return LeadList
+     * @return array
      */
     public function getList()
     {
@@ -47,11 +46,11 @@ class ListPreProcessListEvent extends CommonEvent
     }
 
     /**
-     * Sets the LeadList entity.
+     * Sets the lead list entity.
      *
-     * @param LeadList $list
+     * @param array $list
      */
-    public function setList(LeadList $list)
+    public function setList(array $list)
     {
         $this->list = $list;
     }
