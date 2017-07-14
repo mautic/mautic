@@ -73,11 +73,18 @@ return [
             ],
             'mautic.plugin.formbundle.subscriber' => [
                 'class' => 'Mautic\PluginBundle\EventListener\FormSubscriber',
+                'methodCalls' => [
+                    'setIntegrationHelper' => [
+                        'mautic.helper.integration',
+                    ],
+                ],
             ],
             'mautic.plugin.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\PluginBundle\EventListener\CampaignSubscriber',
-                'arguments' => [
-                    'mautic.helper.integration',
+                'class'       => 'Mautic\PluginBundle\EventListener\CampaignSubscriber',
+                'methodCalls' => [
+                    'setIntegrationHelper' => [
+                        'mautic.helper.integration',
+                    ],
                 ],
             ],
             'mautic.plugin.leadbundle.subscriber' => [
