@@ -79,7 +79,7 @@ trait FrequencyRuleTrait
         $method = $this->request->getMethod();
         if ('GET' !== $method) {
             if (!$this->isFormCancelled($form)) {
-                if ($this->isFormValid($form, $data, $method)) {
+                if ($this->isFormValid($form, $data)) {
                     $this->persistFrequencyRuleFormData($lead, $form->getData(), $allChannels, $leadChannels);
 
                     return true;

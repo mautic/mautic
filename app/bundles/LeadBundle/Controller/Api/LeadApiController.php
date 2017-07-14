@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -645,9 +646,11 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      *
+     * @param Form $form
+     *
      * @return bool
      */
-    protected function isFormCancelled()
+    protected function isFormCancelled($form = null)
     {
         return false;
     }
@@ -655,15 +658,14 @@ class LeadApiController extends CommonApiController
     /**
      * Helper method to be used in FrequencyRuleTrait.
      *
-     * @param Form   $form
-     * @param array  $data
-     * @param string $method
+     * @param Form  $form
+     * @param array $data
      *
      * @return bool
      */
-    protected function isFormValid(Form $form, array $data, $method)
+    protected function isFormValid(Form $form, array $data = null)
     {
-        $form->submit($data, 'PATCH' !== $method);
+        $form->submit($data, 'PATCH' !== $this->request->getMethod());
 
         return $form->isValid();
     }
