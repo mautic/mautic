@@ -290,7 +290,7 @@ $view['slots']->set(
                 <li class="">
                     <a href="#integration-container" role="tab" data-toggle="tab">
                     <span class="label label-primary mr-sm" id="IntegrationCount">
-                        <?php echo count($integrationCount); ?>
+                        <?php echo count($integrations); ?>
                     </span>
                         <?php echo $view['translator']->trans('mautic.lead.lead.tab.integration'); ?>
                     </a>

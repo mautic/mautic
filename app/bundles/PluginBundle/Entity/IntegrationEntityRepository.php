@@ -418,21 +418,29 @@ class IntegrationEntityRepository extends CommonRepository
         if (false === $limit) {
             $q->select('count(*) as total');
         } else {
-            $q->select('i.integration, i.integration_entity, i.internal_entity, i.integration_entity_id, i.date_added, i.last_sync_date, i.internal');
+            $q->select('i.integration, i.integration_entity, i.integration_entity_id, i.date_added, i.last_sync_date, i.internal');
         }
 
         $q->where(
-            $q->expr()->eq('i.internal_entity_id', ':internalEntityId')
+            $q->expr()->andX(
+                $q->expr()->eq('i.internal_entity_id', ':internalEntityId'),
+                $q->expr()->eq('i.internal_entity', ':internalEntity')
+            )
         );
+
         $q->setParameter('internalEntityId', $leadId);
+        $q->setParameter('internalEntity', 'lead');
+
         if (!empty($integration)) {
             $q->andWhere($q->expr()->eq('i.integration', ':integration'));
             $q->setParameter('integration', $integration);
         }
+
         if (!empty($internalEntity)) {
             $q->andWhere($q->expr()->eq('i.internalEntity', ':internalEntity'));
             $q->setParameter('internalEntity', $internalEntity);
         }
+
         if (!empty($integrationEntity)) {
             $q->andWhere($q->expr()->eq('i.integrationEntity', ':integrationEntity'));
             $q->setParameter('integrationEntity', $integrationEntity);

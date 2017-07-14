@@ -364,7 +364,6 @@ class LeadController extends FormController
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
-                    'integrationCount'  => $integrationRepo->getIntegrationEntityCount($lead->getId()),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                     'leadNotes'         => $this->forward(
