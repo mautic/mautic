@@ -522,6 +522,24 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     ],
                 ]
             );
+            $builder->add(
+                'updateBlanks',
+                'choice',
+                [
+                    'choices' => [
+                        'updateOwner' => 'mautic.salesforce.blanks',
+                    ],
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'label'       => 'mautic.salesforce.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
+                    ],
+                ]
+            );
 
             $builder->add(
                 'objects',
@@ -2486,5 +2504,34 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function amendToSfFields($fields)
     {
+    }
+
+    /**
+     * @param string $object
+     *
+     * @return array
+     */
+    public function getFieldsForQuery($object)
+    {
+        $fields = $this->getIntegrationSettings()->getFeatureSettings();
+        switch ($object) {
+            case 'company':
+            case 'Account':
+                $fields = array_keys(array_filter($fields['companyFields']));
+                break;
+            default:
+                $mixedFields = array_filter($fields['leadFields']);
+                $fields      = [];
+                foreach ($mixedFields as $sfField => $mField) {
+                    if (strpos($sfField, '__'.$object) !== false) {
+                        $fields[] = str_replace('__'.$object, '', $sfField);
+                    }
+                    if (strpos($sfField, '-'.$object) !== false) {
+                        $fields[] = str_replace('-'.$object, '', $sfField);
+                    }
+                }
+        }
+
+        return $fields;
     }
 }
