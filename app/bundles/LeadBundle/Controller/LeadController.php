@@ -346,8 +346,7 @@ class LeadController extends FormController
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo       = $this->getModel('email')->getRepository();
-        $em              = $this->factory->getEntityManager();
-        $integrationRepo = $em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
         return $this->delegateView(
             [
