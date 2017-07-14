@@ -61,12 +61,12 @@ class FrequencyRule extends CommonEntity
     private $preferredChannel = 0;
 
     /**
-     * @var date
+     * @var \DateTime
      */
     private $pauseFromDate;
 
     /**
-     * @var date
+     * @var \DateTime
      */
     private $pauseToDate;
 

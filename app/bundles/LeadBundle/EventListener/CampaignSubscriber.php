@@ -16,6 +16,7 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -397,13 +398,13 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * Function to compare date value.
      *
-     * @param obj $lead
-     * @param obj $event
-     * @param obj $triggerDate
+     * @param Lead                   $lead
+     * @param CampaignExecutionEvent $event
+     * @param \DateTime              $triggerDate
      *
-     * @return type
+     * @return bool
      */
-    private function compareDateValue($lead, $event, $triggerDate)
+    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate)
     {
         $result = $this->leadFieldModel->getRepository()->compareDateValue(
                 $lead->getId(),
