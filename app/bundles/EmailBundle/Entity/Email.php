@@ -357,8 +357,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             )
         );
 
- 
-        $metadata->addConstraint(new Callback([
+         $metadata->addConstraint(new Callback([
             'callback' => function (Email $email, ExecutionContextInterface $context) {
                 $type = $email->getEmailType();
                 $translationParent = $email->getTranslationParent();
