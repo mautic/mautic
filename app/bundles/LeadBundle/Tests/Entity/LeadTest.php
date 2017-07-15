@@ -115,14 +115,24 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                     'label' => 'Notes',
                     'type'  => 'textarea',
                     'value' => 'Blah blah blah'
+                ],
+                'test' => [
+                    'alias' => 'test',
+                    'label' => 'Test',
+                    'type'  => 'textarea',
+                    'value' => 'Test blah'
                 ]
             ]
         ];
 
         $lead->setFields($fields);
 
+        // This should not killover with a segmentation fault due to a loop
         $lead->setNotes('hello');
-        $this->assertEquals('hello', $lead->getNotes());
+
+        // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
+        $lead->setTest('hello');
+        $this->assertEquals('hello', $lead->getTest());
     }
 
     /**

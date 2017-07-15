@@ -191,6 +191,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $dateIdentified;
 
     /**
+     * @var ArrayCollection
+     */
+    private $notes;
+
+    /**
      * @var string
      */
     private $preferredProfileImage;
@@ -1209,6 +1214,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function setNewlyCreated($newlyCreated)
     {
         $this->newlyCreated = $newlyCreated;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNotes()
+    {
+        return $this->notes;
     }
 
     /**
