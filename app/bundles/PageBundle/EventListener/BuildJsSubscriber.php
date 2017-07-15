@@ -285,7 +285,7 @@ MauticJS.initGatedVideo = function () {
     
     if (MauticJS.videoElements.length) {
         MauticJS.videoElements = Array.prototype.filter.call(MauticJS.videoElements, function(videoElements){
-          return null !== videoElements.attributes.getNamedItem('data-form-id') || null !== videoElements.attributes.getNamedItem('data-gate-time');
+          return null !== videoElements.attributes.getNamedItem('data-form-id') || null !== videoElements.attributes.getNamedItem('data-mtc');
       });
    }
 
