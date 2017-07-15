@@ -18,5 +18,4 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class FailedLeadEventLogRepository extends CommonRepository
 {
-
 }

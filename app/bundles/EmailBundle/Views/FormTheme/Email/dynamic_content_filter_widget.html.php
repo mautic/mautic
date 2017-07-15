@@ -14,6 +14,7 @@
     <div class="panel">
         <?php
         $tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_'.$form->vars['name'].'">';
+        $tabHtml .= '<li><a href="javascript:void(0);" role="tab" class="addNewDynamicContentFilter" style="display: none;" data-index="'.$form->vars['name'].'"><i class="fa fa-plus text-success"></i> '.$view['translator']->trans('mautic.core.form.new').'</a></li>';
         $tabHtml .= '<li class="active"><a data-toggle="tab" href="#emailform_dynamicContent_'.$form->vars['name'].'_default" role="tab">Default</a></li>';
         $tabContentHtml = '<div class="tab-content pa-md"><div class="tab-pane bdr-w-0 active" id="emailform_dynamicContent_'.$form->vars['name'].'_default">';
 

@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper.
@@ -476,12 +477,12 @@ class MailHelper
      *
      * @param bool   $dispatchSendEvent
      * @param string $returnMode        What should happen post send/queue to $this->message after the email send is attempted.
-     *                  Options are:
-     *                  RESET_TO           resets the to recipients and resets errors
-     *                  FULL_RESET         creates a new MauticMessage instance and resets errors
-     *                  DO_NOTHING         leaves the current errors array and MauticMessage instance intact
-     *                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
-     *                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
+     *                                  Options are:
+     *                                  RESET_TO           resets the to recipients and resets errors
+     *                                  FULL_RESET         creates a new MauticMessage instance and resets errors
+     *                                  DO_NOTHING         leaves the current errors array and MauticMessage instance intact
+     *                                  NOTHING_IF_FAILED  leaves the current errors array MauticMessage instance intact if it fails, otherwise reset_to
+     *                                  RETURN_ERROR       return an array of [success, $errors]; only one applicable if message is queued
      *
      * @return bool
      */
@@ -934,8 +935,6 @@ class MailHelper
 
     /**
      * Set plain text for $this->message, replacing if necessary.
-     *
-     * @return null|string
      */
     protected function setMessagePlainText()
     {
@@ -1252,21 +1251,25 @@ class MailHelper
      */
     public static function validateEmail($address)
     {
-        static $grammer;
+        $invalidChar = strpbrk($address, '\'^&*%');
 
-        if ($grammer === null) {
-            $grammer = new \Swift_Mime_Grammar();
+        if ($invalidChar !== false) {
+            throw new \Swift_RfcComplianceException(
+                'Email address ['.$address.
+                '] contains this invalid character: '.substr($invalidChar, 0, 1)
+            );
         }
 
-        if (!preg_match('/^'.$grammer->getDefinition('addr-spec').'$/D',
-            $address)) {
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
             throw new \Swift_RfcComplianceException(
-                'Address in mailbox given ['.$address.
-                '] does not comply with RFC 2822, 3.6.2.'
+                'Email address ['.$address.'] is invalid'
             );
         }
     }
 
+    /**
+     * @return string|null
+     */
     public function getIdHash()
     {
         return $this->idHash;
@@ -1292,6 +1295,9 @@ class MailHelper
         $this->message->leadIdHash = $idHash;
     }
 
+    /**
+     * @return Lead
+     */
     public function getLead()
     {
         return $this->lead;
@@ -1531,6 +1537,14 @@ class MailHelper
     }
 
     /**
+     * @return array
+     */
+    public function getGlobalTokens()
+    {
+        return $this->globalTokens;
+    }
+
+    /**
      * Parses html into basic plaintext.
      *
      * @param string $content
@@ -1594,7 +1608,7 @@ class MailHelper
 
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
-        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens());
+        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
 
         unset($event);
     }
@@ -1614,7 +1628,7 @@ class MailHelper
             // Clean up the error message
             $errorMessage = trim(preg_replace('/(.*?)Log data:(.*)$/is', '$1', $errorMessage));
 
-            $this->fatal  = true;
+            $this->fatal = true;
         } else {
             $errorMessage = trim($error);
         }

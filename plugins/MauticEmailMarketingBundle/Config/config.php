@@ -19,18 +19,38 @@ return [
         'forms' => [
             'mautic.form.type.emailmarketing.mailchimp' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory', 'session', 'mautic.helper.core_parameters'],
                 'alias'     => 'emailmarketing_mailchimp',
             ],
             'mautic.form.type.emailmarketing.constantcontact' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\ConstantContactType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory', 'session', 'mautic.helper.core_parameters'],
                 'alias'     => 'emailmarketing_constantcontact',
             ],
             'mautic.form.type.emailmarketing.icontact' => [
                 'class'     => 'MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['mautic.factory', 'session', 'mautic.helper.core_parameters'],
                 'alias'     => 'emailmarketing_icontact',
+            ],
+        ],
+        'integrations' => [
+            'mautic.integration.constantcontact' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.icontact' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.mailchimp' => [
+                'class'     => \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration::class,
+                'arguments' => [
+
+                ],
             ],
         ],
     ],

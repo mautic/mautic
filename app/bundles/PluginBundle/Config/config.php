@@ -86,6 +86,9 @@ return [
                     'mautic.plugin.model.plugin',
                 ],
             ],
+            'mautic.plugin.integration.subscriber' => [
+                'class' => 'Mautic\PluginBundle\EventListener\IntegrationSubscriber',
+            ],
         ],
         'forms' => [
             'mautic.form.type.integration.details' => [
@@ -131,8 +134,16 @@ return [
         ],
         'other' => [
             'mautic.helper.integration' => [
-                'class'     => 'Mautic\PluginBundle\Helper\IntegrationHelper',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,
+                'arguments' => [
+                    'kernel',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.paths',
+                    'mautic.helper.bundle',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.templating',
+                    'mautic.plugin.model.plugin',
+                ],
             ],
         ],
         'models' => [

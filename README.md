@@ -207,7 +207,21 @@ Every change to Mautic core happens via PRs. Every PR must have 2 successful tes
 
 ## Unit Tests
 
+Before executing unit tests, copy the `app/phpunit.xml.dist` file to `app/phpunit.xml`, then edit that file and update the
+database parameters to point to your test database. If you leave out those credentials, or do not update them to point to
+your test database, then your production database WILL BE TRUNCATED.
+
 The unit tests can be executed in the Mautic root directory with `composer test` command.
+
+If you get the following error when running `composer test`, you need to copy the `app/phpunit.xml.dist` file to `app/phpunit.xml`.
+
+```bash
+<error>Script phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml handling the test event returned with error code 1</error>
+```
+
+## Static Analysis
+
+Mautic uses [PHPSTAN](https://github.com/phpstan/phpstan) for some of its parts during continuous integration tests. If you want to test your specific contribution locally, install PHPSTAN globally with `composer global require phpstan/phpstan-shim`. Mautic cannot have PHPSTAN as its dev dependency, because it requires PHP7+. To run analysis on a specific bundle, run `~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/*Bundle`
 
 # FAQ and Contact Information
 Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.
@@ -217,8 +231,8 @@ Marketing automation has historically been a difficult tool to implement in a bu
 ### Contact Info
 
 * <a href="https://www.mautic.org">https://www.mautic.org</a>
-* <a href="https://twitter.com/mautic">@mautic</a> [Twitter]
-* <a href="https://facebook.com/trymautic">@trymautic</a> [Facebook]
+* <a href="https://twitter.com/MauticCommunity">@MauticCommunity</a> [Twitter]
+* <a href="https://www.facebook.com/MauticCommunity/">@MauticCommunity</a> [Facebook]
 * <a href="https://plus.google.com/+MauticOrg">+MauticOrg</a> [Google+]
 
 ### Developers

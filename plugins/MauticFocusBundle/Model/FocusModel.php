@@ -12,21 +12,30 @@
 namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class FocusModel extends FormModel
 {
+    /**
+     * @var ContainerAwareEventDispatcher
+     */
+    protected $dispatcher;
+
     /**
      * @var \Mautic\FormBundle\Model\FormModel
      */
@@ -43,17 +52,24 @@ class FocusModel extends FormModel
     protected $templating;
 
     /**
+     * @var
+     */
+    protected $leadModel;
+
+    /**
      * FocusModel constructor.
      *
      * @param \Mautic\FormBundle\Model\FormModel $formModel
      * @param TrackableModel                     $trackableModel
      * @param TemplatingHelper                   $templating
      */
-    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating)
+    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel)
     {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
         $this->templating     = $templating;
+        $this->dispatcher     = $dispatcher;
+        $this->leadModel      = $leadModel;
     }
 
     /**
@@ -158,7 +174,6 @@ class FocusModel extends FormModel
     public function getContent(Focus $focus)
     {
         $cached = $focus->getCache();
-
         if (empty($cached)) {
             $cached = $this->generateJavascript($focus);
             $focus->setCache($cached);
@@ -177,6 +192,7 @@ class FocusModel extends FormModel
      */
     public function generateJavascript($focus, $preview = false, $ignoreMinify = false)
     {
+        $focusModel = $focus;
         if ($focus instanceof Focus) {
             $focus = $focus->toArray();
         }
@@ -185,6 +201,17 @@ class FocusModel extends FormModel
             $form = $this->formModel->getEntity($focus['form']);
         } else {
             $form = null;
+        }
+        if ($focus['id'] != 'preview') {
+            $fid = $focus['id'];
+        } elseif (isset($focus['unlockId'])) {
+            $fid = $focus['unlockId'];
+        }
+        if (isset($fid) && !empty($focus['htmlMode']) && in_array($focus['htmlMode'], ['editor', 'html'])) {
+            $lead       = $this->leadModel->getCurrentLead();
+            $tokenEvent = new TokenReplacementEvent($focus[$focus['htmlMode']], $lead, ['focus_id' => $fid]);
+            $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $focus[$focus['htmlMode']] = $tokenEvent->getContent();
         }
 
         if ($preview) {
@@ -209,7 +236,7 @@ class FocusModel extends FormModel
                     $focus['id']
                 );
 
-                $url = $this->trackableModel->generateTrackableUrl($trackable, ['channel' => ['focus', $focus['id']]]);
+                $url = $this->trackableModel->generateTrackableUrl($trackable, ['channel' => ['focus', $focus['id']]], false, $focusModel->getUtmTags());
             }
 
             $content = $this->templating->getTemplating()->render(
@@ -228,7 +255,7 @@ class FocusModel extends FormModel
             }
         }
 
-        return $content;
+        return  $content;
     }
 
     /**
@@ -345,7 +372,7 @@ class FocusModel extends FormModel
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $unit);
 
-        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added');
+        $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['focus_id' => $focus->getId()]);
         if (!$canViewOthers) {
             $this->limitQueryToCreator($q);
         }
