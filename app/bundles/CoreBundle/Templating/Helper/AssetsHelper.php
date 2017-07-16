@@ -122,10 +122,10 @@ class AssetsHelper
             $path        = $assetPrefix.$path;
         }
 
-        $url = ((strpos($path, '/') !== 0)?'/':'').$path;
+        $url = $this->packages->getUrl($path, $packageName, $version);
 
         if ($absolute) {
-            $url = $this->getBaseUrl().$url;
+            $url = $this->getBaseUrl().'/'.str_replace($this->getUrl(), '', $url);
         }
 
         return $url;
