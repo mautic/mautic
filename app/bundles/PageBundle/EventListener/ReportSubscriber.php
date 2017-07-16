@@ -243,6 +243,88 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addGraph($context, 'table', 'mautic.page.table.most.visited.unique');
             }
         }
+        if ($event->checkContext(['video.hits'])) {
+            $hitPrefix  = 'vh.';
+            $hitColumns = [
+                $hitPrefix.'date_hit' => [
+                    'label'          => 'mautic.page.report.hits.date_hit',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$hitPrefix.'date_hit)',
+                ],
+                $hitPrefix.'country' => [
+                    'label' => 'mautic.page.report.hits.country',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'region' => [
+                    'label' => 'mautic.page.report.hits.region',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'city' => [
+                    'label' => 'mautic.page.report.hits.city',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'isp' => [
+                    'label' => 'mautic.page.report.hits.isp',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'organization' => [
+                    'label' => 'mautic.page.report.hits.organization',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'code' => [
+                    'label' => 'mautic.page.report.hits.code',
+                    'type'  => 'int',
+                ],
+                $hitPrefix.'referer' => [
+                    'label' => 'mautic.page.report.hits.referer',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'url' => [
+                    'label' => 'mautic.page.report.hits.url',
+                    'type'  => 'url',
+                ],
+                $hitPrefix.'url_title' => [
+                    'label' => 'mautic.page.report.hits.url_title',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'user_agent' => [
+                    'label' => 'mautic.page.report.hits.user_agent',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'remote_host' => [
+                    'label' => 'mautic.page.report.hits.remote_host',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'browser_languages' => [
+                    'label' => 'mautic.page.report.hits.browser_languages',
+                    'type'  => 'array',
+                ],
+                $hitPrefix.'channel' => [
+                    'label' => 'mautic.report.field.source',
+                    'type'  => 'string',
+                ],
+                $hitPrefix.'channel_id' => [
+                    'label' => 'mautic.report.field.source_id',
+                    'type'  => 'int',
+                ],
+                'time_watched' => [
+                    'label'   => 'mautic.page.report.hits.time_watched',
+                    'type'    => 'string',
+                    'formula' => 'SEC_TO_TIME('.$hitPrefix.'time_watched)',
+                ],
+                'duration' => [
+                    'label'   => 'mautic.page.report.hits.duration',
+                    'type'    => 'string',
+                    'formula' => 'SEC_TO_TIME('.$hitPrefix.'duration)',
+                ],
+            ];
+
+            $data = [
+                'display_name' => 'mautic.video.hits',
+                'columns'      => array_merge($hitColumns, $event->getLeadColumns(), $event->getIpColumn()),
+            ];
+            $event->addTable('video.hits', $data, 'videos');
+        }
     }
 
     /**
@@ -278,8 +360,15 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addLeadLeftJoin($qb, 'ph');
                 $event->addCampaignByChannelJoin($qb, 'p', 'page');
                 break;
-        }
+            case 'video.hits':
+                $event->applyDateFilters($qb, 'date_hit', 'vh');
 
+                $qb->from(MAUTIC_TABLE_PREFIX.'video_hits', 'vh');
+
+                $event->addIpAddressLeftJoin($qb, 'vh');
+                $event->addLeadLeftJoin($qb, 'vh');
+                break;
+        }
         $event->setQueryBuilder($qb);
     }
 
