@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,21 +13,20 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Doctrine\ORM\Query;
 
 /**
- * LeadNoteRepository
+ * LeadNoteRepository.
  */
 class LeadNoteRepository extends CommonRepository
 {
-
     /**
-     * {@inhertidoc}
+     * {@inhertidoc}.
      *
-     * @param array      $args
+     * @param array $args
+     *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('n')
@@ -41,6 +42,7 @@ class LeadNoteRepository extends CommonRepository
      * @param $noteTypes
      *
      * @return mixed
+     *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -54,17 +56,18 @@ class LeadNoteRepository extends CommonRepository
 
         if ($filter != null) {
             $q->andWhere(
-                $q->expr()->like('n.text', ":filter")
+                $q->expr()->like('n.text', ':filter')
             )->setParameter('filter', '%'.$filter.'%');
         }
 
         if ($noteTypes != null) {
             $q->andWhere(
-                $q->expr()->in('n.type', ":noteTypes")
+                $q->expr()->in('n.type', ':noteTypes')
             )->setParameter('noteTypes', $noteTypes);
         }
 
         $results = $q->getQuery()->getArrayResult();
+
         return $results[0]['note_count'];
     }
 
@@ -78,71 +81,80 @@ class LeadNoteRepository extends CommonRepository
         return 'n';
     }
 
-
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
+     *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->like('n.text', ":$unique");
-
-        if ($filter->not) {
-            $q->expr()->not($expr);
-        }
-
-        return array(
-            $expr,
-            array("$unique" => $string)
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'n.text',
+            ]
         );
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
+     *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
-        $command         = $filter->command;
-        $string          = $filter->string;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $string                  = $filter->string;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.note.searchcommand.type'):
-                switch($string) {
+            case $this->translator->trans('mautic.lead.note.searchcommand.type', [], null, 'en_US'):
+                switch ($string) {
                     case $this->translator->trans('mautic.lead.note.searchcommand.general'):
-                        $filter->string = 'general';
+                    case $this->translator->trans('mautic.lead.note.searchcommand.general', [], null, 'en_US'):
+                        $filter->string  = 'general';
+                        $returnParameter = true;
                         break;
                     case $this->translator->trans('mautic.lead.note.searchcommand.call'):
-                        $filter->string = 'call';
+                    case $this->translator->trans('mautic.lead.note.searchcommand.call', [], null, 'en_US'):
+                        $filter->string  = 'call';
+                        $returnParameter = true;
                         break;
                     case $this->translator->trans('mautic.lead.note.searchcommand.email'):
-                        $filter->string = 'email';
+                    case $this->translator->trans('mautic.lead.note.searchcommand.email', [], null, 'en_US'):
+                        $filter->string  = 'email';
+                        $returnParameter = true;
                         break;
                     case $this->translator->trans('mautic.lead.note.searchcommand.meeting'):
-                        $filter->string = 'meeting';
+                    case $this->translator->trans('mautic.lead.note.searchcommand.meeting', [], null, 'en_US'):
+                        $filter->string  = 'meeting';
+                        $returnParameter = true;
                         break;
                 }
-                $expr = $q->expr()->eq('n.type', ":$unique");
+                $expr           = $q->expr()->eq('n.type', ":$unique");
                 $filter->strict = true;
                 break;
         }
 
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
         }
-        return array(
+
+        if ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = ["$unique" => $string];
+        }
+
+        return [
             $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
-        );
+            $parameters,
+        ];
     }
 
     /**
@@ -150,18 +162,20 @@ class LeadNoteRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
-            'mautic.lead.note.searchcommand.type' => array(
+        $commands = [
+            'mautic.lead.note.searchcommand.type' => [
                 'mautic.lead.note.searchcommand.general',
                 'mautic.lead.note.searchcommand.call',
                 'mautic.lead.note.searchcommand.email',
-                'mautic.lead.note.searchcommand.meeting'
-            )
-        );
+                'mautic.lead.note.searchcommand.meeting',
+            ],
+        ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
-     * Updates lead ID (e.g. after a lead merge)
+     * Updates lead ID (e.g. after a lead merge).
      *
      * @param $fromLeadId
      * @param $toLeadId
@@ -169,9 +183,9 @@ class LeadNoteRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $this->_em->getConnection()->createQueryBuilder()
-            ->update(MAUTIC_TABLE_PREFIX . 'lead_notes')
-            ->set('lead_id', (int)$toLeadId)
-            ->where('lead_id = ' . (int)$fromLeadId)
+            ->update(MAUTIC_TABLE_PREFIX.'lead_notes')
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
             ->execute();
     }
 }

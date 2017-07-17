@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
@@ -15,6 +17,7 @@
             <div class="col-xs-2 text-right pull-left">
                 <?php $view['slots']->output('publishStatus'); ?>
             </div>
+            <?php echo $view['content']->getCustomContent('page.header.left', $mauticTemplateVars); ?>
         </div>
         <div class="col-xs-7 col-sm-6 col-md-7 va-m">
             <div class="toolbar text-right" id="toolbar">
@@ -30,8 +33,11 @@
                         <ul class="dropdown-menu dropdown-menu-right" role="menu"></ul>
                     </div>
                 </div>
+                <?php echo $view['content']->getCustomContent('page.header.right', $mauticTemplateVars); ?>
             </div>
             <div class="clearfix"></div>
+
         </div>
+
     </div>
 </div>

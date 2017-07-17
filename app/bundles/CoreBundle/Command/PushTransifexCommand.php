@@ -1,29 +1,27 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
- * CLI Command to push language resources to Transifex
+ * CLI Command to push language resources to Transifex.
  */
 class PushTransifexCommand extends ContainerAwareCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -31,13 +29,13 @@ class PushTransifexCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:transifex:push')
             ->setDescription('Pushes Mautic translation resources to Transifex')
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputOption(
                     'create', null, InputOption::VALUE_NONE,
                     'Flag to create new resources.'
-                )
-            ))
-            ->setHelp(<<<EOT
+                ),
+            ])
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
 
 <info>php %command.full_name%</info>
@@ -75,20 +73,20 @@ EOT
 
         foreach ($files as $bundle => $stringFiles) {
             foreach ($stringFiles as $file) {
-                $name  = $bundle . ' ' . str_replace('.ini', '', basename($file));
+                $name  = $bundle.' '.str_replace('.ini', '', basename($file));
                 $alias = $this->stringURLUnicodeSlug($name);
-                $output->writeln($translator->trans('mautic.core.command.transifex_processing_resource', array('%resource%' => $name)));
+                $output->writeln($translator->trans('mautic.core.command.transifex_processing_resource', ['%resource%' => $name]));
 
                 try {
                     if ($create) {
-                        $transifex->resources->createResource('mautic', $name, $alias, 'PHP_INI', array('file' => $file));
+                        $transifex->resources->createResource('mautic', $name, $alias, 'PHP_INI', ['file' => $file]);
                         $output->writeln($translator->trans('mautic.core.command.transifex_resource_created'));
                     } else {
                         $transifex->resources->updateResourceContent('mautic', $alias, $file, 'file');
                         $output->writeln($translator->trans('mautic.core.command.transifex_resource_updated'));
                     }
                 } catch (\Exception $exception) {
-                    $output->writeln($translator->trans('mautic.core.command.transifex_error_pushing_data', array('%message%' => $exception->getMessage())));
+                    $output->writeln($translator->trans('mautic.core.command.transifex_error_pushing_data', ['%message%' => $exception->getMessage()]));
                 }
             }
         }
@@ -97,22 +95,22 @@ EOT
     }
 
     /**
-     * Returns Mautic translation files
+     * Returns Mautic translation files.
      *
      * @return array
      */
     private function getLanguageFiles()
     {
-        $files = array();
+        $files         = [];
         $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
-        $pluginBundles  = $this->getContainer()->getParameter('mautic.plugin.bundles');
+        $pluginBundles = $this->getContainer()->getParameter('mautic.plugin.bundles');
 
         foreach ($mauticBundles as $bundle) {
             // Parse the namespace into a filepath
-            $translationsDir = $bundle['directory'] . '/Translations/en_US';
+            $translationsDir = $bundle['directory'].'/Translations/en_US';
 
             if (is_dir($translationsDir)) {
-                $files[$bundle['bundle']] = array();
+                $files[$bundle['bundle']] = [];
 
                 // Get files within the directory
                 $finder = new Finder();
@@ -127,10 +125,10 @@ EOT
 
         foreach ($pluginBundles as $bundle) {
             // Parse the namespace into a filepath
-            $translationsDir = $bundle['directory'] . '/Translations/en_US';
+            $translationsDir = $bundle['directory'].'/Translations/en_US';
 
             if (is_dir($translationsDir)) {
-                $files[$bundle['bundle']] = array();
+                $files[$bundle['bundle']] = [];
 
                 // Get files within the directory
                 $finder = new Finder();

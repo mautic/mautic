@@ -1,17 +1,21 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\NotificationBundle\Helper\NotificationHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -19,6 +23,28 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
+    /**
+     * @var NotificationHelper
+     */
+    protected $notificationHelper;
+
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
+     * BuildJsSubscriber constructor.
+     *
+     * @param NotificationHelper $notificationHelper
+     * @param IntegrationHelper  $integrationHelper
+     */
+    public function __construct(NotificationHelper $notificationHelper, IntegrationHelper $integrationHelper)
+    {
+        $this->notificationHelper = $notificationHelper;
+        $this->integrationHelper  = $integrationHelper;
+    }
+
     /**
      * @return array
      */
@@ -34,15 +60,26 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $router = $this->factory->getRouter();
-        $subscribeUrl = $router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
+        $subscribeUrl   = $this->router->generate('mautic_notification_popup', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $subscribeTitle = 'Subscribe To Notifications';
-        $width = 450;
-        $height = 450;
+        $width          = 450;
+        $height         = 450;
 
         $js = <<<JS
+        
+        {$this->notificationHelper->getHeaderScript()}
+       
 MauticJS.notification = {
     init: function () {
+        
+        {$this->notificationHelper->getScript()}
+         
         var subscribeButton = document.getElementById('mautic-notification-subscribe');
 
         if (subscribeButton) {

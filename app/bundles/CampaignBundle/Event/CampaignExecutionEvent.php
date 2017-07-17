@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,7 +15,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CampaignExecutionEvent
+ * Class CampaignExecutionEvent.
  */
 class CampaignExecutionEvent extends Event
 {
@@ -52,13 +54,25 @@ class CampaignExecutionEvent extends Event
      */
     protected $eventSettings;
 
-    /** @var LeadEventLog */
+    /**
+     * @var LeadEventLog|null
+     */
     protected $log;
 
     /**
      * @var bool
      */
     protected $logUpdatedByListener = false;
+
+    /**
+     * @var
+     */
+    protected $channel;
+
+    /**
+     * @var
+     */
+    protected $channelId;
 
     /**
      * CampaignExecutionEvent constructor.
@@ -129,21 +143,31 @@ class CampaignExecutionEvent extends Event
 
     /**
      * @param $result
+     *
+     * @return $this
      */
     public function setResult($result)
     {
         $this->result = $result;
+
+        return $this;
     }
 
     /**
-     * Set the result to failed
+     * Set the result to failed.
+     *
+     * @param null $reason
+     *
+     * @return $this
      */
     public function setFailed($reason = null)
     {
         $this->result = [
             'failed' => 1,
-            'reason' => $reason
+            'reason' => $reason,
         ];
+
+        return $this;
     }
 
     /**
@@ -155,14 +179,18 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * Set a custom log entry to override auto-handling of the log entry
+     * Set a custom log entry to override auto-handling of the log entry.
      *
      * @param LeadEventLog $log
+     *
+     * @return $this
      */
     public function setLogEntry(LeadEventLog $log)
     {
         $this->logUpdatedByListener = true;
         $this->log                  = $log;
+
+        return $this;
     }
 
     /**
@@ -174,7 +202,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * Returns if a listener updated the log entry
+     * Returns if a listener updated the log entry.
      *
      * @return bool
      */
@@ -184,25 +212,48 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * Check if an event is applicable
+     * Check if an event is applicable.
      *
      * @param $eventType
      */
     public function checkContext($eventType)
     {
-        return (strtolower($eventType) == strtolower($this->event['type']));
+        return strtolower($eventType) == strtolower($this->event['type']);
     }
 
     /**
      * @param      $channel
      * @param null $channelId
+     *
+     * @return $this
      */
     public function setChannel($channel, $channelId = null)
     {
         if (null !== $this->log) {
             // Set the channel since we have the resource
             $this->log->setChannel($channel)
-                ->setChannelId($channelId);
+                      ->setChannelId($channelId);
         }
+
+        $this->channel   = $channel;
+        $this->channelId = $channelId;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannel()
+    {
+        return $this->channel;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getChannelId()
+    {
+        return $this->channelId;
     }
 }

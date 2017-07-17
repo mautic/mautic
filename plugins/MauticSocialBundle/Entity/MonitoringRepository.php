@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,23 +15,28 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class MonitoringRepository
+ * Class MonitoringRepository.
  */
 class MonitoringRepository extends CommonRepository
 {
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities(array $args = [])
     {
         return parent::getEntities($args);
     }
 
-    public function getPublishedEntities($args = array())
+    /**
+     * @param array $args
+     *
+     * @return Paginator
+     */
+    public function getPublishedEntities($args = [])
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);
@@ -40,8 +47,8 @@ class MonitoringRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /*
-     *
+    /**
+     * @return float|int
      */
     public function getPublishedEntitiesCount()
     {
@@ -50,34 +57,34 @@ class MonitoringRepository extends CommonRepository
         $q->where($expr);
         $args['qb'] = $q;
 
-        return (parent::getEntities($args)->count());
+        return parent::getEntities($args)->count();
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
             $filter,
-            array(
+            [
                 $this->getTableAlias().'.title',
-                $this->getTableAlias().'.description'
-            )
+                $this->getTableAlias().'.description',
+            ]
         );
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }

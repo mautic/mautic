@@ -1,21 +1,42 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\PageBundle\EventListener;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 /**
- * Class BuildJsSubscriber
+ * Class BuildJsSubscriber.
  */
 class BuildJsSubscriber extends CommonSubscriber
 {
+    /**
+     * @var AssetsHelper
+     */
+    protected $assetsHelper;
+
+    /**
+     * BuildJsSubscriber constructor.
+     *
+     * @param AssetsHelper $assetsHelper
+     */
+    public function __construct(AssetsHelper $assetsHelper)
+    {
+        $this->assetsHelper = $assetsHelper;
+    }
+
     /**
      * @return array
      */
@@ -24,100 +45,202 @@ class BuildJsSubscriber extends CommonSubscriber
         return [
             CoreEvents::BUILD_MAUTIC_JS => [
                 ['onBuildJs', 255],
-                ['onBuildJsForVideo', 256]
-            ]
+                ['onBuildJsForVideo', 256],
+            ],
         ];
     }
 
     /**
      * @param BuildJsEvent $event
-     *
-     * @return void
      */
     public function onBuildJs(BuildJsEvent $event)
     {
-        $router = $this->factory->getRouter();
-        $pageTrackingUrl = str_replace(
-            array('http://', 'https://'),
+        $pageTrackingUrl = $this->router->generate('mautic_page_tracker', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        // Determine if this is https
+        $parts           = parse_url($pageTrackingUrl);
+        $scheme          = $parts['scheme'];
+        $pageTrackingUrl = str_replace(['http://', 'https://'], '', $pageTrackingUrl);
+
+        $pageTrackingCORSUrl = str_replace(
+            ['http://', 'https://'],
             '',
-            $router->generate('mautic_page_tracker', array(), UrlGeneratorInterface::ABSOLUTE_URL)
+            $this->router->generate('mautic_page_tracker_cors', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+        $contactIdUrl = str_replace(
+            ['http://', 'https://'],
+            '',
+            $this->router->generate('mautic_page_tracker_getcontact', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
 
         $js = <<<JS
 (function(m, l, n, d) {
-    m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : 'http:') + '//{$pageTrackingUrl}';
+    m.pageTrackingUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingUrl}';
+    m.pageTrackingCORSUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$pageTrackingCORSUrl}';
+    m.contactIdUrl = (l.protocol == 'https:' ? 'https:' : '{$scheme}:') + '//{$contactIdUrl}';
+    m.fingerprint = null;
+    m.fingerprintComponents = null;
+    m.fingerprintIsLoading = false;
+    
+    m.addFingerprint = function(params) {
+        for (var componentId in m.fingerprintComponents) {
+            var component = m.fingerprintComponents[componentId];
+            if (typeof component.key !== 'undefined') {
+                if (component.key === 'resolution') {
+                    params.resolution = component.value[0] + 'x' + component.value[1];
+                } else if (component.key === 'timezone_offset') {
+                    params.timezone_offset = component.value;
+                } else if (component.key === 'navigator_platform') {
+                    params.platform = component.value;
+                } else if (component.key === 'adblock') {
+                    params.adblock = component.value;
+                } else if (component.key === 'do_not_track') {
+                    params.do_not_track = component.value;
+                }
+            }
+        }
+        params.fingerprint = m.fingerprint;
+        
+        return params;
+    }
 
-    m.sendPageview = function(pageview) {
+    m.deliverPageEvent = function(event, params) {
+        if (!m.firstDeliveryMade && params['counter'] > 0) {
+            // Wait for the first delivery to complete so that the tracking information is set
+            setTimeout(function () {
+                m.deliverPageEvent(event, params);
+            }, 5);
+            
+            return;
+        }
+        
+        if (m.fingerprintComponents) {
+            params = m.addFingerprint(params);
+        }
+        
+        MauticJS.makeCORSRequest('POST', m.pageTrackingCORSUrl, params, 
+        function(response) {
+            MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': event, 'params': params, 'response': response});
+        },
+        function() {
+            // CORS failed so load an image
+            m.buildTrackingImage(event, params);
+            m.firstDeliveryMade = true;
+        });
+    }
+    
+    m.buildTrackingImage = function(pageview, params) {
+        delete m.trackingPixel;
+        m.trackingPixel = new Image();
 
-        var params = {
-            page_title: d.title,
-            page_language: n.language,
-            page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
-            page_url: l.href
+        if (typeof pageview[3] === 'object') {
+            var events = ['onabort', 'onerror', 'onload'];
+            for (var i = 0; i < events.length; i++) {
+                var e = events[i];
+                if (typeof pageview[3][e] === 'function') {
+                    m.trackingPixel[e] = pageview[3][e];
+                }
+            }
+        }
+        
+        m.trackingPixel.onload = function(e) {
+            MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': pageview, 'params': params, 'image': true});
         };
 
-        // Merge user defined tracking pixel parameters.
-        if (typeof pageview[2] === 'object') {
-            for (var attr in pageview[2]) {
-                params[attr] = pageview[2][attr];
+        m.trackingPixel.src = m.pageTrackingUrl + '?' + m.serialize(params);
+    }
+
+    m.pageViewCounter = 0;
+    m.sendPageview = function(pageview) {
+        var queue = [];
+
+        if (!pageview) {
+            if (typeof m.getInput === 'function') {
+                queue = m.getInput('send', 'pageview');
+            } else {
+                return false;
             }
+        } else {
+            queue.push(pageview);
         }
 
-        new Fingerprint2().get(function(result, components) {
-            params.fingerprint = result;
-            for (var componentId in components) {
-                var component = components[componentId];
-                if (typeof component.key !== 'undefined') {
-                    if (component.key === 'resolution') {
-                        params.resolution = component.value[0] + 'x' + component.value[1];
-                    } else if (component.key === 'timezone_offset') {
-                        params.timezone_offset = component.value;
-                    } else if (component.key === 'navigator_platform') {
-                        params.platform = component.value;
-                    } else if (component.key === 'adblock') {
-                        params.adblock = component.value;
-                    } else if (component.key === 'do_not_track') {
-                        params.do_not_track = component.value;
+        if (queue) {
+            for (var i=0; i<queue.length; i++) {
+                var event = queue[i];
+
+                var params = {
+                    page_title: d.title,
+                    page_language: n.language,
+                    page_referrer: (d.referrer) ? d.referrer.split('/')[2] : '',
+                    page_url: l.href,
+                    counter: m.pageViewCounter
+                };
+                
+                params = MauticJS.appendTrackedContact(params);
+                
+                // Merge user defined tracking pixel parameters.
+                if (typeof event[2] === 'object') {
+                    for (var attr in event[2]) {
+                        params[attr] = event[2][attr];
                     }
                 }
+
+                m.handleFingerprintInit(event, params);
+                
+                m.pageViewCounter++;
             }
-
-            m.trackingPixel = new Image();
-
-            if (typeof pageview[3] === 'object') {
-                if (typeof pageview[3]['onload'] === 'function') {
-                    m.trackingPixel.onload = pageview[3]['onload'];
-                }
-            }
-
-            m.trackingPixel.src = m.pageTrackingUrl + '?' + m.serialize(params);
-        });
-
-        
-    }
-
-    if (typeof m.getInput === 'function') {
-        var pageview = m.getInput('send', 'pageview');
-
-        if (pageview) {
-            m.sendPageview(pageview)
         }
     }
 
+    m.handleFingerprintInit = function(event, params) {
+        if (m.fingerprintComponents) {
+            // Already loaded
+            m.deliverPageEvent(event, params);
+        } else if (!m.fingerprint && m.fingerprintIsLoading === false) {
+            m.fingerprintIsLoading = true;
+            new Fingerprint2().get(function(result, components) {
+                m.fingerprintIsLoading = false;
+                m.fingerprint = result;
+                m.fingerprintComponents = components;
+                m.deliverPageEvent(event, params);
+            });
+        } else if (m.fingerprintIsLoading === true) {
+            var fingerprintLoop = window.setInterval(function() {
+                if (m.fingerprintIsLoading === false) {
+                    m.deliverPageEvent(event, params);
+                    clearInterval(fingerprintLoop);
+                }
+            }, 5);
+        } else {
+            m.deliverPageEvent(event, params);
+        }
+    }
+
+    // Process pageviews after mtc.js loaded
+    m.sendPageview();
+
+    // Process pageviews after new are added
+    document.addEventListener('eventAddedToMauticQueue', function(e) {
+        m.sendPageview(e.detail);
+    });
 })(MauticJS, location, navigator, document);
 JS;
 
         $event->appendJs($js, 'Mautic Tracking Pixel');
     }
 
+    /**
+     * @param BuildJsEvent $event
+     */
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
-        $router = $this->factory->getRouter();
-        $assetsHelper = $this->factory->getHelper('template.assets');
-        $formSubmitUrl = $router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $mauticBaseUrl = $router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $mediaElementCss = $assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
-        $jQueryUrl = $assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
+        $formSubmitUrl   = $this->router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
+        $jQueryUrl       = $this->assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
+
+        $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
+        $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
+        $jQueryUrl       = str_replace('/index_dev.php', '', $jQueryUrl);
 
         $mediaElementJs = <<<'JS'
 /*!
@@ -153,8 +276,13 @@ JS;
         $js = <<<JS
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
-    
+    if (MauticJS.videoElements.length) {
+        MauticJS.videoElements = Array.prototype.filter.call(MauticJS.videoElements, function(videoElements){
+            return null !== videoElements.attributes.getNamedItem('data-form-id');
+        });
+    }
     if (! MauticJS.videoElements.length) {
+        MauticJS.videoElements = null;
         return;
     }
 

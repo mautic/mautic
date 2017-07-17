@@ -1,18 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CampaignScheduledEvent
+ * Class CampaignScheduledEvent.
  */
 class CampaignScheduledEvent extends Event
 {
@@ -52,11 +55,17 @@ class CampaignScheduledEvent extends Event
     protected $eventSettings;
 
     /**
-     * Construct
-     *
-     * @param $args
+     * @var LeadEventLog
      */
-    public function __construct($args)
+    protected $log;
+
+    /**
+     * CampaignScheduledEvent constructor.
+     *
+     * @param                   $args
+     * @param LeadEventLog|null $log
+     */
+    public function __construct(array $args, LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
@@ -65,6 +74,8 @@ class CampaignScheduledEvent extends Event
         $this->systemTriggered = $args['systemTriggered'];
         $this->dateScheduled   = $args['dateScheduled'];
         $this->eventSettings   = $args['eventSettings'];
+
+        $this->log = $log;
     }
 
     /**
@@ -121,5 +132,13 @@ class CampaignScheduledEvent extends Event
     public function getEventSettings()
     {
         return $this->eventSettings;
+    }
+
+    /**
+     * @return LeadEventLog|null
+     */
+    public function getLog()
+    {
+        return $this->log;
     }
 }

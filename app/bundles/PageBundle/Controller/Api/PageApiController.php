@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,50 +15,41 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class PageApiController
+ * Class PageApiController.
  */
 class PageApiController extends CommonApiController
 {
-
     /**
      * {@inheritdoc}
      */
-    public function initialize (FilterControllerEvent $event)
+    public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('page');
         $this->entityClass      = 'Mautic\PageBundle\Entity\Page';
         $this->entityNameOne    = 'page';
         $this->entityNameMulti  = 'pages';
-        $this->permissionBase   = 'page:pages';
-        $this->serializerGroups = array('pageDetails', 'categoryList', 'publishDetails');
+        $this->serializerGroups = ['pageDetails', 'categoryList', 'publishDetails'];
+
+        parent::initialize($event);
     }
 
     /**
-     * Obtains a list of pages
+     * Obtains a list of pages.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEntitiesAction ()
+    public function getEntitiesAction()
     {
-        if (!$this->security->isGranted('page:pages:viewother')) {
-            $this->listFilters = array(
-                'column' => 'p.createdBy',
-                'expr'   => 'eq',
-                'value'  => $this->factory->getUser()->getId()
-            );
-        }
-
         //get parent level only
-        $this->listFilters[] = array(
+        $this->listFilters[] = [
             'column' => 'p.variantParent',
-            'expr'   => 'isNull'
-        );
+            'expr'   => 'isNull',
+        ];
 
-        $this->listFilters[] = array(
+        $this->listFilters[] = [
             'column' => 'p.translationParent',
-            'expr'   => 'isNull'
-        );
+            'expr'   => 'isNull',
+        ];
 
         return parent::getEntitiesAction();
     }
@@ -64,7 +57,7 @@ class PageApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    protected function preSerializeEntity (&$entity, $action = 'view')
+    protected function preSerializeEntity(&$entity, $action = 'view')
     {
         $entity->url = $this->model->generateUrl($entity);
     }

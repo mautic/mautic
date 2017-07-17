@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,10 +15,9 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Class MaintenanceSubscriber
+ * Class MaintenanceSubscriber.
  */
 class MaintenanceSubscriber extends CommonSubscriber
 {
@@ -28,30 +29,27 @@ class MaintenanceSubscriber extends CommonSubscriber
     /**
      * MaintenanceSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param Connection    $db
+     * @param Connection $db
      */
-    public function __construct(MauticFactory $factory, Connection $db)
+    public function __construct(Connection $db)
     {
-        parent::__construct($factory);
-
         $this->db = $db;
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', 10] // Cleanup before visitors are processed
+            CoreEvents::MAINTENANCE_CLEANUP_DATA => ['onDataCleanup', 10], // Cleanup before visitors are processed
         ];
     }
 
     /**
      * @param MaintenanceEvent $event
      */
-    public function onDataCleanup (MaintenanceEvent $event)
+    public function onDataCleanup(MaintenanceEvent $event)
     {
         $this->cleanData($event, 'page_hits');
         $this->cleanData($event, 'lead_utmtags');

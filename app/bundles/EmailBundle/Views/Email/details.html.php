@@ -1,16 +1,19 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+if (!$isEmbedded) {
+    $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'email');
-$view['slots']->set("headerTitle", $email->getName());
-
+    $view['slots']->set('mauticContent', 'email');
+    $view['slots']->set('headerTitle', $email->getName());
+}
 $variantContent = $view->render(
     'MauticCoreBundle:Variant:index.html.php',
     [
@@ -21,7 +24,8 @@ $variantContent = $view->render(
         'actionRoute'   => 'mautic_email_action',
     ]
 );
-$showVariants    = !empty(trim($variantContent));
+
+$showVariants = !empty(trim($variantContent));
 
 $translationContent = $view->render(
     'MauticCoreBundle:Translation:index.html.php',
@@ -32,7 +36,7 @@ $translationContent = $view->render(
         'actionRoute'  => 'mautic_email_action',
     ]
 );
-$showTranslations   = !empty(trim($translationContent));
+$showTranslations = !empty(trim($translationContent));
 
 $emailType = $email->getEmailType();
 if (empty($emailType)) {
@@ -40,70 +44,74 @@ if (empty($emailType)) {
 }
 
 $customButtons = [];
-
-if ($emailType == 'list') {
-    $customButtons[] = [
-        'attr'      => [
-            'data-toggle' => 'ajax',
-            'href'        => $view['router']->path(
-                'mautic_email_action',
-                ['objectAction' => 'send', 'objectId' => $email->getId()]
-            ),
-        ],
-        'iconClass' => 'fa fa-send-o',
-        'btnText'   => 'mautic.email.send',
-    ];
-}
-
-$customButtons[] = [
-    'attr'      => [
-        'data-toggle' => 'ajax',
-        'href'        => $view['router']->path(
-            'mautic_email_action',
-            ['objectAction' => 'example', 'objectId' => $email->getId()]
-        ),
-    ],
-    'iconClass' => 'fa fa-send',
-    'btnText'   => 'mautic.email.send.example',
-];
-
-// Only show A/B test button if not already a translation of an a/b test
-$allowAbTest = $email->isTranslation(true) && $translations['parent']->isVariant(true) ? false : true;
-
-$view['slots']->set(
-    'actions',
-    $view->render(
-        'MauticCoreBundle:Helper:page_actions.html.php',
-        [
-            'item'             => $email,
-            'templateButtons'  => [
-                'edit'   => $view['security']->hasEntityAccess(
-                    $permissions['email:emails:editown'],
-                    $permissions['email:emails:editother'],
-                    $email->getCreatedBy()
-                ),
-                'clone'  => $permissions['email:emails:create'],
-                'abtest' => ($allowAbTest && $permissions['email:emails:create']),
-                'delete' => $view['security']->hasEntityAccess(
-                    $permissions['email:emails:deleteown'],
-                    $permissions['email:emails:deleteother'],
-                    $email->getCreatedBy()
-                ),
-                'close'  => $view['security']->hasEntityAccess(
-                    $permissions['email:emails:viewown'],
-                    $permissions['email:emails:viewother'],
-                    $email->getCreatedBy()
+if (!$isEmbedded) {
+    if ($emailType == 'list') {
+        $customButtons[] = [
+            'attr' => [
+                'data-toggle' => 'ajax',
+                'href'        => $view['router']->path(
+                    'mautic_email_action',
+                    ['objectAction' => 'send', 'objectId' => $email->getId()]
                 ),
             ],
-            'routeBase'        => 'email',
-            'preCustomButtons' => $customButtons,
-        ]
-    )
-);
-$view['slots']->set(
-    'publishStatus',
-    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $email])
-);
+            'iconClass' => 'fa fa-send-o',
+            'btnText'   => 'mautic.email.send',
+            'primary'   => true,
+        ];
+    }
+
+    $customButtons[] = [
+        'attr' => [
+            'class'       => 'btn btn-default btn-nospin',
+            'data-toggle' => 'ajaxmodal',
+            'data-target' => '#MauticSharedModal',
+            'href'        => $view['router']->path('mautic_email_action', ['objectAction' => 'sendExample', 'objectId' => $email->getId()]),
+            'data-header' => $view['translator']->trans('mautic.email.send.example'),
+        ],
+        'iconClass' => 'fa fa-send',
+        'btnText'   => 'mautic.email.send.example',
+        'primary'   => true,
+    ];
+}
+// Only show A/B test button if not already a translation of an a/b test
+$allowAbTest = $email->isTranslation(true) && $translations['parent']->isVariant(true) ? false : true;
+if (!$isEmbedded) {
+    $view['slots']->set(
+        'actions',
+        $view->render(
+            'MauticCoreBundle:Helper:page_actions.html.php',
+            [
+                'item'            => $email,
+                'templateButtons' => [
+                    'edit' => $view['security']->hasEntityAccess(
+                        $permissions['email:emails:editown'],
+                        $permissions['email:emails:editother'],
+                        $email->getCreatedBy()
+                    ),
+                    'clone'  => $permissions['email:emails:create'],
+                    'abtest' => ($allowAbTest && $permissions['email:emails:create']),
+                    'delete' => $view['security']->hasEntityAccess(
+                        $permissions['email:emails:deleteown'],
+                        $permissions['email:emails:deleteother'],
+                        $email->getCreatedBy()
+                    ),
+                    'close' => $view['security']->hasEntityAccess(
+                        $permissions['email:emails:viewown'],
+                        $permissions['email:emails:viewother'],
+                        $email->getCreatedBy()
+                    ),
+                ],
+                'routeBase'     => 'email',
+                'customButtons' => $customButtons,
+            ]
+        )
+    );
+
+    $view['slots']->set(
+        'publishStatus',
+        $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $email])
+    );
+}
 ?>
 
 <!-- start: box layout -->
@@ -214,7 +222,7 @@ $view['slots']->set(
                     'email'         => $email,
                     'isVariant'     => ($showTranslations || $showVariants),
                     'showAllStats'  => $showAllStats,
-                    'dateRangeForm' => $dateRangeForm
+                    'dateRangeForm' => $dateRangeForm,
                 ]
             ); ?>
 

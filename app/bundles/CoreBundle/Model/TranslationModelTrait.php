@@ -1,27 +1,29 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
-use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Provides helper methods for determine the requested language from contact's profile and/or request
+ * Provides helper methods for determine the requested language from contact's profile and/or request.
  *
  * Class TranslationModelTrait
  */
 trait TranslationModelTrait
 {
     /**
-     * Get the entity based on requested translation
+     * Get the entity based on requested translation.
      *
      *
      * @param TranslationEntityInterface $entity
@@ -33,6 +35,8 @@ trait TranslationModelTrait
     public function getTranslatedEntity(TranslationEntityInterface $entity, $lead = null, Request $request = null)
     {
         list($translationParent, $translationChildren) = $entity->getTranslations();
+
+        $leadPreference = $chosenLanguage = null;
 
         if (count($translationChildren)) {
             if ($translationParent) {
@@ -90,9 +94,8 @@ trait TranslationModelTrait
                 }
             }
 
-            $matchFound     = false;
-            $preferredCore  = false;
-            $chosenLanguage = null;
+            $matchFound    = false;
+            $preferredCore = false;
             foreach ($languageList as $language) {
                 $core = $this->getTranslationLocaleCore($language);
                 if (isset($translationList[$core])) {
@@ -121,7 +124,7 @@ trait TranslationModelTrait
         }
 
         // Save the preferred language to the lead's profile
-        if (!$leadPreference && $chosenLanguage && $lead instanceof Lead) {
+        if (!$leadPreference && !empty($chosenLanguage) && $lead instanceof Lead) {
             $lead->addUpdatedField('preferred_locale', $chosenLanguage);
         }
 
@@ -130,7 +133,7 @@ trait TranslationModelTrait
     }
 
     /**
-     * Run post saving a translation aware entity
+     * Run post saving a translation aware entity.
      *
      * @param TranslationEntityInterface $entity
      */

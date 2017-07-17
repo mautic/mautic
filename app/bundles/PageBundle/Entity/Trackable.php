@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,9 +16,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Class Trackable
- *
- * @package Mautic\PageBundle\Entity
+ * Class Trackable.
  */
 class Trackable
 {
@@ -48,13 +48,13 @@ class Trackable
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('channel_url_trackables')
             ->setCustomRepositoryClass('Mautic\PageBundle\Entity\TrackableRepository')
-            ->addIndex(array('channel', 'channel_id'), 'channel_url_trackable_search');
+            ->addIndex(['channel', 'channel_id'], 'channel_url_trackable_search');
 
         $builder->createManyToOne('redirect', 'Mautic\PageBundle\Entity\Redirect')
             ->addJoinColumn('redirect_id', 'id', true, false, 'CASCADE')
@@ -76,7 +76,7 @@ class Trackable
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -84,13 +84,13 @@ class Trackable
     {
         $metadata->setGroupPrefix('trackable')
             ->addListProperties(
-                array(
+                [
                     'redirect',
                     'channelId',
                     'channel',
                     'hits',
-                    'uniqueHits'
-                )
+                    'uniqueHits',
+                ]
             )
             ->build();
     }

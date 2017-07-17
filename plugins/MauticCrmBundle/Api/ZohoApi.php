@@ -1,4 +1,5 @@
 <?php
+
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -7,23 +8,23 @@ class ZohoApi extends CrmApi
 {
     private $module = 'Leads';
 
-    protected function request($operation, $parameters = array(), $method = 'GET')
+    protected function request($operation, $parameters = [], $method = 'GET')
     {
         $tokenData = $this->integration->getKeys();
         $url       = sprintf('%s/%s/%s', $this->integration->getApiUrl(), $this->module, $operation);
 
-        $parameters  = array_merge(array(
+        $parameters = array_merge([
             'authtoken' => $tokenData['AUTHTOKEN'],
-            'scope'     => 'crmapi'
-        ), $parameters);
+            'scope'     => 'crmapi',
+        ], $parameters);
 
         $response = $this->integration->makeRequest($url, $parameters, $method);
 
         if (!empty($response['response']['error'])) {
             $response = $response['response'];
-            $errorMsg = $response['error']['message'] . ' (' . $response['error']['code'] . ')';
+            $errorMsg = $response['error']['message'].' ('.$response['error']['code'].')';
             if (isset($response['uri'])) {
-                $errorMsg .= '; ' . $response['uri'];
+                $errorMsg .= '; '.$response['uri'];
             }
             throw new ApiErrorException($errorMsg);
         }
@@ -32,11 +33,11 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * List types
+     * List types.
      *
      * @return mixed
      */
-    public function getLeadFields ()
+    public function getLeadFields()
     {
         return $this->request('getFields');
     }
@@ -46,12 +47,12 @@ class ZohoApi extends CrmApi
      *
      * @return array
      */
-    public function createLead ($data)
+    public function createLead($data)
     {
-        $parameters  = array(
+        $parameters = [
             'xmlData'        => $data,
-            'duplicateCheck' => 2 //update if exists
-        );
+            'duplicateCheck' => 2, //update if exists
+        ];
 
         return $this->request('insertRecords', $parameters, 'POST');
     }

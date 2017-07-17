@@ -1,34 +1,42 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:slim.html.php');
 $view['slots']->set('mauticContent', 'social');
+
 $data = json_encode($data);
-$js = <<<JS
+$js   = <<<JS
 function postFormHandler() {
     var opener = window.opener;
-    if(opener && typeof opener.postAuthCallback == 'function') {
-            opener.postAuthCallback({$data});
-    }else {
+    if (opener && typeof opener.postAuthCallback == 'function') {
+        opener.postAuthCallback({$data});
+    } else {
         Mautic.refreshIntegrationForm();
     }
     window.close()
-
 }
+JS;
+
+if (!empty($message) && 'success' === $alert):
+    $js .= <<<'JS'
+    
 (function() {
    postFormHandler();
 })();
 JS;
+endif;
 ?>
 <script>
     <?php echo $js; ?>
 </script>
+
 <?php if (!empty($message)): ?>
     <div class="alert alert-<?php echo $alert; ?>">
         <?php echo $message; ?>

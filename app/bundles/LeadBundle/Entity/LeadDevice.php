@@ -1,27 +1,25 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+
 /**
- * Class LeadDevice
- *
- * @package Mautic\LeadBundle\Entity
+ * Class LeadDevice.
  */
 class LeadDevice
 {
-
     /**
      * @var int
      */
@@ -35,7 +33,7 @@ class LeadDevice
     /**
      * @var array
      */
-    private $clientInfo = array();
+    private $clientInfo = [];
 
     /**
      * @var string
@@ -73,15 +71,19 @@ class LeadDevice
     private $deviceModel;
 
     /**
+     * @var string
+     */
+    private $deviceFingerprint;
+
+    /**
      * @var \DateTime
      */
     private $dateAdded;
 
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -94,11 +96,12 @@ class LeadDevice
             ->addIndex(['device_os_version'], 'device_os_version_search')
             ->addIndex(['device_os_platform'], 'device_os_platform_search')
             ->addIndex(['device_brand'], 'device_brand_search')
-            ->addIndex(['device_model'], 'device_model_search');
+            ->addIndex(['device_model'], 'device_model_search')
+            ->addIndex(['device_fingerprint'], 'device_fingerprint_search');
 
         $builder->addId();
 
-        $builder->addLead(false, 'CASCADE');
+        $builder->addLead(false, 'CASCADE', false);
 
         $builder->addDateAdded();
 
@@ -138,29 +141,34 @@ class LeadDevice
             ->columnName('device_model')
             ->nullable()
             ->build();
+
+        $builder->createField('deviceFingerprint', 'string')
+            ->columnName('device_fingerprint')
+            ->nullable()
+            ->build();
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('stat')
+        $metadata->setGroupPrefix('leadDevice')
             ->addProperties(
-                array(
+                [
                     'id',
+                    'lead',
                     'clientInfo',
-                    'dateOpened',
                     'device',
                     'deviceBrand',
                     'deviceModel',
                     'deviceOsName',
                     'deviceOsShortName',
                     'deviceOsVersion',
-                    'deviceOsPlatform'
-                )
+                    'deviceOsPlatform',
+                ]
             )
             ->build();
     }
@@ -168,7 +176,7 @@ class LeadDevice
     /**
      * @return mixed
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
@@ -176,7 +184,7 @@ class LeadDevice
     /**
      * @return mixed
      */
-    public function getClientInfo ()
+    public function getClientInfo()
     {
         return $this->clientInfo;
     }
@@ -184,7 +192,7 @@ class LeadDevice
     /**
      * @param mixed $clientInfo
      */
-    public function setClientInfo ($clientInfo)
+    public function setClientInfo($clientInfo)
     {
         $this->clientInfo = $clientInfo;
     }
@@ -192,7 +200,7 @@ class LeadDevice
     /**
      * @return mixed
      */
-    public function getDevice ()
+    public function getDevice()
     {
         return $this->device;
     }
@@ -200,7 +208,7 @@ class LeadDevice
     /**
      * @param mixed $device
      */
-    public function setDevice ($device)
+    public function setDevice($device)
     {
         $this->device = $device;
     }
@@ -208,7 +216,7 @@ class LeadDevice
     /**
      * @return mixed
      */
-    public function getDeviceBrand ()
+    public function getDeviceBrand()
     {
         return $this->deviceBrand;
     }
@@ -216,7 +224,7 @@ class LeadDevice
     /**
      * @param mixed $isFailed
      */
-    public function setDeviceBrand ($brand)
+    public function setDeviceBrand($brand)
     {
         $this->deviceBrand = $brand;
     }
@@ -224,16 +232,15 @@ class LeadDevice
     /**
      * @return mixed
      */
-    public function getDeviceModel ()
+    public function getDeviceModel()
     {
         return $this->deviceModel;
     }
 
-
     /**
      * @param mixed $deviceModel
      */
-    public function setDeviceModel ($deviceModel)
+    public function setDeviceModel($deviceModel)
     {
         $this->deviceModel = $deviceModel;
     }
@@ -241,7 +248,87 @@ class LeadDevice
     /**
      * @return string
      */
-    public function getDeviceOs ()
+    public function getDeviceOsName()
+    {
+        return $this->deviceOsName;
+    }
+
+    /**
+     * @param string $deviceOsName
+     *
+     * @return $this
+     */
+    public function setDeviceOsName($deviceOsName)
+    {
+        $this->deviceOsName = $deviceOsName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsShortName()
+    {
+        return $this->deviceOsShortName;
+    }
+
+    /**
+     * @param string $deviceOsShortName
+     *
+     * @return $this
+     */
+    public function setDeviceOsShortName($deviceOsShortName)
+    {
+        $this->deviceOsShortName = $deviceOsShortName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsVersion()
+    {
+        return $this->deviceOsVersion;
+    }
+
+    /**
+     * @param string $deviceOsVersion
+     *
+     * @return $this
+     */
+    public function setDeviceOsVersion($deviceOsVersion)
+    {
+        $this->deviceOsVersion = $deviceOsVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOsPlatform()
+    {
+        return $this->deviceOsPlatform;
+    }
+
+    /**
+     * @param string $deviceOsPlatform
+     *
+     * @return $this
+     */
+    public function setDeviceOsPlatform($deviceOsPlatform)
+    {
+        $this->deviceOsPlatform = $deviceOsPlatform;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceOs()
     {
         return $this->deviceOsName;
     }
@@ -249,7 +336,7 @@ class LeadDevice
     /**
      * @param mixed $deviceOs
      */
-    public function setDeviceOs ($deviceOs)
+    public function setDeviceOs($deviceOs)
     {
         if (isset($deviceOs['name'])) {
             $this->deviceOsName = $deviceOs['name'];
@@ -263,6 +350,22 @@ class LeadDevice
         if (isset($deviceOs['platform'])) {
             $this->deviceOsPlatform = $deviceOs['platform'];
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeviceFingerprint()
+    {
+        return $this->deviceFingerprint;
+    }
+
+    /**
+     * @param string $deviceFingerprint
+     */
+    public function setDeviceFingerprint($deviceFingerprint)
+    {
+        $this->deviceFingerprint = $deviceFingerprint;
     }
 
     /**
@@ -288,17 +391,36 @@ class LeadDevice
     /**
      * @return mixed
      */
-    public function getDateOpen ()
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
 
     /**
-     * @param mixed $dateOpen
+     * @param mixed $dateAdded
      */
-    public function setDateOpen ($dateOpen)
+    public function setDateAdded($dateAdded)
     {
-        $this->dateAdded = $dateOpen;
+        $this->dateAdded = $dateAdded;
     }
 
+    /**
+     * @return mixed
+     *
+     * @deprecated 2.4.0 to be removed 3.0; use getDateAdded instead
+     */
+    public function getDateOpen()
+    {
+        return $this->getDateAdded();
+    }
+
+    /**
+     * @param mixed $dateOpen
+     *
+     * @deprecated 2.4.0 to be removed 3.0; use setDateAdded instead
+     */
+    public function setDateOpen($dateOpen)
+    {
+        $this->setDateAdded($dateOpen);
+    }
 }

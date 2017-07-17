@@ -1,17 +1,22 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\Api;
 
 use Joomla\Http\Http;
 use Joomla\Http\Response;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 abstract class AbstractNotificationApi
 {
@@ -31,13 +36,29 @@ abstract class AbstractNotificationApi
     protected $http;
 
     /**
-     * @param MauticFactory $factory
-     * @param Http          $http
+     * @var TrackableModel
      */
-    public function __construct(MauticFactory $factory, Http $http)
+    protected $trackableModel;
+
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
+     * AbstractNotificationApi constructor.
+     *
+     * @param MauticFactory     $factory
+     * @param Http              $http
+     * @param TrackableModel    $trackableModel
+     * @param IntegrationHelper $integrationHelper
+     */
+    public function __construct(MauticFactory $factory, Http $http, TrackableModel $trackableModel, IntegrationHelper $integrationHelper)
     {
-        $this->factory = $factory;
-        $this->http = $http;
+        $this->factory           = $factory;
+        $this->http              = $http;
+        $this->trackableModel    = $trackableModel;
+        $this->integrationHelper = $integrationHelper;
     }
 
     /**
@@ -49,13 +70,12 @@ abstract class AbstractNotificationApi
     abstract public function send($endpoint, $data);
 
     /**
-     * @param mixed        $id
-     * @param string|array $message
-     * @param string|array $title
+     * @param              $id
+     * @param Notification $notification
      *
-     * @return Response
+     * @return mixed
      */
-    abstract public function sendNotification($id, $message, $title = '');
+    abstract public function sendNotification($id, Notification $notification);
 
     /**
      * Convert a non-tracked url to a tracked url.
@@ -67,12 +87,9 @@ abstract class AbstractNotificationApi
      */
     public function convertToTrackedUrl($url, array $clickthrough = [])
     {
-        /** @var \Mautic\PageBundle\Model\TrackableModel $trackableModel */
-        $trackableModel = $this->factory->getModel('page.trackable');
-
         /* @var \Mautic\PageBundle\Entity\Redirect $redirect */
-        $trackable = $trackableModel->getTrackableByUrl($url, 'notification', $clickthrough['notification']);
+        $trackable = $this->trackableModel->getTrackableByUrl($url, 'notification', $clickthrough['notification']);
 
-        return $trackableModel->generateTrackableUrl($trackable, $clickthrough);
+        return $this->trackableModel->generateTrackableUrl($trackable, $clickthrough);
     }
 }

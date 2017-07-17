@@ -1,24 +1,32 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Mautic\CoreBundle\Entity\DeprecatedInterface;
 
 /**
- * Class DoctrineEventsSubscriber
+ * Class DoctrineEventsSubscriber.
  */
 class DoctrineEventsSubscriber implements EventSubscriber
 {
     protected $tablePrefix;
+
+    /**
+     * @var
+     */
+    protected $deprecatedEntityTables = [];
 
     /**
      * DoctrineEventsSubscriber constructor.
@@ -35,19 +43,19 @@ class DoctrineEventsSubscriber implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return ['loadClassMetadata'];
+        return [
+            'loadClassMetadata',
+            'postGenerateSchema',
+        ];
     }
 
     /**
      * @param LoadClassMetadataEventArgs $args
-     *
-     * @return void
      */
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         //in the installer
         if (!defined('MAUTIC_TABLE_PREFIX') && empty($this->tablePrefix)) {
-
             return;
         } elseif (empty($this->tablePrefix)) {
             $this->tablePrefix = MAUTIC_TABLE_PREFIX;
@@ -58,7 +66,6 @@ class DoctrineEventsSubscriber implements EventSubscriber
 
         // Do not re-apply the prefix in an inheritance hierarchy.
         if ($classMetadata->isInheritanceTypeSingleTable() && !$classMetadata->isRootEntity()) {
-
             return;
         }
 
@@ -85,7 +92,7 @@ class DoctrineEventsSubscriber implements EventSubscriber
                 [
                     'name'              => $this->tablePrefix.$classMetadata->getTableName(),
                     'indexes'           => $indexes,
-                    'uniqueConstraints' => $uniqueConstraints
+                    'uniqueConstraints' => $uniqueConstraints,
                 ]
             );
 
@@ -116,6 +123,27 @@ class DoctrineEventsSubscriber implements EventSubscriber
                     );
                     $classMetadata->setIdGenerator($sequenceGenerator);
                 }
+            }
+
+            // Note deprecated entities so they can be removed from the schema before it's generated
+            if ($classMetadata->reflClass->implementsInterface(DeprecatedInterface::class)) {
+                $this->deprecatedEntityTables[] = $classMetadata->getTableName();
+            }
+        }
+    }
+
+    /**
+     * @param GenerateSchemaEventArgs $args
+     */
+    public function postGenerateSchema(GenerateSchemaEventArgs $args)
+    {
+        $schema = $args->getSchema();
+        $tables = $schema->getTables();
+
+        foreach ($tables as $table) {
+            if (in_array($table->getName(), $this->deprecatedEntityTables)) {
+                // remove table from schema
+                $schema->dropTable($table->getName());
             }
         }
     }

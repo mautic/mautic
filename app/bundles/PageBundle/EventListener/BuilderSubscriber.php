@@ -1,27 +1,31 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\GatedVideoType;
+use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailBuilderEvent;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailBuilderEvent;
-use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
- * Class BuilderSubscriber
+ * Class BuilderSubscriber.
  */
 class BuilderSubscriber extends CommonSubscriber
 {
@@ -31,24 +35,28 @@ class BuilderSubscriber extends CommonSubscriber
     protected $tokenHelper;
 
     /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
      * @var PageModel
      */
     protected $pageModel;
 
-    protected $pageTokenRegex = '{pagelink=(.*?)}';
-    protected $langBarRegex = '{langbar}';
-    protected $shareButtonsRegex = '{sharebuttons}';
-    protected $titleRegex = '{pagetitle}';
-    protected $descriptionRegex = '{pagemetadescription}';
+    protected $pageTokenRegex      = '{pagelink=(.*?)}';
+    protected $langBarRegex        = '{langbar}';
+    protected $shareButtonsRegex   = '{sharebuttons}';
+    protected $titleRegex          = '{pagetitle}';
+    protected $descriptionRegex    = '{pagemetadescription}';
     protected $emailIsInternalSend = false;
-    protected $emailEntity = null;
+    protected $emailEntity         = null;
 
-    public function __construct(MauticFactory $factory, TokenHelper $tokenHelper, PageModel $pageModel)
+    public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
     {
-        $this->tokenHelper = $tokenHelper;
-        $this->pageModel   = $pageModel;
-
-        parent::__construct($factory);
+        $this->tokenHelper       = $tokenHelper;
+        $this->integrationHelper = $integrationHelper;
+        $this->pageModel         = $pageModel;
     }
 
     /**
@@ -61,12 +69,12 @@ class BuilderSubscriber extends CommonSubscriber
             PageEvents::PAGE_ON_BUILD     => ['onPageBuild', 0],
             EmailEvents::EMAIL_ON_BUILD   => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND    => ['onEmailGenerate', 0],
-            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0]
+            EmailEvents::EMAIL_ON_DISPLAY => ['onEmailGenerate', 0],
         ];
     }
 
     /**
-     * Add forms to available page tokens
+     * Add forms to available page tokens.
      *
      * @param Events\PageBuilderEvent $event
      */
@@ -74,41 +82,19 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
 
-        if ($event->tokenSectionsRequested()) {
-            //add extra tokens
-            $content = $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:token.html.php');
-            $event->addTokenSection('page.extratokens', 'mautic.page.builder.header.extra', $content, 2);
-
-            //add pagetokens
-            $event->addTokenSection(
-                'page.pagetokens',
-                'mautic.page.pages',
-                $tokenHelper->getTokenContent(
-                    [
-                        'filter' => [
-                            'force' => [
-                                ['column' => 'p.variantParent', 'expr' => 'isNull']
-                            ]
-                        ]
-                    ]
-                ),
-                -254
-            );
-        }
-
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $bounceRate = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.bounce',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner'
+                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineBounceTestWinner',
             ];
             $event->addAbTestWinnerCriteria('page.bouncerate', $bounceRate);
 
             $dwellTime = [
                 'group'    => 'mautic.page.abtest.criteria',
                 'label'    => 'mautic.page.abtest.criteria.dwelltime',
-                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner'
+                'callback' => '\Mautic\PageBundle\Helper\AbTestHelper::determineDwellTimeTestWinner',
             ];
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
@@ -134,7 +120,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'Text',
                 'font',
                 'MauticCoreBundle:Slots:text.html.php',
-                'slot',
+                SlotTextType::class,
                 1000
             );
             $event->addSlotType(
@@ -142,8 +128,24 @@ class BuilderSubscriber extends CommonSubscriber
                 'Image',
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot',
+                'slot_image',
                 900
+            );
+            $event->addSlotType(
+                'imagecard',
+                'Image Card',
+                'id-card-o',
+                'MauticCoreBundle:Slots:imagecard.html.php',
+                'slot_imagecard',
+                870
+            );
+            $event->addSlotType(
+                'imagecaption',
+                'Image+Caption',
+                'image',
+                'MauticCoreBundle:Slots:imagecaption.html.php',
+                'slot_imagecaption',
+                850
             );
             $event->addSlotType(
                 'button',
@@ -154,12 +156,71 @@ class BuilderSubscriber extends CommonSubscriber
                 800
             );
             $event->addSlotType(
+                'socialshare',
+                'Social Share',
+                'share-alt',
+                'MauticCoreBundle:Slots:socialshare.html.php',
+                'slot_socialshare',
+                700
+            );
+            $event->addSlotType(
+                'socialfollow',
+                'Social Follow',
+                'twitter',
+                'MauticCoreBundle:Slots:socialfollow.html.php',
+                'slot_socialfollow',
+                600
+            );
+            $event->addSlotType(
+                'codemode',
+                'Code Mode',
+                'code',
+                'MauticCoreBundle:Slots:codemode.html.php',
+                'slot_codemode',
+                500
+            );
+            $event->addSlotType(
                 'separator',
                 'Separator',
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
-                'slot',
-                700
+                'slot_separator',
+                400
+            );
+            $event->addSlotType(
+                'gatedvideo',
+                'Video',
+                'video-camera',
+                'MauticCoreBundle:Slots:gatedvideo.html.php',
+                GatedVideoType::class,
+                600
+            );
+        }
+
+        if ($event->sectionsRequested()) {
+            $event->addSection(
+                'one-column',
+                'One Column',
+                'file-text-o',
+                'MauticCoreBundle:Sections:one-column.html.php',
+                null,
+                1000
+            );
+            $event->addSection(
+                'two-column',
+                'Two Columns',
+                'columns',
+                'MauticCoreBundle:Sections:two-column.html.php',
+                null,
+                900
+            );
+            $event->addSection(
+                'three-column',
+                'Three Columns',
+                'th',
+                'MauticCoreBundle:Sections:three-column.html.php',
+                null,
+                800
             );
         }
     }
@@ -201,16 +262,16 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * Renders the HTML for the social share buttons
+     * Renders the HTML for the social share buttons.
      *
      * @return string
      */
     protected function renderSocialShareButtons()
     {
-        static $content = "";
+        static $content = '';
 
         if (empty($content)) {
-            $shareButtons = $this->factory->getHelper('integration')->getShareButtons();
+            $shareButtons = $this->integrationHelper->getShareButtons();
 
             $content = "<div class='share-buttons'>\n";
             foreach ($shareButtons as $network => $button) {
@@ -226,7 +287,7 @@ class BuilderSubscriber extends CommonSubscriber
     }
 
     /**
-     * Renders the HTML for the language bar for a given page
+     * Renders the HTML for the language bar for a given page.
      *
      * @param $page
      *
@@ -242,7 +303,6 @@ class BuilderSubscriber extends CommonSubscriber
 
             //check to see if this page is grouped with another
             if (empty($parent) && empty($children)) {
-
                 return;
             }
 
@@ -262,9 +322,9 @@ class BuilderSubscriber extends CommonSubscriber
                     $trans = $lang;
                 }
                 $related[$parent->getId()] = [
-                    "lang" => $trans,
+                    'lang' => $trans,
                     // Add ntrd to not auto redirect to another language
-                    "url"  => $this->pageModel->generateUrl($parent, false).'?ntrd=1'
+                    'url' => $this->pageModel->generateUrl($parent, false).'?ntrd=1',
                 ];
                 foreach ($children as $c) {
                     $lang  = $c->getLanguage();
@@ -273,9 +333,9 @@ class BuilderSubscriber extends CommonSubscriber
                         $trans = $lang;
                     }
                     $related[$c->getId()] = [
-                        "lang" => $trans,
+                        'lang' => $trans,
                         // Add ntrd to not auto redirect to another language
-                        "url"  => $this->pageModel->generateUrl($c, false).'?ntrd=1'
+                        'url' => $this->pageModel->generateUrl($c, false).'?ntrd=1',
                     ];
                 }
             }
@@ -289,7 +349,6 @@ class BuilderSubscriber extends CommonSubscriber
             );
 
             if (empty($related)) {
-
                 return;
             }
 
@@ -301,39 +360,17 @@ class BuilderSubscriber extends CommonSubscriber
 
     /**
      * @param EmailBuilderEvent $event
-     *
-     * @return void
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
-
-        if ($event->tokenSectionsRequested()) {
-            $event->addTokenSection(
-                'page.emailtokens',
-                'mautic.page.pages',
-                $tokenHelper->getTokenContent(
-                    [
-                        'filter' => [
-                            'force' => [
-                                ['column' => 'p.variantParent', 'expr' => 'isNull']
-                            ]
-                        ]
-                    ]
-                ),
-                -254
-            );
-        }
-
         if ($event->tokensRequested([$this->pageTokenRegex])) {
+            $tokenHelper = new BuilderTokenHelper($this->factory, 'page');
             $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
         }
     }
 
     /**
      * @param EmailSendEvent $event
-     *
-     * @return void
      */
     public function onEmailGenerate(EmailSendEvent $event)
     {

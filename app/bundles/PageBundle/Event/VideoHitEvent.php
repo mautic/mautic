@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,11 +15,10 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\VideoHit;
 
 /**
- * Class PageHitEvent
+ * Class PageHitEvent.
  */
 class VideoHitEvent extends CommonEvent
 {
-
     /**
      * @var
      */
@@ -37,13 +38,13 @@ class VideoHitEvent extends CommonEvent
      */
     public function __construct(VideoHit $hit, $request, $code)
     {
-        $this->entity           = $hit;
-        $this->request          = $request;
-        $this->code             = $code;
+        $this->entity  = $hit;
+        $this->request = $request;
+        $this->code    = $code;
     }
 
     /**
-     * Get page request
+     * Get page request.
      *
      * @return string
      */
@@ -53,7 +54,7 @@ class VideoHitEvent extends CommonEvent
     }
 
     /**
-     * Get HTML code
+     * Get HTML code.
      *
      * @return mixed
      */

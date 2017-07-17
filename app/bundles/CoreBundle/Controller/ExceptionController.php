@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 /**
- * Class ExceptionController
+ * Class ExceptionController.
  */
 class ExceptionController extends CommonController
 {
@@ -39,13 +41,26 @@ class ExceptionController extends CommonController
             }
 
             // Special handling for oauth and api urls
-            if ((strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) || strpos($request->getUri(), '/api') !== false) {
-                $dataArray = array(
-                    'error' => array(
-                        'message' => $exception->getMessage(),
-                        'code'    => $code
-                    )
-                );
+            if (
+                (strpos($request->getUri(), '/oauth') !== false && strpos($request->getUri(), 'authorize') === false) ||
+                strpos($request->getUri(), '/api') !== false ||
+                (!defined('MAUTIC_AJAX_VIEW') && strpos($request->server->get('HTTP_ACCEPT', ''), 'application/json') !== false)
+            ) {
+                $message   = ('dev' === MAUTIC_ENV) ? $exception->getMessage() : $this->get('translator')->trans('mautic.core.error.generic', ['%code%' => $code]);
+                $dataArray = [
+                    'errors' => [
+                        [
+                            'message' => $message,
+                            'code'    => $code,
+                            'type'    => null,
+                        ],
+                    ],
+                    // @deprecated 2.6.0 to be removed in 3.0
+                    'error' => [
+                        'message' => $message.' (`error` is deprecated as of 2.6.0 and will be removed in 3.0. Use the `errors` array instead.)',
+                        'code'    => $code,
+                    ],
+                ];
                 if ($env == 'dev') {
                     $dataArray['trace'] = $exception->getTrace();
                 }
@@ -57,7 +72,7 @@ class ExceptionController extends CommonController
                 $layout = 'Error';
             }
 
-            $anonymous    = $this->factory->getSecurity()->isAnonymous();
+            $anonymous    = $this->get('mautic.security')->isAnonymous();
             $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
             if ($anonymous) {
                 if ($templatePage = $this->factory->getTheme()->getErrorPageTemplate($code)) {
@@ -77,33 +92,34 @@ class ExceptionController extends CommonController
             $urlParts = parse_url($url);
 
             return $this->delegateView(
-                array(
-                    'viewParameters'  => array(
+                [
+                    'viewParameters' => [
                         'baseTemplate'   => $baseTemplate,
                         'status_code'    => $code,
                         'status_text'    => $statusText,
                         'exception'      => $exception,
                         'logger'         => $logger,
                         'currentContent' => $currentContent,
-                        'isPublicPage'   => $anonymous
-                    ),
+                        'isPublicPage'   => $anonymous,
+                    ],
                     'contentTemplate' => $template,
-                    'passthroughVars' => array(
-                        'error' => array(
+                    'passthroughVars' => [
+                        'error' => [
                             'code'      => $code,
                             'text'      => $statusText,
                             'exception' => ($env == 'dev') ? $exception->getMessage() : '',
-                            'trace'     => ($env == 'dev') ? $exception->getTrace() : ''
-                        ),
-                        'route' => $urlParts['path']
-                    )
-                )
+                            'trace'     => ($env == 'dev') ? $exception->getTrace() : '',
+                        ],
+                        'route' => $urlParts['path'],
+                    ],
+                    'responseCode' => $code,
+                ]
             );
         }
     }
 
     /**
-     * @param int     $startObLevel
+     * @param int $startObLevel
      *
      * @return string
      */

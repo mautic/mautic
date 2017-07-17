@@ -1,20 +1,25 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ReportBundle\Model;
 
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -22,20 +27,21 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Security\Core\SecurityContext;
 
 /**
- * Class ReportModel
+ * Class ReportModel.
  */
 class ReportModel extends FormModel
 {
+    const CHANNEL_FEATURE = 'reporting';
+
     /**
      * @var mixed
      */
@@ -52,18 +58,47 @@ class ReportModel extends FormModel
     protected $templatingHelper;
 
     /**
+     * @var ChannelListHelper
+     */
+    protected $channelListHelper;
+
+    /**
      * @var Session
      */
     protected $session;
 
+    /**
+     * @var FieldModel
+     */
+    protected $fieldModel;
+
+    /**
+     * @var ReportHelper
+     */
+    protected $reportHelper;
+
+    /**
+     * ReportModel constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param FormatterHelper      $formatterHelper
+     * @param TemplatingHelper     $templatingHelper
+     * @param ChannelListHelper    $channelListHelper
+     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         FormatterHelper $formatterHelper,
-        TemplatingHelper $templatingHelper
+        TemplatingHelper $templatingHelper,
+        ChannelListHelper $channelListHelper,
+        FieldModel $fieldModel,
+        ReportHelper $reportHelper
     ) {
-        $this->defaultPageLimit = $coreParametersHelper->getParameter('default_pagelimit');
-        $this->formatterHelper  = $formatterHelper;
-        $this->templatingHelper = $templatingHelper;
+        $this->defaultPageLimit  = $coreParametersHelper->getParameter('default_pagelimit');
+        $this->formatterHelper   = $formatterHelper;
+        $this->templatingHelper  = $templatingHelper;
+        $this->channelListHelper = $channelListHelper;
+        $this->fieldModel        = $fieldModel;
+        $this->reportHelper      = $reportHelper;
     }
 
     /**
@@ -110,7 +145,7 @@ class ReportModel extends FormModel
 
         $params['table_list'] = $this->getTableData();
 
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $formFactory);
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         return $reportGenerator->getForm($entity, $params);
     }
@@ -141,16 +176,16 @@ class ReportModel extends FormModel
         }
 
         switch ($action) {
-            case "pre_save":
+            case 'pre_save':
                 $name = ReportEvents::REPORT_PRE_SAVE;
                 break;
-            case "post_save":
+            case 'post_save':
                 $name = ReportEvents::REPORT_POST_SAVE;
                 break;
-            case "pre_delete":
+            case 'pre_delete':
                 $name = ReportEvents::REPORT_PRE_DELETE;
                 break;
-            case "post_delete":
+            case 'post_delete':
                 $name = ReportEvents::REPORT_POST_DELETE;
                 break;
             default:
@@ -172,7 +207,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Build the table and graph data
+     * Build the table and graph data.
      *
      * @param $context
      *
@@ -185,12 +220,13 @@ class ReportModel extends FormModel
         if (empty($data[$context])) {
             // Check to see if all has been obtained
             if (isset($data['all'])) {
-                $data[$context]['tables'] =& $data['all']['tables'][$context];
-                $data[$context]['graphs'] =& $data['all']['graphs'][$context];
+                $data[$context]['tables'] = &$data['all']['tables'][$context];
+                $data[$context]['graphs'] = &$data['all']['graphs'][$context];
             } else {
                 //build them
                 $eventContext = ($context == 'all') ? '' : $context;
-                $event        = new ReportBuilderEvent($this->translator, $eventContext);
+
+                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
                 $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
 
                 $tables = $event->getTables();
@@ -219,7 +255,7 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Builds the table lookup data for the report forms
+     * Builds the table lookup data for the report forms.
      *
      * @param string $context
      *
@@ -249,7 +285,7 @@ class ReportModel extends FormModel
      *
      * @return \stdClass ['choices' => [], 'choiceHtml' => '', definitions => []]
      */
-    public function getColumnList($context)
+    public function getColumnList($context, $isGroupBy = false)
     {
         $tableData           = $this->getTableData($context);
         $columns             = isset($tableData['columns']) ? $tableData['columns'] : [];
@@ -259,6 +295,9 @@ class ReportModel extends FormModel
         $return->definitions = [];
 
         foreach ($columns as $column => $data) {
+            if ($isGroupBy && ($column == 'unsubscribed' || $column == 'unsubscribed_ratio' || $column == 'unique_ratio')) {
+                continue;
+            }
             if (isset($data['label'])) {
                 $return->choiceHtml .= "<option value=\"$column\">{$data['label']}</option>\n";
                 $return->choices[$column]     = $data['label'];
@@ -281,8 +320,8 @@ class ReportModel extends FormModel
     {
         $tableData = $this->getTableData($context);
 
-        $return                  = new \stdClass();
-        $filters                 = (isset($tableData['filters'])) ? $tableData['filters']
+        $return  = new \stdClass();
+        $filters = (isset($tableData['filters'])) ? $tableData['filters']
             : (isset($tableData['columns']) ? $tableData['columns'] : []);
         $return->choices         = [];
         $return->choiceHtml      = '';
@@ -322,7 +361,7 @@ class ReportModel extends FormModel
 
         // First sort
         foreach ($graphData as $key => $details) {
-            $return->choices[$key] = $this->translator->trans($key)." (".$this->translator->trans('mautic.report.graph.'.$details['type']).")";
+            $return->choices[$key] = $this->translator->trans($key).' ('.$this->translator->trans('mautic.report.graph.'.$details['type']).')';
         }
         natsort($return->choices);
 
@@ -334,63 +373,46 @@ class ReportModel extends FormModel
     }
 
     /**
-     * Export report
+     * Export report.
      *
      * @param $format
      * @param $report
      * @param $reportData
      *
      * @return StreamedResponse|Response
+     *
      * @throws \Exception
      */
-    public function exportResults($format, $report, $reportData)
+    public function exportResults($format, $report, $reportData, $handle = null, $page = null)
     {
         $formatter = $this->formatterHelper;
-        $date      = (new DateTimeHelper)->toLocalString();
+        $date      = (new DateTimeHelper())->toLocalString();
         $name      = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
-                $response = new StreamedResponse(
-                    function () use ($reportData, $report, $formatter) {
-                        $handle = fopen('php://output', 'r+');
-                        $header = [];
-
-                        //build the data rows
-                        foreach ($reportData['data'] as $count => $data) {
-                            $row = [];
-                            foreach ($data as $k => $v) {
-                                if ($count === 0) {
-                                    //set the header
-                                    $header[] = $k;
-                                }
-
-                                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
-                            }
-
-                            if ($count === 0) {
-                                //write the row
-                                fputcsv($handle, $header);
-                            } else {
-                                fputcsv($handle, $row);
-                            }
-
-                            //free memory
-                            unset($row, $reportData['data'][$count]);
+                //build the data rows
+                if (is_null($handle)) {
+                    $response = new StreamedResponse(
+                        function () use ($reportData, $formatter) {
+                            $handle = fopen('php://output', 'r+');
+                            $this->exportCSV($formatter, $reportData, $handle, 0);
+                            fclose($handle);
                         }
+                    );
+                    $response->headers->set('Content-Type', 'application/force-download');
+                    $response->headers->set('Content-Type', 'application/octet-stream');
+                    $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
+                    $response->headers->set('Expires', 0);
+                    $response->headers->set('Cache-Control', 'must-revalidate');
+                    $response->headers->set('Pragma', 'public');
 
-                        fclose($handle);
-                    }
-                );
+                    return $response;
+                } else {
+                    $this->exportCSV($formatter, $reportData, $handle, $page);
 
-                $response->headers->set('Content-Type', 'application/force-download');
-                $response->headers->set('Content-Type', 'application/octet-stream');
-                $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', 0);
-                $response->headers->set('Cache-Control', 'must-revalidate');
-                $response->headers->set('Pragma', 'public');
-
-                return $response;
+                    return;
+                }
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
                     'MauticReportBundle:Report:export.html.php',
@@ -406,6 +428,7 @@ class ReportModel extends FormModel
                 )->getContent();
 
                 return new Response($content);
+
             case 'xlsx':
                 if (class_exists('PHPExcel')) {
                     $response = new StreamedResponse(
@@ -427,18 +450,16 @@ class ReportModel extends FormModel
                                     $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
                                 }
 
-                                //write the row
                                 if ($count === 0) {
+                                    //write the column names row
                                     $objPHPExcel->getActiveSheet()->fromArray($header, null, 'A1');
-                                } else {
-                                    $rowCount = $count + 1;
-                                    $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
                                 }
-
+                                //write the row
+                                $rowCount = $count + 2;
+                                $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
                                 //free memory
                                 unset($row, $reportData['data'][$count]);
                             }
-
 
                             $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
                             $objWriter->setPreCalculateFormulas(false);
@@ -457,13 +478,14 @@ class ReportModel extends FormModel
                     return $response;
                 }
                 throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
+
             default:
                 return new Response();
         }
     }
 
     /**
-     * Get report data for view rendering
+     * Get report data for view rendering.
      *
      * @param       $entity
      * @param       $formFactory
@@ -505,15 +527,20 @@ class ReportModel extends FormModel
 
         $paginate        = !empty($options['paginate']);
         $reportPage      = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
-        $data            = $graphs = [];
-        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $formFactory);
+        $data            = $graphs            = [];
+        $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
         $selectedColumns = $entity->getColumns();
-        $totalResults    = $limit = 0;
+        $totalResults    = $limit    = 0;
 
         // Prepare the query builder
         $tableDetails = $this->getTableData($entity->getSource());
 
+        $aggregatorColumns = ($aggregators = $entity->getAggregators()) ? $aggregators : [];
+
+        foreach ($aggregatorColumns as $aggregatorColumn) {
+            $selectedColumns[] = $aggregatorColumn['column'];
+        }
         // Build a reference for column to data column (without table prefix)
         $dataColumns = [];
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
@@ -529,7 +556,7 @@ class ReportModel extends FormModel
             'filters'        => (isset($tableDetails['filters'])) ? $tableDetails['filters'] : $tableDetails['columns'],
             'dateFrom'       => (isset($options['dateFrom'])) ? $options['dateFrom'] : null,
             'dateTo'         => (isset($options['dateTo'])) ? $options['dateTo'] : null,
-            'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : []
+            'dynamicFilters' => (isset($options['dynamicFilters'])) ? $options['dynamicFilters'] : [],
         ];
 
         /** @var \Doctrine\DBAL\Query\QueryBuilder $query */
@@ -569,7 +596,7 @@ class ReportModel extends FormModel
                         $graphOptions    = array_merge($defaultGraphOptions, $graphOptions);
                         $eventGraphs[$g] = [
                             'options' => $graphOptions,
-                            'type'    => $availableGraphs[$g]['type']
+                            'type'    => $availableGraphs[$g]['type'],
                         ];
                     }
                 }
@@ -583,9 +610,13 @@ class ReportModel extends FormModel
         }
 
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
-            if ($paginate) {
+            if ($paginate && !$entity->getGroupBy()) {
                 // Build the options array to pass into the query
                 $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                if (!empty($options['limit'])) {
+                    $limit      = $options['limit'];
+                    $reportPage = $options['page'];
+                }
                 $start = ($reportPage === 1) ? 0 : (($reportPage - 1) * $limit);
                 if ($start < 0) {
                     $start = 0;
@@ -617,12 +648,12 @@ class ReportModel extends FormModel
             if ($queryTime >= 1000) {
                 $queryTime *= 1000;
 
-                $queryTime .= "s";
+                $queryTime .= 's';
             } else {
-                $queryTime .= "ms";
+                $queryTime .= 'ms';
             }
 
-            if (!$paginate) {
+            if (!$paginate || $entity->getGroupBy()) {
                 $totalResults = count($data);
             }
 
@@ -640,7 +671,7 @@ class ReportModel extends FormModel
                 $debugData['query'] = str_replace(":$name", "'$param'", $debugData['query']);
             }
 
-            $debugData['query_time'] = (isset($queryTime)) ? $queryTime : "N/A";
+            $debugData['query_time'] = (isset($queryTime)) ? $queryTime : 'N/A';
         }
 
         return [
@@ -653,7 +684,7 @@ class ReportModel extends FormModel
             'limit'           => ($paginate) ? $limit : 0,
             'dateFrom'        => $dataOptions['dateFrom'],
             'dateTo'          => $dataOptions['dateTo'],
-            'debug'           => $debugData
+            'debug'           => $debugData,
         ];
     }
 
@@ -662,13 +693,13 @@ class ReportModel extends FormModel
      */
     public function getReportsWithGraphs()
     {
-        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->user->getId();
+        $ownedBy = $this->security->isGranted('report:reports:viewother') ? null : $this->userHelper->getUser()->getId();
 
         return $this->getRepository()->findReportsWithGraphs($ownedBy);
     }
 
     /**
-     * Determine what operators should be used for the filter type
+     * Determine what operators should be used for the filter type.
      *
      * @param array $data
      *
@@ -694,5 +725,26 @@ class ReportModel extends FormModel
         }
 
         return $options;
+    }
+
+    private function exportCSV($formatter, $reportData, $handle, $page)
+    {
+        foreach ($reportData['data'] as $count => $data) {
+            $row = [];
+            foreach ($data as $k => $v) {
+                if ($count == 0) {
+                    //set the header
+                    $header[] = $k;
+                }
+
+                $row[] = $formatter->_($v, $reportData['columns'][$reportData['dataColumns'][$k]]['type'], true);
+            }
+
+            if ($page === 1 && $count === 0) {
+                fputcsv($handle, $header);
+            }
+            fputcsv($handle, $row);
+            unset($row, $reportData['data'][$count]);
+        }
     }
 }

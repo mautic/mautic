@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,16 +15,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Class TriggerEvent
- *
- * @package Mautic\PointBundle\Entity
+ * Class TriggerEvent.
  */
 class TriggerEvent
 {
-
     /**
      * @var int
      */
@@ -51,7 +49,7 @@ class TriggerEvent
     /**
      * @var array
      */
-    private $properties = array();
+    private $properties = [];
 
     /**
      * @var Trigger
@@ -69,9 +67,9 @@ class TriggerEvent
     private $changes;
 
     /**
-     * Construct
+     * Construct.
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->log = new ArrayCollection();
     }
@@ -79,13 +77,13 @@ class TriggerEvent
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata (ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('point_trigger_events')
             ->setCustomRepositoryClass('Mautic\PointBundle\Entity\TriggerEventRepository')
-            ->addIndex(array('type'), 'trigger_type_search');
+            ->addIndex(['type'], 'trigger_type_search');
 
         $builder->addIdColumns();
 
@@ -110,12 +108,10 @@ class TriggerEvent
             ->cascadeRemove()
             ->fetchExtraLazy()
             ->build();
-
-
     }
 
     /**
-     * Prepares the metadata for API usage
+     * Prepares the metadata for API usage.
      *
      * @param $metadata
      */
@@ -123,14 +119,14 @@ class TriggerEvent
     {
         $metadata->setGroupPrefix('trigger')
             ->addProperties(
-                array(
+                [
                     'id',
                     'name',
                     'description',
                     'type',
                     'order',
-                    'properties'
-                )
+                    'properties',
+                ]
             )
             ->build();
     }
@@ -139,39 +135,39 @@ class TriggerEvent
      * @param $prop
      * @param $val
      */
-    private function isChanged ($prop, $val)
+    private function isChanged($prop, $val)
     {
         if ($this->$prop != $val) {
-            $this->changes[$prop] = array($this->$prop, $val);
+            $this->changes[$prop] = [$this->$prop, $val];
         }
     }
 
     /**
      * @return array
      */
-    public function getChanges ()
+    public function getChanges()
     {
         return $this->changes;
     }
 
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
-    public function getId ()
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Set order
+     * Set order.
      *
-     * @param integer $order
+     * @param int $order
      *
      * @return TriggerEvent
      */
-    public function setOrder ($order)
+    public function setOrder($order)
     {
         $this->isChanged('order', $order);
 
@@ -181,23 +177,23 @@ class TriggerEvent
     }
 
     /**
-     * Get order
+     * Get order.
      *
-     * @return integer
+     * @return int
      */
-    public function getOrder ()
+    public function getOrder()
     {
         return $this->order;
     }
 
     /**
-     * Set properties
+     * Set properties.
      *
      * @param array $properties
      *
      * @return TriggerEvent
      */
-    public function setProperties ($properties)
+    public function setProperties($properties)
     {
         $this->isChanged('properties', $properties);
 
@@ -207,23 +203,23 @@ class TriggerEvent
     }
 
     /**
-     * Get properties
+     * Get properties.
      *
      * @return array
      */
-    public function getProperties ()
+    public function getProperties()
     {
         return $this->properties;
     }
 
     /**
-     * Set trigger
+     * Set trigger.
      *
      * @param Trigger $trigger
      *
      * @return TriggerTriggerEvent
      */
-    public function setTrigger (Trigger $trigger)
+    public function setTrigger(Trigger $trigger)
     {
         $this->trigger = $trigger;
 
@@ -231,23 +227,23 @@ class TriggerEvent
     }
 
     /**
-     * Get trigger
+     * Get trigger.
      *
      * @return Trigger
      */
-    public function getTrigger ()
+    public function getTrigger()
     {
         return $this->trigger;
     }
 
     /**
-     * Set type
+     * Set type.
      *
      * @param string $type
      *
      * @return TriggerEvent
      */
-    public function setType ($type)
+    public function setType($type)
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -256,11 +252,11 @@ class TriggerEvent
     }
 
     /**
-     * Get type
+     * Get type.
      *
      * @return string
      */
-    public function getType ()
+    public function getType()
     {
         return $this->type;
     }
@@ -268,19 +264,19 @@ class TriggerEvent
     /**
      * @return array
      */
-    public function convertToArray ()
+    public function convertToArray()
     {
         return get_object_vars($this);
     }
 
     /**
-     * Set description
+     * Set description.
      *
      * @param string $description
      *
      * @return TriggerEvent
      */
-    public function setDescription ($description)
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -289,23 +285,23 @@ class TriggerEvent
     }
 
     /**
-     * Get description
+     * Get description.
      *
      * @return string
      */
-    public function getDescription ()
+    public function getDescription()
     {
         return $this->description;
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
      * @return TriggerEvent
      */
-    public function setName ($name)
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -314,23 +310,23 @@ class TriggerEvent
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
-    public function getName ()
+    public function getName()
     {
         return $this->name;
     }
 
     /**
-     * Add log
+     * Add log.
      *
      * @param LeadTriggerLog $log
      *
      * @return Log
      */
-    public function addLog (LeadTriggerLog $log)
+    public function addLog(LeadTriggerLog $log)
     {
         $this->log[] = $log;
 
@@ -338,21 +334,21 @@ class TriggerEvent
     }
 
     /**
-     * Remove log
+     * Remove log.
      *
      * @param LeadTriggerLog $log
      */
-    public function removeLog (LeadTriggerLog $log)
+    public function removeLog(LeadTriggerLog $log)
     {
         $this->log->removeElement($log);
     }
 
     /**
-     * Get log
+     * Get log.
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getLog ()
+    public function getLog()
     {
         return $this->log;
     }

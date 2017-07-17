@@ -1,27 +1,30 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\WebhookBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\WebhookBundle\Form\DataTransformer\EventsToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Mautic\WebhookBundle\Form\DataTransformer\EventsToArrayTransformer;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class ReportType
+ * Class ReportType.
  */
 class WebhookType extends AbstractType
 {
     /**
-     * Translator object
+     * Translator object.
      *
      * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
@@ -42,6 +45,8 @@ class WebhookType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'strict_html']));
+
         $builder->add(
             'name',
             'text',
@@ -49,7 +54,7 @@ class WebhookType extends AbstractType
                 'label'      => 'mautic.core.name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
-                'required'   => true
+                'required'   => true,
             ]
         );
 
@@ -61,7 +66,7 @@ class WebhookType extends AbstractType
                 'required' => false,
                 'attr'     => [
                     'class' => 'form-control',
-                ]
+                ],
             ]
         );
 
@@ -69,10 +74,10 @@ class WebhookType extends AbstractType
             'webhookUrl',
             'url',
             [
-                'label'       => 'mautic.webhook.form.webhook_url',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
-                'required'    => true,
+                'label'      => 'mautic.webhook.form.webhook_url',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'required'   => true,
             ]
         );
 
@@ -115,7 +120,7 @@ class WebhookType extends AbstractType
             'category',
             'category',
             [
-                'bundle' => 'Webhook'
+                'bundle' => 'Webhook',
             ]
         );
 
@@ -141,6 +146,6 @@ class WebhookType extends AbstractType
      */
     public function getName()
     {
-        return "webhook";
+        return 'webhook';
     }
 }

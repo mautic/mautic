@@ -1,47 +1,44 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
 
 /**
- * Class ReportSubscriber
- *
- * @package Mautic\AssetBundle\EventListener
+ * Class ReportSubscriber.
  */
 class ReportSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
-            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0]
+            ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
         ];
     }
 
     /**
-     * Add available tables and columns to the report builder lookup
+     * Add available tables and columns to the report builder lookup.
      *
      * @param ReportBuilderEvent $event
-     *
-     * @return void
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
@@ -49,34 +46,40 @@ class ReportSubscriber extends CommonSubscriber
             // Assets
             $prefix  = 'a.';
             $columns = [
-                $prefix.'download_count'        => [
+                $prefix.'download_count' => [
                     'label' => 'mautic.asset.report.download_count',
-                    'type'  => 'int'
+                    'type'  => 'int',
                 ],
                 $prefix.'unique_download_count' => [
                     'label' => 'mautic.asset.report.unique_download_count',
-                    'type'  => 'int'
+                    'type'  => 'int',
                 ],
-                $prefix.'alias'                 => [
+                $prefix.'alias' => [
                     'label' => 'mautic.core.alias',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
-                $prefix.'lang'                  => [
+                $prefix.'lang' => [
                     'label' => 'mautic.core.language',
-                    'type'  => 'string'
+                    'type'  => 'string',
                 ],
-                $prefix.'title'                 => [
+                $prefix.'title' => [
                     'label' => 'mautic.core.title',
-                    'type'  => 'string'
-                ]
+                    'type'  => 'string',
+                ],
             ];
 
-            $columns = array_merge($columns, $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'), $event->getCategoryColumns());
+            $columns = array_merge(
+                $columns,
+                $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'),
+                $event->getCategoryColumns(),
+                $event->getCampaignByChannelColumns()
+            );
+
             $event->addTable(
                 'assets',
                 [
                     'display_name' => 'mautic.asset.assets',
-                    'columns'      => $columns
+                    'columns'      => $columns,
                 ]
             );
 
@@ -86,31 +89,36 @@ class ReportSubscriber extends CommonSubscriber
                 $downloadColumns = [
                     $downloadPrefix.'date_download' => [
                         'label' => 'mautic.asset.report.download.date_download',
-                        'type'  => 'datetime'
+                        'type'  => 'datetime',
                     ],
-                    $downloadPrefix.'code'          => [
+                    $downloadPrefix.'code' => [
                         'label' => 'mautic.asset.report.download.code',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $downloadPrefix.'referer'       => [
+                    $downloadPrefix.'referer' => [
                         'label' => 'mautic.core.referer',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $downloadPrefix.'source'        => [
+                    $downloadPrefix.'source' => [
                         'label' => 'mautic.report.field.source',
-                        'type'  => 'string'
+                        'type'  => 'string',
                     ],
-                    $downloadPrefix.'source_id'     => [
+                    $downloadPrefix.'source_id' => [
                         'label' => 'mautic.report.field.source_id',
-                        'type'  => 'int'
-                    ]
+                        'type'  => 'int',
+                    ],
                 ];
 
                 $event->addTable(
                     'asset.downloads',
                     [
                         'display_name' => 'mautic.asset.report.downloads.table',
-                        'columns'      => array_merge($columns, $downloadColumns, $event->getLeadColumns(), $event->getIpColumn())
+                        'columns'      => array_merge(
+                            $columns,
+                            $downloadColumns,
+                            $event->getLeadColumns(),
+                            $event->getIpColumn()
+                        ),
                     ],
                     'assets'
                 );
@@ -126,11 +134,9 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
-     * Initialize the QueryBuilder object to generate reports from
+     * Initialize the QueryBuilder object to generate reports from.
      *
      * @param ReportGeneratorEvent $event
-     *
-     * @return void
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
@@ -140,6 +146,7 @@ class ReportSubscriber extends CommonSubscriber
         if ($context == 'assets') {
             $queryBuilder->from(MAUTIC_TABLE_PREFIX.'assets', 'a');
             $event->addCategoryLeftJoin($queryBuilder, 'a');
+            $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
         } elseif ($context == 'asset.downloads') {
             $event->applyDateFilters($queryBuilder, 'date_download', 'ad');
 
@@ -148,17 +155,16 @@ class ReportSubscriber extends CommonSubscriber
             $event->addCategoryLeftJoin($queryBuilder, 'a');
             $event->addLeadLeftJoin($queryBuilder, 'ad');
             $event->addIpAddressLeftJoin($queryBuilder, 'ad');
+            $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
         }
 
         $event->setQueryBuilder($queryBuilder);
     }
 
     /**
-     * Initialize the QueryBuilder object to generate reports from
+     * Initialize the QueryBuilder object to generate reports from.
      *
      * @param ReportGraphEvent $event
-     *
-     * @return void
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
@@ -169,7 +175,7 @@ class ReportSubscriber extends CommonSubscriber
 
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
-        $downloadRepo = $this->factory->getEntityManager()->getRepository('MauticAssetBundle:Download');
+        $downloadRepo = $this->em->getRepository('MauticAssetBundle:Download');
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,7 +14,7 @@ namespace Mautic\CoreBundle\Tests\Helper;
 use Mautic\CoreBundle\Helper\ColorHelper;
 
 /**
- * Class ColorHelper test
+ * Class ColorHelper test.
  */
 class ColorHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +25,7 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testTheHelperIsInstantiatedWithoutAttributeCorrectly()
     {
-        $helper = new ColorHelper;
+        $helper = new ColorHelper();
         $this->assertAttributeSame(0, 'red', $helper);
         $this->assertAttributeSame(0, 'green', $helper);
         $this->assertAttributeSame(0, 'blue', $helper);
@@ -36,14 +38,14 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatColorHexAreSetCorrectly()
     {
-        $colors = array(
-            '#ccc'      => array(204, 204, 204),
-            '#fff'      => array(255, 255, 255),
-            '#000'      => array(0, 0, 0),
-            '#333333'   => array(51, 51, 51),
-            '#369'      => array(51, 102, 153),
-            '#f8Ac30'   => array(248, 172, 48)
-        );
+        $colors = [
+            '#ccc'    => [204, 204, 204],
+            '#fff'    => [255, 255, 255],
+            '#000'    => [0, 0, 0],
+            '#333333' => [51, 51, 51],
+            '#369'    => [51, 102, 153],
+            '#f8Ac30' => [248, 172, 48],
+        ];
 
         foreach ($colors as $hex => $rgb) {
             $helper = new ColorHelper($hex);
@@ -61,17 +63,17 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatColorHexAreConvertedBackToHexCorrectly()
     {
-        $colors = array(
-            '#ccc'      => '#cccccc',
-            '#fff'      => '#ffffff',
-            '#000'      => '#000000',
-            '#333333'   => '#333333',
-            '#369'      => '#336699',
-            '#f8Ac30'   => '#f8ac30'
-        );
+        $colors = [
+            '#ccc'    => '#cccccc',
+            '#fff'    => '#ffffff',
+            '#000'    => '#000000',
+            '#333333' => '#333333',
+            '#369'    => '#336699',
+            '#f8Ac30' => '#f8ac30',
+        ];
 
         foreach ($colors as $hex1 => $hex2) {
-            $helper = new ColorHelper;
+            $helper = new ColorHelper();
             $helper->setHex($hex1);
             $this->assertEquals($hex2, $helper->toHex());
         }
@@ -84,14 +86,14 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatColorHexAreConvertedToRgbCorrectly()
     {
-        $colors = array(
-            '#ccc'      => 'rgb(204,204,204)',
-            '#fff'      => 'rgb(255,255,255)',
-            '#000'      => 'rgb(0,0,0)',
-            '#333333'   => 'rgb(51,51,51)',
-            '#369'      => 'rgb(51,102,153)',
-            '#f8Ac30'   => 'rgb(248,172,48)'
-        );
+        $colors = [
+            '#ccc'    => 'rgb(204,204,204)',
+            '#fff'    => 'rgb(255,255,255)',
+            '#000'    => 'rgb(0,0,0)',
+            '#333333' => 'rgb(51,51,51)',
+            '#369'    => 'rgb(51,102,153)',
+            '#f8Ac30' => 'rgb(248,172,48)',
+        ];
 
         foreach ($colors as $hex => $rgb) {
             $helper = new ColorHelper($hex);
@@ -106,18 +108,18 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatColorHexAreConvertedToRgbaCorrectly()
     {
-        $colors = array(
-            '#ccc'      => 'rgba(204,204,204,%g)',
-            '#fff'      => 'rgba(255,255,255,%g)',
-            '#000'      => 'rgba(0,0,0,%g)',
-            '#333333'   => 'rgba(51,51,51,%g)',
-            '#369'      => 'rgba(51,102,153,%g)',
-            '#f8Ac30'   => 'rgba(248,172,48,%g)'
-        );
+        $colors = [
+            '#ccc'    => 'rgba(204,204,204,%g)',
+            '#fff'    => 'rgba(255,255,255,%g)',
+            '#000'    => 'rgba(0,0,0,%g)',
+            '#333333' => 'rgba(51,51,51,%g)',
+            '#369'    => 'rgba(51,102,153,%g)',
+            '#f8Ac30' => 'rgba(248,172,48,%g)',
+        ];
 
         foreach ($colors as $hex => $rgba) {
             $helper = new ColorHelper($hex);
-            $randA = round((mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax()), 2);
+            $randA  = round((mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax()), 2);
             $this->assertEquals(sprintf($rgba, $randA), $helper->toRgba($randA, $randA));
         }
     }
@@ -130,7 +132,7 @@ class ColorHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testThatRandomColorIsWithinBorders()
     {
-        $helper = new ColorHelper;
+        $helper = new ColorHelper();
         $helper->buildRandomColor();
         $rgb = $helper->getColorArray();
 

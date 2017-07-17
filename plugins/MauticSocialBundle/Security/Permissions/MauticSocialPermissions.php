@@ -1,21 +1,21 @@
 <?php
-/**
- * @package     Mautic
+
+/*
  * @copyright   2016 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
+ *
  * @link        https://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticSocialBundle\Security\Permissions;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class MauticSocialPermissions
- *
- * @package MauticPlugin\MauticSocialBundle\Security\Permissions
+ * Class MauticSocialPermissions.
  */
 class MauticSocialPermissions extends AbstractPermissions
 {
@@ -27,6 +27,7 @@ class MauticSocialPermissions extends AbstractPermissions
         parent::__construct($params);
         $this->addStandardPermissions('categories');
         $this->addStandardPermissions('monitoring');
+        $this->addExtendedPermissions('tweets');
     }
 
     /**
@@ -34,7 +35,8 @@ class MauticSocialPermissions extends AbstractPermissions
      *
      * @return string|void
      */
-    public function getName() {
+    public function getName()
+    {
         return 'mauticSocial';
     }
 
@@ -44,10 +46,10 @@ class MauticSocialPermissions extends AbstractPermissions
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
         $this->addStandardFormFields('mauticSocial', 'categories', $builder, $data);
         $this->addStandardFormFields('mauticSocial', 'monitoring', $builder, $data);
+        $this->addExtendedFormFields('mauticSocial', 'tweets', $builder, $data);
     }
 }

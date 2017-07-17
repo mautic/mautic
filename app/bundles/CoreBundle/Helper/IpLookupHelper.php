@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -16,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class IpLookupHelper
+ * Class IpLookupHelper.
  */
 class IpLookupHelper
 {
@@ -43,6 +45,11 @@ class IpLookupHelper
     /**
      * @var array
      */
+    protected $doNotTrackBots;
+
+    /**
+     * @var array
+     */
     protected $doNotTrackInternalIps;
 
     /**
@@ -63,6 +70,7 @@ class IpLookupHelper
         $this->em                    = $em;
         $this->ipLookup              = $ipLookup;
         $this->doNotTrackIps         = $coreParametersHelper->getParameter('mautic.do_not_track_ips');
+        $this->doNotTrackBots        = $coreParametersHelper->getParameter('mautic.do_not_track_bots');
         $this->doNotTrackInternalIps = $coreParametersHelper->getParameter('mautic.do_not_track_internal_ips');
     }
 
@@ -81,7 +89,7 @@ class IpLookupHelper
                 'HTTP_X_CLUSTER_CLIENT_IP',
                 'HTTP_FORWARDED_FOR',
                 'HTTP_FORWARDED',
-                'REMOTE_ADDR'
+                'REMOTE_ADDR',
             ];
 
             foreach ($ipHolders as $key) {
@@ -94,7 +102,6 @@ class IpLookupHelper
 
                     // Validate IP
                     if (null !== $ip && $this->ipIsValid($ip)) {
-
                         return $ip;
                     }
                 }
@@ -106,7 +113,7 @@ class IpLookupHelper
     }
 
     /**
-     * Get an IpAddress entity for current session or for passed in IP address
+     * Get an IpAddress entity for current session or for passed in IP address.
      *
      * @param string $ip
      *
@@ -120,12 +127,12 @@ class IpLookupHelper
             $ip = $this->getIpAddressFromRequest();
         }
 
-        if (empty($ip)) {
+        if (empty($ip) || !$this->ipIsValid($ip)) {
             //assume local as the ip is empty
             $ip = '127.0.0.1';
         }
 
-        if (empty($ipAddress[$ip])) {
+        if (empty($ipAddresses[$ip])) {
             $repo      = $this->em->getRepository('MauticCoreBundle:IpAddress');
             $ipAddress = $repo->findOneByIpAddress($ip);
             $saveIp    = ($ipAddress === null);
@@ -140,12 +147,32 @@ class IpLookupHelper
                 $this->doNotTrackIps = [];
             }
 
+            if (!is_array($this->doNotTrackBots)) {
+                $this->doNotTrackBots = [];
+            }
+
             if (!is_array($this->doNotTrackInternalIps)) {
                 $this->doNotTrackInternalIps = [];
             }
 
-            $doNotTrack = array_merge(['127.0.0.1', '::1'], $this->doNotTrackIps, $this->doNotTrackInternalIps);
+            $doNotTrack = array_merge($this->doNotTrackIps, $this->doNotTrackInternalIps);
+            if ('prod' === MAUTIC_ENV) {
+                // Do not track internal IPs
+                $doNotTrack = array_merge($doNotTrack, ['127.0.0.1', '::1']);
+            }
+
             $ipAddress->setDoNotTrackList($doNotTrack);
+
+            if ($ipAddress->isTrackable() && $this->request) {
+                $userAgent = $this->request->headers->get('User-Agent');
+                foreach ($this->doNotTrackBots as $bot) {
+                    if (strpos($userAgent, $bot) !== false) {
+                        $doNotTrack[] = $ip;
+                        $ipAddress->setDoNotTrackList($doNotTrack);
+                        continue;
+                    }
+                }
+            }
 
             $details = $ipAddress->getIpDetails();
             if ($ipAddress->isTrackable() && empty($details['city'])) {
@@ -174,7 +201,7 @@ class IpLookupHelper
     }
 
     /**
-     * Validates if an IP address if valid
+     * Validates if an IP address if valid.
      *
      * @param $ip
      *
@@ -191,8 +218,6 @@ class IpLookupHelper
 
     /**
      * @param $ip
-     *
-     * @return null
      */
     protected function getClientIpFromProxyList($ip)
     {
@@ -213,7 +238,6 @@ class IpLookupHelper
         // X-Forwarded-For: client, proxy1, proxy2
         foreach ($ips as $ip) {
             if ($this->ipIsValid($ip)) {
-
                 return $ip;
             }
         }

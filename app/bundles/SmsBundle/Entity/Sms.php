@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -88,8 +90,8 @@ class Sms extends FormEntity
 
     public function __clone()
     {
-        $this->id = null;
-        $this->stats = new ArrayCollection();
+        $this->id        = null;
+        $this->stats     = new ArrayCollection();
         $this->sentCount = 0;
         $this->readCount = 0;
 
@@ -237,12 +239,12 @@ class Sms extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter = 'get'.ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
         if ($prop == 'category' || $prop == 'list') {
             $currentId = ($current) ? $current->getId() : '';
-            $newId = ($val) ? $val->getId() : null;
+            $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }

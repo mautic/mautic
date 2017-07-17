@@ -13,7 +13,7 @@ $attr = $form->vars['attr'];
             <?php foreach ($form->children as $child): ?>
                 <div class="checkbox">
                     <label>
-                        <?php echo $view['form']->widget($child, array('attr' => $attr)); ?>
+                        <?php echo $view['form']->widget($child, ['attr' => $attr]); ?>
                         <?php echo $view['translator']->trans($child->vars['label']); ?>
                     </label>
                 </div>

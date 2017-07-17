@@ -1,42 +1,62 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class LeadDeviceRepository
- *
- * @package Mautic\LeadBundle\Entity
+ * Class LeadDeviceRepository.
  */
 class LeadDeviceRepository extends CommonRepository
 {
     /**
-     * @param           $emailIds
-     * @param \DateTime $fromDate
+     * {@inhertidoc}.
+     *
+     * @param array $args
+     *
+     * @return Paginator
+     */
+    public function getEntities(array $args = [])
+    {
+        $q = $this
+            ->createQueryBuilder($this->getTableAlias())
+            ->select($this->getTableAlias());
+        $args['qb'] = $q;
+
+        return parent::getEntities($args);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'd';
+    }
+
+    /**
+     * @param      $lead
+     * @param null $deviceName
+     * @param null $deviceBrand
+     * @param null $deviceModel
      *
      * @return array
      */
-    public function getDevice(
-        $statIds,
-        $lead,
-        $deviceName = null,
-        $deviceBrand = null,
-        $deviceModel = null,
-        \DateTime $fromDate = null,
-        \DateTime $toDate = null
-    ) {
+    public function getDevice($lead, $deviceName = null, $deviceBrand = null, $deviceModel = null)
+    {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.device as device')
+        $sq->select('es.id as id, es.device as device, es.device_fingerprint')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
         if (!empty($statIds)) {
             $inIds = (!is_array($statIds)) ? [(int) $statIds] : $statIds;
@@ -73,23 +93,35 @@ class LeadDeviceRepository extends CommonRepository
             );
         }
 
-        if ($fromDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($fromDate);
-            $sq->andWhere(
-                $sq->expr()->gte('es.date_added', $sq->expr()->literal($dt->toUtcString()))
-            );
-        }
-        if ($toDate !== null) {
-            //make sure the date is UTC
-            $dt = new DateTimeHelper($toDate);
-            $sq->andWhere(
-                $sq->expr()->lte('es.date_added', $sq->expr()->literal($dt->toUtcString()))
-            );
-        }
         //get totals
         $device = $sq->execute()->fetchAll();
 
         return (!empty($device)) ? $device[0] : [];
+    }
+
+    /**
+     * @param string $fingerprint
+     *
+     * @return LeadDevice
+     */
+    public function getDeviceByFingerprint($fingerprint)
+    {
+        if (!$fingerprint) {
+            return null;
+        }
+
+        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq->select('es.id as id, es.lead_id as lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+
+        $sq->where(
+            $sq->expr()->eq('es.device_fingerprint', ':fingerprint')
+        )
+            ->setParameter('fingerprint', $fingerprint);
+
+        //get the first match
+        $device = $sq->execute()->fetch();
+
+        return $device ? $device : null;
     }
 }

@@ -1,6 +1,7 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -9,10 +10,11 @@
  */
 
 /** @var \Mautic\DynamicContentBundle\Entity\DynamicContent $entity */
-$view->extend('MauticCoreBundle:Default:content.html.php');
+if (!$isEmbedded) {
+    $view->extend('MauticCoreBundle:Default:content.html.php');
+}
 $view['slots']->set('mauticContent', 'dynamicContent');
 $view['slots']->set('headerTitle', $entity->getName());
-
 
 $translationContent = $view->render(
     'MauticCoreBundle:Translation:index.html.php',
@@ -23,43 +25,44 @@ $translationContent = $view->render(
         'actionRoute'  => 'mautic_dynamicContent_action',
     ]
 );
-$showTranslations   = !empty(trim($translationContent));
+$showTranslations = !empty(trim($translationContent));
 
 $customButtons = [];
-
-$view['slots']->set(
-    'actions',
-    $view->render(
-        'MauticCoreBundle:Helper:page_actions.html.php',
-        [
-            'item' => $entity,
-            'customButtons' => (isset($customButtons)) ? $customButtons : [],
-            'templateButtons' => [
-                'edit' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:editown'],
-                    $permissions['dynamicContent:dynamicContents:editother'],
-                    $entity->getCreatedBy()
-                ),
-                'clone'  => $permissions['dynamicContent:dynamicContents:create'],
-                'delete' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:deleteown'],
-                    $permissions['dynamicContent:dynamicContents:deleteother'],
-                    $entity->getCreatedBy()
-                ),
-                'close' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:viewown'],
-                    $permissions['dynamicContent:dynamicContents:viewother'],
-                    $entity->getCreatedBy()
-                ),
-            ],
-            'routeBase' => 'dynamicContent',
-        ]
-    )
-);
-$view['slots']->set(
-    'publishStatus',
-    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $entity])
-);
+if (!$isEmbedded) {
+    $view['slots']->set(
+        'actions',
+        $view->render(
+            'MauticCoreBundle:Helper:page_actions.html.php',
+            [
+                'item'            => $entity,
+                'customButtons'   => (isset($customButtons)) ? $customButtons : [],
+                'templateButtons' => [
+                    'edit' => $view['security']->hasEntityAccess(
+                        $permissions['dynamiccontent:dynamiccontents:editown'],
+                        $permissions['dynamiccontent:dynamiccontents:editother'],
+                        $entity->getCreatedBy()
+                    ),
+                    'clone'  => $permissions['dynamiccontent:dynamiccontents:create'],
+                    'delete' => $view['security']->hasEntityAccess(
+                        $permissions['dynamiccontent:dynamiccontents:deleteown'],
+                        $permissions['dynamiccontent:dynamiccontents:deleteother'],
+                        $entity->getCreatedBy()
+                    ),
+                    'close' => $view['security']->hasEntityAccess(
+                        $permissions['dynamiccontent:dynamiccontents:viewown'],
+                        $permissions['dynamiccontent:dynamiccontents:viewother'],
+                        $entity->getCreatedBy()
+                    ),
+                ],
+                'routeBase' => 'dynamicContent',
+            ]
+        )
+    );
+    $view['slots']->set(
+        'publishStatus',
+        $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $entity])
+    );
+}
 ?>
 
 <!-- start: box layout -->
@@ -90,7 +93,6 @@ $view['slots']->set(
                 </div>
             </div>
             <!--/ page detail header -->
-
             <!-- page detail collapseable -->
             <div class="collapse" id="page-details">
                 <div class="pr-md pl-md pb-md">
@@ -108,7 +110,6 @@ $view['slots']->set(
             </div>
             <!--/ page detail collapseable -->
         </div>
-
         <div class="bg-auto bg-dark-xs">
             <!-- page detail collapseable toggler -->
             <div class="hr-expand nm">

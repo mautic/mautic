@@ -1,47 +1,47 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\PluginBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class SocialMediaServiceType
- *
- * @package Mautic\FormBundle\Form\Type
+ * Class FieldsType.
  */
 class FieldsType extends AbstractType
 {
+    use FieldsTypeTrait;
+
+    private $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['integration_fields'] as $field => $details) {
-            $label = (is_array($details)) ? $details['label'] : $details;
-            $field = InputHelper::alphanum($field, false, '_');
-
-            $builder->add($field, 'choice', array(
-                'choices'    => $options['lead_fields'],
-                'label'      => $label,
-                'required'   => (is_array($details) && isset($details['required'])) ? $details['required'] : false,
-                'label_attr' => array('class' => 'control-label'),
-                'attr'       => array('class' => 'form-control', 'data-placeholder' => ' ')
-            ));
-        }
+        $this->buildFormFields($builder, $options, $options['integration_fields'], $options['mautic_fields'], '', $options['limit'], $options['start'], $this->translator);
     }
 
     /**
@@ -49,21 +49,15 @@ class FieldsType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(['integration_fields', 'lead_fields']);
-        $resolver->setDefaults(
-            [
-                'special_instructions' => '',
-                'alert_type'           => '',
-                'allow_extra_fields'   => true
-            ]
-        );
+        $this->configureFieldOptions($resolver, 'lead');
     }
 
     /**
      * @return string
      */
-    public function getName() {
-        return "integration_fields";
+    public function getName()
+    {
+        return 'integration_fields';
     }
 
     /**
@@ -71,7 +65,6 @@ class FieldsType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['specialInstructions'] = $options['special_instructions'];
-        $view->vars['alertType']           = $options['alert_type'];
+        $this->buildFieldView($view,  $options, 'lead');
     }
 }

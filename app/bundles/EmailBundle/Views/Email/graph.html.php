@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 if ($emailType == 'list') {
     $label = 'mautic.email.lead.list.comparison';
     $type  = 'bar';
@@ -19,11 +20,11 @@ $dateTo      = $dateRangeForm->children['date_to']->vars['data'];
 $actionRoute = $view['router']->path('mautic_email_action',
     [
         'objectAction' => 'view',
-        'objectId' => $email->getId(),
-        'daterange' => [
-            'date_to' => $dateTo,
-            'date_from' => $dateFrom
-        ]
+        'objectId'     => $email->getId(),
+        'daterange'    => [
+            'date_to'   => $dateTo,
+            'date_from' => $dateFrom,
+        ],
     ]
 );
 
@@ -34,13 +35,17 @@ $actionRoute = $view['router']->path('mautic_email_action',
             <?php if ($isVariant): ?>
             <div class="text-right small" id="variant-chart-switcher">
                 <span>
-                    <a data-toggle="ajax" class="btn btn-xs<?php if (!$showAllStats) echo " disabled"; ?>" href="<?php echo $actionRoute."&stats=variant"; ?>">
+                    <a data-toggle="ajax" class="btn btn-xs<?php if (!$showAllStats) {
+    echo ' disabled';
+} ?>" href="<?php echo $actionRoute.'&stats=variant'; ?>">
                         <?php echo $view['translator']->trans('mautic.email.variant.graph.variant'); ?>
                     </a>
                 </span>
                 </span> | </span>
                 <span>
-                    <a data-toggle="ajax" class="btn btn-xs<?php  if ($showAllStats) echo " disabled"; ?>" href="<?php echo $actionRoute."&stats=all"; ?>">
+                    <a data-toggle="ajax" class="btn btn-xs<?php  if ($showAllStats) {
+    echo ' disabled';
+} ?>" href="<?php echo $actionRoute.'&stats=all'; ?>">
                         <?php echo $view['translator']->trans('mautic.email.variant.graph.all'); ?>
                     </a>
                 </span>
@@ -55,15 +60,15 @@ $actionRoute = $view['router']->path('mautic_email_action',
                         </h5>
                     </div>
                     <div class="col-xs-8 va-m">
-                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', array('dateRangeForm' => $dateRangeForm, 'class' => 'pull-right')); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm, 'class' => 'pull-right']); ?>
                     </div>
                 </div>
                 <div class="row">
                     <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
-                        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $stats, 'chartType' => $type, 'chartHeight' => 300)); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', ['chartData' => $stats, 'chartType' => $type, 'chartHeight' => 300]); ?>
                     </div>
                     <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
-                        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', array('chartData' => $statsDevices, 'chartType' => 'horizontal-bar', 'chartHeight' => 300)); ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', ['chartData' => $statsDevices, 'chartType' => 'horizontal-bar', 'chartHeight' => 300]); ?>
                     </div>
                 </div>
             </div>

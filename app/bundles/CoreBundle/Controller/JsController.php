@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,7 +16,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class JsController
+ * Class JsController.
  */
 class JsController extends CommonController
 {
@@ -23,19 +25,19 @@ class JsController extends CommonController
      */
     public function indexAction()
     {
-        $dispatcher = $this->factory->getDispatcher();
-        $debug = $this->factory->getKernel()->isDebug();
-        $event = new BuildJsEvent($this->getJsHeader(), $debug);
+        $dispatcher = $this->dispatcher;
+        $debug      = $this->factory->getKernel()->isDebug();
+        $event      = new BuildJsEvent($this->getJsHeader(), $debug);
 
         if ($dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
             $dispatcher->dispatch(CoreEvents::BUILD_MAUTIC_JS, $event);
         }
 
-        return new Response($event->getJs(), 200, array('Content-Type' => 'application/javascript'));
+        return new Response($event->getJs(), 200, ['Content-Type' => 'application/javascript']);
     }
 
     /**
-     * Build a JS header for the Mautic embedded JS
+     * Build a JS header for the Mautic embedded JS.
      *
      * @return string
      */

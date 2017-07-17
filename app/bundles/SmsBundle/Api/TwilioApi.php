@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Api;
 
 use libphonenumber\NumberParseException;
@@ -14,6 +16,7 @@ use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Monolog\Logger;
 
 class TwilioApi extends AbstractSmsApi
@@ -37,18 +40,22 @@ class TwilioApi extends AbstractSmsApi
      * TwilioApi constructor.
      *
      * @param TrackableModel    $pageTrackableModel
-     * @param \Services_Twilio  $client
      * @param PhoneNumberHelper $phoneNumberHelper
-     * @param                   $sendingPhoneNumber
+     * @param IntegrationHelper $integrationHelper
      * @param Logger            $logger
      */
-    public function __construct(TrackableModel $pageTrackableModel, \Services_Twilio $client, PhoneNumberHelper $phoneNumberHelper, $sendingPhoneNumber, Logger $logger)
+    public function __construct(TrackableModel $pageTrackableModel, PhoneNumberHelper $phoneNumberHelper, IntegrationHelper $integrationHelper, Logger $logger)
     {
-        $this->client = $client;
         $this->logger = $logger;
 
-        if ($sendingPhoneNumber) {
-            $this->sendingPhoneNumber = $phoneNumberHelper->format($sendingPhoneNumber);
+        $integration = $integrationHelper->getIntegrationObject('Twilio');
+
+        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
+            $this->sendingPhoneNumber = $integration->getIntegrationSettings()->getFeatureSettings()['sending_phone_number'];
+
+            $keys = $integration->getDecryptedApiKeys();
+
+            $this->client = new \Services_Twilio($keys['username'], $keys['password']);
         }
 
         parent::__construct($pageTrackableModel);
@@ -71,12 +78,11 @@ class TwilioApi extends AbstractSmsApi
      * @param string $number
      * @param string $content
      *
-     * @return boolean
+     * @return bool|string
      */
     public function sendSms($number, $content)
     {
         if ($number === null) {
-
             return false;
         }
 
@@ -89,19 +95,19 @@ class TwilioApi extends AbstractSmsApi
 
             return true;
         } catch (\Services_Twilio_RestException $e) {
-            $this->logger->addError(
+            $this->logger->addWarning(
                 $e->getMessage(),
                 ['exception' => $e]
             );
 
-            return false;
+            return $e->getMessage();
         } catch (NumberParseException $e) {
-            $this->logger->addError(
+            $this->logger->addWarning(
                 $e->getMessage(),
                 ['exception' => $e]
             );
 
-            return false;
+            return $e->getMessage();
         }
     }
 }

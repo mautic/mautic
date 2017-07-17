@@ -1,17 +1,19 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\Entity;
 
-use Mautic\LeadBundle\Entity\Lead;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 
 class PushID
 {
@@ -29,6 +31,16 @@ class PushID
      * @var string
      */
     private $pushID;
+
+    /**
+     * @var bool
+     */
+    private $enabled;
+
+    /**
+     * @var bool
+     */
+    private $mobile;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -54,6 +66,9 @@ class PushID
             ->addJoinColumn('lead_id', 'id', true, false, 'SET NULL')
             ->inversedBy('pushIds')
             ->build();
+
+        $builder->createField('enabled', 'boolean')->build();
+        $builder->createField('mobile', 'boolean')->build();
     }
 
     /**
@@ -112,6 +127,46 @@ class PushID
     public function setPushID($pushID)
     {
         $this->pushID = $pushID;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param $enabled
+     *
+     * @return $this
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
 
         return $this;
     }

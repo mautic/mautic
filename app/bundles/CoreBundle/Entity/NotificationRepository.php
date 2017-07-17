@@ -1,20 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Entity;
 
 /**
- * NotificationRepository
+ * NotificationRepository.
  */
 class NotificationRepository extends CommonRepository
 {
-
     /**
      * {@inheritdoc}
      *
@@ -32,38 +33,60 @@ class NotificationRepository extends CommonRepository
      */
     public function getDefaultOrder()
     {
-        return array(
-            array('n.dateAdded', 'DESC')
-        );
+        return [
+            ['n.dateAdded', 'DESC'],
+        ];
     }
 
     /**
-     * Mark user notifications as read
+     * Mark user notifications as read.
      *
      * @param $userId
      */
     public function markAllReadForUser($userId)
     {
-        $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'notifications', array('is_read' => 1), array('user_id' => (int) $userId));
+        $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX.'notifications', ['is_read' => 1], ['user_id' => (int) $userId]);
     }
 
     /**
-     * Clear notifications for a user
+     * Clear notifications for a user.
      *
      * @param      $userId
-     * @param null $id      Clears all if empty
+     * @param null $id     Clears all if empty
+     * @param null $limit  Clears a set number
      *
      * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
      */
-    public function clearNotificationsForUser($userId, $id = null)
+    public function clearNotificationsForUser($userId, $id = null, $limit = null)
     {
-        $filter = array('user_id' => (int) $userId);
-
         if (!empty($id)) {
-            $filter['id'] = (int) $id;
-        }
+            $this->getEntityManager()->getConnection()->update(
+                MAUTIC_TABLE_PREFIX.'notifications',
+                [
+                    'is_read' => 1,
+                ],
+                [
+                    'user_id' => (int) $userId,
+                    'id'      => $id,
+                ]
+            );
+        } else {
+            // Only mark the first 30 read
+            $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $qb->update(MAUTIC_TABLE_PREFIX.'notifications')
+                ->set('is_read', 1)
+                ->where('user_id = '.(int) $userId.' AND is_read = 0')
+                ->orderBy('id');
 
-        $this->_em->getConnection()->update(MAUTIC_TABLE_PREFIX . 'notifications', ['is_read' => 1], $filter);
+            if ($limit) {
+                // Doctrine API doesn't support updates with limits
+                $this->getEntityManager()->getConnection()->executeUpdate(
+                    $qb->getSQL()." LIMIT $limit"
+                );
+            } else {
+                $qb->execute();
+            }
+        }
     }
 
     /**
@@ -84,16 +107,17 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * Fetch notifications for this user
+     * Fetch notifications for this user.
      *
      * @param      $userId
      * @param null $afterId
      * @param bool $includeRead
      * @param null $type
+     * @param null $limit
      *
      * @return array
      */
-    public function getNotifications($userId, $afterId = null, $includeRead = false, $type = null)
+    public function getNotifications($userId, $afterId = null, $includeRead = false, $type = null, $limit = null)
     {
         $qb = $this->createQueryBuilder('n');
 
@@ -120,7 +144,12 @@ class NotificationRepository extends CommonRepository
             $qb->setParameter('type', $type);
         }
 
-        $qb->where($expr);
+        $qb->where($expr)
+            ->orderBy('n.id');
+
+        if ($limit) {
+            $qb->setMaxResults($limit);
+        }
 
         return $qb->getQuery()->getArrayResult();
     }

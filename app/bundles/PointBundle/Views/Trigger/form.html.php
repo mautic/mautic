@@ -1,20 +1,21 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'pointTrigger');
 
 $header = ($entity->getId()) ?
     $view['translator']->trans('mautic.point.trigger.header.edit',
-        array('%name%' => $view['translator']->trans($entity->getName()))) :
+        ['%name%' => $view['translator']->trans($entity->getName())]) :
     $view['translator']->trans('mautic.point.trigger.header.new');
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 ?>
 
 
@@ -38,7 +39,7 @@ $view['slots']->set("headerTitle", $header);
                                 <div class="pa-md">
                                     <?php
                                     echo $view['form']->row($form['name']);
-                                    echo $view['form']->row($form['description'], array('attr' => array('class' => 'form-control editor')));
+                                    echo $view['form']->row($form['description'], ['attr' => ['class' => 'form-control editor']]);
                                     ?>
                                 </div>
                             </div>
@@ -70,7 +71,7 @@ $view['slots']->set("headerTitle", $header);
                                             </li>
                                             <?php foreach ($event as $k => $e): ?>
                                                 <li id="event_<?php echo $k; ?>">
-                                                    <a data-toggle="ajaxmodal" data-target="#triggerEventModal" class="list-group-item" href="<?php echo $view['router']->path('mautic_pointtriggerevent_action', array('objectAction' => 'new', 'type' => $k, 'tmpl'=> 'event', 'triggerId' => $sessionId)); ?>">
+                                                    <a data-toggle="ajaxmodal" data-target="#triggerEventModal" class="list-group-item" href="<?php echo $view['router']->path('mautic_pointtriggerevent_action', ['objectAction' => 'new', 'type' => $k, 'tmpl' => 'event', 'triggerId' => $sessionId]); ?>">
                                                         <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
                                                             <span><?php echo $e['label']; ?></span>
                                                         </div>
@@ -85,12 +86,12 @@ $view['slots']->set("headerTitle", $header);
                             foreach ($triggerEvents as $event):
                                 $template = (isset($event['settings']['template'])) ? $event['settings']['template'] :
                                     'MauticPointBundle:Event:generic.html.php';
-                                echo $view->render($template, array(
+                                echo $view->render($template, [
                                     'event'     => $event,
                                     'id'        => $event['id'],
                                     'deleted'   => in_array($event['id'], $deletedEvents),
-                                    'sessionId' => $sessionId
-                                ));
+                                    'sessionId' => $sessionId,
+                                ]);
                             endforeach;
                             ?>
                             <?php if (!count($triggerEvents)): ?>
@@ -118,9 +119,9 @@ $view['slots']->set("headerTitle", $header);
 <?php echo $view['form']->end($form); ?>
 
  <?php
-    $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', array(
+    $view['slots']->append('modal', $this->render('MauticCoreBundle:Helper:modal.html.php', [
         'id'            => 'triggerEventModal',
         'header'        => $view['translator']->trans('mautic.point.trigger.form.modalheader'),
-        'footerButtons' => true
-    )));
+        'footerButtons' => true,
+    ]));
 ?>

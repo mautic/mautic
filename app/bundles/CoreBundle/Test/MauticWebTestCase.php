@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,8 +13,11 @@ namespace Mautic\CoreBundle\Test;
 
 //@TODO - fix entity detachment issue that is leading to failed tests
 
+use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-//use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -20,7 +25,6 @@ define('MAUTIC_TEST_ENV', 1);
 
 class MauticWebTestCase extends WebTestCase
 {
-
     /**
      * @var \Symfony\Bundle\FrameworkBundle\Client
      */
@@ -37,11 +41,16 @@ class MauticWebTestCase extends WebTestCase
     protected $encoder;
 
     /**
-     * @var
+     * @var ContainerInterface
      */
     protected $container;
 
-    protected function getClient(array $options = array(), array $server = array())
+    /**
+     * @var ReferenceRepository
+     */
+    public $fixtures;
+
+    protected function getClient(array $options = [], array $server = [])
     {
         if (empty($server['PHP_AUTH_USER'])) {
             $server['PHP_AUTH_USER'] = 'admin';
@@ -50,10 +59,11 @@ class MauticWebTestCase extends WebTestCase
         $client = static::createClient($options, $server);
 
         $client->followRedirects(true);
+
         return $client;
     }
 
-    protected function getNonAdminClient($user = 'sales', array $options = array(), array $server = array())
+    protected function getNonAdminClient($user = 'sales', array $options = [], array $server = [])
     {
         if (empty($server['PHP_AUTH_USER'])) {
             $server['PHP_AUTH_USER'] = $user;
@@ -64,11 +74,12 @@ class MauticWebTestCase extends WebTestCase
         return $client;
     }
 
-    protected function getAnonClient(array $options = array(), array $server = array())
+    protected function getAnonClient(array $options = [], array $server = [])
     {
         $client = static::createClient($options, $server);
 
         $client->followRedirects(true);
+
         return $client;
     }
 
@@ -78,10 +89,10 @@ class MauticWebTestCase extends WebTestCase
 
         $anonClient->followRedirects(false);
 
-        $client = $this->em->getRepository('MauticApiBundle:oAuth2\Client')->findOneByName('Mautic');
+        $client       = $this->em->getRepository('MauticApiBundle:oAuth2\Client')->findOneByName('Mautic');
         $redirectUris = $client->getRedirectUris();
         $redirectUri  = urlencode($redirectUris[0]);
-        $anonClient->request('GET', 'oauth/v2/auth?client_id=' . $client->getPublicId() . '&response_type=code&redirect_uri=' . $redirectUri);
+        $anonClient->request('GET', 'oauth/v2/auth?client_id='.$client->getPublicId().'&response_type=code&redirect_uri='.$redirectUri);
         $crawler = $anonClient->followRedirect();
 
         $this->assertNoError($anonClient->getResponse(), $crawler);
@@ -99,10 +110,10 @@ class MauticWebTestCase extends WebTestCase
 
         // submit the form
         $crawler = $anonClient->submit($form,
-            array(
+            [
                 '_username' => 'admin',
-                '_password' => 'mautic'
-            )
+                '_password' => 'mautic',
+            ]
         );
         $this->assertNoError($anonClient->getResponse(), $crawler);
 
@@ -118,7 +129,7 @@ class MauticWebTestCase extends WebTestCase
             //Let's authorize
             $crawler = $anonClient->submit($form);
         } elseif ($fullTest) {
-            $this->assertTrue($authorize, "Could not find the authorization form.");
+            $this->assertTrue($authorize, 'Could not find the authorization form.');
         }
 
         //should get a redirect header
@@ -126,16 +137,16 @@ class MauticWebTestCase extends WebTestCase
         $this->assertTrue(!empty($location));
 
         //get the code
-        $code = str_replace($redirectUris[0]."?code=", "", $location);
+        $code = str_replace($redirectUris[0].'?code=', '', $location);
         $this->assertTrue(!empty($code));
 
         //reset the client
         $anonClient = $this->getAnonClient();
 
         //submit for a token
-        $anonClient->request('GET', 'oauth/v2/token?client_id=' . $client->getPublicId() . '&client_secret=' .
-            $client->getSecret() . '&grant_type=authorization_code&redirect_uri=' . $redirectUri .
-            '&code=' . $code);
+        $anonClient->request('GET', 'oauth/v2/token?client_id='.$client->getPublicId().'&client_secret='.
+            $client->getSecret().'&grant_type=authorization_code&redirect_uri='.$redirectUri.
+            '&code='.$code);
 
         $this->assertNoError($anonClient->getResponse(), $crawler);
 
@@ -145,28 +156,27 @@ class MauticWebTestCase extends WebTestCase
 
         $content = $response->getContent();
         $decoded = json_decode($content, true);
-        $this->assertTrue(!empty($decoded["access_token"]));
+        $this->assertTrue(!empty($decoded['access_token']));
 
-        return $decoded["access_token"];
-
+        return $decoded['access_token'];
     }
 
-    protected function assertContentType($response, $type = "application/json")
+    protected function assertContentType($response, $type = 'application/json')
     {
         $this->assertTrue(
-            $response->headers->contains('Content-Type', $type), 'Unrecognized content type. Expecting ' . $type .
-            '; received ' . $response->headers->get('Content-Type')
+            $response->headers->contains('Content-Type', $type), 'Unrecognized content type. Expecting '.$type.
+            '; received '.$response->headers->get('Content-Type')
         );
     }
 
     protected function assertNoError($response, $crawler, $fullOutput = false)
     {
         $noException = true;
-        $msg         = "Status code " . $response->getStatusCode();
+        $msg         = 'Status code '.$response->getStatusCode();
         if ($response->getStatusCode() >= 400) {
             //symfony inserts the exception into the title so extract it from that
             if (count($crawler)) {
-                $msg .= ": " . trim($crawler->filter('title')->text());
+                $msg .= ': '.trim($crawler->filter('title')->text());
             } elseif ($response->getContent()) {
                 if ($response->headers->get('Content-Type') == 'application/json') {
                     $content = json_decode($response->getContent());
@@ -179,16 +189,15 @@ class MauticWebTestCase extends WebTestCase
                     } else {
                         $message = print_r($content, true);
                     }
-                    $msg .= ": " . $message;
+                    $msg .= ': '.$message;
                 } else {
-                    $msg .= ": " . $response->getContent();
+                    $msg .= ': '.$response->getContent();
                 }
             }
             $noException = false;
         }
         $this->assertTrue($noException, $msg);
     }
-
 
     /**
      * {@inheritdoc}
@@ -200,43 +209,18 @@ class MauticWebTestCase extends WebTestCase
         $this->container = static::$kernel->getContainer();
 
         //setup the request stack
-        $request = Request::createFromGlobals();
+        $request      = Request::createFromGlobals();
         $requestStack = new RequestStack();
         $requestStack->push($request);
         $this->container->set('request_stack', $requestStack);
-
-        $command = new \Mautic\CoreBundle\Command\InstallDataCommand();
-        $command->setContainer($this->container);
-
-        /*
-        $application = new Application(static::$kernel);
-        $doctrineCreate = new CreateSchemaDoctrineCommand();
-        $application->add($doctrineCreate);
-        $doctrineDrop = new DropSchemaDoctrineCommand();
-        $application->add($doctrineDrop);
-        $doctrineLoad = new LoadDataFixturesDoctrineCommand();
-        $application->add($doctrineLoad);
-        $command->setApplication($application);
-
-        //recreate the database
-        $input = new ArrayInput(array(
-            'command' => 'mautic:install:data',
-            '--env'   => 'test',
-            '--force' => true,
-            '--quiet' => true
-        ));
-        $output = new ConsoleOutput();
-        $command->run($input, $output);
-        */
-
-        $fixtures = $command->getMauticFixtures(true);
-        $executor = $this->loadFixtures($fixtures);
 
         //setup the entity manager
         $this->em = $this->container
             ->get('doctrine')->getManager();
         $this->encoder = $this->container
             ->get('security.encoder_factory');
+
+        $this->setupDatabaseOnFirstRun();
     }
 
     /**
@@ -245,7 +229,85 @@ class MauticWebTestCase extends WebTestCase
     protected function tearDown()
     {
         parent::tearDown();
-        $this->em->close();
+
+        if ($this->em) {
+            $this->em->close();
+        }
         unset($this->em, $this->container, $this->client, $this->encoder);
+    }
+
+    /**
+     * TODO: Backup the database after creation, and store in cache dir to reimport between test.
+     */
+    private function setupDatabaseOnFirstRun()
+    {
+        $this->runCommand('doctrine:schema:drop', [
+            '--env'   => 'test',
+            '--force' => true,
+            '--quiet' => true,
+        ], true);
+
+        $this->runCommand('doctrine:schema:create', [
+            '--env'   => 'test',
+            '--quiet' => true,
+        ], true);
+
+        $this->em->getConnection()->query('SET GLOBAL FOREIGN_KEY_CHECKS = 0;');
+
+        $this->fixtures = $this->loadFixtures($this->getMauticFixtures(true))->getReferenceRepository();
+
+        $this->em->getConnection()->query('SET GLOBAL FOREIGN_KEY_CHECKS = 1;');
+    }
+
+    /**
+     * Returns Mautic fixtures.
+     *
+     * @param bool $returnClassNames
+     *
+     * @return array
+     */
+    private function getMauticFixtures($returnClassNames = false)
+    {
+        $fixtures      = [];
+        $mauticBundles = $this->container->getParameter('mautic.bundles');
+        foreach ($mauticBundles as $bundle) {
+            $fixturesDir = $bundle['directory'].'/DataFixtures/ORM';
+
+            if (file_exists($fixturesDir)) {
+                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\DataFixtures\\ORM\\';
+                $this->populateFixturesFromDirectory($fixturesDir, $fixtures, $classPrefix, $returnClassNames);
+            }
+
+            $testFixturesDir = $bundle['directory'].'/Tests/DataFixtures/ORM';
+
+            if (MAUTIC_TEST_ENV && file_exists($testFixturesDir)) {
+                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\Tests\\DataFixtures\\ORM\\';
+                $this->populateFixturesFromDirectory($testFixturesDir, $fixtures, $classPrefix, $returnClassNames);
+            }
+        }
+
+        return $fixtures;
+    }
+
+    /**
+     * @param string $fixturesDir
+     * @param array  $fixtures
+     * @param string $classPrefix
+     * @param bool   $returnClassNames
+     */
+    private function populateFixturesFromDirectory($fixturesDir, array &$fixtures, $classPrefix = null, $returnClassNames = false)
+    {
+        if ($returnClassNames) {
+            //get files within the directory
+            $finder = new Finder();
+            $finder->files()->in($fixturesDir)->name('*.php');
+            foreach ($finder as $file) {
+                //add the file to be loaded
+                $class      = str_replace('.php', '', $file->getFilename());
+                $fixtures[] = $classPrefix.$class;
+            }
+        } else {
+            $fixtures[] = $fixturesDir;
+        }
     }
 }

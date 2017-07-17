@@ -1,29 +1,31 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CategoryBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class CategoryListType
- *
- * @package Mautic\CategoryBundle\Form\Type
+ * Class CategoryListType.
  */
 class CategoryListType extends AbstractType
 {
-
     private $em;
 
     private $model;
@@ -33,13 +35,19 @@ class CategoryListType extends AbstractType
     private $router;
 
     /**
-     * @param MauticFactory $factory
+     * CategoryListType constructor.
+     *
+     * @param EntityManager       $em
+     * @param TranslatorInterface $translator
+     * @param CategoryModel       $model
+     * @param Router              $router
      */
-    public function __construct(MauticFactory $factory) {
-        $this->em         = $factory->getEntityManager();
-        $this->translator = $factory->getTranslator();
-        $this->model      = $factory->getModel('category');
-        $this->router     = $factory->getRouter();
+    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, Router $router)
+    {
+        $this->em         = $em;
+        $this->translator = $translator;
+        $this->model      = $model;
+        $this->router     = $router;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -51,52 +59,56 @@ class CategoryListType extends AbstractType
     /**
      * @param OptionsResolverInterface $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $model = $this->model;
-        $createNew = $this->translator->trans('mautic.category.createnew');
-        $modalHeader = $this->translator->trans('mautic.category.header.new');
-        $router     = $this->router;
-        $resolver->setDefaults(array(
-            'choices'    =>  function (Options $options) use ($model, $createNew, $modalHeader) {
-                $categories = $model->getLookupResults($options['bundle'], '', 0);
-                $choices = array();
+        $resolver->setDefaults([
+            'choices' => function (Options $options) {
+                $createNew = $this->translator->trans('mautic.category.createnew');
+                $categories = $this->model->getLookupResults($options['bundle'], '', 0);
+                $choices = [];
                 foreach ($categories as $l) {
                     $choices[$l['id']] = $l['title'];
                 }
                 $choices['new'] = $createNew;
+
                 return $choices;
             },
-            'label'      => 'mautic.core.category',
-            'label_attr' => array('class' => 'control-label'),
-            'multiple'   => false,
-            'empty_value'=> 'mautic.core.form.uncategorized',
-            'attr'       => function (Options $options) use ($modalHeader, $router) {
-                $newUrl    = $router->generate('mautic_category_action', array(
+            'label'       => 'mautic.core.category',
+            'label_attr'  => ['class' => 'control-label'],
+            'multiple'    => false,
+            'empty_value' => 'mautic.core.form.uncategorized',
+            'attr'        => function (Options $options) {
+                $modalHeader = $this->translator->trans('mautic.category.header.new');
+                $newUrl = $this->router->generate('mautic_category_action', [
                     'objectAction' => 'new',
                     'bundle'       => $options['bundle'],
-                    'inForm'       => 1
-                ));
-                return array(
-                    'class'     => 'form-control category-select',
-                    'onchange'  => "Mautic.onCategoryChange(this, '{$newUrl}', '{$modalHeader}');"
-                );
-            },
-            'required'   => false
-        ));
+                    'inForm'       => 1,
+                ]);
 
-        $resolver->setRequired(array('bundle'));
+                return [
+                    'class'    => 'form-control category-select',
+                    'onchange' => "Mautic.loadAjaxModalBySelectValue(this, 'new', '{$newUrl}', '{$modalHeader}');",
+                ];
+            },
+            'required' => false,
+        ]);
+
+        $resolver->setRequired(['bundle']);
     }
 
     /**
      * @return string
      */
-    public function getName() {
-        return "category";
+    public function getName()
+    {
+        return 'category';
     }
 
+    /**
+     * @return string
+     */
     public function getParent()
     {
-        return "choice";
+        return 'choice';
     }
 }

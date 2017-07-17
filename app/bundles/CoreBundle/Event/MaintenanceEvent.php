@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,11 +14,10 @@ namespace Mautic\CoreBundle\Event;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class MaintenanceEvent
+ * Class MaintenanceEvent.
  */
 class MaintenanceEvent extends Event
 {
-
     /**
      * @var int
      */
@@ -56,7 +57,7 @@ class MaintenanceEvent extends Event
     }
 
     /**
-     * Get integer for number of days ago to purge data
+     * Get integer for number of days ago to purge data.
      *
      * @return int
      */
@@ -66,7 +67,7 @@ class MaintenanceEvent extends Event
     }
 
     /**
-     * Returns a DateTime in UTC for the date to delete records older than the given date
+     * Returns a DateTime in UTC for the date to delete records older than the given date.
      *
      * @return \DateTime
      */
@@ -76,7 +77,7 @@ class MaintenanceEvent extends Event
     }
 
     /**
-     * Set the number of records purged by the listener
+     * Set the number of records purged by the listener.
      *
      * @param string $key
      * @param int    $recordCount
@@ -104,7 +105,7 @@ class MaintenanceEvent extends Event
     }
 
     /**
-     * Return if this is to be a dry run
+     * Return if this is to be a dry run.
      *
      * @return bool
      */

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,11 +19,10 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class LoadPageCategoryData
+ * Class LoadPageCategoryData.
  */
 class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
 {
-
     /**
      * @var ContainerInterface
      */
@@ -40,12 +41,10 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
      */
     public function load(ObjectManager $manager)
     {
-        $trans   = $this->container->get('translator');
-        $factory = $this->container->get('mautic.factory');
-        $repo    = $factory->getModel('category.category')->getRepository();
-        $today   = new \DateTime();
+        $repo  = $this->container->get('mautic.category.model.category')->getRepository();
+        $today = new \DateTime();
 
-        $cat    = new Category();
+        $cat = new Category();
         $cat->setBundle('page');
         $events = 'Events';
 

@@ -1,36 +1,37 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 /**
- * DoNotContactRepository
+ * DoNotContactRepository.
  */
 class DoNotContactRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * Get a list of DNC entries based on channel and lead_id
+     * Get a list of DNC entries based on channel and lead_id.
      *
-     * @param Lead $lead
+     * @param Lead   $lead
      * @param string $channel
      *
      * @return \Mautic\LeadBundle\Entity\DoNotContact[]
      */
     public function getEntriesByLeadAndChannel(Lead $lead, $channel)
     {
-        return $this->findBy(array('channel' => $channel, 'lead' => $lead));
+        return $this->findBy(['channel' => $channel, 'lead' => $lead]);
     }
 
     /**
@@ -51,7 +52,7 @@ class DoNotContactRepository extends CommonRepository
 
         if ($ids) {
             if (!is_array($ids)) {
-                $ids = array((int) $ids);
+                $ids = [(int) $ids];
             }
             $q->where(
                 $q->expr()->in('dnc.channel_id', $ids)
@@ -74,6 +75,12 @@ class DoNotContactRepository extends CommonRepository
             if (true === $listId) {
                 $q->addSelect('cs.leadlist_id')
                     ->groupBy('cs.leadlist_id');
+            } elseif (is_array($listId)) {
+                $q->andWhere(
+                    $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
+                )
+                    ->addSelect('cs.leadlist_id')
+                    ->groupBy('cs.leadlist_id');
             } else {
                 $q->andWhere('cs.leadlist_id = :list_id')
                     ->setParameter('list_id', $listId);
@@ -86,7 +93,7 @@ class DoNotContactRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        if (true === $listId) {
+        if (true === $listId || is_array($listId)) {
             // Return list group of counts
             $byList = [];
             foreach ($results as $result) {
@@ -113,7 +120,7 @@ class DoNotContactRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('dnc.channel', $query->expr()->literal('%' . $options['search'] . '%'))
+                $query->expr()->like('dnc.channel', $query->expr()->literal('%'.$options['search'].'%'))
             );
         }
 
@@ -121,19 +128,24 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param      $channel
-     * @param null $contacts Array of contacts to filter by
+     * @param       $channel
+     * @param array $contacts Array of contacts to filter by
      *
      * @return array
      */
-    public function getChannelList($channel, $contacts = null)
+    public function getChannelList($channel, array $contacts = null)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX . 'lead_donotcontact', 'dnc')
-            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX . 'leads', 'l', 'l.id = dnc.lead_id')
-            ->where('dnc.channel = :channel')
-            ->setParameter('channel', $channel);
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
+            ->leftJoin('dnc', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = dnc.lead_id');
+
+        if (null === $channel) {
+            $q->select('dnc.channel, dnc.reason, l.id as lead_id');
+        } else {
+            $q->select('l.id')
+              ->where('dnc.channel = :channel')
+              ->setParameter('channel', $channel);
+        }
 
         if ($contacts) {
             $q->andWhere(
@@ -143,10 +155,17 @@ class DoNotContactRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        $dnc = array();
-
+        $dnc = [];
         foreach ($results as $r) {
-            $dnc[] = $r['id'];
+            if (isset($r['lead_id'])) {
+                if (!isset($dnc[$r['lead_id']])) {
+                    $dnc[$r['lead_id']] = [];
+                }
+
+                $dnc[$r['lead_id']][$r['channel']] = $r['reason'];
+            } else {
+                $dnc[] = $r['id'];
+            }
         }
 
         unset($results);

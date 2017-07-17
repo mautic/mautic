@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,14 +14,14 @@ namespace Mautic\PluginBundle\Event;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
- * Class PluginIntegrationFormDisplayEvent
+ * Class PluginIntegrationFormDisplayEvent.
  */
 class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
 {
     /**
      * @var string
      */
-    private $settings = array();
+    private $settings = [];
 
     /**
      * PluginIntegrationAuthCallbackUrlEvent constructor.
@@ -51,4 +53,3 @@ class PluginIntegrationFormDisplayEvent extends AbstractPluginIntegrationEvent
         $this->stopPropagation();
     }
 }
-

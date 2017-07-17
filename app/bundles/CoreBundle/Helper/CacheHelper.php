@@ -1,53 +1,51 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
- * Class CacheHelper
- *
- * @package Mautic\CoreBundle\Helper
+ * Class CacheHelper.
  */
 class CacheHelper
 {
-    protected $factory;
-
     protected $cacheDir;
-
-    protected $env;
 
     protected $configFile;
 
     protected $containerFile;
 
+    protected $container;
+
     /**
-     * @param MauticFactory $factory
+     * CacheHelper constructor.
+     *
+     * @param \AppKernel $kernel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(\AppKernel $kernel)
     {
-        $this->factory       = $factory;
-        $this->cacheDir      = $factory->getSystemPath('cache', true);
-        $this->env           = $factory->getEnvironment();
-        $this->configFile    = $this->factory->getLocalConfigFile(false);
-        $this->containerFile = $this->factory->getKernel()->getContainerFile();
+        $this->kernel        = $kernel;
+        $this->container     = $kernel->getContainer();
+        $this->cacheDir      = $this->container->get('mautic.helper.paths')->getSystemPath('cache', true);
+        $this->configFile    = $kernel->getLocalConfigFile(false);
+        $this->containerFile = $kernel->getContainerFile();
     }
 
     /**
-     * Clear the application cache and run the warmup routine for the current environment
-     *
-     * @return void
+     * Clear the application cache and run the warmup routine for the current environment.
      */
     public function clearCache()
     {
@@ -62,16 +60,16 @@ class CacheHelper
         //attempt to squash command output
         ob_start();
 
-        $args = array('console', 'cache:clear', '--env=' . $this->env);
+        $args = ['console', 'cache:clear', '--env='.MAUTIC_ENV];
 
-        if ($this->env == 'prod') {
+        if (MAUTIC_ENV == 'prod') {
             $args[] = '--no-debug';
         }
 
         $input       = new ArgvInput($args);
-        $application = new Application($this->factory->getKernel());
+        $application = new Application($this->kernel);
         $application->setAutoExit(false);
-        $output      = new NullOutput();
+        $output = new NullOutput();
         $application->run($input, $output);
 
         if (ob_get_length() > 0) {
@@ -80,7 +78,7 @@ class CacheHelper
     }
 
     /**
-     * Deletes the cache folder
+     * Deletes the cache folder.
      */
     public function nukeCache()
     {
@@ -93,7 +91,7 @@ class CacheHelper
     }
 
     /**
-     * Delete's the file Symfony caches settings in
+     * Delete's the file Symfony caches settings in.
      *
      * @param bool $configSave
      */
@@ -101,41 +99,40 @@ class CacheHelper
     {
         $this->clearSessionItems();
 
-        $containerFile = $this->factory->getKernel()->getContainerFile();
-        if (file_exists($containerFile)) {
-            unlink($containerFile);
+        if (file_exists($this->containerFile)) {
+            unlink($this->containerFile);
         }
 
         $this->clearOpcaches($configSave);
     }
 
     /**
-     * Clears the cache for translations
+     * Clears the cache for translations.
      *
      * @param null $locale
      */
     public function clearTranslationCache($locale = null)
     {
         if ($locale) {
-            $localeCache = $this->cacheDir . '/translations/catalogue.' . $locale . '.php';
+            $localeCache = $this->cacheDir.'/translations/catalogue.'.$locale.'.php';
             if (file_exists($localeCache)) {
                 unlink($localeCache);
             }
         } else {
             $fs = new Filesystem();
-            $fs->remove($this->cacheDir . '/translations');
+            $fs->remove($this->cacheDir.'/translations');
         }
     }
 
     /**
-     * Clears the cache for routing
+     * Clears the cache for routing.
      */
     public function clearRoutingCache()
     {
-        $unlink = array(
-            $this->factory->getKernel()->getContainer()->getParameter('router.options.generator.cache_class'),
-            $this->factory->getKernel()->getContainer()->getParameter('router.options.matcher.cache_class')
-        );
+        $unlink = [
+            $this->kernel->getContainer()->getParameter('router.options.generator.cache_class'),
+            $this->kernel->getContainer()->getParameter('router.options.matcher.cache_class'),
+        ];
 
         foreach ($unlink as $file) {
             if (file_exists($this->cacheDir.'/'.$file.'.php')) {
@@ -145,18 +142,18 @@ class CacheHelper
     }
 
     /**
-     * Clear cache related session items
+     * Clear cache related session items.
      */
     protected function clearSessionItems()
     {
         // Clear the menu items and icons so they can be rebuilt
-        $session = $this->factory->getSession();
+        $session = $this->kernel->getContainer()->get('session');
         $session->remove('mautic.menu.items');
         $session->remove('mautic.menu.icons');
     }
 
     /**
-     * Clear opcaches
+     * Clear opcaches.
      *
      * @param bool|false $configSave
      */

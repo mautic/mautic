@@ -1,20 +1,25 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+$request     = $app->getRequest();
+$contentOnly = $request->get('contentOnly', false) || $view['slots']->get('contentOnly', false) || !empty($contentOnly);
+$modalView   = $request->get('modal', false) || $view['slots']->get('inModal', false) || !empty($modalView);
 
-$request = $app->getRequest();
-if (!$request->isXmlHttpRequest() && $view['slots']->get('contentOnly', false) === false):
+if (!$request->isXmlHttpRequest() && !$modalView):
     //load base template
-    $template = ($request->get('contentOnly')) ? 'slim' : 'base';
+    $template = ($contentOnly) ? 'slim' : 'base';
     $view->extend("MauticCoreBundle:Default:$template.html.php");
 endif;
 ?>
 
+<?php if (!$modalView): ?>
 <div class="content-body">
     <?php echo $view->render('MauticCoreBundle:Default:pageheader.html.php'); ?>
 	<?php $view['slots']->output('_content'); ?>
@@ -22,3 +27,6 @@ endif;
 
 <?php $view['slots']->output('modal'); ?>
 <?php echo $view['security']->getAuthenticationContent(); ?>
+<?php else: ?>
+<?php $view['slots']->output('_content'); ?>
+<?php endif; ?>

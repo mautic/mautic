@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,35 +16,34 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\PageEvents;
 
 /**
- * Class PageSubscriber
+ * Class PageSubscriber.
  */
 class PageSubscriber extends CommonSubscriber
 {
-
     /**
      * {@inheritdoc}
      */
-    static public function getSubscribedEvents ()
+    public static function getSubscribedEvents()
     {
-        return array(
-            PageEvents::PAGE_ON_BUILD   => array('OnPageBuild', 0)
-        );
+        return [
+            PageEvents::PAGE_ON_BUILD => ['OnPageBuild', 0],
+        ];
     }
 
     /**
-     * Add forms to available page tokens
+     * Add forms to available page tokens.
      *
      * @param PageBuilderEvent $event
      */
-    public function onPageBuild (PageBuilderEvent $event)
+    public function onPageBuild(PageBuilderEvent $event)
     {
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
-            $assetDownloads = array(
+            $assetDownloads = [
                 'group'    => 'mautic.asset.abtest.criteria',
                 'label'    => 'mautic.asset.abtest.criteria.downloads',
-                'callback' => '\Mautic\AssetBundle\Helper\AbTestHelper::determineDownloadWinner'
-            );
+                'callback' => '\Mautic\AssetBundle\Helper\AbTestHelper::determineDownloadWinner',
+            ];
             $event->addAbTestWinnerCriteria('asset.downloads', $assetDownloads);
         }
     }

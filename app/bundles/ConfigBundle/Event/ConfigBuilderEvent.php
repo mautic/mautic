@@ -1,92 +1,100 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ConfigBundle\Event;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class ConfigEvent
- *
- * @package Mautic\ConfigBundle\Event
+ * Class ConfigEvent.
  */
 class ConfigBuilderEvent extends Event
 {
+    /**
+     * @var array
+     */
+    private $forms = [];
 
     /**
      * @var array
      */
-    private $forms = array();
+    private $formThemes = [
+        'MauticConfigBundle:FormTheme',
+    ];
+
+    /**
+     * @var PathsHelper
+     */
+    private $pathsHelper;
+
+    /**
+     * @var BundleHelper
+     */
+    private $bundleHelper;
 
     /**
      * @var array
      */
-    private $formThemes = array();
+    protected $encodedFields = [];
 
     /**
-     * @var MauticFactory
+     * ConfigBuilderEvent constructor.
+     *
+     * @param PathsHelper  $pathsHelper
+     * @param BundleHelper $bundleHelper
      */
-    private $factory;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct (MauticFactory $factory)
+    public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
     {
-        $this->factory = $factory;
+        $this->pathsHelper  = $pathsHelper;
+        $this->bundleHelper = $bundleHelper;
     }
 
     /**
-     * Set new form to the forms array
+     * Set new form to the forms array.
      *
-     * @param array $form
+     * @param $form
      *
-     * @return void
+     * @return $this
      */
-    public function addForm ($form)
+    public function addForm($form)
     {
         if (isset($form['formTheme'])) {
             $this->formThemes[] = $form['formTheme'];
         }
 
         $this->forms[$form['formAlias']] = $form;
+
+        return $this;
     }
 
     /**
-     * Returns the forms array
+     * Returns the forms array.
      *
      * @return array
      */
-    public function getForms ()
+    public function getForms()
     {
         return $this->forms;
     }
 
     /**
-     * Returns the formThemes array
+     * Returns the formThemes array.
      *
      * @return array
      */
-    public function getFormThemes ()
+    public function getFormThemes()
     {
         return $this->formThemes;
-    }
-
-    /**
-     * Returns the factory
-     *
-     * @return MauticFactory
-     */
-    public function getFactory ()
-    {
-        return $this->factory;
     }
 
     /**
@@ -96,9 +104,9 @@ class ConfigBuilderEvent extends Event
      *
      * @return array
      */
-    public function getParameters ($path = null)
+    public function getParameters($path = null)
     {
-        $paramsFile = $this->factory->getSystemPath('app') . $path;
+        $paramsFile = $this->pathsHelper->getSystemPath('app').$path;
 
         if (file_exists($paramsFile)) {
             // Import the bundle configuration, $parameters is defined in this file
@@ -106,7 +114,15 @@ class ConfigBuilderEvent extends Event
         }
 
         if (!isset($parameters)) {
-            $parameters = array();
+            $parameters = [];
+        }
+
+        $fields     = $this->getBase64EncodedFields();
+        $checkThese = array_intersect(array_keys($parameters), $fields);
+        foreach ($checkThese as $checkMe) {
+            if (!empty($parameters[$checkMe])) {
+                $parameters[$checkMe] = base64_decode($parameters[$checkMe]);
+            }
         }
 
         return $parameters;
@@ -117,18 +133,38 @@ class ConfigBuilderEvent extends Event
      *
      * @return array
      */
-    public function getParametersFromConfig ($bundle)
+    public function getParametersFromConfig($bundle)
     {
         static $allBundles;
 
         if (empty($allBundles)) {
-            $allBundles = $this->factory->getMauticBundles(true);
+            $allBundles = $this->bundleHelper->getMauticBundles(true);
         }
 
         if (isset($allBundles[$bundle]) && $allBundles[$bundle]['config']['parameters']) {
             return $allBundles[$bundle]['config']['parameters'];
         } else {
-            return array();
+            return [];
         }
+    }
+
+    /**
+     * @param $fields
+     *
+     * @return $this
+     */
+    public function addFileFields($fields)
+    {
+        $this->encodedFields = array_merge($this->encodedFields, (array) $fields);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFileFields()
+    {
+        return $this->encodedFields;
     }
 }

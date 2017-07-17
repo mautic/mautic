@@ -1,19 +1,21 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 
 /**
  * Class Stat.
@@ -49,6 +51,11 @@ class Stat
      * @var \DateTime
      */
     private $dateSent;
+
+    /**
+     * @var \DateTime
+     */
+    private $dateRead;
 
     /**
      * @var bool
@@ -131,6 +138,11 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->build();
+
+        $builder->createField('dateRead', 'datetime')
+            ->columnName('date_read')
+            ->nullable()
             ->build();
 
         $builder->createField('isClicked', 'boolean')
@@ -352,9 +364,6 @@ class Stat
         $this->retryCount = $retryCount;
     }
 
-    /**
-     *
-     */
     public function upRetryCount()
     {
         ++$this->retryCount;
@@ -445,7 +454,7 @@ class Stat
      */
     public function upClickCount()
     {
-        $count = (int) $this->clickCount + 1;
+        $count            = (int) $this->clickCount + 1;
         $this->clickCount = $count;
 
         return $this;
@@ -487,6 +496,26 @@ class Stat
     public function setClickDetails($clickDetails)
     {
         $this->clickDetails = $clickDetails;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateRead()
+    {
+        return $this->dateRead;
+    }
+
+    /**
+     * @param \DateTime $dateRead
+     *
+     * @return Stat
+     */
+    public function setDateRead($dateRead)
+    {
+        $this->dateRead = $dateRead;
 
         return $this;
     }

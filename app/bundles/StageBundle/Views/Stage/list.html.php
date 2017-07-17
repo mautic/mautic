@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($tmpl == 'index') {
@@ -19,41 +21,45 @@ if ($tmpl == 'index') {
                 <?php
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
-                        'checkall' => 'true',
-                        'target'   => '#stageTable'
-                    )
+                    [
+                        'checkall'        => 'true',
+                        'target'          => '#stageTable',
+                        'routeBase'       => 'stage',
+                        'templateButtons' => [
+                            'delete' => $permissions['stage:stages:delete'],
+                        ],
+                    ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
+                    [
                         'sessionVar' => 'stage',
                         'orderBy'    => 's.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-stage-name',
-                        'default'    => true
-                    )
+                        'default'    => true,
+                    ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
+                    [
                         'sessionVar' => 'stage',
                         'orderBy'    => 'c.title',
                         'text'       => 'mautic.core.category',
-                        'class'      => 'visible-md visible-lg col-stage-category'
-                    )
+                        'class'      => 'visible-md visible-lg col-stage-category',
+                    ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
-                    array(
+                    [
                         'sessionVar' => 'stage',
                         'orderBy'    => 's.id',
                         'text'       => 'mautic.core.id',
-                        'class'      => 'visible-md visible-lg col-stage-id'
-                    )
+                        'class'      => 'visible-md visible-lg col-stage-id',
+                    ]
                 );
                 ?>
             </tr>
@@ -65,15 +71,15 @@ if ($tmpl == 'index') {
                         <?php
                         echo $view->render(
                             'MauticCoreBundle:Helper:list_actions.html.php',
-                            array(
+                            [
                                 'item'            => $item,
-                                'templateButtons' => array(
+                                'templateButtons' => [
                                     'edit'   => $permissions['stage:stages:edit'],
                                     'clone'  => $permissions['stage:stages:create'],
                                     'delete' => $permissions['stage:stages:delete'],
-                                ),
-                                'routeBase'       => 'stage'
-                            )
+                                ],
+                                'routeBase' => 'stage',
+                            ]
                         );
                         ?>
                     </td>
@@ -82,11 +88,11 @@ if ($tmpl == 'index') {
 
                             <?php echo $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                array('item' => $item, 'model' => 'stage')
+                                ['item' => $item, 'model' => 'stage']
                             ); ?>
                             <a href="<?php echo $view['router']->generate(
                                 'mautic_stage_action',
-                                array("objectAction" => "edit", "objectId" => $item->getId())
+                                ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
@@ -99,7 +105,7 @@ if ($tmpl == 'index') {
                     </td>
                     <td class="visible-md visible-lg">
                         <?php $category = $item->getCategory(); ?>
-                        <?php $catName = ($category)
+                        <?php $catName  = ($category)
                             ? $category->getTitle()
                             : $view['translator']->trans(
                                 'mautic.core.form.uncategorized'
@@ -117,19 +123,19 @@ if ($tmpl == 'index') {
     <div class="panel-footer">
         <?php echo $view->render(
             'MauticCoreBundle:Helper:pagination.html.php',
-            array(
-                "totalItems" => count($items),
-                "page"       => $page,
-                "limit"      => $limit,
-                "menuLinkId" => 'mautic_stage_index',
-                "baseUrl"    => $view['router']->generate('mautic_stage_index'),
-                'sessionVar' => 'stage'
-            )
+            [
+                'totalItems' => count($items),
+                'page'       => $page,
+                'limit'      => $limit,
+                'menuLinkId' => 'mautic_stage_index',
+                'baseUrl'    => $view['router']->generate('mautic_stage_index'),
+                'sessionVar' => 'stage',
+            ]
         ); ?>
     </div>
 <?php else: ?>
     <?php echo $view->render(
         'MauticCoreBundle:Helper:noresults.html.php',
-        array('tip' => 'mautic.stage.action.noresults.tip')
+        ['tip' => 'mautic.stage.action.noresults.tip']
     ); ?>
 <?php endif; ?>

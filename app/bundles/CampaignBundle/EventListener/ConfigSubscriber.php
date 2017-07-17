@@ -1,26 +1,26 @@
 <?php
+
 namespace Mautic\CampaignBundle\EventListener;
 
-use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\CoreBundle\EventListener\CommonSubscriber;
 
 /**
- * Class ConfigSubscriber
+ * Class ConfigSubscriber.
  */
 class ConfigSubscriber extends CommonSubscriber
 {
-
     /**
      * @return array
      */
-    static public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
-        return array(
-            ConfigEvents::CONFIG_ON_GENERATE => array('onConfigGenerate', 0),
-            ConfigEvents::CONFIG_PRE_SAVE    => array('onConfigSave', 0)
-        );
+        return [
+            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
+            ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigSave', 0],
+        ];
     }
 
     /**
@@ -29,12 +29,12 @@ class ConfigSubscriber extends CommonSubscriber
     public function onConfigGenerate(ConfigBuilderEvent $event)
     {
         $event->addForm(
-            array(
+            [
                 'bundle'     => 'CampaignBundle',
                 'formAlias'  => 'campaignconfig',
                 'formTheme'  => 'MauticCampaignBundle:FormTheme\Config',
-                'parameters' => $event->getParametersFromConfig('MauticCampaignBundle')
-            )
+                'parameters' => $event->getParametersFromConfig('MauticCampaignBundle'),
+            ]
         );
     }
 

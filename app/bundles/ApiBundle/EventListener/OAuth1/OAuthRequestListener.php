@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -12,14 +14,15 @@ namespace Mautic\ApiBundle\EventListener\OAuth1;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class OAuthRequestListener
+ * Class OAuthRequestListener.
  */
-class OAuthRequestListener extends \Bazinga\OAuthServerBundle\EventListener\OAuthRequestListener {
-
+class OAuthRequestListener extends \Bazinga\OAuthServerBundle\EventListener\OAuthRequestListener
+{
     /**
      * {@inheritdoc}
      *
-     * @param  Request $request The request.
+     * @param Request $request The request
+     *
      * @return array
      */
     protected function parseAuthorizationHeader(Request $request)

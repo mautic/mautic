@@ -1,26 +1,27 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
+use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder as OrmClassMetadataBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 /**
- * Class ClassMetadataBuilder
+ * Class ClassMetadataBuilder.
  *
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
  * See @link https://github.com/doctrine/doctrine2/pull/1326/
- *
- * @package Mautic\CoreBundle\Doctrine\Metadata
  */
-class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder
+class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
     /**
      * @param \Doctrine\ORM\Mapping\ClassMetadataInfo $cm
@@ -47,10 +48,10 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     {
         return new AssociationBuilder(
             $this,
-            array(
+            [
                 'fieldName'    => $name,
-                'targetEntity' => $targetEntity
-            ),
+                'targetEntity' => $targetEntity,
+            ],
             ClassMetadata::MANY_TO_ONE
         );
     }
@@ -67,10 +68,10 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     {
         return new AssociationBuilder(
             $this,
-            array(
+            [
                 'fieldName'    => $name,
-                'targetEntity' => $targetEntity
-            ),
+                'targetEntity' => $targetEntity,
+            ],
             ClassMetadata::ONE_TO_ONE
         );
     }
@@ -87,10 +88,10 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     {
         return new ManyToManyAssociationBuilder(
             $this,
-            array(
+            [
                 'fieldName'    => $name,
-                'targetEntity' => $targetEntity
-            ),
+                'targetEntity' => $targetEntity,
+            ],
             ClassMetadata::MANY_TO_MANY
         );
     }
@@ -107,34 +108,39 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
     {
         return new OneToManyAssociationBuilder(
             $this,
-            array(
+            [
                 'fieldName'    => $name,
-                'targetEntity' => $targetEntity
-            ),
+                'targetEntity' => $targetEntity,
+            ],
             ClassMetadata::ONE_TO_MANY
         );
     }
 
     /**
-     * Add Id column
+     * Add Id column.
+     *
+     * @return $this
      */
     public function addId()
     {
         $this->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
+
+        return $this;
     }
 
     /**
-     * Add id, name, and description columns
+     * Add id, name, and description columns.
      *
      * @param string $nameColumn
      * @param string $descriptionColumn
+     *
+     * @return $this
      */
-    public function addIdColumns ($nameColumn = 'name', $descriptionColumn = 'description')
+    public function addIdColumns($nameColumn = 'name', $descriptionColumn = 'description')
     {
-
         $this->addId();
 
         if ($nameColumn) {
@@ -147,20 +153,28 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
                 ->nullable()
                 ->build();
         }
+
+        return $this;
     }
 
     /**
-     * Add category to metadata
+     * Add category to metadata.
+     *
+     * @return $this
      */
     public function addCategory()
     {
         $this->createManyToOne('category', 'Mautic\CategoryBundle\Entity\Category')
             ->addJoinColumn('category_id', 'id', true, false, 'SET NULL')
             ->build();
+
+        return $this;
     }
 
     /**
-     * Add publish up and down dates to metadata
+     * Add publish up and down dates to metadata.
+     *
+     * @return $this
      */
     public function addPublishDates()
     {
@@ -173,12 +187,16 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
             ->columnName('publish_down')
             ->nullable()
             ->build();
+
+        return $this;
     }
 
     /**
-     * Added dateAdded column
+     * Added dateAdded column.
      *
      * @param bool|false $nullable
+     *
+     * @return $this
      */
     public function addDateAdded($nullable = false)
     {
@@ -190,22 +208,57 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         }
 
         $dateAdded->build();
+
+        return $this;
     }
 
     /**
-     * Add a lead column
+     * Add a contact column.
      *
      * @param bool|false $nullable
      * @param string     $onDelete
      * @param bool|false $isPrimaryKey
      * @param null       $inversedBy
+     *
+     * @return $this
+     */
+    public function addContact($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
+    {
+        $lead = $this->createManyToOne('contact', 'Mautic\LeadBundle\Entity\Lead');
+
+        if ($isPrimaryKey) {
+            $lead->makePrimaryKey();
+        }
+
+        if ($inversedBy) {
+            $lead->inversedBy($inversedBy);
+        }
+
+        $lead
+            ->addJoinColumn('contact_id', 'id', $nullable, false, $onDelete)
+            ->build();
+
+        return $this;
+    }
+
+    /**
+     * Add a lead column.
+     *
+     * @param bool|false $nullable
+     * @param string     $onDelete
+     * @param bool|false $isPrimaryKey
+     * @param null       $inversedBy
+     *
+     * @deprecated Use addContact instead; existing implementations will need a migration to rename lead_id to contact_id
+     *
+     * @return $this
      */
     public function addLead($nullable = false, $onDelete = 'CASCADE', $isPrimaryKey = false, $inversedBy = null)
     {
         $lead = $this->createManyToOne('lead', 'Mautic\LeadBundle\Entity\Lead');
 
         if ($isPrimaryKey) {
-            $lead->isPrimaryKey();
+            $lead->makePrimaryKey();
         }
 
         if ($inversedBy) {
@@ -215,12 +268,16 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         $lead
             ->addJoinColumn('lead_id', 'id', $nullable, false, $onDelete)
             ->build();
+
+        return $this;
     }
 
     /**
-     * Adds IP address
+     * Adds IP address.
      *
-     * @param bool|false $nullable
+     * @param bool $nullable
+     *
+     * @return $this
      */
     public function addIpAddress($nullable = false)
     {
@@ -229,14 +286,18 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
             ->cascadeMerge()
             ->addJoinColumn('ip_id', 'id', $nullable)
             ->build();
+
+        return $this;
     }
 
     /**
-     * Add a nullable field
+     * Add a nullable field.
      *
      * @param        $name
      * @param string $type
      * @param null   $columnName
+     *
+     * @return $this
      */
     public function addNullableField($name, $type = 'string', $columnName = null)
     {
@@ -248,15 +309,19 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         }
 
         $field->build();
+
+        return $this;
     }
 
     /**
-     * Add a field with a custom column name
+     * Add a field with a custom column name.
      *
-     * @param            $name
-     * @param            $type
-     * @param            $columnName
-     * @param bool|false $nullable
+     * @param      $name
+     * @param      $type
+     * @param      $columnName
+     * @param bool $nullable
+     *
+     * @return $this
      */
     public function addNamedField($name, $type, $columnName, $nullable = false)
     {
@@ -268,10 +333,26 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         }
 
         $field->build();
+
+        return $this;
     }
 
     /**
-     * Add partial index
+     * Adds Field. Overridden for IDE suggestions when stringing methods in entity class.
+     *
+     * @param string $name
+     * @param string $type
+     * @param array  $mapping
+     *
+     * @return $this
+     */
+    public function addField($name, $type, array $mapping = [])
+    {
+        return parent::addField($name, $type, $mapping);
+    }
+
+    /**
+     * Add partial index.
      *
      * @param array $columns
      * @param       $name
@@ -284,15 +365,15 @@ class ClassMetadataBuilder extends \Doctrine\ORM\Mapping\Builder\ClassMetadataBu
         $cm = $this->getClassMetadata();
 
         if (!isset($cm->table['indexes'])) {
-            $cm->table['indexes'] = array();
+            $cm->table['indexes'] = [];
         }
 
-        $cm->table['indexes'][$name] = array('
+        $cm->table['indexes'][$name] = ['
             columns'  => $columns,
-            'options' => array(
-                'where' => $where
-            )
-        );
+            'options' => [
+                'where' => $where,
+            ],
+        ];
 
         return $this;
     }

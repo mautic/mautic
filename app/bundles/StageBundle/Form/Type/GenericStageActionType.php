@@ -1,44 +1,40 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\StageBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
-use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class GenericStageSettingsType
+ * Class GenericStageSettingsType.
  */
-class GenericStageSettingsType extends AbstractType
+class GenericStageActionType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $default = (empty($options['data']['weight'])) ? 0 : (int) $options['data']['weight'];
-        $builder->add('weight', 'number', array(
+        $builder->add('weight', 'number', [
             'label'      => 'mautic.stage.action.weight',
-            'label_attr' => array('class' => 'control-label'),
-            'attr'       =>
-                array(
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.stage.action.weight.help'
-                ),
-            'precision'  => 0,
-            'data'       => $default
-        ));
+                    'tooltip' => 'mautic.stage.action.weight.help',
+                ],
+            'precision' => 0,
+            'data'      => $default,
+        ]);
     }
 
     /**
@@ -46,6 +42,6 @@ class GenericStageSettingsType extends AbstractType
      */
     public function getName()
     {
-        return "genericstage_settings";
+        return 'genericstage_settings';
     }
 }

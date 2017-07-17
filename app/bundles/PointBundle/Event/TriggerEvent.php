@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,11 +15,10 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PointBundle\Entity\Trigger;
 
 /**
- * Class TriggerEvent
+ * Class TriggerEvent.
  */
 class TriggerEvent extends CommonEvent
 {
-
     /**
      * @var Trigger
      */
@@ -34,12 +35,12 @@ class TriggerEvent extends CommonEvent
      */
     public function __construct(Trigger &$trigger, $isNew = false)
     {
-        $this->entity =& $trigger;
+        $this->entity = &$trigger;
         $this->isNew  = $isNew;
     }
 
     /**
-     * Returns the Trigger entity
+     * Returns the Trigger entity.
      *
      * @return Trigger
      */
@@ -49,7 +50,7 @@ class TriggerEvent extends CommonEvent
     }
 
     /**
-     * Sets the Trigger entity
+     * Sets the Trigger entity.
      *
      * @param Trigger $trigger
      */

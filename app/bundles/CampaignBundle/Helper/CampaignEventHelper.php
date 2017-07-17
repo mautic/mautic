@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,16 +16,15 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 
 class CampaignEventHelper
 {
-
     /**
-     * Determine if this campaign applies
+     * Determine if this campaign applies.
      *
-     * @param $eventDetails
-     * @param $event
+     * @param CampaignLeadChangeEvent $eventDetails
+     * @param array                   $event
      *
      * @return bool
      */
-    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, $event)
+    public static function validateLeadChangeTrigger(CampaignLeadChangeEvent $eventDetails = null, array $event)
     {
         if ($eventDetails == null) {
             return true;
@@ -38,8 +39,8 @@ class CampaignEventHelper
         }
 
         //check against the selected action (was lead removed or added)
-        $func = 'was' . ucfirst($action);
-        if (!$eventDetails->$func()) {
+        $func = 'was'.ucfirst($action);
+        if (!method_exists($eventDetails, $func) || !$eventDetails->$func()) {
             return false;
         }
 

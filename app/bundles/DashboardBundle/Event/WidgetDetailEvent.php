@@ -1,64 +1,64 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\DashboardBundle\Entity\Widget;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class WidgetDetailEvent
- *
- * @package Mautic\DashboardBundle\Event
+ * Class WidgetDetailEvent.
  */
 class WidgetDetailEvent extends CommonEvent
 {
     protected $widget;
     protected $type;
     protected $template;
-    protected $templateData = array();
+    protected $templateData = [];
     protected $errorMessage;
     protected $uniqueId;
     protected $cacheDir;
     protected $uniqueCacheDir;
     protected $cacheTimeout;
     protected $startTime = 0;
-    protected $loadTime = 0;
+    protected $loadTime  = 0;
     protected $translator;
 
     /**
-     * @var CorePermissions $security
+     * @var CorePermissions
      */
     protected $security = null;
 
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
-        $this->startTime = microtime();
+        $this->startTime  = microtime();
     }
 
     /**
-     * Set the cache dir
+     * Set the cache dir.
      *
      * @param string $cacheDir
      */
     public function setCacheDir($cacheDir, $uniqueCacheDir = null)
     {
-        $this->cacheDir = $cacheDir;
+        $this->cacheDir       = $cacheDir;
         $this->uniqueCacheDir = $uniqueCacheDir;
     }
 
     /**
-     * Set the cache timeout
+     * Set the cache timeout.
      *
      * @param string $cacheTimeout
      */
@@ -68,7 +68,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the widget type
+     * Set the widget type.
      *
      * @param string $type
      */
@@ -78,7 +78,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Get the widget type
+     * Get the widget type.
      *
      * @return string $type
      */
@@ -88,7 +88,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the widget entity
+     * Set the widget entity.
      *
      * @param Widget $widget
      */
@@ -112,7 +112,7 @@ class WidgetDetailEvent extends CommonEvent
         }
 
         if (!isset($params['filter'])) {
-            $params['filter'] = array();
+            $params['filter'] = [];
         }
 
         $widget->setParams($params);
@@ -122,7 +122,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Returns the widget entity
+     * Returns the widget entity.
      *
      * @param Widget $widget
      */
@@ -132,7 +132,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the widget template
+     * Set the widget template.
      *
      * @param string $template
      */
@@ -143,7 +143,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Get the widget template
+     * Get the widget template.
      *
      * @return string $template
      */
@@ -153,9 +153,9 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set the widget template data
+     * Set the widget template data.
      *
-     * @param array  $templateData
+     * @param array $templateData
      */
     public function setTemplateData(array $templateData, $skipCache = false)
     {
@@ -171,7 +171,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Get the widget template data
+     * Get the widget template data.
      *
      * @return string $templateData
      */
@@ -181,9 +181,9 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set en error message
+     * Set en error message.
      *
-     * @param array  $errorMessage
+     * @param array $errorMessage
      */
     public function setErrorMessage($errorMessage)
     {
@@ -192,7 +192,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Get an error message
+     * Get an error message.
      *
      * @return string $errorMessage
      */
@@ -202,7 +202,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Build a unique ID from type and widget params
+     * Build a unique ID from type and widget params.
      *
      * @return string
      */
@@ -216,12 +216,12 @@ class WidgetDetailEvent extends CommonEvent
         // Unset dateFrom and dateTo since they constantly change
         unset($params['dateFrom'], $params['dateTo']);
 
-        $uniqueSettings = array(
+        $uniqueSettings = [
             'params' => $params,
             'width'  => $this->getWidget()->getWidth(),
             'height' => $this->getWidget()->getHeight(),
-            'locale' => $this->translator->getLocale()
-        );
+            'locale' => $this->translator->getLocale(),
+        ];
 
         return $this->uniqueId = $this->getType().'_'.substr(md5(json_encode($uniqueSettings)), 0, 16);
     }
@@ -244,6 +244,7 @@ class WidgetDetailEvent extends CommonEvent
         if ($data) {
             $this->widget->setCached(true);
             $this->setTemplateData($data, true);
+
             return true;
         }
 
@@ -251,7 +252,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Get the Translator object
+     * Get the Translator object.
      *
      * @return Translator $translator
      */
@@ -261,7 +262,7 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Set security object to check the perimissions
+     * Set security object to check the perimissions.
      *
      * @param CorePermissions $security
      */
@@ -271,29 +272,35 @@ class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * Check if the user has at least one permission of defined array of permissions
+     * Check if the user has at least one permission of defined array of permissions.
      *
-     * @param  array $permissions
+     * @param array $permissions
      *
-     * @return boolean
+     * @return bool
      */
     public function hasPermissions(array $permissions)
     {
-        if (!$this->security) return true;
-        $perm = $this->security->isGranted($permissions, "RETURN_ARRAY");
+        if (!$this->security) {
+            return true;
+        }
+        $perm = $this->security->isGranted($permissions, 'RETURN_ARRAY');
+
         return in_array(true, $perm);
     }
 
     /**
-     * Check if the user has defined permission to see the widgets
+     * Check if the user has defined permission to see the widgets.
      *
-     * @param  string $permission
+     * @param string $permission
      *
-     * @return boolean
+     * @return bool
      */
     public function hasPermission($permission)
     {
-        if (!$this->security) return true;
+        if (!$this->security) {
+            return true;
+        }
+
         return $this->security->isGranted($permission);
     }
 }

@@ -1,6 +1,6 @@
 <?php
-$hasErrors = count($form->vars['errors']);
-$feedbackClass = (!empty($hasErrors)) ? " has-error" : ""; ?>
+$hasErrors     = count($form->vars['errors']);
+$feedbackClass = (!empty($hasErrors)) ? ' has-error' : ''; ?>
 <div class="row">
     <div class="form-group col-xs-12<?php echo $feedbackClass; ?>">
         <div class="checkbox">

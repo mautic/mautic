@@ -1,9 +1,10 @@
 <?php
 /**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -102,6 +103,7 @@ if (!isset($args['repackage'])) {
         '.github/PULL_REQUEST_TEMPLATE.md',
         '.gitignore',
         '.travis.yml',
+        '.php_cs',
         'app/phpunit.xml.dist',
         'build',
         'composer.json',
@@ -148,7 +150,7 @@ if (!isset($args['repackage'])) {
     }
 
     // Include assets just in case they weren't
-    $assetFiles    = [
+    $assetFiles = [
         'media/css/app.css'       => true,
         'media/css/libraries.css' => true,
         'media/js/app.js'         => true,

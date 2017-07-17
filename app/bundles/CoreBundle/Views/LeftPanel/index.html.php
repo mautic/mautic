@@ -1,12 +1,13 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $extraMenu = $view['menu']->render('extra');
 ?>
 <!-- start: sidebar-header -->
@@ -69,6 +70,7 @@ $extraMenu = $view['menu']->render('extra');
     <div class="scroll-content slimscroll">
         <!-- start: navigation -->
         <nav class="nav-sidebar">
+            <?php echo $view['content']->getCustomContent('menu.above', $mauticTemplateVars); ?>
             <?php echo $view['menu']->render('main'); ?>
 
             <!-- start: left nav -->

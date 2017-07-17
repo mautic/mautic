@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,19 +15,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * RoleRepository
+ * RoleRepository.
  */
 class RoleRepository extends CommonRepository
 {
-
     /**
-     * Get a list of roles
+     * Get a list of roles.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities(array $args = [])
     {
         $q = $this->createQueryBuilder('r');
 
@@ -35,7 +36,7 @@ class RoleRepository extends CommonRepository
     }
 
     /**
-     * Get a list of roles
+     * Get a list of roles.
      *
      * @param string $search
      * @param int    $limit
@@ -68,57 +69,57 @@ class RoleRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('r.name',  ':'.$unique),
-            $q->expr()->like('r.description', ':'.$unique)
-        );
-
-        if ($filter->not) {
-            $q->expr()->not($expr);
-        }
-
-        return array(
-            $expr,
-            array("$unique" => $string)
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'r.name',
+                'r.description',
+            ]
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
-        $command         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+
         switch ($command) {
-            case $this->translator->trans('mautic.user.user.searchcommand.isadmin');
-                $expr = $q->expr()->eq("r.isAdmin", 1);
-                $returnParameter = false;
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin'):
+            case $this->translator->trans('mautic.user.user.searchcommand.isadmin', [], null, 'en_US'):
+                $expr = $q->expr()->eq('r.isAdmin', 1);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                $expr = $q->expr()->like("r.name", ':'.$unique);
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                $expr            = $q->expr()->like('r.name', ':'.$unique);
+                $returnParameter = true;
                 break;
         }
 
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($filter->not) {
             $expr = $q->expr()->not($expr);
         }
-        return array(
+
+        if ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = ["$unique" => $string];
+        }
+
+        return [
             $expr,
-            ($returnParameter) ? array("$unique" => $string) : array()
-        );
+            $parameters,
+        ];
     }
 
     /**
-     * Get a count of users that belong to the role
+     * Get a count of users that belong to the role.
      *
      * @param $roleIds
      *
@@ -134,7 +135,7 @@ class RoleRepository extends CommonRepository
         $returnArray = (is_array($roleIds));
 
         if (!$returnArray) {
-            $roleIds = array($roleIds);
+            $roleIds = [$roleIds];
         }
 
         $q->where(
@@ -144,7 +145,7 @@ class RoleRepository extends CommonRepository
 
         $result = $q->execute()->fetchAll();
 
-        $return = array();
+        $return = [];
         foreach ($result as $r) {
             $return[$r['role_id']] = $r['thecount'];
         }
@@ -164,10 +165,12 @@ class RoleRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        $commands = [
             'mautic.user.user.searchcommand.isadmin',
-            'mautic.core.searchcommand.name'
-        );
+            'mautic.core.searchcommand.name',
+        ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
@@ -175,9 +178,9 @@ class RoleRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('r.name', 'ASC')
-        );
+        return [
+            ['r.name', 'ASC'],
+        ];
     }
 
     /**

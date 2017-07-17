@@ -29,8 +29,8 @@ class Version20160624032452 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $statDwcFK  = $this->generatePropertyName('dynamic_content_stats', 'fk', ['dynamic_content_id']);
-        $statDwcIDX = $this->generatePropertyName('dynamic_content_stats', 'idx', ['dynamic_content_id']);
+        $statDwcFK   = $this->generatePropertyName('dynamic_content_stats', 'fk', ['dynamic_content_id']);
+        $statDwcIDX  = $this->generatePropertyName('dynamic_content_stats', 'idx', ['dynamic_content_id']);
         $statLeadFK  = $this->generatePropertyName('dynamic_content_stats', 'fk', ['lead_id']);
         $statLeadIDX = $this->generatePropertyName('dynamic_content_stats', 'idx', ['lead_id']);
 

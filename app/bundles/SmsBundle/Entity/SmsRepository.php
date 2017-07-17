@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Query;
@@ -25,14 +27,15 @@ class SmsRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
-            ->select('e')
-            ->from('MauticSmsBundle:Sms', 'e', 'e.id');
+            ->select($this->getTableAlias())
+            ->from('MauticSmsBundle:Sms', $this->getTableAlias(), $this->getTableAlias().'.id');
+
         if (empty($args['iterator_mode'])) {
-            $q->leftJoin('e.category', 'c');
+            $q->leftJoin($this->getTableAlias().'.category', 'c');
         }
 
         $args['qb'] = $q;
@@ -60,52 +63,35 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
-        $command = $filter->command;
-        $unique = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr = false;
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr = $q->expr()->eq('e.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr = $q->expr()->eq('e.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->isNull('e.category'),
-                    $q->expr()->eq('e.category', $q->expr()->literal(''))
-                );
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr = $q->expr()->eq('IDENTITY(e.createdBy)', $this->currentUser->getId());
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr = $q->expr()->like('e.alias', ":$unique");
-                $filter->strict = true;
-                break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
-                $langUnique = $this->generateRandomParameterName();
-                $langValue = $filter->string.'_%';
+                $langUnique      = $this->generateRandomParameterName();
+                $langValue       = $filter->string.'_%';
                 $forceParameters = [
                     $langUnique => $langValue,
-                    $unique => $filter->string,
+                    $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->orX(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
+                $returnParameter = true;
                 break;
         }
 
@@ -115,10 +101,8 @@ class SmsRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif (!$returnParameter) {
-            $parameters = [];
-        } else {
-            $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+        } elseif ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
 
@@ -130,7 +114,7 @@ class SmsRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
@@ -138,6 +122,8 @@ class SmsRepository extends CommonRepository
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
@@ -195,8 +181,14 @@ class SmsRepository extends CommonRepository
         $q->select('partial e.{id, name, language}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('e.name', ':search'))
-                ->setParameter('search', "{$search}%");
+            if (is_array($search)) {
+                $search = array_map('intval', $search);
+                $q->andWhere($q->expr()->in('e.id', ':search'))
+                  ->setParameter('search', $search);
+            } else {
+                $q->andWhere($q->expr()->like('e.name', ':search'))
+                  ->setParameter('search', "%{$search}%");
+            }
         }
 
         if (!$viewOther) {

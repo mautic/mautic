@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -33,7 +35,7 @@ class TagListType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm (FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'id',
@@ -43,15 +45,15 @@ class TagListType extends AbstractType
         $builder->add(
             'tags',
             'lead_tag',
-            array(
-                'attr' => array(
-                    'data-placeholder'      => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text'  => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
-                    'data-allow-add'        => 'true',
-                    'onchange'              => 'Mautic.updateLeadTags(this)'
-                ),
-                'disabled' => (!$options['allow_edit'])
-            )
+            [
+                'attr' => [
+                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                    'data-allow-add'       => 'true',
+                    'onchange'             => 'Mautic.updateLeadTags(this)',
+                ],
+                'disabled' => (!$options['allow_edit']),
+            ]
         );
     }
 
@@ -60,9 +62,9 @@ class TagListType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array(
-            'allow_edit'
-        ));
+        $resolver->setRequired([
+            'allow_edit',
+        ]);
     }
 
     /**

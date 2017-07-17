@@ -1,26 +1,29 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * Class ConfigEvent
+ * Class ConfigEvent.
  */
 class ConfigEvent extends CommonEvent
 {
     /**
      * @var array
      */
-    private $preserve = array();
+    private $preserve = [];
 
     /**
      * @param array $config
@@ -35,7 +38,12 @@ class ConfigEvent extends CommonEvent
     /**
      * @var array
      */
-    private $errors = array();
+    private $errors = [];
+
+    /**
+     * @var array
+     */
+    private $fieldErrors = [];
 
     /**
      * @param array        $config
@@ -48,7 +56,7 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * Returns the config array
+     * Returns the config array.
      *
      * @param string $key
      *
@@ -57,14 +65,14 @@ class ConfigEvent extends CommonEvent
     public function getConfig($key = null)
     {
         if ($key) {
-            return (isset($this->config[$key])) ? $this->config[$key] : array();
+            return (isset($this->config[$key])) ? $this->config[$key] : [];
         }
 
         return $this->config;
     }
 
     /**
-     * Sets the config array
+     * Sets the config array.
      *
      * @param array $config
      * @param null  $key
@@ -79,7 +87,7 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * Returns the POST
+     * Returns the POST.
      *
      * @return \Symfony\Component\HttpFoundation\ParameterBag
      */
@@ -90,14 +98,14 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Set fields such as passwords that will not overwrite existing values
-     * if the current is empty
+     * if the current is empty.
      *
      * @param array|string $fields
      */
     public function unsetIfEmpty($fields)
     {
         if (!is_array($fields)) {
-            $fields = array($fields);
+            $fields = [$fields];
         }
 
         $this->preserve = array_merge($this->preserve, $fields);
@@ -105,7 +113,7 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Return array of fields to unset if empty so that existing values are not
-     * overwritten if empty
+     * overwritten if empty.
      *
      * @return array
      */
@@ -115,23 +123,70 @@ class ConfigEvent extends CommonEvent
     }
 
     /**
-     * Set error message
+     * Set error message.
      *
-     * @param  string $message (untranslated)
-     * @param  array  $messageVars for translation
+     * @param string $message     (untranslated)
+     * @param array  $messageVars for translation
      */
-    public function setError($message, $messageVars = array())
+    public function setError($message, $messageVars = [], $key = null, $field = null)
     {
+        if (!empty($key) && !empty($field)) {
+            if (!isset($this->errors[$key])) {
+                $this->fieldErrors[$key] = [];
+            }
+
+            $this->fieldErrors[$key][$field] = [
+                $message,
+                $messageVars,
+            ];
+
+            return $this;
+        }
+
         $this->errors[$message] = $messageVars;
+
+        return $this;
     }
 
     /**
-     * Get error messages
+     * Get error messages.
      *
-     * @return  array
+     * @return array
      */
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldErrors()
+    {
+        return $this->fieldErrors;
+    }
+
+    /**
+     * @param UploadedFile $file
+     *
+     * @return string
+     */
+    public function getFileContent(UploadedFile $file)
+    {
+        $tmpFile = $file->getRealPath();
+        $content = trim(file_get_contents($tmpFile));
+        @unlink($tmpFile);
+
+        return $content;
+    }
+
+    /**
+     * @param $content
+     *
+     * @return string
+     */
+    public function encodeFileContents($content)
+    {
+        return base64_encode($content);
     }
 }

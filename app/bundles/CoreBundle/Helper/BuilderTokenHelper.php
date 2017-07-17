@@ -1,24 +1,24 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\CoreBundle\Helper;
 
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Factory\MauticFactory;
 
 /**
- * Class BuilderTokenHelper
+ * Class BuilderTokenHelper.
  */
 class BuilderTokenHelper
 {
-
     protected $viewPermissionBase;
     protected $modelName;
     protected $langVar;
@@ -45,114 +45,19 @@ class BuilderTokenHelper
         $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
         $this->langVar            = (!empty($langVar)) ? $langVar : $modelName;
 
-        $this->permissionSet = array(
+        $this->permissionSet = [
             $this->viewPermissionBase.':viewown',
-            $this->viewPermissionBase.':viewother'
-        );
+            $this->viewPermissionBase.':viewother',
+        ];
     }
 
     /**
-     * @param int   $page
-     * @param array $entityArguments
-     * @param array $viewParameters
-     *
-     * @return string
-     */
-    public function getTokenContent($page = 1, $entityArguments = array(), $viewParameters = array())
-    {
-        if (is_array($page)) {
-            // Laziness
-            $entityArguments = $page;
-            $page            = 1;
-        }
-
-        //set some permissions
-        $permissions = $this->factory->getSecurity()->isGranted(
-            $this->permissionSet,
-            "RETURN_ARRAY"
-        );
-
-
-        if (count(array_unique($permissions)) == 1 && end($permissions) == false) {
-            return;
-        }
-
-        $session = $this->factory->getSession();
-
-        //set limits
-        $limit = 5;
-
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $request = $this->factory->getRequest();
-        $search  = $request->get('search', $session->get('mautic'.$this->langVar.'buildertoken.filter', ''));
-
-        $session->set('mautic'.$this->langVar.'buildertoken.filter', $search);
-
-        $model  = $this->factory->getModel($this->modelName);
-        $repo   = $model->getRepository();
-        $prefix = $repo->getTableAlias();
-        if (!empty($prefix)) {
-            $prefix .= '.';
-        }
-
-        $filter          = array('string' => $search);
-        $filter['force'] = (isset($entityArguments['filter']['force'])) ? $entityArguments['filter']['force'] : array();
-
-        if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
-            $filter['force'][] = array('column' => $prefix.'createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId());
-        }
-
-        $entityArguments['filter'] = $filter;
-
-        $entityArguments = array_merge(
-            array(
-                'start'      => $start,
-                'limit'      => $limit,
-                'orderByDir' => 'DESC'
-            ),
-            $entityArguments
-        );
-
-        $items = $model->getEntities($entityArguments);
-        $count = count($items);
-
-        if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $page = 1;
-            } else {
-                $page = (ceil($count / $limit)) ?: 1;
-            }
-            $session->set('mautic'.$this->langVar.'buildertoken.page', $page);
-        }
-
-        return $this->factory->getTemplating()->render(
-            $this->bundleName.':SubscribedEvents\BuilderToken:list.html.php',
-            array_merge(
-                $viewParameters,
-                array(
-                    'items'       => $items,
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'totalCount'  => $count,
-                    'tmpl'        => $request->get('tmpl', 'index'),
-                    'searchValue' => $search
-                )
-            )
-        );
-    }
-
-    /**
-     * @param string              $tokenRegex     Token regex without wrapping regex escape characters.  Use (value) or (.*?) where the ID of the
-     *                                            entity should go. i.e. {pagelink=(value)}
-     * @param string              $filter         String to filter results by
-     * @param string              $labelColumn    The column that houses the label
-     * @param string              $valueColumn    The column that houses the value
-     * @param CompositeExpression $expr           Use $factory->getDatabase()->getExpressionBuilder()->andX()
+     * @param string              $tokenRegex  Token regex without wrapping regex escape characters.  Use (value) or (.*?) where the ID of the
+     *                                         entity should go. i.e. {pagelink=(value)}
+     * @param string              $filter      String to filter results by
+     * @param string              $labelColumn The column that houses the label
+     * @param string              $valueColumn The column that houses the value
+     * @param CompositeExpression $expr        Use $factory->getDatabase()->getExpressionBuilder()->andX()
      *
      * @return array|void
      */
@@ -166,7 +71,7 @@ class BuilderTokenHelper
         //set some permissions
         $permissions = $this->factory->getSecurity()->isGranted(
             $this->permissionSet,
-            "RETURN_ARRAY"
+            'RETURN_ARRAY'
         );
 
         if (count(array_unique($permissions)) == 1 && end($permissions) == false) {
@@ -195,18 +100,18 @@ class BuilderTokenHelper
                 $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
             );
 
-            $parameters = array(
-                'label' => strtolower($filter).'%'
-            );
+            $parameters = [
+                'label' => strtolower($filter).'%',
+            ];
         } else {
-            $parameters = array();
+            $parameters = [];
         }
 
         $items = $repo->getSimpleList($expr, $parameters, $labelColumn, $valueColumn);
 
-        $tokens = array();
+        $tokens = [];
         foreach ($items as $item) {
-            $token          = str_replace(array('(value)', '(.*?)'), $item['value'], $tokenRegex);
+            $token          = str_replace(['(value)', '(.*?)'], $item['value'], $tokenRegex);
             $tokens[$token] = $item['label'];
         }
 
@@ -214,7 +119,7 @@ class BuilderTokenHelper
     }
 
     /**
-     * Override default permission set of viewown and viewother
+     * Override default permission set of viewown and viewother.
      *
      * @param array $permissions
      */
@@ -224,42 +129,23 @@ class BuilderTokenHelper
     }
 
     /**
-     * @param $content
-     * @param $encodeTokensInUrls
-     */
-    static public function replaceVisualPlaceholdersWithTokens(&$content, $encodeTokensInUrls = array('leadfield'))
-    {
-        if (is_array($content)) {
-            foreach ($content as &$slot) {
-                self::replaceVisualPlaceholdersWithTokens($slot);
-                if ($encodeTokensInUrls) {
-                    self::encodeUrlTokens($slot, $encodeTokensInUrls);
-                }
-            }
-        } else {
-            $content = preg_replace('/'.self::getVisualTokenHtml(null, null, true).'/smi', '$1', $content);
-            if ($encodeTokensInUrls) {
-                self::encodeUrlTokens($content, $encodeTokensInUrls);
-            }
-        }
-    }
-
-    /**
-     * Prevent tokens in URLs from being converted to visual tokens by encoding the brackets
+     * Prevent tokens in URLs from being converted to visual tokens by encoding the brackets.
+     *
+     * @deprecated 2.2.1 - to be removed in 3.0
      *
      * @param string $content
      * @param array  $tokenKeys
      */
-    static public function encodeUrlTokens(&$content, array $tokenKeys)
+    public static function encodeUrlTokens(&$content, array $tokenKeys)
     {
-        $processMatches = function($matches) use (&$content, $tokenKeys) {
+        $processMatches = function ($matches) use (&$content, $tokenKeys) {
             foreach ($matches as $link) {
                 // There may be more than one leadfield token in the URL
                 preg_match_all('/{['.implode('|', $tokenKeys).'].*?}/i', $link, $tokens);
                 $newLink = $link;
                 foreach ($tokens as $token) {
                     // Encode brackets
-                    $encodedToken = str_replace(array('{', '}'), array('%7B', '%7D'), $token);
+                    $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
                     $newLink      = str_replace($token, $encodedToken, $newLink);
                 }
                 $content = str_replace($link, $newLink, $content);
@@ -280,13 +166,15 @@ class BuilderTokenHelper
     }
 
     /**
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
      * @param $token
      * @param $description
      * @param $forPregReplace
      *
      * @return string
      */
-    static public function getVisualTokenHtml($token, $description, $forPregReplace = false)
+    public static function getVisualTokenHtml($token, $description, $forPregReplace = false)
     {
         if ($forPregReplace) {
             return preg_quote('<strong contenteditable="false" data-token="', '/').'(.*?)'.preg_quote('">**', '/')
@@ -294,5 +182,118 @@ class BuilderTokenHelper
         }
 
         return '<strong contenteditable="false" data-token="'.$token.'">**'.$description.'**</strong>';
+    }
+
+    /**
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
+     * @param $content
+     * @param $encodeTokensInUrls
+     */
+    public static function replaceVisualPlaceholdersWithTokens(&$content, $encodeTokensInUrls = ['leadfield'])
+    {
+        if (is_array($content)) {
+            foreach ($content as &$slot) {
+                self::replaceVisualPlaceholdersWithTokens($slot);
+            }
+        } else {
+            $content = preg_replace('/'.self::getVisualTokenHtml(null, null, true).'/smi', '$1', $content);
+        }
+    }
+
+    /**
+     * @deprecated 2.6.0 to be removed in 3.0
+     *
+     * @param int   $page
+     * @param array $entityArguments
+     * @param array $viewParameters
+     *
+     * @return string
+     */
+    public function getTokenContent($page = 1, $entityArguments = [], $viewParameters = [])
+    {
+        if (is_array($page)) {
+            // Laziness
+            $entityArguments = $page;
+            $page            = 1;
+        }
+
+        //set some permissions
+        $permissions = $this->factory->getSecurity()->isGranted(
+            $this->permissionSet,
+            'RETURN_ARRAY'
+        );
+
+        if (count(array_unique($permissions)) == 1 && end($permissions) == false) {
+            return;
+        }
+
+        $session = $this->factory->getSession();
+
+        //set limits
+        $limit = 5;
+
+        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        if ($start < 0) {
+            $start = 0;
+        }
+
+        $request = $this->factory->getRequest();
+        $search  = $request->get('search', $session->get('mautic'.$this->langVar.'buildertoken.filter', ''));
+
+        $session->set('mautic'.$this->langVar.'buildertoken.filter', $search);
+
+        $model  = $this->factory->getModel($this->modelName);
+        $repo   = $model->getRepository();
+        $prefix = $repo->getTableAlias();
+        if (!empty($prefix)) {
+            $prefix .= '.';
+        }
+
+        $filter          = ['string' => $search];
+        $filter['force'] = (isset($entityArguments['filter']['force'])) ? $entityArguments['filter']['force'] : [];
+
+        if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
+            $filter['force'][] = ['column' => $prefix.'createdBy', 'expr' => 'eq', 'value' => $this->factory->getUser()->getId()];
+        }
+
+        $entityArguments['filter'] = $filter;
+
+        $entityArguments = array_merge(
+            [
+                'start'      => $start,
+                'limit'      => $limit,
+                'orderByDir' => 'DESC',
+            ],
+            $entityArguments
+        );
+
+        $items = $model->getEntities($entityArguments);
+        $count = count($items);
+
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            if ($count === 1) {
+                $page = 1;
+            } else {
+                $page = (ceil($count / $limit)) ?: 1;
+            }
+            $session->set('mautic'.$this->langVar.'buildertoken.page', $page);
+        }
+
+        return $this->factory->getTemplating()->render(
+            $this->bundleName.':SubscribedEvents\BuilderToken:list.html.php',
+            array_merge(
+                $viewParameters,
+                [
+                    'items'       => $items,
+                    'page'        => $page,
+                    'limit'       => $limit,
+                    'totalCount'  => $count,
+                    'tmpl'        => $request->get('tmpl', 'index'),
+                    'searchValue' => $search,
+                ]
+            )
+        );
     }
 }

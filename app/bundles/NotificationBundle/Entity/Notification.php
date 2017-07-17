@@ -1,12 +1,14 @@
 <?php
-/**
- * @copyright   2016 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -62,6 +64,11 @@ class Notification extends FormEntity
     private $message;
 
     /**
+     * @var string
+     */
+    private $button;
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -102,12 +109,19 @@ class Notification extends FormEntity
     private $notificationType = 'template';
 
     /**
-     *
+     * @var bool
      */
+    private $mobile = false;
+
+    /**
+     * @var array
+     */
+    private $mobileSettings;
+
     public function __clone()
     {
-        $this->id = null;
-        $this->stats = new ArrayCollection();
+        $this->id        = null;
+        $this->stats     = new ArrayCollection();
         $this->sentCount = 0;
         $this->readCount = 0;
 
@@ -157,6 +171,10 @@ class Notification extends FormEntity
         $builder->createField('message', 'text')
             ->build();
 
+        $builder->createField('button', 'text')
+            ->nullable()
+            ->build();
+
         $builder->createField('notificationType', 'text')
             ->columnName('notification_type')
             ->nullable()
@@ -188,6 +206,10 @@ class Notification extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('mobile', 'boolean')->build();
+
+        $builder->createField('mobileSettings', 'array')->build();
     }
 
     /**
@@ -253,6 +275,7 @@ class Notification extends FormEntity
                     'url',
                     'language',
                     'category',
+                    'button',
                 ]
             )
             ->addProperties(
@@ -272,12 +295,12 @@ class Notification extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter = 'get'.ucfirst($prop);
+        $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
 
         if ($prop == 'category' || $prop == 'list') {
             $currentId = ($current) ? $current->getId() : '';
-            $newId = ($val) ? $val->getId() : null;
+            $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
@@ -370,6 +393,23 @@ class Notification extends FormEntity
     {
         $this->isChanged('heading', $heading);
         $this->heading = $heading;
+    }
+
+    /**
+     * @return string
+     */
+    public function getButton()
+    {
+        return $this->button;
+    }
+
+    /**
+     * @param string $heading
+     */
+    public function setButton($button)
+    {
+        $this->isChanged('button', $button);
+        $this->button = $button;
     }
 
     /**
@@ -564,5 +604,45 @@ class Notification extends FormEntity
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMobileSettings()
+    {
+        return $this->mobileSettings;
+    }
+
+    /**
+     * @param array $mobileSettings
+     *
+     * @return $this
+     */
+    public function setMobileSettings(array $mobileSettings)
+    {
+        $this->mobileSettings = $mobileSettings;
+
+        return $this;
     }
 }

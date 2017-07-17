@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,19 +13,16 @@ namespace Mautic\CoreBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 
 /**
- * CLI Command to install Mautic sample data
+ * CLI Command to install Mautic sample data.
  */
 class InstallDataCommand extends ContainerAwareCommand
 {
-
     /**
      * {@inheritdoc}
      */
@@ -31,12 +30,12 @@ class InstallDataCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:install:data')
             ->setDescription('Installs Mautic with sample data')
-            ->setDefinition(array(
+            ->setDefinition([
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
-                )
-            ))
-            ->setHelp(<<<EOT
+                ),
+            ])
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command re-installs Mautic with sample data.
 
 <info>php %command.full_name%</info>
@@ -63,10 +62,10 @@ EOT
             $confirm = $dialog->select(
                 $output,
                 $translator->trans('mautic.core.command.install_data_confirm'),
-                array(
+                [
                     $translator->trans('mautic.core.form.no'),
                     $translator->trans('mautic.core.form.yes'),
-                ),
+                ],
                 0
             );
 
@@ -83,12 +82,12 @@ EOT
 
         //due to foreign restraint and truncate issues with doctrine, the whole schema must be dropped and recreated
         $command = $this->getApplication()->find('doctrine:schema:drop');
-        $input = new ArrayInput(array(
+        $input   = new ArrayInput([
             'command' => 'doctrine:schema:drop',
             '--force' => true,
             '--env'   => $env,
-            '--quiet'  => true
-        ));
+            '--quiet' => true,
+        ]);
         $returnCode = $command->run($input, $output);
 
         if ($returnCode !== 0) {
@@ -97,11 +96,11 @@ EOT
 
         //recreate the database
         $command = $this->getApplication()->find('doctrine:schema:create');
-        $input = new ArrayInput(array(
+        $input   = new ArrayInput([
             'command' => 'doctrine:schema:create',
             '--env'   => $env,
-            '--quiet'  => true
-        ));
+            '--quiet' => true,
+        ]);
         $returnCode = $command->run($input, $output);
         if ($returnCode !== 0) {
             return $returnCode;
@@ -109,19 +108,20 @@ EOT
 
         //now populate the tables with fixture
         $command = $this->getApplication()->find('doctrine:fixtures:load');
-        $args = array(
-            '--append' => true,
+        $args    = [
             'command'  => 'doctrine:fixtures:load',
+            '--append' => true,
             '--env'    => $env,
-            '--quiet'  => true
-        );
+            '--quiet'  => true,
+        ];
 
         $fixtures = $this->getMauticFixtures();
         foreach ($fixtures as $fixture) {
             $args['--fixtures'][] = $fixture;
         }
-        $input = new ArrayInput($args);
+        $input      = new ArrayInput($args);
         $returnCode = $command->run($input, $output);
+
         if ($returnCode !== 0) {
             return $returnCode;
         }
@@ -135,7 +135,7 @@ EOT
     }
 
     /**
-     * Returns Mautic fixtures
+     * Returns Mautic fixtures.
      *
      * @param bool $returnClassNames
      *
@@ -143,27 +143,46 @@ EOT
      */
     public function getMauticFixtures($returnClassNames = false)
     {
-        $fixtures = array();
+        $fixtures      = [];
         $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
         foreach ($mauticBundles as $bundle) {
-            //parse the namespace into a filepath
-            $fixturesDir    = $bundle['directory'] . '/DataFixtures/ORM';
+            $fixturesDir = $bundle['directory'].'/DataFixtures/ORM';
 
             if (file_exists($fixturesDir)) {
-                if ($returnClassNames) {
-                    //get files within the directory
-                    $finder = new Finder();
-                    $finder->files()->in($fixturesDir)->name('*.php');
-                    foreach ($finder as $file) {
-                        //add the file to be loaded
-                        $class      = str_replace(".php", "", $file->getFilename());
-                        $fixtures[] = 'Mautic\\' . $bundle['bundle'] . '\\DataFixtures\\ORM\\' . $class;
-                    }
-                } else {
-                    $fixtures[] = $fixturesDir;
-                }
+                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\DataFixtures\\ORM\\';
+                $this->populateFixturesFromDirectory($fixturesDir, $fixtures, $classPrefix, $returnClassNames);
+            }
+
+            $testFixturesDir = $bundle['directory'].'/Tests/DataFixtures/ORM';
+
+            if (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV && file_exists($testFixturesDir)) {
+                $classPrefix = 'Mautic\\'.$bundle['bundle'].'\\Tests\\DataFixtures\\ORM\\';
+                $this->populateFixturesFromDirectory($testFixturesDir, $fixtures, $classPrefix, $returnClassNames);
             }
         }
+
         return $fixtures;
+    }
+
+    /**
+     * @param string $fixturesDir
+     * @param array  $fixtures
+     * @param string $classPrefix
+     * @param bool   $returnClassNames
+     */
+    private function populateFixturesFromDirectory($fixturesDir, array &$fixtures, $classPrefix = null, $returnClassNames = false)
+    {
+        if ($returnClassNames) {
+            //get files within the directory
+            $finder = new Finder();
+            $finder->files()->in($fixturesDir)->name('*.php');
+            foreach ($finder as $file) {
+                //add the file to be loaded
+                $class      = str_replace('.php', '', $file->getFilename());
+                $fixtures[] = $classPrefix.$class;
+            }
+        } else {
+            $fixtures[] = $fixturesDir;
+        }
     }
 }

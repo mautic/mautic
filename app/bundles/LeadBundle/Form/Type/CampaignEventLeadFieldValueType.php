@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -11,7 +13,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -19,7 +21,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Class CampaignEventLeadFieldValueType
+ * Class CampaignEventLeadFieldValueType.
  */
 class CampaignEventLeadFieldValueType extends AbstractType
 {
@@ -42,65 +44,52 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 'label'       => 'mautic.lead.campaign.event.field',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
+                'with_tags'   => true,
                 'empty_value' => 'mautic.core.select',
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.lead.campaign.event.field_descr',
-                    'onchange' => 'Mautic.updateLeadFieldValues(this)'
+                    'onchange' => 'Mautic.updateLeadFieldValues(this)',
                 ],
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
                         ['message' => 'mautic.core.value.required']
-                    )
-                ]
+                    ),
+                ],
             ]
         );
 
+        /** @var LeadModel $leadModel */
         $leadModel  = $this->factory->getModel('lead.lead');
         $fieldModel = $this->factory->getModel('lead.field');
-        $operators  = $leadModel->getFilterExpressionFunctions();
-        $choices    = [];
-
-
-        foreach ($operators as $key => $operator) {
-            $choices[$key] = $operator['label'];
-        }
-
-        $builder->add(
-            'operator',
-            'choice',
-            [
-                'choices' => $choices,
-            ]
-        );
 
         $ff = $builder->getFormFactory();
 
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) use ($ff, $fieldModel) {
+        $func = function (FormEvent $e) use ($ff, $fieldModel, $leadModel) {
             $data = $e->getData();
             $form = $e->getForm();
 
             $fieldValues = null;
             $fieldType   = null;
-            $choiceTypes = ['boolean', 'locale', 'country', 'region', 'lookup', 'timezone', 'select', 'radio'];
+            $operator    = '=';
 
             if (isset($data['field'])) {
-                $field = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
+                $field    = $fieldModel->getRepository()->findOneBy(['alias' => $data['field']]);
+                $operator = $data['operator'];
 
                 if ($field) {
                     $properties = $field->getProperties();
                     $fieldType  = $field->getType();
                     if (!empty($properties['list'])) {
                         // Lookup/Select options
-                        $fieldValues = explode('|', $properties['list']);
-                        $fieldValues = array_combine($fieldValues, $fieldValues);
+                        $fieldValues = FormFieldHelper::parseList($properties['list']);
                     } elseif (!empty($properties) && $fieldType == 'boolean') {
                         // Boolean options
                         $fieldValues = [
                             0 => $properties['no'],
-                            1 => $properties['yes']
+                            1 => $properties['yes'],
                         ];
                     } else {
                         switch ($fieldType) {
@@ -116,7 +105,18 @@ class CampaignEventLeadFieldValueType extends AbstractType
                             case 'locale':
                                 $fieldValues = FormFieldHelper::getLocaleChoices();
                                 break;
-                            default:
+                            case 'date':
+                            case 'datetime':
+                                if ('date' === $operator) {
+                                    $fieldHelper = new FormFieldHelper();
+                                    $fieldHelper->setTranslator($this->factory->getTranslator());
+                                    $fieldValues = $fieldHelper->getDateChoices();
+                                }
+                                break;
+                            case 'boolean':
+                            case 'lookup':
+                            case 'select':
+                            case 'radio':
                                 if (!empty($properties)) {
                                     $fieldValues = $properties;
                                 }
@@ -125,8 +125,11 @@ class CampaignEventLeadFieldValueType extends AbstractType
                 }
             }
 
+            $supportsValue   = !in_array($operator, ['empty', '!empty']);
+            $supportsChoices = !in_array($operator, ['empty', '!empty', 'regexp', '!regexp']);
+
             // Display selectbox for a field with choices, textbox for others
-            if (!empty($fieldValues) && in_array($fieldType, $choiceTypes)) {
+            if (!empty($fieldValues) && $supportsChoices) {
                 $form->add(
                     'value',
                     'choice',
@@ -135,35 +138,53 @@ class CampaignEventLeadFieldValueType extends AbstractType
                         'label'      => 'mautic.form.field.form.value',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class' => 'form-control'
+                            'class' => 'form-control',
                         ],
                         'required'    => true,
                         'constraints' => [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']
-                            )
-                        ]
+                            ),
+                        ],
                     ]
                 );
             } else {
+                $attr = [
+                    'class' => 'form-control',
+                ];
+
+                if (!$supportsValue) {
+                    $attr['disabled'] = 'disabled';
+                }
+
                 $form->add(
                     'value',
                     'text',
                     [
-                        'label'      => 'mautic.form.field.form.value',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => [
-                            'class' => 'form-control'
-                        ],
-                        'required'    => true,
-                        'constraints' => [
+                        'label'       => 'mautic.form.field.form.value',
+                        'label_attr'  => ['class' => 'control-label'],
+                        'attr'        => $attr,
+                        'constraints' => ($supportsValue) ? [
                             new NotBlank(
                                 ['message' => 'mautic.core.value.required']
-                            )
-                        ]
+                            ),
+                        ] : [],
                     ]
                 );
             }
+
+            $form->add(
+                'operator',
+                'choice',
+                [
+                    'label'      => 'mautic.lead.lead.submitaction.operator',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'onchange' => 'Mautic.updateLeadFieldValues(this)',
+                    ],
+                    'choices' => $leadModel->getOperatorsForFieldType(null == $fieldType ? 'default' : $fieldType, ['date']),
+                ]
+            );
         };
 
         // Register the function above as EventListener on PreSet and PreBind
@@ -176,6 +197,6 @@ class CampaignEventLeadFieldValueType extends AbstractType
      */
     public function getName()
     {
-        return "campaignevent_lead_field_value";
+        return 'campaignevent_lead_field_value';
     }
 }

@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -17,10 +19,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class IpLookupHelperTest
+ * Class IpLookupHelperTest.
  */
 class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
 {
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'prod');
+    }
+
     /**
      * @testdox Check if IP outside a request that local IP is returned
      *
@@ -53,10 +62,10 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testClientIpIsReturnedFromRequest()
     {
-        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('73.77.245.52', $ip->getIpAddress());
+        $this->assertEquals('73.77.245.53', $ip->getIpAddress());
     }
 
     /**
@@ -90,14 +99,15 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $mockRepository->expects($this->any())
-            ->method('findOneByIpAddress')
-            ->will($this->returnValue(null));
+            ->method('__call')
+            ->with($this->equalTo('findOneByIpAddress'))
+            ->willReturn(null);
 
         $mockEm = $this
             ->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $mockEm->expects($this->once())
+        $mockEm->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($mockRepository));
 

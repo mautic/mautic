@@ -12,9 +12,9 @@ Features that are determined not to fit within the direction of the Mautic Core 
 
 ### Coding Standards
 
-Mautic tries to follow [Symfony's coding standards](http://symfony.com/doc/current/contributing/code/standards.html) and thus we ask the same of any code submitted through pull requests.
+Mautic follows [Symfony's coding standards](http://symfony.com/doc/current/contributing/code/standards.html) by implementing pre-commit git hook running [php-cs-fixer](https://github.com/friendsofphp/php-cs-fixer), which is installed and updated with `composer install`/`composer update`.
 
-In addition to Symfony's coding standards, please appropriately indent code using 4 spaces rather than a tab. If using PhpStorm, a code style settings file can be found [here](https://gist.github.com/alanhartless/f3ad051108351a3fcffd). Simply add it to the project's .idea folder then through PhpStorm's preferences, browse to Editor -> Code Style -> PHP and select "Symfony" as the Scheme. 
+All code styling is handled automatically by the aforementioned git hook. In case if you setup git hook correctly (which is true if you ever run `composer install`/`composer update` before creating a pull request), you can format your code as you like - it will be converted to Mautic code style automatically.
 
 ### Pull Request Description Format
 

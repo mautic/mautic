@@ -2,8 +2,8 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
+use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
@@ -29,10 +29,10 @@ class Version20160725161822 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $leadIDX  = $this->generatePropertyName('video_hits', 'idx', ['lead_id']);
-        $leadFK   = $this->generatePropertyName('video_hits', 'fk', ['lead_id']);
-        $ipIDX    = $this->generatePropertyName('video_hits', 'idx', ['ip_id']);
-        $ipFK     = $this->generatePropertyName('video_hits', 'fk', ['ip_id']);
+        $leadIDX = $this->generatePropertyName('video_hits', 'idx', ['lead_id']);
+        $leadFK  = $this->generatePropertyName('video_hits', 'fk', ['lead_id']);
+        $ipIDX   = $this->generatePropertyName('video_hits', 'idx', ['ip_id']);
+        $ipFK    = $this->generatePropertyName('video_hits', 'fk', ['ip_id']);
 
         $sql = <<<SQL
 CREATE TABLE {$this->prefix}video_hits (

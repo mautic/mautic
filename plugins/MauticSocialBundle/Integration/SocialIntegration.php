@@ -1,21 +1,37 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 
 abstract class SocialIntegration extends AbstractIntegration
 {
     protected $persistNewLead = false;
+
+    /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
+     * @param IntegrationHelper $integrationHelper
+     */
+    public function setIntegrationHelper(IntegrationHelper $integrationHelper)
+    {
+        $this->integrationHelper = $integrationHelper;
+    }
 
     /**
      * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
@@ -26,12 +42,12 @@ abstract class SocialIntegration extends AbstractIntegration
     {
         if ($formArea == 'features') {
             $name = strtolower($this->getName());
-            if ($this->factory->serviceExists('mautic.form.type.social.' . $name)) {
-                $builder->add('shareButton', 'socialmedia_' . $name, array(
+            if ($this->factory->serviceExists('mautic.form.type.social.'.$name)) {
+                $builder->add('shareButton', 'socialmedia_'.$name, [
                     'label'    => 'mautic.integration.form.sharebutton',
                     'required' => false,
-                    'data'     => (isset($data['shareButton'])) ? $data['shareButton'] : array()
-                ));
+                    'data'     => (isset($data['shareButton'])) ? $data['shareButton'] : [],
+                ]);
             }
         }
     }
@@ -43,19 +59,18 @@ abstract class SocialIntegration extends AbstractIntegration
      *
      * @return array
      */
-    public function getFormLeadFields($settings = array())
+    public function getFormLeadFields($settings = [])
     {
-        static $fields = array();
+        static $fields = [];
 
         if (empty($fields)) {
-            $translator        = $this->factory->getTranslator();
-            $s                 = $this->getName();
-            $available         = $this->getAvailableLeadFields($settings);
+            $s         = $this->getName();
+            $available = $this->getAvailableLeadFields($settings);
             if (empty($available) || !is_array($available)) {
-                return array();
+                return [];
             }
             //create social profile fields
-            $socialProfileUrls = $this->factory->getHelper('integration')->getSocialProfileUrlRegex();
+            $socialProfileUrls = $this->integrationHelper->getSocialProfileUrlRegex();
 
             foreach ($available as $field => $details) {
                 $label = (!empty($details['label'])) ? $details['label'] : false;
@@ -64,7 +79,7 @@ abstract class SocialIntegration extends AbstractIntegration
                     case 'string':
                     case 'boolean':
                         $fields[$fn] = (!$label)
-                            ? $translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                            ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                             : $label;
                         break;
                     case 'object':
@@ -72,48 +87,56 @@ abstract class SocialIntegration extends AbstractIntegration
                             foreach ($details['fields'] as $f) {
                                 $fn          = $this->matchFieldName($field, $f);
                                 $fields[$fn] = (!$label)
-                                    ? $translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                                    ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                                     : $label;
                             }
                         } else {
                             $fields[$field] = (!$label)
-                                ? $translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                                ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                                 : $label;
                         }
                         break;
                     case 'array_object':
-                        if ($field == "urls" || $field == "url") {
+                        if ($field == 'urls' || $field == 'url') {
                             foreach ($socialProfileUrls as $p => $d) {
                                 $fields["{$p}ProfileHandle"] = (!$label)
-                                    ? $translator->transConditional("mautic.integration.common.{$p}ProfileHandle", "mautic.integration.{$s}.{$p}ProfileHandle")
+                                    ? $this->translator->transConditional("mautic.integration.common.{$p}ProfileHandle", "mautic.integration.{$s}.{$p}ProfileHandle")
                                     : $label;
                             }
                             foreach ($details['fields'] as $f) {
                                 $fields["{$p}Urls"] = (!$label)
-                                    ? $translator->transConditional("mautic.integration.common.{$f}Urls", "mautic.integration.{$s}.{$f}Urls")
+                                    ? $this->translator->transConditional("mautic.integration.common.{$f}Urls", "mautic.integration.{$s}.{$f}Urls")
                                     : $label;
                             }
                         } elseif (isset($details['fields'])) {
                             foreach ($details['fields'] as $f) {
                                 $fn          = $this->matchFieldName($field, $f);
                                 $fields[$fn] = (!$label)
-                                    ? $translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                                    ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                                     : $label;
                             }
                         } else {
                             $fields[$fn] = (!$label)
-                                ? $translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                                ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
                                 : $label;
                         }
                         break;
                 }
             }
             if ($this->sortFieldsAlphabetically()) {
-                uasort($fields, "strnatcmp");
+                uasort($fields, 'strnatcmp');
             }
         }
 
         return $fields;
+    }
+
+    /**
+     * @param array $settings
+     */
+    public function getFormCompanyFields($settings = [])
+    {
+        $settings['feature_settings']['objects'] = ['Company'];
     }
 
     /**
@@ -129,28 +152,28 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     public function getRequiredKeyFields()
     {
-        return array(
-            'client_id'      => 'mautic.integration.keyfield.clientid',
-            'client_secret'  => 'mautic.integration.keyfield.clientsecret'
-        );
+        return [
+            'client_id'     => 'mautic.integration.keyfield.clientid',
+            'client_secret' => 'mautic.integration.keyfield.clientsecret',
+        ];
     }
 
     /**
-     * Get the array key for clientId
+     * Get the array key for clientId.
      *
      * @return string
      */
-    public function getClientIdKey ()
+    public function getClientIdKey()
     {
         return 'client_id';
     }
 
     /**
-     * Get the array key for client secret
+     * Get the array key for client secret.
      *
      * @return string
      */
-    public function getClientSecretKey ()
+    public function getClientSecretKey()
     {
         return 'client_secret';
     }
@@ -163,7 +186,7 @@ abstract class SocialIntegration extends AbstractIntegration
      *
      * @return mixed
      */
-    public function parseCallbackResponse ($data, $postAuthorization = false)
+    public function parseCallbackResponse($data, $postAuthorization = false)
     {
         if ($postAuthorization) {
             return json_decode($data, true);
@@ -173,19 +196,19 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * Returns notes specific to sections of the integration form (if applicable)
+     * Returns notes specific to sections of the integration form (if applicable).
      *
      * @param $section
      *
      * @return string
      */
-    public function getFormNotes ($section)
+    public function getFormNotes($section)
     {
-        return array('', 'info');
+        return ['', 'info'];
     }
 
     /**
-     * Get the template for social profiles
+     * Get the template for social profiles.
      *
      * @return string
      */
@@ -195,7 +218,7 @@ abstract class SocialIntegration extends AbstractIntegration
     }
 
     /**
-     * Get the access token from session or socialCache
+     * Get the access token from session or socialCache.
      *
      * @param $socialCache
      *
@@ -203,16 +226,19 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     protected function getContactAccessToken(&$socialCache)
     {
-        $accessToken = $this->factory->getSession()->get($this->getName().'_tokenResponse', array());
+        if (!$this->session->isStarted()) {
+            return (isset($socialCache['accessToken'])) ? $this->decryptApiKeys($socialCache['accessToken']) : null;
+        }
+
+        $accessToken = $this->session->get($this->getName().'_tokenResponse', []);
         if (!isset($accessToken[$this->getAuthTokenKey()])) {
             if (isset($socialCache['accessToken'])) {
                 $accessToken = $this->decryptApiKeys($socialCache['accessToken']);
             } else {
-
                 return null;
             }
         } else {
-            $this->factory->getSession()->remove($this->getName().'_tokenResponse');
+            $this->session->remove($this->getName().'_tokenResponse');
             $socialCache['accessToken'] = $this->encryptApiKeys($accessToken);
 
             $this->persistNewLead = true;

@@ -1,21 +1,22 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'report');
 
 $header = ($report->getId()) ?
     $view['translator']->trans('mautic.report.report.header.edit',
-        array('%name%' => $view['translator']->trans($report->getName()))) :
+        ['%name%' => $view['translator']->trans($report->getName())]) :
     $view['translator']->trans('mautic.report.report.header.new');
 
-$view['slots']->set("headerTitle", $header);
+$view['slots']->set('headerTitle', $header);
 $showGraphTab = count($form['graphs']->vars['choices']);
 ?>
 
@@ -33,7 +34,7 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                     <li class="">
                         <a href="#data-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.data'); ?></a>
                     </li>
-                    <li class="<?php if (!$showGraphTab) echo "hide"; ?>" id="graphs-tab">
+                    <li class="<?php if (!$showGraphTab): echo 'hide'; endif; ?>" id="graphs-tab">
                         <a href="#graphs-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.graphs'); ?></a>
                     </li>
                 </ul>
@@ -71,7 +72,7 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="pa-md">
+                                <div class="ml-md">
                                     <h4><strong><?php echo $view['translator']->trans('mautic.core.order'); ?></strong></h4>
                                     <?php echo $view['form']->row($form['tableOrder']); ?>
                                 </div>
@@ -90,9 +91,22 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="pa-md">
+                                    <h4><strong><?php echo $view['translator']->trans('mautic.report.form.groupby'); ?></strong></h4>
+                                    <?php echo $view['form']->row($form['groupBy']); ?>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="pa-md">
+                                    <h4><strong><?php echo $view['translator']->trans('mautic.core.calculated.fields'); ?></strong></h4>
+                                    <?php echo $view['form']->row($form['aggregators']); ?>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="tab-pane fade bdr-w-0<?php if (!$showGraphTab) echo "hide"; ?>" id="graphs-container">
+                    <div class="tab-pane fade bdr-w-0<?php if (!$showGraphTab): echo 'hide'; endif; ?>" id="graphs-container">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="pa-md">

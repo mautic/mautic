@@ -31,17 +31,6 @@ Mautic.leadOnLoad = function (container, response) {
         return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
     };
 
-    if (mQuery(container + ' form[name="lead"]').length) {
-        mQuery("*[data-toggle='field-lookup']").each(function (index) {
-            var target = mQuery(this).attr('data-target');
-            var field  = mQuery(this).attr('id');
-            var options = mQuery(this).attr('data-options');
-            Mautic.activateLeadFieldTypeahead(field, target, options);
-        });
-
-        Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
-    }
-
     // Timeline filters
     var timelineForm = mQuery(container + ' #timeline-filters');
     if (timelineForm.length) {
@@ -134,6 +123,10 @@ Mautic.leadOnLoad = function (container, response) {
     });
 
     Mautic.initUniqueIdentifierFields();
+
+    if (mQuery(container + ' .panel-companies').length) {
+        mQuery(container + ' .panel-companies .fa-check').tooltip({html: true});
+    }
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
@@ -214,48 +207,6 @@ Mautic.leadEmailOnLoad = function(container, response) {
     });
 }
 
-Mautic.activateLeadFieldTypeahead = function(field, target, options) {
-    if (typeof options !== 'undefined' && ((!mQuery.isArray(options) && options !== '') || (mQuery.isArray(options) && options.length))) {
-        var keys = [], values = [];
-        //check to see if there is a key/value split
-        if (typeof options == 'string') {
-            options = options.split('||');
-            if (options.length == 2) {
-                keys = options[1].split('|');
-                values = options[0].split('|');
-            } else {
-                values = options[0].split('|');
-            }
-        } else {
-            values = options;
-        }
-
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
-            dataOptions: values,
-            dataOptionKeys: keys,
-            minLength: 0
-        });
-    } else {
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
-            prefetch: true,
-            remote: true,
-            action: "lead:fieldList&field=" + target
-        });
-    }
-
-    var filterId = field.replace("display", "filter");
-    mQuery(fieldTypeahead).on('typeahead:selected', function (event, datum) {
-
-        if (mQuery("#" + filterId).length && datum["id"]) {
-            mQuery("#" + filterId).val(datum["id"]);
-        }
-    }).on('typeahead:autocompleted', function (event, datum) {
-        if (mQuery("#" + filterId).length && datum["id"]) {
-            mQuery("#" + filterId).val(datum["id"]);
-        }
-    });
-};
-
 Mautic.leadlistOnLoad = function(container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'lead.list');
@@ -288,23 +239,23 @@ Mautic.leadlistOnLoad = function(container) {
             });
         });
     }
-
-    mQuery("*[data-toggle='field-lookup']").each(function (index) {
-        var target = mQuery(this).attr('data-target');
-        var options = mQuery(this).attr('data-options');
-        var field  = mQuery(this).attr('id');
-
-        Mautic.activateLeadFieldTypeahead(field, target, options);
-    });
 };
 
 Mautic.convertLeadFilterInput = function(el) {
+    var prefix = 'leadlist';
+
+    var parent = mQuery(el).parents('.dynamic-content-filter');
+    if (parent.length) {
+        prefix = parent.attr('id');
+    }
+
     var operator = mQuery(el).val();
+
     // Extract the filter number
-    var regExp    = /leadlist_filters_(\d+)_operator/;
+    var regExp    = /_filters_(\d+)_operator/;
     var matches   = regExp.exec(mQuery(el).attr('id'));
     var filterNum = matches[1];
-    var filterId  = '#leadlist_filters_' + filterNum + '_filter';
+    var filterId  = '#' + prefix + '_filters_' + filterNum + '_filter';
 
     // Reset has-error
     if (mQuery(filterId).parent().hasClass('has-error')) {
@@ -312,23 +263,26 @@ Mautic.convertLeadFilterInput = function(el) {
         mQuery(filterId).parent().removeClass('has-error');
     }
 
-    var disabled = (operator == 'empty' || operator == '!empty') ? true : false;
-    mQuery(filterId).prop('disabled', disabled);
+    var disabled = (operator == 'empty' || operator == '!empty');
+    mQuery(filterId+', #' + prefix + '_filters_' + filterNum + '_display').prop('disabled', disabled);
 
     if (disabled) {
         mQuery(filterId).val('');
     }
 
+    var newName = '';
+    var lastPos;
+
     if (mQuery(filterId).is('select')) {
         var isMultiple  = mQuery(filterId).attr('multiple');
-        var multiple    = (operator == 'in' || operator == '!in') ? true : false;
+        var multiple    = (operator == 'in' || operator == '!in');
         var placeholder = mQuery(filterId).attr('data-placeholder');
 
         if (multiple && !isMultiple) {
             mQuery(filterId).attr('multiple', 'multiple');
 
             // Update the name
-            var newName =  mQuery(filterId).attr('name') + '[]';
+            newName =  mQuery(filterId).attr('name') + '[]';
             mQuery(filterId).attr('name', newName);
 
             placeholder = mauticLang['chosenChooseMore'];
@@ -336,7 +290,10 @@ Mautic.convertLeadFilterInput = function(el) {
             mQuery(filterId).removeAttr('multiple');
 
             // Update the name
-            var newName =  mQuery(filterId).attr('name').replace(/[\[\]']+/g,'')
+            newName = filterEl.attr('name');
+            lastPos = newName.lastIndexOf('[]');
+            newName = newName.substring(0, lastPos);
+
             mQuery(filterId).attr('name', newName);
 
             placeholder = mauticLang['chosenChooseOne'];
@@ -364,6 +321,19 @@ Mautic.convertLeadFilterInput = function(el) {
     }
 };
 
+Mautic.updateLookupListFilter = function(field, datum) {
+    if (datum && datum.id) {
+        var filterField = '#'+field.replace('_display', '_filter');
+        mQuery(filterField).val(datum.id);
+    }
+};
+
+Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptions) {
+    mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
+
+    Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
+};
+
 Mautic.addLeadListFilter = function (elId) {
     var filterId = '#available_' + elId;
     var label    = mQuery(filterId).text();
@@ -375,7 +345,8 @@ Mautic.addLeadListFilter = function (elId) {
 
     var prototype = mQuery('.available-filters').data('prototype');
     var fieldType = mQuery(filterId).data('field-type');
-    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'tags', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale']) != -1);
+    var fieldObject = mQuery(filterId).data('field-object');
+    var isSpecial = (mQuery.inArray(fieldType, ['leadlist', 'lead_email_received', 'lead_email_sent', 'tags', 'multiselect', 'boolean', 'select', 'country', 'timezone', 'region', 'stage', 'locale', 'globalcategory']) != -1);
 
     prototype = prototype.replace(/__name__/g, filterNum);
     prototype = prototype.replace(/__label__/g, label);
@@ -388,9 +359,10 @@ Mautic.addLeadListFilter = function (elId) {
 
     if (isSpecial) {
         var templateField = fieldType;
-        if (fieldType == 'boolean') {
+        if (fieldType == 'boolean' || fieldType == 'multiselect') {
             templateField = 'select';
         }
+
         var template = mQuery('#templates .' + templateField + '-template').clone();
         mQuery(template).attr('name', mQuery(template).attr('name').replace(/__name__/g, filterNum));
         mQuery(template).attr('id', mQuery(template).attr('id').replace(/__name__/g, filterNum));
@@ -399,8 +371,15 @@ Mautic.addLeadListFilter = function (elId) {
 
     if (mQuery('#leadlist_filters div.panel').length == 0) {
         // First filter so hide the glue footer
-        mQuery(prototype).find(".panel-footer").addClass('hide');
+        mQuery(prototype).find(".panel-heading").addClass('hide');
     }
+
+    if (fieldObject == 'company') {
+        mQuery(prototype).find(".object-icon").removeClass('fa-user').addClass('fa-building');
+    } else {
+        mQuery(prototype).find(".object-icon").removeClass('fa-building').addClass('fa-user');
+    }
+    mQuery(prototype).find(".inline-spacer").append(fieldObject);
 
     mQuery(prototype).find("a.remove-selected").on('click', function() {
         mQuery(this).closest('.panel').animate(
@@ -414,6 +393,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     mQuery(prototype).find("input[name='" + filterBase + "[field]']").val(elId);
     mQuery(prototype).find("input[name='" + filterBase + "[type]']").val(fieldType);
+    mQuery(prototype).find("input[name='" + filterBase + "[object]']").val(fieldObject);
 
     var filterEl = (isSpecial) ? "select[name='" + filterBase + "[filter]']" : "input[name='" + filterBase + "[filter]']";
 
@@ -423,7 +403,7 @@ Mautic.addLeadListFilter = function (elId) {
 
     //activate fields
     if (isSpecial) {
-        if (fieldType == 'select' || fieldType == 'boolean') {
+        if (fieldType == 'select' || fieldType == 'multiselect' || fieldType == 'boolean') {
             // Generate the options
             var fieldOptions = mQuery(filterId).data("field-list");
 
@@ -488,18 +468,12 @@ Mautic.addLeadListFilter = function (elId) {
         mQuery(filter).attr('type', fieldType);
     }
 
-    // Remove inapplicable operator types
     var operators = mQuery(filterId).data('field-operators');
-
-    if (typeof operators.include != 'undefined') {
-        mQuery('#' + filterIdBase + 'operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['include']) == -1
-        }).remove();
-    } else if (typeof operators.exclude != 'undefined') {
-        mQuery('#' + filterIdBase + 'operator option').filter(function () {
-            return mQuery.inArray(mQuery(this).val(), operators['exclude']) !== -1
-        }).remove();
-    }
+    mQuery('#' + filterIdBase + 'operator').html('');
+    mQuery.each(operators, function (value, label) {
+        var newOption = mQuery('<option/>').val(value).text(label);
+        newOption.appendTo(mQuery('#' + filterIdBase + 'operator'));
+    });
 
     // Convert based on first option in list
     Mautic.convertLeadFilterInput('#' + filterIdBase + 'operator');
@@ -542,22 +516,63 @@ Mautic.leadfieldOnLoad = function (container) {
     }
 
     if (mQuery(container + ' form[name="leadfield"]').length) {
-        Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val());
+        Mautic.updateLeadFieldProperties(mQuery('#leadfield_type').val(), true);
     }
 
 };
 
-Mautic.updateLeadFieldProperties = function(selectedVal) {
-    var defaultValueField = mQuery('input#leadfield_defaultValue');
-    if (selectedVal == 'lookup') {
+Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
+    if (selectedVal == 'multiselect') {
         // Use select
         selectedVal = 'select';
     }
 
-    if (mQuery('#field-templates .'+selectedVal).length) {
-        mQuery('#leadfield_properties').html('');
-        mQuery('#leadfield_properties').append(mQuery('#field-templates .'+selectedVal).clone(true));
-    } else if (!mQuery('#leadfield_properties .'+selectedVal).length) {
+    if (mQuery('#field-templates .' + selectedVal).length) {
+        mQuery('#leadfield_properties').html(
+            mQuery('#field-templates .' + selectedVal).html()
+                .replace(/leadfield_properties_template/g, 'leadfield_properties')
+        );
+        mQuery("#leadfield_properties *[data-toggle='sortablelist']").each(function (index) {
+            var sortableList = mQuery(this);
+            Mautic.activateSortable(this);
+            // Using an interval so removing, adding, updating and reordering are accounted for
+            var contactFieldListOptions = mQuery('#leadfield_properties').find('input').map(function() {
+                return mQuery(this).val();
+            }).get().join();
+            var updateDefaultValuesetInterval = setInterval(function() {
+                var evalListOptions = mQuery('#leadfield_properties').find('input').map(function() {
+                    return mQuery(this).val();
+                }).get().join();
+                if (mQuery('#leadfield_properties_itemcount').length) {
+                    if (contactFieldListOptions != evalListOptions) {
+                        contactFieldListOptions = evalListOptions;
+                        var selected = mQuery('#leadfield_defaultValue').val();
+                        mQuery('#leadfield_defaultValue').html('<option value=""></option>');
+                        var labels = mQuery('#leadfield_properties').find('input.sortable-label');
+                        if (labels.length) {
+                            labels.each(function () {
+                                // label/value pairs
+                                var label = mQuery(this).val();
+                                var val = mQuery(this).closest('.row').find('input.sortable-value').first().val();
+                                mQuery('<option value="' + val + '">' + label + '</option>').appendTo(mQuery('#leadfield_defaultValue'));
+                            });
+                        } else {
+                            mQuery('#leadfield_properties .list-sortable').find('input').each(function () {
+                                var val = mQuery(this).val();
+                                mQuery('<option value="' + val + '">' + val + '</option>').appendTo(mQuery('#leadfield_defaultValue'));
+                            });
+                        }
+
+                        mQuery('#leadfield_defaultValue').val(selected);
+                        mQuery('#leadfield_defaultValue').trigger('chosen:updated');
+                    }
+                } else {
+                    clearInterval(updateDefaultValuesetInterval);
+                    delete contactFieldListOptions;
+                }
+            }, 500);
+        });
+    } else if (!mQuery('#leadfield_properties .' + selectedVal).length) {
         mQuery('#leadfield_properties').html('');
     }
 
@@ -568,29 +583,67 @@ Mautic.updateLeadFieldProperties = function(selectedVal) {
     }
 
     // Switch default field if applicable
+    var defaultValueField = mQuery('#leadfield_defaultValue');
+    if (defaultValueField.hasClass('calendar-activated')) {
+        defaultValueField.datetimepicker('destroy').removeClass('calendar-activated');
+    } else if (mQuery('#leadfield_defaultValue_chosen').length) {
+        mQuery('#leadfield_defaultValue').chosen('destroy');
+    }
+
     var defaultFieldType = mQuery('input[name="leadfield[defaultValue]"]').attr('type');
-    if (selectedVal == 'boolean') {
-        if (defaultFieldType == 'text') {
-            // Convert to a select
-            var newDiv      = mQuery('<div id="leadfield_defaultValue"></div>');
-            var defaultBool = mQuery('#field-templates .default_bool').html();
-            defaultBool     = defaultBool.replace(/default_bool_template/g, 'defaultValue');
+    var tempType = selectedVal;
+    var html = '';
+    var isSelect = false;
+    var defaultVal = defaultValueField.val();
+    switch (selectedVal) {
+        case 'boolean':
+            if (defaultFieldType != 'radio') {
+                // Convert to a boolean type
+                html = '<div id="leadfield_default_template_boolean">' + mQuery('#field-templates .default_template_boolean').html() + '</div>';
+            }
+            break;
+        case 'country':
+        case 'region':
+        case 'locale':
+        case 'timezone':
+            html = mQuery('#field-templates .default_template_' + selectedVal).html();
+            isSelect = true;
+            break;
+        case 'select':
+        case 'multiselect':
+        case 'lookup':
+            html = mQuery('#field-templates .default_template_select').html();
+            tempType = 'select';
+            isSelect = true;
+            break;
+        case 'textarea':
+            html = mQuery('#field-templates .default_template_textarea').html();
+            break;
+        default:
+            html = mQuery('#field-templates .default_template_text').html();
+            tempType = 'text';
 
-            mQuery(defaultBool).appendTo(newDiv);
+            if (selectedVal == 'number' || selectedVal == 'tel' || selectedVal == 'url' || selectedVal == 'email') {
+                var replace = 'type="text"';
+                var regex = new RegExp(replace, "g");
+                html = html.replace(regex, 'type="' + selectedVal + '"');
+            }
 
-            defaultValueField.replaceWith(newDiv);
-        }
-    } else if (defaultFieldType == 'radio') {
-        // Convert to input
-        var html = mQuery('#field-templates .default').html();
-        html     = html.replace(/default_template/g, 'defaultValue');
-        defaultValueField.replaceWith(html);
+            break;
+    }
+
+    if (html && !onload) {
+        var replace = 'default_template_' + tempType;
+        var regex = new RegExp(replace, "g");
+        html = html.replace(regex, 'defaultValue')
+        defaultValueField.replaceWith(mQuery(html));
+        mQuery('#leadfield_defaultValue').val(defaultVal);
     }
 
     if (selectedVal === 'datetime' || selectedVal === 'date' || selectedVal === 'time') {
-        Mautic.activateDateTimeInputs(defaultValueField, selectedVal);
-    } else if (defaultValueField.hasClass('calendar-activated')) {
-        defaultValueField.datetimepicker('destroy').removeClass('calendar-activated');
+        Mautic.activateDateTimeInputs('#leadfield_defaultValue', selectedVal);
+    } else if (isSelect) {
+       Mautic.activateChosenSelect('#leadfield_defaultValue');
     }
 };
 
@@ -678,6 +731,48 @@ Mautic.toggleLeadList = function(toggleId, leadId, listId) {
     var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
     var query = "action=lead:toggleLeadList&leadId=" + leadId + "&listId=" + listId + "&listAction=" + action;
 
+    Mautic.toggleLeadSwitch(toggleId, query, action);
+};
+
+Mautic.togglePreferredChannel = function(channel) {
+    if (channel == 'all') {
+        var status = mQuery('#lead_contact_frequency_rules_subscribed_channels_0')[0].checked;  //"select all" change
+
+       // "select all" checked status
+        mQuery('#channels input:checkbox').each(function(){ //iterate all listed checkbox items
+            if (this.checked != status) {
+                this.checked = status;
+                Mautic.setPreferredChannel(this.value);
+            }
+        });
+    } else {
+        Mautic.setPreferredChannel(channel);
+    }
+};
+
+Mautic.setPreferredChannel = function(channel) {
+    mQuery( '#frequency_' + channel ).slideToggle();
+    mQuery( '#frequency_' + channel ).removeClass('hide');
+    if (mQuery('#' + channel)[0].checked) {
+        mQuery('#is-contactable-' + channel).removeClass('text-muted');
+        mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , false).trigger("chosen:updated");
+        mQuery('#preferred_' + channel).prop("disabled" , false);
+        mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , false).trigger("chosen:updated");
+        mQuery('#lead_contact_frequency_rules_contact_pause_start_date_' + channel).prop("disabled" , false);
+        mQuery('#lead_contact_frequency_rules_contact_pause_end_date_' + channel).prop("disabled" , false);
+    } else {
+        mQuery('#is-contactable-' + channel).addClass('text-muted');
+        mQuery('#lead_contact_frequency_rules_frequency_number_' + channel).prop("disabled" , true).trigger("chosen:updated");
+        mQuery('#preferred_' + channel).prop("disabled" , true);
+        mQuery('#lead_contact_frequency_rules_frequency_time_' + channel).prop("disabled" , true).trigger("chosen:updated");
+        mQuery('#lead_contact_frequency_rules_contact_pause_start_date_' + channel).prop("disabled" , true);
+        mQuery('#lead_contact_frequency_rules_contact_pause_end_date_' + channel).prop("disabled" , true);
+    }
+};
+
+Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
+    var action = mQuery('#' + toggleId).hasClass('fa-toggle-on') ? 'remove' : 'add';
+    var query = "action=lead:toggleCompanyLead&leadId=" + leadId + "&companyId=" + companyId + "&companyAction=" + action;
     Mautic.toggleLeadSwitch(toggleId, query, action);
 };
 
@@ -920,13 +1015,24 @@ Mautic.toggleAnonymousLeads = function() {
 };
 
 Mautic.getLeadEmailContent = function (el) {
-    Mautic.activateLabelLoadingIndicator('lead_quickemail_templates');
-    mQuery('#MauticSharedModal .btn-primary').prop('disabled', true);
+    var id = (mQuery.type( el ) === "string") ? el : mQuery(el).attr('id');
+    Mautic.activateLabelLoadingIndicator(id);
+
+    var inModal = mQuery('#'+id).closest('modal').length;
+    if (inModal) {
+        mQuery('#MauticSharedModal .btn-primary').prop('disabled', true);
+    }
+
     Mautic.ajaxActionRequest('lead:getEmailTemplate', {'template': mQuery(el).val()}, function(response) {
-        mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
-        mQuery('#lead_quickemail_body').froalaEditor('html.set', response.body);
-        mQuery('#lead_quickemail_body').val(response.body);
-        mQuery('#lead_quickemail_subject').val(response.subject);
+        if (inModal) {
+            mQuery('#MauticSharedModal .btn-primary').prop('disabled', false);
+        }
+        var idPrefix = id.replace('templates', '');
+        var bodyEl = (mQuery('#'+idPrefix+'message').length) ? '#'+idPrefix+'message' : '#'+idPrefix+'body';
+        mQuery(bodyEl).froalaEditor('html.set', response.body);
+        mQuery(bodyEl).val(response.body);
+        mQuery('#'+idPrefix+'subject').val(response.subject);
+
         Mautic.removeLabelLoadingIndicator();
     });
 };
@@ -1019,55 +1125,7 @@ Mautic.leadBatchSubmit = function() {
 };
 
 Mautic.updateLeadFieldValues = function (field) {
-    Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
-
-    field = mQuery(field);
-    var fieldAlias = field.val();
-    Mautic.ajaxActionRequest('lead:updateLeadFieldValues', {'alias': fieldAlias}, function(response) {
-        if (typeof response.options != 'undefined') {
-            var valueField = mQuery('#campaignevent_properties_value');
-            var valueFieldAttrs = {
-                'class': valueField.attr('class'),
-                'id': valueField.attr('id'),
-                'name': valueField.attr('name'),
-                'autocomplete': valueField.attr('autocomplete'),
-                'value': valueField.attr('value')
-            };
-
-            if (mQuery('#campaignevent_properties_value_chosen').length) {
-                mQuery('#campaignevent_properties_value').chosen('destroy');
-            }
-
-            if (!mQuery.isEmptyObject(response.options)) {
-                var newValueField = mQuery('<select/>')
-                    .attr('class', valueFieldAttrs['class'])
-                    .attr('id', valueFieldAttrs['id'])
-                    .attr('name', valueFieldAttrs['name'])
-                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
-                mQuery.each(response.options, function(optionKey, optionVal) {
-                    var option = mQuery("<option/>")
-                        .attr('value', optionKey)
-                        .text(optionVal);
-                    newValueField.append(option);
-                });
-                valueField.replaceWith(newValueField);
-
-                Mautic.activateChosenSelect(newValueField);
-            } else {
-                var newValueField = mQuery('<input/>')
-                    .attr('type', 'text')
-                    .attr('class', valueFieldAttrs['class'])
-                    .attr('id', valueFieldAttrs['id'])
-                    .attr('name', valueFieldAttrs['name'])
-                    .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
-
-                valueField.replaceWith(newValueField);
-            }
-        }
-        Mautic.removeLabelLoadingIndicator();
-    });
+    Mautic.updateFieldOperatorValue(field, 'lead:updateLeadFieldValues');
 };
 
 Mautic.toggleTimelineMoreVisiblity = function (el) {
@@ -1100,7 +1158,7 @@ Mautic.initUniqueIdentifierFields = function() {
             };
             Mautic.ajaxActionRequest('lead:getLeadIdsByFieldValue', request, function(response) {
                 if (response.items !== 'undefined' && response.items.length) {
-                    var warning = mQuery('<div/>').text(response.existsMessage);
+                    var warning = mQuery('<div class="exists-warning" />').text(response.existsMessage);
                     mQuery.each(response.items, function(i, item) {
                         if (i > 0) {
                             warning.append(mQuery('<span>, </span>'));
@@ -1113,6 +1171,8 @@ Mautic.initUniqueIdentifierFields = function() {
                         warning.append(link);
                     });
                     warning.appendTo(input.parent());
+                } else {
+                    input.parent().find('div.exists-warning').remove();
                 }
             });
         });
@@ -1129,3 +1189,17 @@ Mautic.updateFilterPositioning = function (el) {
         $parentEl.removeClass('in-group');
     }
 };
+
+Mautic.setAsPrimaryCompany = function (companyId,leadId){
+    Mautic.ajaxActionRequest('lead:setAsPrimaryCompany', {'companyId': companyId, 'leadId': leadId}, function(response) {
+        if (response.success) {
+            if (response.oldPrimary == response.newPrimary && mQuery('#company-' + response.oldPrimary).hasClass('primary')) {
+                mQuery('#company-' + response.oldPrimary).removeClass('primary');
+            } else {
+                mQuery('#company-' + response.oldPrimary).removeClass('primary');
+                mQuery('#company-' + response.newPrimary).addClass('primary');
+            }
+
+        }
+    });
+}

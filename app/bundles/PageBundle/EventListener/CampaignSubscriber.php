@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -14,14 +16,13 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 
 /**
- * Class CampaignSubscriber
+ * Class CampaignSubscriber.
  */
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -38,16 +39,13 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * CampaignSubscriber constructor.
      *
-     * @param MauticFactory $factory
-     * @param PageModel $pageModel
+     * @param PageModel  $pageModel
      * @param EventModel $campaignEventModel
      */
-    public function __construct(MauticFactory $factory, PageModel $pageModel, EventModel $campaignEventModel)
+    public function __construct(PageModel $pageModel, EventModel $campaignEventModel)
     {
-        $this->pageModel = $pageModel;
+        $this->pageModel          = $pageModel;
         $this->campaignEventModel = $campaignEventModel;
-
-        parent::__construct($factory);
     }
 
     /**
@@ -56,31 +54,33 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            PageEvents::PAGE_ON_HIT           => ['onPageHit', 0],
-            PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0]
+            CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
+            PageEvents::PAGE_ON_HIT                  => ['onPageHit', 0],
+            PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
         ];
     }
 
     /**
-     * Add event triggers and actions
+     * Add event triggers and actions.
      *
      * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         //Add trigger
-        $pageHitTrigger = array(
-            'label'       => 'mautic.page.campaign.event.pagehit',
-            'description' => 'mautic.page.campaign.event.pagehit_descr',
-            'formType'    => 'campaignevent_pagehit',
-            'eventName'   => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION
-        );
-        $event->addLeadDecision('page.pagehit', $pageHitTrigger);
+        $pageHitTrigger = [
+            'label'          => 'mautic.page.campaign.event.pagehit',
+            'description'    => 'mautic.page.campaign.event.pagehit_descr',
+            'formType'       => 'campaignevent_pagehit',
+            'eventName'      => PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+            'channel'        => 'page',
+            'channelIdField' => 'pages',
+        ];
+        $event->addDecision('page.pagehit', $pageHitTrigger);
     }
 
     /**
-     * Trigger actions for page hits
+     * Trigger actions for page hits.
      *
      * @param PageHitEvent $event
      */
@@ -106,7 +106,7 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $eventDetails = $event->getEventDetails();
-        $config = $event->getConfig();
+        $config       = $event->getConfig();
 
         if ($eventDetails == null) {
             return true;
@@ -116,31 +116,44 @@ class CampaignSubscriber extends CommonSubscriber
 
         // Check Landing Pages
         if ($pageHit instanceof Page) {
-            list($parent, $children)  = $pageHit->getVariants();
+            list($parent, $children) = $pageHit->getVariants();
             //use the parent (self or configured parent)
             $pageHitId = $parent->getId();
         } else {
             $pageHitId = 0;
         }
 
-        $limitToPages = $config['pages'];
+        $limitToPages = (isset($config['pages'])) ? $config['pages'] : [];
 
-        $urlMatches   = array();
+        $urlMatches = [];
 
         // Check Landing Pages URL or Tracing Pixel URL
         if (isset($config['url']) && $config['url']) {
-            $pageUrl        = $eventDetails->getUrl();
-            $limitToUrls    = explode(',', $config['url']);
+            $pageUrl     = $eventDetails->getUrl();
+            $limitToUrls = explode(',', $config['url']);
 
             foreach ($limitToUrls as $url) {
-                $url = trim($url);
+                $url              = trim($url);
                 $urlMatches[$url] = fnmatch($url, $pageUrl);
+            }
+        }
+
+        $refererMatches = [];
+
+        // Check Landing Pages URL or Tracing Pixel URL
+        if (isset($config['referer']) && $config['referer']) {
+            $refererUrl      = $eventDetails->getReferer();
+            $limitToReferers = explode(',', $config['referer']);
+
+            foreach ($limitToReferers as $referer) {
+                $referer                  = trim($referer);
+                $refererMatches[$referer] = fnmatch($referer, $refererUrl);
             }
         }
 
         // **Page hit is true if:**
         // 1. no landing page is set and no URL rule is set
-        $applyToAny = (empty($config['url']) && empty($limitToPages));
+        $applyToAny = (empty($config['url']) && empty($config['referer']) && empty($limitToPages));
 
         // 2. some landing pages are set and page ID match
         $langingPageIsHit = (!empty($limitToPages) && in_array($pageHitId, $limitToPages));
@@ -148,7 +161,10 @@ class CampaignSubscriber extends CommonSubscriber
         // 3. URL rule is set and match with URL hit
         $urlIsHit = (!empty($config['url']) && in_array(true, $urlMatches));
 
-        if ($applyToAny || $langingPageIsHit || $urlIsHit) {
+        // 3. URL rule is set and match with URL hit
+        $refererIsHit = (!empty($config['referer']) && in_array(true, $refererMatches));
+
+        if ($applyToAny || $langingPageIsHit || $urlIsHit || $refererIsHit) {
             return $event->setResult(true);
         }
 

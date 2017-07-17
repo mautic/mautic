@@ -1,9 +1,11 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2014 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2014 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -13,19 +15,18 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ReportRepository
+ * ReportRepository.
  */
 class ReportRepository extends CommonRepository
 {
-
     /**
-     * Get a list of entities
+     * Get a list of entities.
      *
      * @param array $args
      *
      * @return Paginator
      */
-    public function getEntities($args = array())
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('r')
@@ -39,46 +40,43 @@ class ReportRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
-        $unique  = $this->generateRandomParameterName(); //ensure that the string has a unique parameter identifier
-        $string  = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-
-        $expr = $q->expr()->orX(
-            $q->expr()->like('r.name',  ":$unique")
-        );
-        if ($filter->not) {
-            $expr = $q->expr()->not($expr);
-        }
-        return array(
-            $expr,
-            array("$unique" => $string)
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'r.name',
+            ]
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
-        $command         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq("r.isPublished", ":$unique");
-                $forceParameters = array($unique => true);
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('r.isPublished', ":$unique");
+                $forceParameters = [$unique => true];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq("r.isPublished", ":$unique");
-                $forceParameters = array($unique => false);
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('r.isPublished', ":$unique");
+                $forceParameters = [$unique => false];
 
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq("IDENTITY(r.createdBy)", $this->currentUser->getId());
-                $returnParameter = false;
+            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
+                $expr = $q->expr()->eq('IDENTITY(r.createdBy)', $this->currentUser->getId());
                 break;
         }
 
@@ -88,14 +86,12 @@ class ReportRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif (!$returnParameter) {
-            $parameters = array();
-        } else {
+        } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = array("$unique" => $string);
+            $parameters = ["$unique" => $string];
         }
 
-        return array($expr, $parameters);
+        return [$expr, $parameters];
     }
 
     /**
@@ -103,11 +99,13 @@ class ReportRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return array(
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
-            'mautic.core.searchcommand.ismine'
-        );
+            'mautic.core.searchcommand.ismine',
+        ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**
@@ -115,9 +113,9 @@ class ReportRepository extends CommonRepository
      */
     protected function getDefaultOrder()
     {
-        return array(
-            array('r.name', 'ASC')
-        );
+        return [
+            ['r.name', 'ASC'],
+        ];
     }
 
     /**

@@ -1,15 +1,18 @@
 <?php
-/**
- * @package     Mautic
- * @copyright   2015 Mautic Contributors. All rights reserved.
+
+/*
+ * @copyright   2015 Mautic Contributors. All rights reserved
  * @author      Mautic
+ *
  * @link        http://mautic.org
+ *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace Mautic\LeadBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Templating\Helper\Helper;
 
@@ -23,7 +26,7 @@ class AvatarHelper extends Helper
     /**
      * @param MauticFactory $factory
      */
-    public function __construct (MauticFactory $factory)
+    public function __construct(MauticFactory $factory)
     {
         $this->factory = $factory;
     }
@@ -39,12 +42,12 @@ class AvatarHelper extends Helper
         $socialData = $lead->getSocialCache();
         $leadEmail  = $lead->getEmail();
 
-        if ($preferred == 'custom' ) {
-            $avatarPath = $this->getAvatarPath(true) . '/avatar'.$lead->getId();
+        if ($preferred == 'custom') {
+            $avatarPath = $this->getAvatarPath(true).'/avatar'.$lead->getId();
             if (file_exists($avatarPath) && $fmtime = filemtime($avatarPath)) {
                 // Append file modified time to ensure the latest is used by browser
                 $img = $this->factory->getHelper('template.assets')->getUrl(
-                    $this->getAvatarPath().'/avatar'.$lead->getId() . '?' . $fmtime,
+                    $this->getAvatarPath().'/avatar'.$lead->getId().'?'.$fmtime,
                     null,
                     null,
                     false,
@@ -68,7 +71,7 @@ class AvatarHelper extends Helper
     }
 
     /**
-     * Get avatar path
+     * Get avatar path.
      *
      * @param $absolute
      *
@@ -88,12 +91,9 @@ class AvatarHelper extends Helper
      */
     public function getDefaultAvatar($absolute = false)
     {
-        return $this->factory->getHelper('template.assets')->getUrl(
-            $this->factory->getSystemPath('assets').'/images/avatar.png',
-            null,
-            null,
-            $absolute
-        );
+        $img = $this->factory->getSystemPath('assets').'/images/avatar.png';
+
+        return UrlHelper::rel2abs($this->factory->getHelper('template.assets')->getUrl($img));
     }
 
     /**

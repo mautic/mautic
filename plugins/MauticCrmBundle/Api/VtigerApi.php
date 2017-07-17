@@ -1,22 +1,23 @@
 <?php
+
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class VtigerApi extends CrmApi
 {
-    protected $element = "Leads";
+    protected $element = 'Leads';
 
-    protected function request($operation, $element, $elementData = array(), $method = 'GET')
+    protected function request($operation, $element, $elementData = [], $method = 'GET')
     {
         $tokenData = $this->integration->getKeys();
 
         $request_url = $this->integration->getApiUrl();
-        $parameters  = array(
+        $parameters  = [
             'operation'   => $operation,
             'sessionName' => $tokenData['sessionName'],
-            'elementType' => $element
-        );
+            'elementType' => $element,
+        ];
 
         if (!empty($elementData)) {
             $parameters['element'] = json_encode($elementData);
@@ -33,21 +34,21 @@ class VtigerApi extends CrmApi
     }
 
     /**
-     * List types
+     * List types.
      *
      * @return mixed
      */
-    public function listTypes ()
+    public function listTypes()
     {
         return $this->request('listtypes', $this->element);
     }
 
     /**
-     * List leads
+     * List leads.
      *
      * @return mixed
      */
-    public function getLeadFields ()
+    public function getLeadFields()
     {
         return $this->request('describe', $this->element);
     }
@@ -57,7 +58,7 @@ class VtigerApi extends CrmApi
      *
      * @return mixed
      */
-    public function createLead (array $data)
+    public function createLead(array $data)
     {
         return $this->request('create', $this->element, $data, 'POST');
     }
