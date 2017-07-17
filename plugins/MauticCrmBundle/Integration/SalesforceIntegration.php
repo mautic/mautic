@@ -527,17 +527,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'updateOwner' => 'mautic.salesforce.blanks',
+                        'updateBlanks' => 'mautic.salesforce.blanks',
                     ],
-                    'expanded'    => false,
-                    'multiple'    => false,
+                    'expanded'    => true,
+                    'multiple'    => true,
                     'label'       => 'mautic.salesforce.form.blanks',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
-                    'attr'        => [
-                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
-                    ],
                 ]
             );
 
@@ -652,10 +649,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 foreach (['Contact', 'Lead'] as $object) {
                     if (!empty($existingPersons[$object])) {
+                        $fieldsToUpdate = $mappedData[$object]['update'];
+                        //check if update blank fields is selected
+                        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks') {
+                            $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPersons[$object], $mappedData);
+                        }
                         $personFound = true;
-                        if (!empty($mappedData[$object]['update'])) {
+                        if (!empty($fieldsToUpdate)) {
                             foreach ($existingPersons[$object] as $person) {
-                                $personData                     = $this->getApiHelper()->updateObject($mappedData[$object]['update'], $object, $person['Id']);
+                                $personData                     = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
                                 $people[$object][$person['Id']] = $person['Id'];
                             }
                         }
@@ -1180,7 +1182,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $this->cleanupFromSync($leadsToSync, $exception);
                 }
             } elseif ($checkEmailsInSF) {
-                $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, $fieldMapping[$sfObject]['required']['string']);
+                $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, implode(',', array_keys($fieldMapping[$sfObject]['create'])));
 
                 if (!isset($sfEntityRecords['records'])) {
                     // Something is wrong so throw an exception to prevent creating a bunch of new leads
@@ -1733,7 +1735,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         // When creating, we have to check for Contacts first then Lead
         if (isset($fieldMapping['Contact'])) {
-            $sfEntityRecords = $this->getSalesforceObjectsByEmails('Contact', $checkEmailsInSF, $fieldMapping['Contact']['required']['string']);
+            $sfEntityRecords = $this->getSalesforceObjectsByEmails('Contact', $checkEmailsInSF, implode(',', array_keys($fieldMapping['Contact']['create'])));
             if (isset($sfEntityRecords['records'])) {
                 foreach ($sfEntityRecords['records'] as $sfContactRecord) {
                     if (!isset($sfContactRecord['Email'])) {
@@ -1749,7 +1751,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         // For any Mautic contacts left over, check to see if existing Leads exist
         if (isset($fieldMapping['Lead']) && $checkSfLeads = array_diff_key($checkEmailsInSF, $foundContacts)) {
-            $sfLeadRecords = $this->getSalesforceObjectsByEmails('Lead', $checkSfLeads, $fieldMapping['Lead']['required']['string']);
+            $sfLeadRecords = $this->getSalesforceObjectsByEmails('Lead', $checkSfLeads, implode(',', array_keys($fieldMapping['Lead']['create'])));
 
             if (isset($sfLeadRecords['records'])) {
                 // Merge contact records with these
@@ -1789,11 +1791,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
     ) {
         $body       = [];
         $updateLead = [];
+        $config     = $this->mergeConfigToFeatureSettings([]);
 
         if (isset($lead['email']) && !empty($lead['email'])) {
             //use a composite patch here that can update and create (one query) every 200 records
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
+                //check if update blank fields is selected
+                if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks' && $objectId) {
+                    $fields = $this->getBlankFieldsToUpdate($fields, $sfRecord, $objectFields);
+                }
             } else {
                 $fields = $objectFields;
             }
@@ -2530,6 +2537,27 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $fields[] = str_replace('-'.$object, '', $sfField);
                     }
                 }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @param $fields
+     * @param $sfRecord
+     * @param $config
+     * @param $objectFields
+     */
+    public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields)
+    {
+        foreach ($sfRecord as $fieldName => $sfField) {
+            if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
+                continue; // this will be treated differently
+            }
+            if (empty($sfField) && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
+                //map to mautic field
+                $fields[$fieldName] = $objectFields['create'][$fieldName];
+            }
         }
 
         return $fields;
