@@ -97,7 +97,7 @@ if ($tmpl == 'index') {
                     <td>
                         <?php echo $view->render(
                             'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                            ['item' => $item, 'model' => 'messenger']
+                            ['item' => $item, 'model' => 'messengerMessage']
                         ); ?>
                         <a href="<?php echo $view['router']->generate(
                             'mautic_messenger_action',

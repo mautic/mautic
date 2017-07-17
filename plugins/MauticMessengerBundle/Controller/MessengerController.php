@@ -11,15 +11,13 @@
 
 namespace MauticPlugin\MauticMessengerBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Exception as MauticException;
-use Joomla\Http\Http;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use MauticPlugin\MauticMessengerBundle\Helper\MessengerHelper;
 use MauticPlugin\MauticMessengerBundle\Entity\MessengerMessage;
 
-class MessengerController extends FormController
+class MessengerController extends AbstractFormController
 {
 
     /**
