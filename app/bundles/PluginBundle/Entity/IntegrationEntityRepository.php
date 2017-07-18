@@ -423,19 +423,29 @@ class IntegrationEntityRepository extends CommonRepository
 
         $q->where('1=1');
 
-        if (!empty($integration)) {
+        if (empty($integration)) {
+            // get list of published integrations
+            $pq = $this->_em->getConnection()->createQueryBuilder()
+                ->select('p.name')
+                ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
+                ->where('p.is_published = 1');
+            $rows    = $pq->execute()->fetchAll();
+            $plugins = array_map(function ($i) {
+                return "'${i['name']}'";
+            }, $rows);
+            $q->andWhere($q->expr()->in('i.integration', $plugins));
+        } else {
             $q->andWhere($q->expr()->eq('i.integration', ':integration'));
             $q->setParameter('integration', $integration);
         }
 
         $q->andWhere(
             $q->expr()->andX(
-                $q->expr()->eq('i.internal_entity', ':internalEntity'),
+                "i.internal_entity='lead'",
                 $q->expr()->eq('i.internal_entity_id', ':internalEntityId')
             )
         );
 
-        $q->setParameter('internalEntity', 'lead');
         $q->setParameter('internalEntityId', $leadId);
 
         if (!empty($internalEntity)) {

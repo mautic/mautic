@@ -23,7 +23,7 @@
             <div class="panel-heading pr-0">
                 <h3 class="panel-title"><?php echo $details['integration']; ?></h3>
             </div>
-            <div class="panel-collapse pull out">
+            <div class="panel-body">
                 <dl class="dl-horizontal">
                     <dt>Object</dt>
                     <dd><?php echo $details['integration_entity']; ?></dd>
