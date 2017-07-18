@@ -335,6 +335,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
             $fieldsToUpdateInMautic = array_intersect_key($leadFields, $fieldsToUpdateInMautic);
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+            if ((isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks')) {
+                $matchedFields = $this->getBlankFieldsToUpdateInMautic($matchedFields, $lead->getFields(true), $leadFields, $data, $object);
+            }
         }
 
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
@@ -458,5 +461,22 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             : null;
 
         return [$fromDate, $toDate];
+    }
+
+    /**
+     * @param $fields
+     * @param $sfRecord
+     * @param $config
+     * @param $objectFields
+     */
+    public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')
+    {
+        foreach ($objectFields as $integrationField => $mauticField) {
+            if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object])) {
+                $matchedFields[$mauticField] = $integrationData[$integrationField.'__'.$object];
+            }
+        }
+
+        return $matchedFields;
     }
 }
