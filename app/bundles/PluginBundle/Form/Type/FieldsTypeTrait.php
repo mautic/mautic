@@ -172,7 +172,8 @@ trait FieldsTypeTrait
                     }
                     if (!$fieldObject) {
                         $contactLink['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
-                        $mauticFields = array_merge($mauticFields, $contactLink);
+                        $isContactable['mauticContactIsContactable'] = $this->translator->trans('mautic.plugin.integration.contact.donotcontact');
+                        $mauticFields = array_merge($mauticFields, $contactLink, $isContactable);
                     }
 
                     $form->add(

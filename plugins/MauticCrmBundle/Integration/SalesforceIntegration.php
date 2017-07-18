@@ -1202,7 +1202,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // Persist pending changes
             $this->cleanupFromSync($leadsToSync);
-
+            print_r($mauticData);
             // Make the request
             $this->makeCompositeRequest($mauticData, $totalUpdated, $totalCreated, $totalErrors);
 
@@ -1639,8 +1639,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($toUpdate as $lead) {
             if (!empty($lead['email'])) {
-                $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
-
+                $lead['mauticContactTimelineLink']                  = $this->getContactTimelineLink($lead['internal_entity_id']);
+                $lead['mauticContactIsContactable']                 = $this->getLeadDonotContact($lead['internal_entity_id']);
                 $key                                                = $this->getSyncKey($lead['email']);
                 $trackedContacts[$lead['integration_entity']][$key] = $lead['id'];
 
@@ -1704,7 +1704,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $error = false;
 
         foreach ($leadsToCreate as $lead) {
-            $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
+            $lead['mauticContactTimelineLink']  = $this->getContactTimelineLink($lead['internal_entity_id']);
+            $lead['mauticContactIsContactable'] = $this->getLeadDonotContact($lead['internal_entity_id']);
 
             if (isset($lead['email'])) {
                 $this->setContactToSync($checkEmailsInSF, $lead);
@@ -1851,6 +1852,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $leadFields = array_unique(array_values($config['leadFields']));
         $leadFields = array_combine($leadFields, $leadFields);
         unset($leadFields['mauticContactTimelineLink']);
+        unset($leadFields['mauticContactIsContactable']);
 
         $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config);
         $fieldKeys          = array_keys($config['leadFields']);

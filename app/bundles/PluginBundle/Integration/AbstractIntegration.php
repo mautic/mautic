@@ -1649,7 +1649,8 @@ abstract class AbstractIntegration
         $missingRequiredFields  = [];
 
         // add special case in order to prevent it from being removed
-        $mauticLeadFields['mauticContactTimelineLink'] = '';
+        $mauticLeadFields['mauticContactTimelineLink']  = '';
+        $mauticLeadFields['mauticContactIsContactable'] = '';
 
         //make sure now non-existent aren't saved
         $settings = [
@@ -1809,6 +1810,11 @@ abstract class AbstractIntegration
             if (isset($leadFields[$integrationKey])) {
                 if ('mauticContactTimelineLink' === $leadFields[$integrationKey]) {
                     $matched[$integrationKey] = $this->getContactTimelineLink($leadId);
+
+                    continue;
+                }
+                if ('mauticContactIsContactable' === $leadFields[$integrationKey]) {
+                    $matched[$integrationKey] = $lead->getDoNotContact();
 
                     continue;
                 }
@@ -2661,5 +2667,18 @@ abstract class AbstractIntegration
         }
 
         return $fields;
+    }
+
+    public function getLeadDonotContact($leadId)
+    {
+        $lead                = $this->leadModel->getEntity($leadId);
+        $isContactableReason = $this->leadModel->isContactable($lead, 'email');
+        if ($isContactableReason === 0) {
+            $isContactable = 1;
+        } else {
+            $isContactable = 0;
+        }
+
+        return $isContactable;
     }
 }
