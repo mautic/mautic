@@ -347,6 +347,18 @@ class LeadController extends FormController
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->getModel('email')->getRepository();
 
+        $auditlog = [
+            'events'   => [],
+            'page'     => 1,
+            'maxPages' => 1,
+            'total'    => 0,
+            'filters'  => [
+                'search'        => '',
+                'includeEvents' => [],
+                'excludeEvents' => [],
+            ],
+        ];
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -362,6 +374,7 @@ class LeadController extends FormController
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
+                    'auditlog'          => $auditlog,
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',
