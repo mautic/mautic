@@ -352,10 +352,8 @@ $view['slots']->set(
                 <?php echo $view->render(
                     'MauticLeadBundle:Integration:index.html.php',
                     [
-                        'lead'              => $lead,
-                        'socialProfiles'    => $socialProfiles,
-                        'socialProfileUrls' => $socialProfileUrls,
-                        'integrations'      => $integrations,
+                        'lead'         => $lead,
+                        'integrations' => $integrations,
                     ]
                 ); ?>
             </div>
