@@ -149,7 +149,7 @@ class MailchimpType extends AbstractType
                     'integration_object'   => $mailchimp,
                     'limit'                => $limit,
                     'page'                 => $page,
-                    'data'                 => $data,
+                    'data'                 => $data['leadFields'],
                     'integration_fields'   => $fields,
                     'special_instructions' => $specialInstructions,
                     'mapped'               => true,
