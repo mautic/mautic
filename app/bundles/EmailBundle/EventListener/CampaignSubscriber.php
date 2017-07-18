@@ -111,6 +111,19 @@ class CampaignSubscriber extends CommonSubscriber
                 'channelIdField'  => 'email',
             ]
         );
+
+        $event->addAction(
+            'email.send.to.user',
+            [
+                'label'          => 'mautic.email.campaign.event.send.to.user',
+                'description'    => 'mautic.email.campaign.event.send.to.user_descr',
+                'eventName'      => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'       => 'email_to_user',
+                'formTheme'      => 'MauticEmailBundle:FormTheme\EmailSendList',
+                'channel'        => 'email',
+                'channelIdField' => 'email',
+            ]
+        );
     }
 
     /**
