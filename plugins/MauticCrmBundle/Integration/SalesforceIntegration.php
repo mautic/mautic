@@ -1202,7 +1202,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // Persist pending changes
             $this->cleanupFromSync($leadsToSync);
-            print_r($mauticData);
             // Make the request
             $this->makeCompositeRequest($mauticData, $totalUpdated, $totalCreated, $totalErrors);
 
