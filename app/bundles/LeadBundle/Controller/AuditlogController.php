@@ -41,17 +41,17 @@ class AuditlogController extends CommonController
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
                 'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents', [])),
             ];
-            $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
+            $session->set('mautic.lead.'.$leadId.'.auditlog.filters', $filters);
         } else {
             $filters = null;
         }
 
         $order = [
-            $session->get('mautic.lead.'.$leadId.'.timeline.orderby'),
-            $session->get('mautic.lead.'.$leadId.'.timeline.orderbydir'),
+            $session->get('mautic.lead.'.$leadId.'.auditlog.orderby'),
+            $session->get('mautic.lead.'.$leadId.'.auditlog.orderbydir'),
         ];
 
-        $events = $this->getEngagements($lead, $filters, $order, $page);
+        $events = $this->getAuditlogs($lead, $filters, $order, $page);
 
         return $this->delegateView(
             [
@@ -62,10 +62,10 @@ class AuditlogController extends CommonController
                 ],
                 'passthroughVars' => [
                     'route'         => false,
-                    'mauticContent' => 'leadTimeline',
+                    'mauticContent' => 'leadAuditlog',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:list.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Auditlog:list.html.php',
             ]
         );
     }
@@ -93,14 +93,14 @@ class AuditlogController extends CommonController
                 'includeEvents' => InputHelper::clean($request->request->get('includeEvents', [])),
                 'excludeEvents' => InputHelper::clean($request->request->get('excludeEvents', [])),
             ];
-            $session->set('mautic.lead.'.$leadId.'.timeline.filters', $filters);
+            $session->set('mautic.lead.'.$leadId.'.auditlog.filters', $filters);
         } else {
             $filters = null;
         }
 
         $order = [
-            $session->get('mautic.lead.'.$leadId.'.timeline.orderby'),
-            $session->get('mautic.lead.'.$leadId.'.timeline.orderbydir'),
+            $session->get('mautic.lead.'.$leadId.'.auditlog.orderby'),
+            $session->get('mautic.lead.'.$leadId.'.auditlog.orderbydir'),
         ];
 
         $dataType = $this->request->get('filetype', 'csv');
@@ -118,7 +118,7 @@ class AuditlogController extends CommonController
             ];
         };
 
-        $results    = $this->getEngagements($lead, $filters, $order, 1, 200);
+        $results    = $this->getAuditlogs($lead, $filters, $order, 1, 200);
         $count      = $results['total'];
         $items      = $results['events'];
         $iterations = ceil($count / 200);
@@ -142,13 +142,13 @@ class AuditlogController extends CommonController
                 }
             }
 
-            $items = $this->getEngagements($lead, $filters, $order, $loop + 1, 200);
+            $items = $this->getAuditlogs($lead, $filters, $order, $loop + 1, 200);
 
             $this->getDoctrine()->getManager()->clear();
 
             ++$loop;
         }
 
-        return $this->exportResultsAs($toExport, $dataType, 'contact_timeline');
+        return $this->exportResultsAs($toExport, $dataType, 'contact_auditlog');
     }
 }

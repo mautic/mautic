@@ -232,7 +232,17 @@ trait LeadDetailsTrait
             ];
         }, $logs);
 
+        $types = [
+            'delete'     => $this->translator->trans('mautic.lead.event.delete'),
+            'create'     => $this->translator->trans('mautic.lead.event.create'),
+            'identified' => $this->translator->trans('mautic.lead.event.identified'),
+            'ipadded'    => $this->translator->trans('mautic.lead.event.ipadded'),
+            'merge'      => $this->translator->trans('mautic.lead.event.merge'),
+            'update'     => $this->translator->trans('mautic.lead.event.update'),
+        ];
+
         $auditlog = [
+            'types'    => $types,
             'events'   => $logEvents,
             'page'     => 1,
             'maxPages' => 1,
