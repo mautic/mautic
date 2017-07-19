@@ -2651,7 +2651,7 @@ abstract class AbstractIntegration
                 if (isset($fields['i_'.$i]) && isset($fields['m_'.$i])) {
                     $formattedFields[$fields['i_'.$i]] = $fields['m_'.$i];
                 } else {
-                    break;
+                    continue;
                 }
             }
         }
