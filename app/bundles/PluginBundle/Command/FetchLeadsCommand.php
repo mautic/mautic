@@ -99,6 +99,16 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $integrationHelper = $container->get('mautic.helper.integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
+
+            if (!$integrationObject->isAuthorized()) {
+                $output->writeln(sprintf('<error>ERROR:</error> <info>%s is not authorized</info>', $integration));
+
+                return null;
+            }
+
+            // Tell audit log to use integration name
+            define('MAUTIC_AUDITLOG_USER', $integration);
+
             $config            = $integrationObject->mergeConfigToFeatureSettings();
             $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 

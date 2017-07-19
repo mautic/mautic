@@ -350,7 +350,7 @@ $view['slots']->set(
             <!-- #auditlog-container -->
             <div class="tab-pane fade bdr-w-0" id="auditlog-container">
                 <?php echo $view->render(
-                    'MauticLeadBundle:Timeline:list.html.php',
+                    'MauticLeadBundle:Auditlog:list.html.php',
                     [
                         'events' => $auditlog,
                         'lead'   => $lead,

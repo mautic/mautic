@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
@@ -179,6 +180,71 @@ trait LeadDetailsTrait
         $lineChart->setDataset($translator->trans('mautic.lead.graph.line.points'), $pointStats);
 
         return $lineChart->render();
+    }
+
+    /**
+     * @param Lead       $lead
+     * @param array|null $filters
+     * @param array|null $orderBy
+     * @param int        $page
+     * @param int        $limit
+     *
+     * @return array
+     */
+    protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    {
+        $session = $this->get('session');
+
+        if (null == $filters) {
+            $filters = $session->get(
+                'mautic.lead.'.$lead->getId().'.auditlog.filters',
+                [
+                    'search'        => '',
+                    'includeEvents' => [],
+                    'excludeEvents' => [],
+                ]
+            );
+        }
+
+        if (null == $orderBy) {
+            if (!$session->has('mautic.lead.'.$lead->getId().'.auditlog.orderby')) {
+                $session->set('mautic.lead.'.$lead->getId().'.auditlog.orderby', 'timestamp');
+                $session->set('mautic.lead.'.$lead->getId().'.auditlog.orderbydir', 'DESC');
+            }
+
+            $orderBy = [
+                $session->get('mautic.lead.'.$lead->getId().'.auditlog.orderby'),
+                $session->get('mautic.lead.'.$lead->getId().'.auditlog.orderbydir'),
+            ];
+        }
+
+        // Audit Log
+        /** @var AuditLogModel $auditlogModel */
+        $auditlogModel = $this->getModel('core.auditLog');
+        $logs          = $auditlogModel->getLogForObject('lead', $lead->getId(), null, 10, 'lead');
+        $logEvents     = array_map(function ($l) {
+            return [
+                'eventType'       => $this->translator->trans('mautic.lead.event.'.$l['action']),
+                'eventLabel'      => $l['userName'],
+                'timestamp'       => $l['dateAdded'],
+                'details'         => $l['details'],
+                'contentTemplate' => 'MauticLeadBundle:Auditlog:details.html.php',
+            ];
+        }, $logs);
+
+        $auditlog = [
+            'events'   => $logEvents,
+            'page'     => 1,
+            'maxPages' => 1,
+            'total'    => count($logs),
+            'filters'  => [
+                'search'        => '',
+                'includeEvents' => [],
+                'excludeEvents' => [],
+            ],
+        ];
+
+        return $auditlog;
     }
 
     /**
