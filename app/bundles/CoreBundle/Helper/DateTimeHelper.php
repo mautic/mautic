@@ -47,9 +47,9 @@ class DateTimeHelper
     private $datetime;
 
     /**
-     * @param string $string     Datetime string
-     * @param string $fromFormat Format the string is in
-     * @param string $timezone   Timezone the string is in
+     * @param \DateTime|string $string
+     * @param string           $fromFormat Format the string is in
+     * @param string           $timezone   Timezone the string is in
      */
     public function __construct($string = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'UTC')
     {
@@ -79,6 +79,7 @@ class DateTimeHelper
 
         if ($datetime instanceof \DateTime) {
             $this->datetime = $datetime;
+            $this->timezone = $datetime->getTimezone()->getName();
             $this->string   = $this->datetime->format($fromFormat);
         } elseif (empty($datetime)) {
             $this->datetime = new \DateTime('now', new \DateTimeZone($this->timezone));
