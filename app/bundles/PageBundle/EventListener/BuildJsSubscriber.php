@@ -276,11 +276,17 @@ JS;
         $js = <<<JS
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
- 
+
     if (! MauticJS.videoElements.length) {
         MauticJS.videoElements = null;
         return;
     }
+    
+    if (MauticJS.videoElements.length) {
+        MauticJS.videoElements = Array.prototype.filter.call(MauticJS.videoElements, function(videoElements){
+          return null !== videoElements.attributes.getNamedItem('data-form-id') || null !== videoElements.attributes.getNamedItem('data-mtc');
+      });
+   }
 
     MauticJS.mauticInsertedScripts = MauticJS.mauticInsertedScripts || {};
     
