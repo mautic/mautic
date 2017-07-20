@@ -748,6 +748,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $leadFields            = array_unique(array_values($config['leadFields']));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
 
+        if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
+            unset($leadFields[$key]);
+        }
+        if ($key = array_search('mauticContactIsContactable', $leadFields)) {
+            unset($leadFields[$key]);
+        }
+
         if (empty($leadFields)) {
             return [0, 0, 0];
         }
@@ -785,11 +792,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
             $totalUpdated += count($toUpdate);
             foreach ($toUpdate as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
-                    $key                        = mb_strtolower($this->cleanPushData($lead['email']));
-                    $lead['integration_entity'] = $object;
-                    $leadsToUpdateInD[$key]     = $lead;
-                    $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
-                    $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
+                    $key                                = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead['mauticContactTimelineLink']  = $this->getContactTimelineLink($lead['integration_entity_id']);
+                    $lead['mauticContactIsContactable'] = $this->getLeadDonotContact($lead['integration_entity_id']);
+                    $lead['integration_entity']         = $object;
+                    $leadsToUpdateInD[$key]             = $lead;
+                    $integrationEntity                  = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
+                    $integrationEntities[]              = $integrationEntity->setLastSyncDate(new \DateTime());
                 }
             }
         }
@@ -802,9 +811,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
             $totalCreated += count($leadsToCreate);
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
-                    $key                        = mb_strtolower($this->cleanPushData($lead['email']));
-                    $lead['integration_entity'] = $object;
-                    $leadsToCreateInD[$key]     = $lead;
+                    $key                                = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead['mauticContactTimelineLink']  = $this->getContactTimelineLink($lead['integration_entity_id']);
+                    $lead['mauticContactIsContactable'] = $this->getLeadDonotContact($lead['integration_entity_id']);
+                    $lead['integration_entity']         = $object;
+                    $leadsToCreateInD[$key]             = $lead;
                 }
             }
         }
