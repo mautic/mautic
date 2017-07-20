@@ -650,11 +650,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 foreach (['Contact', 'Lead'] as $object) {
                     if (!empty($existingPersons[$object])) {
                         $fieldsToUpdate = $mappedData[$object]['update'];
-                        //check if update blank fields is selected
-                        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks') {
-                            $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPersons[$object], $mappedData);
-                        }
-                        $personFound = true;
+                        $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPersons[$object], $mappedData, $config);
+                        $personFound    = true;
                         if (!empty($fieldsToUpdate)) {
                             foreach ($existingPersons[$object] as $person) {
                                 $personData                     = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
@@ -1797,10 +1794,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             //use a composite patch here that can update and create (one query) every 200 records
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
-                //check if update blank fields is selected
-                if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks' && $objectId) {
-                    $fields = $this->getBlankFieldsToUpdate($fields, $sfRecord, $objectFields);
-                }
+                $fields = $this->getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config);
             } else {
                 $fields = $objectFields;
             }
@@ -2548,15 +2542,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
      * @param $config
      * @param $objectFields
      */
-    public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields)
+    public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
     {
-        foreach ($sfRecord as $fieldName => $sfField) {
-            if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
-                continue; // this will be treated differently
-            }
-            if (empty($sfField) && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
-                //map to mautic field
-                $fields[$fieldName] = $objectFields['create'][$fieldName];
+        //check if update blank fields is selected
+        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks') {
+            foreach ($sfRecord as $fieldName => $sfField) {
+                if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
+                    continue; // this will be treated differently
+                }
+                if (empty($sfField) && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
+                    //map to mautic field
+                    $fields[$fieldName] = $objectFields['create'][$fieldName];
+                }
             }
         }
 

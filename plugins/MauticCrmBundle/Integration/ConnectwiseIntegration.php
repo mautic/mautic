@@ -553,7 +553,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
         $leadFields         = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
-        $mappedData         = $this->populateLeadData(
+       //check for blank fields to update here
+        $mappedData = $this->populateLeadData(
             $lead,
             ['leadFields' => $leadFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']], 'update' => $personFound]
         );
