@@ -882,14 +882,19 @@ Mautic.leadNoteOnLoad = function (container, response) {
     }
 
     if (response.upNoteCount || response.noteCount || response.downNoteCount) {
-        if (response.upNoteCount || response.downNoteCount) {
-            var count = parseInt(mQuery('#NoteCount').html());
-            count = (response.upNoteCount) ? count + 1 : count - 1;
+        var noteCountWrapper = mQuery('#NoteCount');
+        var count = parseInt(noteCountWrapper.text().trim());
+        // console.log(response, count);
+
+        if (response.upNoteCount) {
+            count++;
+        } else if (response.downNoteCount) {
+            count--;
         } else {
-            var count = parseInt(response.noteCount);
+            count = parseInt(response.noteCount);
         }
 
-        mQuery('#NoteCount').html(count);
+        noteCountWrapper.text(count);
     }
 };
 
