@@ -20,6 +20,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ImportController extends FormController
 {
@@ -30,12 +31,15 @@ class ImportController extends FormController
     const STEP_IMPORT_FROM_CSV = 4;
 
     /**
+     * @param
      * @param int $page
      *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function indexAction($page = 1)
     {
+        $this->get('session')->set('mautic.import.object', $this->getObjectFromRequest());
+
         return $this->indexStandard($page);
     }
 
@@ -109,6 +113,10 @@ class ImportController extends FormController
         //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
         ini_set('auto_detect_line_endings', true);
 
+        $object = $this->getObjectFromRequest();
+
+        $this->get('session')->set('mautic.import.object', $object);
+
         /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
         $importModel = $this->getModel($this->getModelName());
 
@@ -135,7 +143,7 @@ class ImportController extends FormController
 
         $progress = (new Progress())->bindArray($session->get('mautic.lead.import.progress', [0, 0]));
         $import   = $importModel->getEntity();
-        $action   = $this->generateUrl('mautic_contact_import_action', ['objectAction' => 'new']);
+        $action   = $this->generateUrl('mautic_import_action', ['object' => $this->request->get('object'), 'objectAction' => 'new']);
 
         switch ($step) {
             case self::STEP_UPLOAD_CSV:
@@ -148,18 +156,20 @@ class ImportController extends FormController
                 break;
             case self::STEP_MATCH_FIELDS:
 
-                /** @var \Mautic\LeadBundle\Model\FieldModel $pluginModel */
-                $fieldModel = $this->getModel('lead.field');
-
-                $leadFields   = $fieldModel->getFieldList(false, false);
-                $importFields = $session->get('mautic.lead.import.importfields', []);
+                /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
+                $fieldModel    = $this->getModel('lead.field');
+                $leadFields    = $fieldModel->getFieldList(false, false);
+                $importFields  = $session->get('mautic.lead.import.importfields', []);
+                $companyFields = $fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']);
 
                 $form = $this->get('form.factory')->create(
                     'lead_field_import',
                     [],
                     [
+                        'object'           => $object,
                         'action'           => $action,
                         'lead_fields'      => $leadFields,
+                        'company_fields'   => $companyFields,
                         'import_fields'    => $importFields,
                         'line_count_limit' => $this->getLineCountLimit(),
                     ]
@@ -586,6 +596,39 @@ class ImportController extends FormController
     }
 
     /**
+     * Support non-index pages such as modal forms.
+     *
+     * @param string $route
+     * @param array  $parameters
+     * @param int    $referenceType
+     *
+     * @return bool|string
+     */
+    public function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        if (!isset($parameters['object'])) {
+            $parameters['object'] = $this->request->get('object', 'contacts');
+        }
+
+        return parent::generateUrl($route, $parameters, $referenceType);
+    }
+
+    protected function getObjectFromRequest()
+    {
+        $objectInRequest = $this->request->get('object');
+
+        switch ($objectInRequest) {
+            case 'companies':
+                return 'company';
+            case 'contacts':
+            default:
+                return 'lead';
+        }
+
+        return null;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getModelName()
@@ -616,7 +659,7 @@ class ImportController extends FormController
      */
     protected function getRouteBase()
     {
-        return 'contact_import';
+        return 'import';
     }
 
     /**

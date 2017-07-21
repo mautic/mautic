@@ -37,12 +37,21 @@ class LeadImportFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        foreach ($options['lead_fields'] as $field => $label) {
+        $importChoiceFields = [
+            'mautic.lead.contact' => $options['lead_fields'],
+            'mautic.lead.company' => $options['company_fields'],
+        ];
+
+        if ($options['object'] !== 'lead') {
+            unset($importChoiceFields['mautic.lead.contact']);
+        }
+
+        foreach ($options['import_fields'] as $field => $label) {
             $builder->add(
                 $field,
                 'choice',
                 [
-                    'choices'    => $options['import_fields'],
+                    'choices'    => $importChoiceFields,
                     'label'      => $label,
                     'required'   => false,
                     'label_attr' => ['class' => 'control-label'],
@@ -208,38 +217,40 @@ class LeadImportFieldType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $builder->add(
-            $builder->create(
-                'list',
-                'leadlist_choices',
+        if ($options['object'] === 'lead') {
+            $builder->add(
+                $builder->create(
+                    'list',
+                    'leadlist_choices',
+                    [
+                        'label'      => 'mautic.lead.lead.field.list',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control',
+                        ],
+                        'required' => false,
+                        'multiple' => false,
+                    ]
+                )
+            );
+
+            $builder->add(
+                'tags',
+                'lead_tag',
                 [
-                    'label'      => 'mautic.lead.lead.field.list',
+                    'label'      => 'mautic.lead.tags',
+                    'required'   => false,
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class' => 'form-control',
+                        'class'                => 'form-control',
+                        'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                        'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
+                        'data-allow-add'       => 'true',
+                        'onchange'             => 'Mautic.createLeadTag(this)',
                     ],
-                    'required' => false,
-                    'multiple' => false,
                 ]
-            )
-        );
-
-        $builder->add(
-            'tags',
-            'lead_tag',
-            [
-                'label'      => 'mautic.lead.tags',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'                => 'form-control',
-                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
-                    'data-allow-add'       => 'true',
-                    'onchange'             => 'Mautic.createLeadTag(this)',
-                ],
-            ]
-        );
+            );
+        }
 
         $buttons = ['cancel_icon' => 'fa fa-times'];
 
@@ -269,7 +280,7 @@ class LeadImportFieldType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(['lead_fields', 'import_fields']);
+        $resolver->setRequired(['lead_fields', 'import_fields', 'company_fields', 'object']);
         $resolver->setDefaults(['line_count_limit' => 0]);
     }
 

@@ -78,12 +78,28 @@ return [
                     'leadId' => '\d+',
                 ],
             ],
+            // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_index instead.
             'mautic_contact_import_index' => [
-                'path'       => '/contacts/import/{page}',
+                'path'       => '/import/{object}/{page}',
+                'controller' => 'MauticLeadBundle:Import:index',
+                'defaults'   => [
+                    'object' => 'contacts',
+                ],
+            ],
+            // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_action instead.
+            'mautic_contact_import_action' => [
+                'path'       => '/import/{object}/{objectAction}/{objectId}',
+                'controller' => 'MauticLeadBundle:Import:execute',
+                'defaults'   => [
+                    'object' => 'contacts',
+                ],
+            ],
+            'mautic_import_index' => [
+                'path'       => '/{object}/import/{page}',
                 'controller' => 'MauticLeadBundle:Import:index',
             ],
-            'mautic_contact_import_action' => [
-                'path'       => '/contacts/import/{objectAction}/{objectId}',
+            'mautic_import_action' => [
+                'path'       => '/{object}/import/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Import:execute',
             ],
             'mautic_contact_action' => [
