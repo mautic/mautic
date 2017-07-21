@@ -896,6 +896,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
             if (!empty($checkEmailsInSugar)) {
                 $sugarLeads = $this->getApiHelper()->getLeads(['checkemail_contacts' => $checkEmailsInSugar, 'offset' => 0, 'max_results' => 1000], 'Contacts');
+                print_r($sugarLeads);
                 if (isset($sugarLeads[$RECORDS_LIST_NAME])) {
                     foreach ($sugarLeads[$RECORDS_LIST_NAME] as $k => $record) {
                         $sugarLeadRecord = [];
@@ -1385,9 +1386,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads')
     {
+        $config     = $this->mergeConfigToFeatureSettings([]);
         $queryParam = ($object == 'Leads') ? 'checkemail' : 'checkemail_contacts';
 
-        $sugarLead         = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
+        $sugarLead = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
+
         $deletedSugarLeads = $sugarLeadRecords = [];
 
         if (isset($sugarLead['entry_list'])) {
@@ -1440,6 +1443,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                         $ownerAssignedUserIdByEmail = $this->getApiHelper()->getIdBySugarEmail(['emails' => array_unique($leadOwnerEmails)]);
                         if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
+                            $sugarContactFields = $this->prepareFieldsForPush($availableFields['Contacts']);
+                            $sugarLeadFields    = $this->prepareFieldsForPush($availableFields['Leads']);
+
+                            $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarContactFields, $config);
+
+                            $leadSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarLeadFields, $config);
+
                             $this->buildCompositeBody(
                                 $mauticData,
                                 $availableFields,
