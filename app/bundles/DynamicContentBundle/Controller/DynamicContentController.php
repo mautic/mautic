@@ -11,12 +11,12 @@
 
 namespace Mautic\DynamicContentBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class DynamicContentController extends FormController
+class DynamicContentController extends AbstractFormController
 {
     /**
      * @return array

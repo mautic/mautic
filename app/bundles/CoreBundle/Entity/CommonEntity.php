@@ -21,6 +21,11 @@ class CommonEntity
     protected $changes = [];
 
     /**
+     * @var array
+     */
+    protected $pastChanges = [];
+
+    /**
      * Wrapper function for isProperty methods.
      *
      * @param string $name
@@ -87,6 +92,9 @@ class CommonEntity
                     $current = $current->format('c');
                 } elseif (is_object($current)) {
                     $current = (method_exists($current, 'getId')) ? $current->getId() : (string) $current;
+                } elseif (('' === $current && null === $val) || (null === $current && '' === $val)) {
+                    // Ingore empty conversion (but allow 0 to '' or null)
+                    return;
                 }
 
                 if ($val instanceof \DateTime) {
@@ -106,7 +114,7 @@ class CommonEntity
      */
     protected function addChange($key, $value)
     {
-        if (isset($this->changes[$key]) && is_array($this->changes[$key])) {
+        if (isset($this->changes[$key]) && is_array($this->changes[$key]) && [0, 1] !== array_keys($this->changes[$key])) {
             $this->changes[$key] = array_merge($this->changes[$key], $value);
         } else {
             $this->changes[$key] = $value;
@@ -116,8 +124,12 @@ class CommonEntity
     /**
      * @return array
      */
-    public function getChanges()
+    public function getChanges($includePast = false)
     {
+        if ($includePast && empty($this->changes) && !empty($this->pastChanges)) {
+            return $this->pastChanges;
+        }
+
         return $this->changes;
     }
 
@@ -126,6 +138,7 @@ class CommonEntity
      */
     public function resetChanges()
     {
-        $this->changes = [];
+        $this->pastChanges = $this->changes;
+        $this->changes     = [];
     }
 }

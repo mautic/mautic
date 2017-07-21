@@ -11,14 +11,14 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\UserBundle\Entity as Entity;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 /**
  * Class RoleController.
  */
-class RoleController extends FormController
+class RoleController extends AbstractFormController
 {
     /**
      * Generate's default role list view.

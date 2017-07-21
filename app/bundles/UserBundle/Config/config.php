@@ -192,6 +192,7 @@ return [
                 'alias'     => 'userconfig',
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'translator',
                 ],
             ],
         ],
@@ -256,6 +257,7 @@ return [
                     'monolog.logger',
                     'event_dispatcher',
                     '', // providerKey
+                    'mautic.permission.repository',
                 ],
                 'public' => false,
             ],
