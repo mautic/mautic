@@ -275,17 +275,6 @@ class ReportSubscriber extends CommonSubscriber
                     $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id');
                 }
 
-                if ($event->hasColumn($dncColumns) || $event->hasFilter($dncColumns)) {
-                    $qb->leftJoin(
-                        'e',
-                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-                        'dnc',
-                        'e.id = dnc.channel_id and dnc.channel=\'email\' and dnc.reason='.DoNotContact::UNSUBSCRIBED
-                    );
-                }
-
-                $event->addCampaignByChannelJoin($qb, 'e', 'email');
-
                 break;
             case 'email.stats':
                 $qb->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
