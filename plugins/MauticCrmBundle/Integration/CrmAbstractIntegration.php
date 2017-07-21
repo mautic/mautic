@@ -479,4 +479,53 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         return $matchedFields;
     }
+
+    /**
+     * @param $fields
+     * @param $sfRecord
+     * @param $config
+     * @param $objectFields
+     */
+    public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
+    {
+        //check if update blank fields is selected
+        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks') {
+            foreach ($sfRecord as $fieldName => $sfField) {
+                if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
+                    continue; // this will be treated differently
+                }
+                if (empty($sfField) && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
+                    //map to mautic field
+                    $fields[$fieldName] = $objectFields['create'][$fieldName];
+                }
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @param $fields
+     *
+     * @return array
+     */
+    protected function prepareFieldsForPush($fields)
+    {
+        $fieldMappings = [];
+        $required      = [];
+        $config        = $this->mergeConfigToFeatureSettings();
+
+        $leadFields = $config['leadFields'];
+        foreach ($fields as $key => $field) {
+            if ($field['required']) {
+                $required[$key] = $field;
+            }
+        }
+        $fieldMappings['required'] = [
+            'fields' => $required,
+        ];
+        $fieldMappings['create'] = $leadFields;
+
+        return $fieldMappings;
+    }
 }

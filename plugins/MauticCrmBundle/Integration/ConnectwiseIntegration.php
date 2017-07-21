@@ -263,6 +263,21 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+        $builder->add(
+            'updateBlanks',
+            'choice',
+            [
+                'choices' => [
+                    'updateBlanks' => 'mautic.salesforce.blanks',
+                ],
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.salesforce.form.blanks',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+            ]
+        );
         if ($formArea == 'features') {
             $builder->add(
                 'objects',
@@ -552,8 +567,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
-        $leadFields         = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
-       //check for blank fields to update here
+        $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
+
+        $cwContactExists = $this->amendLeadDataBeforeMauticPopulate($cwContactExists[0], $object);
+
+        $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
+        $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
+        //check for blank fields to update here
         $mappedData = $this->populateLeadData(
             $lead,
             ['leadFields' => $leadFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']], 'update' => $personFound]
