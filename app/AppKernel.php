@@ -34,7 +34,7 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 8;
+    const MINOR_VERSION = 9;
 
     /**
      * Patch version number.
@@ -312,7 +312,7 @@ class AppKernel extends Kernel
      *
      * @return bool
      */
-    private function isInstalled()
+    protected function isInstalled()
     {
         static $isInstalled = null;
 

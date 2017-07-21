@@ -208,6 +208,7 @@ trait EntityFieldsBuildFormTrait
                     );
                     break;
                 default:
+                    $attr['data-encoding'] = 'raw';
                     switch ($type) {
                         case 'lookup':
                             $type                = 'text';
@@ -221,7 +222,8 @@ trait EntityFieldsBuildFormTrait
                             break;
                         case 'email':
                             // Enforce a valid email
-                            $constraints[] = new Email(
+                            $attr['data-encoding'] = 'email';
+                            $constraints[]         = new Email(
                                 [
                                     'message' => 'mautic.core.email.required',
                                 ]
@@ -233,9 +235,10 @@ trait EntityFieldsBuildFormTrait
                         $alias,
                         $type,
                         [
-                            'required'    => $field['isRequired'],
-                            'label'       => $field['label'],
-                            'label_attr'  => ['class' => 'control-label'],
+                            'required'   => $field['isRequired'],
+                            'label'      => $field['label'],
+                            'label_attr' => ['class' => 'control-label'],
+
                             'attr'        => $attr,
                             'data'        => $value,
                             'mapped'      => $mapped,

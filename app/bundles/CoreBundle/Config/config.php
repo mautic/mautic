@@ -378,8 +378,12 @@ return [
             ],
             'mautic.helper.template.analytics' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
-                'arguments' => 'mautic.factory',
                 'alias'     => 'analytics',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.cookie',
+                    'mautic.lead.model.lead',
+                ],
             ],
             'mautic.helper.template.mautibot' => [
                 'class' => 'Mautic\CoreBundle\Templating\Helper\MautibotHelper',
@@ -898,5 +902,6 @@ return [
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'max_entity_lock_time'      => 0,
     ],
 ];

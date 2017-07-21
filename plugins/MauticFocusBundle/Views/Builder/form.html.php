@@ -138,7 +138,6 @@ if (empty($preview)):
                             $f->setProperties($properties);
                         }
                     }
-
                     echo $view->render($template, ['field' => $f->convertToArray(), 'id' => $f->getAlias()]);
                 endforeach;
 

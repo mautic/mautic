@@ -136,7 +136,7 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');}\""
         ],
-        "test": "phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist app/bundles"
+        "test": "phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml"
     },
     "config": {
         "bin-dir": "bin"

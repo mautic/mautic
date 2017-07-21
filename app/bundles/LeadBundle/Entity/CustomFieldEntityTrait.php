@@ -65,8 +65,9 @@ trait CustomFieldEntityTrait
         if (($isSetter && array_key_exists(0, $arguments)) || $isGetter) {
             $fieldRequested = mb_strtolower(mb_substr($name, 3));
             $fields         = $this->getProfileFields();
+
             if (array_key_exists($fieldRequested, $fields)) {
-                return ($isSetter) ? $this->addUpdatedField($fieldRequested, $arguments[0]) : $this->getFieldValue($name);
+                return ($isSetter) ? $this->addUpdatedField($fieldRequested, $arguments[0]) : $this->getFieldValue($fieldRequested);
             }
         }
 
@@ -113,10 +114,9 @@ trait CustomFieldEntityTrait
     {
         $property = (defined('self::FIELD_ALIAS')) ? str_replace(self::FIELD_ALIAS, '', $alias) : $alias;
 
-        if (property_exists($this, $property)) {
-            // Fixed custom field so use the setter
-            $setter = 'set'.ucfirst($property);
-
+        $setter = 'set'.ucfirst($property);
+        if (property_exists($this, $property) && method_exists($this, $setter)) {
+            // Fixed custom field so use the setter but don't get caught in a loop such as a custom field called "notes"
             $this->$setter($value);
         }
 
@@ -139,7 +139,7 @@ trait CustomFieldEntityTrait
             $value = implode('|', $value);
         }
 
-        if ($oldValue !== $value) {
+        if ($oldValue !== $value && !(('' === $oldValue && null === $value) || (null === $oldValue && '' === $value))) {
             $this->addChange('fields', [$alias => [$oldValue, $value]]);
             $this->updatedFields[$alias] = $value;
         }
