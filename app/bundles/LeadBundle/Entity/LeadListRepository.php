@@ -1361,6 +1361,9 @@ class LeadListRepository extends CommonRepository
                                 $nf         = $ll->getFilters();
                                 $isNot      = 'NOT EXISTS' === $func;
                                 $se         = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListId, $isNot);
+                            } else {
+                                $table  = 'lead_lists_leads';
+                                $column = 'leadlist_id';
                             }
 
                             $falseParameter = $this->generateRandomParameterName();
