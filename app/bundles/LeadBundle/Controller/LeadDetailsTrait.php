@@ -221,7 +221,9 @@ trait LeadDetailsTrait
         // Audit Log
         /** @var AuditLogModel $auditlogModel */
         $auditlogModel = $this->getModel('core.auditLog');
-        $logs          = $auditlogModel->getLogForObject('lead', $lead->getId(), null, 10, 'lead');
+        $repo          = $auditlogModel->getRepository();
+        $logCount      = $repo->getAuditLogsCount($lead, $filters, $orderBy, $page, $limit);
+        $logs          = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
         $logEvents     = array_map(function ($l) {
             return [
                 'eventType'       => $this->translator->trans('mautic.lead.event.'.$l['action']),
@@ -241,20 +243,29 @@ trait LeadDetailsTrait
             'update'     => $this->translator->trans('mautic.lead.event.update'),
         ];
 
-        $auditlog = [
-            'types'    => $types,
-            'events'   => $logEvents,
-            'page'     => 1,
-            'maxPages' => 1,
-            'total'    => count($logs),
-            'filters'  => [
-                'search'        => '',
-                'includeEvents' => [],
-                'excludeEvents' => [],
-            ],
-        ];
+//        $auditlog = [
+//            'types'    => $types,
+//            'events'   => $logEvents,
+//            'page'     => $page,
+//            'maxPages' => 1,
+//            'total'    => count($logs),
+//            'filters'  => [
+//                'search'        => '',
+//                'includeEvents' => [],
+//                'excludeEvents' => [],
+//            ],
+//        ];
 
-        return $auditlog;
+        return [
+            'events'   => $logEvents,
+            'filters'  => $filters,
+            'order'    => $orderBy,
+            'types'    => $types,
+            'total'    => $logCount,
+            'page'     => $page,
+            'limit'    => $limit,
+            'maxPages' => ceil($logCount / $limit),
+        ];
     }
 
     /**
