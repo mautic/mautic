@@ -896,7 +896,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
             if (!empty($checkEmailsInSugar)) {
                 $sugarLeads = $this->getApiHelper()->getLeads(['checkemail_contacts' => $checkEmailsInSugar, 'offset' => 0, 'max_results' => 1000], 'Contacts');
-                print_r($sugarLeads);
                 if (isset($sugarLeads[$RECORDS_LIST_NAME])) {
                     foreach ($sugarLeads[$RECORDS_LIST_NAME] as $k => $record) {
                         $sugarLeadRecord = [];
@@ -1279,9 +1278,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $integrationEntityRepo   = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $mauticData              = $leadsToUpdate              = $fields              = [];
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+        $leadFields              = $config['leadFields'];
+        if (!empty($leadFields)) {
+            if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
+                unset($leadFields[$key]);
+            }
+            if ($key = array_search('mauticContactIsContactable', $leadFields)) {
+                unset($leadFields[$key]);
+            }
 
-        if (!empty($config['leadFields'])) {
-            $fields = implode(', l.', $config['leadFields']);
+            $fields = implode(', l.', $leadFields);
             $fields = 'l.owner_id,l.'.$fields;
             $result = 0;
 
@@ -1306,6 +1312,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         foreach ($leadsToUpdate as $object => $records) {
             foreach ($records as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
+                    $lead['mauticContactTimelineLink']                          = $this->getContactTimelineLink($lead['internal_entity_id']);
+                    $lead['mauticContactIsContactable']                         = $this->getLeadDonotContact($lead['internal_entity_id']);
                     $checkEmailsInSugar[$object][mb_strtolower($lead['email'])] = $lead;
                 }
             }
@@ -1320,6 +1328,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $leadsToCreate = $integrationEntityRepo->findLeadsToCreate('Sugarcrm', $fields, $limit, $fromDate, $toDate);
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email'])) {
+                    $lead['mauticContactTimelineLink']                          = $this->getContactTimelineLink($lead['internal_entity_id']);
+                    $lead['mauticContactIsContactable']                         = $this->getLeadDonotContact($lead['internal_entity_id']);
                     $checkEmailsInSugar['Leads'][mb_strtolower($lead['email'])] = $lead;
                 }
             }
@@ -1386,11 +1396,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads')
     {
-        $config     = $this->mergeConfigToFeatureSettings([]);
         $queryParam = ($object == 'Leads') ? 'checkemail' : 'checkemail_contacts';
 
-        $sugarLead = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
-
+        $sugarLead         = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
         $deletedSugarLeads = $sugarLeadRecords = [];
 
         if (isset($sugarLead['entry_list'])) {
@@ -1443,13 +1451,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                         $ownerAssignedUserIdByEmail = $this->getApiHelper()->getIdBySugarEmail(['emails' => array_unique($leadOwnerEmails)]);
                         if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
-                            $sugarContactFields = $this->prepareFieldsForPush($availableFields['Contacts']);
-                            $sugarLeadFields    = $this->prepareFieldsForPush($availableFields['Leads']);
-
-                            $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarContactFields, $config);
-
-                            $leadSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarLeadFields, $config);
-
                             $this->buildCompositeBody(
                                 $mauticData,
                                 $availableFields,
