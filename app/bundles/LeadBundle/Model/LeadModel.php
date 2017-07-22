@@ -789,7 +789,7 @@ class LeadModel extends FormModel
      *
      * @param bool|false $returnTracking
      *
-     * @return Lead|array
+     * @return null|Lead|array
      */
     public function getCurrentLead($returnTracking = false)
     {
@@ -806,7 +806,7 @@ class LeadModel extends FormModel
             // this is a Mautic user that's somehow tracked as a contact which we're going to ignore
             $this->logger->addDebug('LEAD: In a Mautic user session');
 
-            $lead = new Lead();
+            $lead = null;
 
             return ($returnTracking) ? [$lead, null, false] : $lead;
         }
@@ -983,18 +983,20 @@ class LeadModel extends FormModel
             $lead = $this->getCurrentLead();
         }
 
-        $leadIpAddresses = $lead->getIpAddresses();
-        if (!$leadIpAddresses->contains($ipAddress)) {
-            $lead->addIpAddress($ipAddress);
+        if ($lead) {
+            $leadIpAddresses = $lead->getIpAddresses();
+            if (!$leadIpAddresses->contains($ipAddress)) {
+                $lead->addIpAddress($ipAddress);
+            }
+
+            $this->setFieldValues($lead, $inQuery, false, true, true);
+
+            if (isset($queryFields['tags'])) {
+                $this->modifyTags($lead, $queryFields['tags']);
+            }
+
+            $this->setCurrentLead($lead);
         }
-
-        $this->setFieldValues($lead, $inQuery, false, true, true);
-
-        if (isset($queryFields['tags'])) {
-            $this->modifyTags($lead, $queryFields['tags']);
-        }
-
-        $this->setCurrentLead($lead);
 
         return $lead;
     }
@@ -1013,6 +1015,13 @@ class LeadModel extends FormModel
             $this->systemCurrentLead = $lead;
 
             return;
+        }
+
+        if (!$this->security->isAnonymous()) {
+            // this is a Mautic user so set the contact as a system contact so that the user is not tracked as the contact
+            $this->logger->addDebug('LEAD: In a Mautic user session');
+
+            $this->setSystemCurrentLead($lead);
         }
 
         $oldLead = (is_null($this->currentLead)) ? null : $this->currentLead;
