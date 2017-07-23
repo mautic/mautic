@@ -181,10 +181,18 @@ class MessengerController extends AbstractStandardFormController
         $viewParameters = [];
         switch ($action) {
             case 'view':
+                /** @var Import $entity */
+                $entity = $args['entity'];
 
-                $viewParameters = [
-                    'contentTemplate' => 'MauticMessengerBundle:Messenger:details.html.php',
-                ];
+                /** @var \Mautic\LeadBundle\Model\ImportModel $model */
+                $model = $this->getModel($this->getModelName());
+
+                $args['viewParameters'] = array_merge(
+                    $args['viewParameters'],
+                    [
+                    ]
+                );
+
                 break;
         }
 
