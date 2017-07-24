@@ -202,10 +202,14 @@ $view['slots']->set(
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
                                                     <?php else: ?>
-                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
+                                                        <?php if (is_array($field['value']) && $field['type'] === 'multiselect'): ?>
                                                             <?php echo implode(', ', $field['value']); ?>
                                                         <?php else: ?>
-                                                            <?php echo $field['value']; ?>
+                                                            <?php if ($field['type'] === 'select'): ?>
+                                                                <?php echo $field['label']; ?>
+                                                            <?php else: ?>
+                                                                <?php echo $field['value']; ?>
+                                                            <?php endif; ?>
                                                         <?php endif; ?>
                                                     <?php endif; ?>
                                                 </td>
