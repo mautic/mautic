@@ -89,7 +89,7 @@ class MailHelper
     protected $errors = [];
 
     /**
-     * @var null
+     * @var array|Lead
      */
     protected $lead = null;
 
@@ -1296,7 +1296,7 @@ class MailHelper
     }
 
     /**
-     * @return array
+     * @return array|Lead
      */
     public function getLead()
     {
@@ -1304,10 +1304,10 @@ class MailHelper
     }
 
     /**
-     * @param array $lead
-     * @param bool  internalSend  Set to true if the email is not being sent to this lead
+     * @param array|Lead $lead
+     * @param bool       $internalSend Set to true if the email is not being sent to this lead
      */
-    public function setLead(array $lead, $interalSend = false)
+    public function setLead($lead, $interalSend = false)
     {
         $this->lead         = $lead;
         $this->internalSend = $interalSend;
