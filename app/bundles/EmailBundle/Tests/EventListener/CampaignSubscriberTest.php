@@ -199,7 +199,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
                 ];
                 \PHPUnit_Framework_Assert::assertTrue($email instanceof Email);
                 \PHPUnit_Framework_Assert::assertEquals($expectedUsers, $users);
-                \PHPUnit_Framework_Assert::assertTrue($saveStat);
+                \PHPUnit_Framework_Assert::assertFalse($saveStat);
                 \PHPUnit_Framework_Assert::assertEquals(['hello@there.com', 'bob@bobek.cz'], $to);
                 \PHPUnit_Framework_Assert::assertEquals([], $cc);
                 \PHPUnit_Framework_Assert::assertEquals(['hidden@translation.in'], $bcc);

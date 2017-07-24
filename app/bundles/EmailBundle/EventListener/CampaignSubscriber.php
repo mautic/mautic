@@ -273,17 +273,13 @@ class CampaignSubscriber extends CommonSubscriber
         $users           = $this->transformToUserIds($userIds, $ownerId);
         $tokens          = []; // Todo: find the real tokens
 
-        try {
-            $errors = $this->emailModel->sendEmailToUser($email, $users, $leadCredentials, $tokens, [], false, $to, $cc, $bcc);
-        } catch (\Exception $e) {
-            return $event->setFailed($e->getMessage());
-        }
+        $errors = $this->emailModel->sendEmailToUser($email, $users, $leadCredentials, $tokens, [], false, $to, $cc, $bcc);
 
         if ($errors) {
             $event->setFailed(implode(', ', $errors));
         }
 
-        return $event->setResult($errors === []);
+        return $event->setResult(empty($errors));
     }
 
     /**
