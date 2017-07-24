@@ -207,7 +207,7 @@ class MessengerController extends AbstractStandardFormController
      */
     public function callbackAction()
     {
-        $verify_token = "bot_app";
+        $verify_token = "mautic_bot_app";
         $hub_verify_token = null;
         if (isset($_REQUEST['hub_challenge'])) {
             $challenge = $_REQUEST['hub_challenge'];
