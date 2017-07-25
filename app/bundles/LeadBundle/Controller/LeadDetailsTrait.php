@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -208,7 +209,7 @@ trait LeadDetailsTrait
 
         if (null == $orderBy) {
             if (!$session->has('mautic.lead.'.$lead->getId().'.auditlog.orderby')) {
-                $session->set('mautic.lead.'.$lead->getId().'.auditlog.orderby', 'timestamp');
+                $session->set('mautic.lead.'.$lead->getId().'.auditlog.orderby', 'al.dateAdded');
                 $session->set('mautic.lead.'.$lead->getId().'.auditlog.orderbydir', 'DESC');
             }
 
@@ -221,12 +222,14 @@ trait LeadDetailsTrait
         // Audit Log
         /** @var AuditLogModel $auditlogModel */
         $auditlogModel = $this->getModel('core.auditLog');
-        $repo          = $auditlogModel->getRepository();
-        $logCount      = $repo->getAuditLogsCount($lead, $filters, $orderBy, $page, $limit);
-        $logs          = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
-        $logEvents     = array_map(function ($l) {
+        /** @var AuditLogRepository $repo */
+        $repo     = $auditlogModel->getRepository();
+        $logCount = $repo->getAuditLogsCount($lead, $filters);
+        $logs     = $repo->getAuditLogs($lead, $filters, $orderBy, $page, $limit);
+
+        $logEvents = array_map(function ($l) {
             return [
-                'eventType'       => $this->translator->trans('mautic.lead.event.'.$l['action']),
+                'eventType'       => $l['action'],
                 'eventLabel'      => $l['userName'],
                 'timestamp'       => $l['dateAdded'],
                 'details'         => $l['details'],
@@ -242,19 +245,6 @@ trait LeadDetailsTrait
             'merge'      => $this->translator->trans('mautic.lead.event.merge'),
             'update'     => $this->translator->trans('mautic.lead.event.update'),
         ];
-
-//        $auditlog = [
-//            'types'    => $types,
-//            'events'   => $logEvents,
-//            'page'     => $page,
-//            'maxPages' => 1,
-//            'total'    => count($logs),
-//            'filters'  => [
-//                'search'        => '',
-//                'includeEvents' => [],
-//                'excludeEvents' => [],
-//            ],
-//        ];
 
         return [
             'events'   => $logEvents,

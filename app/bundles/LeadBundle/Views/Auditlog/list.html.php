@@ -34,7 +34,7 @@ $baseUrl = $view['router']->path(
             </th>
             <?php
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'orderBy'    => 'eventLabel',
+                'orderBy'    => 'userName',
                 'text'       => 'mautic.lead.timeline.user_name',
                 'class'      => 'timeline-name',
                 'sessionVar' => 'lead.'.$lead->getId().'.auditlog',
@@ -43,7 +43,7 @@ $baseUrl = $view['router']->path(
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'orderBy'    => 'eventType',
+                'orderBy'    => 'action',
                 'text'       => 'mautic.lead.timeline.event_type',
                 'class'      => 'visible-md visible-lg timeline-type',
                 'sessionVar' => 'lead.'.$lead->getId().'.auditlog',
@@ -52,7 +52,7 @@ $baseUrl = $view['router']->path(
             ]);
 
             echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                'orderBy'    => 'timestamp',
+                'orderBy'    => 'dateAdded',
                 'text'       => 'mautic.lead.timeline.event_timestamp',
                 'class'      => 'visible-md visible-lg timeline-timestamp',
                 'sessionVar' => 'lead.'.$lead->getId().'.auditlog',
@@ -91,7 +91,7 @@ $baseUrl = $view['router']->path(
                 </td>
                 <td class="timeline-name"><?php echo $eventLabel; ?></td>
                 <td class="timeline-type"><?php if (isset($event['eventType'])) {
-                echo $event['eventType'];
+                echo $view['translator']->trans('mautic.lead.event.'.$event['eventType']);
             } ?></td>
                 <td class="timeline-timestamp"><?php echo $view['date']->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true); ?></td>
             </tr>

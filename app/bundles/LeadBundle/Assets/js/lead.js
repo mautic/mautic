@@ -58,6 +58,19 @@ Mautic.leadOnLoad = function (container, response) {
         Mautic.leadTimelineOnLoad(container, response);
     }
 
+    // Auditlog filters
+    var auditlogForm = mQuery(container + ' #auditlog-filters');
+    if (auditlogForm.length) {
+        auditlogForm.on('change', function() {
+            auditlogForm.submit();
+        }).on('keyup', function() {
+            auditlogForm.delay(200).submit();
+        }).on('submit', function(e) {
+            e.preventDefault();
+            Mautic.refreshLeadAuditLog(auditlogForm);
+        });
+    }
+
     //Note type filters
     var noteForm = mQuery(container + ' #note-filters');
     if (noteForm.length) {
@@ -765,6 +778,14 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
             Mautic.stopIconSpinPostEvent();
         }
+    });
+};
+
+Mautic.refreshLeadAuditLog = function(form) {
+    Mautic.postForm(mQuery(form), function (response) {
+        response.target = '#auditlog-table';
+        mQuery('#AuditLogCount').html(response.auditLogCount);
+        Mautic.processPageContent(response);
     });
 };
 

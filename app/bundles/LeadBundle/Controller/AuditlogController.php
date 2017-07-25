@@ -63,7 +63,7 @@ class AuditlogController extends CommonController
                 'passthroughVars' => [
                     'route'         => false,
                     'mauticContent' => 'leadAuditlog',
-                    'timelineCount' => $events['total'],
+                    'auditLogCount' => $events['total'],
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Auditlog:list.html.php',
             ]
