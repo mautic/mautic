@@ -86,7 +86,7 @@ class FormEventHelper
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $factory->getModel('lead');
-        if ($lead      = $leadModel->getCurrentLead()) {
+        if ($lead = $leadModel->getCurrentLead()) {
             $score = $properties['score'];
 
             if (!empty($score)) {
