@@ -25,13 +25,7 @@ class PageSubscriberTest extends WebTestCase
         $pageBuilderEvent = new PageBuilderEvent($translator);
         $pageBuilderEvent->addToken('{token_test}', 'TOKEN VALUE');
         $tokens = $pageBuilderEvent->getTokens();
-
-        foreach ($tokens as $token) {
-            if ('{token_test}' === $token) {
-                $this->assertEquals($tokens[$token], 'TOKEN VALUE');
-                $this->assertArrayHasKey('{token_test}', $tokens);
-                break;
-            }
-        }
+        $this->assertArrayHasKey('{token_test}', $tokens);
+        $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
     }
 }
