@@ -23,7 +23,7 @@ use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\PageBundle\Model\VideoModel;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -50,6 +50,8 @@ class PageTestAbstract extends WebTestCase
             ->getMockBuilder(CookieHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $router = $this->container->get('router');
 
         $ipLookupHelper = $this
             ->getMockBuilder(IpLookupHelper::class)
@@ -122,6 +124,7 @@ class PageTestAbstract extends WebTestCase
         $pageModel->setDispatcher($dispatcher);
         $pageModel->setTranslator($translator);
         $pageModel->setEntityManager($entityManager);
+        $pageModel->setRouter($router);
 
         return $pageModel;
     }
@@ -156,28 +159,6 @@ class PageTestAbstract extends WebTestCase
         $mockRedirectModel->expects($this->any())
             ->method('generateRedirectUrl')
             ->willReturn('http://some-url.com');
-
-        return $mockRedirectModel;
-    }
-
-    /**
-     * @return VideoModel
-     */
-    protected function getVideoModel()
-    {
-        $ipLookupHelper = $this
-            ->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadModel = $this
-            ->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\VideoModel')
-            ->setConstructorArgs([$leadModel, $ipLookupHelper])
-            ->getMock();
 
         return $mockRedirectModel;
     }

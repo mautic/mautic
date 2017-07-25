@@ -16,9 +16,12 @@ use Mautic\PageBundle\Tests\PageTestAbstract;
 
 class PageModelTest extends PageTestAbstract
 {
-    public function testCreate()
+    public function testGenerateUrl_WhenCalled_ReturnsValidUrl()
     {
-        $page      = new Page();
+        $page = new Page();
+        $page->setAlias('this-is-a-test');
         $pageModel = $this->getPageModel();
+        $url       = $pageModel->generateUrl($page);
+        $this->assertContains('/this-is-a-test', $url);
     }
 }

@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PageSubscriberTest extends WebTestCase
 {
-    public function testOnPageBuilder()
+    public function testGetTokens_WhenCalled_ReturnsValidTokens()
     {
         $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()
             ->getMock();
@@ -30,6 +30,7 @@ class PageSubscriberTest extends WebTestCase
             if ('{token_test}' === $token) {
                 $this->assertEquals($tokens[$token], 'TOKEN VALUE');
                 $this->assertArrayHasKey('{token_test}', $tokens);
+                break;
             }
         }
     }
