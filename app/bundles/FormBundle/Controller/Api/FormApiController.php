@@ -156,10 +156,10 @@ class FormApiController extends CommonApiController
 
                 $fieldEntityArray           = $fieldEntity->convertToArray();
                 $fieldEntityArray['formId'] = $formId;
-                $fieldEntityArray['alias']  = str_replace('"', '', $fieldEntityArray['alias']);
+                $escapedAlias               = str_replace('"', '', $fieldParams['alias']);
 
-                if (!in_array($fieldEntityArray['alias'], $aliases)) {
-                    $fieldEntityArray['alias'] = $fieldParams['alias'];
+                if (!in_array($escapedAlias, $aliases)) {
+                    $fieldEntityArray['alias'] = $escapedAlias;
                 } else {
                     $fieldEntityArray['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
                 }
