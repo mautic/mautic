@@ -104,6 +104,37 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $this->adjustPointsTest(10, $this->getLeadChangedArray(150, 15), $lead, 'divide');
     }
 
+    public function testCustomFieldGetterSetters()
+    {
+        $lead = new Lead();
+
+        $fields = [
+            'core' => [
+                'notes' => [
+                    'alias' => 'notes',
+                    'label' => 'Notes',
+                    'type'  => 'textarea',
+                    'value' => 'Blah blah blah',
+                ],
+                'test' => [
+                    'alias' => 'test',
+                    'label' => 'Test',
+                    'type'  => 'textarea',
+                    'value' => 'Test blah',
+                ],
+            ],
+        ];
+
+        $lead->setFields($fields);
+
+        // This should not killover with a segmentation fault due to a loop
+        $lead->setNotes('hello');
+
+        // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
+        $lead->setTest('hello');
+        $this->assertEquals('hello', $lead->getTest());
+    }
+
     /**
      * @param $points
      * @param $expected
