@@ -621,7 +621,6 @@ class LeadModel extends FormModel
             }
         }
 
-
         $lead->setFields($fieldValues);
     }
 

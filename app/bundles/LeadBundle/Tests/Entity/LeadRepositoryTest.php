@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Tests;
 
-
 use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
 
 class LeadRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -23,7 +22,7 @@ class LeadRepositoryTest extends \PHPUnit_Framework_TestCase
         $fields = [
             'true'   => true,
             'false'  => false,
-            'string' => 'blah'
+            'string' => 'blah',
         ];
 
         $this->prepareDbalFieldsForSave($fields);
