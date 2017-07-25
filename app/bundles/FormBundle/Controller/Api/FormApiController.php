@@ -12,8 +12,8 @@
 namespace Mautic\FormBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class FormApiController.
