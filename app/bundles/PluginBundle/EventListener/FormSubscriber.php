@@ -13,7 +13,6 @@ namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
-use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PluginBundle\PluginEvents;
@@ -59,8 +58,8 @@ class FormSubscriber extends CommonSubscriber
      */
     public function onFormSubmitActionTriggered(SubmissionEvent $event)
     {
-        $config  = $event->getActionConfig();
-        $lead    = $event->getLead();
+        $config = $event->getActionConfig();
+        $lead   = $event->getLead();
 
         $this->pushToIntegration($config, $lead);
     }

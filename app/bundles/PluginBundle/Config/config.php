@@ -72,7 +72,7 @@ return [
                 'class' => 'Mautic\PluginBundle\EventListener\PointSubscriber',
             ],
             'mautic.plugin.formbundle.subscriber' => [
-                'class' => 'Mautic\PluginBundle\EventListener\FormSubscriber',
+                'class'       => 'Mautic\PluginBundle\EventListener\FormSubscriber',
                 'methodCalls' => [
                     'setIntegrationHelper' => [
                         'mautic.helper.integration',

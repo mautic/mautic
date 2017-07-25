@@ -17,11 +17,9 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 
 /**
  * Static methods must be used due to the Point triggers not being converted to Events yet
- * Once that happens, this can be converted to a standard method classes
+ * Once that happens, this can be converted to a standard method classes.
  *
  * Trait PushToIntegrationTrait
- *
- * @package Mautic\PluginBundle\EventListener
  */
 trait PushToIntegrationTrait
 {
@@ -31,7 +29,7 @@ trait PushToIntegrationTrait
     protected static $integrationHelper;
 
     /**
-     * Used by methodCalls to event subscribers
+     * Used by methodCalls to event subscribers.
      *
      * @param IntegrationHelper $integrationHelper
      */
@@ -41,7 +39,7 @@ trait PushToIntegrationTrait
     }
 
     /**
-     * Used by callback methods such as point triggers
+     * Used by callback methods such as point triggers.
      *
      * @param IntegrationHelper $integrationHelper
      */
@@ -54,13 +52,13 @@ trait PushToIntegrationTrait
      * @param array $config
      * @param       $lead
      */
-    protected function pushToIntegration(array $config, Lead $lead, array &$errors = array())
+    protected function pushToIntegration(array $config, Lead $lead, array &$errors = [])
     {
         return static::pushIt($config, $lead, $errors);
     }
 
     /**
-     * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback
+     * Used because the the Point trigger actions have not be converted to Events yet and thus must leverage a callback.
      *
      * @param IntegrationHelper $helper
      * @param                   $config
@@ -79,7 +77,7 @@ trait PushToIntegrationTrait
         $success  = true;
 
         /**
-         * @var AbstractIntegration $s
+         * @var AbstractIntegration
          */
         foreach ($services as $name => $s) {
             $settings = $s->getIntegrationSettings();
