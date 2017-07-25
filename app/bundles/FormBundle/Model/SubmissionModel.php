@@ -768,14 +768,14 @@ class SubmissionModel extends CommonFormModel
     {
         //set the mapped data
         $inKioskMode = $form->isInKioskMode();
+        $lead        = $this->leadModel->getCurrentLead();
 
-        if (!$inKioskMode) {
+        if (!$inKioskMode && $lead instanceof Lead) {
             // Default to currently tracked lead
-            $lead          = $this->leadModel->getCurrentLead();
             $leadId        = $lead->getId();
             $currentFields = $lead->getProfileFields();
 
-            $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$lead->getId());
+            $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$leadId);
         } else {
             // Default to a new lead in kiosk mode
             $lead = new Lead();
