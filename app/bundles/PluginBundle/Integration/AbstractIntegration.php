@@ -2574,8 +2574,8 @@ abstract class AbstractIntegration
                     [],
                     false
                 );
-
                 $entity->setLastSyncDate($this->getLastSyncDate($internalEntityObject, $params, false));
+                $integrationEntities[$internalEntityId] = $entity;
             } else {
                 $integrationEntities[$internalEntityId]->setLastSyncDate($this->getLastSyncDate($internalEntityObject, $params, false));
             }

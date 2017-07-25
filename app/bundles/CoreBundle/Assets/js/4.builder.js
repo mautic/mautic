@@ -1094,8 +1094,8 @@ Mautic.initSlotListeners = function() {
                         extraKeys: {"Ctrl-Space": "autocomplete"},
                         lineWrapping: true,
                     });
-                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
-                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
+                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer').html());
+                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer'));
                 }
             }
 
