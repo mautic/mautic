@@ -715,7 +715,7 @@ class FormController extends CommonFormController
             foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
 
-                if ($formField->getAlias() == 'submit' && $formField->getType() == 'button') {
+                if ($formField->getType() == 'button') {
                     //submit button found
                     $submitButton = true;
                 }
