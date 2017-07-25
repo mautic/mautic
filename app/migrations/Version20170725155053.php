@@ -40,6 +40,6 @@ class Version20170725155053 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         // Please modify to your needs
-        $this->addSql('ALTER TABLE '.$this->prefix.'companies CHANGE score score INT(11) NULL DEFAULT 0');
+        $this->addSql('ALTER TABLE '.$this->prefix.'companies CHANGE score score INT(11) NULL');
     }
 }
