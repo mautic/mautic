@@ -114,15 +114,15 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                     'alias' => 'notes',
                     'label' => 'Notes',
                     'type'  => 'textarea',
-                    'value' => 'Blah blah blah'
+                    'value' => 'Blah blah blah',
                 ],
                 'test' => [
                     'alias' => 'test',
                     'label' => 'Test',
                     'type'  => 'textarea',
-                    'value' => 'Test blah'
-                ]
-            ]
+                    'value' => 'Test blah',
+                ],
+            ],
         ];
 
         $lead->setFields($fields);
