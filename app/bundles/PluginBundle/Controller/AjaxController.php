@@ -78,7 +78,6 @@ class AjaxController extends CommonAjaxController
                     // Get a list of custom form fields
                     $mauticFields       = ($isLead) ? $pluginModel->getLeadFields() : $pluginModel->getCompanyFields();
                     $featureSettings    = $integrationObject->getIntegrationSettings()->getFeatureSettings();
-                    $formSettings       = $integrationObject->getFormDisplaySettings();
                     $enableDataPriority = $integrationObject->getDataPriority();
                     $formType           = $isLead ? 'integration_fields' : 'integration_company_fields';
                     $form               = $this->createForm(
