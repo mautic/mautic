@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * Class FormApiController.
@@ -156,7 +157,7 @@ class FormApiController extends CommonApiController
 
                 $fieldEntityArray           = $fieldEntity->convertToArray();
                 $fieldEntityArray['formId'] = $formId;
-                $escapedAlias               = str_replace('"', '', $fieldParams['alias']);
+                $escapedAlias               = InputHelper::filename($fieldParams['alias']);
 
                 if (!in_array($escapedAlias, $aliases)) {
                     $fieldEntityArray['alias'] = $escapedAlias;
