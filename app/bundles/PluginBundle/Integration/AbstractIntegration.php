@@ -2594,7 +2594,8 @@ abstract class AbstractIntegration
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        if (!$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
+        $isNew = method_exists($entity, 'isNew') && $entity->isNew();
+        if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */
             $changes = $entity->getChanges(true);
