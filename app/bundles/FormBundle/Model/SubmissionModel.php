@@ -334,7 +334,11 @@ class SubmissionModel extends CommonFormModel
             //set tracking ID for stats purposes to determine unique hits
             $submission->setTrackingId($trackingId);
         }
-        $submission->setLead($lead);
+
+        // If a user is testing a form, $lead will not have an ID
+        if ($lead && $lead->getId()) {
+            $submission->setLead($lead);
+        }
 
         // Remove validation errors if the field is not visible
         if ($form->usesProgressiveProfiling()) {

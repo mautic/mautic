@@ -254,9 +254,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field, $object) {
-            return ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id']))
-                || ($object == 'Lead'
-                    && in_array($field['name'], ['Company']));
+            return
+                ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id'])) ||
+                ($object == 'Lead' && in_array($field['name'], ['Company'])) ||
+                (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
         };
 
         $salesFields = [];
