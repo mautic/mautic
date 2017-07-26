@@ -377,7 +377,7 @@ class LeadListRepository extends CommonRepository
                 }
 
                 if ($newOnly) {
-                    $expr = $this->generateSegmentExpression($filters, $parameters, $q);
+                    $expr = $this->generateSegmentExpression($filters, $parameters, $q, null, $l['id']);
 
                     if (!$this->hasCompanyFilter && !$expr->count()) {
                         // Treat this as if it has no filters since all the filters are now invalid (fields were deleted)
@@ -561,7 +561,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return QueryBuilder
      */
-    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null)
+    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false)
     {
         if (null === $parameterQ) {
             $parameterQ = $q;
@@ -571,7 +571,7 @@ class LeadListRepository extends CommonRepository
         $this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0;
 
         $this->listFiltersInnerJoinCompany = false;
-        $expr                              = $this->getListFilterExprCombined($filters, $parameters, $q);
+        $expr                              = $this->getListFilterExpr($filters, $parameters, $q, $not, null, 'lead', $listId);
 
         if ($this->hasCompanyFilter) {
             $this->applyCompanyFieldFilters($q);
@@ -636,18 +636,22 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * This is a public method that can be used by 3rd party.
+     * Do not change the signature.
+     *
      * @param              $filters
      * @param              $parameters
      * @param QueryBuilder $q
+     * @param bool         $not
+     * @param int|null     $leadId
+     * @param string       $object
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    public function getListFilterExprCombined($filters, &$parameters, QueryBuilder $q)
+    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null, $object = 'lead', $listId = null)
     {
         static $leadTable;
         static $companyTable;
-        $not    = false;
-        $leadId = null;
 
         if (!count($filters)) {
             return $q->expr()->andX();
@@ -1346,10 +1350,21 @@ class LeadListRepository extends CommonRepository
                         );
                     }
 
+                    $isLeadList = false;
                     switch ($details['field']) {
                         case 'leadlist':
-                            $table  = 'lead_lists_leads';
-                            $column = 'leadlist_id';
+                            $newListId = $details['filter'];
+                            if ($listId !== $newListId) { // prevent infinite loop
+                                $isLeadList = true;
+                                $ll         = $this->getEntity($newListId);
+                                $nq         = $this->_em->getConnection()->createQueryBuilder();
+                                $nf         = $ll->getFilters();
+                                $isNot      = 'NOT EXISTS' === $func;
+                                $se         = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListId, $isNot);
+                            } else {
+                                $table  = 'lead_lists_leads';
+                                $column = 'leadlist_id';
+                            }
 
                             $falseParameter = $this->generateRandomParameterName();
                             $subExpr->add(
@@ -1391,6 +1406,12 @@ class LeadListRepository extends CommonRepository
                             $table  = 'lead_devices';
                             $column = 'device_os_name';
                             break;
+                    }
+
+                    if ($isLeadList) {
+                        // add segment filters to current filters
+                        $groupExpr->add($se);
+                        break;
                     }
 
                     $deviceFilterParamater = $this->generateRandomParameterName();

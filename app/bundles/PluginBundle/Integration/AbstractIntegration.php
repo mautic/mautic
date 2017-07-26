@@ -2574,8 +2574,8 @@ abstract class AbstractIntegration
                     [],
                     false
                 );
-
                 $entity->setLastSyncDate($this->getLastSyncDate($internalEntityObject, $params, false));
+                $integrationEntities[$internalEntityId] = $entity;
             } else {
                 $integrationEntities[$internalEntityId]->setLastSyncDate($this->getLastSyncDate($internalEntityObject, $params, false));
             }
@@ -2594,7 +2594,8 @@ abstract class AbstractIntegration
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        if (!$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
+        $isNew = method_exists($entity, 'isNew') && $entity->isNew();
+        if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */
             $changes = $entity->getChanges(true);
@@ -2651,7 +2652,7 @@ abstract class AbstractIntegration
                 if (isset($fields['i_'.$i]) && isset($fields['m_'.$i])) {
                     $formattedFields[$fields['i_'.$i]] = $fields['m_'.$i];
                 } else {
-                    break;
+                    continue;
                 }
             }
         }
