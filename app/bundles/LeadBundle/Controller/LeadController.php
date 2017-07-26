@@ -323,7 +323,7 @@ class LeadController extends FormController
         $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
+        /* @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $companyModel  = $this->getModel('lead.company');
         $companiesRepo = $companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
@@ -1854,7 +1854,7 @@ class LeadController extends FormController
      */
     public function batchOwnersAction($objectId = 0)
     {
-       if ($this->request->getMethod() == 'POST') {
+        if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
             $data  = $this->request->request->get('lead_batch_owner', [], true);
@@ -1884,7 +1884,7 @@ class LeadController extends FormController
 
                     if (!empty($data['addowner'])) {
                         $userModel = $this->getModel('user');
-                        $user = $userModel->getEntity((int) $data['addowner']);
+                        $user      = $userModel->getEntity((int) $data['addowner']);
                         $lead->setOwner($user);
                     }
                 }
@@ -1905,12 +1905,11 @@ class LeadController extends FormController
                     'flashes'    => $this->getFlashContent(),
                 ]
             );
-       }
-       else{
+        } else {
             $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
-            $items  = [];
+            $items = [];
             foreach ($users as $user) {
-                $items[$user['id']] = $user['firstName']." ".$user['lastName'];
+                $items[$user['id']] = $user['firstName'].' '.$user['lastName'];
             }
 
             $route = $this->generateUrl(
@@ -1941,7 +1940,6 @@ class LeadController extends FormController
                 ]
             );
         }
-
     }
 
     /**
