@@ -1007,7 +1007,7 @@ abstract class AbstractIntegration
             $timeout = (isset($settings['request_timeout'])) ? (int) $settings['request_timeout'] : 10;
             $this->logger->debug(strtoupper($this->getName()).': Request URL: '.$url);
             $this->logger->debug(strtoupper($this->getName()).': Request Headers: '.$headers);
-            $this->logger->debug(strtoupper($this->getName()).': Request Prameters: '.$parameters);
+            $this->logger->debug(strtoupper($this->getName()).': Request Parameters: '.$parameters);
             switch ($method) {
                 case 'GET':
                     $result = $connector->get($url, $headers, $timeout);
