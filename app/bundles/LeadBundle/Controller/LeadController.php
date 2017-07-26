@@ -57,7 +57,7 @@ class LeadController extends FormController
         }
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model   = $this->getModel('lead');
+        $model = $this->getModel('lead');
         $session = $this->get('session');
         //set limits
         $limit = $session->get('mautic.lead.limit', $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit'));
@@ -70,15 +70,15 @@ class LeadController extends FormController
         $session->set('mautic.lead.filter', $search);
 
         //do some default filtering
-        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $orderBy = $session->get('mautic.lead.orderby', 'l.last_active');
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
 
-        $filter      = ['string' => $search, 'force' => ''];
-        $translator  = $this->get('translator');
-        $anonymous   = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $filter = ['string' => $search, 'force' => ''];
+        $translator = $this->get('translator');
+        $anonymous = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $listCommand = $translator->trans('mautic.lead.lead.searchcommand.list');
-        $mine        = $translator->trans('mautic.core.searchcommand.ismine');
-        $indexMode   = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
+        $mine = $translator->trans('mautic.core.searchcommand.ismine');
+        $indexMode = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
 
         $session->set('mautic.lead.indexmode', $indexMode);
 
@@ -95,11 +95,11 @@ class LeadController extends FormController
         }
 
         $results = $model->getEntities([
-            'start'          => $start,
-            'limit'          => $limit,
-            'filter'         => $filter,
-            'orderBy'        => $orderBy,
-            'orderByDir'     => $orderByDir,
+            'start' => $start,
+            'limit' => $limit,
+            'filter' => $filter,
+            'orderBy' => $orderBy,
+            'orderByDir' => $orderByDir,
             'withTotalCount' => true,
         ]);
 
@@ -121,11 +121,11 @@ class LeadController extends FormController
 
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $returnUrl,
-                    'viewParameters'  => ['page' => $lastPage],
+                    'returnUrl' => $returnUrl,
+                    'viewParameters' => ['page' => $lastPage],
                     'contentTemplate' => 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'lead',
                     ],
                 ]
@@ -146,7 +146,7 @@ class LeadController extends FormController
 
         //check to see if in a single list
         $inSingleList = (substr_count($search, "$listCommand:") === 1) ? true : false;
-        $list         = [];
+        $list = [];
         if ($inSingleList) {
             preg_match("/$listCommand:(.*?)(?=\s|$)/", $search, $matches);
 
@@ -171,27 +171,27 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue'      => $search,
-                    'items'            => $leads,
-                    'page'             => $page,
-                    'totalItems'       => $count,
-                    'limit'            => $limit,
-                    'permissions'      => $permissions,
-                    'tmpl'             => $tmpl,
-                    'indexMode'        => $indexMode,
-                    'lists'            => $lists,
-                    'currentList'      => $list,
-                    'security'         => $this->get('mautic.security'),
-                    'inSingleList'     => $inSingleList,
-                    'noContactList'    => $emailRepo->getDoNotEmailList(array_keys($leads)),
-                    'maxLeadId'        => $maxLeadId,
+                    'searchValue' => $search,
+                    'items' => $leads,
+                    'page' => $page,
+                    'totalItems' => $count,
+                    'limit' => $limit,
+                    'permissions' => $permissions,
+                    'tmpl' => $tmpl,
+                    'indexMode' => $indexMode,
+                    'lists' => $lists,
+                    'currentList' => $list,
+                    'security' => $this->get('mautic.security'),
+                    'inSingleList' => $inSingleList,
+                    'noContactList' => $emailRepo->getDoNotEmailList(array_keys($leads)),
+                    'maxLeadId' => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
                 ],
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_contact_index',
+                    'activeLink' => '#mautic_contact_index',
                     'mauticContent' => 'lead',
-                    'route'         => $this->generateUrl('mautic_contact_index', ['page' => $page]),
+                    'route' => $this->generateUrl('mautic_contact_index', ['page' => $page]),
                 ],
             ]
         );
@@ -214,18 +214,18 @@ class LeadController extends FormController
                     'force' => [
                         [
                             'column' => 'f.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true,
+                            'expr' => 'eq',
+                            'value' => true,
                         ],
                         [
                             'column' => 'f.isShortVisible',
-                            'expr'   => 'eq',
-                            'value'  => true,
+                            'expr' => 'eq',
+                            'value' => true,
                         ],
                         [
                             'column' => 'f.object',
-                            'expr'   => 'like',
-                            'value'  => 'lead',
+                            'expr' => 'like',
+                            'value' => 'lead',
                         ],
                     ],
                 ],
@@ -246,9 +246,9 @@ class LeadController extends FormController
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Lead:quickadd.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_contact_index',
+                    'activeLink' => '#mautic_contact_index',
                     'mauticContent' => 'lead',
-                    'route'         => false,
+                    'route' => false,
                 ],
             ]
         );
@@ -292,17 +292,17 @@ class LeadController extends FormController
 
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $returnUrl,
-                    'viewParameters'  => ['page' => $page],
+                    'returnUrl' => $returnUrl,
+                    'viewParameters' => ['page' => $page],
                     'contentTemplate' => 'MauticLeadBundle:Lead:index',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'contact',
                     ],
                     'flashes' => [
                         [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.lead.lead.error.notfound',
+                            'type' => 'error',
+                            'msg' => 'mautic.lead.lead.error.notfound',
                             'msgVars' => ['%id%' => $objectId],
                         ],
                     ],
@@ -319,14 +319,16 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
-        $fields            = $lead->getFields();
+        $fields = $lead->getFields();
         $integrationHelper = $this->get('mautic.helper.integration');
-        $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
+        $socialProfiles = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
         /* @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $companyModel  = $this->getModel('lead.company');
+ 
+        $companyModel  = $this->getModel('lead.company'); 
+ 
         $companiesRepo = $companyModel->getRepository();
-        $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
+        $companies = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
         if ($socialProfiles) {
             foreach ($socialProfiles as $integration => &$details) {
@@ -350,36 +352,36 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead'              => $lead,
-                    'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
-                    'fields'            => $fields,
-                    'companies'         => $companies,
-                    'socialProfiles'    => $socialProfiles,
+                    'lead' => $lead,
+                    'avatarPanelState' => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
+                    'fields' => $fields,
+                    'companies' => $companies,
+                    'socialProfiles' => $socialProfiles,
                     'socialProfileUrls' => $socialProfileUrls,
-                    'places'            => $this->getPlaces($lead),
-                    'permissions'       => $permissions,
-                    'events'            => $this->getEngagements($lead),
-                    'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
-                    'engagementData'    => $this->getEngagementData($lead),
-                    'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
-                    'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
-                    'leadNotes'         => $this->forward(
+                    'places' => $this->getPlaces($lead),
+                    'permissions' => $permissions,
+                    'events' => $this->getEngagements($lead),
+                    'upcomingEvents' => $this->getScheduledCampaignEvents($lead),
+                    'engagementData' => $this->getEngagementData($lead),
+                    'noteCount' => $this->getModel('lead.note')->getNoteCount($lead, true),
+                    'doNotContact' => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
+                    'leadNotes' => $this->forward(
                         'MauticLeadBundle:Note:index',
                         [
-                            'leadId'     => $lead->getId(),
+                            'leadId' => $lead->getId(),
                             'ignoreAjax' => 1,
                         ]
                     )->getContent(),
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_contact_index',
+                    'activeLink' => '#mautic_contact_index',
                     'mauticContent' => 'lead',
-                    'route'         => $this->generateUrl(
+                    'route' => $this->generateUrl(
                         'mautic_contact_action',
                         [
                             'objectAction' => 'view',
-                            'objectId'     => $lead->getId(),
+                            'objectId' => $lead->getId(),
                         ]
                     ),
                 ],
@@ -396,7 +398,7 @@ class LeadController extends FormController
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
-        $lead  = $model->getEntity();
+        $lead = $model->getEntity();
 
         if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
             return $this->accessDenied();
@@ -455,13 +457,13 @@ class LeadController extends FormController
                     $this->addFlash(
                         'mautic.core.notice.created',
                         [
-                            '%name%'      => $identifier,
+                            '%name%' => $identifier,
                             '%menu_link%' => 'mautic_contact_index',
-                            '%url%'       => $this->generateUrl(
+                            '%url%' => $this->generateUrl(
                                 'mautic_contact_action',
                                 [
                                     'objectAction' => 'edit',
-                                    'objectId'     => $lead->getId(),
+                                    'objectId' => $lead->getId(),
                                 ]
                             ),
                         ]
@@ -471,35 +473,35 @@ class LeadController extends FormController
 
                     if ($inQuickForm) {
                         $viewParameters = ['page' => $page];
-                        $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
-                        $template       = 'MauticLeadBundle:Lead:index';
+                        $returnUrl = $this->generateUrl('mautic_contact_index', $viewParameters);
+                        $template = 'MauticLeadBundle:Lead:index';
                     } elseif ($form->get('buttons')->get('save')->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
-                            'objectId'     => $lead->getId(),
+                            'objectId' => $lead->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_contact_action', $viewParameters);
-                        $template  = 'MauticLeadBundle:Lead:view';
+                        $template = 'MauticLeadBundle:Lead:view';
                     } else {
                         return $this->editAction($lead->getId(), true);
                     }
                 }
             } else {
                 $viewParameters = ['page' => $page];
-                $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
-                $template       = 'MauticLeadBundle:Lead:index';
+                $returnUrl = $this->generateUrl('mautic_contact_index', $viewParameters);
+                $template = 'MauticLeadBundle:Lead:index';
             }
 
             if ($cancelled || $valid) { //cancelled or success
                 return $this->postActionRedirect(
                     [
-                        'returnUrl'       => $returnUrl,
-                        'viewParameters'  => $viewParameters,
+                        'returnUrl' => $returnUrl,
+                        'viewParameters' => $viewParameters,
                         'contentTemplate' => $template,
                         'passthroughVars' => [
-                            'activeLink'    => '#mautic_contact_index',
+                            'activeLink' => '#mautic_contact_index',
                             'mauticContent' => 'lead',
-                            'closeModal'    => 1, //just in case in quick form
+                            'closeModal' => 1, //just in case in quick form
                         ],
                     ]
                 );
@@ -513,15 +515,15 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'   => $form->createView(),
-                    'lead'   => $lead,
+                    'form' => $form->createView(),
+                    'lead' => $lead,
                     'fields' => $model->organizeFieldsByGroup($fields),
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_contact_index',
+                    'activeLink' => '#mautic_contact_index',
                     'mauticContent' => 'lead',
-                    'route'         => $this->generateUrl(
+                    'route' => $this->generateUrl(
                         'mautic_contact_action',
                         [
                             'objectAction' => 'new',
@@ -544,7 +546,7 @@ class LeadController extends FormController
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
-        $lead  = $model->getEntity($objectId);
+        $lead = $model->getEntity($objectId);
 
         //set the page we came from
         $page = $this->get('session')->get('mautic.lead.page', 1);
@@ -553,11 +555,11 @@ class LeadController extends FormController
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
 
         $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
+            'returnUrl' => $returnUrl,
+            'viewParameters' => ['page' => $page],
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => [
-                'activeLink'    => '#mautic_contact_index',
+                'activeLink' => '#mautic_contact_index',
                 'mauticContent' => 'lead',
             ],
         ];
@@ -569,8 +571,8 @@ class LeadController extends FormController
                     [
                         'flashes' => [
                             [
-                                'type'    => 'error',
-                                'msg'     => 'mautic.lead.lead.error.notfound',
+                                'type' => 'error',
+                                'msg' => 'mautic.lead.lead.error.notfound',
                                 'msgVars' => ['%id%' => $objectId],
                             ],
                         ],
@@ -591,7 +593,7 @@ class LeadController extends FormController
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $fields = $this->getModel('lead.field')->getPublishedFieldArrays('lead');
-        $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
+        $form = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
@@ -636,13 +638,13 @@ class LeadController extends FormController
                     $this->addFlash(
                         'mautic.core.notice.updated',
                         [
-                            '%name%'      => $identifier,
+                            '%name%' => $identifier,
                             '%menu_link%' => 'mautic_contact_index',
-                            '%url%'       => $this->generateUrl(
+                            '%url%' => $this->generateUrl(
                                 'mautic_contact_action',
                                 [
                                     'objectAction' => 'edit',
-                                    'objectId'     => $lead->getId(),
+                                    'objectId' => $lead->getId(),
                                 ]
                             ),
                         ]
@@ -656,15 +658,15 @@ class LeadController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
-                    'objectId'     => $lead->getId(),
+                    'objectId' => $lead->getId(),
                 ];
 
                 return $this->postActionRedirect(
                     array_merge(
                         $postActionVars,
                         [
-                            'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
-                            'viewParameters'  => $viewParameters,
+                            'returnUrl' => $this->generateUrl('mautic_contact_action', $viewParameters),
+                            'viewParameters' => $viewParameters,
                             'contentTemplate' => 'MauticLeadBundle:Lead:view',
                         ]
                     )
@@ -682,19 +684,19 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'   => $form->createView(),
-                    'lead'   => $lead,
+                    'form' => $form->createView(),
+                    'lead' => $lead,
                     'fields' => $lead->getFields(), //pass in the lead fields as they are already organized by ['group']['alias']
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_contact_index',
+                    'activeLink' => '#mautic_contact_index',
                     'mauticContent' => 'lead',
-                    'route'         => $this->generateUrl(
+                    'route' => $this->generateUrl(
                         'mautic_contact_action',
                         [
                             'objectAction' => 'edit',
-                            'objectId'     => $lead->getId(),
+                            'objectId' => $lead->getId(),
                         ]
                     ),
                 ],
@@ -709,7 +711,7 @@ class LeadController extends FormController
      */
     private function uploadAvatar(Lead $lead)
     {
-        $file      = $this->request->files->get('lead[custom_avatar]', null, true);
+        $file = $this->request->files->get('lead[custom_avatar]', null, true);
         $avatarDir = $this->get('mautic.helper.template.avatar')->getAvatarPath(true);
 
         if (!file_exists($avatarDir)) {
@@ -732,19 +734,19 @@ class LeadController extends FormController
     public function mergeAction($objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model    = $this->getModel('lead');
+        $model = $this->getModel('lead');
         $mainLead = $model->getEntity($objectId);
-        $page     = $this->get('session')->get('mautic.lead.page', 1);
+        $page = $this->get('session')->get('mautic.lead.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
 
         $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
+            'returnUrl' => $returnUrl,
+            'viewParameters' => ['page' => $page],
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => [
-                'activeLink'    => '#mautic_contact_index',
+                'activeLink' => '#mautic_contact_index',
                 'mauticContent' => 'lead',
             ],
         ];
@@ -756,8 +758,8 @@ class LeadController extends FormController
                     [
                         'flashes' => [
                             [
-                                'type'    => 'error',
-                                'msg'     => 'mautic.lead.lead.error.notfound',
+                                'type' => 'error',
+                                'msg' => 'mautic.lead.lead.error.notfound',
                                 'msgVars' => ['%id%' => $objectId],
                             ],
                         ],
@@ -768,33 +770,33 @@ class LeadController extends FormController
 
         //do some default filtering
         $session = $this->get('session');
-        $search  = $this->request->get('search', $session->get('mautic.lead.merge.filter', ''));
+        $search = $this->request->get('search', $session->get('mautic.lead.merge.filter', ''));
         $session->set('mautic.lead.merge.filter', $search);
         $leads = [];
 
         if (!empty($search)) {
             $filter = [
                 'string' => $search,
-                'force'  => [
+                'force' => [
                     [
                         'column' => 'l.date_identified',
-                        'expr'   => 'isNotNull',
-                        'value'  => $mainLead->getId(),
+                        'expr' => 'isNotNull',
+                        'value' => $mainLead->getId(),
                     ],
                     [
                         'column' => 'l.id',
-                        'expr'   => 'neq',
-                        'value'  => $mainLead->getId(),
+                        'expr' => 'neq',
+                        'value' => $mainLead->getId(),
                     ],
                 ],
             ];
 
             $leads = $model->getEntities(
                 [
-                    'limit'          => 25,
-                    'filter'         => $filter,
-                    'orderBy'        => 'l.firstname,l.lastname,l.company,l.email',
-                    'orderByDir'     => 'ASC',
+                    'limit' => 25,
+                    'filter' => $filter,
+                    'orderBy' => 'l.firstname,l.lastname,l.company,l.email',
+                    'orderByDir' => 'ASC',
                     'withTotalCount' => false,
                 ]
             );
@@ -812,7 +814,7 @@ class LeadController extends FormController
             [],
             [
                 'action' => $action,
-                'leads'  => $leadChoices,
+                'leads' => $leadChoices,
             ]
         );
 
@@ -820,9 +822,9 @@ class LeadController extends FormController
             $valid = true;
             if (!$this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-                    $data      = $form->getData();
+                    $data = $form->getData();
                     $secLeadId = $data['lead_to_merge'];
-                    $secLead   = $model->getEntity($secLeadId);
+                    $secLead = $model->getEntity($secLeadId);
 
                     if ($secLead === null) {
                         return $this->postActionRedirect(
@@ -831,8 +833,8 @@ class LeadController extends FormController
                                 [
                                     'flashes' => [
                                         [
-                                            'type'    => 'error',
-                                            'msg'     => 'mautic.lead.lead.error.notfound',
+                                            'type' => 'error',
+                                            'msg' => 'mautic.lead.lead.error.notfound',
                                             'msgVars' => ['%id%' => $secLead->getId()],
                                         ],
                                     ],
@@ -859,14 +861,14 @@ class LeadController extends FormController
 
             if ($valid) {
                 $viewParameters = [
-                    'objectId'     => $mainLead->getId(),
+                    'objectId' => $mainLead->getId(),
                     'objectAction' => 'view',
                 ];
 
                 return $this->postActionRedirect(
                     [
-                        'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
-                        'viewParameters'  => $viewParameters,
+                        'returnUrl' => $this->generateUrl('mautic_contact_action', $viewParameters),
+                        'viewParameters' => $viewParameters,
                         'contentTemplate' => 'MauticLeadBundle:Lead:view',
                         'passthroughVars' => [
                             'closeModal' => 1,
@@ -881,22 +883,22 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'         => $tmpl,
-                    'leads'        => $leads,
-                    'searchValue'  => $search,
-                    'action'       => $action,
-                    'form'         => $form->createView(),
+                    'tmpl' => $tmpl,
+                    'leads' => $leads,
+                    'searchValue' => $search,
+                    'action' => $action,
+                    'form' => $form->createView(),
                     'currentRoute' => $this->generateUrl(
                         'mautic_contact_action',
                         [
                             'objectAction' => 'merge',
-                            'objectId'     => $mainLead->getId(),
+                            'objectId' => $mainLead->getId(),
                         ]
                     ),
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php',
                 'passthroughVars' => [
-                    'route'  => false,
+                    'route' => false,
                     'target' => ($tmpl == 'update') ? '.lead-merge-options' : null,
                 ],
             ]
@@ -914,7 +916,7 @@ class LeadController extends FormController
     {
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead = $model->getEntity($objectId);
 
         if ($lead === null
             || !$this->get('mautic.security')->hasEntityAccess(
@@ -927,7 +929,7 @@ class LeadController extends FormController
         }
 
         $viewParameters = [
-            'objectId'     => $lead->getId(),
+            'objectId' => $lead->getId(),
             'objectAction' => 'view',
         ];
 
@@ -942,8 +944,8 @@ class LeadController extends FormController
         if (true === $form) {
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
-                    'viewParameters'  => $viewParameters,
+                    'returnUrl' => $this->generateUrl('mautic_contact_action', $viewParameters),
+                    'viewParameters' => $viewParameters,
                     'contentTemplate' => 'MauticLeadBundle:Lead:view',
                     'passthroughVars' => [
                         'closeModal' => 1,
@@ -958,13 +960,13 @@ class LeadController extends FormController
             [
                 'viewParameters' => array_merge(
                     [
-                        'tmpl'         => $tmpl,
-                        'form'         => $form->createView(),
+                        'tmpl' => $tmpl,
+                        'form' => $form->createView(),
                         'currentRoute' => $this->generateUrl(
                             'mautic_contact_action',
                             [
                                 'objectAction' => 'contactFrequency',
-                                'objectId'     => $lead->getId(),
+                                'objectId' => $lead->getId(),
                             ]
                         ),
                         'lead' => $lead,
@@ -973,7 +975,7 @@ class LeadController extends FormController
                 ),
                 'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
                 'passthroughVars' => [
-                    'route'  => false,
+                    'route' => false,
                     'target' => ($tmpl == 'update') ? '.lead-frequency-options' : null,
                 ],
             ]
@@ -989,28 +991,28 @@ class LeadController extends FormController
      */
     public function deleteAction($objectId)
     {
-        $page      = $this->get('session')->get('mautic.lead.page', 1);
+        $page = $this->get('session')->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
-        $flashes   = [];
+        $flashes = [];
 
         $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
+            'returnUrl' => $returnUrl,
+            'viewParameters' => ['page' => $page],
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => [
-                'activeLink'    => '#mautic_contact_index',
+                'activeLink' => '#mautic_contact_index',
                 'mauticContent' => 'lead',
             ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
-            $model  = $this->getModel('lead.lead');
+            $model = $this->getModel('lead.lead');
             $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
                 $flashes[] = [
-                    'type'    => 'error',
-                    'msg'     => 'mautic.lead.lead.error.notfound',
+                    'type' => 'error',
+                    'msg' => 'mautic.lead.lead.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -1026,12 +1028,12 @@ class LeadController extends FormController
                 $model->deleteEntity($entity);
 
                 $identifier = $this->get('translator')->trans($entity->getPrimaryIdentifier());
-                $flashes[]  = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.core.notice.deleted',
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg' => 'mautic.core.notice.deleted',
                     'msgVars' => [
                         '%name%' => $identifier,
-                        '%id%'   => $objectId,
+                        '%id%' => $objectId,
                     ],
                 ];
             }
@@ -1054,23 +1056,23 @@ class LeadController extends FormController
      */
     public function batchDeleteAction()
     {
-        $page      = $this->get('session')->get('mautic.lead.page', 1);
+        $page = $this->get('session')->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
-        $flashes   = [];
+        $flashes = [];
 
         $postActionVars = [
-            'returnUrl'       => $returnUrl,
-            'viewParameters'  => ['page' => $page],
+            'returnUrl' => $returnUrl,
+            'viewParameters' => ['page' => $page],
             'contentTemplate' => 'MauticLeadBundle:Lead:index',
             'passthroughVars' => [
-                'activeLink'    => '#mautic_contact_index',
+                'activeLink' => '#mautic_contact_index',
                 'mauticContent' => 'lead',
             ],
         ];
 
         if ($this->request->getMethod() == 'POST') {
-            $model     = $this->getModel('lead');
-            $ids       = json_decode($this->request->query->get('ids', '{}'));
+            $model = $this->getModel('lead');
+            $ids = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 
             // Loop over the IDs to perform access checks pre-delete
@@ -1079,8 +1081,8 @@ class LeadController extends FormController
 
                 if ($entity === null) {
                     $flashes[] = [
-                        'type'    => 'error',
-                        'msg'     => 'mautic.lead.lead.error.notfound',
+                        'type' => 'error',
+                        'msg' => 'mautic.lead.lead.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->get('mautic.security')->hasEntityAccess(
@@ -1102,8 +1104,8 @@ class LeadController extends FormController
                 $entities = $model->deleteEntities($deleteIds);
 
                 $flashes[] = [
-                    'type'    => 'notice',
-                    'msg'     => 'mautic.lead.lead.notice.batch_deleted',
+                    'type' => 'notice',
+                    'msg' => 'mautic.lead.lead.notice.batch_deleted',
                     'msgVars' => [
                         '%count%' => count($entities),
                     ],
@@ -1132,7 +1134,7 @@ class LeadController extends FormController
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead = $model->getEntity($objectId);
 
         if ($lead != null
             && $this->get('mautic.security')->hasEntityAccess(
@@ -1143,7 +1145,7 @@ class LeadController extends FormController
         ) {
             /** @var \Mautic\LeadBundle\Model\ListModel $listModel */
             $listModel = $this->getModel('lead.list');
-            $lists     = $listModel->getUserLists();
+            $lists = $listModel->getUserLists();
 
             // Get a list of lists for the lead
             $leadsLists = $model->getLists($lead, true, true);
@@ -1154,9 +1156,9 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lists'      => $lists,
+                    'lists' => $lists,
                     'leadsLists' => $leadsLists,
-                    'lead'       => $lead,
+                    'lead' => $lead,
                 ],
                 'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.php',
             ]
@@ -1173,7 +1175,7 @@ class LeadController extends FormController
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead = $model->getEntity($objectId);
 
         if ($lead != null
             && $this->get('mautic.security')->hasEntityAccess(
@@ -1184,7 +1186,7 @@ class LeadController extends FormController
         ) {
             /** @var \Mautic\LeadBundle\Model\CompanyModel $companyModel */
             $companyModel = $this->getModel('lead.company');
-            $companies    = $companyModel->getUserCompanies();
+            $companies = $companyModel->getUserCompanies();
 
             // Get a list of lists for the lead
             $companyLeads = $lead->getCompanies();
@@ -1198,9 +1200,9 @@ class LeadController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'companies'   => $companies,
+                    'companies' => $companies,
                     'companyLead' => $companyLead,
-                    'lead'        => $lead,
+                    'lead' => $lead,
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Lead:company.html.php',
             ]
@@ -1217,7 +1219,7 @@ class LeadController extends FormController
     public function campaignAction($objectId)
     {
         $model = $this->getModel('lead');
-        $lead  = $model->getEntity($objectId);
+        $lead = $model->getEntity($objectId);
 
         if ($lead != null
             && $this->get('mautic.security')->hasEntityAccess(
@@ -1227,8 +1229,8 @@ class LeadController extends FormController
             )
         ) {
             /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-            $campaignModel  = $this->getModel('campaign');
-            $campaigns      = $campaignModel->getPublishedCampaigns(true);
+            $campaignModel = $this->getModel('campaign');
+            $campaigns = $campaignModel->getPublishedCampaigns(true);
             $leadsCampaigns = $campaignModel->getLeadCampaigns($lead, true);
 
             foreach ($campaigns as $c) {
@@ -1242,7 +1244,7 @@ class LeadController extends FormController
             [
                 'viewParameters' => [
                     'campaigns' => $campaigns,
-                    'lead'      => $lead,
+                    'lead' => $lead,
                 ],
                 'contentTemplate' => 'MauticLeadBundle:LeadCampaigns:index.html.php',
             ]
@@ -1274,10 +1276,10 @@ class LeadController extends FormController
             return $this->modalAccessDenied();
         }
 
-        $leadFields       = $lead->getProfileFields();
+        $leadFields = $lead->getProfileFields();
         $leadFields['id'] = $lead->getId();
-        $leadEmail        = $leadFields['email'];
-        $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];
+        $leadEmail = $leadFields['email'];
+        $leadName = $leadFields['firstname'].' '.$leadFields['lastname'];
 
         // Set onwer ID to be the current user ID so it will use his signature
         $leadFields['owner_id'] = $this->get('mautic.helper.user')->getUser()->getId();
@@ -1285,7 +1287,7 @@ class LeadController extends FormController
         // Check if lead has a bounce status
         /** @var \Mautic\EmailBundle\Model\EmailModel $emailModel */
         $emailModel = $this->getModel('email');
-        $dnc        = $emailModel->getRepository()->checkDoNotEmail($leadEmail);
+        $dnc = $emailModel->getRepository()->checkDoNotEmail($leadEmail);
 
         $inList = ($this->request->getMethod() == 'GET')
             ? $this->request->get('list', 0)
@@ -1294,9 +1296,9 @@ class LeadController extends FormController
                 0,
                 true
             );
-        $email  = ['list' => $inList];
+        $email = ['list' => $inList];
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
-        $form   = $this->get('form.factory')->create('lead_quickemail', $email, ['action' => $action]);
+        $form = $this->get('form.factory')->create('lead_quickemail', $email, ['action' => $action]);
 
         if ($this->request->getMethod() == 'POST') {
             $valid = false;
@@ -1337,7 +1339,7 @@ class LeadController extends FormController
                                 'mautic.lead.email.notice.sent',
                                 [
                                     '%subject%' => $subject,
-                                    '%email%'   => $leadEmail,
+                                    '%email%' => $leadEmail,
                                 ]
                             );
                         } else {
@@ -1354,8 +1356,8 @@ class LeadController extends FormController
                                         'mautic.lead.email.error.failed',
                                         [
                                             '%subject%' => $subject,
-                                            '%email%'   => $leadEmail,
-                                            '%error%'   => (is_array($errors)) ? implode('<br />', $errors) : $errors,
+                                            '%email%' => $leadEmail,
+                                            '%error%' => (is_array($errors)) ? implode('<br />', $errors) : $errors,
                                         ],
                                         'flashes'
                                     )
@@ -1377,28 +1379,28 @@ class LeadController extends FormController
 
         if (empty($leadEmail) || $valid || $cancelled) {
             if ($inList) {
-                $route          = 'mautic_contact_index';
+                $route = 'mautic_contact_index';
                 $viewParameters = [
                     'page' => $this->get('session')->get('mautic.lead.page', 1),
                 ];
                 $func = 'index';
             } else {
-                $route          = 'mautic_contact_action';
+                $route = 'mautic_contact_action';
                 $viewParameters = [
                     'objectAction' => 'view',
-                    'objectId'     => $objectId,
+                    'objectId' => $objectId,
                 ];
                 $func = 'view';
             }
 
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $this->generateUrl($route, $viewParameters),
-                    'viewParameters'  => $viewParameters,
+                    'returnUrl' => $this->generateUrl($route, $viewParameters),
+                    'viewParameters' => $viewParameters,
                     'contentTemplate' => 'MauticLeadBundle:Lead:'.$func,
                     'passthroughVars' => [
                         'mauticContent' => 'lead',
-                        'closeModal'    => 1,
+                        'closeModal' => 1,
                     ],
                 ]
             );
@@ -1407,13 +1409,13 @@ class LeadController extends FormController
         return $this->ajaxAction(
             [
                 'contentTemplate' => 'MauticLeadBundle:Lead:email.html.php',
-                'viewParameters'  => [
+                'viewParameters' => [
                     'form' => $form->createView(),
-                    'dnc'  => $dnc,
+                    'dnc' => $dnc,
                 ],
                 'passthroughVars' => [
                     'mauticContent' => 'leadEmail',
-                    'route'         => false,
+                    'route' => false,
                 ],
             ]
         );
@@ -1431,8 +1433,8 @@ class LeadController extends FormController
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $this->request->request->get('lead_batch', [], true);
-            $ids   = json_decode($data['ids'], true);
+            $data = $this->request->request->get('lead_batch', [], true);
+            $ids = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1442,8 +1444,8 @@ class LeadController extends FormController
                             'force' => [
                                 [
                                     'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
+                                    'expr' => 'in',
+                                    'value' => $ids,
                                 ],
                             ],
                         ],
@@ -1471,14 +1473,14 @@ class LeadController extends FormController
                 'mautic.lead.batch_leads_affected',
                 [
                     'pluralCount' => $count,
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
+                    'flashes' => $this->getFlashContent(),
                 ]
             );
         } else {
@@ -1505,16 +1507,16 @@ class LeadController extends FormController
                             'lead_batch',
                             [],
                             [
-                                'items'  => $items,
+                                'items' => $items,
                                 'action' => $route,
                             ]
                         )->createView(),
                     ],
                     'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -1536,8 +1538,8 @@ class LeadController extends FormController
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $this->request->request->get('lead_batch', [], true);
-            $ids   = json_decode($data['ids'], true);
+            $data = $this->request->request->get('lead_batch', [], true);
+            $ids = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1547,8 +1549,8 @@ class LeadController extends FormController
                             'force' => [
                                 [
                                     'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
+                                    'expr' => 'in',
+                                    'value' => $ids,
                                 ],
                             ],
                         ],
@@ -1563,7 +1565,7 @@ class LeadController extends FormController
                 }
             }
 
-            $add    = (!empty($data['add'])) ? $data['add'] : [];
+            $add = (!empty($data['add'])) ? $data['add'] : [];
             $remove = (!empty($data['remove'])) ? $data['remove'] : [];
 
             if ($count = count($entities)) {
@@ -1573,8 +1575,8 @@ class LeadController extends FormController
                             'force' => [
                                 [
                                     'column' => 'c.id',
-                                    'expr'   => 'in',
-                                    'value'  => array_merge($add, $remove),
+                                    'expr' => 'in',
+                                    'value' => array_merge($add, $remove),
                                 ],
                             ],
                         ],
@@ -1599,20 +1601,20 @@ class LeadController extends FormController
                 'mautic.lead.batch_leads_affected',
                 [
                     'pluralCount' => $count,
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
+                    'flashes' => $this->getFlashContent(),
                 ]
             );
         } else {
             // Get a list of campaigns
             $campaigns = $campaignModel->getPublishedCampaigns(true);
-            $items     = [];
+            $items = [];
             foreach ($campaigns as $campaign) {
                 $items[$campaign['id']] = $campaign['name'];
             }
@@ -1631,16 +1633,16 @@ class LeadController extends FormController
                             'lead_batch',
                             [],
                             [
-                                'items'  => $items,
+                                'items' => $items,
                                 'action' => $route,
                             ]
                         )->createView(),
                     ],
                     'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -1659,8 +1661,8 @@ class LeadController extends FormController
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $this->request->request->get('lead_batch_dnc', [], true);
-            $ids   = json_decode($data['ids'], true);
+            $data = $this->request->request->get('lead_batch_dnc', [], true);
+            $ids = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1670,8 +1672,8 @@ class LeadController extends FormController
                             'force' => [
                                 [
                                     'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
+                                    'expr' => 'in',
+                                    'value' => $ids,
                                 ],
                             ],
                         ],
@@ -1698,14 +1700,14 @@ class LeadController extends FormController
                 'mautic.lead.batch_leads_affected',
                 [
                     'pluralCount' => $count,
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
+                    'flashes' => $this->getFlashContent(),
                 ]
             );
         } else {
@@ -1729,9 +1731,9 @@ class LeadController extends FormController
                     ],
                     'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -1750,8 +1752,8 @@ class LeadController extends FormController
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $this->request->request->get('lead_batch_stage', [], true);
-            $ids   = json_decode($data['ids'], true);
+            $data = $this->request->request->get('lead_batch_stage', [], true);
+            $ids = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1761,8 +1763,8 @@ class LeadController extends FormController
                             'force' => [
                                 [
                                     'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
+                                    'expr' => 'in',
+                                    'value' => $ids,
                                 ],
                             ],
                         ],
@@ -1795,22 +1797,22 @@ class LeadController extends FormController
                 'mautic.lead.batch_leads_affected',
                 [
                     'pluralCount' => $count,
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
+                    'flashes' => $this->getFlashContent(),
                 ]
             );
         } else {
             // Get a list of lists
             /** @var \Mautic\StageBundle\Model\StageModel $model */
-            $model  = $this->getModel('stage');
+            $model = $this->getModel('stage');
             $stages = $model->getUserStages();
-            $items  = [];
+            $items = [];
             foreach ($stages as $stage) {
                 $items[$stage['id']] = $stage['name'];
             }
@@ -1829,16 +1831,16 @@ class LeadController extends FormController
                             'lead_batch_stage',
                             [],
                             [
-                                'items'  => $items,
+                                'items' => $items,
                                 'action' => $route,
                             ]
                         )->createView(),
                     ],
                     'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -1857,8 +1859,8 @@ class LeadController extends FormController
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $this->request->request->get('lead_batch_owner', [], true);
-            $ids   = json_decode($data['ids'], true);
+            $data = $this->request->request->get('lead_batch_owner', [], true);
+            $ids = json_decode($data['ids'], true);
 
             $entities = [];
             if (is_array($ids)) {
@@ -1868,8 +1870,8 @@ class LeadController extends FormController
                             'force' => [
                                 [
                                     'column' => 'l.id',
-                                    'expr'   => 'in',
-                                    'value'  => $ids,
+                                    'expr' => 'in',
+                                    'value' => $ids,
                                 ],
                             ],
                         ],
@@ -1895,14 +1897,14 @@ class LeadController extends FormController
                 'mautic.lead.batch_leads_affected',
                 [
                     'pluralCount' => $count,
-                    '%count%'     => $count,
+                    '%count%' => $count,
                 ]
             );
 
             return new JsonResponse(
                 [
                     'closeModal' => true,
-                    'flashes'    => $this->getFlashContent(),
+                    'flashes' => $this->getFlashContent(),
                 ]
             );
         } else {
@@ -1926,16 +1928,16 @@ class LeadController extends FormController
                             'lead_batch_owner',
                             [],
                             [
-                                'items'  => $items,
+                                'items' => $items,
                                 'action' => $route,
                             ]
                         )->createView(),
                     ],
                     'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink' => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
-                        'route'         => $route,
+                        'route' => $route,
                     ],
                 ]
             );
@@ -1968,26 +1970,26 @@ class LeadController extends FormController
         }
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model      = $this->getModel('lead');
-        $session    = $this->get('session');
-        $search     = $session->get('mautic.lead.filter', '');
-        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $model = $this->getModel('lead');
+        $session = $this->get('session');
+        $search = $session->get('mautic.lead.filter', '');
+        $orderBy = $session->get('mautic.lead.orderby', 'l.last_active');
         $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
-        $ids        = $this->request->get('ids');
+        $ids = $this->request->get('ids');
 
-        $filter     = ['string' => $search, 'force' => ''];
+        $filter = ['string' => $search, 'force' => ''];
         $translator = $this->get('translator');
-        $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
-        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
-        $indexMode  = $session->get('mautic.lead.indexmode', 'list');
-        $dataType   = $this->request->get('filetype', 'csv');
+        $anonymous = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine = $translator->trans('mautic.core.searchcommand.ismine');
+        $indexMode = $session->get('mautic.lead.indexmode', 'list');
+        $dataType = $this->request->get('filetype', 'csv');
 
         if (!empty($ids)) {
             $filter['force'] = [
                 [
                     'column' => 'l.id',
-                    'expr'   => 'in',
-                    'value'  => json_decode($ids, true),
+                    'expr' => 'in',
+                    'value' => json_decode($ids, true),
                 ],
             ];
         } else {
@@ -2002,11 +2004,11 @@ class LeadController extends FormController
         }
 
         $args = [
-            'start'          => 0,
-            'limit'          => 200,
-            'filter'         => $filter,
-            'orderBy'        => $orderBy,
-            'orderByDir'     => $orderByDir,
+            'start' => 0,
+            'limit' => 200,
+            'filter' => $filter,
+            'orderBy' => $orderBy,
+            'orderByDir' => $orderByDir,
             'withTotalCount' => true,
         ];
 
