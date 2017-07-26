@@ -94,7 +94,7 @@ class MessengerHelper
         return false;
     }
 
-    public function getTemplateContent($template = 'MauticMessengerBundle:Plugin:checkbox_plugin.html.php')
+    public function getTemplateContent()
     {
         $integration = $this->integrationHelper->getIntegrationObject('Messenger');
 
@@ -105,7 +105,7 @@ class MessengerHelper
         $featureSettings = $settings->getFeatureSettings();
 
         return $this->templateHelper->getTemplating()->render(
-            $template,
+            'MauticMessengerBundle:Plugin:checkbox_plugin.html.php',
             [
                 'userRef' => $this->getUserRef(),
                 'featureSettings' => $featureSettings,

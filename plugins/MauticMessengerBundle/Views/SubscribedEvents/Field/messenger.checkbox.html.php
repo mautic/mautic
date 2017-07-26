@@ -8,21 +8,30 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
-$containerType = (isset($type)) ? $type : 'text';
-$defaultInputClass = (isset($inputClass)) ? $inputClass : 'input';
+$defaultInputClass = $containerType = 'msgCheckbox';
 include __DIR__.'/../../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
-$label = (!$field['showLabel']) ? '' : <<<HTML
+if (!empty($inForm)){
+    $htmlContent = $view['translator']->trans('mautic.dynamicContent.timeline.content');
+} else {
+    $htmlContent = $field['properties']['messengerCheckboxPlugin'];
+}
+$label = (!$field['showLabel']) ? '' :
+    <<<HTML
 
-                <label $labelAttr>{$field['label']}</label>
+                <h3 $labelAttr>
+                    {$field['label']}
+                </h3>
 HTML;
 
-if (!empty($inForm)):
-    $textInput = <<<HTML
-{$view['translator']->trans('mautic.dynamicContent.timeline.content')}
+$html = <<<HTML
+
+            <div $containerAttr>{$label}
+                <div $inputAttr>
+                    {$htmlContent}
+                </div>
+            </div>
+
 HTML;
-else:
 
-endif;
-
+echo $html;

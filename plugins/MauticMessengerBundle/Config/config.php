@@ -46,6 +46,9 @@ return [
             'mautic.form.type.messenger.checkbox' => [
                 'class' => 'MauticPlugin\MauticMessengerBundle\Form\Type\FormFieldMessengerCheckboxType',
                 'alias' => 'messenger_checkbox',
+                'arguments' => [
+                    'mautic.plugin.helper.messenger'
+                ],
             ],
             'mautic.form.type.messenger.send_to_messenger' => [
                 'class' => 'MauticPlugin\MauticMessengerBundle\Form\Type\SendToMessengerType',
