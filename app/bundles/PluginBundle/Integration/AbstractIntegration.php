@@ -1005,6 +1005,9 @@ abstract class AbstractIntegration
         }
         try {
             $timeout = (isset($settings['request_timeout'])) ? (int) $settings['request_timeout'] : 10;
+            $this->logger->debug('SUGARCRM: Request URL: '.$url);
+            $this->logger->debug('SUGARCRM: Request Headers: '.$headers);
+            $this->logger->debug('SUGARCRM: Request Prameters: '.$parameters);
             switch ($method) {
                 case 'GET':
                     $result = $connector->get($url, $headers, $timeout);

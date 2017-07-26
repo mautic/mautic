@@ -289,7 +289,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             }
                                         }
                                     }
-                                    $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[trim($sObject)]);
                                 } elseif (isset($fields['fields']) && !empty($fields['fields'])) {
                                     //7.x
                                     foreach ($fields['fields'] as $fieldInfo) {
@@ -339,9 +338,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                         }
                                     }
                                 }
-
-                                $this->cache->set('leadFields', $sugarFields);
                             }
+                            $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[trim($sObject)]);
                         }
                     } else {
                         throw new ApiErrorException($this->authorzationError);
