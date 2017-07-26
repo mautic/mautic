@@ -1843,8 +1843,8 @@ class LeadController extends FormController
                 ]
             );
         }
-    } 
-    
+    }
+ 
     /**
      * Bulk export contacts.
      *
