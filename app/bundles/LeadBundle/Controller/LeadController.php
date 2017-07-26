@@ -1844,7 +1844,107 @@ class LeadController extends FormController
             );
         }
     }
+        /**
+     * Bulk edit lead owner.
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function batchOwnersAction($objectId = 0)
+    {
+       if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->getModel('lead');
+            $data  = $this->request->request->get('lead_batch_owner', [], true);
+            $ids   = json_decode($data['ids'], true);
 
+            $entities = [];
+            if (is_array($ids)) {
+                $entities = $model->getEntities(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $ids,
+                                ],
+                            ],
+                        ],
+                        'ignore_paginator' => true,
+                    ]
+                );
+            }
+            $count = 0;
+            foreach ($entities as $lead) {
+                 
+                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                    ++$count;
+
+                    if (!empty($data['addowner'])) {
+                        $userModel = $this->getModel('user'); 
+                        $user = $userModel->getEntity((int) $data['addowner']); 
+                        $lead->setOwner($user);
+                    } 
+                } 
+            }
+            
+            // Save entities
+            $model->saveEntities($entities);
+            $this->addFlash(
+                'mautic.lead.batch_leads_affected',
+                [
+                    'pluralCount' => $count,
+                    '%count%'     => $count,
+                ]
+            );
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
+       }
+       else{
+            $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
+           
+            $items  = [];
+            foreach ($users as $user) {
+                $items[$user['id']] = $user['firstName']." ".$user['lastName'];
+            }
+
+            $route = $this->generateUrl(
+                'mautic_contact_action',
+                [
+                    'objectAction' => 'batchOwners',
+                ]
+            );
+
+            return $this->delegateView(
+                [
+                    'viewParameters' => [
+                        'form' => $this->createForm(
+                            'lead_batch_owner',
+                            [],
+                            [
+                                'items'  => $items,
+                                'action' => $route,
+                            ]
+                        )->createView(),
+                    ],
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_contact_index',
+                        'mauticContent' => 'leadBatch',
+                        'route'         => $route,
+                    ],
+                ]
+            );
+        }
+
+    }
     /**
      * Bulk export contacts.
      *
