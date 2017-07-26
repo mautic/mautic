@@ -1353,15 +1353,36 @@ class LeadListRepository extends CommonRepository
                     $isLeadList = false;
                     switch ($details['field']) {
                         case 'leadlist':
-                            $newListId = $details['filter'];
-                            if ($listId !== $newListId) { // prevent infinite loop
-                                $isLeadList = true;
-                                $ll         = $this->getEntity($newListId);
-                                $nq         = $this->_em->getConnection()->createQueryBuilder();
-                                $nf         = $ll->getFilters();
-                                $isNot      = 'NOT EXISTS' === $func;
-                                $se         = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListId, $isNot);
+                            $newListIds = $details['filter'];
+                            $nq         = $this->_em->getConnection()->createQueryBuilder();
+                            $isNot      = 'NOT EXISTS' === $func;
+                            if (!is_array($newListIds)) {
+                                if ($listId !== $newListIds) {
+                                    $ll = $this->getEntity($newListIds);
+                                    if (null !== $ll) {
+                                        $nf = $ll->getFilters();
+                                        $se =
+                                            $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListIds, $isNot);
+                                        $isLeadList = true;
+                                    }
+                                }
                             } else {
+                                $se    = $nq->expr();
+                                $count = 0;
+                                foreach ($newListIds as $newListId) {
+                                    $ll = $this->getEntity($newListId);
+                                    if (null === $ll) {
+                                        continue;
+                                    }
+                                    $nf = $ll->getFilters();
+                                    $si = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListId, $isNot);
+                                    $se->andX($si);
+                                    ++$count;
+                                }
+                                $isLeadList = $count > 0;
+                            }
+
+                            if (!$isLeadList) {
                                 $table  = 'lead_lists_leads';
                                 $column = 'leadlist_id';
                             }
