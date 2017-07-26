@@ -171,7 +171,7 @@ Mautic.getIntegrationFields = function(settings, page, el) {
     var object    = settings.object ? settings.object : 'lead';
     var fieldsTab = ('lead' === object) ? '#fields-tab' : '#'+object+'-fields-container';
 
-    if (el) {
+    if (el && mQuery(el).is('input')) {
         Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
     }
 
