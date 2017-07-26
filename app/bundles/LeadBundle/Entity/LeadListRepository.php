@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\DateType;
 use Doctrine\DBAL\Types\FloatType;
@@ -377,7 +378,7 @@ class LeadListRepository extends CommonRepository
                 }
 
                 if ($newOnly) {
-                    $expr = $this->generateSegmentExpression($filters, $parameters, $q, null, $l['id']);
+                    $expr = $this->generateSegmentExpression($filters, $parameters, $q, null, $id);
 
                     if (!$this->hasCompanyFilter && !$expr->count()) {
                         // Treat this as if it has no filters since all the filters are now invalid (fields were deleted)
@@ -678,8 +679,9 @@ class LeadListRepository extends CommonRepository
         $groups    = [];
         $groupExpr = $q->expr()->andX();
 
+        $defaultObject = $object;
         foreach ($filters as $k => $details) {
-            $object = 'lead';
+            $object = $defaultObject;
             if (!empty($details['object'])) {
                 $object = $details['object'];
             }
@@ -1361,13 +1363,14 @@ class LeadListRepository extends CommonRepository
                                     $ll = $this->getEntity($newListIds);
                                     if (null !== $ll) {
                                         $nf = $ll->getFilters();
-                                        $se =
-                                            $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListIds, $isNot);
-                                        $isLeadList = true;
+                                        if (count($nf) > 0) {
+                                            $se         = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListIds, $isNot);
+                                            $isLeadList = true;
+                                        }
                                     }
                                 }
                             } else {
-                                $se    = $nq->expr();
+                                $se    = $nq->expr()->andX();
                                 $count = 0;
                                 foreach ($newListIds as $newListId) {
                                     $ll = $this->getEntity($newListId);
@@ -1375,9 +1378,12 @@ class LeadListRepository extends CommonRepository
                                         continue;
                                     }
                                     $nf = $ll->getFilters();
-                                    $si = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListId, $isNot);
-                                    $se->andX($si);
-                                    ++$count;
+                                    if (count($nf) > 0) {
+                                        /** @var CompositeExpression $si */
+                                        $si = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListId, $isNot);
+                                        $se->add($si);
+                                        ++$count;
+                                    }
                                 }
                                 $isLeadList = $count > 0;
                             }
