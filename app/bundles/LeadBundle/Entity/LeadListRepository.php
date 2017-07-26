@@ -1370,7 +1370,7 @@ class LeadListRepository extends CommonRepository
                                     }
                                 }
                             } else {
-                                $se    = $nq->expr()->andX();
+                                $se    = $isNot ? $nq->expr()->andX() : $nq->expr()->orX(); // for including segments
                                 $count = 0;
                                 foreach ($newListIds as $newListId) {
                                     $ll = $this->getEntity($newListId);
