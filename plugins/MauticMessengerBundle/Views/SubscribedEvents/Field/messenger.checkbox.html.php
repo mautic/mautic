@@ -11,11 +11,6 @@
 $defaultInputClass = $containerType = 'msgCheckbox';
 include __DIR__.'/../../../../../app/bundles/FormBundle/Views/Field/field_helper.php';
 
-if (!empty($inForm)){
-    $htmlContent = $view['translator']->trans('mautic.dynamicContent.timeline.content');
-} else {
-    $htmlContent = $field['properties']['messengerCheckboxPlugin'];
-}
 $label = (!$field['showLabel']) ? '' :
     <<<HTML
 
@@ -23,12 +18,13 @@ $label = (!$field['showLabel']) ? '' :
                     {$field['label']}
                 </h3>
 HTML;
-
+$scr = str_replace('http://','https://',$view['router']->url('messenger_checkbox_plugin_js'));
 $html = <<<HTML
 
             <div $containerAttr>{$label}
                 <div $inputAttr>
-                    {$htmlContent}
+                <div class="messengerCheckboxPlugin"></div>
+                    <script type="text/javascript" src="{$scr}"></script>
                 </div>
             </div>
 

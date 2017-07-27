@@ -42,3 +42,10 @@ js.src = "//connect.facebook.net/en_US/sdk.js";
 fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk')
 );
+
+var elems = document.querySelectorAll('.messengerCheckboxPlugin');
+
+for (var i = 0; i < elems.length; i++) {
+elems[i].innerHTML = '<div class="fb-messenger-checkbox" origin="https://e0367573.ngrok.io" page_id="<?php echo $featureSettings['messenger_page_id']; ?>" messenger_app_id="<?php echo $featureSettings['messenger_app_id']; ?>" user_ref="<?php echo rand().time().rand(); ?>" prechecked="true" allow_login="true" size="large"></div>';
+};
+
