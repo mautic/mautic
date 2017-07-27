@@ -247,17 +247,18 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         // Match Sugar object to Mautic's
                         $sObject = 'company';
                     }
+                    $sObject = trim($sObject);
                     if ($this->isAuthorized()) {
                         // Check the cache first
-                        $settings['cache_suffix'] = $cacheSuffix = '.'.trim($sObject);
+                        $settings['cache_suffix'] = $cacheSuffix = '.'.$sObject;
                         if ($fields = parent::getAvailableLeadFields($settings)) {
-                            if (('company' === trim($sObject) && isset($fields['id'])) || isset($fields['id__'.trim($sObject)])) {
-                                $sugarFields[trim($sObject)] = $fields;
+                            if (('company' === $sObject && isset($fields['id'])) || isset($fields['id__'.$sObject])) {
+                                $sugarFields[$sObject] = $fields;
                                 continue;
                             }
                         }
-                        if (!isset($sugarFields[trim($sObject)])) {
-                            $fields = $this->getApiHelper()->getLeadFields(trim($sObject));
+                        if (!isset($sugarFields[$sObject])) {
+                            $fields = $this->getApiHelper()->getLeadFields($sObject);
 
                             if ($fields != null && !empty($fields)) {
                                 if (isset($fields['module_fields']) && !empty($fields['module_fields'])) {
@@ -272,19 +273,19 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                             $fieldName = (strpos($fieldInfo['name'], 'webtolead_email') === false) ? $fieldInfo['name'] : str_replace('webtolead_', '', $fieldInfo['name']);
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $fieldInfo['label']);
-                                            if (trim($sObject) !== 'company') {
-                                                $sugarFields[trim($sObject)][$fieldName.'__'.trim($sObject)] = [
+                                            if ($sObject !== 'company') {
+                                                $sugarFields[$sObject][$fieldName.'__'.$sObject] = [
                                                     'type'        => $type,
-                                                    'label'       => trim($sObject).'-'.$label,
-                                                    'required'    => $isRequired($fieldInfo, trim($sObject)),
-                                                    'group'       => trim($sObject),
+                                                    'label'       => $sObject.'-'.$label,
+                                                    'required'    => $isRequired($fieldInfo, $sObject),
+                                                    'group'       => $sObject,
                                                     'optionLabel' => $fieldInfo['label'],
                                                 ];
                                             } else {
-                                                $sugarFields[trim($sObject)][$fieldName] = [
+                                                $sugarFields[$sObject][$fieldName] = [
                                                     'type'     => $type,
                                                     'label'    => $label,
-                                                    'required' => $isRequired($fieldInfo, trim($sObject)),
+                                                    'required' => $isRequired($fieldInfo, $sObject),
                                                 ];
                                             }
                                         }
@@ -320,26 +321,26 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                                 );
 
                                             $type = 'string';
-                                            if (trim($sObject) !== 'company') {
-                                                $sugarFields[trim($sObject)][$fieldName.'__'.trim($sObject)] = [
+                                            if ($sObject !== 'company') {
+                                                $sugarFields[$sObject][$fieldName.'__'.$sObject] = [
                                                     'type'        => $type,
-                                                    'label'       => trim($sObject).'-'.$label,
-                                                    'required'    => $isRequired($fieldInfo, trim($sObject)),
-                                                    'group'       => trim($sObject),
+                                                    'label'       => $sObject.'-'.$label,
+                                                    'required'    => $isRequired($fieldInfo, $sObject),
+                                                    'group'       => $sObject,
                                                     'optionLabel' => $label,
                                                 ];
                                             } else {
-                                                $sugarFields[trim($sObject)][$fieldName] = [
+                                                $sugarFields[$sObject][$fieldName] = [
                                                     'type'     => $type,
                                                     'label'    => $label,
-                                                    'required' => $isRequired($fieldInfo, trim($sObject)),
+                                                    'required' => $isRequired($fieldInfo, $sObject),
                                                 ];
                                             }
                                         }
                                     }
                                 }
                             }
-                            $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[trim($sObject)]);
+                            $this->cache->set('leadFields'.$cacheSuffix, $sugarFields[$sObject]);
                         }
                     } else {
                         throw new ApiErrorException($this->authorzationError);
