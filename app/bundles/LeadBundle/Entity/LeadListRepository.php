@@ -1625,6 +1625,8 @@ class LeadListRepository extends CommonRepository
                         case 'startsWith':
                         case 'endsWith':
                         case 'contains':
+                            $ignoreAutoFilter = true;
+
                             switch ($func) {
                                 case 'like':
                                 case 'notLike':
