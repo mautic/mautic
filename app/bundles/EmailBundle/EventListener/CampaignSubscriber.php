@@ -271,9 +271,9 @@ class CampaignSubscriber extends CommonSubscriber
         $cc              = empty($config['cc']) ? [] : $transformer->reverseTransform($config['cc']);
         $bcc             = empty($config['bcc']) ? [] : $transformer->reverseTransform($config['bcc']);
         $users           = $this->transformToUserIds($userIds, $ownerId);
-        $tokens          = []; // Todo: find the real tokens
-
-        $errors = $this->emailModel->sendEmailToUser($email, $users, $leadCredentials, $tokens, [], false, $to, $cc, $bcc);
+        $idHash          = 'xxxxxxxxxxxxxx'; // bogus ID since it goes to users, not contacts
+        $tokens          = $this->emailModel->dispatchEmailSendEvent($email, $leadCredentials, $idHash)->getTokens();
+        $errors          = $this->emailModel->sendEmailToUser($email, $users, $leadCredentials, $tokens, [], false, $to, $cc, $bcc);
 
         if ($errors) {
             $event->setFailed(implode(', ', $errors));
