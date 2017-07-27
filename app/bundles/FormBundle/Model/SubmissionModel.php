@@ -333,7 +333,7 @@ class SubmissionModel extends CommonFormModel
             ->setLead($lead);
 
         // Remove validation errors if the field is not visible
-        if ($form->usesProgressiveProfiling()) {
+        if ($lead && $form->usesProgressiveProfiling()) {
             $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
 
             foreach ($fields as $field) {
@@ -767,27 +767,28 @@ class SubmissionModel extends CommonFormModel
     protected function createLeadFromSubmit($form, array $leadFieldMatches, $leadFields)
     {
         //set the mapped data
-        $inKioskMode = $form->isInKioskMode();
-        $lead        = $this->leadModel->getCurrentLead();
+        $inKioskMode   = $form->isInKioskMode();
+        $leadId        = null;
+        $lead          = new Lead();
+        $currentFields = $leadFieldMatches;
 
-        if (!$inKioskMode && $lead instanceof Lead) {
+        if (!$inKioskMode) {
             // Default to currently tracked lead
-            $leadId        = $lead->getId();
-            $currentFields = $lead->getProfileFields();
+            if ($currentLead = $this->leadModel->getCurrentLead()) {
+                $lead          = $currentLead;
+                $leadId        = $lead->getId();
+                $currentFields = $lead->getProfileFields();
+            }
 
             $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$leadId);
         } else {
             // Default to a new lead in kiosk mode
-            $lead = new Lead();
             $lead->setNewlyCreated(true);
-            $currentFields = $leadFieldMatches;
-
-            $leadId = null;
 
             $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
         }
 
-        $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentiferFields();
+        $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentifierFields();
 
         // Closure to get data and unique fields
         $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
@@ -854,10 +855,10 @@ class SubmissionModel extends CommonFormModel
             $foundLeadFields = $this->leadModel->flattenFields($foundLead->getFields());
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
-            $uniqueFieldsFound             = $getData($foundLeadFields, true);
+            $uniqueFieldsFound = $getData($foundLeadFields, true);
             list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
-            if ($inKioskMode || $hasConflict) {
+            if ($inKioskMode || $hasConflict || !$lead->getId()) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
                 $lead = $foundLead;
 
@@ -874,7 +875,7 @@ class SubmissionModel extends CommonFormModel
             }
 
             // Update unique fields data for comparison with submitted data
-            $currentFields       = $this->leadModel->flattenFields($lead->getFields());
+            $currentFields       = $lead->getProfileFields();
             $uniqueFieldsCurrent = $getData($currentFields, true);
         }
 
