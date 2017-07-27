@@ -867,7 +867,7 @@ class FieldModel extends FormModel
             $this->uniqueIdentifierFields[$key] = $this->getFieldList(false, true, $filters);
         }
 
-        return ($this->uniqueIdentifierFields[$key]) ? $this->uniqueIdentifierFields[$key] : [];
+        return $this->uniqueIdentifierFields[$key];
     }
 
     /**
