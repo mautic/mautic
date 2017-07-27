@@ -855,7 +855,7 @@ class SubmissionModel extends CommonFormModel
             $foundLeadFields = $this->leadModel->flattenFields($foundLead->getFields());
 
             // Get unique identifier fields for the found lead then compare with the lead currently tracked
-            $uniqueFieldsFound = $getData($foundLeadFields, true);
+            $uniqueFieldsFound             = $getData($foundLeadFields, true);
             list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
             if ($inKioskMode || $hasConflict || !$lead->getId()) {
