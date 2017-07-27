@@ -794,22 +794,16 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
-        if ((!$returnTracking && $this->systemCurrentLead) || defined('IN_MAUTIC_CONSOLE')) {
-            // Just return the system set lead
-            if (null === $this->systemCurrentLead) {
+        $isUser = (!$this->security->isAnonymous());
+        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
+            $this->logger->addDebug('LEAD: System lead is being used');
+            if (!$isUser && null === $this->systemCurrentLead) {
                 $this->systemCurrentLead = new Lead();
+            } elseif ($isUser) {
+                $this->logger->addDebug('LEAD: In a Mautic user session');
             }
 
-            return $this->systemCurrentLead;
-        }
-
-        if (!$this->security->isAnonymous()) {
-            // this is a Mautic user that's somehow tracked as a contact which we're going to ignore
-            $this->logger->addDebug('LEAD: In a Mautic user session');
-
-            $lead = null;
-
-            return ($returnTracking) ? [$lead, null, false] : $lead;
+            return ($returnTracking) ? [$this->systemCurrentLead, null, false] : $this->systemCurrentLead;
         }
 
         if ($this->request) {
@@ -1011,18 +1005,14 @@ class LeadModel extends FormModel
     {
         $this->logger->addDebug("LEAD: {$lead->getId()} set as current lead.");
 
-        if ($this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
+        $isUser = (!$this->security->isAnonymous());
+        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
+            if ($isUser) {
+                $this->logger->addDebug('LEAD: In a Mautic user session');
+            }
+
             // Overwrite system current lead
-            $this->systemCurrentLead = $lead;
-
-            return;
-        }
-
-        if (!$this->security->isAnonymous()) {
-            // this is a Mautic user so set the contact as a system contact so that the user is not tracked as the contact
-            $this->logger->addDebug('LEAD: In a Mautic user session');
-
-            $this->setSystemCurrentLead($lead);
+            return $this->setSystemCurrentLead($lead);
         }
 
         $oldLead = (is_null($this->currentLead)) ? null : $this->currentLead;
@@ -1068,6 +1058,8 @@ class LeadModel extends FormModel
      */
     public function setSystemCurrentLead(Lead $lead = null)
     {
+        $this->logger->addDebug("LEAD: {$lead->getId()} set as system lead.");
+
         $fields = $lead->getFields();
         if (empty($fields)) {
             $lead->setFields($this->getLeadDetails($lead));
