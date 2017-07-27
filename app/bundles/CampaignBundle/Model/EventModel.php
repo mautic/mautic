@@ -250,8 +250,15 @@ class EventModel extends CommonFormModel
             return false;
         }*/
 
-        //get the current lead
-        $lead   = $this->leadModel->getCurrentLead();
+        // get the current lead
+        $lead = $this->leadModel->getCurrentLead();
+
+        if (!$lead instanceof Lead) {
+            $this->logger->debug('CAMPAIGN: unidentifiable contact; abort');
+
+            return false;
+        }
+
         $leadId = $lead->getId();
         $this->logger->debug('CAMPAIGN: Current Lead ID# '.$leadId);
 

@@ -457,7 +457,7 @@ class FormModel extends CommonFormModel
             $theme .= '|';
         }
 
-        if ($entity->usesProgressiveProfiling()) {
+        if ($lead && $entity->usesProgressiveProfiling()) {
             $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
