@@ -242,6 +242,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $channelRules = [];
 
+    /** CAPTIVEA.CORE START **/
+    /**
+     *
+     * @var array
+     */
+    private $scoringValues;
+    /** CAPTIVEA.CORE END **/
+
     /**
      * Constructor.
      */
@@ -256,6 +264,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->stageChangeLog   = new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
+        /** CAPTIVEA.CORE START **/
+        $this->scoringValues = new ArrayCollection();
+        /** CAPTIVEA.CORE END **/
     }
 
     /**
@@ -412,6 +423,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
+
+        /** CAPTIVEA.CORE START **/
+        $builder->createOneToMany('scoringValues', 'Mautic\ScoringBundle\Entity\ScoringValue')
+                ->mappedBy('lead')
+                ->cascadeAll()
+                ->fetchLazy()
+                ->build();
+        /** CAPTIVEA.CORE END **/
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -808,6 +827,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
         return $this;
     }
+
+    /** CAPTIVEA.CORE START **/
+    /**
+     * 
+     * @param integer $points
+     * @param string $operator
+     * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
+     * @return $this
+     */
+    public function adjustCategorizedScore($points, $operator = 'plus', $scoringCategory) {
+        $scoringCategory->a();
+    }
+    /** CAPTIVEA.CORE END **/
 
     /**
      * Set points.
@@ -1954,4 +1986,46 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
         return $rules;
     }
+    
+    /** CAPTIVEA.CORE START **/
+    
+    /**
+     * @param \Mautic\ScoringBundle\Entity\ScoringValue $scoringValue
+     *
+     * @return $this
+     */
+    public function addScoringValue(\Mautic\ScoringBundle\Entity\ScoringValue $scoringValue)
+    {
+        $this->scoringValues[] = $scoringValue;
+
+        return $this;
+}
+
+    /**
+     * @param \Mautic\ScoringBundle\Entity\ScoringValue $scoringValue
+     */
+    public function removeScoringValue(\Mautic\ScoringBundle\Entity\ScoringValue $scoringValue)
+    {
+        $this->scoringValues->removeElement($scoringValue);
+    }
+
+    /**
+     * @param ArrayCollection $scoringValues
+     * @return $this
+     */
+    public function setScoringValues(ArrayCollection $scoringValues)
+    {
+        $this->scoringValues = $scoringValues;
+        return $this;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getScoringValues()
+    {
+        return $this->scoringValues;
+    }
+    
+    /** CAPTIVEA.CORE END **/
 }

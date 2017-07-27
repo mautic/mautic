@@ -18,6 +18,7 @@ use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 
 /**
  * Class PointType.
@@ -34,6 +35,15 @@ class PointType extends AbstractType
      */
     private $translator;
 
+    /** CAPTIVEA.CORE START **/
+    
+    /**
+     *
+     * @var MauticFactory
+     */
+    private $factory;
+    /** CAPTIVEA.CORE END **/
+
     /**
      * @param MauticFactory $factory
      */
@@ -41,6 +51,9 @@ class PointType extends AbstractType
     {
         $this->translator = $factory->getTranslator();
         $this->security   = $factory->getSecurity();
+        /** CAPTIVEA.CORE START **/
+        $this->factory = $factory;
+        /** CAPTIVEA.CORE END **/
     }
 
     /**
@@ -112,6 +125,30 @@ class PointType extends AbstractType
             $data     = true;
         }
 
+        /** CAPTIVEA.CORE START **/
+        $transformer = new IdToEntityModelTransformer(
+            $this->factory->getEntityManager(),
+            'MauticScoringBundle:ScoringCategory'
+        );
+
+        $builder->add(
+            $builder->create(
+                'scoringCategory',
+                'scoringcategory_list',
+                [
+                    'label'      => 'mautic.point.action.scoringCategory',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'required' => false,
+                    'multiple' => false,
+                ]
+            )
+                ->addModelTransformer($transformer)
+        );
+        /** CAPTIVEA.CORE END **/
+        
         $builder->add('isPublished', 'yesno_button_group', [
             'read_only' => $readonly,
             'data'      => $data,

@@ -29,6 +29,9 @@ echo $view['form']->start($form);
 				    <?php
                     echo $view['form']->row($form['name']);
                     echo $view['form']->row($form['description']);
+                    /** CAPTIVEA.CORE CLIENT START **/
+                    echo $view['form']->row($form['scoringCategory']);
+                    /** CAPTIVEA.CORE CLIENT END **/
                     ?>
 				</div>
 			</div>

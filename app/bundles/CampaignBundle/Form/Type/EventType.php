@@ -17,12 +17,33 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** CAPTIVEA.CORE START **/
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
+/** CAPTIVEA.CORE END **/
+
 /**
  * Class EventType.
  */
 class EventType extends AbstractType
 {
     use PropertiesTrait;
+
+    /** CAPTIVEA.CORE START **/
+    
+    /**
+     *
+     * @var MauticFactory
+     */
+    private $factory;
+
+    /**
+     * @param MauticFactory $factory
+     */
+    public function __construct(\Mautic\CoreBundle\Factory\MauticFactory $factory) {
+        $this->factory = $factory;
+    }
+    
+    /** CAPTIVEA.CORE END **/
 
     /**
      * @param FormBuilderInterface $builder

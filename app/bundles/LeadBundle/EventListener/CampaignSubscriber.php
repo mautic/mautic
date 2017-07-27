@@ -204,14 +204,32 @@ class CampaignSubscriber extends CommonSubscriber
         $somethingHappened = false;
 
         if ($lead !== null && !empty($points)) {
+            /** CAPTIVEA.CORE START REPLACE **/
+            //$lead->adjustPoints($points);
+            $scoringCategory = $event->getScoringCategory();
+            if(empty($scoringCategory)) {
             $lead->adjustPoints($points);
+            } else {
+                $this->em->getRepository('ScoringCategory')->adjustPoints($lead, $scoringCategory, $points);
+            }
+            /** CAPTIVEA.CORE END REPLACE **/
 
             //add a lead point change log
             $log = new PointsChangeLog();
             $log->setDelta($points);
             $log->setLead($lead);
             $log->setType('campaign');
-            $log->setEventName("{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}");
+            
+            /** CAPTIVEA.CORE START REPLACE **/
+            // $log->setEventName("{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}");
+            $strEvent = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
+            if(empty($scoringCategory)) {
+                $log->setEventName($strEvent);
+            } else {
+                $log->setEventName($strEvent.' ('.$scoringCategory->getName().') ');
+            }
+            /** CAPTIVEA.CORE END REPLACE **/
+                    
             $log->setActionName("{$event->getEvent()['id']}: {$event->getEvent()['name']}");
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());

@@ -283,11 +283,18 @@ class PointModel extends CommonFormModel
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
-                    $lead->adjustPoints($delta);
+                    
+                    /** CAPTIVEA.CORE START REPLACE **/
+                    $lead->adjustPoints($delta); // TODO
+                    /** CAPTIVEA.CORE END REPLACE **/
+                    
                     $parsed = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
-                        $action->getId().': '.$action->getName(),
+                        /** CAPTIVEA.CORE START REPLACE **/
+                        $action->getId().': '.$action->getName(), // TODO
+                        //$action->getId().': '.$action->getName().' ('.$scoreField == false ? 'standard' : $scoreField['alias'].') ',// TODO
+                        /** CAPTIVEA.CORE END REPLACE **/
                         $parsed[1],
                         $delta,
                         $ipAddress
