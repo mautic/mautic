@@ -1630,10 +1630,8 @@ class LeadListRepository extends CommonRepository
                             switch ($func) {
                                 case 'like':
                                 case 'notLike':
-                                    if (strpos($details['filter'], '%') === false) {
-                                        $parameters[$parameter] = '%'.$details['filter'].'%';
-                                    }
-                                    break;
+                                    $parameters[$parameter] = (strpos($details['filter'], '%') === false) ? '%'.$details['filter'].'%' : $details['filter'];
+                                break;
                                 case 'startsWith':
                                     $func                   = 'like';
                                     $parameters[$parameter] = $details['filter'].'%';
