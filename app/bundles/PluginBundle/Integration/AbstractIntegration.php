@@ -2669,7 +2669,7 @@ abstract class AbstractIntegration
         return $fields;
     }
 
-    public function getLeadDonotContact($leadId, $channel)
+    public function getLeadDonotContact($leadId, $channel = 'email')
     {
         $isContactable = 0;
         $lead          = $this->leadModel->getEntity($leadId);
