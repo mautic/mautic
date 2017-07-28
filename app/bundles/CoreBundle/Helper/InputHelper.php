@@ -399,6 +399,14 @@ class InputHelper
                 },
                 $value, -1, $needsDecoding);
 
+            // Slecial handling for script tags
+            $value = preg_replace_callback(
+                "/<script>(.*?)<\/script>/is",
+                function ($matches) {
+                    return '<mscript>'.base64_encode($matches[0]).'</mscript>';
+                },
+                $value, -1, $needsScriptDecoding);
+
             // Special handling for HTML comments
             $value = str_replace(['<!--', '-->'], ['<mcomment>', '</mcomment>'], $value, $commentCount);
 
@@ -422,12 +430,23 @@ class InputHelper
                 $value = str_replace(['<mcomment>', '</mcomment>'], ['<!--', '-->'], $value);
             }
 
-            $value = preg_replace_callback(
-                "/<mencoded>(.*?)<\/mencoded>/is",
-                function ($matches) {
-                    return htmlspecialchars_decode($matches[1]);
-                },
-                $value);
+            if ($needsDecoding) {
+                $value = preg_replace_callback(
+                    "/<mencoded>(.*?)<\/mencoded>/is",
+                    function ($matches) {
+                        return htmlspecialchars_decode($matches[1]);
+                    },
+                    $value);
+            }
+
+            if ($needsScriptDecoding) {
+                $value = preg_replace_callback(
+                    "/<mscript>(.*?)<\/mscript>/is",
+                    function ($matches) {
+                        return base64_decode($matches[1]);
+                    },
+                    $value);
+            }
         }
 
         return $value;

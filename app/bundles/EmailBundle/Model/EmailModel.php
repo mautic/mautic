@@ -1243,7 +1243,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                             $errorMessages[$stat->getLead()->getId()] = $error;
                             // Down sent counts
                             $emailId = $stat->getEmail()->getId();
-                            ++$emailSentCounts[$emailId];
+                            --$emailSentCounts[$emailId];
 
                             if ($stat->getId()) {
                                 $deleteEntities[] = $stat;

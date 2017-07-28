@@ -636,17 +636,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 foreach (['Contact', 'Lead'] as $object) {
                     if (!empty($existingPersons[$object])) {
                         $personFound = true;
-                        if (!empty($mappedData[$object]['update'])) {
-                            foreach ($existingPersons[$object] as $person) {
-                                $personData                     = $this->getApiHelper()->updateObject($mappedData[$object]['update'], $object, $person['Id']);
-                                $people[$object][$person['Id']] = $person['Id'];
+                        foreach ($existingPersons[$object] as $person) {
+                            if (!empty($mappedData[$object]['update'])) {
+                                $personData = $this->getApiHelper()->updateObject(
+                                    $mappedData[$object]['update'],
+                                    $object,
+                                    $person['Id']
+                                );
                             }
+                            $people[$object][$person['Id']] = $person['Id'];
                         }
                     }
 
                     if ('Lead' === $object && !$personFound) {
                         $personData                         = $this->getApiHelper()->createLead($mappedData[$object]['create']);
                         $people[$object][$personData['Id']] = $personData['Id'];
+                        $personFound                        = true;
                     }
 
                     if (isset($personData['Id'])) {
@@ -665,7 +670,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Return success if any Contact or Lead was updated or created
-                return ($people) ? $people : false;
+                return ($personFound) ? $people : false;
             }
         } catch (\Exception $e) {
             if ($e instanceof ApiErrorException) {
@@ -1540,7 +1545,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
                     $pushPeople      = $personIds[$pushObject];
                 }
-            }
+            } // pushLead should have handled this
 
             foreach ($pushPeople as $memberId) {
                 $campaignMappingId = '-'.$campaignId;
