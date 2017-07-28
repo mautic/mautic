@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -184,6 +185,14 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $email = new Email();
         $email->setIsPublished(true);
 
+        $mockEmailSendEvent = $this->getMockBuilder(EmailSendEvent::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockEmailSendEvent->expects($this->once())
+            ->method('getTokens')
+            ->will($this->returnValue([]));
+
         $mockEmailModel->expects($this->once())
             ->method('getEntity')
             ->will($this->returnValue($email));
@@ -204,6 +213,10 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
                 \PHPUnit_Framework_Assert::assertEquals([], $cc);
                 \PHPUnit_Framework_Assert::assertEquals(['hidden@translation.in'], $bcc);
             }));
+
+        $mockEmailModel->expects($this->once())
+            ->method('dispatchEmailSendEvent')
+            ->will($this->returnValue($mockEmailSendEvent));
 
         $mockEventModel = $this->getMockBuilder(EventModel::class)
             ->disableOriginalConstructor()
