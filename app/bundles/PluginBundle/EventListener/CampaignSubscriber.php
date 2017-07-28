@@ -53,6 +53,8 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return $this
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
