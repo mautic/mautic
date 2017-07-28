@@ -844,7 +844,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
             unset($leadFields[$key]);
         }
-        if ($key = array_search('mauticContactIsContactable', $leadFields)) {
+        if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
             unset($leadFields[$key]);
         }
         if (empty($leadFields)) {
@@ -906,9 +906,8 @@ class ZohoIntegration extends CrmAbstractIntegration
 
             foreach ($toUpdate as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
-                    $key                                = mb_strtolower($this->cleanPushData($lead['email']));
-                    $lead['mauticContactTimelineLink']  = $this->getContactTimelineLink($lead['internal_entity_id']);
-                    $lead['mauticContactIsContactable'] = $this->getLeadDonotContact($lead['internal_entity_id']);
+                    $key  = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead = $this->getCompoundMauticFields($lead);
                     if (isset($isContact[$key])) {
                         $isContact[$key] = $lead; // lead-converted
                     } else {
@@ -945,11 +944,10 @@ class ZohoIntegration extends CrmAbstractIntegration
             $totalCreated += count($leadsToCreate);
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
-                    $key                                = mb_strtolower($this->cleanPushData($lead['email']));
-                    $lead['mauticContactTimelineLink']  = $this->getContactTimelineLink($lead['internal_entity_id']);
-                    $lead['mauticContactIsContactable'] = $this->getLeadDonotContact($lead['internal_entity_id']);
-                    $lead['integration_entity']         = 'Leads';
-                    $leadsToCreateInZ[$key]             = $lead;
+                    $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead                       = $this->getCompoundMauticFields($lead);
+                    $lead['integration_entity'] = 'Leads';
+                    $leadsToCreateInZ[$key]     = $lead;
                 }
             }
         }
