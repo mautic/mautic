@@ -445,7 +445,7 @@ class EventController extends CommonFormController
                 }
 
                 //Always remove from modified list if deleted
-                if(isset($modifiedEvents[$objectId])) {
+                if (isset($modifiedEvents[$objectId])) {
                     unset($modifiedEvents[$objectId]);
                     $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
                 }
