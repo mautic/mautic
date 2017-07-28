@@ -311,7 +311,7 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
                     'setUsername'      => ['%mautic.mailer_user%'],
-                    'setPassword'      => ['%mautic.mailer_password%'],
+                    'setPassword'      => ['%mautic.mailer_api_key%'],
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],

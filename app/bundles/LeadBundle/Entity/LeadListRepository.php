@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\DateType;
 use Doctrine\DBAL\Types\FloatType;
@@ -377,7 +378,7 @@ class LeadListRepository extends CommonRepository
                 }
 
                 if ($newOnly) {
-                    $expr = $this->generateSegmentExpression($filters, $parameters, $q);
+                    $expr = $this->generateSegmentExpression($filters, $parameters, $q, null, $id);
 
                     if (!$this->hasCompanyFilter && !$expr->count()) {
                         // Treat this as if it has no filters since all the filters are now invalid (fields were deleted)
@@ -561,7 +562,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return QueryBuilder
      */
-    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null)
+    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false)
     {
         if (null === $parameterQ) {
             $parameterQ = $q;
@@ -571,7 +572,7 @@ class LeadListRepository extends CommonRepository
         $this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0;
 
         $this->listFiltersInnerJoinCompany = false;
-        $expr                              = $this->getListFilterExpr($filters, $parameters, $q, false, null);
+        $expr                              = $this->getListFilterExpr($filters, $parameters, $q, $not, null, 'lead', $listId);
 
         if ($this->hasCompanyFilter) {
             $this->applyCompanyFieldFilters($q);
@@ -648,7 +649,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null, $object = 'lead')
+    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null, $object = 'lead', $listId = null)
     {
         static $leadTable;
         static $companyTable;
@@ -678,8 +679,9 @@ class LeadListRepository extends CommonRepository
         $groups    = [];
         $groupExpr = $q->expr()->andX();
 
+        $defaultObject = $object;
         foreach ($filters as $k => $details) {
-            $object = 'lead';
+            $object = $defaultObject;
             if (!empty($details['object'])) {
                 $object = $details['object'];
             }
@@ -1350,10 +1352,46 @@ class LeadListRepository extends CommonRepository
                         );
                     }
 
+                    $isLeadList = false;
                     switch ($details['field']) {
                         case 'leadlist':
-                            $table  = 'lead_lists_leads';
-                            $column = 'leadlist_id';
+                            $newListIds = $details['filter'];
+                            $nq         = $this->_em->getConnection()->createQueryBuilder();
+                            $isNot      = 'NOT EXISTS' === $func;
+                            if (!is_array($newListIds)) {
+                                if ($listId !== $newListIds) {
+                                    $ll = $this->getEntity($newListIds);
+                                    if (null !== $ll) {
+                                        $nf = $ll->getFilters();
+                                        if (count($nf) > 0) {
+                                            $se         = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListIds, $isNot);
+                                            $isLeadList = true;
+                                        }
+                                    }
+                                }
+                            } else {
+                                $se    = $isNot ? $nq->expr()->andX() : $nq->expr()->orX(); // for including segments
+                                $count = 0;
+                                foreach ($newListIds as $newListId) {
+                                    $ll = $this->getEntity($newListId);
+                                    if (null === $ll) {
+                                        continue;
+                                    }
+                                    $nf = $ll->getFilters();
+                                    if (count($nf) > 0) {
+                                        /** @var CompositeExpression $si */
+                                        $si = $this->generateSegmentExpression($nf, $parameters, $nq, null, $newListId, $isNot);
+                                        $se->add($si);
+                                        ++$count;
+                                    }
+                                }
+                                $isLeadList = $count > 0;
+                            }
+
+                            if (!$isLeadList) {
+                                $table  = 'lead_lists_leads';
+                                $column = 'leadlist_id';
+                            }
 
                             $falseParameter = $this->generateRandomParameterName();
                             $subExpr->add(
@@ -1395,6 +1433,12 @@ class LeadListRepository extends CommonRepository
                             $table  = 'lead_devices';
                             $column = 'device_os_name';
                             break;
+                    }
+
+                    if ($isLeadList) {
+                        // add segment filters to current filters
+                        $groupExpr->add($se);
+                        break;
                     }
 
                     $deviceFilterParamater = $this->generateRandomParameterName();
@@ -1581,6 +1625,8 @@ class LeadListRepository extends CommonRepository
                         case 'startsWith':
                         case 'endsWith':
                         case 'contains':
+                            $ignoreAutoFilter = true;
+
                             switch ($func) {
                                 case 'like':
                                 case 'notLike':
