@@ -588,7 +588,7 @@ class LeadModel extends FormModel
                         $this->cleanFields($data, $field);
                     }
                     $curValue = $field['value'];
-                    $newValue = $data[$alias];
+                    $newValue = isset($data[$alias]) ? $data[$alias] : '';
 
                     if (is_array($newValue)) {
                         $newValue = implode('|', $newValue);
