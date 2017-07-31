@@ -48,10 +48,18 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
         $string = (string) $expr;
 
-        $found = preg_match('/\(l.email = :(.*?)\) OR \(l.email = :(.*?)\)/', $string, $match);
+        $found = preg_match_all('/EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
+        $this->assertEquals(2, $found, $string);
+
+        // Segment filters combined by OR to keep consistent behavior with the use of leadlist_id IN (1,2,3)
+        $found = preg_match_all('/OR \(EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
         $this->assertEquals(1, $found, $string);
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] = 'blah@blah.com', $string);
-        $this->assertTrue(isset($parameters[$match[2]]) && $parameters[$match[2]] = 'blah2@blah.com', $string);
+
+        $found = preg_match_all('/\(l.email = :(.*?)\)/', $string, $matches);
+        $this->assertEquals(2, $found, $string);
+
+        $this->assertTrue(isset($parameters[$matches[1][0]]) && $parameters[$matches[1][0]] = 'blah@blah.com', $string);
+        $this->assertTrue(isset($parameters[$matches[1][1]]) && $parameters[$matches[1][1]] = 'blah2@blah.com', $string);
     }
 
     public function testIncludeSegmentFilterWithOutFiltersAppendMembershipSubquery()
@@ -109,23 +117,20 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
-
         $string = (string) $expr;
+
+        $found = preg_match_all('/NOT EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
+        $this->assertEquals(2, $found, $string);
+
+        // Segment filters combined by AND to keep consistent behavior with the use of leadlist_id IN (1,2,3)
+        $found = preg_match_all('/AND \(NOT EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
+        $this->assertEquals(1, $found, $string);
 
         $found = preg_match_all('/\(l.email = :(.*?)\)/', $string, $matches);
         $this->assertEquals(2, $found, $string);
 
-        foreach ($matches[1] as $match) {
-            $this->assertTrue(isset($parameters[$match]) && strpos($parameters[$match], '@blah.com') !== false);
-        }
-
-        // Two segments excluded
-        $found = preg_match_all('/NOT EXISTS \(SELECT null FROM leads/', $string, $matches);
-        $this->assertEquals(2, $found, $string);
-
-        // Segment filters combined by AND to keep consistent behavior with the use of leadlist_id NOT IN (1,2,3)
-        $found = preg_match_all('/AND \(NOT EXISTS \(SELECT null FROM leads/', $string, $matches);
-        $this->assertEquals(1, $found, $string);
+        $this->assertTrue(isset($parameters[$matches[1][0]]) && $parameters[$matches[1][0]] = 'blah@blah.com', $string);
+        $this->assertTrue(isset($parameters[$matches[1][1]]) && $parameters[$matches[1][1]] = 'blah2@blah.com', $string);
     }
 
     public function testExcludeSegmentFilterWithOutFiltersAppendMembershipSubquery()
@@ -189,7 +194,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] = '%blah.com', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com%', $string);
     }
 
     public function testLikeFilterDoesNotAppendsAmperstandIfAlreadyIncluded()
@@ -219,7 +224,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] = 'blah.com%', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == 'blah.com%', $string);
     }
 
     public function testContainsFilterAppendsAmperstandOnBothEnds()
@@ -249,7 +254,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] = '%blah.com%', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com%', $string);
     }
 
     public function testStartsWithFilterAppendsAmperstandAtEnd()
@@ -279,7 +284,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] = 'blah.com%', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == 'blah.com%', $string);
     }
 
     public function testEndsWithFilterAppendsAmperstandAtBeginning()
@@ -292,7 +297,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     'glue'     => 'and',
-                    'operator' => 'startsWith',
+                    'operator' => 'endsWith',
                     'field'    => 'email',
                     'object'   => 'lead',
                     'type'     => 'text',
@@ -309,7 +314,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
-        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] = '%blah.com', $string);
+        $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com', $string);
     }
 
     private function getReflectedGenerateSegmentExpressionMethod($noFilters = false)
