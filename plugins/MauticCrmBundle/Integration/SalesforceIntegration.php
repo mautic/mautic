@@ -1840,6 +1840,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function getRequiredFieldString(array $config, array $availableFields, $object)
     {
+        if (!$object) {
+            $object = 'Lead';
+        }
         $requiredFields = $this->getRequiredFields($availableFields[$object]);
         $requiredFields = $this->prepareFieldsForSync($config['leadFields'], array_keys($requiredFields), $object);
         $requiredString = implode(',', array_keys($requiredFields));
