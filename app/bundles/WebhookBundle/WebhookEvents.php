@@ -88,4 +88,14 @@ final class WebhookEvents
      * @var string
      */
     const WEBHOOK_ON_BUILD = 'mautic.webhook_on_build';
+
+    /**
+     * The mautic.webhook.campaign_on_trigger event is dispatched from the mautic:campaign:trigger command.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignTriggerEvent instance.
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.webhook.campaign_on_trigger_action';
 }

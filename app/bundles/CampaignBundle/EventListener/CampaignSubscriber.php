@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Joomla\Http\Http;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
@@ -51,10 +50,9 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_POST_SAVE         => ['onCampaignPostSave', 0],
-            CampaignEvents::CAMPAIGN_POST_DELETE       => ['onCampaignDelete', 0],
-            CampaignEvents::CAMPAIGN_ON_BUILD          => ['onCampaignBuild', 0],
-            CampaignEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 1],
+            CampaignEvents::CAMPAIGN_POST_SAVE   => ['onCampaignPostSave', 0],
+            CampaignEvents::CAMPAIGN_POST_DELETE => ['onCampaignDelete', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD    => ['onCampaignBuild', 0],
         ];
     }
 

@@ -68,16 +68,6 @@ final class CampaignEvents
     const CAMPAIGN_ON_BUILD = 'mautic.campaign_on_build';
 
     /**
-     * The mautic.campaign_on_trigger event is dispatched from the mautic:campaign:trigger command.
-     *
-     * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignTriggerEvent instance.
-     *
-     * @var string
-     */
-    const CAMPAIGN_ON_TRIGGER = 'mautic.campaign_on_trigger';
-
-    /**
      * The mautic.campaign_on_leadchange event is dispatched when a lead was added or removed from the campaign.
      *
      * The event listener receives a
