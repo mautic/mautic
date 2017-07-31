@@ -68,18 +68,15 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $options
+     * @param Lead|null $lead
+     * @param array     $options
      *
      * @return array
      */
-    public function getLeadIpLogs(Lead $lead, array $options = [])
+    public function getLeadIpLogs(Lead $lead = null, array $options = [])
     {
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
-        $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
 
         $sqb
             ->select('MAX(l.date_added) as date_added, l.ip_address')
@@ -88,12 +85,22 @@ class AuditLogRepository extends CommonRepository
                 $sqb->expr()->andX(
                     $sqb->expr()->eq('l.bundle', $sqb->expr()->literal('lead')),
                     $sqb->expr()->eq('l.object', $sqb->expr()->literal('lead')),
-                    $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded')),
-                    $sqb->expr()->eq('l.object_id', $lead->getId()),
-                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getUtcTimestamp()))
+                    $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded'))
                 )
             )
             ->groupBy('l.ip_address');
+
+        if ($lead instanceof Lead) {
+            // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
+            $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
+
+            $sqb->andWhere(
+                $sqb->expr()->andX(
+                    $sqb->expr()->eq('l.object_id', $lead->getId()),
+                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getUtcTimestamp()))
+                )
+            );
+        }
 
         $qb
             ->select('ip.date_added, ip.ip_address')

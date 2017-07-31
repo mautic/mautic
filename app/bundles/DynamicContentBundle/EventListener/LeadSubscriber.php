@@ -48,11 +48,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository */
         $statRepository = $this->em->getRepository('MauticDynamicContentBundle:Stat');
-        $stats          = $statRepository->getLeadStats($lead->getId(), $event->getQueryOptions());
+        $stats          = $statRepository->getLeadStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $stats);

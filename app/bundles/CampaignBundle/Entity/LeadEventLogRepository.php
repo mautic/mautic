@@ -60,15 +60,15 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Get a lead's page event log.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadLogs($leadId, array $options = [])
+    public function getLeadLogs($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()
                       ->getConnection()
@@ -92,8 +92,11 @@ class LeadEventLogRepository extends CommonRepository
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
                       ->where('ll.lead_id = '.(int) $leadId)
-                      ->andWhere('e.event_type != :eventType')
-                      ->setParameter('eventType', 'decision');
+                      ->andWhere('e.event_type != :eventType');
+
+        if ($leadId) {
+            $query->setParameter('eventType', 'decision');
+        }
 
         if (isset($options['scheduledState'])) {
             if ($options['scheduledState']) {

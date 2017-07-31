@@ -107,16 +107,19 @@ class DoNotContactRepository extends CommonRepository
     }
 
     /**
-     * @param       $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      */
-    public function getTimelineStats($leadId, array $options = [])
+    public function getTimelineStats($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $query->select('dnc.channel, dnc.channel_id, dnc.date_added, dnc.reason, dnc.comments')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
-            ->where($query->expr()->eq('dnc.lead_id', (int) $leadId));
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc');
+
+        if ($leadId) {
+            $query->where($query->expr()->eq('dnc.lead_id', (int) $leadId));
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(

@@ -71,13 +71,11 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
         $statRepository        = $this->em->getRepository('MauticEmailBundle:Stat');
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
-        $stats                 = $statRepository->getLeadStats($lead->getId(), $queryOptions);
+        $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $stats);

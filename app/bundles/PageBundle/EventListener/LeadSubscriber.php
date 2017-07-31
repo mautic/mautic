@@ -81,11 +81,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $hitRepository = $this->em->getRepository('MauticPageBundle:Hit');
-        $hits          = $hitRepository->getLeadHits($lead->getId(), $event->getQueryOptions());
+        $hits          = $hitRepository->getLeadHits($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $hits);
@@ -184,7 +182,7 @@ class LeadSubscriber extends CommonSubscriber
         /** @var \Mautic\PageBundle\Entity\VideoHitRepository $hitRepository */
         $hitRepository = $this->em->getRepository('MauticPageBundle:VideoHit');
 
-        $hits = $hitRepository->getTimelineStats($event->getLead()->getId(), $event->getQueryOptions());
+        $hits = $hitRepository->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
 
         $event->addToCounter($eventTypeKey, $hits);
 

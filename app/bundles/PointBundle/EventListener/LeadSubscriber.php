@@ -91,11 +91,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $logRepository = $this->em->getRepository('MauticLeadBundle:PointsChangeLog');
-        $logs          = $logRepository->getLeadTimelineEvents($lead->getId(), $event->getQueryOptions());
+        $logs          = $logRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);

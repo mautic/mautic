@@ -2516,7 +2516,7 @@ class LeadModel extends FormModel
     /**
      * Get timeline/engagement data.
      *
-     * @param Lead       $lead
+     * @param Lead|null  $lead
      * @param null       $filters
      * @param array|null $orderBy
      * @param int        $page
@@ -2524,7 +2524,7 @@ class LeadModel extends FormModel
      *
      * @return array
      */
-    public function getEngagements(Lead $lead, $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    public function getEngagements(Lead $lead = null, $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
         $event = $this->dispatcher->dispatch(
             LeadEvents::TIMELINE_ON_GENERATE,

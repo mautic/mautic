@@ -76,19 +76,22 @@ class HitRepository extends CommonRepository
     /**
      * Get a lead's page hits.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      *
      * @return array
      */
-    public function getLeadHits($leadId, array $options = [])
+    public function getLeadHits($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $query->select('h.page_id, h.user_agent as userAgent, h.date_hit as dateHit, h.date_left as dateLeft, h.referer, h.source, h.source_id as sourceId, h.url, h.url_title as urlTitle, h.query, ds.client_info as clientInfo, ds.device, ds.device_os_name as deviceOsName, ds.device_brand as deviceBrand, ds.device_model as deviceModel')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
-            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id')
-            ->where('h.lead_id = '.(int) $leadId);
+            ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id');
+
+        if ($leadId) {
+            $query->where('h.lead_id = '.(int) $leadId);
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->like('p.title', $query->expr()->literal('%'.$options['search'].'%')));

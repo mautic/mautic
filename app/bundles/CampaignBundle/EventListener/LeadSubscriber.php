@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
@@ -199,13 +200,11 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
         $logRepository             = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
         $options                   = $event->getQueryOptions();
         $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
-        $logs                      = $logRepository->getLeadLogs($lead->getId(), $options);
+        $logs                      = $logRepository->getLeadLogs($event->getLeadId(), $options);
         $eventSettings             = $this->campaignModel->getEvents();
 
         // Add total number to counter

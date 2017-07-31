@@ -113,7 +113,7 @@ class LeadTimelineEvent extends Event
      * @param int        $page
      * @param int        $limit   Limit per type
      */
-    public function __construct(Lead $lead, array $filters = [], array $orderBy = null, $page = 1, $limit = 25)
+    public function __construct(Lead $lead = null, array $filters = [], array $orderBy = null, $page = 1, $limit = 25)
     {
         $this->lead    = $lead;
         $this->filters = !empty($filters) ? $filters :
@@ -294,7 +294,7 @@ class LeadTimelineEvent extends Event
     public function getEventLimit()
     {
         return [
-            'leadId' => $this->lead->getId(),
+            'leadId' => ($this->lead instanceof Lead) ? $this->lead->getId() : null,
             'limit'  => $this->limit,
             'start'  => (1 >= $this->page) ? 0 : ($this->page - 1) * $this->limit,
         ];
@@ -328,6 +328,16 @@ class LeadTimelineEvent extends Event
     public function getLead()
     {
         return $this->lead;
+    }
+
+    /**
+     * Returns the lead ID if any.
+     *
+     * @return int|null
+     */
+    public function getLeadId()
+    {
+        return ($this->lead instanceof Lead) ? $this->lead->getId() : null;
     }
 
     /**

@@ -116,22 +116,25 @@ class StatRepository extends CommonRepository
     /**
      * Get a lead's dynamic content stat.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $options = [])
+    public function getLeadStats($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $query->select('dc.id AS dynamic_content_id, s.id, s.date_sent as dateSent, dc.name, s.sent_details as sentDetails')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id')
-            ->where($query->expr()->eq('s.lead_id', (int) $leadId));
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id');
+
+        if ($leadId) {
+            $query->where($query->expr()->eq('s.lead_id', (int) $leadId));
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(

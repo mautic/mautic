@@ -50,11 +50,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var StagesChangeLogRepository $logRepository */
         $logRepository = $this->em->getRepository('MauticLeadBundle:StagesChangeLog');
-        $logs          = $logRepository->getLeadTimelineEvents($lead->getId(), $event->getQueryOptions());
+        $logs          = $logRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);

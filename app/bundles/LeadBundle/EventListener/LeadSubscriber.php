@@ -16,6 +16,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
@@ -346,8 +347,7 @@ class LeadSubscriber extends CommonSubscriber
             $event->addToCounter($eventTypeKey, $rows);
 
             // Add the entries to the event array
-            /** @var \Mautic\CoreBundle\Entity\AuditLog $row */
-            $ipAddresses = $lead->getIpAddresses()->toArray();
+            $ipAddresses = ($lead instanceof Lead) ? $lead->getIpAddresses()->toArray() : [];
 
             foreach ($rows['results'] as $row) {
                 if (!isset($ipAddresses[$row['ip_address']])) {
@@ -380,6 +380,11 @@ class LeadSubscriber extends CommonSubscriber
      */
     protected function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
+        // Do nothing if the lead is not set
+        if ($event->getLead() instanceof Lead) {
+            return;
+        }
+
         $dateAdded = $event->getLead()->getDateAdded();
         if (!$event->isEngagementCount()) {
             $event->addToCounter($eventTypeKey, 1);
@@ -408,6 +413,11 @@ class LeadSubscriber extends CommonSubscriber
      */
     protected function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
+        // Do nothing if the lead is not set
+        if ($event->getLead() instanceof Lead) {
+            return;
+        }
+
         if ($dateIdentified = $event->getLead()->getDateIdentified()) {
             if (!$event->isEngagementCount()) {
                 $event->addToCounter($eventTypeKey, 1);
@@ -438,8 +448,8 @@ class LeadSubscriber extends CommonSubscriber
      */
     protected function addTimelineUtmEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        $lead    = $event->getLead();
-        $utmTags = $this->em->getRepository('MauticLeadBundle:UtmTag')->getUtmTagsByLead($lead, $event->getQueryOptions());
+        $utmRepo = $this->em->getRepository('MauticLeadBundle:UtmTag');
+        $utmTags = $utmRepo->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
         // Add to counter
         $event->addToCounter($eventTypeKey, $utmTags);
 
@@ -498,13 +508,11 @@ class LeadSubscriber extends CommonSubscriber
      */
     protected function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        $lead = $event->getLead();
-
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
         $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
-        $rows = $dncRepo->getTimelineStats($lead->getId(), $event->getQueryOptions());
+        $rows = $dncRepo->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $rows);
@@ -592,8 +600,8 @@ class LeadSubscriber extends CommonSubscriber
      */
     protected function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
-        $lead    = $event->getLead();
-        $imports = $this->em->getRepository('MauticLeadBundle:LeadEventLog')->getEventsByLead('lead', 'import', $lead, $event->getQueryOptions());
+        $eventLogRepo = $this->em->getRepository('MauticLeadBundle:LeadEventLog');
+        $imports      = $eventLogRepo->getEventsByLead('lead', 'import', $event->getLead(), $event->getQueryOptions());
         // Add to counter
         $event->addToCounter($eventTypeKey, $imports);
 

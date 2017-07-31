@@ -23,18 +23,18 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get a lead's point log.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      *
      * @return array
      */
-    public function getLeadTimelineEvents($leadId, array $options = [])
+    public function getLeadTimelineEvents($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
             ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id');
 
-        if (null !== $leadId) {
+        if ($leadId) {
             $query->where('lp.lead_id = '.(int) $leadId);
         }
 

@@ -67,11 +67,9 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
         $downloadRepository = $this->em->getRepository('MauticAssetBundle:Download');
-        $downloads          = $downloadRepository->getLeadDownloads($lead->getId(), $event->getQueryOptions());
+        $downloads          = $downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $downloads);
