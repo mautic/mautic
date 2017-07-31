@@ -327,7 +327,7 @@ class LeadListRepository extends CommonRepository
         // Return leads that do not belong to a list based on filters
         $nonMembersOnly = (!array_key_exists('nonMembersOnly', $args)) ? false : $args['nonMembersOnly'];
         // Use filters to dynamically generate the list
-        $dynamic = ($newOnly || $nonMembersOnly);
+        $dynamic = ($newOnly || $nonMembersOnly || (!$newOnly && !$nonMembersOnly && $countOnly));
         // Limiters
         $batchLimiters = (!array_key_exists('batchLimiters', $args)) ? false : $args['batchLimiters'];
         $start         = (!array_key_exists('start', $args)) ? false : $args['start'];
@@ -386,7 +386,7 @@ class LeadListRepository extends CommonRepository
                     }
                 }
 
-                if ($newOnly) {
+                if ($newOnly || !$nonMembersOnly) { // !$nonMembersOnly is mainly used for tests as we just want a live count
                     $expr = $this->generateSegmentExpression($filters, $parameters, $q, null, $id);
 
                     if (!$this->hasCompanyFilter && !$expr->count()) {
@@ -427,7 +427,9 @@ class LeadListRepository extends CommonRepository
                         $listOnExpr
                     );
 
-                    $expr->add($q->expr()->isNull('ll.lead_id'));
+                    if ($newOnly) {
+                        $expr->add($q->expr()->isNull('ll.lead_id'));
+                    }
 
                     if ($batchExpr->count()) {
                         $expr->add($batchExpr);
@@ -435,6 +437,20 @@ class LeadListRepository extends CommonRepository
 
                     if ($expr->count()) {
                         $q->andWhere($expr);
+                    }
+
+                    if (!$newOnly) { // live count
+                        // Include manually added
+                        $q->orWhere(
+                            $q->expr()->eq("ll.manually_added", 1)
+                        );
+
+                        $q->andWhere(
+                            $q->expr()->orX(
+                                $q->expr()->isNull("ll.manually_removed"), // account for those not in a list yet
+                                $q->expr()->eq("ll.manually_removed", 0) //exclude manually removed
+                            )
+                        );
                     }
                 } elseif ($nonMembersOnly) {
                     // Only leads that are part of the list that no longer match filters and have not been manually removed
@@ -1349,16 +1365,14 @@ class LeadListRepository extends CommonRepository
                             $listQb->expr()->in('l.id', $filterListIds)
                         );
                         $filterLists = $listQb->execute()->fetchAll();
-                        $isNot = 'NOT EXISTS' === $func;
+                        $isNot       = 'NOT EXISTS' === $func;
 
                         // Each segment's filters must be appended as ORs so that each list is evaluated individually
                         $existsExpr = ($isNot) ? $listQb->expr()->andX() : $listQb->expr()->orX();
 
                         foreach ($filterLists as $list) {
-                            $subQueryFilters= [];
-
                             $alias = $this->generateRandomParameterName();
-                            $id = (int) $list['id'];
+                            $id    = (int) $list['id'];
                             if ($id === (int) $listId) {
                                 // Ignore as somehow self is included in the list
                                 continue;
@@ -1367,31 +1381,39 @@ class LeadListRepository extends CommonRepository
                             $listFilters = unserialize($list['filters']);
                             if (empty($listFilters)) {
                                 // Use an EXISTS/NOT EXISTS on contact membership as this is a manual list
-
-                                $subQueryFilters[$alias.'.manually_removed'] = $falseParameter;
-                                $subQb = $this->createFilterExpressionSubQuery($table, $alias, $column, $id, $leadId, $subQueryFilters);
+                                $subQb = $this->createFilterExpressionSubQuery(
+                                    $table,
+                                    $alias,
+                                    $column,
+                                    $id,
+                                    $parameters,
+                                    $leadId,
+                                    [
+                                        $alias.'.manually_removed' => $falseParameter
+                                    ]
+                                );
                             } else {
                                 // Build a EXISTS/NOT EXISTS using the filters for this list to include/exclude those not processed yet
                                 // but also leverage the current membership to take into account those manually added or removed from the segment
 
                                 // Build a "live" query based on current filters to catch those that have not been processed yet
-                                $subQb   = $this->createFilterExpressionSubQuery('leads', $alias, null, null,  $leadId);
+                                $subQb      = $this->createFilterExpressionSubQuery('leads', $alias, null, null, $parameters, $leadId);
                                 $filterExpr = $this->generateSegmentExpression($listFilters, $parameters, $subQb, null, $id);
-                                $subQb->andWhere($filterExpr);
 
                                 // Left join membership to account for manually added and removed
                                 $membershipAlias = $this->generateRandomParameterName();
-                                $subQb->leftJoin($alias, MAUTIC_TABLE_PREFIX.$table, $membershipAlias, "$membershipAlias.lead")
+                                $subQb->leftJoin($alias, MAUTIC_TABLE_PREFIX.$table, $membershipAlias, "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id")
+                                    ->where(
+                                        $subQb->expr()->orX(
+                                            $filterExpr,
+                                            $subQb->expr()->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
+                                        )
+                                    )
                                     ->andWhere(
-                                        $subQb->expr()->andX(
-                                            $subQb->expr()->orX(
-                                                $subQb->expr()->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
-                                                $subQb->expr()->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
-                                            ),
-                                            $subQb->expr()->orX(
-                                                $subQb->expr()->isNull("$membershipAlias.manually_added"), // account for those not in a list yet
-                                                $subQb->expr()->eq("$membershipAlias.manually_added", ":$trueParameter") //include manually added
-                                            )
+                                        $subQb->expr()->eq("$alias.id", "l.id"),
+                                        $subQb->expr()->orX(
+                                            $subQb->expr()->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
+                                            $subQb->expr()->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
                                         )
                                     );
                             }
@@ -1735,7 +1757,7 @@ class LeadListRepository extends CommonRepository
      *
      * @return QueryBuilder
      */
-    protected function createFilterExpressionSubQuery($table, $alias, $column, $value, $leadId = null, array $subQueryFilters = [])
+    protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $subExpr = $subQb->expr()->andX();
