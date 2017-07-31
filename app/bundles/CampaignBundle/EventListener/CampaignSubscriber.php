@@ -14,12 +14,9 @@ namespace Mautic\CampaignBundle\EventListener;
 use Joomla\Http\Http;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event as Events;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\LeadBundle\Helper\TokenHelper;
 
 /**
  * Class CampaignSubscriber.
@@ -37,22 +34,15 @@ class CampaignSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
-     * @var Http
-     */
-    protected $connector;
-
-    /**
      * CampaignSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
-     * @param Http           $connector
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, Http $connector)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
-        $this->connector      = $connector;
     }
 
     /**
@@ -66,65 +56,6 @@ class CampaignSubscriber extends CommonSubscriber
             CampaignEvents::CAMPAIGN_ON_BUILD          => ['onCampaignBuild', 0],
             CampaignEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 1],
         ];
-    }
-
-    /**
-     * @param CampaignExecutionEvent $event
-     *
-     * @return CampaignExecutionEvent
-     */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
-    {
-        if (!$event->checkContext('campaign.remoteurl')) {
-            return;
-        }
-        $lead   = $event->getLead();
-        $config = $event->getConfig();
-        try {
-            $url    = $config['url'];
-            $method = $config['method'];
-            $data   = !empty($config['additional_data']['list']) ? $config['additional_data']['list'] : '';
-            $data   = array_flip(AbstractFormFieldHelper::parseList($data));
-            // replace contacts tokens
-            foreach ($data as $key => $value) {
-                $data[$key] = urlencode(TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true));
-            }
-            $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
-            $headers = array_flip(AbstractFormFieldHelper::parseList($headers));
-            foreach ($headers as $key => $value) {
-                $headers[$key] = urlencode(TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true));
-            }
-            $timeout = $config['timeout'];
-
-            if (in_array($method, ['get', 'trace'])) {
-                $response = $this->connector->$method(
-                    $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($data),
-                    $headers,
-                    $timeout
-                );
-            } elseif (in_array($method, ['post', 'put', 'patch'])) {
-                $response = $this->connector->$method(
-                    $url,
-                    $data,
-                    $headers,
-                    $timeout
-                );
-            } elseif ($method == 'delete') {
-                $response = $this->connector->$method(
-                    $url,
-                    $headers,
-                    $timeout,
-                    $data
-                );
-            }
-            if (in_array($response->code, [200, 201])) {
-                return $event->setResult(true);
-            }
-        } catch (\Exception $e) {
-            return $event->setFailed($e->getMessage());
-        }
-
-        return $event->setFailed($this->translator->trans('Error code').': '.$response->code);
     }
 
     /**
@@ -190,15 +121,5 @@ class CampaignSubscriber extends CommonSubscriber
             'callback' => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead',
         ];
         $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
-
-        //Add action to remote url call
-        $remoteUrlAction = [
-            'label'       => 'mautic.campaign.event.remoteurl',
-            'description' => 'mautic.campaign.event.remoteurl_desc',
-            'formType'    => 'campaignevent_remoteurl',
-            'eventName'   => CampaignEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'    => 'campaignevent_remoteurl',
-        ];
-        $event->addAction('campaign.remoteurl', $remoteUrlAction);
     }
 }

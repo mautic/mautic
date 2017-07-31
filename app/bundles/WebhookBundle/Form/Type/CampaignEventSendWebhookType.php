@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CampaignBundle\Form\Type;
+namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\Url;
 /**
  * Class CampaignEventRemoteUrlType.
  */
-class CampaignEventRemoteUrlType extends AbstractType
+class CampaignEventSendWebhookType extends AbstractType
 {
     /**
      * @var TranslatorInterface
@@ -46,7 +46,7 @@ class CampaignEventRemoteUrlType extends AbstractType
             'url',
             'text',
             [
-                'label'       => 'mautic.campaign.event.remoteurl.url',
+                'label'       => 'mautic.webhook.event.sendwebhook.url',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => true,
@@ -74,7 +74,7 @@ class CampaignEventRemoteUrlType extends AbstractType
                 ],
                 'multiple'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'label'      => 'mautic.campaign.event.remoteurl.method',
+                'label'      => 'mautic.webhook.event.sendwebhook.method',
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -88,7 +88,7 @@ class CampaignEventRemoteUrlType extends AbstractType
             SortableListType::class,
             [
                 'required'        => false,
-                'label'           => 'mautic.campaign.event.remoteurl.headers',
+                'label'           => 'mautic.webhook.event.sendwebhook.headers',
                 'option_required' => false,
                 'with_labels'     => true,
             ]
@@ -99,7 +99,7 @@ class CampaignEventRemoteUrlType extends AbstractType
             SortableListType::class,
             [
                 'required'        => false,
-                'label'           => 'mautic.campaign.event.remoteurl.data',
+                'label'           => 'mautic.webhook.event.sendwebhook.data',
                 'option_required' => false,
                 'with_labels'     => true,
             ]
@@ -109,7 +109,7 @@ class CampaignEventRemoteUrlType extends AbstractType
             'timeout',
             'number',
             [
-                'label'      => 'mautic.campaign.event.remoteurl.timeout',
+                'label'      => 'mautic.webhook.event.sendwebhook.timeout',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'          => 'form-control',
@@ -125,6 +125,6 @@ class CampaignEventRemoteUrlType extends AbstractType
      */
     public function getName()
     {
-        return 'campaignevent_remoteurl';
+        return 'campaignevent_sendwebhook';
     }
 }

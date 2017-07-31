@@ -125,7 +125,6 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
-                    'mautic.http.connector',
                 ],
             ],
             'mautic.campaign.leadbundle.subscriber' => [
@@ -189,13 +188,6 @@ return [
             'mautic.campaign.type.action.addremovelead' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
                 'alias' => 'campaignevent_addremovelead',
-            ],
-            'mautic.campaign.type.action.remoteurl' => [
-                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignEventRemoteUrlType',
-                'arguments' => [
-                    'arguments' => 'translator',
-                ],
-                'alias' => 'campaignevent_remoteurl',
             ],
             'mautic.campaign.type.canvassettings' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
