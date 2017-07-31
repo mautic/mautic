@@ -299,10 +299,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     ) {
                                         continue;
                                     }
-                                    if ($fieldInfo['type'] == 'boolean') {
-                                        $type = 'boolean';
-                                    } else {
-                                        $type = 'string';
+                                    switch ($fieldInfo['type']) {
+                                        case 'boolean': $type = 'boolean';
+                                                        break;
+                                        case 'datetime': $type = 'datetime';
+                                            break;
+                                        case 'date': $type = 'date';
+                                            break;
+                                        default: $type = 'string';
                                     }
                                     if ($sfObject !== 'company') {
                                         $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject] = [
@@ -1208,7 +1212,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // Persist pending changes
             $this->cleanupFromSync($leadsToSync);
-
             // Make the request
             $this->makeCompositeRequest($mauticData, $totalUpdated, $totalCreated, $totalErrors);
 
@@ -1791,7 +1794,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $fieldType      = (isset($objectFields['types']) && isset($objectFields['types'][$sfField])) ? $objectFields['types'][$sfField] : 'string';
                     $body[$sfField] = $this->cleanPushData($lead[$mauticField], $fieldType);
                 }
-
                 if (array_key_exists($sfField, $objectFields['required']['fields']) && empty($body[$sfField])) {
                     if (isset($sfRecord[$sfField])) {
                         $body[$sfField] = $sfRecord[$sfField];
@@ -1840,7 +1842,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function getRequiredFieldString(array $config, array $availableFields, $object)
     {
-        $requiredFields = isset($availableFields[$object]) ? $this->getRequiredFields($availableFields[$object]) : [];
+        $requiredFields = $this->getRequiredFields($availableFields[$object]);
         $requiredFields = $this->prepareFieldsForSync($config['leadFields'], array_keys($requiredFields), $object);
         $requiredString = implode(',', array_keys($requiredFields));
 
