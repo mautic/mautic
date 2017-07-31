@@ -130,6 +130,22 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
+            [
+                'name'    => 'Like segment test with field percent sign at end',
+                'alias'   => 'like-percent-end',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'title',
+                        'operator' => 'like',
+                        'filter'   => 'Mr%',
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

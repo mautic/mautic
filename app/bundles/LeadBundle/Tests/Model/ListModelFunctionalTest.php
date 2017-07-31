@@ -9,12 +9,13 @@ class ListModelFunctionalTest extends MauticWebTestCase
 {
     public function testSegmentCountIsCorrect()
     {
-        $repo            = $this->em->getRepository(LeadList::class);
-        $segmentTest1Ref = $this->fixtures->getReference('segment-test-1');
-        $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
-        $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
-        $segmentTest4Ref = $this->fixtures->getReference('segment-test-4');
-        $segmentTest5Ref = $this->fixtures->getReference('segment-test-5');
+        $repo              = $this->em->getRepository(LeadList::class);
+        $segmentTest1Ref   = $this->fixtures->getReference('segment-test-1');
+        $segmentTest2Ref   = $this->fixtures->getReference('segment-test-2');
+        $segmentTest3Ref   = $this->fixtures->getReference('segment-test-3');
+        $segmentTest4Ref   = $this->fixtures->getReference('segment-test-4');
+        $segmentTest5Ref   = $this->fixtures->getReference('segment-test-5');
+        $likePercentEndRef = $this->fixtures->getReference('like-percent-end');
 
         $segmentContacts = $repo->getLeadsByList([
             $segmentTest1Ref->getId(),
@@ -22,6 +23,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
             $segmentTest3Ref->getId(),
             $segmentTest4Ref->getId(),
             $segmentTest5Ref->getId(),
+            $likePercentEndRef->getId(),
         ], ['countOnly' => true]);
 
         $this->assertEquals(
@@ -52,6 +54,12 @@ class ListModelFunctionalTest extends MauticWebTestCase
             49,
             $segmentContacts[$segmentTest5Ref->getId()]['count'],
             'There should be 49 contacts in the segment-test-5 segment.'
+        );
+
+        $this->assertEquals(
+            32,
+            $segmentContacts[$likePercentEndRef->getId()]['count'],
+            'There should be 32 contacts in the like-percent-end segment.'
         );
     }
 
