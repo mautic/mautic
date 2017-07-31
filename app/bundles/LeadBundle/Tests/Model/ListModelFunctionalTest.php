@@ -9,24 +9,25 @@ class ListModelFunctionalTest extends MauticWebTestCase
 {
     public function testSegmentCountIsCorrect()
     {
-        $repo                                          = $this->em->getRepository(LeadList::class);
-        $segmentTest1Ref                               = $this->fixtures->getReference('segment-test-1');
-        $segmentTest2Ref                               = $this->fixtures->getReference('segment-test-2');
-        $segmentTest3Ref                               = $this->fixtures->getReference('segment-test-3');
-        $segmentTest4Ref                               = $this->fixtures->getReference('segment-test-4');
-        $segmentTest5Ref                               = $this->fixtures->getReference('segment-test-5');
-        $likePercentEndRef                             = $this->fixtures->getReference('like-percent-end');
-        $segmentTestWithoutFiltersRef                  = $this->fixtures->getReference('segment-test-without-filters');
-        $segmentTestIncludeMembershipWithFiltersRef    = $this->fixtures->getReference('segment-test-include-segment-with-filters');
-        $segmentTestExcludeMembershipWithFiltersRef    = $this->fixtures->getReference('segment-test-exclude-segment-with-filters');
-        $segmentTestIncludeMembershipWithoutFiltersRef = $this->fixtures->getReference('segment-test-include-segment-without-filters');
-        $segmentTestExcludeMembershipWithoutFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-without-filters');
-        $segmentTestIncludeMembershipMixedFiltersRef   = $this->fixtures->getReference('segment-test-include-segment-mixed-filters');
-        $segmentTestExcludeMembershipMixedFiltersRef   = $this->fixtures->getReference('segment-test-exclude-segment-mixed-filters');
-        $segmentTestMixedIncludeExcludeRef             = $this->fixtures->getReference('segment-test-mixed-include-exclude-filters');
-        $segmentTestManualMembership                   = $this->fixtures->getReference('segment-test-manual-membership');
-        $segmentTestIncludeMembershipManualMembersRef  = $this->fixtures->getReference('segment-test-include-segment-manual-members');
-        $segmentTestExcludeMembershipManualMembersRef  = $this->fixtures->getReference('segment-test-exclude-segment-manual-members');
+        $repo                                               = $this->em->getRepository(LeadList::class);
+        $segmentTest1Ref                                    = $this->fixtures->getReference('segment-test-1');
+        $segmentTest2Ref                                    = $this->fixtures->getReference('segment-test-2');
+        $segmentTest3Ref                                    = $this->fixtures->getReference('segment-test-3');
+        $segmentTest4Ref                                    = $this->fixtures->getReference('segment-test-4');
+        $segmentTest5Ref                                    = $this->fixtures->getReference('segment-test-5');
+        $likePercentEndRef                                  = $this->fixtures->getReference('like-percent-end');
+        $segmentTestWithoutFiltersRef                       = $this->fixtures->getReference('segment-test-without-filters');
+        $segmentTestIncludeMembershipWithFiltersRef         = $this->fixtures->getReference('segment-test-include-segment-with-filters');
+        $segmentTestExcludeMembershipWithFiltersRef         = $this->fixtures->getReference('segment-test-exclude-segment-with-filters');
+        $segmentTestIncludeMembershipWithoutFiltersRef      = $this->fixtures->getReference('segment-test-include-segment-without-filters');
+        $segmentTestExcludeMembershipWithoutFiltersRef      = $this->fixtures->getReference('segment-test-exclude-segment-without-filters');
+        $segmentTestIncludeMembershipMixedFiltersRef        = $this->fixtures->getReference('segment-test-include-segment-mixed-filters');
+        $segmentTestExcludeMembershipMixedFiltersRef        = $this->fixtures->getReference('segment-test-exclude-segment-mixed-filters');
+        $segmentTestMixedIncludeExcludeRef                  = $this->fixtures->getReference('segment-test-mixed-include-exclude-filters');
+        $segmentTestManualMembership                        = $this->fixtures->getReference('segment-test-manual-membership');
+        $segmentTestIncludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-include-segment-manual-members');
+        $segmentTestExcludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-exclude-segment-manual-members');
+        $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-wihtout-other-filters');
 
         // These expect filters to be part of the $lists passed to getLeadsByList so pass the entity
         $segmentContacts = $repo->getLeadsByList(
@@ -47,7 +48,8 @@ class ListModelFunctionalTest extends MauticWebTestCase
                 $segmentTestMixedIncludeExcludeRef,
                 $segmentTestManualMembership,
                 $segmentTestIncludeMembershipManualMembersRef,
-                $segmentTestExcludeMembershipManualMembersRef
+                $segmentTestExcludeMembershipManualMembersRef,
+                $segmentTestExcludeMembershipWithoutOtherFiltersRef
             ],
             ['countOnly' => true]
         );
@@ -145,13 +147,19 @@ class ListModelFunctionalTest extends MauticWebTestCase
         $this->assertEquals(
             12,
             $segmentContacts[$segmentTestIncludeMembershipManualMembersRef->getId()]['count'],
-            'There should be 12 contacts in the included segment-test-manual-membership segment'
+            'There should be 12 contacts in the included segment-test-include-segment-manual-members segment'
         );
 
         $this->assertEquals(
             25,
             $segmentContacts[$segmentTestExcludeMembershipManualMembersRef->getId()]['count'],
-            'There should be 12 contacts in the included segment-test-manual-membership segment'
+            'There should be 25 contacts in the segment-test-exclude-segment-manual-members segment'
+        );
+
+        $this->assertEquals(
+            39,
+            $segmentContacts[$segmentTestExcludeMembershipWithoutOtherFiltersRef->getId()]['count'],
+            'There should be 39 contacts in the included segment-test-exclude-segment-wihtout-other-filters segment'
         );
     }
 

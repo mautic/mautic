@@ -355,6 +355,22 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [ // ID 19
+                'name'    => 'Segment membership with excluded segment without other filters',
+                'alias'   => 'segment-test-exclude-segment-wihtout-other-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => '!in',
+                        'filter'   => [9],
+                        'display'  => '',
+                    ]
+                ],
+                'populate' => false,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
