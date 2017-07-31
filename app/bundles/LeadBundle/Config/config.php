@@ -123,6 +123,10 @@ return [
                 'path'       => '/contacts/{id}/events',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getEvents',
             ],
+            'mautic_api_getcontactsevents' => [
+                'path'       => '/contacts/events',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getAllEvents',
+            ],
             'mautic_api_getcontactnotes' => [
                 'path'       => '/contacts/{id}/notes',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:getNotes',

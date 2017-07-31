@@ -17,6 +17,7 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
+use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
@@ -28,6 +29,7 @@ class LeadApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use FrequencyRuleTrait;
+    use LeadDetailsTrait;
 
     /**
      * @param FilterControllerEvent $event
@@ -427,6 +429,43 @@ class LeadApiController extends CommonApiController
         $view        = $this->view($engagements);
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Obtains a list of contact events.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getAllEventsAction()
+    {
+        $canViewOwn     = $this->security->isGranted('lead:leads:viewown');
+        $canViewOthers  = $this->security->isGranted('lead:leads:others');
+        $canViewOnlyOwn = ($canViewOthers === false && $canViewOwn === true);
+
+        if (!$canViewOthers && !$canViewOwn) {
+            return $this->accessDenied();
+        }
+
+        $filters = InputHelper::clean($this->request->get('filters', []));
+
+        if (!isset($filters['search'])) {
+            $filters['search'] = '';
+        }
+
+        if (!isset($filters['includeEvents'])) {
+            $filters['includeEvents'] = [];
+        }
+
+        if (!isset($filters['excludeEvents'])) {
+            $filters['excludeEvents'] = [];
+        }
+
+        $limit  = InputHelper::clean($this->request->get('limit', 25));
+        $order  = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
+        $page   = (int) $this->request->get('page', 1);
+        $events = $this->model->getAllEngagements($filters, $order, $page, $limit, $canViewOnlyOwn);
+
+        return $this->handleView($this->view($events));
     }
 
     /**

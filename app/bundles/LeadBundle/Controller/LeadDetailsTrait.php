@@ -100,6 +100,36 @@ trait LeadDetailsTrait
     }
 
     /**
+     * @param array      $leads
+     * @param array|null $filters
+     * @param array|null $orderBy
+     * @param int        $page
+     *
+     * @return array
+     */
+    protected function getAllEngagementsForAllUsers(array $filters = null, array $orderBy = null, $page = 1, $limit = 25, $canViewOnlyOwn = false)
+    {
+        $result = [
+            'events'   => [],
+            'filters'  => $filters,
+            'order'    => $orderBy,
+            'types'    => [],
+            'total'    => 0,
+            'page'     => $page,
+            'limit'    => $limit,
+            'maxPages' => 0,
+        ];
+
+        /** @var LeadModel $model */
+        $model       = $this->getModel('lead');
+        $engagements = $model->getEngagements($lead, $filters, $orderBy, $page, $limit);
+
+        echo '<pre>';
+        var_dump($engagements);
+        die('</pre>');
+    }
+
+    /**
      * @param $a
      * @param $b
      *
