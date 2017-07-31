@@ -142,6 +142,16 @@ class LeadModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var
+     */
+    protected $leadTrackingId;
+
+    /**
+     * @var bool
+     */
+    protected $leadTrackingCookieGenerated = false;
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack         $requestStack
@@ -1108,40 +1118,42 @@ class LeadModel extends FormModel
      */
     public function getTrackingCookie($forceRegeneration = false)
     {
-        static $trackingId = false, $generated = false;
-
-        if ($forceRegeneration) {
-            $generated = true;
-
-            $oldTrackingId = $this->request->cookies->get('mautic_session_id');
-            $trackingId    = hash('sha1', uniqid(mt_rand()));
-
-            //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
-
-            return [$trackingId, $oldTrackingId];
+        if (!$this->request) {
+            return [null, false];
         }
 
-        if (empty($trackingId)) {
+        if ($forceRegeneration) {
+            $this->leadTrackingCookieGenerated = true;
+
+            $oldTrackingId = $this->request->cookies->get('mautic_session_id');
+            $this->leadTrackingId    = hash('sha1', uniqid(mt_rand()));
+
+            //create a tracking cookie with a expire of two years
+            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
+
+            return [$this->leadTrackingId, $oldTrackingId];
+        }
+
+        if (empty($this->leadTrackingId)) {
             //check for the tracking cookie or sid from query
-            if ($this->request && !$trackingId = $this->request->cookies->get('mautic_session_id')) {
-                $trackingId = ('GET' == $this->request->getMethod())
+            if ($this->request && !$this->leadTrackingId = $this->request->cookies->get('mautic_session_id')) {
+                $this->leadTrackingId = ('GET' == $this->request->getMethod())
                     ?
                     $this->request->query->get('mtc_sid')
                     :
                     $this->request->request->get('mtc_sid');
             }
-            $generated = false;
-            if (empty($trackingId)) {
-                $trackingId = hash('sha1', uniqid(mt_rand()));
-                $generated  = true;
+            $this->leadTrackingCookieGenerated = false;
+            if (empty($this->leadTrackingId)) {
+                $this->leadTrackingId = hash('sha1', uniqid(mt_rand()));
+                $this->leadTrackingCookieGenerated  = true;
             }
 
             //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
+            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
         }
 
-        return [$trackingId, $generated];
+        return [$this->leadTrackingId, $this->leadTrackingCookieGenerated];
     }
 
     /**
@@ -1151,6 +1163,10 @@ class LeadModel extends FormModel
      */
     public function setLeadCookie($leadId)
     {
+        if (!$this->request) {
+            return;
+        }
+
         // Remove the old if set
         $oldTrackingId                = $this->request->cookies->get('mautic_session_id');
         list($trackingId, $generated) = $this->getTrackingCookie();
