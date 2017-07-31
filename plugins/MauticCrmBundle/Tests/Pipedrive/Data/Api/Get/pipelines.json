@@ -1,0 +1,42 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "Pipeline",
+      "url_title": "default",
+      "order_nr": 1,
+      "active": true,
+      "add_time": "2017-03-31 11:06:10",
+      "update_time": null,
+      "selected": true
+    },
+    {
+      "id": 2,
+      "name": "Pipeline 2",
+      "url_title": "test-2",
+      "order_nr": 2,
+      "active": false,
+      "add_time": "2017-07-18 19:43:27",
+      "update_time": "2017-07-19 10:03:51",
+      "selected": false
+    },
+    {
+      "id": 3,
+      "name": "P3",
+      "url_title": "P3",
+      "order_nr": 3,
+      "active": true,
+      "add_time": "2017-07-19 09:20:45",
+      "update_time": "2017-07-19 09:34:59",
+      "selected": false
+    }
+  ],
+  "additional_data": {
+    "pagination": {
+      "start": 0,
+      "limit": 100,
+      "more_items_in_collection": false
+    }
+  }
+}

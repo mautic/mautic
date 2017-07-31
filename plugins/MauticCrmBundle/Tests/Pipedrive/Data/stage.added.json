@@ -1,0 +1,36 @@
+{
+    "v": 1,
+    "matches_filters": null,
+    "meta": {
+        "v": 1,
+        "action": "added",
+        "object": "stage",
+        "id": 16,
+        "company_id": 1111111,
+        "user_id": 1111111,
+        "host": "host.pipedrive.com",
+        "timestamp": 1501170497,
+        "timestamp_micro": 1501170497613100,
+        "permitted_user_ids": [
+            "*"
+        ],
+        "trans_pending": false,
+        "is_bulk_update": false,
+        "webhook_id": "18282"
+    },
+    "current": {
+        "id": 16,
+        "order_nr": 1,
+        "name": "Stage 1",
+        "active_flag": true,
+        "deal_probability": 100,
+        "pipeline_id": 4,
+        "rotten_flag": false,
+        "rotten_days": null,
+        "add_time": "2017-07-27 15:48:17",
+        "update_time": "2017-07-27 15:48:17"
+    },
+    "previous": null,
+    "event": "added.stage",
+    "retry": 0
+}

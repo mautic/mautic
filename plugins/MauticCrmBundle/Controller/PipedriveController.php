@@ -36,6 +36,22 @@ class PipedriveController extends CommonController
     const COMPANY_UPDATE_EVENT = 'updated.organization';
     const COMPANY_DELETE_EVENT = 'deleted.organization';
 
+    const DEAL_ADD_EVENT    = 'added.deal';
+    const DEAL_UPDATE_EVENT = 'updated.deal';
+    const DEAL_DELETE_EVENT = 'deleted.deal';
+
+    const PIPELINE_ADD_EVENT    = 'added.pipeline';
+    const PIPELINE_UPDATE_EVENT = 'updated.pipeline';
+    const PIPELINE_DELETE_EVENT = 'deleted.pipeline';
+
+    const PRODUCT_ADD_EVENT    = 'added.product';
+    const PRODUCT_UPDATE_EVENT = 'updated.product';
+    const PRODUCT_DELETE_EVENT = 'deleted.product';
+
+    const STAGE_ADD_EVENT    = 'added.stage';
+    const STAGE_UPDATE_EVENT = 'updated.stage';
+    const STAGE_DELETE_EVENT = 'deleted.stage';
+
     const USER_ADD_EVENT    = 'added.user';
     const USER_UPDATE_EVENT = 'updated.user';
 
@@ -91,6 +107,54 @@ class PipedriveController extends CommonController
                     $companyImport = $this->getCompanyImport($pipedriveIntegration);
                     $companyImport->delete($params['previous']);
                     break;
+                case self::DEAL_ADD_EVENT:
+                    $dealImport = $this->getDealImport($pipedriveIntegration);
+                    $dealImport->create($data);
+                    break;
+                case self::DEAL_UPDATE_EVENT:
+                    $dealImport = $this->getDealImport($pipedriveIntegration);
+                    $dealImport->update($data);
+                    break;
+                case self::DEAL_DELETE_EVENT:
+                    $dealImport = $this->getDealImport($pipedriveIntegration);
+                    $dealImport->delete($params['previous']);
+                    break;
+                case self::PIPELINE_ADD_EVENT:
+                    $pipelineImport = $this->getPipelineImport($pipedriveIntegration);
+                    $pipelineImport->create($data);
+                    break;
+                case self::PIPELINE_UPDATE_EVENT:
+                    $pipelineImport = $this->getPipelineImport($pipedriveIntegration);
+                    $pipelineImport->update($data);
+                    break;
+                case self::PIPELINE_DELETE_EVENT:
+                    $pipelineImport = $this->getPipelineImport($pipedriveIntegration);
+                    $pipelineImport->delete($params['previous']);
+                    break;
+                case self::PRODUCT_ADD_EVENT:
+                    $productImport = $this->getProductImport($pipedriveIntegration);
+                    $productImport->create($data);
+                    break;
+                case self::PRODUCT_UPDATE_EVENT:
+                    $productImport = $this->getProductImport($pipedriveIntegration);
+                    $productImport->update($data);
+                    break;
+                case self::PRODUCT_DELETE_EVENT:
+                    $productImport = $this->getProductImport($pipedriveIntegration);
+                    $productImport->delete($params['previous']);
+                    break;
+                case self::STAGE_ADD_EVENT:
+                    $stageImport = $this->getStageImport($pipedriveIntegration);
+                    $stageImport->create($data);
+                    break;
+                case self::STAGE_UPDATE_EVENT:
+                    $stageImport = $this->getStageImport($pipedriveIntegration);
+                    $stageImport->update($data);
+                    break;
+                case self::STAGE_DELETE_EVENT:
+                    $stageImport = $this->getStageImport($pipedriveIntegration);
+                    $stageImport->delete($params['previous']);
+                    break;
                 case self::USER_ADD_EVENT:
                 case self::USER_UPDATE_EVENT:
                 $ownerImport = $this->getOwnerImport($pipedriveIntegration);
@@ -139,6 +203,14 @@ class PipedriveController extends CommonController
         return $companyImport;
     }
 
+    private function getDealImport($integration)
+    {
+        $dealImport = $this->get('mautic_integration.pipedrive.import.deal');
+        $dealImport->setIntegration($integration);
+
+        return $dealImport;
+    }
+
     /**
      * @param $integration
      *
@@ -151,6 +223,30 @@ class PipedriveController extends CommonController
         $ownerImport->setIntegration($integration);
 
         return $ownerImport;
+    }
+
+    private function getPipelineImport($integration)
+    {
+        $pipelineImport = $this->get('mautic_integration.pipedrive.import.pipeline');
+        $pipelineImport->setIntegration($integration);
+
+        return $pipelineImport;
+    }
+
+    private function getProductImport($integration)
+    {
+        $productImport = $this->get('mautic_integration.pipedrive.import.product');
+        $productImport->setIntegration($integration);
+
+        return $productImport;
+    }
+
+    private function getStageImport($integration)
+    {
+        $stageImport = $this->get('mautic_integration.pipedrive.import.stage');
+        $stageImport->setIntegration($integration);
+
+        return $stageImport;
     }
 
     /**

@@ -4,6 +4,9 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export;
 
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveDeal;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveDealProduct;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveProduct;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -33,6 +36,37 @@ class LeadExport extends AbstractPipedrive
         }
 
         return false;
+    }
+
+
+    public function createWithDeal(Lead $lead, $config, DealExport $dealExport)
+    {
+        if (!$this->create($lead)) {
+            return false;
+        }
+
+        $deal = new PipedriveDeal();
+        $deal->setTitle($config['title']);
+        $deal->setStage(
+            $this->em->getReference('MauticPlugin\MauticCrmBundle\Entity\PipedriveStage', $config['stage'])
+        );
+        $deal->setLead($lead);
+
+
+        if ($config['product'] != null) {
+            $dealProduct = new PipedriveDealProduct();
+            $dealProduct->setDeal($deal);
+
+            $dealProduct->setProduct(
+                $this->em->getReference('MauticPlugin\MauticCrmBundle\Entity\PipedriveProduct', $config['product'])
+            );
+            $dealProduct->setQuantity(1);
+            $dealProduct->setItemPrice($config['product_price']);
+
+            $deal->addDealProduct($dealProduct);
+        }
+
+        return $dealExport->create($deal, $lead);
     }
 
     public function update(Lead $lead)

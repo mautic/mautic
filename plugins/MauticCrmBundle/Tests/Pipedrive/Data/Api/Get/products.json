@@ -1,0 +1,160 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "Product 1",
+      "code": null,
+      "unit": null,
+      "tax": 0,
+      "active_flag": true,
+      "selectable": true,
+      "first_char": "p",
+      "visible_to": "3",
+      "owner_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "files_count": null,
+      "followers_count": 0,
+      "add_time": "2017-05-19 09:16:39",
+      "update_time": "2017-05-19 09:16:39",
+      "prices": [
+        {
+          "id": 1,
+          "product_id": 1,
+          "price": 19.9,
+          "currency": "EUR",
+          "cost": 0,
+          "overhead_cost": 0
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Product 2",
+      "code": null,
+      "unit": null,
+      "tax": 0,
+      "active_flag": true,
+      "selectable": true,
+      "first_char": "p",
+      "visible_to": "3",
+      "owner_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "files_count": null,
+      "followers_count": 0,
+      "add_time": "2017-05-19 17:19:56",
+      "update_time": "2017-05-19 17:20:30",
+      "prices": [
+        {
+          "id": 2,
+          "product_id": 2,
+          "price": 49,
+          "currency": "EUR",
+          "cost": 0,
+          "overhead_cost": 0
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Product 3",
+      "code": null,
+      "unit": null,
+      "tax": 0,
+      "active_flag": false,
+      "selectable": false,
+      "first_char": "p",
+      "visible_to": "3",
+      "owner_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "files_count": null,
+      "followers_count": 0,
+      "add_time": "2017-05-19 17:21:07",
+      "update_time": "2017-05-19 17:21:07",
+      "prices": [
+        {
+          "id": 3,
+          "product_id": 3,
+          "price": 99,
+          "currency": "EUR",
+          "cost": 0,
+          "overhead_cost": 0
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Product 4",
+      "code": null,
+      "unit": null,
+      "tax": 0,
+      "active_flag": true,
+      "selectable": true,
+      "first_char": "p",
+      "visible_to": "3",
+      "owner_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "files_count": null,
+      "followers_count": 0,
+      "add_time": "2017-05-19 17:21:25",
+      "update_time": "2017-05-19 17:21:46",
+      "prices": [
+        {
+          "id": 4,
+          "product_id": 4,
+          "price": 299,
+          "currency": "EUR",
+          "cost": 0,
+          "overhead_cost": 0
+        }
+      ]
+    }
+  ],
+  "additional_data": {
+    "pagination": {
+      "start": 0,
+      "limit": 100,
+      "more_items_in_collection": false
+    }
+  },
+  "related_objects": {
+    "user": {
+      "2378326": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true
+      }
+    }
+  }
+}

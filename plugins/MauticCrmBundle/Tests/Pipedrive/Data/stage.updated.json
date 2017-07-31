@@ -1,0 +1,47 @@
+{
+    "v": 1,
+    "matches_filters": null,
+    "meta": {
+        "v": 1,
+        "action": "updated",
+        "object": "stage",
+        "id": 16,
+        "company_id": 1111111,
+        "user_id": 1111111,
+        "host": "host.pipedrive.com",
+        "timestamp": 1501171313,
+        "timestamp_micro": 1501171313895600,
+        "permitted_user_ids": [
+            "*"
+        ],
+        "trans_pending": false,
+        "is_bulk_update": false,
+        "webhook_id": "1111111"
+    },
+    "current": {
+        "id": 16,
+        "order_nr": 1,
+        "name": "STAGE 1",
+        "active_flag": true,
+        "deal_probability": 100,
+        "pipeline_id": 5,
+        "rotten_flag": false,
+        "rotten_days": null,
+        "add_time": "2017-07-27 15:48:17",
+        "update_time": "2017-07-27 16:01:53"
+    },
+    "previous": {
+        "id": 16,
+        "order_nr": 1,
+        "name": "Stage 1",
+        "active_flag": true,
+        "deal_probability": 100,
+        "pipeline_id": 5,
+        "rotten_flag": false,
+        "rotten_days": null,
+        "add_time": "2017-07-27 15:48:17",
+        "update_time": "2017-07-27 15:48:17"
+    },
+    "event": "updated.stage",
+    "retry": 0
+}

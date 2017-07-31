@@ -12,6 +12,7 @@ abstract class AbstractPipedrive
     const LEAD_ENTITY_TYPE         = 'lead';
     const ORGANIZATION_ENTITY_TYPE = 'organization';
     const COMPANY_ENTITY_TYPE      = 'company';
+    const DEAL_TYPE                = 'deal';
 
     /**
      * @var PipedriveIntegration

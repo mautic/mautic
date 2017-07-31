@@ -60,7 +60,21 @@ return [
                     'mautic.lead.model.list',
                 ],
             ],
+            'mautic.integration.lead_content_subscriber' => [
+                'class' => 'MauticPlugin\MauticCrmBundle\EventListener\CustomContentSubscriber',
+                'arguments' => [ 'doctrine.orm.default_entity_manager', 'mautic.helper.integration' ]
+            ],
+            // 'mautic.integration.pipedrive.form_actions.subscriber' => [
+            //     'class' => 'MauticPlugin\MauticCrmBundle\EventListener\PipedriveActionSubscriber',
+            // ]
         ],
+        // 'forms' => [
+        //     'mautic_integration.pipedrive.offer' => [
+        //         'class'     => 'MauticPlugin\MauticCrmBundle\Form\Type\PipedriveOfferType',
+        //         'arguments' => [ 'doctrine.orm.entity_manager'],
+        //         'alias'     => 'pipedrive_offer_action',
+        //     ]
+        // ],
         'integrations' => [
             'mautic.integration.hubspot' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration::class,
@@ -122,12 +136,42 @@ return [
                     'mautic.lead.model.company',
                 ],
             ],
+            'mautic_integration.pipedrive.import.deal' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\DealImport',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
             'mautic_integration.pipedrive.import.lead' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\LeadImport::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
+                ],
+            ],
+            'mautic_integration.pipedrive.import.pipeline' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\PipelineImport',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic_integration.pipedrive.import.product' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\ProductImport',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic_integration.pipedrive.import.stage' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\StageImport',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic_integration.pipedrive.export.deal' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\DealExport',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic_integration.pipedrive.export.company' => [

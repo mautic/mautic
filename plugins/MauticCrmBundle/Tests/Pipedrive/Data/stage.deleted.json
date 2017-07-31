@@ -1,0 +1,38 @@
+{
+    "v": 1,
+    "matches_filters": null,
+    "meta": {
+        "v": 1,
+        "action": "deleted",
+        "object": "stage",
+        "id": "16",
+        "company_id": 1659662,
+        "user_id": 2378326,
+        "host": "host.pipedrive.com",
+        "timestamp": 1501177982,
+        "timestamp_micro": 1501177982722100,
+        "permitted_user_ids": [
+            "*"
+        ],
+        "trans_pending": false,
+        "is_bulk_update": false,
+        "webhook_id": "18282"
+    },
+    "current": null,
+    "previous": {
+        "id": 2,
+        "order_nr": 1,
+        "name": "Contact effectué",
+        "active_flag": true,
+        "deal_probability": 100,
+        "pipeline_id": 1,
+        "rotten_flag": false,
+        "rotten_days": null,
+        "add_time": "2017-03-31 13:21:29",
+        "update_time": "2017-07-19 10:34:49",
+        "pipeline_name": "Pipeline",
+        "pipeline_active": 1
+    },
+    "event": "deleted.stage",
+    "retry": 0
+}

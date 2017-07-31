@@ -1,0 +1,83 @@
+{
+    "success": true,
+    "data": [
+        {
+            "id": 2,
+            "order_nr": 1,
+            "name": "First Contact",
+            "active_flag": true,
+            "deal_probability": 100,
+            "pipeline_id": 1,
+            "rotten_flag": false,
+            "rotten_days": null,
+            "add_time": "2017-03-31 13:21:29",
+            "update_time": "2017-07-19 10:34:49",
+            "pipeline_name": "Pipeline"
+        },
+        {
+            "id": 1,
+            "order_nr": 2,
+            "name": "Contact identified",
+            "active_flag": true,
+            "deal_probability": 100,
+            "pipeline_id": 1,
+            "rotten_flag": false,
+            "rotten_days": null,
+            "add_time": "2017-03-31 13:21:29",
+            "update_time": "2017-07-19 10:34:49",
+            "pipeline_name": "Pipeline"
+        },
+        {
+            "id": 3,
+            "order_nr": 3,
+            "name": "Meeting setup",
+            "active_flag": true,
+            "deal_probability": 100,
+            "pipeline_id": 1,
+            "rotten_flag": false,
+            "rotten_days": null,
+            "add_time": "2017-03-31 13:21:29",
+            "update_time": "2017-07-19 10:34:49",
+            "pipeline_name": "Pipeline"
+        },
+        {
+            "id": 5,
+            "order_nr": 4,
+            "name": "Offer sent",
+            "active_flag": false,
+            "deal_probability": 100,
+            "pipeline_id": 1,
+            "rotten_flag": false,
+            "rotten_days": null,
+            "add_time": "2017-03-31 13:21:29",
+            "update_time": "2017-07-19 10:34:49",
+            "pipeline_name": "Pipeline"
+        },
+        {
+            "id": 6,
+            "order_nr": 5,
+            "name": "Talks",
+            "active_flag": true,
+            "deal_probability": 100,
+            "pipeline_id": 1,
+            "rotten_flag": false,
+            "rotten_days": null,
+            "add_time": "2017-03-31 13:21:29",
+            "update_time": "2017-07-19 10:34:49",
+            "pipeline_name": "Pipeline"
+        },
+        {
+            "id": 7,
+            "order_nr": 1,
+            "name": "step 1",
+            "active_flag": true,
+            "deal_probability": 100,
+            "pipeline_id": 2,
+            "rotten_flag": false,
+            "rotten_days": null,
+            "add_time": "2017-07-18 19:43:38",
+            "update_time": "2017-07-19 11:09:04",
+            "pipeline_name": "Pipeline 2"
+        }
+    ]
+}

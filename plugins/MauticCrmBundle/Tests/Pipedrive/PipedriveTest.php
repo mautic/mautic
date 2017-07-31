@@ -11,6 +11,8 @@ use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
+use MauticPlugin\MauticCrmBundle\Entity\PipedrivePipeline;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveStage;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 
 abstract class PipedriveTest extends MauticMysqlTestCase
@@ -146,6 +148,33 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $company;
+    }
+
+    protected function createPipeline($pipelineId, $name = 'Pipeline name', $isActive = true)
+    {
+        $pipeline = new PipedrivePipeline();
+        $pipeline->setPipelineId($pipelineId);
+        $pipeline->setName($name);
+        $pipeline->setActive($isActive);
+
+        $this->em->persist($pipeline);
+        $this->em->flush();
+
+        return $pipeline;
+    }
+
+    protected function createStage($stageId, $stageName, $order, $pipeline)
+    {
+        $stage = new PipedriveStage();
+        $stage->setStageId($stageId);
+        $stage->setName($stageName);
+        $stage->setPipeline($pipeline);
+        $stage->setOrder($order);
+
+        $this->em->persist($stage);
+        $this->em->flush();
+
+        return $stage;
     }
 
     protected function createLeadIntegrationEntity($integrationEntityId, $internalEntityId)

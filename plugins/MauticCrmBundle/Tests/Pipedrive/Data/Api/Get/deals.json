@@ -1,0 +1,311 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 4,
+      "creator_user_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "user_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "person_id": {
+        "name": "gordon",
+        "email": [
+          {
+            "value": "",
+            "primary": true
+          }
+        ],
+        "phone": [
+          {
+            "value": "",
+            "primary": true
+          }
+        ],
+        "value": 4
+      },
+      "org_id": null,
+      "stage_id": 3,
+      "title": "Offer 1",
+      "value": 0,
+      "currency": "EUR",
+      "add_time": "2017-06-29 09:07:01",
+      "update_time": "2017-06-29 09:07:19",
+      "stage_change_time": "2017-06-29 09:07:19",
+      "active": true,
+      "deleted": false,
+      "status": "open",
+      "next_activity_date": null,
+      "next_activity_time": null,
+      "next_activity_id": null,
+      "last_activity_id": null,
+      "last_activity_date": null,
+      "lost_reason": null,
+      "visible_to": "3",
+      "close_time": null,
+      "pipeline_id": 1,
+      "won_time": null,
+      "first_won_time": null,
+      "lost_time": null,
+      "products_count": 0,
+      "files_count": 0,
+      "notes_count": 0,
+      "followers_count": 1,
+      "email_messages_count": 0,
+      "activities_count": 0,
+      "done_activities_count": 0,
+      "undone_activities_count": 0,
+      "reference_activities_count": 0,
+      "participants_count": 1,
+      "expected_close_date": null,
+      "last_incoming_mail_time": null,
+      "last_outgoing_mail_time": null,
+      "stage_order_nr": 3,
+      "person_name": "gordon",
+      "org_name": null,
+      "next_activity_subject": null,
+      "next_activity_type": null,
+      "next_activity_duration": null,
+      "next_activity_note": null,
+      "formatted_value": "0 €",
+      "rotten_time": null,
+      "weighted_value": 0,
+      "formatted_weighted_value": "0 €",
+      "owner_name": "Gordon",
+      "cc_email": "koko+deal4@pipedrivemail.com",
+      "org_hidden": false,
+      "person_hidden": false
+    },
+     {
+      "id": 5,
+      "creator_user_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "user_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "person_id": {
+        "name": "test",
+        "email": [
+          {
+            "value": "",
+            "primary": true
+          }
+        ],
+        "phone": [
+          {
+            "value": "",
+            "primary": true
+          }
+        ],
+        "value": 4
+      },
+      "org_id": null,
+      "stage_id": 1,
+      "title": "Offre test",
+      "value": 100,
+      "currency": "EUR",
+      "add_time": "2017-06-29 09:07:06",
+      "update_time": "2017-06-29 09:08:53",
+      "stage_change_time": null,
+      "active": true,
+      "deleted": false,
+      "status": "open",
+      "next_activity_date": null,
+      "next_activity_time": null,
+      "next_activity_id": null,
+      "last_activity_id": null,
+      "last_activity_date": null,
+      "lost_reason": null,
+      "visible_to": "3",
+      "close_time": null,
+      "pipeline_id": 1,
+      "won_time": null,
+      "first_won_time": null,
+      "lost_time": null,
+      "products_count": 1,
+      "files_count": 0,
+      "notes_count": 0,
+      "followers_count": 1,
+      "email_messages_count": 0,
+      "activities_count": 0,
+      "done_activities_count": 0,
+      "undone_activities_count": 0,
+      "reference_activities_count": 0,
+      "participants_count": 1,
+      "expected_close_date": null,
+      "last_incoming_mail_time": null,
+      "last_outgoing_mail_time": null,
+      "stage_order_nr": 2,
+      "person_name": "test",
+      "org_name": null,
+      "next_activity_subject": null,
+      "next_activity_type": null,
+      "next_activity_duration": null,
+      "next_activity_note": null,
+      "formatted_value": "100 €",
+      "rotten_time": null,
+      "weighted_value": 100,
+      "formatted_weighted_value": "100 €",
+      "owner_name": "Gordon",
+      "cc_email": "koko+deal5@pipedrivemail.com",
+      "org_hidden": false,
+      "person_hidden": false
+     },
+      {
+      "id": 6,
+      "creator_user_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "user_id": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere.com",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true,
+        "value": 1111111
+      },
+      "person_id": null,
+      "org_id": null,
+      "stage_id": 2,
+      "title": "test deal",
+      "value": 0,
+      "currency": "EUR",
+      "add_time": "2017-07-18 20:06:09",
+      "update_time": "2017-07-18 20:06:09",
+      "stage_change_time": null,
+      "active": true,
+      "deleted": false,
+      "status": "open",
+      "next_activity_date": null,
+      "next_activity_time": null,
+      "next_activity_id": null,
+      "last_activity_id": null,
+      "last_activity_date": null,
+      "lost_reason": null,
+      "visible_to": "3",
+      "close_time": null,
+      "pipeline_id": 1,
+      "won_time": null,
+      "first_won_time": null,
+      "lost_time": null,
+      "products_count": 0,
+      "files_count": 0,
+      "notes_count": 0,
+      "followers_count": 1,
+      "email_messages_count": 0,
+      "activities_count": 0,
+      "done_activities_count": 0,
+      "undone_activities_count": 0,
+      "reference_activities_count": 0,
+      "participants_count": 0,
+      "expected_close_date": null,
+      "last_incoming_mail_time": null,
+      "last_outgoing_mail_time": null,
+      "stage_order_nr": 1,
+      "person_name": null,
+      "org_name": null,
+      "next_activity_subject": null,
+      "next_activity_type": null,
+      "next_activity_duration": null,
+      "next_activity_note": null,
+      "formatted_value": "0 €",
+      "rotten_time": null,
+      "weighted_value": 0,
+      "formatted_weighted_value": "0 €",
+      "owner_name": "Gordon",
+      "cc_email": "koko+deal6@pipedrivemail.com",
+      "org_hidden": false,
+      "person_hidden": false
+    }
+
+
+  ],
+  "additional_data": {
+    "pagination": {
+      "start": 0,
+      "limit": 100,
+      "more_items_in_collection": false
+    }
+  },
+  "related_objects": {
+    "user": {
+      "2378326": {
+        "id": 1111111,
+        "name": "Gordon G",
+        "email": "gordon@nobodynowhere",
+        "has_pic": false,
+        "pic_hash": null,
+        "active_flag": true
+      }
+    },
+    "person": {
+      "49": {
+        "id": 49,
+        "name": "dude",
+        "email": [
+          {
+            "label": "",
+            "value": "dude@nobodynowhere",
+            "primary": true
+          }
+        ],
+        "phone": [
+          {
+            "value": "",
+            "primary": true
+          }
+        ]
+      },
+      "50": {
+        "id": 50,
+        "name": "koko",
+        "email": [
+          {
+            "label": "",
+            "value": "koko@nobodynowhere",
+            "primary": true
+          }
+        ],
+        "phone": [
+          {
+            "value": "",
+            "primary": true
+          }
+        ]
+      }
+    }
+  }
+}

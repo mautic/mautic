@@ -3,6 +3,9 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\MauticCrmBundle\Entity\PipedrivePipeline;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveProduct;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveStage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
@@ -212,6 +215,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 [
                     'choices' => [
                         'company' => 'mautic.pipedrive.object.organization',
+                        'deal'    => 'mautic.pipedrive.object.deal',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
@@ -221,6 +225,114 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     'required'    => false,
                 ]
             );
+        } elseif ($formArea == 'integration') {
+
+            /**
+             * formname can take several values like formaction or campaignevent
+             * which makes it impossible to hardcode a value like below.
+             *
+             * Moreover, even if it could be done, there is an issue with the
+             * first time the form is loaded as the expression for the pushDeal
+             * is not evaluated at that moment. After a click on it, it works as
+             * expected.
+             */
+
+            $formName = 'formaction_properties_config';
+            //            $dontPushDeal = '{"'. $formName . '_push_deal_0": "checked"}'; // does that even work ?
+            $pushDeal = '{"'. $formName . '_push_deal_1": "checked"}';
+            $noProductChosen = '{"'. $formName . '_product": ""}';
+
+            if ($this->isDealSupportEnabled()) {
+                $builder->add(
+                    'push_deal',
+                    'yesno_button_group',
+                    [
+                        'label' => 'mautic.pipedrive.push_deal.question',
+                        'data'  => (isset($data['push_deal'])) ? (bool) $data['push_deal'] : false,
+                        'attr'  => [
+                            'tooltip' => 'mautic.pipedrive.push_deal.tooltip',
+                        ],
+                    ]
+                );
+
+                $stages = $this->em->getRepository(PipedriveStage::class)
+                    ->createQueryBuilder('st')
+                    ->join('st.pipeline', 'p')
+                    ->addOrderBy('p.name', 'ASC')
+                    ->addOrderBy('st.order', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+                $products = $this->em->getRepository(PipedriveProduct::class)->findBy([], ['name' => 'ASC']);
+
+                $stageChoices = [];
+                foreach ($stages as $stage) {
+                    $stageChoices[$stage->getPipeline()->getName()][$stage->getId()] =  $stage->getName();
+                }
+
+                $productChoices = [];
+                foreach ($products as $product) {
+                    $productChoices[$product->getId()] = $product->getName();
+                }
+
+                $builder->add(
+                    'title',
+                    'text',
+                    [
+                        'label' => 'mautic.pipedrive.offer_name.label',
+                        'attr'  => [
+                            'class' => 'form-control',
+                            //'data-show-on' => $pushDeal,
+                        ],
+                        'required' => true,
+                    ]
+                );
+                $builder->add('stage', 'choice', [
+                    'label'   => 'mautic.pipedrive.stage.label',
+                    'choices' => $stageChoices,
+                    'attr' => [
+                        //'data-show-on' => $pushDeal,
+                    ],
+                ]);
+
+                $builder->add('product', 'choice', [
+                    'label'   => 'mautic.pipedrive.product.label',
+                    'choices' => $productChoices,
+                    'placeholder' => 'mautic.pipedrive.product.placeholder',
+                    'attr' => [
+                        'tooltip' => 'mautic.pipedrive.product.tooltip',
+                        'data-show-on' => $pushDeal,
+                    ],
+                ]);
+
+                $builder->add(
+                    'product_price',
+                    'number',
+                    [
+                        'label' => 'mautic.pipedrive.offer_product_price',
+                        'attr'  => [
+                            'class' => 'form-control',
+                            // 'data-hide-on' => $noProductChosen,
+                            // 'data-show-on' => $pushDeal,
+                        ],
+                        'data'  => (isset($data['product_price']))? $data['product_price'] : 0,
+                        'required' => false,
+                    ]
+                );
+                $builder->add(
+                    'product_comment',
+                    'textarea',
+                    [
+                        'label' => 'mautic.pipedrive.offer_product_comment',
+                        'attr'  => [
+                            'class'        => 'form-control',
+                            'tooltip'      => 'mautic.pipedrive.product_comment.tooltip',
+                            // 'data-hide-on' => $noProductChosen,
+                            // 'data-show-on' => $pushDeal,
+                        ],
+                        'required' => false,
+                    ]
+                );
+            }
         }
     }
 
@@ -231,12 +343,26 @@ class PipedriveIntegration extends CrmAbstractIntegration
         return isset($supportedFeatures['objects']) && in_array('company', $supportedFeatures['objects']);
     }
 
+    public function isDealSupportEnabled()
+    {
+        $supportedFeatures = $this->getIntegrationSettings()->getFeatureSettings();
+
+        return isset($supportedFeatures['objects']) && in_array('deal', $supportedFeatures['objects']);
+    }
+
     public function pushLead($lead, $config = [])
     {
         $leadExport = $this->factory->get('mautic_integration.pipedrive.export.lead');
         $leadExport->setIntegration($this);
 
-        return $leadExport->create($lead);
+        if ($this->isDealSupportEnabled()) {
+            $dealExport = $this->factory->get('mautic_integration.pipedrive.export.deal');
+            $dealExport->setIntegration($this);
+
+            return $leadExport->createWithDeal($lead, $config['config'], $dealExport);
+        } else {
+            return $leadExport->create($lead);
+        }
     }
 
     /**
