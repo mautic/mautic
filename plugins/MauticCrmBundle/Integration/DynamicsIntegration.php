@@ -824,6 +824,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();
             }
+            $existingPerson          = $this->getExistingRecord($lead['integration_entity_id']);
+            $fieldsToUpdate[$object] = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPerson, $mappedData, $config);
             // Match that data with mapped lead fields
             foreach ($fieldsToUpdate[$object] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
@@ -908,5 +910,8 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $this->createIntegrationEntity($object, $oid, 'lead', $leadId);
             }
         }
+    }
+    private function getExistingRecord($integrationEntityId)
+    {
     }
 }

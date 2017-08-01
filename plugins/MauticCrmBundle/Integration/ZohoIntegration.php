@@ -964,7 +964,9 @@ class ZohoIntegration extends CrmAbstractIntegration
                 if ($progress) {
                     $progress->advance();
                 }
-                $mappedData['Id'] = $lead['integration_entity_id'];
+                $mappedData['Id']         = $lead['integration_entity_id'];
+                $existingPerson           = $this->getExistingRecord($lead['integration_entity_id']);
+                $fieldsToUpdate[$zObject] = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPerson, $mappedData, $config);
                 $xmlData .= '<row no="'.($rowid++).'">';
                 // Match that data with mapped lead fields
                 foreach ($fieldsToUpdate[$zObject] as $k => $v) {
@@ -1096,5 +1098,8 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
             }
         }
+    }
+    private function getExistingRecord($integrationEntityId)
+    {
     }
 }
