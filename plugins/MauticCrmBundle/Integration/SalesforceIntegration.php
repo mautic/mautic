@@ -171,7 +171,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getCompositeUrl()
     {
-        return sprintf('%s/services/data/v39.0', $this->keys['instance_url']);
+        return sprintf('%s/services/data/v38.0', $this->keys['instance_url']);
     }
 
     /**
