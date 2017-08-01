@@ -969,8 +969,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                         $mauticObjectReference = 'lead';
                         $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
-
-                        $company = null;
+                        $detachClass           = Lead::class;
+                        $company               = null;
                         if ($entity && isset($dataObject['account_id'.$newName]) && trim($dataObject['account_id'.$newName]) != '') {
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
@@ -986,10 +986,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                 $company      = $companyRepo->find($companyId);
 
                                 $companyModel->addLeadToCompany($company, $entity);
+                                $this->em->clear(Company::class);
                             }
                         }
                     } elseif ($object == 'Accounts') {
                         $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
                     } else {
                         $this->logIntegrationError(
@@ -1025,6 +1027,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $integrationEntities[] = $integrationEntity;
                         }
                         $this->em->detach($entity);
+                        $this->em->clear($detachClass);
                         unset($entity);
                     } else {
                         continue;
