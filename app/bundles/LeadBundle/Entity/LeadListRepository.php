@@ -1478,7 +1478,7 @@ class LeadListRepository extends CommonRepository
                             break;
                     }
 
-                    $subQb = $this->createFilterExpressionSubQuery($table, $alias, $column, $details['filter'],  $leadId, $subQueryFilters);
+                    $subQb = $this->createFilterExpressionSubQuery($table, $alias, $column, $details['filter'],  $parameters, $leadId, $subQueryFilters);
 
                     $groupExpr->add(
                         sprintf('%s (%s)', $func, $subQb->getSQL())
