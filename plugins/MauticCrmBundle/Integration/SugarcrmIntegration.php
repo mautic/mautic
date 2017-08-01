@@ -229,7 +229,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         $isRequired = function (array $field, $object) {
             switch (true) {
-                case 'Leads' === $object && 'webtolead_email1' === $field['name']:
+                case 'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']):
                     return true;
                 case 'Contacts' === $object && 'email1' === $field['name']:
                     return true;
