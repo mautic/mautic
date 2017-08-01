@@ -450,7 +450,7 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead        = $this->leadModel->getCurrentLead();
+        $lead        = ($this->request) ? $this->leadModel->getCurrentLead() : null;
         $style       = '';
 
         if (!empty($theme)) {
