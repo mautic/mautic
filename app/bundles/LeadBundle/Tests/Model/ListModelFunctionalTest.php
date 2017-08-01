@@ -51,7 +51,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
                 $segmentTestIncludeMembershipManualMembersRef,
                 $segmentTestExcludeMembershipManualMembersRef,
                 $segmentTestExcludeMembershipWithoutOtherFiltersRef,
-                $segmentTestIncludeWithUnrelatedManualRemovalRef
+                $segmentTestIncludeWithUnrelatedManualRemovalRef,
             ],
             ['countOnly' => true]
         );
@@ -169,7 +169,6 @@ class ListModelFunctionalTest extends MauticWebTestCase
             $segmentContacts[$segmentTestIncludeWithUnrelatedManualRemovalRef->getId()]['count'],
             'There should be 26 contacts in the included segment-test-include-segment-with-filters segment where a contact has been manually removed form another list'
         );
-
     }
 
     public function testPublicSegmentsInContactPreferences()
