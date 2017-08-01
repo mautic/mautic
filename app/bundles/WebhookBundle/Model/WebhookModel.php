@@ -39,6 +39,12 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class WebhookModel extends FormModel
 {
     /**
+     *  2 possible types of the processing of the webhooks.
+     */
+    const COMMAND_PROCESS   = 'command_process';
+    const IMMEDIATE_PROCESS = 'immediate_process';
+
+    /**
      * Whet queue mode is turned on.
      *
      * @var string
@@ -234,11 +240,13 @@ class WebhookModel extends FormModel
 
             $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $serializationGroups));
 
-            // add the queuelist and save everything
-            $this->saveEntity($webhook);
+            // add the queuelist and save everything if command process
+            if ($this->queueMode == self::COMMAND_PROCESS) {
+                $this->saveEntity($webhook);
+            }
         }
 
-        if ($this->queueMode == 'immediate_process') {
+        if ($this->queueMode == self::IMMEDIATE_PROCESS) {
             $this->processWebhooks($webhookList);
         }
 
@@ -293,9 +301,6 @@ class WebhookModel extends FormModel
      */
     public function processWebhook(Webhook $webhook)
     {
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
-        $webhookQueueRepo = $this->getQueueRepository();
-
         // instantiate new http class
         $http = new Http();
 
@@ -346,7 +351,10 @@ class WebhookModel extends FormModel
             return false;
         }
 
-        if ($this->queueMode === 'command_process' && !empty($this->webhookQueueIdList)) {
+        if ($this->queueMode === self::COMMAND_PROCESS && !empty($this->webhookQueueIdList)) {
+
+            /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
+            $webhookQueueRepo = $this->getQueueRepository();
 
             // delete all the queued items we just processed
             $webhookQueueRepo->deleteQueuesById($this->webhookQueueIdList);
@@ -488,8 +496,13 @@ class WebhookModel extends FormModel
             return $payload;
         }
 
-        $queuesArray = $this->getWebhookQueues($webhook);
-        $payload     = [];
+        $payload = [];
+
+        if ($this->queueMode == self::COMMAND_PROCESS) {
+            $queuesArray = $this->getWebhookQueues($webhook);
+        } else {
+            $queuesArray = [$webhook->getQueues()];
+        }
 
         /* @var WebhookQueue $queue */
         foreach ($queuesArray as $queues) {
