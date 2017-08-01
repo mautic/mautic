@@ -357,7 +357,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
             ],
             [ // ID 19
                 'name'    => 'Segment membership with excluded segment without other filters',
-                'alias'   => 'segment-test-exclude-segment-wihtout-other-filters',
+                'alias'   => 'segment-test-exclude-segment-without-other-filters',
                 'public'  => true,
                 'filters' => [
                     [

@@ -27,7 +27,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
         $segmentTestManualMembership                        = $this->fixtures->getReference('segment-test-manual-membership');
         $segmentTestIncludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-include-segment-manual-members');
         $segmentTestExcludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-exclude-segment-manual-members');
-        $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-wihtout-other-filters');
+        $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-without-other-filters');
 
         // These expect filters to be part of the $lists passed to getLeadsByList so pass the entity
         $segmentContacts = $repo->getLeadsByList(
@@ -79,9 +79,9 @@ class ListModelFunctionalTest extends MauticWebTestCase
         );
 
         $this->assertEquals(
-            50,
+            53,
             $segmentContacts[$segmentTest5Ref->getId()]['count'],
-            'There should be 50 contacts in the segment-test-5 segment.'
+            'There should be 53 contacts in the segment-test-5 segment.'
         );
 
         $this->assertEquals(
@@ -127,9 +127,9 @@ class ListModelFunctionalTest extends MauticWebTestCase
         );
 
         $this->assertEquals(
-            27,
+            30,
             $segmentContacts[$segmentTestExcludeMembershipMixedFiltersRef->getId()]['count'],
-            'There should be 24 contacts. 0 from segment-test-without-filters and 24 from segment-test-3.'
+            'There should be 30 contacts. 0 from segment-test-without-filters and 30 from segment-test-3.'
         );
 
         $this->assertEquals(
@@ -157,9 +157,9 @@ class ListModelFunctionalTest extends MauticWebTestCase
         );
 
         $this->assertEquals(
-            39,
+            42,
             $segmentContacts[$segmentTestExcludeMembershipWithoutOtherFiltersRef->getId()]['count'],
-            'There should be 39 contacts in the included segment-test-exclude-segment-wihtout-other-filters segment'
+            'There should be 42 contacts in the included segment-test-exclude-segment-without-other-filters segment'
         );
     }
 

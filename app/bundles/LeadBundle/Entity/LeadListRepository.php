@@ -603,6 +603,7 @@ class LeadListRepository extends CommonRepository
             $this->applyCompanyFieldFilters($q);
         }
 
+        $paramType = null;
         foreach ($parameters as $k => $v) {
             switch (true) {
                 case is_array($v):
