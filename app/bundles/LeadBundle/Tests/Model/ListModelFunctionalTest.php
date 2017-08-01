@@ -165,9 +165,9 @@ class ListModelFunctionalTest extends MauticWebTestCase
         );
 
         $this->assertEquals(
-            26,
+            11,
             $segmentContacts[$segmentTestIncludeWithUnrelatedManualRemovalRef->getId()]['count'],
-            'There should be 26 contacts in the included segment-test-include-segment-with-filters segment where a contact has been manually removed form another list'
+            'There should be 11 contacts in the segment-test-include-segment-with-unrelated-segment-manual-removal segment where a contact has been manually removed form another list'
         );
     }
 
