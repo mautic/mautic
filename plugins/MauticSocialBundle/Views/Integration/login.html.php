@@ -75,6 +75,7 @@ $js = <<<JS
                 }
             }
         }
+	document.getElementById("mauticform_{$formName}").submit();
     }
 JS;
 $html = <<<HTML
