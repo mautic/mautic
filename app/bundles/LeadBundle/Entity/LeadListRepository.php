@@ -442,13 +442,13 @@ class LeadListRepository extends CommonRepository
                     if (!$newOnly) { // live count
                         // Include manually added
                         $q->orWhere(
-                            $q->expr()->eq("ll.manually_added", 1)
+                            $q->expr()->eq('ll.manually_added', 1)
                         );
 
                         $q->andWhere(
                             $q->expr()->orX(
-                                $q->expr()->isNull("ll.manually_removed"), // account for those not in a list yet
-                                $q->expr()->eq("ll.manually_removed", 0) //exclude manually removed
+                                $q->expr()->isNull('ll.manually_removed'), // account for those not in a list yet
+                                $q->expr()->eq('ll.manually_removed', 0) //exclude manually removed
                             )
                         );
                     }
@@ -1349,14 +1349,14 @@ class LeadListRepository extends CommonRepository
                     break;
 
                 case 'leadlist':
-                    $table  = 'lead_lists_leads';
-                    $column = 'leadlist_id';
-                    $falseParameter = $this->generateRandomParameterName();
+                    $table                       = 'lead_lists_leads';
+                    $column                      = 'leadlist_id';
+                    $falseParameter              = $this->generateRandomParameterName();
                     $parameters[$falseParameter] = false;
-                    $trueParameter = $this->generateRandomParameterName();
-                    $parameters[$trueParameter] = true;
-                    $func = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
-                    $ignoreAutoFilter = true;
+                    $trueParameter               = $this->generateRandomParameterName();
+                    $parameters[$trueParameter]  = true;
+                    $func                        = in_array($func, ['eq', 'in']) ? 'EXISTS' : 'NOT EXISTS';
+                    $ignoreAutoFilter            = true;
 
                     if ($filterListIds = (array) $details['filter']) {
                         $listQb = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -1390,7 +1390,7 @@ class LeadListRepository extends CommonRepository
                                     $parameters,
                                     $leadId,
                                     [
-                                        $alias.'.manually_removed' => $falseParameter
+                                        $alias.'.manually_removed' => $falseParameter,
                                     ]
                                 );
                             } else {
@@ -1411,7 +1411,7 @@ class LeadListRepository extends CommonRepository
                                         )
                                     )
                                     ->andWhere(
-                                        $subQb->expr()->eq("$alias.id", "l.id"),
+                                        $subQb->expr()->eq("$alias.id", 'l.id'),
                                         $subQb->expr()->orX(
                                             $subQb->expr()->isNull("$membershipAlias.manually_removed"), // account for those not in a list yet
                                             $subQb->expr()->eq("$membershipAlias.manually_removed", ":$falseParameter") //exclude manually removed
@@ -1457,9 +1457,9 @@ class LeadListRepository extends CommonRepository
                             $table  = 'email_stats';
                             $column = 'email_id';
 
-                            $trueParameter = $this->generateRandomParameterName();
+                            $trueParameter                      = $this->generateRandomParameterName();
                             $subQueryFilters[$alias.'.is_read'] = $trueParameter;
-                            $parameters[$trueParameter] = true;
+                            $parameters[$trueParameter]         = true;
                             break;
                         case 'lead_email_sent':
                             $table  = 'email_stats';

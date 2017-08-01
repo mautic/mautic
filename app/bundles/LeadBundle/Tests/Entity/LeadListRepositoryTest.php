@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Tests;
 
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -40,12 +39,12 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'leadlist',
                     'display'  => null,
-                    'filter'   => [1, 2]
-                ]
+                    'filter'   => [1, 2],
+                ],
             ];
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
+        $expr   = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
         $string = (string) $expr;
 
         $found = preg_match_all('/EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
@@ -77,10 +76,9 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'leadlist',
                     'display'  => null,
-                    'filter'   => [1, 2]
-                ]
+                    'filter'   => [1, 2],
+                ],
             ];
-
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
@@ -111,12 +109,12 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'leadlist',
                     'display'  => null,
-                    'filter'   => [1, 2]
-                ]
+                    'filter'   => [1, 2],
+                ],
             ];
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
-        $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
+        $expr   = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
         $string = (string) $expr;
 
         $found = preg_match_all('/NOT EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
@@ -148,10 +146,9 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'leadlist',
                     'display'  => null,
-                    'filter'   => [1, 2]
-                ]
+                    'filter'   => [1, 2],
+                ],
             ];
-
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
@@ -182,16 +179,15 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'text',
                     'display'  => null,
-                    'filter'   => 'blah.com'
-                ]
+                    'filter'   => 'blah.com',
+                ],
             ];
-
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
 
         $string = (string) $expr;
-        $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
+        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
         $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com%', $string);
@@ -212,16 +208,15 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'text',
                     'display'  => null,
-                    'filter'   => 'blah.com%'
-                ]
+                    'filter'   => 'blah.com%',
+                ],
             ];
-
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
 
         $string = (string) $expr;
-        $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
+        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
         $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == 'blah.com%', $string);
@@ -242,16 +237,15 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'text',
                     'display'  => null,
-                    'filter'   => 'blah.com'
-                ]
+                    'filter'   => 'blah.com',
+                ],
             ];
-
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
 
         $string = (string) $expr;
-        $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
+        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
         $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com%', $string);
@@ -272,16 +266,15 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'text',
                     'display'  => null,
-                    'filter'   => 'blah.com'
-                ]
+                    'filter'   => 'blah.com',
+                ],
             ];
-
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
 
         $string = (string) $expr;
-        $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
+        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
         $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == 'blah.com%', $string);
@@ -302,16 +295,15 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     'object'   => 'lead',
                     'type'     => 'text',
                     'display'  => null,
-                    'filter'   => 'blah.com'
-                ]
+                    'filter'   => 'blah.com',
+                ],
             ];
-
 
         // array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false
         $expr = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
 
         $string = (string) $expr;
-        $found = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
+        $found  = preg_match('/^l.email LIKE :(.*?)$/', $string, $match);
         $this->assertEquals(1, $found, $string);
 
         $this->assertTrue(isset($parameters[$match[1]]) && $parameters[$match[1]] == '%blah.com', $string);
@@ -362,7 +354,7 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     $column = new Column($name, $mockType);
 
                     return [
-                        $name => $column
+                        $name => $column,
                     ];
                 }
             );
@@ -399,8 +391,8 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                 'object'   => 'lead',
                 'type'     => 'text',
                 'display'  => null,
-                'filter'   => 'blah@blah.com'
-            ]
+                'filter'   => 'blah@blah.com',
+            ],
         ];
 
         $subFilters2 = [
@@ -411,19 +403,19 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                 'object'   => 'lead',
                 'type'     => 'text',
                 'display'  => null,
-                'filter'   => 'blah2@blah.com'
-            ]
+                'filter'   => 'blah2@blah.com',
+            ],
         ];
 
         $filters = [
             [
                 'id'      => 1,
-                'filters' => serialize($noFilters ? [] : $subFilters1)
+                'filters' => serialize($noFilters ? [] : $subFilters1),
             ],
             [
                 'id'      => 2,
-                'filters' => serialize($noFilters ? [] : $subFilters2)
-            ]
+                'filters' => serialize($noFilters ? [] : $subFilters2),
+            ],
         ];
         $mockStatement->method('fetchAll')
             ->willReturn($filters);

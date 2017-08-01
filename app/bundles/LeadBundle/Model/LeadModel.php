@@ -1125,8 +1125,8 @@ class LeadModel extends FormModel
         if ($forceRegeneration) {
             $this->leadTrackingCookieGenerated = true;
 
-            $oldTrackingId = $this->request->cookies->get('mautic_session_id');
-            $this->leadTrackingId    = hash('sha1', uniqid(mt_rand()));
+            $oldTrackingId        = $this->request->cookies->get('mautic_session_id');
+            $this->leadTrackingId = hash('sha1', uniqid(mt_rand()));
 
             //create a tracking cookie with a expire of two years
             $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
@@ -1145,8 +1145,8 @@ class LeadModel extends FormModel
             }
             $this->leadTrackingCookieGenerated = false;
             if (empty($this->leadTrackingId)) {
-                $this->leadTrackingId = hash('sha1', uniqid(mt_rand()));
-                $this->leadTrackingCookieGenerated  = true;
+                $this->leadTrackingId              = hash('sha1', uniqid(mt_rand()));
+                $this->leadTrackingCookieGenerated = true;
             }
 
             //create a tracking cookie with a expire of two years

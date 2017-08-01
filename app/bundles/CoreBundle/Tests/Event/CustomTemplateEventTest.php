@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Tests\Event;
 
-
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 
 class CustomTemplateEventTest extends \PHPUnit_Framework_TestCase
