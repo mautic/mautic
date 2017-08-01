@@ -371,6 +371,22 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [ // ID 20
+                'name'    => 'Segment membership with including segment that has a contact thats been removed from non-related segment',
+                'alias'   => 'segment-test-include-segment-with-unrelated-segment-manual-removal',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [10],
+                        'display'  => '',
+                    ]
+                ],
+                'populate' => false,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

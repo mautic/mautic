@@ -28,6 +28,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
         $segmentTestIncludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-include-segment-manual-members');
         $segmentTestExcludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-exclude-segment-manual-members');
         $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-without-other-filters');
+        $segmentTestIncludeWithUnrelatedManualRemovalRef    = $this->fixtures->getReference('segment-test-include-segment-with-unrelated-segment-manual-removal');
 
         // These expect filters to be part of the $lists passed to getLeadsByList so pass the entity
         $segmentContacts = $repo->getLeadsByList(
@@ -49,7 +50,8 @@ class ListModelFunctionalTest extends MauticWebTestCase
                 $segmentTestManualMembership,
                 $segmentTestIncludeMembershipManualMembersRef,
                 $segmentTestExcludeMembershipManualMembersRef,
-                $segmentTestExcludeMembershipWithoutOtherFiltersRef
+                $segmentTestExcludeMembershipWithoutOtherFiltersRef,
+                $segmentTestIncludeWithUnrelatedManualRemovalRef
             ],
             ['countOnly' => true]
         );
@@ -161,6 +163,13 @@ class ListModelFunctionalTest extends MauticWebTestCase
             $segmentContacts[$segmentTestExcludeMembershipWithoutOtherFiltersRef->getId()]['count'],
             'There should be 42 contacts in the included segment-test-exclude-segment-without-other-filters segment'
         );
+
+        $this->assertEquals(
+            26,
+            $segmentContacts[$segmentTestIncludeWithUnrelatedManualRemovalRef->getId()]['count'],
+            'There should be 26 contacts in the included segment-test-include-segment-with-filters segment where a contact has been manually removed form another list'
+        );
+
     }
 
     public function testPublicSegmentsInContactPreferences()
