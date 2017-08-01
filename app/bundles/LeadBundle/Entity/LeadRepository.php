@@ -484,8 +484,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $alias = $this->getTableAlias();
         $dq    = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'leads', $alias)
-            ->leftJoin($alias, MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = '.$alias.'.owner_id')
-            ->leftJoin($alias, MAUTIC_TABLE_PREFIX.'stages', 's', 's.id = '.$alias.'.stage_id');
+            ->leftJoin($alias, MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = '.$alias.'.owner_id');
 
         return $dq;
     }
@@ -815,8 +814,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.stage', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->$likeExpr('s.name', ':'.$unique)
+                $this->applySearchQueryRelationship(
+                    $q,
+                    [
+                        [
+                            'from_alias' => 'l',
+                            'table'      => 'stages',
+                            'alias'      => 's',
+                            'condition'  => 'l.stage_id = s.id',
+                        ],
+                    ],
+                    $innerJoinTables,
+                    $this->generateFilterExpression($q, 's.name', $likeExpr, $unique, null)
                 );
                 $returnParameter = true;
                 break;
