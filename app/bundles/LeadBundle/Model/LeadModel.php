@@ -790,26 +790,20 @@ class LeadModel extends FormModel
      *
      * @param bool|false $returnTracking
      *
-     * @return Lead|array
+     * @return null|Lead|array
      */
     public function getCurrentLead($returnTracking = false)
     {
-        if ((!$returnTracking && $this->systemCurrentLead) || defined('IN_MAUTIC_CONSOLE')) {
-            // Just return the system set lead
-            if (null === $this->systemCurrentLead) {
+        $isUser = (!$this->security->isAnonymous());
+        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
+            $this->logger->addDebug('LEAD: System lead is being used');
+            if (!$isUser && null === $this->systemCurrentLead) {
                 $this->systemCurrentLead = new Lead();
+            } elseif ($isUser) {
+                $this->logger->addDebug('LEAD: In a Mautic user session');
             }
 
-            return $this->systemCurrentLead;
-        }
-
-        if (!$this->security->isAnonymous()) {
-            // this is a Mautic user that's somehow tracked as a contact which we're going to ignore
-            $this->logger->addDebug('LEAD: In a Mautic user session');
-
-            $lead = new Lead();
-
-            return ($returnTracking) ? [$lead, null, false] : $lead;
+            return ($returnTracking) ? [$this->systemCurrentLead, null, false] : $this->systemCurrentLead;
         }
 
         if ($this->request) {
@@ -984,18 +978,20 @@ class LeadModel extends FormModel
             $lead = $this->getCurrentLead();
         }
 
-        $leadIpAddresses = $lead->getIpAddresses();
-        if (!$leadIpAddresses->contains($ipAddress)) {
-            $lead->addIpAddress($ipAddress);
+        if ($lead) {
+            $leadIpAddresses = $lead->getIpAddresses();
+            if (!$leadIpAddresses->contains($ipAddress)) {
+                $lead->addIpAddress($ipAddress);
+            }
+
+            $this->setFieldValues($lead, $inQuery, false, true, true);
+
+            if (isset($queryFields['tags'])) {
+                $this->modifyTags($lead, $queryFields['tags']);
+            }
+
+            $this->setCurrentLead($lead);
         }
-
-        $this->setFieldValues($lead, $inQuery, false, true, true);
-
-        if (isset($queryFields['tags'])) {
-            $this->modifyTags($lead, $queryFields['tags']);
-        }
-
-        $this->setCurrentLead($lead);
 
         return $lead;
     }
@@ -1009,11 +1005,14 @@ class LeadModel extends FormModel
     {
         $this->logger->addDebug("LEAD: {$lead->getId()} set as current lead.");
 
-        if ($this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
-            // Overwrite system current lead
-            $this->systemCurrentLead = $lead;
+        $isUser = (!$this->security->isAnonymous());
+        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
+            if ($isUser) {
+                $this->logger->addDebug('LEAD: In a Mautic user session');
+            }
 
-            return;
+            // Overwrite system current lead
+            return $this->setSystemCurrentLead($lead);
         }
 
         $oldLead = (is_null($this->currentLead)) ? null : $this->currentLead;
@@ -1059,6 +1058,8 @@ class LeadModel extends FormModel
      */
     public function setSystemCurrentLead(Lead $lead = null)
     {
+        $this->logger->addDebug("LEAD: {$lead->getId()} set as system lead.");
+
         $fields = $lead->getFields();
         if (empty($fields)) {
             $lead->setFields($this->getLeadDetails($lead));

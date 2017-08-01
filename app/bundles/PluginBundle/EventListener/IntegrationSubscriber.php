@@ -42,6 +42,7 @@ class IntegrationSubscriber extends CommonSubscriber
      */
     public function onRequest(PluginIntegrationRequestEvent $event)
     {
+        $name    = strtoupper($event->getIntegrationName());
         $headers = (count($event->getHeaders())) ? implode(PHP_EOL, array_map(function ($k, $v) {
             return "$k: $v";
         }, array_keys($event->getHeaders()), array_values($event->getHeaders()))) : '';
@@ -74,16 +75,16 @@ class IntegrationSubscriber extends CommonSubscriber
             $output->writeln('<fg=cyan>'.$params.'</>');
             $output->writeln('');
             $output->writeln('<fg=cyan>'.$settings.'</>');
-        } elseif ('dev' === MAUTIC_ENV) {
-            $this->logger->debug('INTEGRATION REQUEST: '.$event->getMethod().' '.$event->getUrl());
+        } else {
+            $this->logger->debug("$name REQUEST URL: ".$event->getMethod().' '.$event->getUrl());
             if ('' !== $headers) {
-                $this->logger->debug("REQUEST HEADERS: \n".$headers.PHP_EOL);
+                $this->logger->debug("$name REQUEST HEADERS: \n".$headers.PHP_EOL);
             }
             if ('' !== $params) {
-                $this->logger->debug("REQUEST PARAMS: \n".$params.PHP_EOL);
+                $this->logger->debug("$name REQUEST PARAMS: \n".$params.PHP_EOL);
             }
             if ('' !== $settings) {
-                $this->logger->debug("REQUEST SETTINGS: \n".$settings.PHP_EOL);
+                $this->logger->debug("$name REQUEST SETTINGS: \n".$settings.PHP_EOL);
             }
         }
     }
