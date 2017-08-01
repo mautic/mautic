@@ -987,6 +987,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
                                 $companyModel->addLeadToCompany($company, $entity);
                                 $this->em->clear(Company::class);
+                                $this->em->detach($entity);
                             }
                         }
                     } elseif ($object == 'Accounts') {
@@ -1557,12 +1558,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     protected function processCompositeResponse($response, array $sugarcrmIdMapping = [])
     {
-        $created = 0;
-        $errored = 0;
-        $updated = 0;
-        $object  = 'Lead';
+        $created         = 0;
+        $errored         = 0;
+        $updated         = 0;
+        $object          = 'Lead';
+        $persistEntities = [];
         if (is_array($response)) {
-            $persistEntities = [];
             foreach ($response as $item) {
                 $contactId = $integrationEntityId = null;
                 if (!empty($item['reference_id'])) {
