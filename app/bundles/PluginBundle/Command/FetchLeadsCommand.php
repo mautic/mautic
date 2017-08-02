@@ -101,7 +101,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
             if (!$integrationObject->isAuthorized()) {
-                $output->writeln(sprintf('<error>ERROR:</error> <info>%s is not authorized</info>', $integration));
+                $output->writeln(sprintf('<error>ERROR:</error> <info>'.$translator->trans('mautic.plugin.command.notauthorized').'</info>', $integration));
 
                 return null;
             }
