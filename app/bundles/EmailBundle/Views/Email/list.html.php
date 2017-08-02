@@ -161,32 +161,34 @@ if ($tmpl == 'index') {
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="<?php echo $item->getId(); ?>">
                         <?php  ?>
-                        <span class="mt-xs label label-default hide"
-                              id="pending-<?php echo $item->getId(); ?>"
-                              data-toggle="tooltip"
-                              title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">
-                        </span>
-                        <span class="mt-xs label label-default hide"
-                              id="queued-<?php echo $item->getId(); ?>"
-                              data-toggle="tooltip"
-                              title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>">
-                        </span>
-                        <span class="mt-xs label label-warning" id="sent-count-<?php echo $item->getId(); ?>">
-                            <div style="width: 50px;">
-                                <i class="fa fa-spin fa-spinner"></i>
-                            </div>
-                        </span>
-                        <span class="mt-xs label label-success" id="read-count-<?php echo $item->getId(); ?>">
-                            <div style="width: 50px;">
-                                <i class="fa fa-spin fa-spinner"></i>
-                            </div>
-                        </span>
-                        <span class="mt-xs label label-primary" id="read-percent-<?php echo $item->getId(); ?>">
-                            <div style="width: 50px;">
-                                <i class="fa fa-spin fa-spinner"></i>
-                            </div>
-                        </span>
-                        <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
+                        <div class="btn-group btn-group-xs">
+                            <button class="mt-xs btn btn-default hide"
+                                  id="pending-<?php echo $item->getId(); ?>"
+                                  data-toggle="tooltip"
+                                  title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">
+                            </button>
+                            <button class="mt-xs btn btn-default hide"
+                                  id="queued-<?php echo $item->getId(); ?>"
+                                  data-toggle="tooltip"
+                                  title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>">
+                            </button>
+                            <button class="mt-xs btn btn-warning" id="sent-count-<?php echo $item->getId(); ?>">
+                                <div style="width: 50px;">
+                                    <i class="fa fa-spin fa-spinner"></i>
+                                </div>
+                            </button>
+                            <button class="mt-xs btn btn-success" id="read-count-<?php echo $item->getId(); ?>">
+                                <div style="width: 50px;">
+                                    <i class="fa fa-spin fa-spinner"></i>
+                                </div>
+                            </button>
+                            <button class="mt-xs btn btn-primary" id="read-percent-<?php echo $item->getId(); ?>">
+                                <div style="width: 50px;">
+                                    <i class="fa fa-spin fa-spinner"></i>
+                                </div>
+                            </button>
+                            <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
+                        </div>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
