@@ -24,9 +24,10 @@ class ScoringCategoryRepository extends CommonRepository {
     
     /**
      * Get the list of entities, sort by asked criterias
+     * @param boolean $publishedOnly default as false
      * @return ScoringCategory[]
      */
-    public function getSpecializedList() {
+    public function getSpecializedList($publishedOnly = false) {
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias())
@@ -34,6 +35,9 @@ class ScoringCategoryRepository extends CommonRepository {
             ->where($this->getTableAlias().'.isGlobalScore=0') // yeah...
             ->orderBy($this->getTableAlias().'.orderIndex', 'ASC')
             ->addOrderBy($this->getTableAlias().'.name', 'ASC');
+        if($publishedOnly) {
+            $q->andWhere($this->getTableAlias().'.isPublished=1');
+        }
 
         $args['qb'] = $q;
 

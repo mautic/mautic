@@ -443,7 +443,7 @@ class CompanyController extends FormController
 
         /** CAPTIVEA.CORE START **/
         $allScoringCategoriesWithValues = array();
-        $scoringCategories = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList();
+        $scoringCategories = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList(true);
         foreach($scoringCategories as $scoringCategory) {
             $allScoringCategoriesWithValues[$scoringCategory->getId()] = array(
                 'category' => $scoringCategory->getName(),
