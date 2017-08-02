@@ -406,29 +406,12 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filters = InputHelper::clean($this->request->get('filters', []));
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
+        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
+        $page    = (int) $this->request->get('page', 1);
+        $events  = $this->model->getEngagements($entity, $filters, $order, $page);
 
-        if (!isset($filters['search'])) {
-            $filters['search'] = '';
-        }
-
-        if (!isset($filters['includeEvents'])) {
-            $filters['includeEvents'] = [];
-        }
-
-        if (!isset($filters['excludeEvents'])) {
-            $filters['excludeEvents'] = [];
-        }
-
-        $order = InputHelper::clean($this->request->get('order', [
-            'timestamp',
-            'DESC',
-        ]));
-        $page        = (int) $this->request->get('page', 1);
-        $engagements = $this->model->getEngagements($entity, $filters, $order, $page);
-        $view        = $this->view($engagements);
-
-        return $this->handleView($view);
+        return $this->handleView($this->view($events));
     }
 
     /**
@@ -440,30 +423,17 @@ class LeadApiController extends CommonApiController
     {
         $canViewOwn     = $this->security->isGranted('lead:leads:viewown');
         $canViewOthers  = $this->security->isGranted('lead:leads:others');
-        $canViewOnlyOwn = ($canViewOthers === false && $canViewOwn === true);
+        $canViewOnlyOwn = (!$canViewOthers && $canViewOwn);
 
         if (!$canViewOthers && !$canViewOwn) {
             return $this->accessDenied();
         }
 
-        $filters = InputHelper::clean($this->request->get('filters', []));
-
-        if (!isset($filters['search'])) {
-            $filters['search'] = '';
-        }
-
-        if (!isset($filters['includeEvents'])) {
-            $filters['includeEvents'] = [];
-        }
-
-        if (!isset($filters['excludeEvents'])) {
-            $filters['excludeEvents'] = [];
-        }
-
-        $limit  = InputHelper::clean($this->request->get('limit', 25));
-        $order  = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
-        $page   = (int) $this->request->get('page', 1);
-        $events = $this->model->getAllEngagements($filters, $order, $page, $limit, $canViewOnlyOwn);
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
+        $limit   = (int) $this->request->get('limit', 25);
+        $page    = (int) $this->request->get('page', 1);
+        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
+        $events  = $this->getModel('lead')->getEngagements(null, $filters, $order, $page, $limit);
 
         return $this->handleView($this->view($events));
     }

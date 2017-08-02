@@ -100,33 +100,33 @@ trait LeadDetailsTrait
     }
 
     /**
-     * @param array      $leads
-     * @param array|null $filters
-     * @param array|null $orderBy
-     * @param int        $page
+     * Makes sure that the event filter array is in the right format.
+     *
+     * @param mixed $filters
      *
      * @return array
+     *
+     * @throws InvalidArgumentException if not an array
      */
-    protected function getAllEngagementsForAllUsers(array $filters = null, array $orderBy = null, $page = 1, $limit = 25, $canViewOnlyOwn = false)
+    public function sanitizeEventFilter($filters)
     {
-        $result = [
-            'events'   => [],
-            'filters'  => $filters,
-            'order'    => $orderBy,
-            'types'    => [],
-            'total'    => 0,
-            'page'     => $page,
-            'limit'    => $limit,
-            'maxPages' => 0,
-        ];
+        if (!is_array($filters)) {
+            throw new \InvalidArgumentException('filters parameter must be an array');
+        }
 
-        /** @var LeadModel $model */
-        $model       = $this->getModel('lead');
-        $engagements = $model->getEngagements($lead, $filters, $orderBy, $page, $limit);
+        if (!isset($filters['search'])) {
+            $filters['search'] = '';
+        }
 
-        echo '<pre>';
-        var_dump($engagements);
-        die('</pre>');
+        if (!isset($filters['includeEvents'])) {
+            $filters['includeEvents'] = [];
+        }
+
+        if (!isset($filters['excludeEvents'])) {
+            $filters['excludeEvents'] = [];
+        }
+
+        return $filters;
     }
 
     /**
