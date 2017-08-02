@@ -105,6 +105,10 @@ class LeadSubscriber extends CommonSubscriber
                 } else {
                     $dateSent = 'read';
                 }
+
+                $contactId = $stat['lead_id'];
+                unset($stat['lead_id']);
+
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
@@ -118,6 +122,7 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => ($state == 'read') ? 'fa-envelope-o' : 'fa-envelope',
+                        'contactId'       => $contactId,
                     ]
                 );
             }

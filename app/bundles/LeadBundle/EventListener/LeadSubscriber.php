@@ -347,10 +347,10 @@ class LeadSubscriber extends CommonSubscriber
             $event->addToCounter($eventTypeKey, $rows);
 
             // Add the entries to the event array
-            $ipAddresses = ($lead instanceof Lead) ? $lead->getIpAddresses()->toArray() : [];
+            $ipAddresses = ($lead instanceof Lead) ? $lead->getIpAddresses()->toArray() : null;
 
             foreach ($rows['results'] as $row) {
-                if (!isset($ipAddresses[$row['ip_address']])) {
+                if ($ipAddresses !== null && !isset($ipAddresses[$row['ip_address']])) {
                     continue;
                 }
 
@@ -365,6 +365,7 @@ class LeadSubscriber extends CommonSubscriber
                             'ipDetails' => $ipAddresses[$row['ip_address']],
                         ],
                         'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:ipadded.html.php',
+                        'contactId'       => $row['lead_id'],
                     ]
                 );
             }
@@ -381,7 +382,7 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         // Do nothing if the lead is not set
-        if ($event->getLead() instanceof Lead) {
+        if (!$event->getLead() instanceof Lead) {
             return;
         }
 
@@ -414,7 +415,7 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         // Do nothing if the lead is not set
-        if ($event->getLead() instanceof Lead) {
+        if (!$event->getLead() instanceof Lead) {
             return;
         }
 

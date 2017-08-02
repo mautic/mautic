@@ -65,7 +65,7 @@ class DownloadRepository extends CommonRepository
     public function getLeadDownloads($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('a.id as asset_id, d.date_download as dateDownload, a.title')
+            ->select('a.id as asset_id, d.date_download as dateDownload, a.title, d.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'd')
             ->leftJoin('d', MAUTIC_TABLE_PREFIX.'assets', 'a', 'd.asset_id = a.id');
 

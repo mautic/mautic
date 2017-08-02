@@ -146,6 +146,9 @@ class LeadSubscriber extends CommonSubscriber
                     ];
                 }
 
+                $contactId = $hit['lead_id'];
+                unset($hit['lead_id']);
+
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
@@ -157,6 +160,7 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => $template,
                         'icon'            => $icon,
+                        'contactId'       => $contactId,
                     ]
                 );
             }

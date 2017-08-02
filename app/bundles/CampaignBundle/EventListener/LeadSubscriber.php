@@ -246,6 +246,7 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => $template,
                         'icon'            => 'fa-clock-o',
+                        'contactId'       => $log['lead_id'],
                     ]
                 );
             }

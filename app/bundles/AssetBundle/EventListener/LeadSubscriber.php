@@ -94,6 +94,7 @@ class LeadSubscriber extends CommonSubscriber
                         'timestamp'       => $download['dateDownload'],
                         'icon'            => 'fa-download',
                         'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contactId'       => $download['lead_id'],
                     ]
                 );
             }

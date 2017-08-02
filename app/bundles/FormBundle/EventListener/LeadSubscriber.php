@@ -102,6 +102,7 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => 'fa-pencil-square-o',
+                        'contactId'       => $row['lead_id'],
                     ]
                 );
             }

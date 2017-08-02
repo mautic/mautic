@@ -59,6 +59,8 @@ class LeadSubscriber extends CommonSubscriber
 
             // Add the events to the event array
             foreach ($stats['results'] as $stat) {
+                $contactId = $stat['lead_id'];
+                unset($stat['lead_id']);
                 if ($stat['dateSent']) {
                     $event->addEvent(
                         [
@@ -78,6 +80,7 @@ class LeadSubscriber extends CommonSubscriber
                             ],
                             'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
                             'icon'            => 'fa-envelope',
+                            'contactId'       => $contactId,
                         ]
                     );
                 }

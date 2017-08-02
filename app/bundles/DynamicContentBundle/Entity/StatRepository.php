@@ -128,7 +128,7 @@ class StatRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select('dc.id AS dynamic_content_id, s.id, s.date_sent as dateSent, dc.name, s.sent_details as sentDetails')
+        $query->select('dc.id AS dynamic_content_id, s.id, s.date_sent as dateSent, dc.name, s.sent_details as sentDetails, s.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id');
 

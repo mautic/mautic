@@ -85,17 +85,18 @@ class LeadEventLogRepository extends CommonRepository
                     ll.is_scheduled as isScheduled,
                     ll.trigger_date as triggerDate,
                     ll.channel,
-                    ll.channel_id as channel_id
+                    ll.channel_id as channel_id,
+                    ll.lead_id
                     '
                       )
                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
-                      ->where('ll.lead_id = '.(int) $leadId)
-                      ->andWhere('e.event_type != :eventType');
+                      ->andWhere('e.event_type != :eventType')
+                      ->setParameter('eventType', 'decision');
 
         if ($leadId) {
-            $query->setParameter('eventType', 'decision');
+            $query->where('ll.lead_id = '.(int) $leadId);
         }
 
         if (isset($options['scheduledState'])) {

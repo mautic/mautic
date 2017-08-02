@@ -79,7 +79,7 @@ class AuditLogRepository extends CommonRepository
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $sqb
-            ->select('MAX(l.date_added) as date_added, l.ip_address')
+            ->select('MAX(l.date_added) as date_added, l.ip_address, l.object_id as lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'l')
             ->where(
                 $sqb->expr()->andX(
@@ -103,7 +103,7 @@ class AuditLogRepository extends CommonRepository
         }
 
         $qb
-            ->select('ip.date_added, ip.ip_address')
+            ->select('ip.date_added, ip.ip_address, ip.lead_id')
             ->from(sprintf('(%s)', $sqb->getSQL()), 'ip');
 
         return $this->getTimelineResults($qb, $options, 'ip.ip_address', 'ip.date_added', [], ['date_added']);
