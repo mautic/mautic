@@ -675,6 +675,10 @@ class LeadListRepository extends CommonRepository
             $options = $event->getOperators();
         }
 
+        /** CAPTIVEA.CORE START **/
+        $snowflakes = null;
+        /** CAPTIVEA.CORE END **/
+
         $groups    = [];
         $groupExpr = $q->expr()->andX();
 
@@ -684,10 +688,26 @@ class LeadListRepository extends CommonRepository
                 $object = $details['object'];
             }
 
-            if ($object == 'lead') {
-                $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
-            } elseif ($object == 'company') {
-                $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
+            /** CAPTIVEA.CORE START REPLACE **/
+//            if ($object == 'lead') {
+//                $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
+//            } elseif ($object == 'company') {
+//                $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
+//            }
+            $matches = array();
+            if(preg_match('`^scoringCategory_([0-9]+)$`i', $details['field'], $matches)) {
+                $snowflakes = array(
+                    'type' => 'scoringCategory',
+                    'subValue' => intval($matches[1]),
+                );
+                $details['field'] = 'snowflake';
+                $column = null;
+            } else {
+                if ($object == 'lead') {
+                    $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
+                } elseif ($object == 'company') {
+                    $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
+                }
             }
 
             // DBAL does not have a not() function so we have to use the opposite
@@ -1501,6 +1521,112 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
 
                     break;
+                /** CAPTIVEA.CORE START **/
+                case 'snowflake':
+                    if(!empty($snowflakes) && ('scoringCategory' === $snowflakes['type'])) {
+                        if ($isCompany) {
+                            // Must tell getLeadsByList how to best handle the relationship with the companies table
+                            if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
+                                $this->listFiltersInnerJoinCompany = true;
+                            }
+                        }
+                        
+                        $field = 'scoringv.score';
+                        $parameters['s__scoringCategory'] = $snowflakes['subValue'];
+                        if ($object == 'lead') {
+                            $q->leftJoin('l', 'scoring_values', 'scoringv', 'scoringv.scoringcategory_id=:s__scoringCategory and scoringv.lead_id=l.id');
+                        } elseif ($object == 'company') {
+                            $q->leftJoin('cl', 'scoring_company_values', 'scoringv', 'scoringv.scoringcategory_id=:s__scoringCategory and scoringv.company_id=cl.id');
+                        }
+
+                        switch ($func) {
+                            case 'between':
+                            case 'notBetween':
+                                // Filter should be saved with double || to separate options
+                                $parameter2              = $this->generateRandomParameterName();
+                                $parameters[$parameter]  = $details['filter'][0];
+                                $parameters[$parameter2] = $details['filter'][1];
+                                $exprParameter2          = ":$parameter2";
+                                $ignoreAutoFilter        = true;
+
+                                if ($func == 'between') {
+                                    $groupExpr->add(
+                                        $q->expr()->andX(
+                                            $q->expr()->gte($field, $exprParameter),
+                                            $q->expr()->lt($field, $exprParameter2)
+                                        )
+                                    );
+                                } else {
+                                    $groupExpr->add(
+                                        $q->expr()->andX(
+                                            $q->expr()->lt($field, $exprParameter),
+                                            $q->expr()->gte($field, $exprParameter2)
+                                        )
+                                    );
+                                }
+                                break;
+
+                            case 'notEmpty':
+                                $groupExpr->add(
+                                    $q->expr()->andX(
+                                        $q->expr()->isNotNull($field),
+                                        $q->expr()->neq($field, $q->expr()->literal(''))
+                                    )
+                                );
+                                $ignoreAutoFilter = true;
+                                break;
+
+                            case 'empty':
+                                $details['filter'] = '';
+                                $groupExpr->add(
+                                    $this->generateFilterExpression($q, $field, 'eq', $exprParameter, true)
+                                );
+                                break;
+
+                            case 'in':
+                            case 'notIn':
+                                foreach ($details['filter'] as &$value) {
+                                    $value = $q->expr()->literal(
+                                        InputHelper::clean($value)
+                                    );
+                                }
+                                $groupExpr->add(
+                                    $this->generateFilterExpression($q, $field, $func, $details['filter'], null)
+                                );
+                                $ignoreAutoFilter = true;
+                                break;
+
+                            case 'neq':
+                                $groupExpr->add(
+                                    $this->generateFilterExpression($q, $field, $func, $exprParameter, null)
+                                );
+                                break;
+
+                            case 'like':
+                            case 'notLike':
+                                if (strpos($details['filter'], '%') === false) {
+                                    $details['filter'] = '%'.$details['filter'].'%';
+                                }
+
+                                $groupExpr->add(
+                                    $this->generateFilterExpression($q, $field, $func, $exprParameter, null)
+                                );
+                                break;
+                            case 'regexp':
+                            case 'notRegexp':
+                                $ignoreAutoFilter       = true;
+                                $parameters[$parameter] = $details['filter'];
+                                $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                                $groupExpr->add(
+                                    $field.$not.' REGEXP '.$exprParameter
+                                );
+                                break;
+                            default:
+                                $groupExpr->add($q->expr()->$func($field, $exprParameter));
+                        }
+                    }
+                    break;
+                /** CAPTIVEA.CORE END **/
                 default:
                     if (!$column) {
                         // Column no longer exists so continue

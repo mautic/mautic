@@ -1307,6 +1307,21 @@ class LeadModel extends FormModel
         $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
         $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points to lead');
 
+        /** CAPTIVEA.CORE START **/
+        foreach($mergeFrom->getScoringValues() as $sv) {
+            $scoringValue = $this->em->getRepository('MauticScoringBundle:ScoringValue')->findOneBy(array('scoringCategory' => $sv->getScoringCategory()->getId(), 'lead' => $mergeWith->getId()));
+            if(empty($scoringValue)) {
+                $scoringValue = new \Mautic\ScoringBundle\Entity\ScoringValue;
+                $scoringValue->setScore(0);
+                $scoringValue->setScoringCategory($sv->getScoringCategory());
+                $scoringValue->setLead($mergeWith);
+            }
+            $scoringValue->setScore($scoringValue->getScore() + $sv->getScore());
+            $this->em->persist($scoringValue);
+            $this->em->flush();
+        }
+        /** CAPTIVEA.CORE END **/
+
         //merge tags
         $mergeFromTags = $mergeFrom->getTags();
         $addTags       = $mergeFromTags->getKeys();
