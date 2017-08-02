@@ -36,7 +36,7 @@ This is a simple 3 step installation process. You'll want to make sure you alrea
 **Get stuck?** *No problem. Check out [general troubleshooting](https://mautic.org/docs/en/tips/troubleshooting.html) and if it won't solve your issue join us at the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
 
 # Disclaimer
-Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates. For production is recommened the pre-packaged Mautic available at [mautic.com/download](https://www.mautic.org/download).
+Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates. For production the pre-packaged Mautic available at [mautic.com/download](https://www.mautic.org/download) is recommended.
 
 *Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
 
@@ -156,19 +156,19 @@ There are many more ways in which automation can be used throughout Mautic to im
 
 ## Customizing - Plugins, Themes
 
-There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. You can choose whether you want to submit your feature as to the community as a pull request or wheter to build it as a plugin or theme.
+There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. You can choose whether you want to submit your feature to the community as a pull request or whether to build it as a plugin or theme.
 
 Read more about plugins and themes in the [Mautic Developer Docummentation](https://developer.mautic.org).
 
 ## Connecting - API, Webhooks
 
-Mautic have a REST API which you can use to connect it with another app. Of you can use the webhooks to send the updates which happens in Mautic to another app.
+Mautic have a REST API which you can use to connect it with another app. You can use the webhooks to send the updates which happen in Mautic to another app.
 
 Read more about API and webhooks in the [Mautic Developer Docummentation](https://developer.mautic.org).
 
 ## Translations
 
-One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for the translation by the community at [Transifex](https://www.transifex.com/mautic/mautic/dashboard) and if you are interested you can add more languages, or help to translate the current ones.
+One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for translation by the community at [Transifex](https://www.transifex.com/mautic/mautic/dashboard) and if you are interested you can add more languages, or help to translate the current ones.
 
 ## How to test a pull request
 
@@ -183,27 +183,27 @@ Everyone can test submitted features and bug fixes. No programming skills are re
 5. Install dependencies (`composer install`).
 6. Visit Mautic in a browser (probably at http://localhost/mautic) and follow installation steps.
 
-### Development environement
+### Development environment
 
-Mautic downloaded from GitHub have the development environment. You can access it by adding `index_dev.php` after the Mautic URL. Eg. `http://localhost/mautic/index_dev.php/s/`. Or in case of CLI commands, add `--env=dev` attribute to it.
+Mautic downloaded from GitHub has the development environment. You can access it by adding `index_dev.php` after the Mautic URL. Eg. `http://localhost/mautic/index_dev.php/s/`. Or in case of CLI commands, add `--env=dev` attribute to it.
 
-This development environment will display the PHP errors, warnigns and notices directly as the output so you don't have to open the log to see them. It will also load for example translations without cache, so every change you make will be visible without clearing it. The only changes which requires clearing the cache are in the `config.php` files.
+This development environment will display the PHP errors, warnings and notices directly as the output so you don't have to open the log to see them. It will also load for example translations without cache, so every change you make will be visible without clearing it. The only changes which require clearing the cache are in the `config.php` files.
 
-In case of assets like JS, CSS, the source files are loaded instead of concatinated, minified file. This way the changes in those files will be directly visible on refresh. If you'd want to see the change in production environment, you'd have to run the `app/console mautic:assets:generate` command.
+In case of assets like JS, CSS, the source files are loaded instead of concatenated, minified files. This way the changes in those files will be directly visible on refresh. If you'd wanted to see the change in the production environment, you'd have to have run the `app/console mautic:assets:generate` command.
 
 In many cases, the CSS files are built from LESS files. To compile the changes in the LESS files, run `grunt compile-less` command.
 
 ### Test a pull request (PR)
 
-Every change to Mautic core happens via PRs. Every PR must have 2 successful tests to be merged to the core and released in the next version. Testing a PR is a great way how to move Mautic forward and personally improve its quality and stability.
+Every change to Mautic core happens via PRs. Every PR must have 2 successful tests to be merged to the core and released in the next version. Testing a PR is a great way to move Mautic forward and personally improve its quality and stability.
 
 1. [Select a PR](https://github.com/mautic/mautic/pulls) to test.
-2. Read the description and steps to test. If it's a bug fix, follow the steps if you'll be able to recreate the issue.
+2. Read the description and steps to test. If it's a bug fix, follow the steps to ensure you can recreate the issue.
 3. Use the development environment (above) for testing.
 3. [Apply the PR](https://help.github.com/articles/checking-out-pull-requests-locally/#modifying-an-inactive-pull-request-locally)
 4. Clear cache for development environment (`rm -rf app/cache/*` or `app/console cache:clear -e dev`).
 5. Follow the steps from the PR description again to see if the result is as described.
-6. Write a comment how the test went. If there is a problem, provide as many information as possible including error log messages.
+6. Write a comment about how the test went. If there is a problem, provide as much information as possible including error log messages.
 
 ## Unit Tests
 

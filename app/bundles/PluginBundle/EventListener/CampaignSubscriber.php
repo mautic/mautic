@@ -15,8 +15,6 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\PluginEvents;
 
 /**
@@ -24,20 +22,7 @@ use Mautic\PluginBundle\PluginEvents;
  */
 class CampaignSubscriber extends CommonSubscriber
 {
-    /**
-     * @var IntegrationHelper
-     */
-    protected $integrationHelper;
-
-    /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     */
-    public function __construct(IntegrationHelper $integrationHelper)
-    {
-        $this->integrationHelper = $integrationHelper;
-    }
+    use PushToIntegrationTrait;
 
     /**
      * {@inheritdoc}
@@ -68,49 +53,15 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return $this
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $config = $event->getConfig();
-        $lead   = $event->getLead();
-
-        $integration             = (!empty($config['integration'])) ? $config['integration'] : null;
-        $integrationCampaign     = (!empty($config['config']['campaigns'])) ? $config['config']['campaigns'] : null;
-        $integrationMemberStatus = (!empty($config['campaign_member_status']['campaign_member_status']))
-            ? $config['campaign_member_status']['campaign_member_status'] : null;
-        $services = $this->integrationHelper->getIntegrationObjects($integration);
-        $success  = true;
-        $errors   = [];
-
-        /**
-         * @var
-         * @var AbstractIntegration $s
-         */
-        foreach ($services as $name => $s) {
-            $settings = $s->getIntegrationSettings();
-            if (!$settings->isPublished()) {
-                continue;
-            }
-
-            $personIds = null;
-            if (method_exists($s, 'pushLead')) {
-                if (!$personIds = $s->resetLastIntegrationError()->pushLead($lead, $config)) {
-                    $success = false;
-                    if ($error = $s->getLastIntegrationError()) {
-                        $errors[] = $error;
-                    }
-                }
-            }
-
-            if ($success && $integrationCampaign && method_exists($s, 'pushLeadToCampaign')) {
-                if (!$s->resetLastIntegrationError()->pushLeadToCampaign($lead, $integrationCampaign, $integrationMemberStatus, $personIds)) {
-                    $success = false;
-                    if ($error = $s->getLastIntegrationError()) {
-                        $errors[] = $error;
-                    }
-                }
-            }
-        }
+        $config  = $event->getConfig();
+        $lead    = $event->getLead();
+        $errors  = [];
+        $success = $this->pushToIntegration($config, $lead, $errors);
 
         if (count($errors)) {
             $event->setFailed(implode('<br />', $errors));

@@ -920,34 +920,26 @@ Mautic.leadNoteOnLoad = function (container, response) {
             mQuery('#LeadNotes').prepend(response.noteHtml);
         }
 
-        //initialize ajax'd modals
-        mQuery(el + " *[data-toggle='ajaxmodal']").off('click.ajaxmodal');
-        mQuery(el + " *[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
-            event.preventDefault();
-
-            Mautic.ajaxifyModal(this, event);
-        });
-
-        //initiate links
-        mQuery(el + " a[data-toggle='ajax']").off('click.ajax');
-        mQuery(el + " a[data-toggle='ajax']").on('click.ajax', function (event) {
-            event.preventDefault();
-
-            return Mautic.ajaxifyLink(this, event);
-        });
+        Mautic.makeModalsAlive(mQuery(el + " *[data-toggle='ajaxmodal']"));
+        Mautic.makeConfirmationsAlive(mQuery(el+' a[data-toggle="confirmation"]'));
+        Mautic.makeLinksAlive(mQuery(el + " a[data-toggle='ajax']"));
     } else if (response.deleteId && mQuery('#LeadNote' + response.deleteId).length) {
         mQuery('#LeadNote' + response.deleteId).remove();
     }
 
     if (response.upNoteCount || response.noteCount || response.downNoteCount) {
-        if (response.upNoteCount || response.downNoteCount) {
-            var count = parseInt(mQuery('#NoteCount').html());
-            count = (response.upNoteCount) ? count + 1 : count - 1;
+        var noteCountWrapper = mQuery('#NoteCount');
+        var count = parseInt(noteCountWrapper.text().trim());
+
+        if (response.upNoteCount) {
+            count++;
+        } else if (response.downNoteCount) {
+            count--;
         } else {
-            var count = parseInt(response.noteCount);
+            count = parseInt(response.noteCount);
         }
 
-        mQuery('#NoteCount').html(count);
+        noteCountWrapper.text(count);
     }
 };
 

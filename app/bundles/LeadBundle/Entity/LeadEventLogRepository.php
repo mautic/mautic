@@ -109,11 +109,11 @@ class LeadEventLogRepository extends CommonRepository
             ->andWhere($alias.'.object = :object')
             ->setParameter('object', $object);
 
-        if (isset($options['search']) && $options['search']) {
-            $qb->andWhere($qb->expr()->like($alias.'.action', $qb->expr()->literal('%'.$options['search'].'%')));
+        if (!empty($options['search'])) {
+            $qb->andWhere($qb->expr()->like($alias.'.properties', $qb->expr()->literal('%'.$options['search'].'%')));
         }
 
-        return $this->getTimelineResults($qb, $options, $alias.'.action', $alias.'.date_added', ['query'], ['date_added']);
+        return $this->getTimelineResults($qb, $options, $alias.'.original_file', $alias.'.date_added', ['query'], ['date_added']);
     }
 
     /**
