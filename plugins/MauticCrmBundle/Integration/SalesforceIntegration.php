@@ -1504,33 +1504,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        //find campaignMember
-        $existingCampaignMember = $integrationEntityRepo->getIntegrationsEntityId(
-            'Salesforce',
-            'CampaignMember',
-            'lead',
-            $lead->getId(),
-            null,
-            null,
-            null,
-            false,
-            0,
-            0,
-            "'$campaignId'"
-        );
 
         $body = [
             'Status' => $status,
         ];
         $object = 'CampaignMember';
         $url    = '/services/data/v38.0/sobjects/'.$object;
-        if ($existingCampaignMember) {
-            foreach ($existingCampaignMember as $member) {
-                $integrationEntity = $integrationEntityRepo->getEntity($member['id']);
-                $referenceId       = $integrationEntity->getId();
-                $internalLeadId    = $integrationEntity->getInternalEntityId();
-            }
-        }
 
         if (!empty($lead->getEmail())) {
             $pushPeople = [];
@@ -1554,11 +1533,30 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $campaignMappingId = '-'.$campaignId;
 
                 if (isset($campaignMembers[$memberId])) {
+                    $existingCampaignMember = $integrationEntityRepo->getIntegrationsEntityId(
+                        'Salesforce',
+                        'CampaignMember',
+                        'lead',
+                        null,
+                        null,
+                        null,
+                        false,
+                        0,
+                        0,
+                        "'".$campaignMembers[$memberId]."'"
+                    );
+                    if ($existingCampaignMember) {
+                        foreach ($existingCampaignMember as $member) {
+                            $integrationEntity = $integrationEntityRepo->getEntity($member['id']);
+                            $referenceId       = $integrationEntity->getId();
+                            $internalLeadId    = $integrationEntity->getInternalEntityId();
+                        }
+                    }
                     $id = !empty($lead->getId()) ? $lead->getId() : '';
-                    $id .= '-CampaignMember'.$memberId;
-                    $id .= !empty($referenceId && $internalLeadId == $lead->getId()) ? '-'.$referenceId : '';
+                    $id .= '-CampaignMember'.$campaignMembers[$memberId];
+                    $id .= !empty($referenceId) ? '-'.$referenceId : '';
                     $id .= $campaignMappingId;
-                    $patchurl        = $url.'/'.$memberId;
+                    $patchurl        = $url.'/'.$campaignMembers[$memberId];
                     $mauticData[$id] = [
                         'method'      => 'PATCH',
                         'url'         => $patchurl,
