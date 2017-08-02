@@ -14,16 +14,16 @@ $type    = $event['eventType'];
 $text    = '';
 switch ($type) {
     case 'create':
-        $text = 'The contact was created.';
+        $text = $view['translator']->trans('mautic.lead.audit.created');
         if (isset($details['ipAddresses']) && is_array($details['ipAddresses'])) {
-            $text .= ' Origin IP: '.implode(', ', array_splice($details['ipAddresses'], 1));
+            $text .= ' '.$view['translator']->trans('mautic.lead.audit.originip').' '.implode(', ', array_splice($details['ipAddresses'], 1));
         }
         break;
     case 'delete':
-        $text = 'The contact was deleted.';
+        $text = $view['translator']->trans('mautic.lead.audit.deleted');
         break;
     case 'update':
-        $text = 'The contact was updated.';
+        $text = $view['translator']->trans('mautic.lead.audit.updated');
         if (!isset($details['fields'])) {
             break;
         }
@@ -39,13 +39,13 @@ switch ($type) {
         $text .= '</table>';
         break;
     case 'identified':
-        $text = 'The contact was identified.';
+        $text = $view['translator']->trans('mautic.lead.audit.identified');
         break;
     case 'ipadded':
-        $text = 'The contact was accessed from: '.implode(',', array_splice($details, 1));
+        $text = $view['translator']->trans('mautic.lead.audit.accessed').' '.implode(',', array_splice($details, 1));
         break;
     case 'merged':
-        $text = 'The contact was merged.';
+        $text = $view['translator']->trans('mautic.lead.audit.merged');
         break;
 }
 echo $text;
