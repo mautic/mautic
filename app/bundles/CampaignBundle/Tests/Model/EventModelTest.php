@@ -11,7 +11,6 @@
 
 namespace Mautic\CampaignBundle\Tests\Model;
 
-
 use Mautic\CampaignBundle\Model\EventModel;
 
 class EventModelTest extends \PHPUnit_Framework_TestCase
@@ -29,11 +28,11 @@ class EventModelTest extends \PHPUnit_Framework_TestCase
         $currentEvents = [
             'new1',
             'new2',
-            'new3'
+            'new3',
         ];
 
         $deletedEvents = [
-            'new1'
+            'new1',
         ];
 
         $mockModel->deleteEvents($currentEvents, $deletedEvents);
