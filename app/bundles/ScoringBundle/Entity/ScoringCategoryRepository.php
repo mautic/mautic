@@ -10,7 +10,7 @@ class ScoringCategoryRepository extends CommonRepository {
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this->_em
             ->createQueryBuilder()
