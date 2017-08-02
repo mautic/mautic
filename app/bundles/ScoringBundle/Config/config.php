@@ -35,6 +35,7 @@ return [
                 'route'    => 'mautic_scoring_index',
                 'parent'   => 'mautic.points.menu.root',
                 'priority' => 2,
+                'access'   => 'point:scoringCategory:view',
             ],
         ],
     ],

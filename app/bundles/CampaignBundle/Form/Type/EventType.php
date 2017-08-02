@@ -64,6 +64,31 @@ class EventType extends AbstractType
             ]
         );
 
+        /** CAPTIVEA.CORE START **/
+        if (in_array($options['data']['eventType'], ['action'])) {
+            $transformer = new IdToEntityModelTransformer(
+                $this->factory->getEntityManager(),
+                'MauticScoringBundle:ScoringCategory'
+            );
+
+        $builder->add(
+                $builder->create(
+                    'scoringCategory',
+                    'scoringcategory_list',
+                    [
+                        'label'      => 'mautic.campaign.form.type.scoringCategory',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class' => 'form-control',
+                        ],
+                        'required' => false,
+                        'multiple' => false,
+                    ]
+                )->addModelTransformer($transformer)
+            );
+        }
+        /** CAPTIVEA.CORE END **/
+        
         $builder->add(
             'anchor',
             'hidden',

@@ -347,10 +347,30 @@ class LeadController extends FormController
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->getModel('email')->getRepository();
 
+        /** CAPTIVEA.CORE START **/
+        $allScoringCategoriesWithValues = array();
+        $scoringCategories = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList();
+        foreach($scoringCategories as $scoringCategory) {
+            $allScoringCategoriesWithValues[$scoringCategory->getId()] = array(
+                'category' => $scoringCategory->getName(),
+                'value' => 0,
+            );
+        }
+        foreach($lead->getScoringValues() as $scoringValue) {
+            $scat = $scoringValue->getScoringCategory();
+            if(!empty($scat)) {
+                $allScoringCategoriesWithValues[$scat->getId()]['value'] = $scoringValue->getScore();
+            }
+        }
+        /** CAPTIVEA.CORE END **/
+
         return $this->delegateView(
             [
                 'viewParameters' => [
                     'lead'              => $lead,
+                    /** CAPTIVEA.CORE START **/
+                    'scoringValues' => $allScoringCategoriesWithValues,
+                    /** CAPTIVEA.CORE END **/
                     'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,
                     'companies'         => $companies,

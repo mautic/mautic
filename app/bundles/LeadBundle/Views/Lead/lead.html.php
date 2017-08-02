@@ -387,25 +387,8 @@ $view['slots']->set(
                     ); ?>
                 </h1>
                 <?php /** CAPTIVEA.CORE START **/
-                $sortedScoringValues = array();
-                foreach ($lead->getScoringValues() as $scoringValue) {
-                    $sortedScoringValues[] = $scoringValue;
-                }
-                uasort($sortedScoringValues, function($a, $b){
-                    $r = 0;
-                    $ao = $a->getScoringCategory()->getOrderIndex();
-                    $bo = $b->getScoringCategory()->getOrderIndex();
-                    if($ao > $bo) { $r = 1; }
-                    elseif($ao < $bo) { $r = -1; }
-                    else {
-                        $an = $a->getScoringCategory()->getName();
-                        $bn = $b->getScoringCategory()->getName();
-                        $r = min(1, max(-1, strcmp($an, $bn)));
-                    }
-                    return $r;
-                });
-                foreach ($sortedScoringValues as $scoringValue) { ?>
-                    <b><span><?php echo $scoringValue->getScoringCategory()->getName(); ?></span> : <span><?php echo $scoringValue->getScore(); ?> points</span></b><br/> 
+                foreach($scoringValues as $sv) { ?>
+                    <b><span><?php echo $sv['category']; ?></span> : <span><?php echo $sv['value']; ?> points</span></b><br/> 
                 <?php } /** CAPTIVEA.CORE END **/ ?>
                 
                 <hr/>

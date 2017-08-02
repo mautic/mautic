@@ -1,3 +1,4 @@
+
 Mautic.getScoringActionPropertiesForm = function(actionType) {
     Mautic.activateLabelLoadingIndicator('scoring_type');
     var query = "action=scoring:getActionForm&actionType=" + actionType;

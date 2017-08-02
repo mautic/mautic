@@ -15,8 +15,17 @@ class ScoringCategoryController extends FormController {
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction()
-    {
+    public function batchDeleteAction() {
+        $globalScorings = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->findByIsGlobalScore(true);
+        
+        // we need to remove any isGlobalScore from a batch delete, cuz they ca'nt be batchDeleted
+        $ids = array_map('intval', json_decode($this->request->query->get('ids'), true));
+        foreach($globalScorings as $gs) {
+            if(in_array($gs->getId(), $ids)) {
+                unset($ids[array_search($gs->getId(), $ids)]);
+            }
+        }
+        $this->request->query->set('ids', json_encode(array_map('strval', array_values($ids))));
         return $this->batchDeleteStandard();
     }
 
@@ -112,6 +121,6 @@ class ScoringCategoryController extends FormController {
     }
     
     protected function getPermissionBase() {
-        return 'scoring:scoringCategory';
+        return 'point:scoringCategory';
     }
 }

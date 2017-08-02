@@ -17,6 +17,9 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\User;
+/** CAPTIVEA.CORE START **/
+use Doctrine\Common\Collections\ArrayCollection;
+/** CAPTIVEA.CORE END **/
 
 /**
  * Class Company.
@@ -107,6 +110,20 @@ class Company extends FormEntity implements CustomFieldEntityInterface
      */
     private $description;
 
+    /** CAPTIVEA.CORE START **/
+    /**
+     *
+     * @var array
+     */
+    private $scoringValues;
+    /** CAPTIVEA.CORE END **/
+    
+    /** CAPTIVEA.CORE START **/
+    public function __construct() {
+        $this->scoringValues = new ArrayCollection();
+    }
+    /** CAPTIVEA.CORE END **/
+
     public function __clone()
     {
         $this->id = null;
@@ -161,6 +178,14 @@ class Company extends FormEntity implements CustomFieldEntityInterface
 
         $builder->createField('score', 'integer')
             ->build();
+
+        /** CAPTIVEA.CORE START **/
+        $builder->createOneToMany('scoringValues', 'Mautic\ScoringBundle\Entity\ScoringCompanyValue')
+                ->mappedBy('company')
+                ->cascadeAll()
+                ->fetchLazy()
+                ->build();
+        /** CAPTIVEA.CORE END **/
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -558,4 +583,46 @@ class Company extends FormEntity implements CustomFieldEntityInterface
 
         return $this;
     }
+    
+    /** CAPTIVEA.CORE START **/
+    
+    /**
+     * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $scoringValue
+     *
+     * @return $this
+     */
+    public function addScoringValue(\Mautic\ScoringBundle\Entity\ScoringCompanyValue $scoringValue)
+    {
+        $this->scoringValues[] = $scoringValue;
+
+        return $this;
+}
+
+    /**
+     * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $scoringValue
+     */
+    public function removeScoringValue(\Mautic\ScoringBundle\Entity\ScoringCompanyValue $scoringValue)
+    {
+        $this->scoringValues->removeElement($scoringValue);
+    }
+
+    /**
+     * @param ArrayCollection $scoringValues
+     * @return $this
+     */
+    public function setScoringValues(ArrayCollection $scoringValues)
+    {
+        $this->scoringValues = $scoringValues;
+        return $this;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getScoringValues()
+    {
+        return $this->scoringValues;
+    }
+    
+    /** CAPTIVEA.CORE END **/
 }

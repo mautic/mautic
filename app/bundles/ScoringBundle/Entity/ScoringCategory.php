@@ -56,7 +56,7 @@ class ScoringCategory extends FormEntity
     /**
      * @var int
      */
-    private $orderIndex;
+    private $orderIndex = 1;
 
     /**
      * @var bool
@@ -66,7 +66,42 @@ class ScoringCategory extends FormEntity
     /**
      * @var float
      */
-    private $globalScoreModifier;
+    private $globalScoreModifier = 0.00;
+    
+    /**
+     * @var boolean
+     */
+    private $isGlobalScore = false;
+    
+    /**
+     *
+     * @var array
+     */
+    private $leadValues;
+    
+    /**
+     *
+     * @var array 
+     */
+    private $companyValues;
+    
+    /**
+     *
+     * @var array 
+     */
+    private $usedByPoints;
+    
+    /**
+     *
+     * @var array 
+     */
+    private $usedByTriggers;
+    
+    /**
+     *
+     * @var array 
+     */
+    private $usedByEvents;
 
     public function __clone() {
         $this->id        = null;
@@ -76,7 +111,11 @@ class ScoringCategory extends FormEntity
     }
 
     public function __construct() {
-        
+        $this->leadValues = new ArrayCollection();
+        $this->companyValues = new ArrayCollection();
+        $this->usedByEvents = new ArrayCollection();
+        $this->usedByPoints = new ArrayCollection();
+        $this->usedByTriggers = new ArrayCollection();
     }
 
     /**
@@ -103,6 +142,40 @@ class ScoringCategory extends FormEntity
         $builder->createField('globalScoreModifier', 'float')
             ->columnName('global_score_modifier')
             ->build();
+        
+        $builder->createField('isGlobalScore', 'boolean')
+            ->columnName('is_global_score')
+            ->build();
+        
+        $builder->createOneToMany('leadValues', 'Mautic\ScoringBundle\Entity\ScoringValue')
+                ->mappedBy('scoringCategory')
+                ->cascadeAll()
+                ->fetchLazy()
+                ->build();
+        
+        $builder->createOneToMany('companyValues', 'Mautic\ScoringBundle\Entity\ScoringCompanyValue')
+                ->mappedBy('scoringCategory')
+                ->cascadeAll()
+                ->fetchLazy()
+                ->build();
+        
+        $builder->createOneToMany('usedByPoints', 'Mautic\PointBundle\Entity\Point')
+                ->mappedBy('scoringCategory')
+                ->cascadeAll()
+                ->fetchLazy()
+                ->build();
+        
+        $builder->createOneToMany('usedByTriggers', 'Mautic\PointBundle\Entity\Trigger')
+                ->mappedBy('scoringCategory')
+                ->cascadeAll()
+                ->fetchLazy()
+                ->build();
+        
+        $builder->createOneToMany('usedByEvents', 'Mautic\CampaignBundle\Entity\Event')
+                ->mappedBy('scoringCategory')
+                ->cascadeAll()
+                ->fetchLazy()
+                ->build();
     }
 
     /**
@@ -276,5 +349,222 @@ class ScoringCategory extends FormEntity
     public function getPublishDown()
     {
         return $this->publishDown;
+    }
+    
+    /**
+     * @return bool
+     */
+    public function getIsGlobalScore() {
+        return $this->isGlobalScore;
+    }
+    
+    /**
+     * 
+     * @param bool $isGlobalScore
+     * @return $this
+     */
+    public function setIsGlobalScore($isGlobalScore) {
+        $this->isGlobalScore = !!$isGlobalScore;
+        return $this;
+    }
+    
+    /**
+     * @param \Mautic\ScoringBundle\Entity\ScoringValue $leadValue
+     *
+     * @return $this
+     */
+    public function addLeadValue(\Mautic\ScoringBundle\Entity\ScoringValue $leadValue)
+    {
+        $this->leadValues[] = $leadValue;
+
+        return $this;
+    }
+
+    /**
+     * @param \Mautic\ScoringBundle\Entity\ScoringValue $leadValue
+     */
+    public function removeLeadValue(\Mautic\ScoringBundle\Entity\ScoringValue $leadValue)
+    {
+        $this->leadValues->removeElement($leadValue);
+    }
+
+    /**
+     * @param ArrayCollection $leadValues
+     * @return $this
+     */
+    public function setLeadValues(ArrayCollection $leadValues)
+    {
+        $this->leadValues = $leadValues;
+        return $this;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getLeadValues()
+    {
+        return $this->leadValues;
+    }
+    
+        
+    /**
+     * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue
+     *
+     * @return $this
+     */
+    public function addCompanyValue(\Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue)
+    {
+        $this->companyValues[] = $companyValue;
+
+        return $this;
+    }
+
+    /**
+     * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue
+     */
+    public function removeCompanyValue(\Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue)
+    {
+        $this->companyValues->removeElement($companyValue);
+    }
+
+    /**
+     * @param ArrayCollection $leadValues
+     * @return $this
+     */
+    public function setCompanyValues(ArrayCollection $companyValues)
+    {
+        $this->companyValues = $companyValues;
+        return $this;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getCompanyValues()
+    {
+        return $this->companyValues;
+    }
+    
+    /**
+     * @param \Mautic\CampaignBundle\Entity\Event $event
+     *
+     * @return $this
+     */
+    public function addUsedByEvent(\Mautic\CampaignBundle\Entity\Event $event)
+    {
+        $this->usedByEvents[] = $event;
+
+        return $this;
+    }
+
+    /**
+     * @param \Mautic\CampaignBundle\Entity\Event $event
+     */
+    public function removeUsedByEvent(\Mautic\CampaignBundle\Entity\Event $event)
+    {
+        $this->usedByEvents->removeElement($event);
+    }
+
+    /**
+     * @param ArrayCollection $events
+     * @return $this
+     */
+    public function setUsedByEvents(ArrayCollection $events)
+    {
+        $this->usedByEvents = $events;
+        return $this;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getUsedByEvents()
+    {
+        return $this->usedByEvents;
+    }
+    
+    /**
+     * @param \Mautic\PointBundle\Entity\Point $point
+     *
+     * @return $this
+     */
+    public function addUsedByPoint(\Mautic\PointBundle\Entity\Point $point)
+    {
+        $this->usedByPoints[] = $point;
+
+        return $this;
+    }
+
+    /**
+     * @param \Mautic\PointBundle\Entity\Point $point
+     */
+    public function removeUsedByPoint(\Mautic\PointBundle\Entity\Point $point)
+    {
+        $this->usedByPoints->removeElement($point);
+    }
+
+    /**
+     * @param ArrayCollection $points
+     * @return $this
+     */
+    public function setUsedByPoints(ArrayCollection $points)
+    {
+        $this->usedByPoints = $points;
+        return $this;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getUsedByPoints()
+    {
+        return $this->usedByPoints;
+    }
+    
+    /**
+     * @param \Mautic\PointBundle\Entity\Trigger $trigger
+     *
+     * @return $this
+     */
+    public function addUsedByTrigger(\Mautic\PointBundle\Entity\Trigger $trigger)
+    {
+        $this->usedByTriggers[] = $trigger;
+
+        return $this;
+    }
+
+    /**
+     * @param \Mautic\PointBundle\Entity\Trigger $trigger
+     */
+    public function removeUsedByTrigger(\Mautic\PointBundle\Entity\Trigger $trigger)
+    {
+        $this->usedByTriggers->removeElement($trigger);
+    }
+
+    /**
+     * @param ArrayCollection $triggers
+     * @return $this
+     */
+    public function setUsedByTriggers(ArrayCollection $triggers)
+    {
+        $this->usedByTriggers = $triggers;
+        return $this;
+    }
+    
+    /**
+     * @return ArrayCollection
+     */
+    public function getUsedByTriggers()
+    {
+        return $this->usedByTriggers;
+    }
+    
+    /**
+     * @return boolean
+     */
+    public function isUsedAnywhere() {
+        return !$this->getUsedByEvents()->isEmpty()
+            || !$this->getUsedByPoints()->isEmpty()
+            || !$this->getUsedByTriggers()->isEmpty();
     }
 }

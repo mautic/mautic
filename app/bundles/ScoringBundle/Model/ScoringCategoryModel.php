@@ -47,7 +47,7 @@ class ScoringCategoryModel extends CommonFormModel
      */
     public function getPermissionBase()
     {
-        return 'scoring:scoringCategory';
+        return 'point:scoringCategory';
     }
     
     

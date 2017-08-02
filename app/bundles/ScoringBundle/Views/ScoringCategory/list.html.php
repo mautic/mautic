@@ -21,7 +21,7 @@ if ($tmpl == 'index') {
                         'target'          => '#scoringTable',
                         'routeBase'       => 'scoring',
                         'templateButtons' => [
-                            'delete' => $permissions['scoring:scoringCategory:delete'],
+                            'delete' => $permissions['point:scoringCategory:delete'],
                         ],
                     ]
                 );
@@ -54,15 +54,20 @@ if ($tmpl == 'index') {
                 <tr>
                     <td>
                         <?php
+                        $templateButtonsActions = [];
+                        if(!$item->isGlobalScore()) { // we want to display the checkbox with no actions...
+                            $templateButtonsActions = [
+                                'edit'   => $permissions['point:scoringCategory:edit'],
+                                'clone'  => $permissions['point:scoringCategory:create'],
+                                'delete' => $permissions['point:scoringCategory:delete'],
+                            ];
+                        }
                         echo $view->render(
-                            'MauticCoreBundle:Helper:list_actions.html.php',
+                            //'MauticCoreBundle:Helper:list_actions.html.php',
+                            'MauticScoringBundle:ScoringCategory:list_actions.html.php',
                             [
                                 'item'            => $item,
-                                'templateButtons' => [
-                                    'edit'   => $permissions['scoring:scoringCategory:edit'],
-                                    'clone'  => $permissions['scoring:scoringCategory:create'],
-                                    'delete' => $permissions['scoring:scoringCategory:delete'],
-                                ],
+                                'templateButtons' => $templateButtonsActions,
                                 'routeBase' => 'scoring',
                             ]
                         );
@@ -70,7 +75,18 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render(
+                            <?php if($item->isGlobalScore()) { ?>
+                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted has-click-event scoring-scoringcategory-publish-icon2"
+                                   data-toggle="tooltip"
+                                   data-container="body"
+                                   data-placement="right"
+                                   data-status="published"
+                                   title=""
+                                   data-original-title="Published"></i>
+                            <span>
+                                <?php echo $item->getName(); ?>
+                            </span>
+                            <?php } else { echo $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 ['item' => $item, 'model' => 'scoring.scoringcategory']
                             ); ?>
@@ -79,7 +95,7 @@ if ($tmpl == 'index') {
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
-                            </a>
+                            </a><?php } ?>
                         </div>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>

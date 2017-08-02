@@ -29,6 +29,10 @@ class TriggerRepository extends CommonRepository
             ->from('MauticPointBundle:Trigger', $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
+        /** CAPTIVEA.CORE START **/
+        $q->leftJoin($this->getTableAlias().'.scoringCategory', 'scat'); // cuz we need to display it in list view
+        /** CAPTIVEA.CORE END **/
+
         $args['qb'] = $q;
 
         return parent::getEntities($args);

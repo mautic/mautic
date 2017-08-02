@@ -16,8 +16,11 @@ class ScoringCategoryListType extends AbstractType {
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
-    {
+    public function __construct(MauticFactory $factory) {
+        // we need to find a way that this filter is applied only if no value is there.
+        // either there is some undocumented way or hidden thing to pass/get options like entity through controller to form builder then form type
+        // either there is none; we don't have time to deal with some strange behaviour asked to "display an option that should never be displayd"
+        
         $choices = $factory->getModel('scoring.scoringCategory')->getRepository()->getEntities([
             'filter' => [
                 'force' => [
@@ -33,11 +36,23 @@ class ScoringCategoryListType extends AbstractType {
         foreach ($choices as $choice) {
             $this->choices[$choice->getId()] = $choice->getName(true);
         }
-
+        
+        // so, yeah, we're doing ALL CIRCLE DIRTY
+        $uri = $factory->getRequest()->getPathInfo();
+        $matches = array();
+        if(preg_match('`/points/edit/([0-9]+)$`iU', $uri, $matches)) {
+            $chosenId = intval($matches[1]);
+            $point = $factory->getEntityManager()->getRepository('MauticPointBundle:Point')->find($chosenId);
+            $scoringCategory = $point->getScoringCategory();
+            if(!empty($scoringCategory) && !array_key_exists($scoringCategory->getId(), $this->choices)) {
+                $this->choices[$scoringCategory->getId()] = $scoringCategory->getName();
+            }
+        }
+        
         //sort by language
         ksort($this->choices);
     }
-
+    
     /**
      * {@inheritdoc}
      */
@@ -49,7 +64,7 @@ class ScoringCategoryListType extends AbstractType {
             'expanded'    => false,
             'multiple'    => true,
             'required'    => false,
-            'empty_value' => 'mautic.core.form.chooseone',
+            'empty_value' => 'mautic.scoring.scoringCategory.globalscore.name',
         ]);
     }
 

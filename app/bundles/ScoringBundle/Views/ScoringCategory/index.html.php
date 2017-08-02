@@ -13,7 +13,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'templateButtons' => [
-                'new' => $permissions['scoring:scoringCategory:create'],
+                'new' => $permissions['point:scoringCategory:create'],
             ],
             'routeBase' => 'scoring',
         ]

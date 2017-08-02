@@ -55,6 +55,18 @@ if ($tmpl == 'index') {
                     ]
                 );
 
+                /** CAPTIVEA.CORE START **/
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'point',
+                        'orderBy'    => 'scat.name',
+                        'text'       => 'mautic.scoring.name',
+                        'class'      => 'visible-md visible-lg col-point-scoreCategory',
+                    ]
+                );
+                /** CAPTIVEA.CORE END **/
+
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [

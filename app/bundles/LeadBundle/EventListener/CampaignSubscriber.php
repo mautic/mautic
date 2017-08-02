@@ -207,7 +207,7 @@ class CampaignSubscriber extends CommonSubscriber
             /** CAPTIVEA.CORE START REPLACE **/
             //$lead->adjustPoints($points);
             $scoringCategory = $event->getScoringCategory();
-            if(empty($scoringCategory)) {
+            if(empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
             $lead->adjustPoints($points);
             } else {
                 $this->em->getRepository('ScoringCategory')->adjustPoints($lead, $scoringCategory, $points);

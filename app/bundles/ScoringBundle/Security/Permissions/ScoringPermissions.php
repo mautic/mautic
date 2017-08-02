@@ -12,30 +12,21 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * Class ScoringPermissions.
  */
-class ScoringPermissions extends AbstractPermissions
+class ScoringPermissions extends \Mautic\PointBundle\Security\Permissions\PointPermissions
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct($params)
-    {
+    public function __construct($params) {
         parent::__construct($params);
-
         $this->addStandardPermissions('scoringCategory');
     }
     
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return 'scoring';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data) {
-        $this->addStandardFormFields('scoring', 'scoringCategory', $builder, $data);
+        parent::buildForm($builder, $options, $data);
+        $this->addStandardFormFields('point', 'scoringCategory', $builder, $data);
     }
 }

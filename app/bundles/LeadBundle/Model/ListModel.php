@@ -661,6 +661,52 @@ class ListModel extends FormModel
             ],
         ];
 
+        /** CAPTIVEA.CORE START **/
+        $scoringCategories = $this->em->getRepository('MauticScoringBundle:ScoringCategory')->getEntities(
+                [
+                    'filter' => [
+                        'isPublished' => true,
+                    ],
+                ]);
+        // as the filter criteria does not works for unrecognized bools ( 'isGlobalScore' => false, )... dunno why tho
+        foreach($scoringCategories as $category) {
+            if(!$category->getIsGlobalScore()) {
+                $choices['lead']['scoringCategory_'.$category->getId()] = [
+                    'label'      => 'Score Category : '.$category->getName(),
+                    'properties' => [
+                        'type' => 'number',
+                    ],
+                    'operators' => array(
+                        '=' => 'equals',
+                        'gt' => 'greater than',
+                        'gte' => 'greater than or equal',
+                        'lt' => 'less than',
+                        'lte' => 'less than or equal',
+                        'empty' => 'empty',
+                        '!empty' => 'not empty',
+                    ),
+                    'object'    => 'lead',
+                ];
+                $choices['company']['scoringCategory_'.$category->getId()] = [
+                    'label'      => 'Score Category : '.$category->getName(),
+                    'properties' => [
+                        'type' => 'number',
+                    ],
+                    'operators' => array(
+                        '=' => 'equals',
+                        'gt' => 'greater than',
+                        'gte' => 'greater than or equal',
+                        'lt' => 'less than',
+                        'lte' => 'less than or equal',
+                        'empty' => 'empty',
+                        '!empty' => 'not empty',
+                    ),
+                    'object'    => 'company',
+                ];
+            }
+        }
+        /** CAPTIVEA.CORE END **/
+        
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
             $event = new LeadListFiltersChoicesEvent($choices, $this->getOperatorsForFieldType(), $this->translator);

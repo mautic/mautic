@@ -74,6 +74,14 @@ class Trigger extends FormEntity
      */
     private $events;
 
+    /** CAPTIVEA.CORE START **/
+    /**
+     *
+     * @var \Mautic\ScoringBundle\Entity\ScoringCategory 
+     */
+    private $scoringCategory = null;
+    /** CAPTIVEA.CORE END **/
+
     public function __clone()
     {
         $this->id = null;
@@ -114,6 +122,12 @@ class Trigger extends FormEntity
             ->build();
 
         $builder->addCategory();
+
+        /** CAPTIVEA.CORE START **/
+        $builder->createManyToOne('scoringCategory', 'Mautic\ScoringBundle\Entity\ScoringCategory')
+            ->addJoinColumn('scoringcategory_id', 'id', true, false, 'SET NULL')
+            ->build();
+        /** CAPTIVEA.CORE END **/
 
         $builder->createOneToMany('events', 'TriggerEvent')
             ->setIndexBy('id')
@@ -389,4 +403,26 @@ class Trigger extends FormEntity
     {
         $this->category = $category;
     }
+    
+    /** CAPTIVEA.CORE START **/
+    
+    /**
+     * 
+     * @return \Mautic\ScoringBundle\Entity\ScoringCategory
+     */
+    public function getScoringCategory() {
+       return $this->scoringCategory; 
+}
+    
+    /**
+     * 
+     * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
+     * @return $this
+     */
+    public function setScoringCategory(\Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory) {
+        $this->scoringCategory = $scoringCategory;
+        return $this;
+    }
+    
+    /** CAPTIVEA.CORE END **/
 }

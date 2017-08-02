@@ -40,6 +40,9 @@ $view['slots']->set('headerTitle', $header);
                                     <?php
                                     echo $view['form']->row($form['name']);
                                     echo $view['form']->row($form['description'], ['attr' => ['class' => 'form-control editor']]);
+                                    /** CAPTIVEA.CORE CLIENT START **/
+                                    echo $view['form']->row($form['scoringCategory']);
+                                    /** CAPTIVEA.CORE CLIENT END **/
                                     ?>
                                 </div>
                             </div>
