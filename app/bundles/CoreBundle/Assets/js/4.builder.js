@@ -1265,7 +1265,7 @@ Mautic.initSlotListeners = function() {
                 params.slot.find('img').closest('div').css('text-align', values[params.field.val()]);
             }
         } else if (fieldParam === 'border-radius') {
-            params.slot.find('a').css(fieldParam, params.field.val() + 'px');
+            params.slot.find('a.button').css(fieldParam, params.field.val() + 'px');
         } else if (fieldParam === 'button-size') {
             var bg_clr = params.slot.attr('data-param-background-color');
             var values = [
@@ -1273,16 +1273,16 @@ Mautic.initSlotListeners = function() {
                 {borderWidth: '20px 23px', padding: '0', fontSize: '20px', borderColor : bg_clr, borderStyle: 'solid'},
                 {borderWidth: '25px 40px', padding: '0', fontSize: '30px', borderColor : bg_clr, borderStyle: 'solid'}
             ];
-            params.slot.find('a').css(values[params.field.val()]);
+            params.slot.find('a.button').css(values[params.field.val()]);
         } else if (fieldParam === 'caption-color') {
             params.slot.find('.imagecard-caption').css('background-color', '#' + params.field.val());
         } else if (fieldParam === 'background-color') {
             if ('imagecard' === type) {
                 params.slot.find('.imagecard').css(fieldParam, '#' + params.field.val());
             } else {
-                params.slot.find('a').css(fieldParam, '#' + params.field.val());
-                params.slot.find('a').attr('background', '#' + params.field.val());
-                params.slot.find('a').css('border-color', '#' + params.field.val());
+                params.slot.find('a.button').css(fieldParam, '#' + params.field.val());
+                params.slot.find('a.button').attr('background', '#' + params.field.val());
+                params.slot.find('a.button').css('border-color', '#' + params.field.val());
             }
         } else if (fieldParam === 'color') {
             if ('imagecard' === type) {
@@ -1290,7 +1290,7 @@ Mautic.initSlotListeners = function() {
             } else if ('imagecaption' === type) {
                 params.slot.find('figcaption').css(fieldParam, '#' + params.field.val());
             } else {
-                params.slot.find('a').css(fieldParam, '#' + params.field.val());
+                params.slot.find('a.button').css(fieldParam, '#' + params.field.val());
             }
         } else if (/gatedvideo/.test(fieldParam)) {
             // Handle gatedVideo replacements
