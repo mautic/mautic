@@ -573,6 +573,21 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+        $builder->add(
+            'updateBlanks',
+            'choice',
+            [
+                'choices' => [
+                    'updateBlanks' => 'mautic.salesforce.blanks',
+                ],
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.salesforce.form.blanks',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+            ]
+        );
         if ($formArea === 'keys') {
             $builder->add(
                 'datacenter',
@@ -964,9 +979,13 @@ class ZohoIntegration extends CrmAbstractIntegration
                 if ($progress) {
                     $progress->advance();
                 }
-                $mappedData['Id']         = $lead['integration_entity_id'];
-                $existingPerson           = $this->getExistingRecord($lead['integration_entity_id']);
-                $fieldsToUpdate[$zObject] = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPerson, $mappedData, $config);
+                $mappedData['Id'] = $lead['integration_entity_id'];
+
+                $existingPerson = $this->getExistingRecord('email', $lead['email'], $zObject);
+                $objectFields   = $this->prepareFieldsForPush($availableFields[$zObject]);
+
+                $fieldsToUpdate[$zObject] = $this->getBlankFieldsToUpdate($fieldsToUpdate[$zObject], $existingPerson, $objectFields, $config);
+
                 $xmlData .= '<row no="'.($rowid++).'">';
                 // Match that data with mapped lead fields
                 foreach ($fieldsToUpdate[$zObject] as $k => $v) {
@@ -1099,7 +1118,69 @@ class ZohoIntegration extends CrmAbstractIntegration
             }
         }
     }
-    private function getExistingRecord($integrationEntityId)
+
+    /**
+     * @param $seachColumn
+     * @param $searchValue
+     * @param string $object
+     *
+     * @return mixed
+     */
+    private function getExistingRecord($seachColumn, $searchValue, $object = 'Leads')
     {
+        $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
+        $selectColumns   = implode(',', $availableFields[$object]);
+        $records         = $this->getApiHelper()->getSearchRecords($selectColumns, $seachColumn, $searchValue, $object);
+        $parsedRecords   = $this->parseZohoRecord($records, $availableFields[$object]);
+
+        return $parsedRecords;
+    }
+
+    /**
+     * @param $data
+     * @param $fields
+     * @param string $object
+     *
+     * @return mixed
+     */
+    private function parseZohoRecord($data, $fields, $object = 'Leads')
+    {
+        if (!empty($data['response']['result'][$object])) {
+            $records = $data['response']['result'][$object]['row']['FL'];
+            foreach ($fields as $key => $field) {
+                foreach ($records as $record) {
+                    if ($record['val'] == $field['dv']) {
+                        $parsedData[$key] = $record['content'];
+                        continue;
+                    }
+                }
+            }
+        }
+
+        return $parsedData;
+    }
+
+    /**
+     * @param $fields
+     * @param $sfRecord
+     * @param $config
+     * @param $objectFields
+     */
+    public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
+    {
+        //check if update blank fields is selected
+        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks') {
+            foreach ($sfRecord as $fieldName => $sfField) {
+                if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
+                    continue; // this will be treated differently
+                }
+                if ($sfField === 'null' && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
+                    //map to mautic field
+                    $fields[$fieldName] = $objectFields['create'][$fieldName];
+                }
+            }
+        }
+
+        return $fields;
     }
 }

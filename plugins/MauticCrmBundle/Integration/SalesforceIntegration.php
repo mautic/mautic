@@ -254,9 +254,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field, $object) {
-            return ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id']))
-                || ($object == 'Lead'
-                    && in_array($field['name'], ['Company']));
+            return
+                ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id'])) ||
+                ($object == 'Lead' && in_array($field['name'], ['Company'])) ||
+                (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
         };
 
         $salesFields = [];
@@ -663,6 +664,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if ('Lead' === $object && !$personFound) {
                         $personData                         = $this->getApiHelper()->createLead($mappedData[$object]['create']);
                         $people[$object][$personData['Id']] = $personData['Id'];
+                        $personFound                        = true;
                     }
 
                     if (isset($personData['Id'])) {
@@ -681,7 +683,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Return success if any Contact or Lead was updated or created
-                return ($people) ? $people : false;
+                return ($personFound) ? $people : false;
             }
         } catch (\Exception $e) {
             if ($e instanceof ApiErrorException) {
@@ -1556,7 +1558,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
                     $pushPeople      = $personIds[$pushObject];
                 }
-            }
+            } // pushLead should have handled this
 
             foreach ($pushPeople as $memberId) {
                 $campaignMappingId = '-'.$campaignId;

@@ -91,6 +91,7 @@ class FormTestAbstract extends WebTestCase
             ->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
+
         $fieldHelper = $this
             ->getMockBuilder(FormFieldHelper::class)
             ->disableOriginalConstructor()
@@ -201,6 +202,10 @@ class FormTestAbstract extends WebTestCase
             ->getMockBuilder(LeadFieldModel::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $leadFieldModel->expects($this
+            ->any())->method('getUniqueIdentifierFields')
+            ->willReturn(['eyJpc1B1Ymxpc2hlZCI6dHJ1ZSwiaXNVbmlxdWVJZGVudGlmZXIiOnRydWUsIm9iamVjdCI6ImxlYWQifQ==' => ['email' => 'Email']]);
 
         $companyModel = $this
             ->getMockBuilder(CompanyModel::class)

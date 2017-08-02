@@ -147,7 +147,6 @@ class ReportSubscriber extends CommonSubscriber
         if ($context == 'assets') {
             $queryBuilder->from(MAUTIC_TABLE_PREFIX.'assets', 'a');
             $event->addCategoryLeftJoin($queryBuilder, 'a');
-            $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
         } elseif ($context == 'asset.downloads') {
             $event->applyDateFilters($queryBuilder, 'date_download', 'ad');
 
