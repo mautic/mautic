@@ -75,6 +75,13 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.social.buildjs.subscriber' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\BuildJsSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.helper.integration',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.social.sociallogin' => [
