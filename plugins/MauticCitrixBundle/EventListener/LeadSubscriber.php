@@ -84,11 +84,6 @@ class LeadSubscriber extends CommonSubscriber
             return;
         }
 
-        $leadEmail = $event->getLead()->getEmail();
-        if ('' === $leadEmail) {
-            return;
-        }
-
         foreach ($activeProducts as $product) {
             $eventTypeRegistered      = $product.'.registered';
             $eventTypeRegisteredLabel = $this->translator->trans('plugin.citrix.timeline.event.'.$product.'.registered');
@@ -105,20 +100,29 @@ class LeadSubscriber extends CommonSubscriber
                 CitrixEventTypes::ATTENDED   => $event->isApplicable($eventTypeAttended),
             ];
 
-            $citrixEvents = $this->model->getEventsByLeadEmail($product, $leadEmail);
-            if (0 !== count($citrixEvents)) {
-                /** @var CitrixEvent $citrixEvent */
-                foreach ($citrixEvents as $citrixEvent) {
-                    $eventType = $citrixEvent->getEventType();
+            $citrixEvents = $this->model->getRepository()->getEventsForTimeline($product, $event->getLeadId(), $event->getQueryOptions());
+
+            if ($citrixEvents['total']) {
+                // Use a single entity class to help parse the name, description, etc without hydrating entities for every single event
+                $entity = new CitrixEvent();
+
+                foreach ($citrixEvents['results'] as $citrixEvent) {
+                    $entity->setProduct($citrixEvent['product'])
+                        ->setEventName($citrixEvent['event_name'])
+                        ->setEventDesc($citrixEvent['event_desc'])
+                        ->setEventType($citrixEvent['event_type'])
+                        ->setEventDate($citrixEvent['event_date']);
+
+                    $eventType = $entity->getEventType();
                     if ($eventType === CitrixEventTypes::REGISTERED) {
                         $timelineEventType      = $eventTypeRegistered;
                         $timelineEventTypeLabel = $eventTypeRegisteredLabel;
-                        $timelineEventLabel     = $eventTypeRegisteredName.' - '.$citrixEvent->getEventDesc();
+                        $timelineEventLabel     = $eventTypeRegisteredName.' - '.$entity->getEventDesc();
                     } else {
                         if ($eventType === CitrixEventTypes::ATTENDED) {
                             $timelineEventType      = $eventTypeAttended;
                             $timelineEventTypeLabel = $eventTypeAttendedLabel;
-                            $timelineEventLabel     = $eventTypeAttendedName.' - '.$citrixEvent->getEventDesc();
+                            $timelineEventLabel     = $eventTypeAttendedName.' - '.$entity->getEventDesc();
                         } else {
                             continue;
                         }
@@ -133,14 +137,16 @@ class LeadSubscriber extends CommonSubscriber
                             'event'      => $timelineEventType,
                             'eventLabel' => $timelineEventLabel,
                             'eventType'  => $timelineEventTypeLabel,
-                            'timestamp'  => $citrixEvent->getEventDate(),
+                            'timestamp'  => $entity->getEventDate(),
                             'extra'      => [
-                                'eventName' => $citrixEvent->getEventNameOnly(),
-                                'eventId'   => $citrixEvent->getEventId(),
-                                'eventDesc' => $citrixEvent->getEventDesc(),
-                                'joinUrl'   => $citrixEvent->getJoinUrl(),
+                                'eventName' => $entity->getEventNameOnly(),
+                                'eventId'   => $entity->getEventId(),
+                                'eventDesc' => $entity->getEventDesc(),
+                                'joinUrl'   => $entity->getJoinUrl(),
                             ],
                             'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.php',
+                            'contactId'       => $citrixEvent['lead_id'],
+
                         ]
                     );
                 }
