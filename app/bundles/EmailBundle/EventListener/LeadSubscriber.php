@@ -115,7 +115,6 @@ class LeadSubscriber extends CommonSubscriber
                         'eventLabel' => $eventName,
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $stat['date'.ucfirst($dateSent)],
-                        'dateSent'   => $stat['dateSent'],
                         'extra'      => [
                             'stat' => $stat,
                             'type' => $state,
