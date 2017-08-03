@@ -41,7 +41,7 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function __construct(
         LeadModel $leadModel,
-IntegrationHelper $integrationHelper)
+        IntegrationHelper $integrationHelper)
     {
         $this->leadModel         = $leadModel;
         $this->integrationHelper = $integrationHelper;
