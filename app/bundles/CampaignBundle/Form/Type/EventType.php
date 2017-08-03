@@ -65,7 +65,7 @@ class EventType extends AbstractType
         );
 
         /** CAPTIVEA.CORE START **/
-        if (in_array($options['data']['eventType'], ['action'])) {
+        if (in_array($options['data']['eventType'], ['action']) && in_array($options['data']['type'], ['lead.changepoints'])) {
             $transformer = new IdToEntityModelTransformer(
                 $this->factory->getEntityManager(),
                 'MauticScoringBundle:ScoringCategory'

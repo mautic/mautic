@@ -862,7 +862,7 @@ class Event
      * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
      * @return $this
      */
-    public function setScoringCategory(\Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory) {
+    public function setScoringCategory(\Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory = null) {
         $this->scoringCategory = $scoringCategory;
         return $this;
     }
