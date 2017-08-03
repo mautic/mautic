@@ -110,7 +110,8 @@ class LeadSubscriber extends CommonSubscriber
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon' => 'fa-calculator',
+                        'icon'      => 'fa-calculator',
+                        'contactId' => $log['lead_id'],
                     ]
                 );
             }

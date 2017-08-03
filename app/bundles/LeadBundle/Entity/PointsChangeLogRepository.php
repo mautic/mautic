@@ -32,7 +32,7 @@ class PointsChangeLogRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id');
+            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id, .lp.lead_id');
 
         if ($leadId) {
             $query->where('lp.lead_id = '.(int) $leadId);

@@ -79,7 +79,8 @@ class LeadSubscriber extends CommonSubscriber
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon' => 'fa-tachometer',
+                        'icon'      => 'fa-tachometer',
+                        'contactId' => $log['lead_id'],
                     ]
                 );
             }

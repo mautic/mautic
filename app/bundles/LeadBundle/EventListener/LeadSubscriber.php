@@ -494,6 +494,7 @@ class LeadSubscriber extends CommonSubscriber
                                 'utmtags' => $utmTag,
                             ],
                             'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.php',
+                            'contactId'       => $utmTag['lead_id'],
                         ]
                     );
             }
@@ -572,7 +573,8 @@ class LeadSubscriber extends CommonSubscriber
                         }
                     }
                 }
-
+                $contactId = $row['lead_id'];
+                unset($row['lead_id']);
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
@@ -588,6 +590,7 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => $template,
                         'icon'            => $icon,
+                        'contactId'       => $contactId,
                     ]
                 );
             }
@@ -635,6 +638,7 @@ class LeadSubscriber extends CommonSubscriber
                             'icon'            => 'fa-download',
                             'extra'           => $import,
                             'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:import.html.php',
+                            'contactId'       => $import['lead_id'],
                         ]
                     );
             }
