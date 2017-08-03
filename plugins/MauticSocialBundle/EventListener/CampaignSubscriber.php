@@ -18,6 +18,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -27,14 +28,21 @@ class CampaignSubscriber extends CommonSubscriber
     protected $helper;
 
     /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
      * CampaignSubscriber constructor.
      *
      * @param MauticFactory       $factory
      * @param CampaignEventHelper $helper
+     * @param Session             $session
      */
-    public function __construct(MauticFactory $factory, CampaignEventHelper $helper)
+    public function __construct(MauticFactory $factory, CampaignEventHelper $helper, Session $session)
     {
-        $this->helper = $helper;
+        $this->helper  = $helper;
+        $this->session = $session;
     }
 
     /**
@@ -64,6 +72,15 @@ class CampaignSubscriber extends CommonSubscriber
         ];
 
         $event->addAction('twitter.tweet', $action);
+
+        $action = [
+            'label'       => 'mautic.social.facebook.pixel.event.send',
+            'description' => 'mautic.social.facebook.pixel.event.send_desc',
+            'eventName'   => SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'formType'    => 'facebook_pixel_send_action',
+        ];
+
+        $event->addAction('facebook.pixel.send', $action);
     }
 
     /**
@@ -71,13 +88,21 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignAction(CampaignExecutionEvent $event)
     {
-        $event->setChannel('social.twitter');
-        if ($response = $this->helper->sendTweetAction($event->getLead(), $event->getEvent())) {
-            return $event->setResult($response);
-        }
+        if ($event->checkContext('')) {
+            $event->setChannel('twitter.tweet');
+            if ($response = $this->helper->sendTweetAction($event->getLead(), $event->getEvent())) {
+                return $event->setResult($response);
+            }
 
-        return $event->setFailed(
-            $this->translator->trans('mautic.social.twitter.error.handle_not_found')
-        );
+            return $event->setFailed(
+                $this->translator->trans('mautic.social.twitter.error.handle_not_found')
+            );
+        } elseif ($event->checkContext('facebook.pixel.send')) {
+            $lead        = $event->getLead();
+            $sessionName = 'mtc-fb-event-'.$lead->getId();
+            $this->session->start();
+            $this->session->set('ahoj', 'test');
+            $this->session->set($sessionName, $event->getConfig()['action'].':'.$event->getConfig()['label']);
+        }
     }
 }

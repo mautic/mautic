@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticSocialBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class BuildJsSubscriber.
@@ -34,6 +34,11 @@ class BuildJsSubscriber extends CommonSubscriber
     protected $integrationHelper;
 
     /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
      * BuildJsSubscriber constructor.
      *
      * @param LeadModel         $leadModel
@@ -41,10 +46,12 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function __construct(
         LeadModel $leadModel,
-        IntegrationHelper $integrationHelper)
-    {
+        IntegrationHelper $integrationHelper,
+        Session $session
+    ) {
         $this->leadModel         = $leadModel;
         $this->integrationHelper = $integrationHelper;
+        $this->session           = $session;
     }
 
     /**
@@ -74,41 +81,54 @@ class BuildJsSubscriber extends CommonSubscriber
             return;
         }
 
+        $lead       = $this->leadModel->getCurrentLead();
+        $leadId     = $lead->getId();
+        $cutomMatch = '{}';
+        if ($lead && $lead->getEmail()) {
+            $cutomMatch = "{em: '{$lead->getEmail()}'}";
+        }
+
         $js = <<<JS
-<!-- Facebook Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        MauticJS.fbpSet = false;
+        var fbq;
+        MauticJS.fbPixelLoad = function() {
+            if(!MauticJS.fbpSet){
+            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '{$integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId']}'
-JS;
-        $lead = $this->leadModel->getCurrentLead();
-        if ($lead instanceof Lead) {
-            $js .= <<<JS
-,{ 
-    em: '{$lead->getEmail()}', 
-    ph: '{$lead->getPhone()}',
-    fn: '{$lead->getFirstname()}',
-    ln: '{$lead->getLastname()}',
-    ct: '{$lead->getCity()}',
-    st: '{$lead->getState()}',
-    zp: '{$lead->getZipcode()}'
+        fbq('init', '{$integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId']}', {$cutomMatch}); 
+        fbq('track', 'PageView');
+        MauticJS.fbpSet = true;
+    };
 }
+ MauticJS.fbPixelLoad();
+ MauticJS.fbPixelLoadEvent= function(fbAction, fbLabel) {
+     console.log(fbq);
+     	if (typeof fbq != 'undefined') {
+				fbq('trackCustom', fbAction, {
+					eventLabel: fbLabel
+				});
+			}
+ }
 JS;
-        }
-        $js .= <<<JS
-); 
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id={$integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId']}&ev=PageView&noscript=1"
-/></noscript>
-<!-- DO NOT MODIFY -->
-<!-- End Facebook Pixel Code -->
+        $sessionName = 'mtc-fb-event-'.$leadId;
+        $fbEvents    = explode('|', $this->session->get($sessionName));
 
+        $js .= <<<JS
+
+   MauticJS.log('te-{$sessionName}-{$this->session->get($sessionName)}');
 JS;
+        array_shift($fbEvents);
+        if (!empty($fbEvents)) {
+            foreach ($fbEvents as $fbEvent) {
+                $fbe = explode(':', $fbEvents);
+                $js .= ' MauticJS.fbPixelLoadEvent('.$fbe['action'].', '.$fbe['label'].')';
+            }
+           // $this->session->remove($sessionName);
+        }
+
         $event->appendJs($js, 'Mautic Social Integration');
     }
 }
