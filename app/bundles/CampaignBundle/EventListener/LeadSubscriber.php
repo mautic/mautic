@@ -228,22 +228,27 @@ class LeadSubscriber extends CommonSubscriber
                         .'" class="fa fa-warning text-danger"></i>';
                 }
 
+                $extra = [
+                    'log' => $log,
+                ];
+
+                if ($event->isForTimeline()) {
+                    $extra['campaignEventSettings'] = $eventSettings;
+                }
+
                 $event->addEvent(
                     [
-                        'event'      => $eventTypeKey,
-                        'eventLabel' => [
+                        'event'           => $eventTypeKey,
+                        'eventLabel'      => [
                             'label' => $label,
                             'href'  => $this->router->generate(
                                 'mautic_campaign_action',
                                 ['objectAction' => 'view', 'objectId' => $log['campaign_id']]
                             ),
                         ],
-                        'eventType' => $eventTypeName,
-                        'timestamp' => $log['dateTriggered'],
-                        'extra'     => [
-                            'log'                   => $log,
-                            'campaignEventSettings' => $eventSettings,
-                        ],
+                        'eventType'       => $eventTypeName,
+                        'timestamp'       => $log['dateTriggered'],
+                        'extra'           => $extra,
                         'contentTemplate' => $template,
                         'icon'            => 'fa-clock-o',
                         'contactId'       => $log['lead_id'],

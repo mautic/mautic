@@ -20,10 +20,13 @@ use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class LeadApiController.
+ *
+ * @property LeadModel $model
  */
 class LeadApiController extends CommonApiController
 {
@@ -411,7 +414,11 @@ class LeadApiController extends CommonApiController
         $page    = (int) $this->request->get('page', 1);
         $events  = $this->model->getEngagements($entity, $filters, $order, $page);
 
-        return $this->handleView($this->view($events));
+        $view = $this->view($events);
+        $context = SerializationContext::create()->setGroups($this->serializerGroups);
+        $view->setSerializationContext($context);
+
+        return $this->handleView($view);
     }
 
     /**
@@ -423,7 +430,6 @@ class LeadApiController extends CommonApiController
     {
         $canViewOwn     = $this->security->isGranted('lead:leads:viewown');
         $canViewOthers  = $this->security->isGranted('lead:leads:others');
-        $canViewOnlyOwn = (!$canViewOthers && $canViewOwn);
 
         if (!$canViewOthers && !$canViewOwn) {
             return $this->accessDenied();
@@ -433,7 +439,10 @@ class LeadApiController extends CommonApiController
         $limit   = (int) $this->request->get('limit', 25);
         $page    = (int) $this->request->get('page', 1);
         $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
-        $events  = $this->getModel('lead')->getEngagements(null, $filters, $order, $page, $limit);
+
+        $events  = $this->model->getEngagements(null, $filters, $order, $page, $limit, false);
+
+
 
         return $this->handleView($this->view($events));
     }

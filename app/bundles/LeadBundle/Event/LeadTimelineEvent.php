@@ -105,6 +105,11 @@ class LeadTimelineEvent extends Event
     protected $chartQuery;
 
     /**
+     * @var bool
+     */
+    protected $forTimeline = true;
+
+    /**
      * LeadTimelineEvent constructor.
      *
      * @param Lead       $lead
@@ -113,18 +118,21 @@ class LeadTimelineEvent extends Event
      * @param int        $page
      * @param int        $limit   Limit per type
      */
-    public function __construct(Lead $lead = null, array $filters = [], array $orderBy = null, $page = 1, $limit = 25)
+    public function __construct(Lead $lead = null, array $filters = [], array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true)
     {
-        $this->lead    = $lead;
-        $this->filters = !empty($filters) ? $filters :
+        $this->lead        = $lead;
+        $this->filters     = !empty($filters)
+            ? $filters
+            :
             [
                 'search'        => '',
                 'includeEvents' => [],
                 'excludeEvents' => [],
             ];
-        $this->orderBy = $orderBy;
-        $this->page    = $page;
-        $this->limit   = $limit;
+        $this->orderBy     = $orderBy;
+        $this->page        = $page;
+        $this->limit       = $limit;
+        $this->forTimeline = $forTimeline;
     }
 
     /**
@@ -161,6 +169,18 @@ class LeadTimelineEvent extends Event
             if (!isset($this->events[$data['event']])) {
                 $this->events[$data['event']] = [];
             }
+
+            if (!$this->isForTimeline()) {
+                // Unset the common stuff used only for the timeline
+                unset($data['contentTemplate'], $data['icon']);
+
+                // Rename extra to details
+                if (isset($data['extra'])) {
+                    $data['details'] = $data['extra'];
+                    unset($data['extra']);
+                }
+            }
+
             $this->events[$data['event']][] = $data;
         }
     }
@@ -485,5 +505,15 @@ class LeadTimelineEvent extends Event
     public function getChartQuery()
     {
         return $this->chartQuery;
+    }
+
+    /**
+     * Check if the data is to be display for the contact's timeline or used for the API
+     *
+     * @return bool
+     */
+    public function isForTimeline()
+    {
+        return $this->forTimeline;
     }
 }
