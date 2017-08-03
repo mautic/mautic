@@ -372,7 +372,7 @@ class SalesforceApi extends CrmApi
             $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', false, null, $this->integration->getQueryUrl());
             if (!empty($foundCampaignMembers['records'])) {
                 foreach ($foundCampaignMembers['records'] as $member) {
-                    $campaignMembers[$member[$idField]] = $member[$idField];
+                    $campaignMembers[$member[$idField]] = $member['Id'];
                 }
             }
         }
