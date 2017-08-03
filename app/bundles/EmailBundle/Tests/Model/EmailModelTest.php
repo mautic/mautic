@@ -30,7 +30,6 @@ use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\DeviceModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -208,10 +207,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
-        $deviceModel = $this->getMockBuilder(DeviceModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -221,8 +216,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $deviceModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -432,10 +426,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
-        $deviceModel = $this->getMockBuilder(DeviceModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -445,8 +435,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $deviceModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -592,10 +581,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
-        $deviceModel = $this->getMockBuilder(DeviceModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -605,8 +590,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $deviceModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -732,10 +716,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
-        $deviceModel = $this->getMockBuilder(DeviceModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -745,8 +725,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $deviceModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -850,10 +829,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->expects($this->exactly(0))
             ->method('getRepository');
 
-        $deviceModel = $this->getMockBuilder(DeviceModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -863,8 +838,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $deviceModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -986,10 +960,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $messageModel->setUserHelper($userHelper);
         $messageModel->setDispatcher($dispatcher);
 
-        $deviceModel = $this->getMockBuilder(DeviceModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -999,8 +969,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $deviceModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
