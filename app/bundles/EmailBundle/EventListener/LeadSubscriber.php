@@ -65,6 +65,7 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'email.'.$state;
         $eventTypeName = $this->translator->trans('mautic.email.'.$state);
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('emailList');
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {

@@ -61,6 +61,7 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'asset.download';
         $eventTypeName = $this->translator->trans('mautic.asset.event.download');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('assetList');
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {

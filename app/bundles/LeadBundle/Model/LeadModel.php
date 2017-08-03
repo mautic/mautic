@@ -2529,10 +2529,10 @@ class LeadModel extends FormModel
     {
         $event = $this->dispatcher->dispatch(
             LeadEvents::TIMELINE_ON_GENERATE,
-            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline)
+            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->getParameter('site_url'))
         );
 
-        return [
+        $payload = [
             'events'   => $event->getEvents(),
             'filters'  => $filters,
             'order'    => $orderBy,
@@ -2542,6 +2542,8 @@ class LeadModel extends FormModel
             'limit'    => $limit,
             'maxPages' => $event->getMaxPage(),
         ];
+
+        return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
     /**

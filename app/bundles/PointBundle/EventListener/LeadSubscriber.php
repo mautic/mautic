@@ -86,6 +86,7 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'point.gained';
         $eventTypeName = $this->translator->trans('mautic.point.event.gained');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('pointList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;

@@ -414,11 +414,7 @@ class LeadApiController extends CommonApiController
         $page    = (int) $this->request->get('page', 1);
         $events  = $this->model->getEngagements($entity, $filters, $order, $page);
 
-        $view = $this->view($events);
-        $context = SerializationContext::create()->setGroups($this->serializerGroups);
-        $view->setSerializationContext($context);
-
-        return $this->handleView($view);
+        return $this->handleView($this->view($events));
     }
 
     /**
@@ -440,11 +436,13 @@ class LeadApiController extends CommonApiController
         $page    = (int) $this->request->get('page', 1);
         $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
 
-        $events  = $this->model->getEngagements(null, $filters, $order, $page, $limit, false);
+        list($events, $serializerGroups)  = $this->model->getEngagements(null, $filters, $order, $page, $limit, false);
 
+        $view = $this->view($events);
+        $context = SerializationContext::create()->setGroups($serializerGroups);
+        $view->setSerializationContext($context);
 
-
-        return $this->handleView($this->view($events));
+        return $this->handleView($view);
     }
 
     /**

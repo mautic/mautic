@@ -194,6 +194,7 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('campaignList');
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {

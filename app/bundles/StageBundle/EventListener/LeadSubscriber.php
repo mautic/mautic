@@ -45,6 +45,7 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'stage.changed';
         $eventTypeName = $this->translator->trans('mautic.stage.event.changed');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('stageList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;

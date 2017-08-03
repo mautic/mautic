@@ -43,6 +43,7 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey      = 'dynamic.content.sent';
         $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.sent');
         $event->addEventType($eventTypeKey, $eventTypeNameSent);
+        $event->addSerializerGroup('dwcList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;

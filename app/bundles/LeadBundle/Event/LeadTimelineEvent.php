@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -110,15 +111,27 @@ class LeadTimelineEvent extends Event
     protected $forTimeline = true;
 
     /**
+     * @var
+     */
+    protected $siteDomain;
+
+    /**
+     * @var array
+     */
+    protected $serializerGroups = [];
+
+    /**
      * LeadTimelineEvent constructor.
      *
-     * @param Lead       $lead
-     * @param array      $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit   Limit per type
+     * @param Lead|null         $lead
+     * @param array             $filters
+     * @param array|null        $orderBy
+     * @param int               $page
+     * @param int               $limit          Limit per type
+     * @param bool              $forTimeline
+     * @param string|null       $siteDomain
      */
-    public function __construct(Lead $lead = null, array $filters = [], array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true)
+    public function __construct(Lead $lead = null, array $filters = [], array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true, $siteDomain = null)
     {
         $this->lead        = $lead;
         $this->filters     = !empty($filters)
@@ -133,6 +146,7 @@ class LeadTimelineEvent extends Event
         $this->page        = $page;
         $this->limit       = $limit;
         $this->forTimeline = $forTimeline;
+        $this->siteDomain  = $siteDomain;
     }
 
     /**
@@ -177,7 +191,18 @@ class LeadTimelineEvent extends Event
                 // Rename extra to details
                 if (isset($data['extra'])) {
                     $data['details'] = $data['extra'];
+                    $this->prepareDetailsForAPI($data['details']);
                     unset($data['extra']);
+                }
+
+                // Ensure a full URL
+                if ($this->siteDomain && isset($data['eventLabel']) && is_array($data['eventLabel']) && isset($data['eventLabel']['href'])) {
+                    if (!empty($data['eventLabel']['isExternal'])) {
+                        // If this does not have a http, then assume a Mautic URL
+                        if (strpos($data['eventLabel']['href'], '://') === false) {
+                            $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
+                        }
+                    }
                 }
             }
 
@@ -515,5 +540,56 @@ class LeadTimelineEvent extends Event
     public function isForTimeline()
     {
         return $this->forTimeline;
+    }
+
+    /**
+     * Add a serializer group for API formatting
+     *
+     * @param $group
+     */
+    public function addSerializerGroup($group)
+    {
+        if (is_array($group)) {
+            $this->serializerGroups = array_merge(
+                $this->serializerGroups,
+                $group
+            );
+        } else {
+            $this->serializerGroups[$group] = $group;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getSerializerGroups()
+    {
+        return $this->serializerGroups;
+    }
+
+    /**
+     * Convert all snake case keys o camel case for API congruency
+     *
+     * @param array $details
+     */
+    protected function prepareDetailsForAPI(array &$details)
+    {
+        foreach ($details as $key => &$detailValues) {
+            if (is_array($detailValues)) {
+                $this->prepareDetailsForAPI($detailValues);
+            }
+
+            if ('lead_id' === $key) {
+                // Don't include this as it should be included in parent as contactId
+                unset($details[$key]);
+                continue;
+            }
+
+            if (strstr($key, '_')) {
+                $newKey = lcfirst(str_replace('_', '', ucwords($key, '_')));
+                $details[$newKey] = $details[$key];
+                unset($details[$key]);
+            }
+        }
     }
 }
