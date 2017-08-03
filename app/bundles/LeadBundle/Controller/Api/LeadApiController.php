@@ -397,7 +397,7 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEventsAction($id)
+    public function getActivityAction($id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -409,12 +409,7 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
-        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
-        $page    = (int) $this->request->get('page', 1);
-        $events  = $this->model->getEngagements($entity, $filters, $order, $page);
-
-        return $this->handleView($this->view($events));
+        return $this->getAllActivityAction($entity);
     }
 
     /**
@@ -422,7 +417,7 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getAllEventsAction()
+    public function getAllActivityAction($lead = null)
     {
         $canViewOwn     = $this->security->isGranted('lead:leads:viewown');
         $canViewOthers  = $this->security->isGranted('lead:leads:others');
@@ -436,7 +431,7 @@ class LeadApiController extends CommonApiController
         $page    = (int) $this->request->get('page', 1);
         $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
 
-        list($events, $serializerGroups)  = $this->model->getEngagements(null, $filters, $order, $page, $limit, false);
+        list($events, $serializerGroups)  = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 
         $view = $this->view($events);
         $context = SerializationContext::create()->setGroups($serializerGroups);
@@ -574,6 +569,35 @@ class LeadApiController extends CommonApiController
     public function removeUtmTagsAction($id, $utmid)
     {
         return $this->applyUtmTagsAction($id, 'removeUtmTags', (int) $utmid);
+    }
+
+    /**
+     * Obtains a list of contact events.
+     *
+     * @deprecated 2.10.0 to be removed in 3.0
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getEventsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'view')) {
+            return $this->accessDenied();
+        }
+
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
+        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
+        $page    = (int) $this->request->get('page', 1);
+        $events  = $this->model->getEngagements($entity, $filters, $order, $page);
+
+        return $this->handleView($this->view($events));
     }
 
     /**
