@@ -528,7 +528,11 @@ return [
             ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
-                'arguments' => ['mautic.factory'],
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.field',
+                ],
                 'alias'     => 'campaignevent_lead_field_value',
             ],
             'mautic.form.type.campaignevent_lead_tags' => [
