@@ -142,6 +142,16 @@ class LeadModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var
+     */
+    protected $leadTrackingId;
+
+    /**
+     * @var bool
+     */
+    protected $leadTrackingCookieGenerated = false;
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack         $requestStack
@@ -584,8 +594,11 @@ class LeadModel extends FormModel
 
                 // Only update fields that are part of the passed $data array
                 if (array_key_exists($alias, $data)) {
+                    if (!$bindWithForm) {
+                        $this->cleanFields($data, $field);
+                    }
                     $curValue = $field['value'];
-                    $newValue = $data[$alias];
+                    $newValue = isset($data[$alias]) ? $data[$alias] : '';
 
                     if (is_array($newValue)) {
                         $newValue = implode('|', $newValue);
@@ -790,26 +803,20 @@ class LeadModel extends FormModel
      *
      * @param bool|false $returnTracking
      *
-     * @return Lead|array
+     * @return null|Lead|array
      */
     public function getCurrentLead($returnTracking = false)
     {
-        if ((!$returnTracking && $this->systemCurrentLead) || defined('IN_MAUTIC_CONSOLE')) {
-            // Just return the system set lead
-            if (null === $this->systemCurrentLead) {
+        $isUser = (!$this->security->isAnonymous());
+        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
+            $this->logger->addDebug('LEAD: System lead is being used');
+            if (!$isUser && null === $this->systemCurrentLead) {
                 $this->systemCurrentLead = new Lead();
+            } elseif ($isUser) {
+                $this->logger->addDebug('LEAD: In a Mautic user session');
             }
 
-            return $this->systemCurrentLead;
-        }
-
-        if (!$this->security->isAnonymous()) {
-            // this is a Mautic user that's somehow tracked as a contact which we're going to ignore
-            $this->logger->addDebug('LEAD: In a Mautic user session');
-
-            $lead = new Lead();
-
-            return ($returnTracking) ? [$lead, null, false] : $lead;
+            return ($returnTracking) ? [$this->systemCurrentLead, null, false] : $this->systemCurrentLead;
         }
 
         if ($this->request) {
@@ -984,18 +991,20 @@ class LeadModel extends FormModel
             $lead = $this->getCurrentLead();
         }
 
-        $leadIpAddresses = $lead->getIpAddresses();
-        if (!$leadIpAddresses->contains($ipAddress)) {
-            $lead->addIpAddress($ipAddress);
+        if ($lead) {
+            $leadIpAddresses = $lead->getIpAddresses();
+            if (!$leadIpAddresses->contains($ipAddress)) {
+                $lead->addIpAddress($ipAddress);
+            }
+
+            $this->setFieldValues($lead, $inQuery, false, true, true);
+
+            if (isset($queryFields['tags'])) {
+                $this->modifyTags($lead, $queryFields['tags']);
+            }
+
+            $this->setCurrentLead($lead);
         }
-
-        $this->setFieldValues($lead, $inQuery, false, true, true);
-
-        if (isset($queryFields['tags'])) {
-            $this->modifyTags($lead, $queryFields['tags']);
-        }
-
-        $this->setCurrentLead($lead);
 
         return $lead;
     }
@@ -1009,11 +1018,14 @@ class LeadModel extends FormModel
     {
         $this->logger->addDebug("LEAD: {$lead->getId()} set as current lead.");
 
-        if ($this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
-            // Overwrite system current lead
-            $this->systemCurrentLead = $lead;
+        $isUser = (!$this->security->isAnonymous());
+        if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
+            if ($isUser) {
+                $this->logger->addDebug('LEAD: In a Mautic user session');
+            }
 
-            return;
+            // Overwrite system current lead
+            return $this->setSystemCurrentLead($lead);
         }
 
         $oldLead = (is_null($this->currentLead)) ? null : $this->currentLead;
@@ -1059,6 +1071,8 @@ class LeadModel extends FormModel
      */
     public function setSystemCurrentLead(Lead $lead = null)
     {
+        $this->logger->addDebug("LEAD: {$lead->getId()} set as system lead.");
+
         $fields = $lead->getFields();
         if (empty($fields)) {
             $lead->setFields($this->getLeadDetails($lead));
@@ -1107,40 +1121,42 @@ class LeadModel extends FormModel
      */
     public function getTrackingCookie($forceRegeneration = false)
     {
-        static $trackingId = false, $generated = false;
-
-        if ($forceRegeneration) {
-            $generated = true;
-
-            $oldTrackingId = $this->request->cookies->get('mautic_session_id');
-            $trackingId    = hash('sha1', uniqid(mt_rand()));
-
-            //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
-
-            return [$trackingId, $oldTrackingId];
+        if (!$this->request) {
+            return [null, false];
         }
 
-        if (empty($trackingId)) {
+        if ($forceRegeneration) {
+            $this->leadTrackingCookieGenerated = true;
+
+            $oldTrackingId        = $this->request->cookies->get('mautic_session_id');
+            $this->leadTrackingId = hash('sha1', uniqid(mt_rand()));
+
+            //create a tracking cookie with a expire of two years
+            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
+
+            return [$this->leadTrackingId, $oldTrackingId];
+        }
+
+        if (empty($this->leadTrackingId)) {
             //check for the tracking cookie or sid from query
-            if ($this->request && !$trackingId = $this->request->cookies->get('mautic_session_id')) {
-                $trackingId = ('GET' == $this->request->getMethod())
+            if ($this->request && !$this->leadTrackingId = $this->request->cookies->get('mautic_session_id')) {
+                $this->leadTrackingId = ('GET' == $this->request->getMethod())
                     ?
                     $this->request->query->get('mtc_sid')
                     :
                     $this->request->request->get('mtc_sid');
             }
-            $generated = false;
-            if (empty($trackingId)) {
-                $trackingId = hash('sha1', uniqid(mt_rand()));
-                $generated  = true;
+            $this->leadTrackingCookieGenerated = false;
+            if (empty($this->leadTrackingId)) {
+                $this->leadTrackingId              = hash('sha1', uniqid(mt_rand()));
+                $this->leadTrackingCookieGenerated = true;
             }
 
             //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
+            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
         }
 
-        return [$trackingId, $generated];
+        return [$this->leadTrackingId, $this->leadTrackingCookieGenerated];
     }
 
     /**
@@ -1150,6 +1166,10 @@ class LeadModel extends FormModel
      */
     public function setLeadCookie($leadId)
     {
+        if (!$this->request) {
+            return;
+        }
+
         // Remove the old if set
         $oldTrackingId                = $this->request->cookies->get('mautic_session_id');
         list($trackingId, $generated) = $this->getTrackingCookie();
@@ -1867,46 +1887,7 @@ class LeadModel extends FormModel
                 }
 
                 try {
-                    switch ($leadField['type']) {
-                        // Adjust the boolean values from text to boolean
-                        case 'boolean':
-                            $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
-                            break;
-                        // Ensure date/time entries match what symfony expects
-                        case 'datetime':
-                        case 'date':
-                        case 'time':
-                            // Prevent zero based date placeholders
-                            $dateTest = (int) str_replace(['/', '-', ' '], '', $fieldData[$leadField['alias']]);
-
-                            if (!$dateTest) {
-                                // Date placeholder was used so just ignore it to allow import of the field
-                                unset($fieldData[$leadField['alias']]);
-                            } else {
-                                switch ($leadField['type']) {
-                                    case 'datetime':
-                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i');
-                                        break;
-                                    case 'date':
-                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d');
-                                        break;
-                                    case 'time':
-                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i');
-                                        break;
-                                }
-                            }
-                            break;
-                        case 'multiselect':
-                            if (strpos($fieldData[$leadField['alias']], '|') !== false) {
-                                $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
-                            } else {
-                                $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
-                            }
-                            break;
-                        case 'number':
-                            $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
-                            break;
-                    }
+                    $this->cleanFields($fieldData, $leadField);
                 } catch (\Exception $exception) {
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
