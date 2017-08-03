@@ -67,7 +67,7 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'form.submitted';
         $eventTypeName = $this->translator->trans('mautic.form.event.submitted');
         $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup(['formList', 'submissionDetails']);
+        $event->addSerializerGroup(['formList', 'submissionEventDetails']);
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;

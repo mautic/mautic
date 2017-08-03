@@ -118,7 +118,9 @@ class LeadTimelineEvent extends Event
     /**
      * @var array
      */
-    protected $serializerGroups = [];
+    protected $serializerGroups = [
+        'ipAddressList',
+    ];
 
     /**
      * LeadTimelineEvent constructor.
@@ -185,8 +187,17 @@ class LeadTimelineEvent extends Event
             }
 
             if (!$this->isForTimeline()) {
-                // Unset the common stuff used only for the timeline
-                unset($data['contentTemplate'], $data['icon']);
+                // standardize the payload
+                $keepThese = [
+                    'event'      => true,
+                    'eventLabel' => true,
+                    'eventType'  => true,
+                    'timestamp'  => true,
+                    'contactId'  => true,
+                    'extra'      => true
+                ];
+
+                $data = array_intersect_key($data, $keepThese);
 
                 // Rename extra to details
                 if (isset($data['extra'])) {
