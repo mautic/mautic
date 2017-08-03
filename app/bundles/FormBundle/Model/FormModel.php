@@ -23,6 +23,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -754,6 +755,10 @@ class FormModel extends CommonFormModel
     {
         $formName = $form->generateFormName();
         $lead     = $this->leadModel->getCurrentLead();
+
+        if (!$lead instanceof Lead) {
+            return;
+        }
 
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */
