@@ -375,6 +375,7 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
+                    'mautic.lead.model.device',
                 ],
             ],
         ],

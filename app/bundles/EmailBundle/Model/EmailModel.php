@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -39,8 +38,8 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DeviceModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -115,6 +114,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     protected $emailSettings = [];
 
     /**
+     * @var DeviceModel
+     */
+    protected $deviceModel;
+
+    /**
      * EmailModel constructor.
      *
      * @param IpLookupHelper    $ipLookupHelper
@@ -126,6 +130,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param TrackableModel    $pageTrackableModel
      * @param UserModel         $userModel
      * @param MessageQueueModel $messageQueueModel
+     * @param DeviceModel       $deviceModel
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -136,7 +141,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         CompanyModel $companyModel,
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
-        MessageQueueModel $messageQueueModel
+        MessageQueueModel $messageQueueModel,
+        DeviceModel $deviceModel
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->themeHelper        = $themeHelper;
@@ -147,6 +153,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->pageTrackableModel = $pageTrackableModel;
         $this->userModel          = $userModel;
         $this->messageQueueModel  = $messageQueueModel;
+        $this->deviceModel        = $deviceModel;
     }
 
     /**
@@ -469,38 +476,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
         }
 
-        //device granularity
-        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
-        $dd->parse();
-        $deviceRepo      = $this->leadModel->getDeviceRepository();
-        $emailOpenDevice = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
-
-        if (empty($emailOpenDevice)) {
-            $emailOpenDevice = new LeadDevice();
-            $emailOpenDevice->setClientInfo($dd->getClient());
-            $emailOpenDevice->setDevice($dd->getDeviceName());
-            $emailOpenDevice->setDeviceBrand($dd->getBrand());
-            $emailOpenDevice->setDeviceModel($dd->getModel());
-            $emailOpenDevice->setDeviceOs($dd->getOs());
-            $emailOpenDevice->setDateOpen($readDateTime->toUtcString());
-            $emailOpenDevice->setLead($lead);
-
-            try {
-                $this->em->persist($emailOpenDevice);
-                $this->em->flush($emailOpenDevice);
-            } catch (\Exception $exception) {
-                if (MAUTIC_ENV === 'dev') {
-                    throw $exception;
-                } else {
-                    $this->logger->addError(
-                        $exception->getMessage(),
-                        ['exception' => $exception]
-                    );
-                }
-            }
-        } else {
-            $emailOpenDevice = $this->em->getReference(LeadDevice::class, $emailOpenDevice['id']);
-        }
+        $emailOpenDevice = $this->deviceModel->getContactDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'), $readDateTime->getUtcDateTime());
 
         if ($email) {
             $this->em->persist($email);
