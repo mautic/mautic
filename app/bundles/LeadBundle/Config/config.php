@@ -297,6 +297,8 @@ return [
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead',
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
@@ -681,5 +683,7 @@ return [
     'parameters' => [
         'parallel_import_limit'               => 1,
         'background_import_if_more_rows_than' => 0,
+        'segments_mapping_created'            => [],
+        'segments_mapping_identified'         => [],
     ],
 ];

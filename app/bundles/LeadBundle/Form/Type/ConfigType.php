@@ -25,14 +25,46 @@ class ConfigType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('background_import_if_more_rows_than', 'number', [
-            'label'      => 'mautic.lead.background.import.if.more.rows.than',
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => [
-                'class'   => 'form-control',
-                'tooltip' => 'mautic.lead.background.import.if.more.rows.than.tooltip',
-            ],
-        ]);
+        $builder->add(
+            'background_import_if_more_rows_than',
+            'number',
+            [
+                'label'      => 'mautic.lead.background.import.if.more.rows.than',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.lead.background.import.if.more.rows.than.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'segments_mapping_created',
+            'leadlist_choices',
+            [
+                'label'      => 'mautic.lead.segments.mapping.created',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'multiple' => true,
+                'expanded' => false,
+            ]
+        );
+
+        $builder->add(
+            'segments_mapping_identified',
+            'leadlist_choices',
+            [
+                'label'      => 'mautic.lead.segments.mapping.identified',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'multiple' => true,
+                'expanded' => false,
+            ]
+        );
     }
 
     /**
