@@ -260,7 +260,7 @@ class ScoringCategory extends FormEntity
      * @return $this
      */
     public function setGlobalScoreModifier($globalScoreModifier) {
-        $this->globalScoreModifier = floatval($globalScoreModifier);
+        $this->globalScoreModifier = max(0.00, floatval($globalScoreModifier));
         return $this;
     }
     
@@ -270,7 +270,7 @@ class ScoringCategory extends FormEntity
      * @return $this
      */
     public function setOrderIndex($orderIndex) {
-        $this->orderIndex = intval($orderIndex);
+        $this->orderIndex = max(1, intval($orderIndex));
         return $this;
     }
     

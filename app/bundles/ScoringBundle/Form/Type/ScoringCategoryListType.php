@@ -34,7 +34,9 @@ class ScoringCategoryListType extends AbstractType {
         ]);
 
         foreach ($choices as $choice) {
-            $this->choices[$choice->getId()] = $choice->getName(true);
+            if(!$choice->getIsGlobalScore()) { // tmp
+                $this->choices[$choice->getId()] = $choice->getName(true);
+            }
         }
         
         // so, yeah, we're doing ALL CIRCLE DIRTY
