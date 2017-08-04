@@ -206,11 +206,16 @@ class CampaignSubscriber extends CommonSubscriber
         if ($lead !== null && !empty($points)) {
             /** CAPTIVEA.CORE START REPLACE **/
             //$lead->adjustPoints($points);
-            $scoringCategory = $event->getScoringCategory();
-            if(empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
-            $lead->adjustPoints($points);
+            $scoringCategoryId = $event->getConfig()['scoringCategory'];
+            if(!empty($scoringCategoryId)) {
+                $scoringCategory = $this->em->getRepository('ScoringCategory')->find($scoringCategoryId);
+                if(empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
+                    $lead->adjustPoints($points);
+                } else {
+                    $this->em->getRepository('ScoringValue')->adjustPoints($lead, $scoringCategory, $points);
+                }
             } else {
-                $this->em->getRepository('ScoringCategory')->adjustPoints($lead, $scoringCategory, $points);
+                $lead->adjustPoints($points);
             }
             /** CAPTIVEA.CORE END REPLACE **/
 
