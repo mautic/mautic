@@ -357,6 +357,7 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                     [
                         'event'         => $eventTypeKey,
+                        'eventId'       => $eventTypeKey.$row['id'],
                         'eventLabel'    => $row['ip_address'],
                         'eventType'     => $eventTypeName,
                         'eventPriority' => -1, // Usually an IP is added after another event
@@ -395,6 +396,7 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                     [
                         'event'         => $eventTypeKey,
+                        'eventId'       => $eventTypeKey.$event->getLead()->getId(),
                         'icon'          => 'fa-user-secret',
                         'eventType'     => $eventTypeName,
                         'eventPriority' => -5, // Usually something happened to create the lead so this should display afterward
@@ -428,6 +430,7 @@ class LeadSubscriber extends CommonSubscriber
                     $event->addEvent(
                         [
                             'event'         => $eventTypeKey,
+                            'eventId'       => $eventTypeKey.$event->getLead()->getId(),
                             'icon'          => 'fa-user',
                             'eventType'     => $eventTypeName,
                             'eventPriority' => -4, // A lead is created prior to being identified
@@ -487,6 +490,7 @@ class LeadSubscriber extends CommonSubscriber
                         [
                             'event'      => $eventTypeKey,
                             'eventType'  => $eventTypeName,
+                            'eventId'    => $eventTypeKey.$utmTag['id'],
                             'eventLabel' => !empty($utmTag) ? $utmTag['utm_campaign'] : 'UTM Tags',
                             'timestamp'  => $utmTag['date_added'],
                             'icon'       => $icon,
@@ -578,6 +582,7 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$row['id'],
                         'eventLabel' => (isset($row['itemName'])) ?
                             [
                                 'label' => ucfirst($row['channel']).' / '.$row['itemName'],
@@ -626,6 +631,7 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                         [
                             'event'      => $eventTypeKey,
+                            'eventId'    => $eventTypeKey.$import['id'],
                             'eventType'  => $eventTypeName,
                             'eventLabel' => !empty($import['object_id']) ? [
                                 'label' => $eventLabel,

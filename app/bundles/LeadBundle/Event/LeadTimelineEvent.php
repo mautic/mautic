@@ -190,6 +190,7 @@ class LeadTimelineEvent extends Event
                 // standardize the payload
                 $keepThese = [
                     'event'      => true,
+                    'eventId'    => true,
                     'eventLabel' => true,
                     'eventType'  => true,
                     'timestamp'  => true,

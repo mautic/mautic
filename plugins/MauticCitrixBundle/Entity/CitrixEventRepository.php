@@ -81,7 +81,7 @@ class CitrixEventRepository extends CommonRepository
                 $query->expr()->like('c.product', $query->expr()->literal('%'.$options['search'].'%'))
             ));
         }
-define('CITRIX',1);
+
         return $this->getTimelineResults($query, $options, 'c.event_name', 'c.event_date', [], ['event_date']);
     }
 

@@ -114,7 +114,7 @@ class DoNotContactRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $query->select('dnc.channel, dnc.channel_id, dnc.date_added, dnc.reason, dnc.comments, dnc.lead_id')
+        $query->select('dnc.id, dnc.channel, dnc.channel_id, dnc.date_added, dnc.reason, dnc.comments, dnc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc');
 
         if ($leadId) {

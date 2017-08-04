@@ -73,7 +73,8 @@ class LeadEventLogRepository extends CommonRepository
         $query = $this->getEntityManager()
                       ->getConnection()
                       ->createQueryBuilder()
-                      ->select('ll.event_id,
+                      ->select('ll.id as log_id,
+                    ll.event_id,
                     ll.campaign_id,
                     ll.date_triggered as dateTriggered,
                     e.name AS event_name,

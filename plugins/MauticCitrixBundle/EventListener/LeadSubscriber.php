@@ -135,6 +135,7 @@ class LeadSubscriber extends CommonSubscriber
                     $event->addEvent(
                         [
                             'event'      => $timelineEventType,
+                            'eventId'    => $timelineEventType.$citrixEvent['id'],
                             'eventLabel' => $timelineEventLabel,
                             'eventType'  => $timelineEventTypeLabel,
                             'timestamp'  => $entity->getEventDate(),

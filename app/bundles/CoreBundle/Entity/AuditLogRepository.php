@@ -79,7 +79,7 @@ class AuditLogRepository extends CommonRepository
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $sqb
-            ->select('MAX(l.date_added) as date_added, l.ip_address, l.object_id as lead_id')
+            ->select('MAX(l.date_added) as date_added, MIN(l.id) as id, l.ip_address, l.object_id as lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'l')
             ->where(
                 $sqb->expr()->andX(

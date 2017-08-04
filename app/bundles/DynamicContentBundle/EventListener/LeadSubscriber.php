@@ -66,6 +66,7 @@ class LeadSubscriber extends CommonSubscriber
                     $event->addEvent(
                         [
                             'event'      => $eventTypeKey,
+                            'eventId'    => $eventTypeKey.$stat['id'],
                             'eventLabel' => [
                                 'label' => $stat['name'],
                                 'href'  => $this->router->generate(
