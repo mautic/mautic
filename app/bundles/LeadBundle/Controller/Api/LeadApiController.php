@@ -419,8 +419,8 @@ class LeadApiController extends CommonApiController
      */
     public function getAllActivityAction($lead = null)
     {
-        $canViewOwn     = $this->security->isGranted('lead:leads:viewown');
-        $canViewOthers  = $this->security->isGranted('lead:leads:others');
+        $canViewOwn    = $this->security->isGranted('lead:leads:viewown');
+        $canViewOthers = $this->security->isGranted('lead:leads:others');
 
         if (!$canViewOthers && !$canViewOwn) {
             return $this->accessDenied();
@@ -431,9 +431,9 @@ class LeadApiController extends CommonApiController
         $page    = (int) $this->request->get('page', 1);
         $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
 
-        list($events, $serializerGroups)  = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
+        list($events, $serializerGroups) = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 
-        $view = $this->view($events);
+        $view    = $this->view($events);
         $context = SerializationContext::create()->setGroups($serializerGroups);
         $view->setSerializationContext($context);
 
