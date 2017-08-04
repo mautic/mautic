@@ -239,8 +239,8 @@ class LeadSubscriber extends CommonSubscriber
 
                 $event->addEvent(
                     [
-                        'event'           => $eventTypeKey,
-                        'eventLabel'      => [
+                        'event'      => $eventTypeKey,
+                        'eventLabel' => [
                             'label' => $label,
                             'href'  => $this->router->generate(
                                 'mautic_campaign_action',

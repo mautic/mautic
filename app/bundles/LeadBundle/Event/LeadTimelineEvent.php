@@ -13,7 +13,6 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -125,18 +124,18 @@ class LeadTimelineEvent extends Event
     /**
      * LeadTimelineEvent constructor.
      *
-     * @param Lead|null         $lead
-     * @param array             $filters
-     * @param array|null        $orderBy
-     * @param int               $page
-     * @param int               $limit          Limit per type
-     * @param bool              $forTimeline
-     * @param string|null       $siteDomain
+     * @param Lead|null   $lead
+     * @param array       $filters
+     * @param array|null  $orderBy
+     * @param int         $page
+     * @param int         $limit       Limit per type
+     * @param bool        $forTimeline
+     * @param string|null $siteDomain
      */
     public function __construct(Lead $lead = null, array $filters = [], array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true, $siteDomain = null)
     {
-        $this->lead        = $lead;
-        $this->filters     = !empty($filters)
+        $this->lead    = $lead;
+        $this->filters = !empty($filters)
             ? $filters
             :
             [
@@ -194,7 +193,7 @@ class LeadTimelineEvent extends Event
                     'eventType'  => true,
                     'timestamp'  => true,
                     'contactId'  => true,
-                    'extra'      => true
+                    'extra'      => true,
                 ];
 
                 $data = array_intersect_key($data, $keepThese);
@@ -544,7 +543,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Check if the data is to be display for the contact's timeline or used for the API
+     * Check if the data is to be display for the contact's timeline or used for the API.
      *
      * @return bool
      */
@@ -554,7 +553,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Add a serializer group for API formatting
+     * Add a serializer group for API formatting.
      *
      * @param $group
      */
@@ -579,7 +578,7 @@ class LeadTimelineEvent extends Event
     }
 
     /**
-     * Convert all snake case keys o camel case for API congruency
+     * Convert all snake case keys o camel case for API congruency.
      *
      * @param array $details
      */
@@ -597,7 +596,7 @@ class LeadTimelineEvent extends Event
             }
 
             if (strstr($key, '_')) {
-                $newKey = lcfirst(str_replace('_', '', ucwords($key, '_')));
+                $newKey           = lcfirst(str_replace('_', '', ucwords($key, '_')));
                 $details[$newKey] = $details[$key];
                 unset($details[$key]);
             }
