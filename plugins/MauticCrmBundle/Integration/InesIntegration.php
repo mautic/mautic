@@ -146,15 +146,15 @@ class InesIntegration extends CrmAbstractIntegration
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
-                    'attr'     => array(
+                    'attr'        => [
                         'onchange' => "
                             var checkbox = mQuery(this),
                                 is_checked = checkbox.prop('checked');
                             if (is_checked) {
                                 checkbox.closest('#features-container').find('input:checkbox:first').prop('checked', true);
                             }
-                        "
-                    )
+                        ",
+                    ],
                 ]
             );
 
@@ -170,34 +170,34 @@ class InesIntegration extends CrmAbstractIntegration
             ]);
 
             // List of fields available at INES and available for the "erasable field" option
-            try {
-                if ($this->isAuthorized()) {
-                    $inesFields = $this->getApiHelper()->getLeadFields();
-                    $choices    = [];
-                    foreach ($inesFields as $field) {
-                        if ($field['excludeFromEcrasableConfig']) {
-                            continue;
-                        }
-                        $key           = $field['concept'].'_'.$field['inesKey'];
-                        $choices[$key] = $field['inesLabel'];
-                    }
+//            try {
+//                if ($this->isAuthorized()) {
+//                    $inesFields = $this->getApiHelper()->getLeadFields();
+//                    $choices    = [];
+//                    foreach ($inesFields as $field) {
+//                        if ($field['excludeFromEcrasableConfig']) {
+//                            continue;
+//                        }
+//                        $key           = $field['concept'].'_'.$field['inesKey'];
+//                        $choices[$key] = $field['inesLabel'];
+//                    }
 
-                    $builder->add(
-                        'not_ecrasable_fields',
-                        'choice',
-                        [
-                            'choices'     => $choices,
-                            'expanded'    => true,
-                            'multiple'    => true,
-                            'label'       => 'mautic.ines.form.protected.fields',
-                            'label_attr'  => ['class' => ''],
-                            'empty_value' => false,
-                            'required'    => false,
-                        ]
-                    );
-                }
-            } catch (\Exception $e) {
-            }
+//                    $builder->add(
+//                        'not_ecrasable_fields',
+//                        'choice',
+//                        [
+//                            'choices'     => $choices,
+//                            'expanded'    => true,
+//                            'multiple'    => true,
+//                            'label'       => 'mautic.ines.form.protected.fields',
+//                            'label_attr'  => ['class' => ''],
+//                            'empty_value' => false,
+//                            'required'    => false,
+//                        ]
+//                    );
+//                }
+//            } catch (\Exception $e) {
+//            }
         }
     }
 
@@ -456,11 +456,11 @@ class InesIntegration extends CrmAbstractIntegration
                 $internalKey = $field['concept'].'_'.$field['inesKey'];
 
                 $mappedFields[] = [
-                    'concept'       => $field['concept'],
-                    'inesFieldKey'  => $field['inesKey'],
-                    'isCustomField' => $field['isCustomField'] ? 1 : 0,
-                    'mauticFieldKey'  => $field['autoMapping'],
-                    'isEcrasable'   => in_array($internalKey, $notEcrasableFields) ? 0 : 1,
+                    'concept'        => $field['concept'],
+                    'inesFieldKey'   => $field['inesKey'],
+                    'isCustomField'  => $field['isCustomField'] ? 1 : 0,
+                    'mauticFieldKey' => $field['autoMapping'],
+                    'isEcrasable'    => in_array($internalKey, $notEcrasableFields) ? 0 : 1,
                 ];
             }
         }
@@ -471,11 +471,11 @@ class InesIntegration extends CrmAbstractIntegration
             list($concept, $inesKey) = explode('_', $internalKey);
 
             $mappedFields[] = [
-                'concept'       => $concept,
-                'inesFieldKey'  => $inesKey,
-                'isCustomField' => in_array($internalKey, $customFields) ? 1 : 0,
-                'mauticFieldKey'  => $mauticKey,
-                'isEcrasable'   => in_array($internalKey, $notEcrasableFields) ? 0 : 1,
+                'concept'        => $concept,
+                'inesFieldKey'   => $inesKey,
+                'isCustomField'  => in_array($internalKey, $customFields) ? 1 : 0,
+                'mauticFieldKey' => $mauticKey,
+                'isEcrasable'    => in_array($internalKey, $notEcrasableFields) ? 0 : 1,
             ];
         }
 
@@ -870,8 +870,8 @@ class InesIntegration extends CrmAbstractIntegration
 
     /**
      * Creates or updates, in Mautic, the custom fiels that the user may need for mapping
-     * Each field has a type (int, bool, list, ...) and a configuration (list of values, etc.)
-     * The config of certain fields is fixed, and for others it is read via a WS INES.
+         * Each field has a type (int, bool, list, ...) and a configuration (list of values, etc.)
+         * The config of certain fields is fixed, and for others it is read via a WS INES.
      */
     public function updateMauticCustomFieldsDefinitions()
     {
