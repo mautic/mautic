@@ -16,7 +16,7 @@ class ScoringValueRepository extends CommonRepository {
      * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function adjustPoints($lead, $scoringCategory, $points, $operator = 'plus') {
-        $scoringValue = $this->findBy(array('lead' => $lead, 'scoringCategory' => $scoringCategory));
+        $scoringValue = $this->findOneBy(array('lead' => $lead, 'scoringCategory' => $scoringCategory));
         if(empty($scoringValue)) {
             $scoringValue = new ScoringValue;
             $scoringValue->setLead($lead);
@@ -40,6 +40,7 @@ class ScoringValueRepository extends CommonRepository {
             default:
                 throw new \UnexpectedValueException('Invalid operator');
         }
+        $scoringValue->setScore($oldScore);
         $this->_em->persist($scoringValue);
         $this->_em->flush();
         

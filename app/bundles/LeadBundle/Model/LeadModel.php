@@ -1318,7 +1318,7 @@ class LeadModel extends FormModel
             }
             $scoringValue->setScore($scoringValue->getScore() + $sv->getScore());
             $this->em->persist($scoringValue);
-            $this->em->flush();
+            // don't flush, else we'll clog doctrine with persistent
         }
         /** CAPTIVEA.CORE END **/
 

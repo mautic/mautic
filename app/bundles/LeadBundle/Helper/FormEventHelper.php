@@ -43,7 +43,19 @@ class FormEventHelper
 
         $oldPoints = $lead->getPoints();
 
-        $lead->adjustPoints($config['points'], $config['operator']);
+        /** CAPTIVEA.CORE START REPLACE **/
+        //$lead->adjustPoints($config['points'], $config['operator']);
+        if(!empty($config['scoringCategory'])) {
+            $scoringCategory = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($config['scoringCategory']);
+            if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
+                $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringValue')->adjustPoints($lead, $scoringCategory, $config['points'], $config['operator']);
+            } else {
+                $lead->adjustPoints($config['points'], $config['operator']);
+            }
+        } else {
+            $lead->adjustPoints($config['points'], $config['operator']);
+        }
+        /** CAPTIVEA.CORE END REPLACE **/
 
         $newPoints = $lead->getPoints();
 
