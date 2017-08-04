@@ -18,6 +18,16 @@ namespace Mautic\LeadBundle;
 final class LeadEvents
 {
     /**
+     * The mautic.lead_advanced_search event is dispatched right before contacts are searched.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadSearchEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_ADVANCED_SEARCH = 'mautic.lead_advanced_search';
+
+    /**
      * The mautic.lead_pre_save event is dispatched right before a lead is persisted.
      *
      * The event listener receives a

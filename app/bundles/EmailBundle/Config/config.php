@@ -154,6 +154,13 @@ return [
                     'mautic.email.model.email',
                 ],
             ],
+            'mautic.email.stat.search.subscriber' => [
+                'class'     => 'Mautic\EmailBundle\EventListener\StatSearchSubscriber',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.email.model.email',
+                ],
+            ],
             'mautic.email.webhook.subscriber' => [
                 'class'       => 'Mautic\EmailBundle\EventListener\WebhookSubscriber',
                 'methodCalls' => [
