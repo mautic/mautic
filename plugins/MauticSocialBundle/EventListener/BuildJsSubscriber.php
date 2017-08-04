@@ -77,10 +77,26 @@ class BuildJsSubscriber extends CommonSubscriber
 
         $lead           = $this->leadModel->getCurrentLead();
         $fbPixelCORSUrl = $this->router->generate('mautic_fb_pixel_custom_event_action', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $cutomMatch     = '{}';
-        if ($lead && $lead->getEmail()) {
-            $cutomMatch = "{em: '{$lead->getEmail()}'}";
+
+        $customMatch = [];
+        if ($lead && $lead->getId()) {
+            $fieldsToMatch = [
+                'fn' => 'firstname',
+                'ln' => 'lastname',
+                'em' => 'email',
+                'ph' => 'phone',
+                'ct' => 'city',
+                'st' => 'state',
+                'zp' => 'zipcode',
+            ];
+            foreach ($fieldsToMatch as $key => $fieldToMatch) {
+                $par = 'get'.ucfirst($fieldToMatch);
+                if ($value = $lead->{$par}()) {
+                    $customMatch[$key] = $value;
+                }
+            }
         }
+        $customMatch = json_encode($customMatch);
 
         $js = <<<JS
         MauticJS.fbpSet = false;
@@ -91,7 +107,7 @@ n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
 n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '{$integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId']}', {$cutomMatch}); 
+        fbq('init', '{$integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId']}', {$customMatch}); 
         fbq('track', 'PageView');
         // check custom event from campaign acton
         if (typeof fbq != 'undefined') {
