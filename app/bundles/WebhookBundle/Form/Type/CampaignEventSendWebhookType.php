@@ -13,8 +13,10 @@ namespace Mautic\WebhookBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Url;
 
 /**
@@ -44,7 +46,7 @@ class CampaignEventSendWebhookType extends AbstractType
     {
         $builder->add(
             'url',
-            'text',
+            UrlType::class,
             [
                 'label'       => 'mautic.webhook.event.sendwebhook.url',
                 'label_attr'  => ['class' => 'control-label'],
@@ -54,6 +56,11 @@ class CampaignEventSendWebhookType extends AbstractType
                     new Url(
                         [
                             'message' => 'mautic.form.submission.url.invalid',
+                        ]
+                    ),
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
                         ]
                     ),
                 ],
@@ -67,10 +74,9 @@ class CampaignEventSendWebhookType extends AbstractType
                 'choices' => [
                     'get'     => 'GET',
                     'post'    => 'POST',
-                    'options' => 'OPTIONS',
                     'put'     => 'PUT',
                     'patch'   => 'PATCH',
-                    'trace'   => 'TRACE',
+                    'delete'  => 'DELETE',
                 ],
                 'multiple'   => false,
                 'label_attr' => ['class' => 'control-label'],
