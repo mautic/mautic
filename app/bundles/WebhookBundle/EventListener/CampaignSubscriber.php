@@ -79,27 +79,37 @@ class CampaignSubscriber extends CommonSubscriber
             }
             $timeout = $config['timeout'];
 
-            if (in_array($method, ['get', 'trace'])) {
-                $response = $this->connector->$method(
-                    $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($data),
-                    $headers,
-                    $timeout
-                );
-            } elseif (in_array($method, ['post', 'put', 'patch'])) {
-                $response = $this->connector->$method(
-                    $url,
-                    $data,
-                    $headers,
-                    $timeout
-                );
-            } elseif ($method == 'delete') {
-                $response = $this->connector->$method(
-                    $url,
-                    $headers,
-                    $timeout,
-                    $data
-                );
+            switch ($method) {
+                case 'get':
+                    $response = $this->connector->get(
+                        $url.(parse_url($url, PHP_URL_QUERY) ? '&' : '?').http_build_query($data),
+                        $headers,
+                        $timeout
+                    );
+                    break;
+                case 'post':
+                case 'put':
+                case 'patch':
+                    $response = $this->connector->$method(
+                        $url,
+                        $data,
+                        $headers,
+                        $timeout
+                    );
+                    break;
+
+                case 'delete':
+                    $response = $this->connector->delete(
+                        $url,
+                        $headers,
+                        $timeout,
+                        $data
+                    );
+                    break;
+                default:
+                    return;
             }
+
             if (in_array($response->code, [200, 201])) {
                 return $event->setResult(true);
             }
