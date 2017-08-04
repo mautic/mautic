@@ -96,6 +96,7 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
         setTimeout(function(){
             if (typeof fbq != 'undefined') {
                 var values = (decodeURIComponent(MauticJS.readCookie('{$sessionName}')).split('|'));
+                if(values.length){
                 values.shift();
                 for(var i = 0; i < values.length; i++) {
                     var hash = values[i].split(':');
@@ -106,6 +107,7 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
 				    }
                 }
                 document.cookie = '{$sessionName}' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                }
 			}
         }, 1000)
         MauticJS.fbpSet = true;
