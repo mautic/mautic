@@ -285,15 +285,25 @@ class PointModel extends CommonFormModel
                     $delta = $action->getDelta();
                     
                     /** CAPTIVEA.CORE START REPLACE **/
-                    $lead->adjustPoints($delta); // TODO
+                    $scoringCategory = $action->getScoringCategory();
+                    if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
+                        $this->em->getRepository('MauticScoringBundle:ScoringValue')->adjustPoints($lead, $scoringCategory, $delta);
+                    } else {
+                        $lead->adjustPoints($delta);
+                    }
                     /** CAPTIVEA.CORE END REPLACE **/
                     
                     $parsed = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
                         /** CAPTIVEA.CORE START REPLACE **/
-                        $action->getId().': '.$action->getName(), // TODO
-                        //$action->getId().': '.$action->getName().' ('.$scoreField == false ? 'standard' : $scoreField['alias'].') ',// TODO
+                        // $action->getId().': '.$action->getName()
+                        (
+                            (!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore())?
+                                $action->getId().': '.$action->getName().' ('.$scoringCategory->getName().') '
+                                :
+                                ($action->getId().': '.$action->getName())
+                        ),
                         /** CAPTIVEA.CORE END REPLACE **/
                         $parsed[1],
                         $delta,

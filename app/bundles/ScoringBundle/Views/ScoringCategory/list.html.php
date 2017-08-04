@@ -76,7 +76,7 @@ if ($tmpl == 'index') {
                     <td>
                         <div>
                             <?php if($item->isGlobalScore()) { ?>
-                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted has-click-event scoring-scoringcategory-publish-icon2"
+                                <i class="fa fa-fw fa-lg fa-toggle-on text-muted has-click-event scoring-scoringcategory-publish-icon-global"
                                    data-toggle="tooltip"
                                    data-container="body"
                                    data-placement="right"
