@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Class BuildJsSubscriber.
@@ -34,11 +33,6 @@ class BuildJsSubscriber extends CommonSubscriber
     protected $integrationHelper;
 
     /**
-     * @var Session
-     */
-    protected $session;
-
-    /**
      * BuildJsSubscriber constructor.
      *
      * @param LeadModel         $leadModel
@@ -46,12 +40,10 @@ class BuildJsSubscriber extends CommonSubscriber
      */
     public function __construct(
         LeadModel $leadModel,
-        IntegrationHelper $integrationHelper,
-        Session $session
+        IntegrationHelper $integrationHelper
     ) {
         $this->leadModel         = $leadModel;
         $this->integrationHelper = $integrationHelper;
-        $this->session           = $session;
     }
 
     /**
@@ -81,16 +73,16 @@ class BuildJsSubscriber extends CommonSubscriber
             return;
         }
 
-        $lead       = $this->leadModel->getCurrentLead();
-        $leadId     = $lead->getId();
-        $cutomMatch = '{}';
+        $lead        = $this->leadModel->getCurrentLead();
+        $leadId      = $lead->getId();
+        $sessionName = 'mtc-fb-event-'.$leadId;
+        $cutomMatch  = '{}';
         if ($lead && $lead->getEmail()) {
             $cutomMatch = "{em: '{$lead->getEmail()}'}";
         }
 
         $js = <<<JS
         MauticJS.fbpSet = false;
-        var fbq;
         MauticJS.fbPixelLoad = function() {
             if(!MauticJS.fbpSet){
             !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -100,35 +92,27 @@ t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '{$integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId']}', {$cutomMatch}); 
         fbq('track', 'PageView');
+        // check custom event from campaign acton
+        setTimeout(function(){
+            if (typeof fbq != 'undefined') {
+                var values = (decodeURIComponent(MauticJS.readCookie('{$sessionName}')).split('|'));
+                values.shift();
+                for(var i = 0; i < values.length; i++) {
+                    var hash = values[i].split(':');
+                    if(hash.length==2){
+                        fbq('trackCustom', hash[0], {
+                            eventLabel: hash[1]
+                        });
+				    }
+                }
+                document.cookie = '{$sessionName}' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+			}
+        }, 1000)
         MauticJS.fbpSet = true;
     };
 }
  MauticJS.fbPixelLoad();
- MauticJS.fbPixelLoadEvent= function(fbAction, fbLabel) {
-     console.log(fbq);
-     	if (typeof fbq != 'undefined') {
-				fbq('trackCustom', fbAction, {
-					eventLabel: fbLabel
-				});
-			}
- }
 JS;
-        $sessionName = 'mtc-fb-event-'.$leadId;
-        $fbEvents    = explode('|', $this->session->get($sessionName));
-
-        $js .= <<<JS
-
-   MauticJS.log('te-{$sessionName}-{$this->session->get($sessionName)}');
-JS;
-        array_shift($fbEvents);
-        if (!empty($fbEvents)) {
-            foreach ($fbEvents as $fbEvent) {
-                $fbe = explode(':', $fbEvents);
-                $js .= ' MauticJS.fbPixelLoadEvent('.$fbe['action'].', '.$fbe['label'].')';
-            }
-           // $this->session->remove($sessionName);
-        }
-
         $event->appendJs($js, 'Mautic Social Integration');
     }
 }

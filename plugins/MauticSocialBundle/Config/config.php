@@ -58,7 +58,7 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.social.helper.campaign',
-                    'session',
+                    'mautic.helper.cookie',
                 ],
             ],
             'mautic.social.configbundle.subscriber' => [
@@ -81,7 +81,6 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.helper.integration',
-                    'session',
                 ],
             ],
         ],
