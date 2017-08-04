@@ -88,8 +88,16 @@ class WebhookSubscriber extends CommonSubscriber
      */
     public function onLeadNewUpdate(LeadEvent $event)
     {
+        $lead = $event->getLead();
+        if ($lead->isAnonymous()) {
+            // Ignore this contact
+            return;
+        }
+
+        $changes = $lead->getChanges();
         $this->webhookModel->queueWebhooksByType(
-            $event->isNew() ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
+        // Consider this a new contact if it was just identified, otherwise consider it updated
+            !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
             [
                 'lead'    => $event->getLead(),
                 'contact' => $event->getLead(),
