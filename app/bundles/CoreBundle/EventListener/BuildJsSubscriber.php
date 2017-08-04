@@ -113,6 +113,10 @@ MauticJS.setCookie = function(name, value) {
     document.cookie = name+"="+value+";";
 };
 
+MauticJS.readCookie = function(name) {
+    return (name = new RegExp('(?:^|;\\s*)' + ('' + name).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&') + '=([^;]*)').exec(document.cookie)) && name[1];
+};
+
 MauticJS.createCORSRequest = function(method, url) {
     var xhr = new XMLHttpRequest();
     
