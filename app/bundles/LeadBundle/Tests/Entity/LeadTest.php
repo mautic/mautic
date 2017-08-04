@@ -11,12 +11,14 @@
 
 namespace Mautic\LeadBundle\Tests;
 
+use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 
 class LeadTest extends \PHPUnit_Framework_TestCase
 {
+    use RequestTrait;
     public function testPreferredChannels()
     {
         $frequencyRules = [
@@ -122,8 +124,45 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                     'type'  => 'textarea',
                     'value' => 'Test blah',
                 ],
+                'boolean' => [
+                    'alias' => 'boolean',
+                    'label' => 'Boolean',
+                    'type'  => 'boolean',
+                    'value' => false,
+                ],
+                'dateField' => [
+                    'alias' => 'dateField',
+                    'label' => 'Date Time',
+                    'type'  => 'datetime',
+                    'value' => '12-12-2017 23:00:00',
+                ],
+                'multiselect' => [
+                    'alias' => 'multi',
+                    'label' => 'Multi Select',
+                    'type'  => 'multiselect',
+                    'value' => ['a', 'b', 'c'],
+                ],
             ],
         ];
+        $data = [
+            'notes'     => 'hello',
+            'test'      => 'test',
+            'boolean'   => 'yes',
+            'dateField' => '12-12-2017 22:03:59',
+            'multi'     => 'a|b',
+        ];
+
+        $this->cleanFields($data, $fields['core']['boolean']);
+
+        $this->cleanFields($data, $fields['core']['dateField']);
+
+        $this->cleanFields($data, $fields['core']['multiselect']);
+
+        $testDateObject = new \DateTime('12-12-2017 22:03:59');
+
+        $this->assertEquals($testDateObject->format('Y-m-d H:i'), $data['dateField']);
+        $this->assertEquals((int) true, $data['boolean']);
+        $this->assertEquals(['a', 'b'], $data['multi']);
 
         $lead->setFields($fields);
 
