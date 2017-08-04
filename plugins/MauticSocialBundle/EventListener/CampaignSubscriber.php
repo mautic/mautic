@@ -16,9 +16,9 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\CoreBundle\Helper\CookieHelper;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -28,21 +28,21 @@ class CampaignSubscriber extends CommonSubscriber
     protected $helper;
 
     /**
-     * @var CookieHelper
+     * @var Session
      */
-    protected $cookieHelper;
+    protected $session;
 
     /**
      * CampaignSubscriber constructor.
      *
      * @param MauticFactory       $factory
      * @param CampaignEventHelper $helper
-     * @param CookieHelper        $cookieHelper
+     * @param Session             $session
      */
-    public function __construct(MauticFactory $factory, CampaignEventHelper $helper, CookieHelper $cookieHelper)
+    public function __construct(MauticFactory $factory, CampaignEventHelper $helper, Session $session)
     {
-        $this->helper       = $helper;
-        $this->cookieHelper = $cookieHelper;
+        $this->helper  = $helper;
+        $this->session = $session;
     }
 
     /**
@@ -110,7 +110,7 @@ class CampaignSubscriber extends CommonSubscriber
         } elseif ($event->checkContext('facebook.pixel.send')) {
             $lead        = $event->getLead();
             $sessionName = 'mtc-fb-event-'.$lead->getId();
-            $this->cookieHelper->setCookie($sessionName, '|'.$event->getConfig()['action'].':'.$event->getConfig()['label']);
+            $this->session->set($sessionName, $this->session->get($sessionName).'|'.$event->getConfig()['action'].':'.$event->getConfig()['label']);
 
             return $event->setResult(true);
         }

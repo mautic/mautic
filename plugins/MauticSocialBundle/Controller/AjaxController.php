@@ -14,6 +14,7 @@ namespace MauticPlugin\MauticSocialBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -69,5 +70,33 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getFacebookPixelEventAction()
+    {
+        if (!$this->get('mautic.security')->isAnonymous()) {
+            return new JsonResponse(
+                [
+                    'success' => 0,
+                ]
+            );
+        }
+
+        /** @var LeadModel $leadModel */
+        $leadModel    = $this->getModel('lead');
+        $lead         = $leadModel->getCurrentLead();
+        $sessionName  = 'mtc-fb-event-'.(($lead) ? $lead->getId() : null);
+        $sessionValue = $this->get('session')->get($sessionName);
+        $this->get('session')->remove($sessionName);
+
+        return new JsonResponse(
+            [
+                'success'  => empty($sessionValue) ? 0 : 1,
+                'response' => $sessionValue,
+            ]
+        );
     }
 }

@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Class BuildJsSubscriber.
@@ -66,17 +67,17 @@ class BuildJsSubscriber extends CommonSubscriber
     public function onBuildJs(BuildJsEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('Facebook');
-        if (!$integration || !$integration->getIntegrationSettings()->isPublished()) {
-            return;
-        }
-        if (!in_array('facebook_pixel', $integration->getIntegrationSettings()->getSupportedFeatures()) || empty($integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId'])) {
+        if (!$integration || !$integration->getIntegrationSettings()->isPublished() || !in_array(
+                'facebook_pixel',
+                $integration->getIntegrationSettings()->getSupportedFeatures()
+            ) || empty($integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId'])
+        ) {
             return;
         }
 
-        $lead        = $this->leadModel->getCurrentLead();
-        $leadId      = $lead->getId();
-        $sessionName = 'mtc-fb-event-'.$leadId;
-        $cutomMatch  = '{}';
+        $lead           = $this->leadModel->getCurrentLead();
+        $fbPixelCORSUrl = $this->router->generate('mautic_fb_pixel_custom_event_action', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $cutomMatch     = '{}';
         if ($lead && $lead->getEmail()) {
             $cutomMatch = "{em: '{$lead->getEmail()}'}";
         }
@@ -93,9 +94,13 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '{$integration->getIntegrationSettings()->getFeatureSettings()['facebookPixelId']}', {$cutomMatch}); 
         fbq('track', 'PageView');
         // check custom event from campaign acton
+        if (typeof fbq != 'undefined') {
         setTimeout(function(){
-            if (typeof fbq != 'undefined') {
-                var values = (decodeURIComponent(MauticJS.readCookie('{$sessionName}')).split('|'));
+        MauticJS.makeCORSRequest('GET', '{$fbPixelCORSUrl}', {}, function(response, xhr) {
+        if(response.success == 0){
+            return;
+        }else{
+                var values = (response.response).split('|');
                 if(values.length){
                 values.shift();
                 for(var i = 0; i < values.length; i++) {
@@ -106,13 +111,14 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
                         });
 				    }
                 }
-                document.cookie = '{$sessionName}' + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                }
+               }
 			}
+	    });
         }, 1000)
+       }
         MauticJS.fbpSet = true;
+     };
     };
-}
  MauticJS.fbPixelLoad();
 JS;
         $event->appendJs($js, 'Mautic Social Integration');

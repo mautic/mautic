@@ -38,6 +38,12 @@ return [
                 'controller' => 'MauticSocialBundle:Tweet:execute',
             ],
         ],
+        'public' => [
+            'mautic_fb_pixel_custom_event_action' => [
+                'path'       => '/facebook/pixel/event',
+                'controller' => 'MauticSocialBundle:Ajax:getFacebookPixelEvent',
+            ],
+        ],
         'api' => [
             'mautic_api_tweetsstandard' => [
                 'standard_entity' => true,
@@ -58,7 +64,7 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.social.helper.campaign',
-                    'mautic.helper.cookie',
+                    'session',
                 ],
             ],
             'mautic.social.configbundle.subscriber' => [
