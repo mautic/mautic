@@ -56,19 +56,24 @@ return [
     ],
     'services' => [
         'events' => [
-            'mautic.crm.leadbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber',
-            ],
+
         ],
+
+    ],
+    'services' => [
         'models' => [
             'mautic.crm.model.ines_sync_log' => [
                 'class'     => 'MauticPlugin\MauticCrmBundle\Model\InesSyncLogModel',
                 'arguments' => 'doctrine.orm.entity_manager',
             ],
         ],
-    ],
-    'services' => [
         'events' => [
+            'mautic.crm.leadbundle.subscriber' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
+            ],
             'mautic_integration.pipedrive.lead.subscriber' => [
                 'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber',
                 'arguments' => [
