@@ -118,15 +118,15 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
         }else{
                 var values = (response.response).split('|');
                 if(values.length){
-                values.shift();
-                for(var i = 0; i < values.length; i++) {
-                    var hash = values[i].split(':');
-                    if(hash.length==2){
-                        fbq('trackCustom', hash[0], {
-                            eventLabel: hash[1]
-                        });
-				    }
-                }
+                    values.shift();
+                    for(var i = 0; i < values.length; i++) {
+                        var hash = values[i].split(':');
+                        if(hash.length==2){
+                            fbq('trackCustom', hash[0], {
+                                eventLabel: hash[1]
+                            });
+                        }
+                   }
                }
 			}
 	    });

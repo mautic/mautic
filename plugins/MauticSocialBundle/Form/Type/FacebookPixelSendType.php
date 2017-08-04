@@ -33,8 +33,7 @@ class FacebookPixelSendType extends AbstractType
                 'label'      => 'mautic.integration.facebook.form.action',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.integration.facebook.form.action.desc',
+                    'class' => 'form-control',
                 ],
                 'required'    => true,
                 'constraints' => [
@@ -50,8 +49,7 @@ class FacebookPixelSendType extends AbstractType
                 'label'      => 'mautic.integration.facebook.form.label',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.integration.facebook.form.label.desc',
+                    'class' => 'form-control',
                 ],
                 'required'    => true,
                 'constraints' => [
