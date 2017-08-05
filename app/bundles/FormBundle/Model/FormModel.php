@@ -23,6 +23,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -450,14 +451,14 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead        = $this->leadModel->getCurrentLead();
+        $lead        = ($this->request) ? $this->leadModel->getCurrentLead() : null;
         $style       = '';
 
         if (!empty($theme)) {
             $theme .= '|';
         }
 
-        if ($entity->usesProgressiveProfiling()) {
+        if ($lead && $entity->usesProgressiveProfiling()) {
             $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
@@ -531,6 +532,7 @@ class FormModel extends CommonFormModel
                 'formPages'     => $pages,
                 'lastFormPage'  => $lastPage,
                 'style'         => $style,
+                'inBuilder'     => false,
             ]
         );
 
@@ -668,7 +670,7 @@ class FormModel extends CommonFormModel
             $customComponents['validators'] = $event->getValidators();
 
             // Generate a list of fields that are not persisted to the database by default
-            $notPersist = ['button', 'captcha', 'freetext', 'pagebreak'];
+            $notPersist = ['button', 'captcha', 'freetext', 'freehtml', 'pagebreak'];
             foreach ($customComponents['fields'] as $type => $field) {
                 if (isset($field['builderOptions']) && isset($field['builderOptions']['addSaveResult']) && false === $field['builderOptions']['addSaveResult']) {
                     $notPersist[] = $type;
@@ -692,8 +694,8 @@ class FormModel extends CommonFormModel
         $html = $this->getContent($form);
 
         //replace line breaks with literal symbol and escape quotations
-        $search  = ["\n", '"'];
-        $replace = ['\n', '\"'];
+        $search  = ["\r\n", "\n", '"'];
+        $replace = ['', '', '\"'];
         $html    = str_replace($search, $replace, $html);
 
         return 'document.write("'.$html.'");';
@@ -753,6 +755,10 @@ class FormModel extends CommonFormModel
     {
         $formName = $form->generateFormName();
         $lead     = $this->leadModel->getCurrentLead();
+
+        if (!$lead instanceof Lead) {
+            return;
+        }
 
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */

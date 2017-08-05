@@ -126,7 +126,7 @@ class LeadSubscriber extends CommonSubscriber
                         'objectId'  => $lead->getId(),
                         'action'    => 'ipadded',
                         'details'   => $details['ipAddresses'],
-                        'ipAddress' => $this->request->server->get('REMOTE_ADDR'),
+                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
                     ];
                     $this->auditLogModel->writeToLog($log);
                 }
@@ -290,6 +290,7 @@ class LeadSubscriber extends CommonSubscriber
             'lead.ipadded'      => 'mautic.lead.event.ipadded',
             'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded',
             'lead.donotcontact' => 'mautic.lead.event.donotcontact',
+            'lead.imported'     => 'mautic.lead.event.imported',
         ];
 
         $filters = $event->getEventFilters();
@@ -321,6 +322,10 @@ class LeadSubscriber extends CommonSubscriber
 
                 case 'lead.donotcontact':
                     $this->addTimelineDoNotContactEntries($event, $type, $name);
+                    break;
+
+                case 'lead.imported':
+                    $this->addTimelineImportedEntries($event, $type, $name);
                     break;
             }
         }
@@ -577,6 +582,55 @@ class LeadSubscriber extends CommonSubscriber
                     ]
                 );
             }
+        }
+    }
+
+    /**
+     * @param Events\LeadTimelineEvent $event
+     * @param                          $eventTypeKey
+     * @param                          $eventTypeName
+     */
+    protected function addTimelineImportedEntries(Events\LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
+    {
+        $lead    = $event->getLead();
+        $imports = $this->em->getRepository('MauticLeadBundle:LeadEventLog')->getEventsByLead('lead', 'import', $lead, $event->getQueryOptions());
+        // Add to counter
+        $event->addToCounter($eventTypeKey, $imports);
+
+        if (!$event->isEngagementCount()) {
+
+            // Add the logs to the event array
+            foreach ($imports['results'] as $import) {
+                if (is_string($import['properties'])) {
+                    $import['properties'] = json_decode($import['properties'], true);
+                }
+                $eventLabel = 'N/A';
+                if (!empty($import['properties']['file'])) {
+                    $eventLabel = $import['properties']['file'];
+                } elseif ($import['object_id']) {
+                    $eventLabel = $import['object_id'];
+                }
+                $eventLabel = $this->translator->trans('mautic.lead.import.contact.action.'.$import['action'], ['%name%' => $eventLabel]);
+                $event->addEvent(
+                        [
+                            'event'      => $eventTypeKey,
+                            'eventType'  => $eventTypeName,
+                            'eventLabel' => !empty($import['object_id']) ? [
+                                'label' => $eventLabel,
+                                'href'  => $this->router->generate(
+                                    'mautic_contact_import_action',
+                                    ['objectAction' => 'view', 'objectId' => $import['object_id']]
+                                ),
+                            ] : $eventLabel,
+                            'timestamp'       => $import['date_added'],
+                            'icon'            => 'fa-download',
+                            'extra'           => $import,
+                            'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:import.html.php',
+                        ]
+                    );
+            }
+        } else {
+            // Purposively not including this
         }
     }
 }

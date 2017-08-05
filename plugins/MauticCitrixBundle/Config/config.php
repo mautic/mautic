@@ -55,7 +55,10 @@ return [
                 ],
             ],
             'mautic.citrix.emailbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber',
+                'class'     => 'MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber',
+                'arguments' => [
+                    'mautic.citrix.model.citrix',
+                ],
             ],
         ],
         'forms' => [
@@ -92,6 +95,32 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.campaign.model.event',
+                ],
+            ],
+        ],
+        'integrations' => [
+            'mautic.integration.gotoassist' => [
+                'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotoassistIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.gotomeeting' => [
+                'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotomeetingIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.gototraining' => [
+                'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GototrainingIntegration::class,
+                'arguments' => [
+
+                ],
+            ],
+            'mautic.integration.gotowebinar' => [
+                'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotowebinarIntegration::class,
+                'arguments' => [
+
                 ],
             ],
         ],

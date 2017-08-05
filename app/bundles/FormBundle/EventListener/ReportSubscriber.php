@@ -51,8 +51,13 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'string',
                 ],
             ];
-            $columns = array_merge($columns, $event->getStandardColumns($prefix, [], 'mautic_form_action'), $event->getCategoryColumns());
-            $data    = [
+            $columns = array_merge(
+                $columns,
+                $event->getStandardColumns($prefix, [], 'mautic_form_action'),
+                $event->getCategoryColumns(),
+                $event->getCampaignByChannelColumns()
+            );
+            $data = [
                 'display_name' => 'mautic.form.forms',
                 'columns'      => $columns,
             ];
@@ -63,8 +68,9 @@ class ReportSubscriber extends CommonSubscriber
                 $pagePrefix        = 'p.';
                 $submissionColumns = [
                     $submissionPrefix.'date_submitted' => [
-                        'label' => 'mautic.form.report.submit.date_submitted',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.form.report.submit.date_submitted',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$submissionPrefix.'date_submitted)',
                     ],
                     $submissionPrefix.'referer' => [
                         'label' => 'mautic.core.referer',
@@ -119,6 +125,7 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addCategoryLeftJoin($qb, 'f');
                 $event->addLeadLeftJoin($qb, 'fs');
                 $event->addIpAddressLeftJoin($qb, 'fs');
+                $event->addCampaignByChannelJoin($qb, 'f', 'form');
                 break;
         }
 

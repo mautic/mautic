@@ -38,6 +38,11 @@ class ChannelListHelper extends Helper
     protected $featureChannels = [];
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
      * ChannelListHelper constructor.
      *
      * @param EventDispatcherInterface $dispatcher
@@ -45,19 +50,8 @@ class ChannelListHelper extends Helper
      */
     public function __construct(EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {
-        $this->translator      = $translator;
-        $event                 = $dispatcher->dispatch(ChannelEvents::ADD_CHANNEL, new ChannelEvent());
-        $this->channels        = $event->getChannelConfigs();
-        $this->featureChannels = $event->getFeatureChannels();
-        unset($event);
-
-        // @deprecated 2.4 to be removed 3.0; BC support
-        if ($dispatcher->hasListeners(\Mautic\LeadBundle\LeadEvents::ADD_CHANNEL)) {
-            $event                 = $dispatcher->dispatch(\Mautic\LeadBundle\LeadEvents::ADD_CHANNEL, new \Mautic\LeadBundle\Event\ChannelEvent());
-            $this->channels        = array_merge($this->channels, $event->getChannelConfigs());
-            $this->featureChannels = array_merge($this->featureChannels, $event->getFeatureChannels());
-            unset($event);
-        }
+        $this->translator = $translator;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -68,7 +62,7 @@ class ChannelListHelper extends Helper
     public function getChannelList()
     {
         $channels = [];
-        foreach ($this->channels as $channel => $details) {
+        foreach ($this->getChannels() as $channel => $details) {
             $channelName            = isset($details['label']) ? $this->translator->trans($details['label']) : $this->getChannelLabel($channel);
             $channels[$channelName] = $channel;
         }
@@ -84,6 +78,8 @@ class ChannelListHelper extends Helper
      */
     public function getFeatureChannels($features, $listOnly = false)
     {
+        $this->setupChannels();
+
         if (!is_array($features)) {
             $features = [$features];
         }
@@ -119,6 +115,8 @@ class ChannelListHelper extends Helper
      */
     public function getChannels()
     {
+        $this->setupChannels();
+
         return $this->channels;
     }
 
@@ -145,5 +143,30 @@ class ChannelListHelper extends Helper
     public function getName()
     {
         return 'chanel';
+    }
+
+    /**
+     * Setup channels.
+     *
+     * Done this way to avoid a circular dependency error with LeadModel
+     */
+    protected function setupChannels()
+    {
+        if (!empty($this->channels)) {
+            return;
+        }
+
+        $event                 = $this->dispatcher->dispatch(ChannelEvents::ADD_CHANNEL, new ChannelEvent());
+        $this->channels        = $event->getChannelConfigs();
+        $this->featureChannels = $event->getFeatureChannels();
+        unset($event);
+
+        // @deprecated 2.4 to be removed 3.0; BC support
+        if ($this->dispatcher->hasListeners(\Mautic\LeadBundle\LeadEvents::ADD_CHANNEL)) {
+            $event                 = $this->dispatcher->dispatch(\Mautic\LeadBundle\LeadEvents::ADD_CHANNEL, new \Mautic\LeadBundle\Event\ChannelEvent());
+            $this->channels        = array_merge($this->channels, $event->getChannelConfigs());
+            $this->featureChannels = array_merge($this->featureChannels, $event->getFeatureChannels());
+            unset($event);
+        }
     }
 }

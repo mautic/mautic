@@ -38,7 +38,7 @@ class LeadApiController extends CommonApiController
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
-        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList'];
+        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
         parent::initialize($event);
     }
@@ -48,9 +48,39 @@ class LeadApiController extends CommonApiController
      */
     public function newEntityAction()
     {
-        // Check for an email to see if the lead already exists
-        $parameters = $this->request->request->all();
+        $existingLeads = $this->getExistingLeads();
+        if (!empty($existingLeads)) {
+            return parent::editEntityAction($existingLeads[0]->getId());
+        }
 
+        return parent::newEntityAction();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function editEntityAction($id)
+    {
+        $existingLeads = $this->getExistingLeads();
+        if (isset($existingLeads[0]) && $existingLeads[0] instanceof Lead) {
+            $entity = $this->model->getEntity($id);
+            if ($entity instanceof Lead && $existingLeads[0]->getId() != $entity->getId()) {
+                $this->model->mergeLeads($existingLeads[0], $entity, false);
+            }
+        }
+
+        return parent::editEntityAction($id);
+    }
+
+    /**
+     * Get existing duplicated contacts based on unique fields and the request data.
+     *
+     * @return array
+     */
+    protected function getExistingLeads()
+    {
+        // Check for an email to see if the lead already exists
+        $parameters          = $this->request->request->all();
         $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
         $uniqueLeadFieldData = [];
 
@@ -61,18 +91,12 @@ class LeadApiController extends CommonApiController
         }
 
         if (count($uniqueLeadFieldData)) {
-            if (count($uniqueLeadFieldData)) {
-                $existingLeads = $this->get('doctrine.orm.entity_manager')->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields($uniqueLeadFieldData);
-
-                if (!empty($existingLeads)) {
-                    // Lead found so edit rather than create a new one
-
-                    return $this->editEntityAction($existingLeads[0]->getId());
-                }
-            }
+            return $this->get('doctrine.orm.entity_manager')->getRepository(
+                'MauticLeadBundle:Lead'
+            )->getLeadsByUniqueFields($uniqueLeadFieldData, null, 1);
         }
 
-        return parent::newEntityAction();
+        return [];
     }
 
     /**
@@ -470,6 +494,73 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Add/Remove a UTM Tagset to/from the contact.
+     *
+     * @param int       $id
+     * @param string    $method
+     * @param array/int $data
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function applyUtmTagsAction($id, $method, $data)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        // calls add/remove method as appropriate
+        $result = $this->model->$method($entity, $data);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        if ('removeUtmTags' == $method) {
+            $view = $this->view(
+                [
+                    'recordFound'        => $result,
+                    $this->entityNameOne => $entity,
+                ]
+            );
+        } else {
+            $view = $this->view([$this->entityNameOne => $entity]);
+        }
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Adds a UTM Tagset to the contact.
+     *
+     * @param int $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function addUtmTagsAction($id)
+    {
+        return $this->applyUtmTagsAction($id, 'addUTMTags', $this->request->request->all());
+    }
+
+    /**
+     * Remove a UTM Tagset for the contact.
+     *
+     * @param int $id
+     * @param int $utmid
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function removeUtmTagsAction($id, $utmid)
+    {
+        return $this->applyUtmTagsAction($id, 'removeUtmTags', (int) $utmid);
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity
@@ -517,7 +608,7 @@ class LeadApiController extends CommonApiController
         if (isset($originalParams['lastActive'])) {
             $lastActive = new DateTimeHelper($originalParams['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
-            unset($parameters['lastActive']);
+            unset($originalParams['lastActive']);
         }
 
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {

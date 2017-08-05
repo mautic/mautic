@@ -101,13 +101,6 @@ class CommonSubscriber implements EventSubscriberInterface
     protected $logger;
 
     /**
-     * CommonSubscriber constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * @param TemplatingHelper $templatingHelper
      */
     public function setTemplating(TemplatingHelper $templatingHelper)

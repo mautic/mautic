@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "26bf4bf7322c68ffed988995dea71fae",
+    "content-hash": "601b4591bbc073ee4991c10a8b5d5748",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -1240,6 +1240,110 @@
                 "orm"
             ],
             "time": "2016-12-18T15:42:34+00:00"
+        },
+        {
+            "name": "egeloen/ordered-form",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/egeloen/ivory-ordered-form.git",
+                "reference": "bd2cd20210aa53c036af2bcbafe8d11612e2cea9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/egeloen/ivory-ordered-form/zipball/bd2cd20210aa53c036af2bcbafe8d11612e2cea9",
+                "reference": "bd2cd20210aa53c036af2bcbafe8d11612e2cea9",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.6|^7.0",
+                "symfony/form": "^2.7|^3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.0",
+                "phpunit/phpunit": "^5.0",
+                "symfony/phpunit-bridge": "^2.7|^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ivory\\OrderedForm\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eric GELOEN",
+                    "email": "geloen.eric@gmail.com"
+                }
+            ],
+            "description": "Provides a form ordering support with the Symfony2 form component.",
+            "keywords": [
+                "Symfony2",
+                "form",
+                "order"
+            ],
+            "time": "2017-02-27T21:20:30+00:00"
+        },
+        {
+            "name": "egeloen/ordered-form-bundle",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/egeloen/IvoryOrderedFormBundle.git",
+                "reference": "e6c2399103be8cffeac96dd48dd0990afa0a54b2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/egeloen/IvoryOrderedFormBundle/zipball/e6c2399103be8cffeac96dd48dd0990afa0a54b2",
+                "reference": "e6c2399103be8cffeac96dd48dd0990afa0a54b2",
+                "shasum": ""
+            },
+            "require": {
+                "egeloen/ordered-form": "^3.0",
+                "php": "^5.6|^7.0",
+                "symfony/framework-bundle": "^2.7|^3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.0",
+                "phpunit/phpunit": "^5.0",
+                "symfony/phpunit-bridge": "^2.7|^3.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ivory\\OrderedFormBundle\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eric GELOEN",
+                    "email": "geloen.eric@gmail.com"
+                }
+            ],
+            "description": "Provides a form ordering support for your Symfony2 project.",
+            "keywords": [
+                "form",
+                "order"
+            ],
+            "time": "2017-02-27T21:30:37+00:00"
         },
         {
             "name": "friendsofsymfony/oauth-server-bundle",
@@ -7402,7 +7506,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mautic/BazingaOAuthServerBundle.git",
-                "reference": "81834da2cddeb7f21873ae2da76fdccd1e530920"
+                "reference": "d4d2e94bb69c20ae4a5fc136c0fe40253368787e"
             },
             "require": {
                 "php": ">=5.3.3",
@@ -7438,7 +7542,7 @@
                 "oauth",
                 "server"
             ],
-            "time": "2016-08-18 17:10:55"
+            "time": "2017-05-10 00:39:21"
         }
     ],
     "packages-dev": [
@@ -8707,7 +8811,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "~5.6.19|~7.0"
+        "php": ">=5.6.19 <7.2"
     },
     "platform-dev": []
 }

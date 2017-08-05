@@ -68,6 +68,16 @@ class Report extends FormEntity
      */
     private $graphs = [];
 
+    /**
+     * @var array
+     */
+    private $groupBy = [];
+
+    /**
+     * @var array
+     */
+    private $aggregators = [];
+
     public function __clone()
     {
         $this->id = null;
@@ -107,6 +117,16 @@ class Report extends FormEntity
         $builder->createField('graphs', 'array')
             ->nullable()
             ->build();
+
+        $builder->createField('groupBy', 'array')
+            ->columnName('group_by')
+            ->nullable()
+            ->build();
+
+        $builder->createField('aggregators', 'array')
+            ->columnName('aggregators')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -142,6 +162,7 @@ class Report extends FormEntity
                     'filters',
                     'tableOrder',
                     'graphs',
+                    'groupBy',
                 ]
             )
             ->build();
@@ -250,7 +271,7 @@ class Report extends FormEntity
     /**
      * Get columns.
      *
-     * @return string
+     * @return array
      */
     public function getColumns()
     {
@@ -275,7 +296,7 @@ class Report extends FormEntity
     /**
      * Get filters.
      *
-     * @return string
+     * @return array
      */
     public function getFilters()
     {
@@ -328,5 +349,37 @@ class Report extends FormEntity
     public function setGraphs(array $graphs)
     {
         $this->graphs = $graphs;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getGroupBy()
+    {
+        return $this->groupBy;
+    }
+
+    /**
+     * @param array $graphs
+     */
+    public function setGroupBy(array $groupBy)
+    {
+        $this->groupBy = $groupBy;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAggregators()
+    {
+        return $this->aggregators;
+    }
+
+    /**
+     * @param array $aggregator
+     */
+    public function setAggregators(array $aggregators)
+    {
+        $this->aggregators = $aggregators;
     }
 }

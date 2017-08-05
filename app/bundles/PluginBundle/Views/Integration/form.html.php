@@ -96,6 +96,7 @@ $hasFeatureErrors =
 <div class="tab-content pa-md bg-white">
     <div class="tab-pane fade <?php if (isset($activeTab) && $activeTab == 'details-container'): echo 'in active'; endif; ?> bdr-w-0" id="details-container">
         <?php echo $view['form']->row($form['isPublished']); ?>
+        <?php echo $view['form']->rowIfExists($form, 'virtual'); ?>
         <?php echo $view['form']->row($form['apiKeys']); ?>
         <?php if (isset($formNotes['authorization'])): ?>
             <div class="alert alert-<?php echo $formNotes['authorization']['type']; ?>">
@@ -119,6 +120,17 @@ $hasFeatureErrors =
                 </div>
             </div>
         <?php endif; ?>
+        <?php if (isset($formNotes['custom'])):
+            if (is_string($formNotes['custom'])):
+                echo $formNotes['custom'];
+            elseif (!empty(isset($formNotes['custom']['template']))):
+                $template = $formNotes['custom']['template'];
+                $params   = isset($formNotes['custom']['parameters']) ? $formNotes['custom']['parameters'] : [];
+
+                echo $this->render($template, $params);
+            endif;
+        endif;
+        ?>
     </div>
 
     <?php if ($hasSupportedFeatures || $hasFeatureSettings): ?>
@@ -140,7 +152,7 @@ $hasFeatureErrors =
     <?php endif; ?>
     <?php if ($hasCompanyFields): ?>
     <div class="tab-pane fade <?php if (isset($activeTab) && $activeTab == 'companyFieldsContainer'): echo 'in active'; endif; ?> bdr-w-0" id="company-fields-container">
-        <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.comapanyfield_matches'); ?></h4>
+        <h4 class="mb-sm"><?php echo $view['translator']->trans('mautic.integration.companyfield_matches'); ?></h4>
         <?php echo $companyFieldHtml; ?>
     </div>
     <?php endif; ?>

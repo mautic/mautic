@@ -15,7 +15,7 @@
         ]
     },
     "require": {
-        "php": "~5.6.19|~7.0",
+        "php": ">=5.6.19 <7.2",
 
         "symfony/console": "~2.8",
         "symfony/debug": "~2.8",
@@ -105,7 +105,8 @@
         "doctrine/data-fixtures": "1.2.1",
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
-        "symfony/expression-language": "~2.8"
+        "symfony/expression-language": "~2.8",
+        "egeloen/ordered-form-bundle": "^3.0"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
@@ -114,6 +115,7 @@
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "~4.3",
         "phpunit/phpunit": "4.5",
+        "phpunit/dbunit": "^2.0",
         "friendsofphp/php-cs-fixer": "^1.12",
         "symfony/var-dumper": "^3.2"
     },
@@ -127,13 +129,14 @@
         "post-install-cmd": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "cp ./build/hooks/pre-commit ./.git/hooks/pre-commit"
+            "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');}\""
         ],
         "post-update-cmd": [
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
-            "cp ./build/hooks/pre-commit ./.git/hooks/pre-commit"
-        ]
+            "php -r \"if(file_exists('./.git')&&file_exists('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''))){copy('./build/hooks/pre-commit'.(PHP_OS=='WINNT'?'.win':''),'./.git/hooks/pre-commit');}\""
+        ],
+        "test": "phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml"
     },
     "config": {
         "bin-dir": "bin"

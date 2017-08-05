@@ -206,7 +206,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addCategoryLeftJoin(QueryBuilder $queryBuilder, $prefix, $categoryPrefix = 'c')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'categories', $categoryPrefix, 'c.id = '.$prefix.'.category_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'categories', $categoryPrefix, $categoryPrefix.'.id = '.$prefix.'.category_id');
 
         return $this;
     }
@@ -222,7 +222,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = 'l')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'leads', $leadPrefix, 'l.id = '.$prefix.'.lead_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'leads', $leadPrefix, $leadPrefix.'.id = '.$prefix.'.lead_id');
 
         return $this;
     }
@@ -238,7 +238,37 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addIpAddressLeftJoin(QueryBuilder $queryBuilder, $prefix, $ipPrefix = 'i')
     {
-        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'ip_addresses', $ipPrefix, 'i.id = '.$prefix.'.ip_id');
+        $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'ip_addresses', $ipPrefix, $ipPrefix.'.id = '.$prefix.'.ip_id');
+
+        return $this;
+    }
+
+    /**
+     * Add IP left join.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param              $prefix
+     * @param string       $ipPrefix
+     * @param string       $leadPrefix
+     *
+     * @return $this
+     */
+    public function addCampaignByChannelJoin(QueryBuilder $queryBuilder, $prefix, $channel, $leadPrefix = 'l')
+    {
+        $options = $this->getOptions();
+        $cmpName = 'cmp.name';
+        $cmpId   = 'clel.campaign_id';
+
+        if ($this->hasColumn($cmpName)
+            || $this->hasFilter($cmpName)
+            || $this->hasColumn($cmpId)
+            || $this->hasFilter($cmpId)
+            || (!empty($options['order'][0]
+                    && ($options['order'][0] === $cmpName
+                        || $options['order'][0] === $cmpId)))) {
+            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel', sprintf('clel.channel="%s" AND %s.id = clel.channel_id AND clel.lead_id = %s.id', $channel, $prefix, $leadPrefix))
+                    ->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaigns', 'cmp', 'cmp.id = clel.campaign_id');
+        }
 
         return $this;
     }
@@ -378,6 +408,21 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         return isset($sorted[$column]);
+    }
+
+    /**
+     * Check if the report has a groupBy columns selected.
+     *
+     *
+     * @return bool
+     */
+    public function hasGroupBy()
+    {
+        if (!empty($this->getReport()->getGroupBy())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

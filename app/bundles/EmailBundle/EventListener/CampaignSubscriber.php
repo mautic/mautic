@@ -198,6 +198,7 @@ class CampaignSubscriber extends CommonSubscriber
                 'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
                 'email_type'     => $type,
                 'return_errors'  => true,
+                'dnc_as_error'   => true,
             ];
 
             $event->setChannel('email', $emailId);
@@ -223,6 +224,11 @@ class CampaignSubscriber extends CommonSubscriber
                     $emailSent = [
                         'result' => false,
                         'errors' => $errors,
+                    ];
+                } elseif (true !== $emailSent) {
+                    $emailSent = [
+                        'result' => false,
+                        'errors' => $emailSent,
                     ];
                 }
             } else {

@@ -37,9 +37,9 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.title',
-                        'text'       => 'mautic.core.title',
-                        'class'      => 'col-dwc-title',
+                        'orderBy'    => 'e.name',
+                        'text'       => 'mautic.core.name',
+                        'class'      => 'col-dwc-name',
                         'default'    => true,
                     ]
                 );
@@ -48,7 +48,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.name',
+                        'orderBy'    => 'c.title',
                         'text'       => 'mautic.core.category',
                         'class'      => 'visible-md visible-lg col-dwc-category',
                     ]

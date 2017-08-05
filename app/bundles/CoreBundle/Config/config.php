@@ -130,7 +130,7 @@ return [
                 'route'     => 'mautic_themes_index',
                 'iconClass' => 'fa-newspaper-o',
                 'id'        => 'mautic_themes_index',
-                'access'    => 'admin',
+                'access'    => 'core:themes:view',
             ],
         ],
         'extra' => [
@@ -316,6 +316,10 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
                 'alias' => 'theme_upload',
             ],
+            'mautic.form.type.slot.dynamiccontent' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotDynamicContentType',
+                'alias' => 'slot_dynamiccontent',
+            ],
             'mautic.form.type.dynamic_content_filter' => [
                 'class' => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
                 'alias' => 'dynamic_content_filter',
@@ -374,8 +378,12 @@ return [
             ],
             'mautic.helper.template.analytics' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
-                'arguments' => 'mautic.factory',
                 'alias'     => 'analytics',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.cookie',
+                    'mautic.lead.model.lead',
+                ],
             ],
             'mautic.helper.template.mautibot' => [
                 'class' => 'Mautic\CoreBundle\Templating\Helper\MautibotHelper',
@@ -653,6 +661,7 @@ return [
                     'mautic.security',
                     'request_stack',
                     '%mautic.parameters%',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.menu_renderer' => [
@@ -893,5 +902,6 @@ return [
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'rss_notification_url'      => 'https://mautic.com/?feed=rss2&tag=notification',
+        'max_entity_lock_time'      => 0,
     ],
 ];

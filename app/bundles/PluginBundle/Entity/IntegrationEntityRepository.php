@@ -31,10 +31,20 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array
      */
-    public function getIntegrationsEntityId($integration, $integrationEntity, $internalEntity, $internalEntityId = null, $startDate = null, $endDate = null, $push = false, $start = 0, $limit = 0)
-    {
+    public function getIntegrationsEntityId(
+        $integration,
+        $integrationEntity,
+        $internalEntity,
+        $internalEntityId = null,
+        $startDate = null,
+        $endDate = null,
+        $push = false,
+        $start = 0,
+        $limit = 0,
+        $integrationEntityIds = null
+    ) {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('i.integration_entity_id, i.id, i.internal_entity_id, i.integration_entity')
+            ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
 
         $q->where('i.integration = :integration')
@@ -72,6 +82,9 @@ class IntegrationEntityRepository extends CommonRepository
         if ($limit) {
             $q->setMaxResults((int) $limit);
         }
+        if ($integrationEntityIds) {
+            $q->andWhere('i.integration_entity_id in ('.$integrationEntityIds.')');
+        }
 
         $results = $q->execute()->fetchAll();
 
@@ -79,53 +92,293 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @param $integration
-     * @param $internalEntity
-     * @param $leadFields
+     * @param      $integration
+     * @param      $integrationEntity
+     * @param      $internalEntity
+     * @param      $internalEntityId
+     * @param null $leadFields
      *
      * @return array
      */
-    public function findLeadsToUpdate($integration, $internalEntity, $leadFields, $limit = 25)
+    public function getIntegrationEntity($integration, $integrationEntity, $internalEntity, $internalEntityId, $leadFields = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id,'.$leadFields)
-            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i')
+            ->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
+        $q->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id');
+        if ($leadFields) {
+            $q->addSelect($leadFields);
+        }
 
-        $q->where('i.integration = :integration')
-            ->andWhere('i.internal_entity = :internalEntity')
-            ->andWhere('i.integration_entity = "Lead" or i.integration_entity = "Contact"')
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('i.integration', ':integration'),
+                $q->expr()->eq('i.internal_entity', ':internalEntity'),
+                $q->expr()->eq('i.integration_entity', ':integrationEntity'),
+                $q->expr()->eq('i.internal_entity_id', (int) $internalEntityId)
+            )
+        )
+            ->setParameter('integration', $integration)
+            ->setParameter('internalEntity', $internalEntity)
+            ->setParameter('integrationEntity', $integrationEntity)
+            ->setMaxResults(1);
+
+        $results = $q->execute()->fetchAll();
+
+        return ($results) ? $results[0] : null;
+    }
+
+    /**
+     * @param      $integration
+     * @param      $integrationEntity
+     * @param      $internalEntity
+     * @param      $internalEntityId
+     * @param null $leadFields
+     *
+     * @return IntegrationEntity[]
+     */
+    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds)
+    {
+        $q = $this->createQueryBuilder('i', 'i.internalEntityId');
+
+        $q->where(
+            $q->expr()->andX(
+                $q->expr()->eq('i.integration', ':integration'),
+                $q->expr()->eq('i.internalEntity', ':internalEntity'),
+                $q->expr()->eq('i.integrationEntity', ':integrationEntity'),
+                $q->expr()->in('i.internalEntityId', ':internalEntityIds')
+            )
+        )
+            ->setParameter('integration', $integration)
+            ->setParameter('internalEntity', $internalEntity)
+            ->setParameter('integrationEntity', $integrationEntity)
+            ->setParameter('internalEntityIds', $internalEntityIds);
+
+        $results = $q->getQuery()->getResult();
+
+        return $results;
+    }
+
+    /**
+     * @param       $integration
+     * @param       $internalEntity
+     * @param       $leadFields
+     * @param int   $limit
+     * @param null  $fromDate
+     * @param null  $toDate
+     * @param array $integrationEntity
+     * @param array $excludeIntegrationIds
+     */
+    public function findLeadsToUpdate(
+        $integration,
+        $internalEntity,
+        $leadFields,
+        $limit = 25,
+        $fromDate = null,
+        $toDate = null,
+        $integrationEntity = ['Contact', 'Lead'],
+        $excludeIntegrationIds = []
+    ) {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i')
+            ->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
+
+        if (false === $limit) {
+            $q->select('count(i.integration_entity_id) as total');
+
+            if ($integrationEntity) {
+                $q->addSelect('i.integration_entity');
+            }
+        } else {
+            $q->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id,'.$leadFields);
+        }
+
+        $q->where('i.integration = :integration');
+
+        if ($integrationEntity) {
+            if (!is_array($integrationEntity)) {
+                $integrationEntity = [$integrationEntity];
+            }
+            $sub = $q->expr()->orX();
+            foreach ($integrationEntity as $key => $entity) {
+                $sub->add($q->expr()->eq('i.integration_entity', ':entity'.$key));
+                $q->setParameter(':entity'.$key, $entity);
+            }
+            $q->andWhere($sub);
+        }
+
+        $q->andWhere('i.internal_entity = :internalEntity')
             ->setParameter('integration', $integration)
             ->setParameter('internalEntity', $internalEntity);
 
-        $q->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id and l.date_modified > i.last_sync_date and l.date_identified is not null and l.email is not null');
+        if (!empty($excludeIntegrationIds)) {
+            $q->andWhere(
+                $q->expr()->notIn(
+                    'i.integration_entity_id',
+                    array_map(
+                        function ($x) {
+                            return "'".$x."'";
+                        },
+                        $excludeIntegrationIds
+                    )
+                )
+            );
+        }
 
-        $q->setMaxResults($limit);
+        $q->andWhere(
+                $q->expr()->andX(
+                    $q->expr()->isNotNull('i.integration_entity_id'),
+                    $q->expr()->isNotNull('l.email'),
+                    $q->expr()->orX(
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('i.last_sync_date'),
+                            $q->expr()->gt('l.date_modified', 'i.last_sync_date')
+                        ),
+                        $q->expr()->andX(
+                            $q->expr()->isNull('i.last_sync_date'),
+                            $q->expr()->isNotNull('l.date_modified'),
+                            $q->expr()->gt('l.date_modified', 'l.date_added')
+                        )
+                    )
+                )
+            );
+
+        if ($fromDate) {
+            if ($toDate) {
+                $q->andWhere(
+                    $q->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
+                )
+                    ->setParameter('dateFrom', $fromDate)
+                    ->setParameter('dateTo', $toDate);
+            } else {
+                $q->andWhere(
+                    $q->expr()->gte('l.date_modified', ':dateFrom')
+                )
+                    ->setParameter('dateFrom', $fromDate);
+            }
+        } elseif ($toDate) {
+            $q->andWhere(
+                $q->expr()->lte('l.date_modified', ':dateTo')
+            )
+                ->setParameter('dateTo', $toDate);
+        }
+
+        // Group by email to prevent duplicates from affecting this
+        if (false === $limit and $integrationEntity) {
+            $q->groupBy('i.integration_entity');
+        }
+
+        if ($limit) {
+            $q->setMaxResults($limit);
+        }
 
         $results = $q->execute()->fetchAll();
+        $leads   = [];
 
-        return $results;
+        if ($integrationEntity) {
+            foreach ($integrationEntity as $entity) {
+                $leads[$entity] = (false === $limit) ? 0 : [];
+            }
+        }
+
+        foreach ($results as $result) {
+            if ($integrationEntity) {
+                if (false === $limit) {
+                    $leads[$result['integration_entity']] = (int) $result['total'];
+                } else {
+                    $leads[$result['integration_entity']][$result['internal_entity_id']] = $result;
+                }
+            } else {
+                $leads[$result['internal_entity_id']] = $result['internal_entity_id'];
+            }
+        }
+
+        return $leads;
     }
 
     /**
-     * @param $integration
-     * @param $leadFields
+     * @param      $integration
+     * @param      $leadFields
+     * @param int  $limit
+     * @param null $fromDate
+     * @param null $toDate
      *
-     * @return array
+     * @return array|int
      */
-    public function findLeadsToCreate($integration, $leadFields, $limit = 25)
+    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('l.id as internal_entity_id,'.$leadFields)
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
+        if (false === $limit) {
+            $q->select('count(*) as total');
+        } else {
+            $q->select('l.id as internal_entity_id,'.$leadFields);
+        }
 
         $q->where('l.date_identified is not null')
             ->andWhere('l.email is not null')
-            ->andWhere('not exists (select null from '.MAUTIC_TABLE_PREFIX.'integration_entity i where i.integration = :integration and (i.internal_entity = "lead" or i.internal_entity = "lead-deleted" or i.internal_entity = "lead-error") and i.internal_entity_id = l.id )')
+            ->andWhere(
+                'not exists (select null from '.MAUTIC_TABLE_PREFIX
+                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id)'
+            )
             ->setParameter('integration', $integration);
 
-        $q->setMaxResults($limit);
+        if ($limit) {
+            $q->setMaxResults($limit);
+        }
+
+        if ($fromDate) {
+            if ($toDate) {
+                $q->andWhere(
+                    $q->expr()->orX(
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('l.date_modified'),
+                            $q->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
+                        ),
+                        $q->expr()->andX(
+                            $q->expr()->isNull('l.date_modified'),
+                            $q->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
+                        )
+                    )
+                )
+                    ->setParameter('dateFrom', $fromDate)
+                    ->setParameter('dateTo', $toDate);
+            } else {
+                $q->andWhere(
+                    $q->expr()->orX(
+                        $q->expr()->andX(
+                            $q->expr()->isNotNull('l.date_modified'),
+                            $q->expr()->gte('l.date_modified', ':dateFrom')
+                        ),
+                        $q->expr()->andX(
+                            $q->expr()->isNull('l.date_modified'),
+                            $q->expr()->gte('l.date_added', ':dateFrom')
+                        )
+                    )
+                )
+                    ->setParameter('dateFrom', $fromDate);
+            }
+        } elseif ($toDate) {
+            $q->andWhere(
+                $q->expr()->orX(
+                    $q->expr()->andX(
+                        $q->expr()->isNotNull('l.date_modified'),
+                        $q->expr()->lte('l.date_modified', ':dateTo')
+                    ),
+                    $q->expr()->andX(
+                        $q->expr()->isNull('l.date_modified'),
+                        $q->expr()->lte('l.date_added', ':dateTo')
+                    )
+                )
+            )
+                ->setParameter('dateTo', $toDate);
+        }
 
         $results = $q->execute()->fetchAll();
+        if (false === $limit) {
+            return (int) $results[0]['total'];
+        }
 
         $leads = [];
         foreach ($results as $result) {
@@ -173,6 +426,35 @@ class IntegrationEntityRepository extends CommonRepository
             ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
-        ->execute();
+            ->execute();
+    }
+
+    /**
+     * @param $internalEntity
+     * @param $leadId
+     */
+    public function updateErrorLeads($internalEntity, $leadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->set('internal_entity', ':lead')->setParameter('lead', 'lead');
+
+        $q->where('internal_entity_id = :leadId')
+            ->andWhere($q->expr()->isNotNull('integration_entity_id'))
+            ->andWhere($q->expr()->eq('internal_entity', ':internalEntity'))
+            ->setParameter('leadId', $leadId)
+            ->setParameter('internalEntity', $internalEntity)
+            ->execute();
+
+        $z = $this->_em->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
+            ->from(MAUTIC_TABLE_PREFIX.'integration_entity');
+
+        $z->where('internal_entity_id = :leadId')
+            ->andWhere($q->expr()->isNull('integration_entity_id'))
+            ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
+            ->setParameter('leadId', $leadId)
+            ->setParameter('internalEntity', $internalEntity)
+            ->execute();
     }
 }

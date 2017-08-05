@@ -451,6 +451,7 @@ class FormController extends CommonFormController
                     'activeForm'     => $entity,
                     'form'           => $form->createView(),
                     'contactFields'  => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'inBuilder'      => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
                 'passthroughVars' => [
@@ -709,9 +710,15 @@ class FormController extends CommonFormController
             $modifiedFields = [];
             $usedLeadFields = [];
             $existingFields = $entity->getFields()->toArray();
+            $submitButton   = false;
 
             foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
+
+                if ($formField->getType() == 'button') {
+                    //submit button found
+                    $submitButton = true;
+                }
                 if ($formField->getType() !== 'button' && !isset($availableFields[$formField->getType()])) {
                     continue;
                 }
@@ -738,7 +745,21 @@ class FormController extends CommonFormController
                     $usedLeadFields[$id] = $field['leadField'];
                 }
             }
+            if (!$submitButton) { //means something deleted the submit button from the form
+                //add a submit button
+                $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
+                $field = new Field();
 
+                $modifiedFields[$keyId]                    = $field->convertToArray();
+                $modifiedFields[$keyId]['label']           = $this->translator->trans('mautic.core.form.submit');
+                $modifiedFields[$keyId]['alias']           = 'submit';
+                $modifiedFields[$keyId]['showLabel']       = 1;
+                $modifiedFields[$keyId]['type']            = 'button';
+                $modifiedFields[$keyId]['id']              = $keyId;
+                $modifiedFields[$keyId]['inputAttributes'] = 'class="btn btn-default"';
+                $modifiedFields[$keyId]['formId']          = $objectId;
+                unset($modifiedFields[$keyId]['form']);
+            }
             $session->set('mautic.form.'.$objectId.'.fields.leadfields', $usedLeadFields);
 
             if (!empty($reorder)) {
@@ -804,6 +825,7 @@ class FormController extends CommonFormController
                     'form'               => $form->createView(),
                     'forceTypeSelection' => $forceTypeSelection,
                     'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'inBuilder'          => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
                 'passthroughVars' => [

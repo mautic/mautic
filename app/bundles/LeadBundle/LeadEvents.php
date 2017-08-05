@@ -289,6 +289,46 @@ final class LeadEvents
     const NOTE_POST_DELETE = 'mautic.lead_note_post_delete';
 
     /**
+     * The mautic.lead_import_pre_save event is dispatched right before an import is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_PRE_SAVE = 'mautic.lead_import_pre_save';
+
+    /**
+     * The mautic.lead_import_post_save event is dispatched right after an import is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_POST_SAVE = 'mautic.lead_import_post_save';
+
+    /**
+     * The mautic.lead_import_pre_delete event is dispatched before an import is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_PRE_DELETE = 'mautic.lead_import_pre_delete';
+
+    /**
+     * The mautic.lead_import_post_delete event is dispatched after an import is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_POST_DELETE = 'mautic.lead_import_post_delete';
+
+    /**
      * The mautic.lead_device_pre_save event is dispatched right before a lead device is persisted.
      *
      * The event listener receives a
@@ -423,6 +463,16 @@ final class LeadEvents
      * @var string
      */
     const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
+
+    /**
+     * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFilteringEvent instance.
+     *
+     * @var string
+     */
+    const LIST_PRE_PROCESS_LIST = 'mautic.list_pre_process_list';
 
     /**
      * The mautic.remove_do_no_contact event is dispatched when a new submission is fired.

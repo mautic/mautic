@@ -82,7 +82,7 @@ class ReportSubscriber extends CommonSubscriber
                     'alias'   => 'read_ratio',
                     'label'   => 'mautic.email.report.read_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100, 1),\'%\')',
                 ],
                 $prefix.'sent_count' => [
                     'label' => 'mautic.email.report.sent_count',
@@ -104,15 +104,13 @@ class ReportSubscriber extends CommonSubscriber
                     'alias'   => 'hits_ratio',
                     'label'   => 'mautic.email.report.hits_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                        .'trackable_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count)*100, 1),\'%\')',
                 ],
                 'unique_ratio' => [
                     'alias'   => 'unique_ratio',
                     'label'   => 'mautic.email.report.unique_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                        .'trackable_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count)*100, 1),\'%\')',
                 ],
                 'unsubscribed' => [
                     'alias'   => 'unsubscribed',
@@ -124,7 +122,7 @@ class ReportSubscriber extends CommonSubscriber
                     'alias'   => 'unsubscribed_ratio',
                     'label'   => 'mautic.email.report.unsubscribed_ratio',
                     'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND((COUNT(DISTINCT '.$doNotContact.'id)/'.$prefix.'sent_count)*100),\'%\')',
+                    'formula' => 'CONCAT(ROUND((COUNT(DISTINCT '.$doNotContact.'id)/'.$prefix.'sent_count)*100, 1),\'%\')',
                 ],
                 $prefix.'revision' => [
                     'label' => 'mautic.email.report.revision',
@@ -139,8 +137,9 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'string',
                 ],
                 $prefix.'variant_start_date' => [
-                    'label' => 'mautic.email.report.variant_start_date',
-                    'type'  => 'datetime',
+                    'label'          => 'mautic.email.report.variant_start_date',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$prefix.'variant_start_date)',
                 ],
                 $prefix.'variant_sent_count' => [
                     'label' => 'mautic.email.report.variant_sent_count',
@@ -154,7 +153,8 @@ class ReportSubscriber extends CommonSubscriber
             $columns = array_merge(
                 $columns,
                 $event->getStandardColumns($prefix, [], 'mautic_email_action'),
-                $event->getCategoryColumns()
+                $event->getCategoryColumns(),
+                $event->getCampaignByChannelColumns()
             );
             $data = [
                 'display_name' => 'mautic.email.emails',
@@ -179,8 +179,9 @@ class ReportSubscriber extends CommonSubscriber
                         'type'  => 'email',
                     ],
                     $statPrefix.'date_sent' => [
-                        'label' => 'mautic.email.report.stat.date_sent',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.email.report.stat.date_sent',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$statPrefix.'date_sent)',
                     ],
                     $statPrefix.'is_read' => [
                         'label' => 'mautic.email.report.stat.is_read',
@@ -195,8 +196,9 @@ class ReportSubscriber extends CommonSubscriber
                         'type'  => 'bool',
                     ],
                     $statPrefix.'date_read' => [
-                        'label' => 'mautic.email.report.stat.date_read',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.email.report.stat.date_read',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$statPrefix.'date_read)',
                     ],
                     $statPrefix.'retry_count' => [
                         'label' => 'mautic.email.report.stat.retry_count',
@@ -214,7 +216,12 @@ class ReportSubscriber extends CommonSubscriber
 
                 $data = [
                     'display_name' => 'mautic.email.stats.report.table',
-                    'columns'      => array_merge($columns, $statColumns, $event->getLeadColumns(), $event->getIpColumn()),
+                    'columns'      => array_merge(
+                        $columns,
+                        $statColumns,
+                        $event->getLeadColumns(),
+                        $event->getIpColumn()
+                    ),
                 ];
                 $event->addTable('email.stats', $data, 'emails');
 
@@ -237,8 +244,9 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        $context = $event->getContext();
-        $qb      = $event->getQueryBuilder();
+        $context    = $event->getContext();
+        $qb         = $event->getQueryBuilder();
+        $hasGroupBy = $event->hasGroupBy();
 
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
@@ -248,10 +256,13 @@ class ReportSubscriber extends CommonSubscriber
         switch ($context) {
             case 'emails':
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
-                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id')
-                   ->groupBy('e.id');
+                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+
                 $event->addCategoryLeftJoin($qb, 'e');
 
+                if (!$hasGroupBy) {
+                    $qb->groupBy('e.id');
+                }
                 if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
                     $qbcut->select(
                         'COUNT(cut2.channel_id) AS trackable_count, SUM(cut2.hits) AS hits',
@@ -264,14 +275,6 @@ class ReportSubscriber extends CommonSubscriber
                     $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id');
                 }
 
-                if ($event->hasColumn($dncColumns) || $event->hasFilter($dncColumns)) {
-                    $qb->leftJoin(
-                        'e',
-                        MAUTIC_TABLE_PREFIX.'lead_donotcontact',
-                        'dnc',
-                        'e.id = dnc.channel_id and dnc.channel=\'email\' and dnc.reason='.DoNotContact::UNSUBSCRIBED
-                    );
-                }
                 break;
             case 'email.stats':
                 $qb->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
@@ -305,6 +308,8 @@ class ReportSubscriber extends CommonSubscriber
                         'e.id = dnc.channel_id AND dnc.channel=\'email\' AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' AND es.lead_id = dnc.lead_id'
                     );
                 }
+
+                $event->addCampaignByChannelJoin($qb, 'e', 'email');
 
                 break;
         }

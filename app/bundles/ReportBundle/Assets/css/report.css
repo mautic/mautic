@@ -20,3 +20,46 @@
 #report_columns_chosen {
 	width: 100% !important;
 }
+#ms-report_groupBy ul{
+	height: 115px;
+}
+
+#report_filters .panel {
+	margin-bottom:0;
+	margin-top:20px;
+}
+
+#report_filters > .in-group {
+	margin-top:5px;
+}
+
+#report_filters .panel-heading {
+	margin-bottom:0;
+	padding-top:10px;
+}
+
+#report_filters .panel-heading .form-group {
+	margin:0;
+}
+
+#report_filters > .in-group > .panel-heading {
+	display:none;
+}
+
+#report_filters > .in-group ~ .in-group {
+	margin-top:0;
+	border-top:0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	margin-left:20px;
+}
+
+#report_filters > .in-group ~ .in-group > .panel-heading {
+	display:block;
+	padding-left:10px;
+}
+
+#report_filters > .in-group ~ .in-group > .panel-body > .row > div {
+	padding-left:10px;
+	padding-right:10px;
+}

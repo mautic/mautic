@@ -153,7 +153,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         // **Page hit is true if:**
         // 1. no landing page is set and no URL rule is set
-        $applyToAny = (empty($config['url']) && empty($limitToPages));
+        $applyToAny = (empty($config['url']) && empty($config['referer']) && empty($limitToPages));
 
         // 2. some landing pages are set and page ID match
         $langingPageIsHit = (!empty($limitToPages) && in_array($pageHitId, $limitToPages));

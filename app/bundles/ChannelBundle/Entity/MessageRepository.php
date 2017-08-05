@@ -20,7 +20,7 @@ class MessageRepository extends CommonRepository
      *
      * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $args['qb'] = $this->createQueryBuilder($this->getTableAlias());
         $args['qb']->join('MauticChannelBundle:Channel', 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');

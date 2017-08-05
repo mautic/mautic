@@ -138,7 +138,7 @@ class CitrixModel extends FormModel
         $emails = [];
         if (0 !== count($citrixEvents)) {
             $emails = array_map(
-                function (\MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent $citrixEvent) {
+                function (CitrixEvent $citrixEvent) {
                     return $citrixEvent->getEmail();
                 },
                 $citrixEvents
@@ -191,7 +191,22 @@ class CitrixModel extends FormModel
         $items  = $query->getResult();
         $result = [];
         foreach ($items as $item) {
-            $result[$item['eventName']] = $item['eventDesc'];
+            $eventDesc = $item['eventDesc'];
+            // strip joinUrl if exists
+            $pos = strpos($eventDesc, '_!');
+            if (false !== $pos) {
+                $eventDesc = substr($eventDesc, 0, $pos);
+            }
+            // filter events with same id
+            $eventId = $item['eventName'];
+            $pos     = strpos($eventId, '_#');
+            $eventId = substr($eventId, $pos);
+            foreach ($result as $k => $v) {
+                if (false !== strpos($k, $eventId)) {
+                    unset($result[$k]);
+                }
+            }
+            $result[$item['eventName']] = $eventDesc;
         }
 
         return $result;
@@ -344,6 +359,10 @@ class CitrixModel extends FormModel
 
                 if (!empty($info['event_date'])) {
                     $citrixEvent->setEventDate($info['event_date']);
+                }
+
+                if (!empty($info['joinUrl'])) {
+                    $citrixEvent->setEventDesc($eventDesc.'_!'.$info['joinUrl']);
                 }
 
                 $newEntities[] = $citrixEvent;

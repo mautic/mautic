@@ -85,10 +85,10 @@ class LeadSubscriber extends CommonSubscriber
         if (!$event->isEngagementCount()) {
             // Add the events to the event array
             foreach ($stats['results'] as $stat) {
-                if (!empty($stat['storedSubject'])) {
-                    $label = $this->translator->trans('mautic.email.timeline.event.custom_email').': '.$stat['storedSubject'];
-                } elseif (!empty($stat['email_name'])) {
+                if (!empty($stat['email_name'])) {
                     $label = $stat['email_name'];
+                } elseif (!empty($stat['storedSubject'])) {
+                    $label = $this->translator->trans('mautic.email.timeline.event.custom_email').': '.$stat['storedSubject'];
                 } else {
                     $label = $this->translator->trans('mautic.email.timeline.event.custom_email');
                 }

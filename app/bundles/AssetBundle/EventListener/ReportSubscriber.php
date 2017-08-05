@@ -68,7 +68,13 @@ class ReportSubscriber extends CommonSubscriber
                 ],
             ];
 
-            $columns = array_merge($columns, $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'), $event->getCategoryColumns());
+            $columns = array_merge(
+                $columns,
+                $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'),
+                $event->getCategoryColumns(),
+                $event->getCampaignByChannelColumns()
+            );
+
             $event->addTable(
                 'assets',
                 [
@@ -82,8 +88,9 @@ class ReportSubscriber extends CommonSubscriber
                 $downloadPrefix  = 'ad.';
                 $downloadColumns = [
                     $downloadPrefix.'date_download' => [
-                        'label' => 'mautic.asset.report.download.date_download',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.asset.report.download.date_download',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$downloadPrefix.'date_download)',
                     ],
                     $downloadPrefix.'code' => [
                         'label' => 'mautic.asset.report.download.code',
@@ -107,7 +114,12 @@ class ReportSubscriber extends CommonSubscriber
                     'asset.downloads',
                     [
                         'display_name' => 'mautic.asset.report.downloads.table',
-                        'columns'      => array_merge($columns, $downloadColumns, $event->getLeadColumns(), $event->getIpColumn()),
+                        'columns'      => array_merge(
+                            $columns,
+                            $downloadColumns,
+                            $event->getLeadColumns(),
+                            $event->getIpColumn()
+                        ),
                     ],
                     'assets'
                 );
@@ -143,6 +155,7 @@ class ReportSubscriber extends CommonSubscriber
             $event->addCategoryLeftJoin($queryBuilder, 'a');
             $event->addLeadLeftJoin($queryBuilder, 'ad');
             $event->addIpAddressLeftJoin($queryBuilder, 'ad');
+            $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
         }
 
         $event->setQueryBuilder($queryBuilder);

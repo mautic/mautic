@@ -69,6 +69,11 @@ class Notification extends FormEntity
     private $button;
 
     /**
+     * @var array
+     */
+    private $utmTags = [];
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -107,6 +112,16 @@ class Notification extends FormEntity
      * @var string
      */
     private $notificationType = 'template';
+
+    /**
+     * @var bool
+     */
+    private $mobile = false;
+
+    /**
+     * @var array
+     */
+    private $mobileSettings;
 
     public function __clone()
     {
@@ -165,6 +180,11 @@ class Notification extends FormEntity
             ->nullable()
             ->build();
 
+        $builder->createField('utmTags', 'array')
+            ->columnName('utm_tags')
+            ->nullable()
+            ->build();
+
         $builder->createField('notificationType', 'text')
             ->columnName('notification_type')
             ->nullable()
@@ -196,6 +216,10 @@ class Notification extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('mobile', 'boolean')->build();
+
+        $builder->createField('mobileSettings', 'array')->build();
     }
 
     /**
@@ -266,6 +290,7 @@ class Notification extends FormEntity
             )
             ->addProperties(
                 [
+                    'utmTags',
                     'publishUp',
                     'publishDown',
                     'readCount',
@@ -413,6 +438,25 @@ class Notification extends FormEntity
     {
         $this->isChanged('message', $message);
         $this->message = $message;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
+    }
+
+    /**
+     * @param array $utmTags
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmTags', $utmTags);
+        $this->utmTags = $utmTags;
+
+        return $this;
     }
 
     /**
@@ -590,5 +634,45 @@ class Notification extends FormEntity
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMobileSettings()
+    {
+        return $this->mobileSettings;
+    }
+
+    /**
+     * @param array $mobileSettings
+     *
+     * @return $this
+     */
+    public function setMobileSettings(array $mobileSettings)
+    {
+        $this->mobileSettings = $mobileSettings;
+
+        return $this;
     }
 }

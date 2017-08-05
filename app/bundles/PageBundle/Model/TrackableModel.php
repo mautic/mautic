@@ -87,10 +87,11 @@ class TrackableModel extends AbstractCommonModel
      * @param Trackable  $trackable
      * @param array      $clickthrough
      * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
+     * @param array      $utmTags
      *
      * @return string
      */
-    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], $shortenUrl = false)
+    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], $shortenUrl = false, $utmTags = [])
     {
         if (!isset($clickthrough['channel'])) {
             $clickthrough['channel'] = [$trackable->getChannel() => $trackable->getChannelId()];
@@ -98,7 +99,7 @@ class TrackableModel extends AbstractCommonModel
 
         $redirect = $trackable->getRedirect();
 
-        return $this->getRedirectModel()->generateRedirectUrl($redirect, $clickthrough, $shortenUrl);
+        return $this->getRedirectModel()->generateRedirectUrl($redirect, $clickthrough, $shortenUrl, $utmTags);
     }
 
     /**
@@ -569,7 +570,7 @@ class TrackableModel extends AbstractCommonModel
     {
         // Ensure it's not in the do not track list
         foreach ($this->doNotTrack as $notTrackable) {
-            if (preg_match('/'.preg_quote($notTrackable, '/').'/', $url)) {
+            if (preg_match('~'.$notTrackable.'~', $url)) {
                 return true;
             }
         }

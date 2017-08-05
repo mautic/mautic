@@ -238,7 +238,7 @@ class SubmissionModel extends CommonFormModel
                 continue;
             }
 
-            if (in_array($type, $components['viewOnlyFields'])) {
+            if (isset($components['viewOnlyFields']) && in_array($type, $components['viewOnlyFields'])) {
                 //don't save items that don't have a value associated with it
                 continue;
             }
@@ -290,11 +290,6 @@ class SubmissionModel extends CommonFormModel
             $leadField = $f->getLeadField();
             if (!empty($leadField)) {
                 $leadValue = $value;
-                if (is_array($leadValue)) {
-                    // Multiselect lead fields store the values with bars
-                    $delimeter = ('multiselect' === $leadFields[$leadField]['type']) ? '|' : ', ';
-                    $leadValue = implode($delimeter, $leadValue);
-                }
 
                 $leadFieldMatches[$leadField] = $leadValue;
             }
@@ -325,24 +320,20 @@ class SubmissionModel extends CommonFormModel
         $this->validateActionCallbacks($submissionEvent, $validationErrors, $alias);
 
         // Create/update lead
+        $lead = null;
         if (!empty($leadFieldMatches)) {
-            $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
-            $submission->setLead($lead);
+            $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields);
         }
 
         // Get updated lead if applicable with tracking ID
-        if ($form->isInKioskMode()) {
-            $lead = $this->leadModel->getCurrentLead();
-        } else {
-            list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
+        list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
 
-            //set tracking ID for stats purposes to determine unique hits
-            $submission->setTrackingId($trackingId);
-        }
-        $submission->setLead($lead);
+        //set tracking ID for stats purposes to determine unique hits
+        $submission->setTrackingId($trackingId)
+            ->setLead($lead);
 
         // Remove validation errors if the field is not visible
-        if ($form->usesProgressiveProfiling()) {
+        if ($lead && $form->usesProgressiveProfiling()) {
             $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
 
             foreach ($fields as $field) {
@@ -467,7 +458,7 @@ class SubmissionModel extends CommonFormModel
                                 if (in_array($r['type'], $viewOnlyFields)) {
                                     continue;
                                 }
-                                $row[] = $r['value'];
+                                $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
                                 //free memory
                                 unset($s['results'][$k2]);
                             }
@@ -544,7 +535,7 @@ class SubmissionModel extends CommonFormModel
                                     if (in_array($r['type'], $viewOnlyFields)) {
                                         continue;
                                     }
-                                    $row[] = $r['value'];
+                                    $row[] = htmlspecialchars_decode($r['value'], ENT_QUOTES);
                                     //free memory
                                     unset($s['results'][$k2]);
                                 }
@@ -776,27 +767,28 @@ class SubmissionModel extends CommonFormModel
     protected function createLeadFromSubmit($form, array $leadFieldMatches, $leadFields)
     {
         //set the mapped data
-        $inKioskMode = $form->isInKioskMode();
+        $inKioskMode   = $form->isInKioskMode();
+        $leadId        = null;
+        $lead          = new Lead();
+        $currentFields = $leadFieldMatches;
 
         if (!$inKioskMode) {
             // Default to currently tracked lead
-            $lead          = $this->leadModel->getCurrentLead();
-            $leadId        = $lead->getId();
-            $currentFields = $lead->getProfileFields();
+            if ($currentLead = $this->leadModel->getCurrentLead()) {
+                $lead          = $currentLead;
+                $leadId        = $lead->getId();
+                $currentFields = $lead->getProfileFields();
+            }
 
-            $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$lead->getId());
+            $this->logger->debug('FORM: Not in kiosk mode so using current contact ID #'.$leadId);
         } else {
             // Default to a new lead in kiosk mode
-            $lead = new Lead();
             $lead->setNewlyCreated(true);
-            $currentFields = $leadFieldMatches;
-
-            $leadId = null;
 
             $this->logger->debug('FORM: In kiosk mode so assuming a new contact');
         }
 
-        $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentiferFields();
+        $uniqueLeadFields = $this->leadFieldModel->getUniqueIdentifierFields();
 
         // Closure to get data and unique fields
         $getData = function ($currentFields, $uniqueOnly = false) use ($leadFields, $uniqueLeadFields) {
@@ -866,7 +858,7 @@ class SubmissionModel extends CommonFormModel
             $uniqueFieldsFound             = $getData($foundLeadFields, true);
             list($hasConflict, $conflicts) = $checkForIdentifierConflict($uniqueFieldsFound, $uniqueFieldsCurrent);
 
-            if ($inKioskMode || $hasConflict) {
+            if ($inKioskMode || $hasConflict || !$lead->getId()) {
                 // Use the found lead without merging because there is some sort of conflict with unique identifiers or in kiosk mode and thus should not merge
                 $lead = $foundLead;
 
@@ -883,7 +875,7 @@ class SubmissionModel extends CommonFormModel
             }
 
             // Update unique fields data for comparison with submitted data
-            $currentFields       = $this->leadModel->flattenFields($lead->getFields());
+            $currentFields       = $lead->getProfileFields();
             $uniqueFieldsCurrent = $getData($currentFields, true);
         }
 

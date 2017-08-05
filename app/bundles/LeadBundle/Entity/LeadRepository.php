@@ -139,31 +139,43 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get a list of lead entities.
      *
-     * @param      $uniqueFieldsWithData
-     * @param null $leadId
+     * @param     $uniqueFieldsWithData
+     * @param int $leadId
+     * @param int $limit
      *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
     {
-        // get the list of IDs
-        $idList = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('l.*')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        // init to empty array
-        $results = [];
-
-        // if we didn't get anything return empty
-        if (!count(($idList))) {
-            return $results;
+        // loop through the fields and
+        foreach ($uniqueFieldsWithData as $col => $val) {
+            $q->orWhere("l.$col = :".$col)
+                ->setParameter($col, $val);
         }
 
-        $ids = [];
-
-        // we know we have at least one
-        foreach ($idList as $r) {
-            $ids[] = $r['id'];
+        // if we have a lead ID lets use it
+        if (!empty($leadId)) {
+            // make sure that its not the id we already have
+            $q->andWhere('l.id != '.$leadId);
         }
 
+        if ($limit) {
+            $q->setMaxResults($limit);
+        }
+
+        $results = $q->execute()->fetchAll();
+
+        // Collect the IDs
+        $leads = [];
+        foreach ($results as $r) {
+            $leads[$r['id']] = $r;
+        }
+
+        // Get entities
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('l')
             ->from('MauticLeadBundle:Lead', 'l');
@@ -171,23 +183,23 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $q->where(
             $q->expr()->in('l.id', ':ids')
         )
-            ->setParameter('ids', $ids)
+            ->setParameter('ids', array_keys($leads))
             ->orderBy('l.dateAdded', 'DESC');
-
-        $results = $q->getQuery()->getResult();
+        $entities = $q->getQuery()->getResult();
 
         /** @var Lead $lead */
-        foreach ($results as $lead) {
+        foreach ($entities as $lead) {
             $lead->setAvailableSocialFields($this->availableSocialFields);
             if (!empty($this->triggerModel)) {
                 $lead->setColor($this->triggerModel->getColorForLeadPoints($lead->getPoints()));
             }
 
-            $fieldValues = $this->getFieldValues($lead->getId());
-            $lead->setFields($fieldValues);
+            $lead->setFields(
+                $this->formatFieldValues($leads[$lead->getId()])
+            );
         }
 
-        return $results;
+        return $entities;
     }
 
     /**
@@ -350,7 +362,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $primary = null;
 
                 foreach ($companies as $company) {
-                    if ($company['is_primary'] == 1) {
+                    if (isset($company['is_primary']) && $company['is_primary'] == 1) {
                         $primary = $company;
                     }
                 }
@@ -373,7 +385,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
@@ -569,12 +581,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the "catch all" where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         $columns = array_merge(
             [
@@ -596,12 +608,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Adds the command where clause to the QueryBuilder.
      *
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         $command                 = $filter->command;
         $string                  = $filter->string;
@@ -918,6 +930,36 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $result;
+    }
+
+    /**
+     * Check lead owner.
+     *
+     * @param Lead  $lead
+     * @param array $ownerIds
+     *
+     * @return array|false
+     */
+    public function checkLeadOwner(Lead $lead, $ownerIds = [])
+    {
+        if (empty($ownerIds)) {
+            return false;
+        }
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('u.id')
+            ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
+            ->join('u', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.owner_id = u.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('u.id', ':ownerIds'),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('ownerIds', implode(',', $ownerIds))
+            ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**
