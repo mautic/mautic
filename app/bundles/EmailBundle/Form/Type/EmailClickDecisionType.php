@@ -13,7 +13,6 @@ namespace Mautic\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
  * Class EmailOpenType.
@@ -28,15 +27,12 @@ class EmailClickDecisionType extends AbstractType
     {
         $builder->add(
             'urls',
-            'text',
+            'sortablelist',
             [
-                'label'      => 'mautic.email.click.urls',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.email.click.urls.tooltip',
-                ],
-                'required' => false,
+                'label'           => 'mautic.email.click.urls.contains',
+                'option_required' => false,
+                'with_labels'     => false,
+                'required'        => false,
             ]
         );
     }
