@@ -163,7 +163,6 @@ class CampaignSubscriber extends CommonSubscriber
                 if ($eventDetails->getEmail()->getId() == (int) $eventParent['properties']['email']) {
                     if (!empty($eventConfig['urls']['list'])) {
                         $limitToUrl = $eventConfig['urls']['list'];
-                        print_r($limitToUrl);
                         foreach ($limitToUrl as $url) {
                             if (preg_match('/'.$url.'/i', $hit->getUrl())) {
                                 return $event->setResult(true);

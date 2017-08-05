@@ -11,12 +11,11 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
-use Mautic\CampaignBundle\Model\EventModel;
 
 /**
  * Class PageSubscriber.
@@ -38,12 +37,11 @@ class PageSubscriber extends CommonSubscriber
      *
      * @param EmailModel $emailModel
      * @param EventModel $campaignEventModel
-     *
      */
     public function __construct(EmailModel $emailModel, EventModel $campaignEventModel)
     {
-        $this->emailModel = $emailModel;
-        $this->campaignEventModel    = $campaignEventModel;
+        $this->emailModel         = $emailModel;
+        $this->campaignEventModel = $campaignEventModel;
     }
 
     /**
@@ -94,7 +92,6 @@ class PageSubscriber extends CommonSubscriber
                     $this->emailModel->hitEmail($stat, $this->request);
                 }
             }
-
         }
     }
 }
