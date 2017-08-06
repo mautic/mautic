@@ -222,6 +222,10 @@ return [
                 'class' => 'Mautic\PageBundle\Form\Type\ConfigType',
                 'alias' => 'pageconfig',
             ],
+            'mautic.form.type.trackingconfig' => [
+                'class' => 'Mautic\PageBundle\Form\Type\ConfigTrackingPageType',
+                'alias' => 'trackingconfig',
+            ],
             'mautic.form.type.slideshow_config' => [
                 'class' => 'Mautic\PageBundle\Form\Type\SlideshowGlobalConfigType',
                 'alias' => 'slideshow_config',

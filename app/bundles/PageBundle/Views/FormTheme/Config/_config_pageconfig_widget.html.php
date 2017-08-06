@@ -26,28 +26,4 @@
             </div>
         <?php endforeach; ?>
     </div>
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.pagetracking'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="form-group">
-    <p><?php echo $view['translator']->trans('mautic.config.tab.pagetracking.info'); ?></p>
-<pre>&lt;script&gt;
-    (function(w,d,t,u,n,a,m){w['MauticTrackingObject']=n;
-        w[n]=w[n]||function(){(w[n].q=w[n].q||[]).push(arguments)},a=d.createElement(t),
-        m=d.getElementsByTagName(t)[0];a.async=1;a.src=u;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','<?php echo $view['router']->url('mautic_js'); ?>','mt');
-
-    mt('send', 'pageview');
-&lt;/script&gt;</pre>
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <?php echo $view['form']->row($form['track_contact_by_ip']); ?>
-            </div>
-            <div class="col-md-6">
-                <?php echo $view['form']->row($form->children['track_by_fingerprint']); ?>
-            </div>
-        </div>
-    </div>
 </div>

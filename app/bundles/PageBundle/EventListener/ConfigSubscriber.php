@@ -36,10 +36,18 @@ class ConfigSubscriber extends CommonSubscriber
     {
         $event->addForm([
             'bundle'     => 'PageBundle',
+            'formAlias'  => 'trackingconfig',
+            'formTheme'  => 'MauticPageBundle:FormTheme\Config',
+            'parameters' => $event->getParametersFromConfig('MauticPageBundle'),
+        ]);
+
+        $event->addForm([
+            'bundle'     => 'PageBundle',
             'formAlias'  => 'pageconfig',
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticPageBundle'),
         ]);
+
     }
 
     public function onConfigSave(ConfigEvent $event)
