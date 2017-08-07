@@ -257,8 +257,9 @@ class Event
         /** CAPTIVEA.CORE START **/
         $builder->createManyToOne('scoringCategory', 'Mautic\ScoringBundle\Entity\ScoringCategory')
             ->addJoinColumn('scoringcategory_id', 'id', true, false, 'SET NULL')
-            ->cascadePersist()
             ->build();
+        // cascadePersist duplicates the scoring id at each save
+        // without the cascadePersist, it crashes
         /** CAPTIVEA.CORE END **/
     }
 
