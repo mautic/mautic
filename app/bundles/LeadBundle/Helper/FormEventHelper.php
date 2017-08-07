@@ -95,7 +95,7 @@ class FormEventHelper
         }
     }
 
-    public static function scoreContactsCompanies($action, $factory)
+    public static function scoreContactsCompanies($action, $factory, $config)
     {
         $properties = $action->getProperties();
 
@@ -105,6 +105,19 @@ class FormEventHelper
         $score     = $properties['score'];
 
         if (!empty($score)) {
+            /** CAPTIVEA.CORE START REPLACE **/
+            //$lead->adjustPoints($config['points'], $config['operator']);
+            if(!empty($config['scoringCategory'])) {
+                $scoringCategory = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($config['scoringCategory']);
+                if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
+                    $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($lead->getPrimaryCompany(), $scoringCategory, $config['points'], $config['operator']);
+                } else {
+                    $lead->adjustPoints($config['points'], $config['operator']);
+                }
+            } else {
+                $lead->adjustPoints($config['points'], $config['operator']);
+            }
+            /** CAPTIVEA.CORE END REPLACE **/
             $leadModel->scoreContactsCompany($lead, $score);
         }
     }
