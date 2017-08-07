@@ -12,7 +12,8 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\Form;
@@ -128,7 +129,7 @@ class ImportController extends FormController
 
         // Move the file to cache and rename it
         $forceStop = $this->request->get('cancel', false);
-        $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
+        $step      = ($forceStop) ? 1 : $session->get('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
         $fileName  = $this->getImportFileName();
         $importDir = $this->getImportDirName();
         $fullPath  = $this->getFullCsvPath();
@@ -138,10 +139,10 @@ class ImportController extends FormController
         if (!file_exists($fullPath)) {
             // Force step one if the file doesn't exist
             $step = 1;
-            $session->set('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
+            $session->set('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
         }
 
-        $progress = (new Progress())->bindArray($session->get('mautic.lead.import.progress', [0, 0]));
+        $progress = (new Progress())->bindArray($session->get('mautic.'.$object.'.import.progress', [0, 0]));
         $import   = $importModel->getEntity();
         $action   = $this->generateUrl('mautic_import_action', ['object' => $this->request->get('object'), 'objectAction' => 'new']);
 
@@ -159,7 +160,7 @@ class ImportController extends FormController
                 /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
                 $fieldModel    = $this->getModel('lead.field');
                 $leadFields    = $fieldModel->getFieldList(false, false);
-                $importFields  = $session->get('mautic.lead.import.importfields', []);
+                $importFields  = $session->get('mautic.'.$object.'.import.importfields', []);
                 $companyFields = $fieldModel->getFieldList(false, false, ['isPublished' => true, 'object' => 'company']);
 
                 $form = $this->get('form.factory')->create(
@@ -178,19 +179,19 @@ class ImportController extends FormController
                 break;
             case self::STEP_PROGRESS_BAR:
                 // Just show the progress form
-                $session->set('mautic.lead.import.step', self::STEP_IMPORT_FROM_CSV);
+                $session->set('mautic.'.$object.'.import.step', self::STEP_IMPORT_FROM_CSV);
                 break;
 
             case self::STEP_IMPORT_FROM_CSV:
                 ignore_user_abort(true);
 
-                $inProgress = $session->get('mautic.lead.import.inprogress', false);
-                $checks     = $session->get('mautic.lead.import.progresschecks', 1);
+                $inProgress = $session->get('mautic.'.$object.'.import.inprogress', false);
+                $checks     = $session->get('mautic.'.$object.'.import.progresschecks', 1);
                 if (true || !$inProgress || $checks > 5) {
-                    $session->set('mautic.lead.import.inprogress', true);
-                    $session->set('mautic.lead.import.progresschecks', 1);
+                    $session->set('mautic.'.$object.'.import.inprogress', true);
+                    $session->set('mautic.'.$object.'.import.progresschecks', 1);
 
-                    $import = $importModel->getEntity($session->get('mautic.lead.import.id', null));
+                    $import = $importModel->getEntity($session->get('mautic.'.$object.'.import.id', null));
 
                     if (!$import->getDateStarted()) {
                         $import->setDateStarted(new \DateTime());
@@ -206,8 +207,8 @@ class ImportController extends FormController
                         $complete = true;
                     } else {
                         $complete = false;
-                        $session->set('mautic.lead.import.inprogress', false);
-                        $session->set('mautic.lead.import.progress', $progress->toArray());
+                        $session->set('mautic.'.$object.'.import.inprogress', false);
+                        $session->set('mautic.'.$object.'.import.progress', $progress->toArray());
                     }
 
                     $importModel->saveEntity($import);
@@ -215,7 +216,7 @@ class ImportController extends FormController
                     break;
                 } else {
                     ++$checks;
-                    $session->set('mautic.lead.import.progresschecks', $checks);
+                    $session->set('mautic.'.$object.'.import.progresschecks', $checks);
                 }
         }
 
@@ -254,7 +255,7 @@ class ImportController extends FormController
                                         }
                                     }
 
-                                    $session->set('mautic.lead.import.config', $config);
+                                    $session->set('mautic.'.$object.'.import.config', $config);
 
                                     if ($file !== false) {
                                         // Get the headers for matching
@@ -265,15 +266,24 @@ class ImportController extends FormController
                                         $linecount = $file->key();
 
                                         if (!empty($headers) && is_array($headers)) {
-                                            array_walk($headers, create_function('&$val', '$val = trim($val);'));
-                                            $session->set('mautic.lead.import.headers', $headers);
-                                            sort($headers);
-                                            $headers = array_combine($headers, $headers);
+                                            array_walk($headers, function (&$val) {
+                                                $val = trim($val);
+                                            });
 
-                                            $session->set('mautic.lead.import.step', self::STEP_MATCH_FIELDS);
-                                            $session->set('mautic.lead.import.importfields', $headers);
-                                            $session->set('mautic.lead.import.progress', [0, $linecount]);
-                                            $session->set('mautic.lead.import.original.file', $fileData->getClientOriginalName());
+                                            $session->set('mautic.'.$object.'.import.headers', $headers);
+                                            sort($headers);
+
+                                            $importFields = [];
+
+                                            foreach ($headers as $header) {
+                                                $fieldName                = strtolower(InputHelper::alphanum($header, false, '_'));
+                                                $importFields[$fieldName] = $header;
+                                            }
+
+                                            $session->set('mautic.'.$object.'.import.step', self::STEP_MATCH_FIELDS);
+                                            $session->set('mautic.'.$object.'.import.importfields', $importFields);
+                                            $session->set('mautic.'.$object.'.import.progress', [0, $linecount]);
+                                            $session->set('mautic.'.$object.'.import.original.file', $fileData->getClientOriginalName());
 
                                             return $this->newAction(0, true);
                                         }
@@ -314,15 +324,21 @@ class ImportController extends FormController
                         $owner = $matchedFields['owner'];
                         unset($matchedFields['owner']);
 
-                        $list = $matchedFields['list'];
-                        unset($matchedFields['list']);
-
-                        $tagCollection = $matchedFields['tags'];
-                        $tags          = [];
-                        foreach ($tagCollection as $tag) {
-                            $tags[] = $tag->getTag();
+                        $list = null;
+                        if (array_key_exists('list', $matchedFields)) {
+                            $list = $matchedFields['list'];
+                            unset($matchedFields['list']);
                         }
-                        unset($matchedFields['tags']);
+
+                        $tags = [];
+                        if (array_key_exists('tags', $matchedFields)) {
+                            $tagCollection = $matchedFields['tags'];
+                            $tags          = [];
+                            foreach ($tagCollection as $tag) {
+                                $tags[] = $tag->getTag();
+                            }
+                            unset($matchedFields['tags']);
+                        }
 
                         foreach ($matchedFields as $k => $f) {
                             if (empty($f)) {
@@ -345,30 +361,31 @@ class ImportController extends FormController
                             $import = $importModel->getEntity();
 
                             $import->setMatchedFields($matchedFields)
+                                ->setObject($object)
                                 ->setDir($importDir)
                                 ->setLineCount($this->getLineCount())
                                 ->setFile($fileName)
-                                ->setOriginalFile($session->get('mautic.lead.import.original.file'))
+                                ->setOriginalFile($session->get('mautic.'.$object.'.import.original.file'))
                                 ->setDefault('owner', $defaultOwner)
                                 ->setDefault('list', $list)
                                 ->setDefault('tags', $tags)
-                                ->setHeaders($session->get('mautic.lead.import.headers'))
-                                ->setParserConfig($session->get('mautic.lead.import.config'));
+                                ->setHeaders($session->get('mautic.'.$object.'.import.headers'))
+                                ->setParserConfig($session->get('mautic.'.$object.'.import.config'));
 
                             // In case the user chose to import in browser
                             if ($this->importInBrowser($form)) {
                                 $import->setStatus($import::MANUAL);
 
-                                $session->set('mautic.lead.import.step', self::STEP_PROGRESS_BAR);
+                                $session->set('mautic.'.$object.'.import.step', self::STEP_PROGRESS_BAR);
                             }
 
                             $importModel->saveEntity($import);
 
-                            $session->set('mautic.lead.import.id', $import->getId());
+                            $session->set('mautic.'.$object.'.import.id', $import->getId());
 
                             // In case the user decided to queue the import
                             if ($this->importInCli($form)) {
-                                $this->addFlash('mautic.lead.batch.import.created');
+                                $this->addFlash('mautic.'.$object.'.batch.import.created');
                                 $this->resetImport($fullPath, false);
 
                                 return $this->indexAction();
@@ -410,16 +427,19 @@ class ImportController extends FormController
 
             return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
         } else {
+            $activeLink = $object === 'lead' ? '#mautic_contact_index' : '#mautic_company_index';
+
             return $this->delegateView(
                 [
                     'viewParameters'  => $viewParameters,
                     'contentTemplate' => $contentTemplate,
                     'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
+                        'activeLink'    => $activeLink,
                         'mauticContent' => 'leadImport',
                         'route'         => $this->generateUrl(
-                            'mautic_contact_import_action',
+                            'mautic_import_action',
                             [
+                                'object'       => $object === 'lead' ? 'contacts' : 'companies',
                                 'objectAction' => 'new',
                             ]
                         ),
@@ -438,7 +458,9 @@ class ImportController extends FormController
      */
     protected function getLineCount()
     {
-        $progress = $this->get('session')->get('mautic.lead.import.progress', [0, 0]);
+        $object = $this->getObjectFromRequest();
+
+        $progress = $this->get('session')->get('mautic.'.$object.'.import.progress', [0, 0]);
 
         return isset($progress[1]) ? $progress[1] : 0;
     }
@@ -510,19 +532,19 @@ class ImportController extends FormController
     protected function getImportFileName()
     {
         $session = $this->get('session');
+        $object  = $this->getObjectFromRequest();
 
         // Return the dir path from session if exists
-        if ($fileName = $session->get('mautic.lead.import.file')) {
+        if ($fileName = $session->get('mautic.'.$object.'.import.file')) {
             return $fileName;
         }
 
         /** @var \Mautic\LeadBundle\Model\ImportModel $importModel */
         $importModel = $this->getModel('lead.import');
-
-        $fileName = $importModel->getUniqueFileName();
+        $fileName    = $importModel->getUniqueFileName();
 
         // Set the dir path to session
-        $session->set('mautic.lead.import.file', $fileName);
+        $session->set('mautic.'.$object.'.import.file', $fileName);
 
         return $fileName;
     }
@@ -530,7 +552,7 @@ class ImportController extends FormController
     /**
      * Return full absolute path to the CSV file.
      *
-     * @return sting
+     * @return string
      */
     protected function getFullCsvPath()
     {
@@ -542,15 +564,16 @@ class ImportController extends FormController
      */
     private function resetImport($filepath, $removeCsv = true)
     {
+        $object  = $this->getObjectFromRequest();
         $session = $this->get('session');
-        $session->set('mautic.lead.import.headers', []);
-        $session->set('mautic.lead.import.file', null);
-        $session->set('mautic.lead.import.step', self::STEP_UPLOAD_CSV);
-        $session->set('mautic.lead.import.progress', [0, 0]);
-        $session->set('mautic.lead.import.inprogress', false);
-        $session->set('mautic.lead.import.importfields', []);
-        $session->set('mautic.lead.import.original.file', null);
-        $session->set('mautic.lead.import.id', null);
+        $session->set('mautic.'.$object.'.import.headers', []);
+        $session->set('mautic.'.$object.'.import.file', null);
+        $session->set('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
+        $session->set('mautic.'.$object.'.import.progress', [0, 0]);
+        $session->set('mautic.'.$object.'.import.inprogress', false);
+        $session->set('mautic.'.$object.'.import.importfields', []);
+        $session->set('mautic.'.$object.'.import.original.file', null);
+        $session->set('mautic.'.$object.'.import.id', null);
 
         if ($removeCsv && file_exists($filepath) && is_readable($filepath)) {
             unlink($filepath);
@@ -624,8 +647,6 @@ class ImportController extends FormController
             default:
                 return 'lead';
         }
-
-        return null;
     }
 
     /**
@@ -643,7 +664,9 @@ class ImportController extends FormController
      */
     protected function getSessionBase($objectId = null)
     {
-        return 'lead.import'.(($objectId) ? '.'.$objectId : '');
+        $object = $this->getObjectFromRequest();
+
+        return $object.'.import'.(($objectId) ? '.'.$objectId : '');
     }
 
     /**

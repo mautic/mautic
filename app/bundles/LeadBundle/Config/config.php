@@ -80,7 +80,7 @@ return [
             ],
             // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_index instead.
             'mautic_contact_import_index' => [
-                'path'       => '/import/{object}/{page}',
+                'path'       => '/{object}/import/{page}',
                 'controller' => 'MauticLeadBundle:Import:index',
                 'defaults'   => [
                     'object' => 'contacts',
@@ -88,7 +88,7 @@ return [
             ],
             // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_action instead.
             'mautic_contact_import_action' => [
-                'path'       => '/import/{object}/{objectAction}/{objectId}',
+                'path'       => '/{object}/import/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Import:execute',
                 'defaults'   => [
                     'object' => 'contacts',
@@ -690,6 +690,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.core.model.notification',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.model.company',
                 ],
             ],
         ],

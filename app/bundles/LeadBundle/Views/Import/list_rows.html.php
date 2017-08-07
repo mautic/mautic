@@ -27,7 +27,7 @@
                 <?php if ($view['security']->hasEntityAccess(true, $permissions[$permissionBase.':viewother'], $item->getCreatedBy())) : ?>
                     <a href="<?php echo $view['router']->path(
                         $actionRoute,
-                        ['objectAction' => 'view', 'objectId' => $item->getId()]
+                        ['objectAction' => 'view', 'objectId' => $item->getId(), 'object' => $app->getRequest()->get('object', 'contacts')]
                     ); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>
