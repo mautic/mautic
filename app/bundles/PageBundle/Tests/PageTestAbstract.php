@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DeviceModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\PageRepository;
@@ -65,6 +66,11 @@ class PageTestAbstract extends WebTestCase
 
         $leadFieldModel = $this
             ->getMockBuilder(FieldModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $deviceModel = $this
+            ->getMockBuilder(DeviceModel::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -118,7 +124,8 @@ class PageTestAbstract extends WebTestCase
             $leadModel,
             $leadFieldModel,
             $redirectModel,
-            $trackableModel
+            $trackableModel,
+            $deviceModel
         );
 
         $pageModel->setDispatcher($dispatcher);

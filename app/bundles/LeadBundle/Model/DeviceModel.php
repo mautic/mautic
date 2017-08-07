@@ -11,11 +11,9 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use DeviceDetector\DeviceDetector;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\LeadDeviceEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\Event;
@@ -30,7 +28,7 @@ class DeviceModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return LeadDeviceRepository
+     * @return string
      */
     public function getRepository()
     {
@@ -133,43 +131,5 @@ class DeviceModel extends FormModel
         } else {
             return null;
         }
-    }
-
-    /**
-     * @param Lead           $lead
-     * @param                $userAgent
-     * @param \DateTime|null $dateAdded
-     *
-     * @return LeadDevice|null
-     */
-    public function getContactDeviceFromUserAgent(Lead $lead, $userAgent, \DateTime $dateAdded = null, $fingerPrint = null)
-    {
-        $dd = new DeviceDetector($userAgent);
-        $dd->parse();
-
-        $device = $this->getRepository()->getDeviceEntity($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
-
-        if (empty($device)) {
-            if (null === $dateAdded) {
-                $dateAdded = new \DateTime();
-            }
-
-            $device = new LeadDevice();
-            $device->setClientInfo($dd->getClient());
-            $device->setDevice($dd->getDeviceName());
-            $device->setDeviceBrand($dd->getBrand());
-            $device->setDeviceModel($dd->getModel());
-            $device->setDeviceOs($dd->getOs());
-            $device->setDateAdded($dateAdded);
-            $device->setLead($lead);
-            $device->setDeviceFingerprint($fingerPrint);
-
-            $this->saveEntity($device);
-        } elseif ($fingerPrint && $device->getDeviceFingerprint() !== $fingerPrint) {
-            $device->setDeviceFingerprint($fingerPrint);
-            $this->saveEntity($device);
-        }
-
-        return $device;
     }
 }

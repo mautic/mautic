@@ -131,12 +131,12 @@ trait RequestTrait
                 }
                 break;
             case 'multiselect':
-                if (is_array($fieldData)) {
+                if (!is_array($fieldData[$leadField['alias']])) {
                     if (strpos($fieldData[$leadField['alias']], '|') !== false) {
                         $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
+                    } else {
+                        $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
                     }
-                } else {
-                    $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
                 }
                 break;
             case 'number':
