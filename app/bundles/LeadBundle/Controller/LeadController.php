@@ -16,8 +16,6 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Event\LeadSearchEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -94,14 +92,6 @@ class LeadController extends FormController
 
         if (!$permissions['lead:leads:viewother']) {
             $filter['force'] .= " $mine";
-        }
-
-        $dispatcher = $this->get('event_dispatcher');
-        $params     = $filter;
-        $event      = new LeadSearchEvent($params);
-        $dispatcher->dispatch(LeadEvents::LEAD_ADVANCED_SEARCH, $event);
-
-        if (!empty($event->getParams())) {
         }
 
         $results = $model->getEntities([

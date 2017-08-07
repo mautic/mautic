@@ -165,24 +165,44 @@ if ($tmpl == 'index') {
                             <button class="mt-xs btn btn-default hide"
                                   id="pending-<?php echo $item->getId(); ?>"
                                   data-toggle="tooltip"
-                                  title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">
+                                  title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>"
+                                  onclick="location.href='<?php echo $view['router']->path(
+                                      'mautic_contact_index',
+                                      ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailpending').':'.$item->getId()]
+                                  ); ?>'">
                             </button>
                             <button class="mt-xs btn btn-default hide"
                                   id="queued-<?php echo $item->getId(); ?>"
                                   data-toggle="tooltip"
-                                  title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>">
+                                  title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>"
+                                    onclick="location.href='<?php echo $view['router']->path(
+                                        'mautic_contact_index',
+                                        ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailqueued').':'.$item->getId()]
+                                    ); ?>'">
                             </button>
-                            <button class="mt-xs btn btn-warning" id="sent-count-<?php echo $item->getId(); ?>">
+                            <button class="mt-xs btn btn-warning" id="sent-count-<?php echo $item->getId(); ?>"
+                                    onclick="location.href='<?php echo $view['router']->path(
+                                        'mautic_contact_index',
+                                        ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailsent').':'.$item->getId()]
+                                    ); ?>'">
                                 <div style="width: 50px;">
                                     <i class="fa fa-spin fa-spinner"></i>
                                 </div>
                             </button>
-                            <button class="mt-xs btn btn-success" id="read-count-<?php echo $item->getId(); ?>">
+                            <button class="mt-xs btn btn-success" id="read-count-<?php echo $item->getId(); ?>"
+                                    onclick="location.href='<?php echo $view['router']->path(
+                                        'mautic_contact_index',
+                                        ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailread').':'.$item->getId()]
+                                    ); ?>'">
                                 <div style="width: 50px;">
                                     <i class="fa fa-spin fa-spinner"></i>
                                 </div>
                             </button>
-                            <button class="mt-xs btn btn-primary" id="read-percent-<?php echo $item->getId(); ?>">
+                            <button class="mt-xs btn btn-primary" id="read-percent-<?php echo $item->getId(); ?>"
+                                    onclick="location.href='<?php echo $view['router']->path(
+                                        'mautic_contact_index',
+                                        ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailread').':'.$item->getId()]
+                                    ); ?>'">
                                 <div style="width: 50px;">
                                     <i class="fa fa-spin fa-spinner"></i>
                                 </div>
