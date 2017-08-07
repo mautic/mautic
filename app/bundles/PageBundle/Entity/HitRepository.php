@@ -458,7 +458,7 @@ class HitRepository extends CommonRepository
         foreach ($results as $r) {
             $dateHit  = $r['date_hit'] ? new \DateTime($r['date_hit']) : 0;
             $dateLeft = $r['date_left'] ? new \DateTime($r['date_left']) : 0;
-            $times[]  = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : 0;
+            $times[]  = $dateLeft ? ($dateLeft->getTimestamp() - $dateHit->getTimestamp()) : -1;
         }
 
         return $this->countStats($times);
