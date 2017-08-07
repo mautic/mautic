@@ -47,6 +47,10 @@ class ScoringCategoryController extends FormController {
      */
     public function editAction($objectId, $ignorePost = false)
     {
+        $sc = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->find($objectId);
+        if($sc->getIsGlobalScore()) { // they have to go through URI to come there, so this is acceptable
+            throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
+        }
         return $this->editStandard($objectId, $ignorePost);
     }
 

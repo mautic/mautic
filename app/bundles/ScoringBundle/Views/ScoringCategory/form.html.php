@@ -21,14 +21,14 @@ echo $view['form']->start($form);
                 <div class="pa-md">
                     <?php
                         echo $view['form']->row($form['name']);
-                        echo $view['form']->row($form['orderIndex']);
+                        echo $view['form']->row($form['updateGlobalScore']);
                     ?>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="pa-md">
                     <?php
-                        echo $view['form']->row($form['updateGlobalScore']);
+                        echo $view['form']->row($form['orderIndex']);
                         echo $view['form']->row($form['globalScoreModifier']);
                     ?>
                 </div>

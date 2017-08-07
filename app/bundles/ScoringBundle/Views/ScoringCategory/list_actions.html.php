@@ -71,13 +71,13 @@ if (is_array($item)) {
                 if(!is_array($item) && $item->isUsedAnywhere()) {
                     $listelems = array();
                     foreach($item->getUsedByEvents() as $ue) {
-                        $listelems[] = $ue->getName().' (Event)';
+                        $listelems[] = $ue->getName().' ('.$view['translator']->trans('mautic.scoring.scoringCategory.usedin.events').')';
                     }
                     foreach($item->getUsedByPoints() as $up) {
-                        $listelems[] = $up->getName().' (Point)';
+                        $listelems[] = $up->getName().' ('.$view['translator']->trans('mautic.scoring.scoringCategory.usedin.points').')';
                     }
                     foreach($item->getUsedByTriggers() as $ut) {
-                        $listelems[] = $ut->getName().' (Trigger)';
+                        $listelems[] = $ut->getName().' ('.$view['translator']->trans('mautic.scoring.scoringCategory.usedin.triggers').')';
                     }
                     $message = $view['translator']->trans('mautic.scoring.scoringCategory.deleteused', ['%listing%' => implode("\r\n"."\r\n", $listelems)]); // don't ask me for the nl2br
                     $view['buttons']->addButton(
