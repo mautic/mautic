@@ -590,6 +590,9 @@ return [
             ],
             'mautic.form.type.company_change_score' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
+                /** CAPTIVEA.CORE START **/
+                'arguments' => ['mautic.factory'],
+                /** CAPTIVEA.CORE END **/
                 'alias' => 'scorecontactscompanies_action',
             ],
             'mautic.form.type.config.form' => [
