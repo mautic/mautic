@@ -102,6 +102,11 @@ return [
                 'arguments' => [
                 ],
             ],
+            'mautic.integration.ines_crm' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\InesCRMIntegration::class,
+                'arguments' => [
+                ],
+            ],
         ],
         'other' => [
             'mautic_integration.pipedrive.guzzle.client' => [
