@@ -63,15 +63,18 @@ trait RequestTrait
                             // Date placeholder was used so just ignore it to allow import of the field
                             unset($params[$name]);
                         } else {
+                            if (($timestamp = strtotime($params[$name])) === false) {
+                                $timestamp = null;
+                            }
                             switch ($type) {
                                 case 'datetime':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('Y-m-d H:i');
+                                    $params[$name] = (new \DateTime($timestamp))->format('Y-m-d H:i:s');
                                     break;
                                 case 'date':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('Y-m-d');
+                                    $params[$name] = (new \DateTime($timestamp))->format('Y-m-d');
                                     break;
                                 case 'time':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('H:i');
+                                    $params[$name] = (new \DateTime($timestamp))->format('H:i:s');
                                     break;
                             }
                         }
