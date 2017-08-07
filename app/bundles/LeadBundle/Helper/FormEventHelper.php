@@ -44,22 +44,29 @@ class FormEventHelper
         $oldPoints = $lead->getPoints();
 
         /** CAPTIVEA.CORE START REPLACE **/
-        //$lead->adjustPoints($config['points'], $config['operator']);
+        // $lead->adjustPoints($config['points'], $config['operator']);
+        // 
+        // $newPoints = $lead->getPoints();
+        // 
+        // $event->setDelta($newPoints - $oldPoints);
         if(!empty($config['scoringCategory'])) {
             $scoringCategory = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($config['scoringCategory']);
             if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
                 $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringValue')->adjustPoints($lead, $scoringCategory, $config['points'], $config['operator']);
+                $event->setEventName($form->getId().':'.$form->getName().' ('.$scoringCategory->getName().')');
+                $event->setDelta($config['points']);
             } else {
                 $lead->adjustPoints($config['points'], $config['operator']);
+                $newPoints = $lead->getPoints();
+                $event->setDelta($newPoints - $oldPoints);
             }
         } else {
             $lead->adjustPoints($config['points'], $config['operator']);
+            $newPoints = $lead->getPoints();
+            $event->setDelta($newPoints - $oldPoints);
         }
         /** CAPTIVEA.CORE END REPLACE **/
-
-        $newPoints = $lead->getPoints();
-
-        $event->setDelta($newPoints - $oldPoints);
+        
         $lead->addPointsChangeLog($event);
 
         $model->saveEntity($lead, false);

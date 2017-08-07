@@ -285,6 +285,7 @@ class PointModel extends CommonFormModel
                     $delta = $action->getDelta();
                     
                     /** CAPTIVEA.CORE START REPLACE **/
+                    //$lead->adjustPoints($delta);
                     $scoringCategory = $action->getScoringCategory();
                     if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
                         $this->em->getRepository('MauticScoringBundle:ScoringValue')->adjustPoints($lead, $scoringCategory, $delta);
