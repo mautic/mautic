@@ -1524,7 +1524,7 @@ class LeadListRepository extends CommonRepository
                 /** CAPTIVEA.CORE START **/
                 case 'snowflake':
                     if(!empty($snowflakes) && ('scoringCategory' === $snowflakes['type'])) {
-                        if ($isCompany) {
+                        if ('company' === $object) {
                             // Must tell getLeadsByList how to best handle the relationship with the companies table
                             if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
                                 $this->listFiltersInnerJoinCompany = true;
