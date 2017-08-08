@@ -386,26 +386,28 @@ $view['slots']->set(
                         ['%points%' => $lead->getPoints()]
                     ); ?>
                 </h1>
-                <?php /** CAPTIVEA.CORE START **/ if(!empty($scoringValues)) { ?>
-                <hr />
-                <?php foreach($scoringValues as $sv) { ?>
-                <div class="row">
-                    <div class="col-md-6" style="text-align: left;">
-                        <strong><?php echo $sv['category']; ?></strong>
-                        :
-                    </div>
-                    <div class="col-md-6" style="text-align: left;">
-                        <span><?php echo $sv['value']; ?> points</span>
-                    </div>
-                </div>
-                <?php } } /** CAPTIVEA.CORE END **/ ?>
-                
                 <hr/>
                 <?php if ($lead->getStage()): ?>
                     <?php echo $lead->getStage()->getName(); ?>
                     <hr>
                 <?php endif; ?>
             </div>
+            <?php /** CAPTIVEA.CORE START **/ if(!empty($scoringValues)) { ?>
+            <div class="panel-heading">
+                <div class="panel-title">
+                    <?php echo $view['translator']->trans('xxx'); ?>
+                </div>
+            </div>
+            <div class="panel-body pt-sm">
+                <?php foreach($scoringValues as $sv) { ?>
+                <h6 class="fw-sb col-md-9">
+                    <?php echo $sv['category']; ?>
+                </h6>
+                <p class="text-muted col-md-3">
+                    <?php echo $sv['value']; ?>
+                    points
+                </p><?php } ?>
+            </div><?php } /** CAPTIVEA.CORE END **/ ?>
             <?php if ($doNotContact) : ?>
                 <div id="bounceLabel<?php echo $doNotContact['id']; ?>">
                     <div class="panel-heading text-center">
