@@ -38,4 +38,31 @@ class InesCRMIntegration extends CrmAbstractIntegration
     public function pushLead($lead, $config = []) {
         // Push lead to integration
     }
+
+    public function getDataPriority()
+    {
+        return true;
+    }
+
+    public function getAvailableLeadFields($settings = [])
+    {
+        return [
+            'email' => [
+                'label' => 'Email address',
+                'required' => true,
+            ],
+            'firstname' => [
+                'label' => 'First name',
+                'required' => false,
+            ],
+            'lastname' => [
+                'label' => 'Last name',
+                'required' => false,
+            ],
+        ];
+    }
+
+    public function getFormLeadFields($settings = []) {
+        return $this->getAvailableLeadFields($settings);
+    }
 }
