@@ -351,8 +351,12 @@ class CampaignSubscriber extends CommonSubscriber
             if(empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
                 $isFine = $this->leadModel->scoreContactsCompany($lead, $score);
             } else {
-                $this->em->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($lead->getPrimaryCompany(), $scoringCategory, $score);
-                $isFine = true;
+                $lead = $this->em->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
+                $primaryCompany = $lead->getPrimaryCompany();// it's an array... or null. depends.
+                if(!empty($primaryCompany)) {
+                    $this->em->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompany['id'], $scoringCategory, $score);
+                    $isFine = true;
+                }
             }
         } else {
             $isFine = $this->leadModel->scoreContactsCompany($lead, $score);
