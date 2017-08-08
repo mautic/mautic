@@ -116,8 +116,7 @@ trait EntityFieldsBuildFormTrait
                     if ($type == 'datetime') {
                         $opts['model_timezone'] = 'UTC';
                         $opts['view_timezone']  = date_default_timezone_get();
-                        $opts['format']         = 'yyyy-MM-dd HH:mm';
-                        $opts['with_seconds']   = false;
+                        $opts['with_seconds']   = true;
 
                         $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
                     } elseif ($type == 'date') {
