@@ -114,7 +114,8 @@ class FormEventHelper
                     $primaryCompany = $lead->getPrimaryCompany();// it's an array... or null. depends.
                     if(!empty($primaryCompany) && !empty($primaryCompany['id'])) {
                         $primaryCompanyObject = $factory->getEntityManager()->getRepository('MauticLeadBundle:Company')->find($primaryCompany['id']);
-                        $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);
+                        $modPoints = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);
+                        $leadModel->scoreContactsCompany($lead, $modPoints);
                     }
                 } else {
                     $leadModel->scoreContactsCompany($lead, $score);

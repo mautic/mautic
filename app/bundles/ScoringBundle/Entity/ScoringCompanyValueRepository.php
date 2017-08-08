@@ -13,9 +13,10 @@ class ScoringCompanyValueRepository extends CommonRepository {
      * 
      * @param \Mautic\LeadBundle\Entity\Company $company
      * @param ScoringCategory $scoringCategory
-     * @return \Mautic\LeadBundle\Entity\Company
+     * @return integer
      */
     public function adjustPoints(\Mautic\LeadBundle\Entity\Company $company, ScoringCategory $scoringCategory, $points, $operator = 'plus') {
+        $modifiedPoints = 0;
         if(!empty($company)) {
             $scoringValue = $this->findOneBy(array('company' => $company, 'scoringCategory' => $scoringCategory));
             if(empty($scoringValue)) {
@@ -48,11 +49,8 @@ class ScoringCompanyValueRepository extends CommonRepository {
             if($scoringCategory->getUpdateGlobalScore()) {
                 $modifier = $scoringCategory->getGlobalScoreModifier();
                 $modifiedPoints = round(($modifier * $points) / 100);
-                if(in_array($operator, array('plus',))) {
-                    $company->setScore($company->getScore() + $modifiedPoints);
-                }
             }
         }
-        return $company;
+        return $modifiedPoints;
     }
 }
