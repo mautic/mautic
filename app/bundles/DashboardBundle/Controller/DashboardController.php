@@ -318,8 +318,10 @@ class DashboardController extends FormController
         if ($this->request->get('save', false)) {
             // Save to the user's folder
             $dir = $this->factory->getSystemPath('dashboard.user');
-            file_put_contents($dir.'/'.$filename, json_encode($dashboard));
-
+             if (!file_exists($dir.$this->factory->getUser()->getId())) {
+                mkdir($dir.$this->factory->getUser()->getId(), 0777, true);
+            }
+            file_put_contents($dir.$this->factory->getUser()->getId().'/'.$filename, json_encode($dashboard));
             return $this->redirect($this->get('router')->generate('mautic_dashboard_action', ['objectAction' => 'import']));
         }
 
@@ -349,7 +351,7 @@ class DashboardController extends FormController
         $name  = implode('.', $parts);
 
         $dir  = $this->factory->getSystemPath("dashboard.$type");
-        $path = $dir.'/'.$name.'.json';
+        $path = $dir.'/'.$this->factory->getUser()->getId().'/'.$name.'.json';
 
         if (file_exists($path) && is_writable($path)) {
             unlink($path);
@@ -422,7 +424,7 @@ class DashboardController extends FormController
         $model = $this->getModel('dashboard');
 
         $directories = [
-            'user'   => $this->factory->getSystemPath('dashboard.user'),
+            'user'   => $this->factory->getSystemPath('dashboard.user').$this->factory->getUser()->getId(),
             'global' => $this->factory->getSystemPath('dashboard.global'),
         ];
 
