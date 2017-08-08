@@ -41,6 +41,7 @@ class ScoringCompanyValueRepository extends CommonRepository {
                 default:
                     throw new \UnexpectedValueException('Invalid operator');
             }
+            $scoringValue->setScore($oldScore);
             $this->_em->persist($scoringValue);
             $this->_em->flush();
 
