@@ -30,7 +30,7 @@ class SubmissionApiController extends CommonApiController
         $this->entityNameOne    = 'result';
         $this->entityNameMulti  = 'results';
         $this->permissionBase   = 'forms:form';
-        $this->serializerGroups = ['categoryList', 'publishDetails'];
+        $this->serializerGroups = [];
 
         parent::initialize($event);
     }
