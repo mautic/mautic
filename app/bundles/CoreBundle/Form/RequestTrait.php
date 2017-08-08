@@ -100,9 +100,11 @@ trait RequestTrait
     public function cleanFields(&$fieldData, $leadField)
     {
         switch ($leadField['type']) {
-            // Adjust the boolean values from text to boolean
+            // Adjust the boolean values from text to boolean. Do not convert null to false.
             case 'boolean':
-                $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                if (!is_null($fieldData[$leadField['alias']])) {
+                    $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                }
                 break;
             // Ensure date/time entries match what symfony expects
             case 'datetime':
