@@ -55,15 +55,15 @@ return [
                 'controller'      => 'MauticFormBundle:Api\FormApi',
             ],
             'mautic_api_formresults' => [
-                'path'       => '/forms/{formId}/results',
+                'path'       => '/forms/{formId}/submissions',
                 'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntities',
             ],
             'mautic_api_formresult' => [
-                'path'       => '/forms/{formId}/results/{submissionId}',
+                'path'       => '/forms/{formId}/submissions/{submissionId}',
                 'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntity',
             ],
             'mautic_api_contactformresults' => [
-                'path'       => '/forms/{formId}/results/contact/{contactId}',
+                'path'       => '/forms/{formId}/submissions/contact/{contactId}',
                 'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntitiesForContact',
             ],
             'mautic_api_formdeletefields' => [

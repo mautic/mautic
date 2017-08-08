@@ -29,8 +29,8 @@ class SubmissionApiController extends CommonApiController
     {
         $this->model            = $this->getModel('form.submission');
         $this->entityClass      = Submission::class;
-        $this->entityNameOne    = 'result';
-        $this->entityNameMulti  = 'results';
+        $this->entityNameOne    = 'submission';
+        $this->entityNameMulti  = 'submissions';
         $this->permissionBase   = 'forms:form';
         $this->serializerGroups = [];
 
