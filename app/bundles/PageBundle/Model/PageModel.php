@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Model;
 
+use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -24,8 +25,8 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\UtmTag;
-use Mautic\LeadBundle\Model\DeviceModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
@@ -89,16 +90,6 @@ class PageModel extends FormModel
     protected $pageTrackableModel;
 
     /**
-     * @var DateTimeHelper
-     */
-    protected $dateTimeHelper;
-
-    /**
-     * @var DeviceModel
-     */
-    protected $deviceModel;
-
-    /**
      * PageModel constructor.
      *
      * @param CookieHelper   $cookieHelper
@@ -107,7 +98,6 @@ class PageModel extends FormModel
      * @param FieldModel     $leadFieldModel
      * @param RedirectModel  $pageRedirectModel
      * @param TrackableModel $pageTrackableModel
-     * @param DeviceModel    $deviceModel
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -115,8 +105,7 @@ class PageModel extends FormModel
         LeadModel $leadModel,
         FieldModel $leadFieldModel,
         RedirectModel $pageRedirectModel,
-        TrackableModel $pageTrackableModel,
-        DeviceModel $deviceModel
+        TrackableModel $pageTrackableModel
     ) {
         $this->cookieHelper       = $cookieHelper;
         $this->ipLookupHelper     = $ipLookupHelper;
@@ -125,7 +114,6 @@ class PageModel extends FormModel
         $this->pageRedirectModel  = $pageRedirectModel;
         $this->pageTrackableModel = $pageTrackableModel;
         $this->dateTimeHelper     = new DateTimeHelper();
-        $this->deviceModel        = $deviceModel;
     }
 
     /**
@@ -643,14 +631,35 @@ class PageModel extends FormModel
             $hit->setBrowserLanguages($languages);
         }
 
-        $fingerprint = !empty($query['fingerprint']) ? $query['fingerprint'] : null;
-        $device      = $this->deviceModel->getContactDeviceFromUserAgent(
-            $lead,
-            $request->server->get('HTTP_USER_AGENT'),
-            $hit->getDateHit(),
-            $fingerprint
-        );
+        //device granularity
+        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+        $dd->parse();
 
+        $deviceRepo = $this->leadModel->getDeviceRepository();
+        $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
+        if (empty($device)) {
+            $device = new LeadDevice();
+            $device->setClientInfo($dd->getClient());
+            $device->setDevice($dd->getDeviceName());
+            $device->setDeviceBrand($dd->getBrand());
+            $device->setDeviceModel($dd->getModel());
+            $device->setDeviceOs($dd->getOs());
+            $device->setDateAdded($hit->getDateHit());
+            $device->setLead($lead);
+        } else {
+            $fingerprint = $device['device_fingerprint'];
+            /** @var LeadDevice $device */
+            $device = $this->em->getReference(LeadDevice::class, $device['id']);
+            $device->setDeviceFingerprint($fingerprint);
+        }
+
+        // Append the fingerprint string to this device
+        if (!empty($query['fingerprint']) && $query['fingerprint'] != $device->getDeviceFingerprint()) {
+            // The device fingerprint has changed, or it was not set previously.
+            $device->setDeviceFingerprint($query['fingerprint']);
+        }
+        $this->em->persist($device);
+        $this->em->flush($device);
         $hit->setDeviceStat($device);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
