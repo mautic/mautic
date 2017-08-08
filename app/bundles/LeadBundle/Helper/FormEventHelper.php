@@ -112,8 +112,9 @@ class FormEventHelper
                 if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
                     $lead = $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
                     $primaryCompany = $lead->getPrimaryCompany();// it's an array... or null. depends.
-                    if(!empty($primaryCompany)) {
-                        $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompany['id'], $scoringCategory, $score);
+                    if(!empty($primaryCompany) && !empty($primaryCompany['id'])) {
+                        $primaryCompanyObject = $factory->getEntityManager()->getRepository('MauticLeadBundle:Company')->find($primaryCompany['id']);
+                        $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);
                     }
                 } else {
                     $leadModel->scoreContactsCompany($lead, $score);
