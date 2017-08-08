@@ -52,9 +52,36 @@ class SubmissionApiController extends CommonApiController
             return $form;
         }
 
-        $this->extraGetEntitiesArguments = ['form' => $form];
+        $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, ['form' => $form]);
 
         return parent::getEntitiesAction();
+    }
+
+    /**
+     * Obtains a list of entities for specific form and contact.
+     *
+     * @param int $formId
+     * @param int $contactId
+     *
+     * @return Response
+     */
+    public function getEntitiesForContactAction($formId, $contactId)
+    {
+        $filter = [
+            'filter' => [
+                'where' => [
+                    [
+                        'col'  => 's.lead_id',
+                        'expr' => 'eq',
+                        'val'  => (int) $contactId,
+                    ],
+                ],
+            ],
+        ];
+
+        $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, $filter);
+
+        return $this->getEntitiesAction($formId);
     }
 
     /**
