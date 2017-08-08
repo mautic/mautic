@@ -54,6 +54,12 @@ return [
                 'path'            => '/forms',
                 'controller'      => 'MauticFormBundle:Api\FormApi',
             ],
+            'mautic_api_formresultsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'submissions',
+                'path'            => '/forms/{formId}/results',
+                'controller'      => 'MauticFormBundle:Api\SubmissionApi',
+            ],
             'mautic_api_formdeletefields' => [
                 'path'       => '/forms/{formId}/fields/delete',
                 'controller' => 'MauticFormBundle:Api\FormApi:deleteFields',
