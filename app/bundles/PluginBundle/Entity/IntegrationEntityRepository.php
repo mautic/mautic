@@ -421,7 +421,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->select('i.integration, i.integration_entity, i.integration_entity_id, i.date_added, i.last_sync_date, i.internal');
         }
 
-        $q->where('1=1');
+        $q->where('internal not like \'%error%\'');
 
         if (empty($integration)) {
             // get list of published integrations
