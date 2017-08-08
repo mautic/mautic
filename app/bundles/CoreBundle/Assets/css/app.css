@@ -4370,9 +4370,6 @@ lesshat-selector { -lh-property: 0 ;
   border: 1px solid #eee;
   height: auto;
 }
-#slot_codemode .CodeMirror {
-  height: 200px;
-}
 .CodeMirror-hints {
   position: absolute;
   z-index: 9999 !important;
@@ -4716,10 +4713,6 @@ table.table > tbody > tr > td.long-text {
   vertical-align: top;
   float: none;
 }
-#dynamic-content-container .addNewDynamicContentFilter{
-  display: inline-block !important;
-}
-
 div[data-filter-container] .in-group {
   margin-left: 20px;
 }

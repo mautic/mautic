@@ -18,9 +18,22 @@
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">
-            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('<?php echo $type; ?>');">
-                <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
-            </button>
+            <div class="row">
+                <div class="col-xs-6">
+                    <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('<?php echo $type; ?>');">
+                        <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
+                    </button>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.core.undo'); ?>">
+                        <span><i class="fa fa-undo"></i></span>
+                    </button>
+                    <button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.core.redo'); ?>">
+                        <span><i class="fa fa-repeat"></i></span>
+                    </button>
+                </div>
+            </div>
+
             <div class="code-mode-toolbar <?php echo $isCodeMode ? '' : 'hide'; ?>">
                 <button class="btn btn-default btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.core.media.manager.desc'); ?>">
                     <i class="fa fa-photo"></i>
