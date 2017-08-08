@@ -50,8 +50,8 @@ class ScoringCategoryController extends FormController {
         // $objectId can be an ID or... the plain entity. Because why not ?
         if(!empty($objectId)) {
             if(!is_object($objectId)) {
-                $sc = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->find($objectId);
-                if($sc->getIsGlobalScore()) { // they have to go through URI to come there, so this is acceptable
+                $sc = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->find($objectId); // we may have an anticiped ID...
+                if(!empty($sc) && $sc->getIsGlobalScore()) { // they have to go through URI to come there, so this is acceptable
                     throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
                 }
             } elseif($objectId->getIsGlobalScore()) {
