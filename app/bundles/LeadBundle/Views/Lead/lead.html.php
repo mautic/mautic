@@ -386,10 +386,19 @@ $view['slots']->set(
                         ['%points%' => $lead->getPoints()]
                     ); ?>
                 </h1>
-                <?php /** CAPTIVEA.CORE START **/
-                foreach($scoringValues as $sv) { ?>
-                    <b><span><?php echo $sv['category']; ?></span> : <span><?php echo $sv['value']; ?> points</span></b><br/> 
-                <?php } /** CAPTIVEA.CORE END **/ ?>
+                <?php /** CAPTIVEA.CORE START **/ if(!empty($scoringValues)) { ?>
+                <hr />
+                <?php foreach($scoringValues as $sv) { ?>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong><?php echo $sv['category']; ?></strong>
+                        :
+                    </div>
+                    <div class="col-md-6">
+                        <span><?php echo $sv['value']; ?> points</span>
+                    </div>
+                </div>
+                <?php } } /** CAPTIVEA.CORE END **/ ?>
                 
                 <hr/>
                 <?php if ($lead->getStage()): ?>
