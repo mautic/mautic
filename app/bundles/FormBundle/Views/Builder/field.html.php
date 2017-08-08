@@ -74,6 +74,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             </li>
             <?php endif; ?>
 
+
             <?php if (isset($form['isRequired'])): ?>
             <li role="presentation">
                 <a href="#required" aria-controls="required" role="tab" data-toggle="tab">
@@ -130,6 +131,9 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 <div class="row">
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['leadField']); ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['companyField']); ?>
                     </div>
                 </div>
             </div>
