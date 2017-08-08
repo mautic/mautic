@@ -342,7 +342,23 @@ class CampaignSubscriber extends CommonSubscriber
         $score = $event->getConfig()['score'];
         $lead  = $event->getLead();
 
-        if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
+        /** CAPTIVEA.CORE START REPLACE **/
+        //if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
+        $isFine = false;
+        $scoringCategoryId = $event->getConfig()['scoringCategory'];
+        if(!empty($scoringCategoryId)) {
+            $scoringCategory = $this->em->getRepository('MauticScoringBundle:ScoringCategory')->find($scoringCategoryId);
+            if(empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
+                $isFine = $this->leadModel->scoreContactsCompany($lead, $score);
+            } else {
+                $this->em->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($lead->getPrimaryCompany(), $scoringCategory, $score);
+                $isFine = true;
+            }
+        } else {
+            $isFine = $this->leadModel->scoreContactsCompany($lead, $score);
+        }
+        if(!$isFine) {
+        /** CAPTIVEA.CORE END REPLACE **/
             return $event->setFailed('mautic.lead.no_company');
         } else {
             return $event->setResult(true);
