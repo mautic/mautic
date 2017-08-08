@@ -390,11 +390,11 @@ $view['slots']->set(
                 <hr />
                 <?php foreach($scoringValues as $sv) { ?>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="text-align: left;">
                         <strong><?php echo $sv['category']; ?></strong>
                         :
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" style="text-align: left;">
                         <span><?php echo $sv['value']; ?> points</span>
                     </div>
                 </div>
