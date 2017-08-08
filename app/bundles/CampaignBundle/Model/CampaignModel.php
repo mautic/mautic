@@ -269,6 +269,8 @@ class CampaignModel extends CommonFormModel
                     if('scoringCategory' === $f) { // dunno why, but there is something there
                         if(!is_object($v) && !empty($v)) {
                             $v = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($v);
+                        } elseif(is_object($v)) {
+                            $v = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($v->getId());
                         }
                     }
                     /** CAPTIVEA.CORE END **/
