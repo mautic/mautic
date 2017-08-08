@@ -265,6 +265,13 @@ class CampaignModel extends CommonFormModel
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
+                    /** CAPTIVEA.CORE START **/
+                    if('scoringCategory' === $f) { // dunno why, but there is something there
+                        if(!is_object($v) && !empty($v)) {
+                            $v = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($v);
+                        }
+                    }
+                    /** CAPTIVEA.CORE END **/
                     $event->$func($v);
                 }
             }

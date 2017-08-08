@@ -110,15 +110,18 @@ class FormEventHelper
             if(!empty($config['scoringCategory'])) {
                 $scoringCategory = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($config['scoringCategory']);
                 if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
-                    $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($lead->getPrimaryCompany(), $scoringCategory, $config['points'], $config['operator']);
+                    $lead = $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
+                    $primaryCompany = $lead->getPrimaryCompany();// it's an array... or null. depends.
+                    if(!empty($primaryCompany)) {
+                        $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompany['id'], $scoringCategory, $score);
+                    }
                 } else {
-                    $lead->adjustPoints($config['points'], $config['operator']);
+                    $leadModel->scoreContactsCompany($lead, $score);
                 }
             } else {
-                $lead->adjustPoints($config['points'], $config['operator']);
+                $leadModel->scoreContactsCompany($lead, $score);
             }
             /** CAPTIVEA.CORE END REPLACE **/
-            $leadModel->scoreContactsCompany($lead, $score);
         }
     }
 }

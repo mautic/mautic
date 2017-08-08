@@ -256,6 +256,7 @@ class Event
             ->build();
         /** CAPTIVEA.CORE START **/
         $builder->createManyToOne('scoringCategory', 'Mautic\ScoringBundle\Entity\ScoringCategory')
+            ->inversedBy('usedByEvents')
             ->addJoinColumn('scoringcategory_id', 'id', true, false, 'SET NULL')
             ->build();
         // cascadePersist duplicates the scoring id at each save

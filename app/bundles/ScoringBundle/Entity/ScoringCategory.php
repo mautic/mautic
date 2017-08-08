@@ -446,14 +446,18 @@ class ScoringCategory extends FormEntity
     }
     
     /**
+     * @param integer $key
      * @param \Mautic\CampaignBundle\Entity\Event $event
      *
      * @return $this
      */
     public function addUsedByEvent(\Mautic\CampaignBundle\Entity\Event $event)
     {
-        $this->usedByEvents[] = $event;
-
+        if ($changes = $event->getChanges()) {
+            $this->changes['usedByEvents']['added'][$event->getId()] = [$event->getId(), $changes];
+        }
+        $this->usedByEvents[$event->getId()] = $event;
+        
         return $this;
     }
 
@@ -462,17 +466,9 @@ class ScoringCategory extends FormEntity
      */
     public function removeUsedByEvent(\Mautic\CampaignBundle\Entity\Event $event)
     {
-        $this->usedByEvents->removeElement($event);
-    }
+        $this->changes['usedByEvents']['removed'][$event->getId()] = $event->getName();
 
-    /**
-     * @param ArrayCollection $events
-     * @return $this
-     */
-    public function setUsedByEvents(ArrayCollection $events)
-    {
-        $this->usedByEvents = $events;
-        return $this;
+        $this->usedByEvents->removeElement($event);
     }
     
     /**

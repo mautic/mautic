@@ -17,10 +17,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/** CAPTIVEA.CORE START **/
-use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
-/** CAPTIVEA.CORE END **/
-
 /**
  * Class EventType.
  */
@@ -66,25 +62,26 @@ class EventType extends AbstractType
 
         /** CAPTIVEA.CORE START **/
         if (in_array($options['data']['eventType'], ['action']) && in_array($options['data']['type'], ['lead.changepoints', 'lead.scorecontactscompanies'])) {
-            $transformer = new IdToEntityModelTransformer(
-                $this->factory->getEntityManager(),
-                'MauticScoringBundle:ScoringCategory'
-            );
-
-        $builder->add(
-                $builder->create(
-                    'scoringCategory',
-                    'scoringcategory_list',
-                    [
-                        'label'      => 'mautic.campaign.form.type.scoringCategory',
-                        'label_attr' => ['class' => 'control-label'],
-                        'attr'       => [
-                            'class' => 'form-control',
-                        ],
-                        'required' => false,
-                        'multiple' => false,
-                    ]
-                )->addModelTransformer($transformer)
+            $scoringChoices = array();
+            $r = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(array('isPublished' => true)); // we will have a hard time with that
+            foreach($r as $l) {
+                $scoringChoices[$l->getId()] = $l->getName();
+            }
+            $builder->add(
+                'scoringCategory',
+                'choice',
+                [
+                    'choices' => $scoringChoices,
+                    'label'      => 'mautic.campaign.form.type.scoringCategory',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'required' => false,
+                    'multiple' => false,
+                    'empty_value' => false,
+                    'data' => (empty($options['data']['scoringCategory'])) ? null : (is_object($options['data']['scoringCategory'])? $options['data']['scoringCategory']->getId():$options['data']['scoringCategory']),
+                ]
             );
         }
         /** CAPTIVEA.CORE END **/
