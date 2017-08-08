@@ -56,15 +56,15 @@ echo $view['form']->start($form);
                 <div>
                     <?php echo $view['form']->row($form['score']); ?>
                 </div>
-                <hr/>
-                <div>
-                    <?php echo $view['form']->row($form['owner']); ?>
-                </div>
                 <?php /** CAPTIVEA.CORE START **/ foreach($allScoringCategoriesWithValues as $sc) { ?><hr/>
                 <div>
                     <span class=""><?php echo htmlspecialchars($sc['category']); ?></span>:
                     <strong class=""><?php echo intval($sc['value']); ?></strong>
                 </div><?php } /** CAPTIVEA.CORE END **/ ?>
+                <hr/>
+                <div>
+                    <?php echo $view['form']->row($form['owner']); ?>
+                </div>
             </div>
         </div>
         <div class="col-md-9 bg-auto height-auto bdr-l">

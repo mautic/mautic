@@ -395,7 +395,7 @@ $view['slots']->set(
             <?php /** CAPTIVEA.CORE START **/ if(!empty($scoringValues)) { ?>
             <div class="panel-heading">
                 <div class="panel-title">
-                    <?php echo $view['translator']->trans('xxx'); ?>
+                    <?php echo $view['translator']->trans('mautic.scoring.lead.scoringCategoryTitle'); ?>
                 </div>
             </div>
             <div class="panel-body pt-sm">
