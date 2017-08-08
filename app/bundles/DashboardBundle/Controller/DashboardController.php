@@ -318,7 +318,7 @@ class DashboardController extends FormController
         if ($this->request->get('save', false)) {
             // Save to the user's folder
             $dir = $this->factory->getSystemPath('dashboard.user');
-             if (!file_exists($dir.$this->user->getId())) {
+            if (!file_exists($dir.$this->user->getId())) {
                 mkdir($dir.$this->user->getId(), 0777, true);
             }
             file_put_contents($dir.$this->user->getId().'/'.$filename, json_encode($dashboard));
