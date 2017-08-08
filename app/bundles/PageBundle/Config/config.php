@@ -50,6 +50,10 @@ return [
                 'path'       => '/video/hit',
                 'controller' => 'MauticPageBundle:Public:hitVideo',
             ],
+            'mautic_tracking_pixel_event' => [
+                'path'       => '/tracking/pixel/event',
+                'controller' => 'MauticPageBundle:Public:trackingPixelEvent',
+            ],
         ],
         'api' => [
             'mautic_api_pagesstandard' => [
@@ -243,6 +247,10 @@ return [
                 'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
                 'alias' => 'page_dashboard_hits_in_time_widget',
             ],
+            'mautic.page.tracking.pixel.send' => [
+                'class' => 'Mautic\PageBundle\Form\Type\TrackingPixelSendType',
+                'alias' => 'tracking_pixel_send_action',
+            ],
         ],
         'models' => [
             'mautic.page.model.page' => [
@@ -288,6 +296,13 @@ return [
             'mautic.page.helper.token' => [
                 'class'     => 'Mautic\PageBundle\Helper\TokenHelper',
                 'arguments' => 'mautic.page.model.page',
+            ],
+            'mautic.page.helper.tracking' => [
+                'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'session',
+                ],
             ],
         ],
     ],

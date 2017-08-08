@@ -17,12 +17,14 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\TrackDisplayEvent;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\PageBundle\Helper\TrackingHelper;
 
 /**
  * Class PublicController.
@@ -538,6 +540,43 @@ class PublicController extends CommonFormController
 
         return new Response();
     }
+
+    /**
+     * Tracking Pixel event.
+     */
+    public function trackingPixelEventAction()
+    {
+        if (!$this->get('mautic.security')->isAnonymous()) {
+            return new JsonResponse(
+                [
+                    'success' => 0,
+                ]
+            );
+        }
+
+        $content = '';
+
+        $dispatcher = $this->get('event_dispatcher');
+        if ($dispatcher->hasListeners(PageEvents::TRACK_ON_HIT)) {
+            $event = new TrackDisplayEvent($content);
+            $dispatcher->dispatch(PageEvents::TRACK_ON_HIT, $event);
+        }
+
+        /** @var LeadModel $leadModel */
+        $leadModel    = $this->getModel('lead');
+        $lead         = $leadModel->getCurrentLead();
+        $sessionName  = TrackingHelper::$prefix.(($lead) ? $lead->getId() : null);
+        $sessionValue = $this->get('session')->get($sessionName);
+        $this->get('session')->remove($sessionName);
+
+        return new JsonResponse(
+            [
+                'success'  => empty($sessionValue) ? 0 : 1,
+                'response' => $sessionValue,
+            ]
+        );
+    }
+
 
     /**
      * Get the ID of the currently tracked Contact.

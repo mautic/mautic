@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
+use Mautic\PageBundle\Helper\TrackingHelper;
 /**
  * Class BuildJsSubscriber.
  */
@@ -46,6 +46,7 @@ class BuildJsSubscriber extends CommonSubscriber
             CoreEvents::BUILD_MAUTIC_JS => [
                 ['onBuildJs', 255],
                 ['onBuildJsForVideo', 256],
+                ['onBuildJsForTrackingEvent', 256],
             ],
         ];
     }
@@ -497,5 +498,66 @@ MauticJS.processGatedVideos = function (videoElements) {
 MauticJS.documentReady(MauticJS.initGatedVideo);
 JS;
         $event->appendJs($js, 'Mautic Gated Videos');
+    }
+
+    /**
+     * @param BuildJsEvent $event
+     */
+    public function onBuildJsForTrackingEvent(BuildJsEvent $event){
+
+        $lead           = $this->leadModel->getCurrentLead();
+        $trackingPixelEventCORSUrl = $this->router->generate('mautic_tracking_pixel_event', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $customMatch = [];
+        if ($lead && $lead->getId()) {
+            $fieldsToMatch = [
+                'fn' => 'firstname',
+                'ln' => 'lastname',
+                'em' => 'email',
+                'ph' => 'phone',
+                'ct' => 'city',
+                'st' => 'state',
+                'zp' => 'zipcode',
+            ];
+            foreach ($fieldsToMatch as $key => $fieldToMatch) {
+                $par = 'get'.ucfirst($fieldToMatch);
+                if ($value = $lead->{$par}()) {
+                    $customMatch[$key] = $value;
+                }
+            }
+        }
+        $customMatch = json_encode($customMatch);
+
+        $js = <<<JS
+   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '', {$customMatch}); 
+        fbq('track', 'PageView');
+    
+       setTimeout(function(){
+        MauticJS.makeCORSRequest('GET', '{$trackingPixelEventCORSUrl}', {}, function(response, xhr) {
+        if(response.success == 0){
+            return;
+        }else{
+                var values = (response.response).split('|');
+                if(values.length){
+                    values.shift();
+                    for(var i = 0; i < values.length; i++) {
+                        var hash = values[i].split(':');
+                        if(hash.length==2){
+                            fbq('trackCustom', hash[0], {
+                                eventLabel: hash[1]
+                            });
+                        }
+                   }
+               }
+			}
+	    });
+        }, 1000)
+JS;
+        $event->appendJs($js, 'Mautic 3rd party tracking pixels');
     }
 }

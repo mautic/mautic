@@ -77,6 +77,25 @@ class CampaignSubscriber extends CommonSubscriber
             'channelIdField' => 'pages',
         ];
         $event->addDecision('page.pagehit', $pageHitTrigger);
+
+        $action = [
+            'label'                  => 'mautic.page.tracking.pixel.event.send',
+            'description'            => 'mautic.page.tracking.pixel.event.send_desc',
+            'eventName'              => PageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'formType'               => 'tracking_pixel_send_action',
+            'connectionRestrictions' => [
+                'anchor' => [
+                    'decision.inaction',
+                ],
+                'source' => [
+                    'decision' => [
+                        'page.pagehit',
+                    ],
+                ],
+            ],
+        ];
+
+        $event->addAction('tracking.pixel.send', $action);
     }
 
     /**
