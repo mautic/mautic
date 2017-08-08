@@ -17,7 +17,7 @@ class ScoringCompanyValueRepository extends CommonRepository {
      */
     public function adjustPoints(\Mautic\LeadBundle\Entity\Company $company, ScoringCategory $scoringCategory, $points, $operator = 'plus') {
         if(!empty($company)) {
-            $scoringValue = $this->findBy(array('company' => $company, 'scoringCategory' => $scoringCategory));
+            $scoringValue = $this->findOneBy(array('company' => $company, 'scoringCategory' => $scoringCategory));
             if(empty($scoringValue)) {
                 $scoringValue = new ScoringCompanyValue;
                 $scoringValue->setCompany($company);
