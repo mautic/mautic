@@ -63,6 +63,25 @@ class CompanyChangeScoreActionType extends AbstractType
                 ],
             ]
         );
+        
+        /** CAPTIVEA.CORE START **/
+        $choices = array();
+        $r = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(array('isPublished' => true)); // we will have a hard time with that
+        foreach($r as $l) {
+            $choices[$l->getId()] = $l->getName();
+        }
+        $builder->add(
+            'scoringCategory',
+            'choice',
+            [
+                'label'      => 'mautic.campaign.form.type.scoringCategory',
+                'attr'       => ['class' => 'form-control'],
+                'label_attr' => ['class' => 'control-label'],
+                'choices'    => $choices,
+                'data' => (empty($options['data']['scoringCategory'])) ? null : (is_object($options['data']['scoringCategory'])? $options['data']['scoringCategory']->getId():$options['data']['scoringCategory']),
+            ]
+        );
+        /** CAPTIVEA.CORE END **/
     }
 
     /**

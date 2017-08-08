@@ -61,7 +61,7 @@ class EventType extends AbstractType
         );
 
         /** CAPTIVEA.CORE START **/
-        if (in_array($options['data']['eventType'], ['action']) && in_array($options['data']['type'], ['lead.changepoints', 'lead.scorecontactscompanies'])) {
+        if (in_array($options['data']['eventType'], ['action']) && in_array($options['data']['type'], ['lead.changepoints'])) {
             $scoringChoices = array();
             $r = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(array('isPublished' => true)); // we will have a hard time with that
             foreach($r as $l) {
