@@ -11,8 +11,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-
 /**
  * Class FacebookIntegration.
  */
@@ -42,7 +40,6 @@ class FacebookIntegration extends SocialIntegration
     public function getSupportedFeatures()
     {
         return [
-            'facebook_pixel',
             'share_button',
             'login_button',
             'public_profile',
@@ -103,29 +100,6 @@ class FacebookIntegration extends SocialIntegration
     public function getApiUrl($endpoint)
     {
         return "https://graph.facebook.com/$endpoint";
-    }
-
-    /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
-     */
-    public function appendToForm(&$builder, $data, $formArea)
-    {
-        parent::appendToForm($builder, $data, $formArea);
-
-        if ($formArea == 'features') {
-            /* @var FormBuilder $builder */
-            $builder->add('facebookPixelId', TextType::class, [
-                'label'      => 'mautic.integration.Facebook.pixel.id',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.integration.Facebook.pixel.id.tooltip',
-                    'data-show-on' => '{"integration_details_supportedFeatures_0":"checked"}',
-                ],
-            ]);
-        }
     }
 
     /**

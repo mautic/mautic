@@ -58,7 +58,6 @@ return [
                 'arguments' => [
                     'mautic.factory',
                     'mautic.social.helper.campaign',
-                    'session',
                 ],
             ],
             'mautic.social.configbundle.subscriber' => [
@@ -74,13 +73,6 @@ return [
                 'class'     => \MauticPlugin\MauticSocialBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.social.buildjs.subscriber' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\BuildJsSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.helper.integration',
                 ],
             ],
         ],
@@ -150,10 +142,6 @@ return [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType',
                 'arguments' => 'router',
                 'alias'     => 'tweetsend_list',
-            ],
-            'mautic.social.facebook.pixel.send' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookPixelSendType',
-                'alias' => 'facebook_pixel_send_action',
             ],
         ],
         'models' => [
