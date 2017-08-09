@@ -103,7 +103,7 @@ class AuditLogRepository extends CommonRepository
         }
 
         $qb
-            ->select('ip.date_added, ip.ip_address, ip.lead_id')
+            ->select('ip.date_added, ip.ip_address, ip.lead_id, ip.id')
             ->from(sprintf('(%s)', $sqb->getSQL()), 'ip');
 
         return $this->getTimelineResults($qb, $options, 'ip.ip_address', 'ip.date_added', [], ['date_added']);
