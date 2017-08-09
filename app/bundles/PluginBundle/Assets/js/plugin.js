@@ -171,10 +171,16 @@ Mautic.getIntegrationFields = function(settings, page, el) {
     var object    = settings.object ? settings.object : 'lead';
     var fieldsTab = ('lead' === object) ? '#fields-tab' : '#'+object+'-fields-container';
 
-    if (el) {
+    if (el && mQuery(el).is('input')) {
         Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
-    }
 
+        var namePrefix = mQuery(el).attr('name').split('[')[0];
+        if ('integration_details' !== namePrefix) {
+            var nameParts = mQuery(el).attr('name').match(/\[.*?\]+/g);
+            nameParts = nameParts.slice(0, -1);
+            settings.prefix = namePrefix + nameParts.join('') + "[" + object + "Fields]";
+        }
+    }
     var fieldsContainer = '#'+object+'FieldsContainer';
 
     var inModal = mQuery(fieldsContainer).closest('.modal');

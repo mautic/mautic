@@ -52,7 +52,7 @@ class WebhookQueueRepository extends CommonRepository
         $qb    = $this->_em->getConnection()->createQueryBuilder();
         $count = $qb->select('count('.$this->getTableAlias().'.id) as webhook_count')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', $this->getTableAlias())
-            ->where($this->getTableAlias().'webhook_id = :id')
+            ->where($this->getTableAlias().'.webhook_id = :id')
             ->setParameter('id', $id)
             ->execute()
             ->fetch();

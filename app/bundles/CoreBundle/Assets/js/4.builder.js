@@ -1094,8 +1094,8 @@ Mautic.initSlotListeners = function() {
                         extraKeys: {"Ctrl-Space": "autocomplete"},
                         lineWrapping: true,
                     });
-                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer').html());
-                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer'));
+                    Mautic.builderCodeMirror.getDoc().setValue(slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer').html());
+                    Mautic.keepPreviewAlive(null, slot.find('#codemodeHtmlContainer,.codemodeHtmlContainer'));
                 }
             }
 
@@ -1276,21 +1276,29 @@ Mautic.initSlotListeners = function() {
             params.slot.find('a').css(values[params.field.val()]);
         } else if (fieldParam === 'caption-color') {
             params.slot.find('.imagecard-caption').css('background-color', '#' + params.field.val());
-        } else if (fieldParam === 'background-color') {
-            if ('imagecard' === type) {
-                params.slot.find('.imagecard').css(fieldParam, '#' + params.field.val());
-            } else {
-                params.slot.find('a').css(fieldParam, '#' + params.field.val());
-                params.slot.find('a').attr('background', '#' + params.field.val());
-                params.slot.find('a').css('border-color', '#' + params.field.val());
-            }
-        } else if (fieldParam === 'color') {
-            if ('imagecard' === type) {
-                params.slot.find('.imagecard-caption').css(fieldParam, '#' + params.field.val());
-            } else if ('imagecaption' === type) {
-                params.slot.find('figcaption').css(fieldParam, '#' + params.field.val());
-            } else {
-                params.slot.find('a').css(fieldParam, '#' + params.field.val());
+        } else if (fieldParam === 'background-color' || fieldParam === 'color') {
+            var matches = params.field.val().match(/^#?([0-9a-f]{6}|[0-9a-f]{3})$/);
+
+            if (matches !== null) {
+                var color = matches[1];
+
+                if (fieldParam === 'background-color') {
+                    if ('imagecard' === type) {
+                        params.slot.find('.imagecard').css(fieldParam, '#' + color);
+                    } else {
+                        params.slot.find('a').css(fieldParam, '#' + color);
+                        params.slot.find('a').attr('background', '#' + color);
+                        params.slot.find('a').css('border-color', '#' + color);
+                    }
+                } else if (fieldParam === 'color') {
+                    if ('imagecard' === type) {
+                        params.slot.find('.imagecard-caption').css(fieldParam, '#' + color);
+                    } else if ('imagecaption' === type) {
+                        params.slot.find('figcaption').css(fieldParam, '#' + color);
+                    } else {
+                        params.slot.find('a').css(fieldParam, '#' + color);
+                    }
+                }
             }
         } else if (/gatedvideo/.test(fieldParam)) {
             // Handle gatedVideo replacements

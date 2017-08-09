@@ -261,6 +261,7 @@ trait CustomFieldRepositoryTrait
         }
 
         if (!empty($fields)) {
+            $this->prepareDbalFieldsForSave($fields);
             $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }
     }
@@ -303,7 +304,7 @@ trait CustomFieldRepositoryTrait
                     $r = (float) $r;
                     break;
                 case 'boolean':
-                    $r = (int) $r;
+                    $r = is_null($r) ? $r : (bool) $r;
                     break;
             }
 
@@ -366,5 +367,18 @@ trait CustomFieldRepositoryTrait
         }
 
         return $this->customFieldList;
+    }
+
+    /**
+     * @param $fields
+     */
+    private function prepareDbalFieldsForSave(&$fields)
+    {
+        // Ensure booleans are integers
+        foreach ($fields as $field => &$value) {
+            if (is_bool($value)) {
+                $fields[$field] = (int) $value;
+            }
+        }
     }
 }

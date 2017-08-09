@@ -254,9 +254,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $isRequired = function (array $field, $object) {
-            return ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id']))
-                || ($object == 'Lead'
-                    && in_array($field['name'], ['Company']));
+            return
+                ($field['type'] !== 'boolean' && empty($field['nillable']) && !in_array($field['name'], ['Status', 'Id'])) ||
+                ($object == 'Lead' && in_array($field['name'], ['Company'])) ||
+                (in_array($object, ['Lead', 'Contact']) && 'Email' === $field['name']);
         };
 
         $salesFields = [];
@@ -298,10 +299,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     ) {
                                         continue;
                                     }
-                                    if ($fieldInfo['type'] == 'boolean') {
-                                        $type = 'boolean';
-                                    } else {
-                                        $type = 'string';
+                                    switch ($fieldInfo['type']) {
+                                        case 'boolean': $type = 'boolean';
+                                                        break;
+                                        case 'datetime': $type = 'datetime';
+                                            break;
+                                        case 'date': $type = 'date';
+                                            break;
+                                        default: $type = 'string';
                                     }
                                     if ($sfObject !== 'company') {
                                         $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject] = [
@@ -635,17 +640,22 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 foreach (['Contact', 'Lead'] as $object) {
                     if (!empty($existingPersons[$object])) {
                         $personFound = true;
-                        if (!empty($mappedData[$object]['update'])) {
-                            foreach ($existingPersons[$object] as $person) {
-                                $personData                     = $this->getApiHelper()->updateObject($mappedData[$object]['update'], $object, $person['Id']);
-                                $people[$object][$person['Id']] = $person['Id'];
+                        foreach ($existingPersons[$object] as $person) {
+                            if (!empty($mappedData[$object]['update'])) {
+                                $personData = $this->getApiHelper()->updateObject(
+                                    $mappedData[$object]['update'],
+                                    $object,
+                                    $person['Id']
+                                );
                             }
+                            $people[$object][$person['Id']] = $person['Id'];
                         }
                     }
 
                     if ('Lead' === $object && !$personFound) {
                         $personData                         = $this->getApiHelper()->createLead($mappedData[$object]['create']);
                         $people[$object][$personData['Id']] = $personData['Id'];
+                        $personFound                        = true;
                     }
 
                     if (isset($personData['Id'])) {
@@ -664,7 +674,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 // Return success if any Contact or Lead was updated or created
-                return ($people) ? $people : false;
+                return ($personFound) ? $people : false;
             }
         } catch (\Exception $e) {
             if ($e instanceof ApiErrorException) {
@@ -1202,7 +1212,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             // Persist pending changes
             $this->cleanupFromSync($leadsToSync);
-
             // Make the request
             $this->makeCompositeRequest($mauticData, $totalUpdated, $totalCreated, $totalErrors);
 
@@ -1495,33 +1504,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        //find campaignMember
-        $existingCampaignMember = $integrationEntityRepo->getIntegrationsEntityId(
-            'Salesforce',
-            'CampaignMember',
-            'lead',
-            $lead->getId(),
-            null,
-            null,
-            null,
-            false,
-            0,
-            0,
-            "'$campaignId'"
-        );
 
         $body = [
             'Status' => $status,
         ];
         $object = 'CampaignMember';
         $url    = '/services/data/v38.0/sobjects/'.$object;
-        if ($existingCampaignMember) {
-            foreach ($existingCampaignMember as $member) {
-                $integrationEntity = $integrationEntityRepo->getEntity($member['id']);
-                $referenceId       = $integrationEntity->getId();
-                $internalLeadId    = $integrationEntity->getInternalEntityId();
-            }
-        }
 
         if (!empty($lead->getEmail())) {
             $pushPeople = [];
@@ -1539,17 +1527,36 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $campaignMembers = $this->getApiHelper()->checkCampaignMembership($campaignId, $pushObject, $personIds[$pushObject]);
                     $pushPeople      = $personIds[$pushObject];
                 }
-            }
+            } // pushLead should have handled this
 
             foreach ($pushPeople as $memberId) {
                 $campaignMappingId = '-'.$campaignId;
 
                 if (isset($campaignMembers[$memberId])) {
+                    $existingCampaignMember = $integrationEntityRepo->getIntegrationsEntityId(
+                        'Salesforce',
+                        'CampaignMember',
+                        'lead',
+                        null,
+                        null,
+                        null,
+                        false,
+                        0,
+                        0,
+                        "'".$campaignMembers[$memberId]."'"
+                    );
+                    if ($existingCampaignMember) {
+                        foreach ($existingCampaignMember as $member) {
+                            $integrationEntity = $integrationEntityRepo->getEntity($member['id']);
+                            $referenceId       = $integrationEntity->getId();
+                            $internalLeadId    = $integrationEntity->getInternalEntityId();
+                        }
+                    }
                     $id = !empty($lead->getId()) ? $lead->getId() : '';
-                    $id .= '-CampaignMember'.$memberId;
-                    $id .= !empty($referenceId && $internalLeadId == $lead->getId()) ? '-'.$referenceId : '';
+                    $id .= '-CampaignMember'.$campaignMembers[$memberId];
+                    $id .= !empty($referenceId) ? '-'.$referenceId : '';
                     $id .= $campaignMappingId;
-                    $patchurl        = $url.'/'.$memberId;
+                    $patchurl        = $url.'/'.$campaignMembers[$memberId];
                     $mauticData[$id] = [
                         'method'      => 'PATCH',
                         'url'         => $patchurl,
@@ -1785,7 +1792,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $fieldType      = (isset($objectFields['types']) && isset($objectFields['types'][$sfField])) ? $objectFields['types'][$sfField] : 'string';
                     $body[$sfField] = $this->cleanPushData($lead[$mauticField], $fieldType);
                 }
-
                 if (array_key_exists($sfField, $objectFields['required']['fields']) && empty($body[$sfField])) {
                     if (isset($sfRecord[$sfField])) {
                         $body[$sfField] = $sfRecord[$sfField];

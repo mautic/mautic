@@ -234,12 +234,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
     Mautic.initDateRangePicker(container + ' #daterange_date_from', container + ' #daterange_date_to');
 
     //initiate links
-    mQuery(container + " a[data-toggle='ajax']").off('click.ajax');
-    mQuery(container + " a[data-toggle='ajax']").on('click.ajax', function (event) {
-        event.preventDefault();
-
-        return Mautic.ajaxifyLink(this, event);
-    });
+    Mautic.makeLinksAlive(mQuery(container + " a[data-toggle='ajax']"));
 
     //initialize forms
     mQuery(container + " form[data-toggle='ajax']").each(function (index) {
@@ -247,12 +242,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
     });
 
     //initialize ajax'd modals
-    mQuery(container + " *[data-toggle='ajaxmodal']").off('click.ajaxmodal');
-    mQuery(container + " *[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
-        event.preventDefault();
-
-        Mautic.ajaxifyModal(this, event);
-    });
+    Mautic.makeModalsAlive(mQuery(container + " *[data-toggle='ajaxmodal']"))
 
     //initialize embedded modal forms
     Mautic.activateModalEmbeddedForms(container);
@@ -306,12 +296,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.initiateFileDownload(mQuery(this).attr('href'));
     });
 
-    mQuery(container + " a[data-toggle='confirmation']").off('click.confirmation');
-    mQuery(container + " a[data-toggle='confirmation']").on('click.confirmation', function (event) {
-        event.preventDefault();
-        MauticVars.ignoreIconSpin = true;
-        return Mautic.showConfirmation(this);
-    });
+    Mautic.makeConfirmationsAlive(mQuery(container + " a[data-toggle='confirmation']"));
 
     //initialize date/time
     mQuery(container + " *[data-toggle='datetime']").each(function() {
@@ -668,7 +653,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-        if (typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
+        if (inModal || typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
             Mautic.loadedContent[contentSpecific] = true;
             Mautic[contentSpecific + "OnLoad"](container, response);
         }
@@ -718,6 +703,33 @@ Mautic.onPageLoad = function (container, response, inModal) {
     if ((response && typeof response.stopPageLoading != 'undefined' && response.stopPageLoading) || container == '#app-content' || container == '.page-list') {
         Mautic.stopPageLoadingBar();
     }
+};
+
+Mautic.makeConfirmationsAlive = function(jQueryObject) {
+    jQueryObject.off('click.confirmation');
+    jQueryObject.on('click.confirmation', function (event) {
+        event.preventDefault();
+        MauticVars.ignoreIconSpin = true;
+        return Mautic.showConfirmation(this);
+    });
+};
+
+Mautic.makeModalsAlive = function(jQueryObject) {
+    jQueryObject.off('click.ajaxmodal');
+    jQueryObject.on('click.ajaxmodal', function (event) {
+        event.preventDefault();
+
+        Mautic.ajaxifyModal(this, event);
+    });
+};
+
+Mautic.makeLinksAlive = function(jQueryObject) {
+    jQueryObject.off('click.ajax');
+    jQueryObject.on('click.ajax', function (event) {
+        event.preventDefault();
+
+        return Mautic.ajaxifyLink(this, event);
+    });
 };
 
 /**

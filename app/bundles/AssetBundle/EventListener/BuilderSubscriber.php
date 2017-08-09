@@ -95,11 +95,12 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(PageDisplayEvent $event)
     {
-        $page   = $event->getPage();
-        $leadId = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead()->getId() : null;
-        $tokens = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
-
+        $page    = $event->getPage();
+        $lead    = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead() : null;
+        $leadId  = ($lead) ? $lead->getId() : null;
+        $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
+
         if (!empty($tokens)) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
