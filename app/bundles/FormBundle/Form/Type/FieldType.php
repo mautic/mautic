@@ -381,29 +381,6 @@ class FieldType extends AbstractType
                     'data'     => $data,
                 ]
             );
-
-            $builder->add(
-                'companyField',
-                'choice',
-                [
-                    'choices'     => $options['companyFields'],
-                    'choice_attr' => function ($val, $key, $index) use ($options) {
-                        if (!empty($options['companyFieldProperties'][$val]) && (in_array($options['companyFieldProperties'][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['companyFieldProperties'][$val]['properties']['list']) || !empty($options['companyFieldProperties'][$val]['properties']['optionlist']))) {
-                            return ['data-list-type' => 1];
-                        }
-
-                        return [];
-                    },
-                    'label'      => 'mautic.form.field.form.company_field',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.company_field',
-                    ],
-                    'required' => false,
-                    'data'     => $data,
-                ]
-            );
         }
 
         $builder->add('type', 'hidden');

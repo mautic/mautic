@@ -59,8 +59,16 @@ class FieldModel extends CommonFormModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        list($fields, $choices)               = $this->getObjectFields('lead');
-        list($companyFields, $companyChoices) = $this->getObjectFields('company');
+        $fields  = $this->leadFieldModel->getFieldListWithProperties();
+        $choices = [];
+
+        foreach ($fields as $alias => $field) {
+            if (!isset($choices[$field['group_label']])) {
+                $choices[$field['group_label']] = [];
+            }
+
+            $choices[$field['group_label']][$alias] = $field['label'];
+        }
 
         // Only show the lead fields not already used
         $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
@@ -77,30 +85,11 @@ class FieldModel extends CommonFormModel
         $options['leadFields']          = $choices;
         $options['leadFieldProperties'] = $fields;
 
-        $options['companyFields']          = $companyChoices;
-        $options['companyFieldProperties'] = $companyFields;
-
         if ($action) {
             $options['action'] = $action;
         }
 
         return $formFactory->create('formfield', $entity, $options);
-    }
-
-    public function getObjectFields($object = 'lead')
-    {
-        $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
-        $choices = [];
-
-        foreach ($fields as $alias => $field) {
-            if (!isset($choices[$field['group_label']])) {
-                $choices[$field['group_label']] = [];
-            }
-
-            $choices[$field['group_label']][$alias] = $field['label'];
-        }
-
-        return [$fields, $choices];
     }
 
     /**
