@@ -703,7 +703,7 @@ class MessageHelper
         * xxxxx@yourdomain.com^M
         * *****************     End of message     ***************^M
         */
-        elseif (preg_match("/\s(\S+@\S+\w).*No such.*(?:alias|account|recipient|address|email|mailbox|user)>/i", $body, $match)) {
+        elseif (preg_match("/\s(\S+@\S+\w).*[\r\n]*.*No such.*(?:alias|account|recipient|address|email|mailbox|user)/i", $body, $match)) {
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0234';
             $result['email']    = $match[1];
@@ -1587,6 +1587,9 @@ class MessageHelper
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0130';
                     } elseif (preg_match('/Host not found/i', $diag_code)) {
+                        $result['rule_cat'] = 'dns_unknown';
+                        $result['rule_no']  = '0130';
+                    } elseif (preg_match('/Host or domain name not found/i', $diag_code)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0130';
                     }
