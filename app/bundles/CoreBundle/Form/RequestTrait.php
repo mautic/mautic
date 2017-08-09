@@ -124,17 +124,18 @@ trait RequestTrait
                     if (($timestamp = strtotime($fieldData[$leadField['alias']])) === false) {
                         $timestamp = null;
                     }
-
-                    switch ($leadField['type']) {
-                        case 'datetime':
-                            $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
-                            break;
-                        case 'date':
-                            $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
-                            break;
-                        case 'time':
-                            $fieldData[$leadField['alias']] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
-                            break;
+                    if ($timestamp) {
+                        switch ($leadField['type']) {
+                            case 'datetime':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                break;
+                            case 'date':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                break;
+                            case 'time':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                break;
+                        }
                     }
                 }
                 break;
