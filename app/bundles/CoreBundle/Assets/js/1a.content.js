@@ -705,6 +705,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeConfirmationsAlive = function(jQueryObject) {
     jQueryObject.off('click.confirmation');
     jQueryObject.on('click.confirmation', function (event) {
@@ -714,6 +718,10 @@ Mautic.makeConfirmationsAlive = function(jQueryObject) {
     });
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeModalsAlive = function(jQueryObject) {
     jQueryObject.off('click.ajaxmodal');
     jQueryObject.on('click.ajaxmodal', function (event) {
@@ -723,6 +731,10 @@ Mautic.makeModalsAlive = function(jQueryObject) {
     });
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeLinksAlive = function(jQueryObject) {
     jQueryObject.off('click.ajax');
     jQueryObject.on('click.ajax', function (event) {
