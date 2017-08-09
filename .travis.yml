@@ -46,4 +46,4 @@ script:
   - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then bin/php-cs-fixer fix -v --dry-run --diff; fi
 
 after_success:
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then travis_retry php bin/coveralls -x build/clover.xml
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then travis_retry php bin/coveralls -x build/clover.xml; fi
