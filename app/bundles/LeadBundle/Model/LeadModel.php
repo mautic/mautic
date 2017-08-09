@@ -594,7 +594,7 @@ class LeadModel extends FormModel
 
                 // Only update fields that are part of the passed $data array
                 if (array_key_exists($alias, $data)) {
-                    if (!$bindWithForm) {
+                    if (!$bindWithForm && null !== $field['value']) {
                         $this->cleanFields($data, $field);
                     }
                     $curValue = $field['value'];

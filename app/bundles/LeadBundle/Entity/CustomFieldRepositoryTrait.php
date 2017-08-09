@@ -304,7 +304,7 @@ trait CustomFieldRepositoryTrait
                     $r = (float) $r;
                     break;
                 case 'boolean':
-                    $r = (int) $r;
+                    $r = is_null($r) ? $r : (bool) $r;
                     break;
             }
 
