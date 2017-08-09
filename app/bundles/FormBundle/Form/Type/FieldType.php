@@ -523,7 +523,7 @@ class FieldType extends AbstractType
             ]
         );
 
-        $resolver->setOptional(['customParameters', 'leadFieldProperties', 'companyFields', 'companyFieldProperties']);
+        $resolver->setOptional(['customParameters', 'leadFieldProperties']);
 
         $resolver->setRequired(['leadFields']);
     }
