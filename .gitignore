@@ -31,6 +31,8 @@
 /vendor/*
 !/vendor/.htaccess
 
+/build/clover.xml
+
 /bin/*
 /bundles
 /node_modules
