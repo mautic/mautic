@@ -119,7 +119,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                     'type'  => 'textarea',
                     'value' => 'Blah blah blah',
                 ],
-                'test' => [
+                'test'  => [
                     'alias' => 'test',
                     'label' => 'Test',
                     'type'  => 'textarea',
@@ -142,13 +142,13 @@ class LeadTest extends \PHPUnit_Framework_TestCase
     {
         $fields = [
             'core' => [
-                'boolean' => [
+                'boolean'     => [
                     'alias' => 'boolean',
                     'label' => 'Boolean',
                     'type'  => 'boolean',
                     'value' => false,
                 ],
-                'dateField' => [
+                'dateField'   => [
                     'alias' => 'dateField',
                     'label' => 'Date Time',
                     'type'  => 'datetime',
@@ -162,7 +162,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-        $data = [
+        $data   = [
             'boolean'   => 'yes',
             'dateField' => '12-12-2017 22:03:59',
             'multi'     => 'a|b',
@@ -191,7 +191,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                     'type'  => 'boolean',
                     'value' => false,
                 ],
-                'number' => [
+                'number'  => [
                     'alias' => 'number',
                     'label' => 'Number',
                     'type'  => 'number',
@@ -199,11 +199,10 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                 ],
             ],
         ];
-        $data = [
-            'boolean'   => null,
-            'number' => null,
+        $data   = [
+            'boolean' => null,
+            'number'  => null,
         ];
-
 
         $this->cleanFields($data, $fields['core']['boolean']);
         $this->cleanFields($data, $fields['core']['number']);
@@ -213,8 +212,8 @@ class LeadTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $points
-     * @param $expected
+     * @param      $points
+     * @param      $expected
      * @param Lead $lead
      * @param bool $operator
      */
