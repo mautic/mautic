@@ -36,7 +36,16 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function pushLead($lead, $config = []) {
-        // Push lead to integration
+        $config = $this->mergeConfigToFeatureSettings($config);
+
+        $leadFields = $config['leadFields'];
+        $mappedData = [];
+
+        foreach ($leadFields as $integrationField => $mauticField) {
+            $mappedData[$integrationField] = $lead->getFieldValue($mauticField);
+        }
+
+        $this->getApiHelper()->createLead($mappedData);
     }
 
     public function getDataPriority()
@@ -47,15 +56,15 @@ class InesCRMIntegration extends CrmAbstractIntegration
     public function getAvailableLeadFields($settings = [])
     {
         return [
-            'email' => [
+            'ines_email' => [
                 'label' => 'Email address',
                 'required' => true,
             ],
-            'firstname' => [
+            'ines_firstname' => [
                 'label' => 'First name',
                 'required' => false,
             ],
-            'lastname' => [
+            'ines_lastname' => [
                 'label' => 'Last name',
                 'required' => false,
             ],
