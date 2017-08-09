@@ -119,15 +119,17 @@ trait EntityFieldsBuildFormTrait
                 if ($type == 'datetime') {
                     $opts['model_timezone'] = 'UTC';
                     $opts['view_timezone']  = date_default_timezone_get();
+                    $opts['format']         = 'yyyy-MM-dd HH:mm:ss';
                     $opts['with_seconds']   = true;
 
                     $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d H:i:s') : null;
                 } elseif ($type == 'date') {
                     $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                 } else {
-                    $opts['with_seconds']  = true;
-                    $opts['view_timezone'] = date_default_timezone_get();
-                    $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                    $opts['model_timezone'] = 'UTC';
+                    $opts['with_seconds']   = true;
+                    $opts['view_timezone']  = date_default_timezone_get();
+                    $opts['data']           = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                 }
 
                     $builder->addEventListener(
@@ -140,15 +142,16 @@ trait EntityFieldsBuildFormTrait
                                     $timestamp = null;
                                 }
                                 if ($timestamp) {
+                                    $dtHelper = new DateTimeHelper(date('Y-m-d H:i:s', $timestamp), null, 'local');
                                     switch ($type) {
                                         case 'datetime':
-                                            $data[$alias] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                            $data[$alias] = $dtHelper->toLocalString('Y-m-d H:i:s');
                                             break;
                                         case 'date':
-                                            $data[$alias] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                            $data[$alias] = $dtHelper->toLocalString('Y-m-d');
                                             break;
                                         case 'time':
-                                            $data[$alias] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                            $data[$alias] = $dtHelper->toLocalString('H:i:s');
                                             break;
                                     }
                                 }
