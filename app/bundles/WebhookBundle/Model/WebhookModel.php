@@ -550,7 +550,7 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * Get the queues and order by date so we get events in chronological order.
+     * Get the queues and order by date so we get events in reversed chronological order.
      *
      * @param Webhook $webhook
      *
@@ -566,11 +566,12 @@ class WebhookModel extends FormModel
                 'iterator_mode' => true,
                 'start'         => $this->webhookStart,
                 'limit'         => $this->webhookLimit,
-                'orderBy'       => 'e.dateAdded', // e is the default prefix unless you define getTableAlias in your repo class,
+                'orderBy'       => $queueRepo->getTableAlias().'.dateAdded',
+                'orderByDir'    => 'DESC',
                 'filter'        => [
                     'force' => [
                         [
-                            'column' => 'IDENTITY(e.webhook)',
+                            'column' => 'IDENTITY('.$queueRepo->getTableAlias().'.webhook)',
                             'expr'   => 'eq',
                             'value'  => $webhook->getId(),
                         ],
