@@ -125,8 +125,9 @@ trait EntityFieldsBuildFormTrait
                 } elseif ($type == 'date') {
                     $opts['data'] = (!empty($value)) ? $dtHelper->toLocalString('Y-m-d') : null;
                 } else {
-                    $opts['with_seconds'] = true;
-                    $opts['data']         = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
+                    $opts['with_seconds']  = true;
+                    $opts['view_timezone'] = date_default_timezone_get();
+                    $opts['data']          = (!empty($value)) ? $dtHelper->toLocalString('H:i:s') : null;
                 }
 
                     $builder->addEventListener(
