@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Mautic\PageBundle\Helper\TrackingHelper;
+
 /**
  * Class BuildJsSubscriber.
  */
@@ -503,9 +503,9 @@ JS;
     /**
      * @param BuildJsEvent $event
      */
-    public function onBuildJsForTrackingEvent(BuildJsEvent $event){
-
-        $lead           = $this->leadModel->getCurrentLead();
+    public function onBuildJsForTrackingEvent(BuildJsEvent $event)
+    {
+        $lead                      = $this->leadModel->getCurrentLead();
         $trackingPixelEventCORSUrl = $this->router->generate('mautic_tracking_pixel_event', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $customMatch = [];
@@ -542,18 +542,15 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
         if(response.success == 0){
             return;
         }else{
-                var values = (response.response).split('|');
-                if(values.length){
-                    values.shift();
-                    for(var i = 0; i < values.length; i++) {
-                        var hash = values[i].split(':');
-                        if(hash.length==2){
-                            fbq('trackCustom', hash[0], {
-                                eventLabel: hash[1]
+             if (typeof fbq  !== 'undefined' && typeof response.response.facebook !== 'undefined') {
+                 var fb = response.response.facebook; 
+                     for(var i = 0; i < fb.length; i++) {
+                         if(typeof fb[i]['action']  !== 'undefined' && typeof fb[i]['label']  !== 'undefined' )
+                            fbq('trackCustom', fb[i]['action'], {
+                                eventLabel: fb[i]['label']
                             });
-                        }
-                   }
-               }
+                     }
+                }
 			}
 	    });
         }, 1000)

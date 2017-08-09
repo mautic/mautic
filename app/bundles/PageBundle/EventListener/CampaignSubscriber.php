@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 
@@ -37,15 +38,22 @@ class CampaignSubscriber extends CommonSubscriber
     protected $campaignEventModel;
 
     /**
+     * @var TrackingHelper
+     */
+    protected $trackingHelper;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param PageModel  $pageModel
-     * @param EventModel $campaignEventModel
+     * @param PageModel      $pageModel
+     * @param EventModel     $campaignEventModel
+     * @param TrackingHelper $trackingHelper
      */
-    public function __construct(PageModel $pageModel, EventModel $campaignEventModel)
+    public function __construct(PageModel $pageModel, EventModel $campaignEventModel, TrackingHelper $trackingHelper)
     {
         $this->pageModel          = $pageModel;
         $this->campaignEventModel = $campaignEventModel;
+        $this->trackingHelper     = $trackingHelper;
     }
 
     /**
@@ -78,24 +86,26 @@ class CampaignSubscriber extends CommonSubscriber
         ];
         $event->addDecision('page.pagehit', $pageHitTrigger);
 
-        $action = [
-            'label'                  => 'mautic.page.tracking.pixel.event.send',
-            'description'            => 'mautic.page.tracking.pixel.event.send_desc',
-            'eventName'              => PageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'               => 'tracking_pixel_send_action',
-            'connectionRestrictions' => [
-                'anchor' => [
-                    'decision.inaction',
-                ],
-                'source' => [
-                    'decision' => [
-                        'page.pagehit',
+        $trackingServices = $this->trackingHelper->getEnabledServices();
+        if ($this->trackingHelper->isEnabledCampaignAction() && !empty($trackingServices)) {
+            $action = [
+                'label'                  => 'mautic.page.tracking.pixel.event.send',
+                'description'            => 'mautic.page.tracking.pixel.event.send_desc',
+                'eventName'              => PageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'               => 'tracking_pixel_send_action',
+                'connectionRestrictions' => [
+                    'anchor' => [
+                        'decision.inaction',
+                    ],
+                    'source' => [
+                        'decision' => [
+                            'page.pagehit',
+                        ],
                     ],
                 ],
-            ],
-        ];
-
-        $event->addAction('tracking.pixel.send', $action);
+            ];
+            $event->addAction('tracking.pixel.send', $action);
+        }
     }
 
     /**

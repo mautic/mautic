@@ -127,6 +127,7 @@ return [
                 'arguments' => [
                     'mautic.page.model.page',
                     'mautic.campaign.model.event',
+                    'mautic.page.helper.tracking',
                 ],
             ],
             'mautic.page.leadbundle.subscriber' => [
@@ -248,8 +249,11 @@ return [
                 'alias' => 'page_dashboard_hits_in_time_widget',
             ],
             'mautic.page.tracking.pixel.send' => [
-                'class' => 'Mautic\PageBundle\Form\Type\TrackingPixelSendType',
-                'alias' => 'tracking_pixel_send_action',
+                'class'     => 'Mautic\PageBundle\Form\Type\TrackingPixelSendType',
+                'alias'     => 'tracking_pixel_send_action',
+                'arguments' => [
+                    'mautic.page.helper.tracking',
+                ],
             ],
         ],
         'models' => [
@@ -302,6 +306,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'session',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],
@@ -317,5 +322,15 @@ return [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
+        'pixel_in_campaign_enabled'             => false,
+        'google_analytics_id'                   => '',
+        'google_analytics_trackingpage_enabled' => false,
+        'google_analytics_landingpage_enabled'  => false,
+        'google_adwords_id'                     => '',
+        'google_adwords_trackingpage_enabled'   => false,
+        'google_adwords_landingpage_enabled'    => false,
+        'facebook_pixel_id'                     => '',
+        'facebook_pixel_trackingpage_enabled'   => false,
+        'facebook_pixel_landingpage_enabled'    => false,
     ],
 ];

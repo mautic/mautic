@@ -11,16 +11,16 @@
 
 namespace Mautic\PageBundle\Helper;
 
-use Symfony\Component\HttpFoundation\Session\Session;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
- * Class TrackinHelper
+ * Class TrackinHelper.
  */
 class TrackingHelper
 {
-
     /**
      * @var LeadModel
      */
@@ -32,18 +32,45 @@ class TrackingHelper
     protected $session;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * BuildJsSubscriber constructor.
      *
-     * @param LeadModel $leadModel
-     * @param Session $session
+     * @param LeadModel            $leadModel
+     * @param Session              $session
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(LeadModel $leadModel, Session $session)
+    public function __construct(LeadModel $leadModel, Session $session, CoreParametersHelper $coreParametersHelper)
     {
-        $this->leadModel = $leadModel;
-        $this->session = $session;
+        $this->leadModel            = $leadModel;
+        $this->session              = $session;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public static $prefix = 'mtc-tracking-pixel-events-';
+    public function isEnabledCampaignAction()
+    {
+        return (bool) $this->coreParametersHelper->getParameter('pixel_in_campaign_enabled');
+    }
+
+    public function getEnabledServices()
+    {
+        $keys = [
+            'google_analytics_id' => 'Google Analytics',
+            'google_adwords_id'   => 'Google Adwords',
+            'facebook_pixel_id'   => 'Facebook Pixel',
+        ];
+        $result = [];
+        foreach ($keys as $key => $service) {
+            if ($id = $this->coreParametersHelper->getParameter($key)) {
+                $result[$key] = $service;
+            }
+        }
+
+        return $result;
+    }
 
     public function getSessionName()
     {
@@ -57,12 +84,13 @@ class TrackingHelper
      * @param $key
      * @param $action
      * @param $label
+     *
      * @return array
      */
     public function setSession($key, $action, $label)
     {
         $sessionName = $this->getSessionName();
-        $session = unserialize($this->session->get($sessionName));
+        $session     = unserialize($this->session->get($sessionName));
         if (!is_array($session)) {
             $session = [$session];
         }
@@ -75,9 +103,10 @@ class TrackingHelper
     /**
      * @return array
      */
-    public function getSession(){
+    public function getSession()
+    {
         $sessionName = $this->getSessionName();
+
         return (array) unserialize($this->session->get($sessionName));
     }
-
 }

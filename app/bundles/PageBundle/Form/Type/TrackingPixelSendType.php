@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\PageBundle\Helper\TrackingHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -21,11 +22,44 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class TrackingPixelSendType extends AbstractType
 {
     /**
+     * @var TrackingHelper
+     */
+    protected $trackingHelper;
+
+    /**
+     * TrackingPixelSendType constructor.
+     *
+     * @param TrackingHelper $trackingHelper
+     */
+    public function __construct(TrackingHelper $trackingHelper)
+    {
+        $this->trackingHelper = $trackingHelper;
+    }
+
+    /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $trackingServices = $this->trackingHelper->getEnabledServices();
+        $builder->add('services', 'choice', [
+            'label'      => 'mautic.page.tracking.form.services',
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                'class' => 'form-control',
+            ],
+            'expanded'    => false,
+            'multiple'    => true,
+            'choices'     => $trackingServices,
+            'empty_value' => 'mautic.core.form.chooseone',
+            'constraints' => [
+                new NotBlank(
+                    ['message' => 'mautic.core.ab_test.winner_criteria.not_blank']
+                ),
+            ],
+        ]);
+
         $builder->add(
             'action',
             'text',

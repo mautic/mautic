@@ -26,14 +26,27 @@ class ConfigTrackingPageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
+            'pixel_in_campaign_enabled',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.page.config.form.pixel.campaign.enabled',
+                'data'  => (bool) $options['data']['pixel_in_campaign_enabled'],
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.form.pixel.campaign.enable.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'google_analytics_id',
             'text',
             [
                 'label' => 'mautic.page.config.form.google.analytics.id',
                 'attr'  => [
-                    'class'       => 'form-control',
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.page.config.form.google.analytics.id.tooltip',
                 ],
+                'required' => false,
             ]
         );
 
@@ -45,6 +58,7 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => (bool) $options['data']['google_analytics_trackingpage_enabled'],
             ]
         );
+
         $builder->add(
             'google_analytics_landingpage_enabled',
             'yesno_button_group',
@@ -53,15 +67,16 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => (bool) $options['data']['google_analytics_landingpage_enabled'],
             ]
         );
-        
+
         $builder->add(
             'google_adwords_id',
             'text',
             [
                 'label' => 'mautic.page.config.form.google.adwords.id',
                 'attr'  => [
-                    'class'       => 'form-control',
+                    'class' => 'form-control',
                 ],
+                'required' => false,
             ]
         );
 
@@ -73,7 +88,7 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => (bool) $options['data']['google_adwords_trackingpage_enabled'],
             ]
         );
-        
+
         $builder->add(
             'google_adwords_landingpage_enabled',
             'yesno_button_group',
@@ -83,6 +98,17 @@ class ConfigTrackingPageType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'facebook_pixel_id',
+            'text',
+            [
+                'label' => 'mautic.page.config.form.facebook.pixel.id',
+                'attr'  => [
+                    'class' => 'form-control',
+                ],
+                'required' => false,
+            ]
+        );
 
         $builder->add(
             'facebook_pixel_trackingpage_enabled',
@@ -101,33 +127,6 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => (bool) $options['data']['facebook_pixel_landingpage_enabled'],
             ]
         );
-
-
-        $builder->add(
-            'facebook_pixel_id',
-            'text',
-            [
-                'label' => 'mautic.page.config.form.facebook.pixel.id',
-                'attr'  => [
-                    'class'       => 'form-control',
-                ],
-            ]
-        );
-
-
-        $builder->add(
-            'pixel_in_campaign_enabled',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.pixel.campaign.enabled',
-                'data'  => (bool) $options['data']['pixel_in_campaign_enabled'],
-                'attr'  => [
-                    'tooltip' => 'mautic.page.config.form.pixel.campaign.enable.tooltip',
-                ],
-            ]
-        );
-
-
     }
 
     /**
