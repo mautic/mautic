@@ -303,7 +303,7 @@ class ConfigType extends AbstractType
             'choice',
             [
                 'choices' => [
-                    'eu-east-1' => 'mautic.email.config.mailer.amazon_host.eu_west_1',
+                    'eu-west-1' => 'mautic.email.config.mailer.amazon_host.eu_west_1',
                     'us-east-1' => 'mautic.email.config.mailer.amazon_host.us_east_1',
                     'us-west-2' => 'mautic.email.config.mailer.amazon_host.us_west_2',
                 ],
