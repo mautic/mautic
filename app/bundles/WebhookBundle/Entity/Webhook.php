@@ -12,6 +12,8 @@
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -84,6 +86,14 @@ class Webhook extends FormEntity
      */
     private $triggers = [];
 
+    /**
+     * ASC or DESC order for fetching order of the events when queue mode is on.
+     * Null means use the global default.
+     *
+     * @var string
+     */
+    private $eventsOrderbyDir;
+
     /*
      * Constructor
      */
@@ -116,7 +126,6 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
-        // 1:M for queues
         $builder->createOneToMany('queues', 'WebhookQueue')
             ->mappedBy('webhook')
             ->fetchExtraLazy()
@@ -125,8 +134,7 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
-        // 1:M for logs
-        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => 'DESC'])
+        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => Criteria::DESC])
             ->fetchExtraLazy()
             ->mappedBy('webhook')
             ->cascadePersist()
@@ -134,11 +142,12 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
-        // status code
-        $builder->createField('webhookUrl', 'string')
+        $builder->createField('webhookUrl', Type::STRING)
             ->columnName('webhook_url')
             ->length(255)
             ->build();
+
+        $builder->addNullableField('eventsOrderbyDir', Type::STRING, 'events_orderby_dir');
     }
 
     /**
@@ -155,6 +164,7 @@ class Webhook extends FormEntity
                     'name',
                     'description',
                     'webhookUrl',
+                    'eventsOrderbyDir',
                     'category',
                     'triggers',
                 ]
@@ -420,6 +430,25 @@ class Webhook extends FormEntity
         $this->events->removeElement($event);
 
         return $this;
+    }
+
+    /**
+     * @param string $eventsOrderbyDir
+     */
+    public function setEventsOrderbyDir($eventsOrderbyDir)
+    {
+        $this->isChanged('eventsOrderbyDir', $eventsOrderbyDir);
+        $this->eventsOrderbyDir = $eventsOrderbyDir;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEventsOrderbyDir()
+    {
+        return $this->eventsOrderbyDir;
     }
 
     /**

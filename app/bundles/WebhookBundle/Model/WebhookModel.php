@@ -11,6 +11,7 @@
 
 namespace Mautic\WebhookBundle\Model;
 
+use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Serializer;
 use Joomla\Http\Http;
@@ -104,6 +105,14 @@ class WebhookModel extends FormModel
     protected $notificationModel;
 
     /**
+     * Queued events default order by dir
+     * Possible values: ['ASC', 'DESC'].
+     *
+     * @var string
+     */
+    protected $eventsOrderByDir;
+
+    /**
      * WebhookModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -121,6 +130,7 @@ class WebhookModel extends FormModel
         $this->webhookTimeout    = (int) $coreParametersHelper->getParameter('webhook_timeout', 15);
         $this->logMax            = (int) $coreParametersHelper->getParameter('webhook_log_max', 1000);
         $this->queueMode         = $coreParametersHelper->getParameter('queue_mode');
+        $this->eventsOrderByDir  = $coreParametersHelper->getParameter('events_orderby_dir', Criteria::ASC);
         $this->serializer        = $serializer;
         $this->notificationModel = $notificationModel;
     }
@@ -567,7 +577,7 @@ class WebhookModel extends FormModel
                 'start'         => $this->webhookStart,
                 'limit'         => $this->webhookLimit,
                 'orderBy'       => $queueRepo->getTableAlias().'.dateAdded',
-                'orderByDir'    => 'DESC',
+                'orderByDir'    => $this->getEventsOrderbyDir($webhook),
                 'filter'        => [
                     'force' => [
                         [
@@ -581,6 +591,24 @@ class WebhookModel extends FormModel
         );
 
         return $queues;
+    }
+
+    /**
+     * Returns either Webhook's orderbyDir or the value from configuration as default.
+     *
+     * @param Webhook|null $webhook
+     *
+     * @return string
+     */
+    public function getEventsOrderbyDir(Webhook $webhook = null)
+    {
+        // Try to get the value from Webhook
+        if ($webhook && $orderByDir = $webhook->getEventsOrderbyDir()) {
+            return $orderByDir;
+        }
+
+        // Use the global config value if it's not set in the Webhook
+        return $this->eventsOrderByDir;
     }
 
     /**
