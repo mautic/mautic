@@ -279,7 +279,12 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($lastSync instanceof \DateTime);
         $this->assertEquals(MAUTIC_DATE_MODIFIED_OVERRIDE, $lastSync->format('U'));
 
-        $lead     = new Lead();
+        $lead          = new Lead();
+        $reflectedLead = new \ReflectionObject($lead);
+        $reflectedId   = $reflectedLead->getProperty('id');
+        $reflectedId->setAccessible(true);
+        $reflectedId->setValue($lead, 1);
+
         $modified = new \DateTime('-15 minutes');
         $lead->setDateModified($modified);
         // Set it twice to get an original and updated datetime

@@ -343,7 +343,6 @@ class ReportSubscriber extends CommonSubscriber
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id');
                 $event->addCategoryLeftJoin($qb, 'p');
-                $event->addCampaignByChannelJoin($qb, 'p', 'page');
                 break;
             case 'page.hits':
                 $event->applyDateFilters($qb, 'date_hit', 'ph');

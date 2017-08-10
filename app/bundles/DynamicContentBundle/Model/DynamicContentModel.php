@@ -147,6 +147,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getSlotContentForLead($slot, $lead)
     {
+        if (!$lead) {
+            return [];
+        }
+
         $qb = $this->em->getConnection()->createQueryBuilder();
 
         $id = $lead instanceof Lead ? $lead->getId() : $lead['id'];
