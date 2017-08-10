@@ -325,7 +325,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     var filterHolder         = parentElement.find('.tab-content');
     var filterBlockPrototype = mQuery('#filterBlockPrototype');
     var filterIndex          = filterHolder.find('.tab-pane').length - 1;
-    var dynamicContentIndex  = $this.attr('id').match(/\d+$/)[0];
+    var dynamicContentIndex  = $this.parents('.tab-pane').attr('id').match(/\d+$/)[0];
 
     var filterPrototype   = filterBlockPrototype.data('prototype');
     var filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex ;

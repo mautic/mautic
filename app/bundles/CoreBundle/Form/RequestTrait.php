@@ -31,18 +31,18 @@ trait RequestTrait
                 switch ($type) {
                     case 'yesno_button_group':
                         if (is_object($entity)) {
-                            // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
                             $setter = 'set'.ucfirst($name);
-                            $data   = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
-
+                            // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
+                            $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
+                            $data = (bool) $data;
                             try {
-                                $entity->$setter((int) $data);
-
+                                $entity->$setter($data);
                                 // Manually handled so remove from form processing
                                 unset($form[$name], $params[$name]);
+                                break;
                             } catch (\InvalidArgumentException $exception) {
-                                // Setter not found
                             }
+                            $params[$name] = $data;
                         }
                         break;
                     case 'choice':
@@ -91,5 +91,59 @@ trait RequestTrait
         }
 
         $params = InputHelper::_($params, $masks);
+    }
+
+    /**
+     * @param $fieldData
+     * @param $leadField
+     */
+    public function cleanFields(&$fieldData, $leadField)
+    {
+        // This will catch null values or non-existent values to prevent null from converting to false/0
+        if (!isset($fieldData[$leadField['alias']])) {
+            return;
+        }
+
+        switch ($leadField['type']) {
+            // Adjust the boolean values from text to boolean. Do not convert null to false.
+            case 'boolean':
+                $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                break;
+            // Ensure date/time entries match what symfony expects
+            case 'datetime':
+            case 'date':
+            case 'time':
+                // Prevent zero based date placeholders
+                $dateTest = (int) str_replace(['/', '-', ' '], '', $fieldData[$leadField['alias']]);
+                if (!$dateTest) {
+                    // Date placeholder was used so just ignore it to allow import of the field
+                    unset($fieldData[$leadField['alias']]);
+                } else {
+                    switch ($leadField['type']) {
+                        case 'datetime':
+                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i');
+                            break;
+                        case 'date':
+                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d');
+                            break;
+                        case 'time':
+                            $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i');
+                            break;
+                    }
+                }
+                break;
+            case 'multiselect':
+                if (!is_array($fieldData[$leadField['alias']])) {
+                    if (strpos($fieldData[$leadField['alias']], '|') !== false) {
+                        $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
+                    } else {
+                        $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
+                    }
+                }
+                break;
+            case 'number':
+                $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
+                break;
+        }
     }
 }

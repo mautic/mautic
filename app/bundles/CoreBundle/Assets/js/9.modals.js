@@ -240,12 +240,6 @@ Mautic.processModalContent = function (response, target) {
             mQuery('body').removeClass('noscroll');
             mQuery(target).modal('hide');
 
-            if (response.mauticContent) {
-                if (typeof Mautic[response.mauticContent + "OnLoad"] == 'function') {
-                    Mautic[response.mauticContent + "OnLoad"](target, response);
-                }
-            }
-
             if (!response.updateModalContent) {
                 Mautic.onPageUnload(target, response);
             }
