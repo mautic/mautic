@@ -234,10 +234,19 @@ JS;
      */
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
-        $formSubmitUrl   = $this->router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $formSubmitUrl = $this->router->generate(
+            'mautic_form_postresults_ajax',
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
-        $jQueryUrl       = $this->assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
+        $jQueryUrl       = $this->assetsHelper->getUrl(
+            'app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js',
+            null,
+            null,
+            true
+        );
 
         $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
         $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
@@ -505,45 +514,20 @@ JS;
      */
     public function onBuildJsForTrackingEvent(BuildJsEvent $event)
     {
-        $lead                      = $this->leadModel->getCurrentLead();
-        $trackingPixelEventCORSUrl = $this->router->generate('mautic_tracking_pixel_event', [], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        $customMatch = [];
-        if ($lead && $lead->getId()) {
-            $fieldsToMatch = [
-                'fn' => 'firstname',
-                'ln' => 'lastname',
-                'em' => 'email',
-                'ph' => 'phone',
-                'ct' => 'city',
-                'st' => 'state',
-                'zp' => 'zipcode',
-            ];
-            foreach ($fieldsToMatch as $key => $fieldToMatch) {
-                $par = 'get'.ucfirst($fieldToMatch);
-                if ($value = $lead->{$par}()) {
-                    $customMatch[$key] = $value;
-                }
-            }
-        }
-        $customMatch = json_encode($customMatch);
+        $trackingPixelEventCORSUrl = $this->router->generate(
+            'mautic_tracking_pixel_event',
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         $js = <<<JS
-   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-document,'script','https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '', {$customMatch}); 
-        fbq('track', 'PageView');
-    
        setTimeout(function(){
         MauticJS.makeCORSRequest('GET', '{$trackingPixelEventCORSUrl}', {}, function(response, xhr) {
         if(response.success == 0){
             return;
         }else{
-             if (typeof fbq  !== 'undefined' && typeof response.response.facebook !== 'undefined') {
-                 var fb = response.response.facebook; 
+             if (typeof fbq  !== 'undefined' && typeof response.response.facebook_pixel_id !== 'undefined') {
+                 var fb = response.response.facebook_pixel_id; 
                      for(var i = 0; i < fb.length; i++) {
                          if(typeof fb[i]['action']  !== 'undefined' && typeof fb[i]['label']  !== 'undefined' )
                             fbq('trackCustom', fb[i]['action'], {
@@ -551,9 +535,22 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
                             });
                      }
                 }
+                
+                if (typeof ga  !== 'undefined' && typeof response.response.google_analytics_id !== 'undefined') {
+                 var fb = response.response.google_analytics_id; 
+                     for(var i = 0; i < fb.length; i++) {
+                         if(typeof fb[i]['action']  !== 'undefined' && typeof fb[i]['label']  !== 'undefined' )
+                             	ga('send', {
+                                    hitType: 'event',
+                                    eventCategory: 'Mautic',
+                                    eventAction: fb[i]['action'],
+                                    eventLabel: fb[i]['label'],
+			                     });
+                     }
+                }
 			}
 	    });
-        }, 1000)
+        }, 1000);
 JS;
         $event->appendJs($js, 'Mautic 3rd party tracking pixels');
     }

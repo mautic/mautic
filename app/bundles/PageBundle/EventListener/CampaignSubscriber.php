@@ -65,6 +65,7 @@ class CampaignSubscriber extends CommonSubscriber
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
             PageEvents::PAGE_ON_HIT                  => ['onPageHit', 0],
             PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
+            PageEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -198,5 +199,23 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         return $event->setResult(false);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    {
+        $config = $event->getConfig();
+        if (empty($config['services'])) {
+            return $event->setResult(false);
+        }
+        $values = [];
+        foreach ($config['services'] as $service) {
+            $values[$service][] = ['action' => $config['action'], 'label' => $config['label']];
+        }
+        $this->trackingHelper->setSession($service, $values);
+
+        return $event->setResult(true);
     }
 }

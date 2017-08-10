@@ -33,26 +33,9 @@
     </div>
     <div class="panel-body">
         <?php echo $view['form']->row($form['pixel_in_campaign_enabled']); ?>
-
-        <hr>
-        <h4><?php echo $view['translator']->trans('mautic.config.tab.facebook.pixel'); ?></h4>
-        <br>
         <?php echo $view['form']->row($form['facebook_pixel_id']); ?>
-        <?php echo $view['form']->row($form['facebook_pixel_landingpage_enabled']); ?>
-        <?php echo $view['form']->row($form['facebook_pixel_trackingpage_enabled']); ?>
-        <hr>
-        <h4><?php echo $view['translator']->trans('mautic.config.tab.google.analytics'); ?></h4>
-        <br>
         <?php echo $view['form']->row($form['google_analytics_id']); ?>
-        <?php echo $view['form']->row($form['google_analytics_landingpage_enabled']); ?>
-        <?php echo $view['form']->row($form['google_analytics_trackingpage_enabled']); ?>
-        <hr>
-        <h4><?php echo $view['translator']->trans('mautic.config.tab.google.adwords'); ?></h4>
-        <br>
         <?php echo $view['form']->row($form['google_adwords_id']); ?>
-        <?php echo $view['form']->row($form['google_adwords_landingpage_enabled']); ?>
-        <?php echo $view['form']->row($form['google_adwords_trackingpage_enabled']); ?>
-
 
     </div>
 </div>

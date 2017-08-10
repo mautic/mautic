@@ -59,12 +59,11 @@ class TrackingHelper
     {
         $keys = [
             'google_analytics_id' => 'Google Analytics',
-            'google_adwords_id'   => 'Google Adwords',
             'facebook_pixel_id'   => 'Facebook Pixel',
         ];
         $result = [];
         foreach ($keys as $key => $service) {
-            if ($id = $this->coreParametersHelper->getParameter($key)) {
+            if (1 == 1 || $id = $this->coreParametersHelper->getParameter($key)) {
                 $result[$key] = $service;
             }
         }
@@ -87,26 +86,26 @@ class TrackingHelper
      *
      * @return array
      */
-    public function setSession($key, $action, $label)
+    public function setSession($key, $values)
     {
         $sessionName = $this->getSessionName();
-        $session     = unserialize($this->session->get($sessionName));
-        if (!is_array($session)) {
-            $session = [$session];
-        }
-        $session[$key][] = ['action' => $action, 'label' => $label];
-        $this->session->set($sessionName, serialize($session));
 
-        return (array) $session;
+        $this->session->set($sessionName, serialize($values));
+
+        return (array) $values;
     }
 
     /**
      * @return array
      */
-    public function getSession()
+    public function getSession($remove = false)
     {
         $sessionName = $this->getSessionName();
+        $sesionValue = (array) unserialize($this->session->get($sessionName));
+        if ($remove) {
+            $this->session->remove($sessionName);
+        }
 
-        return (array) unserialize($this->session->get($sessionName));
+        return $sesionValue;
     }
 }
