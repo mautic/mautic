@@ -184,7 +184,8 @@ if ($tmpl == 'index') {
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailsent').':'.$item->getId()]
-                            ); ?>">
+                            ); ?>" data-toggle="tooltip"
+                               title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
                                 <div style="width: 50px;">
                                     <i class="fa fa-spin fa-spinner"></i>
                                 </div>
@@ -195,7 +196,8 @@ if ($tmpl == 'index') {
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailread').':'.$item->getId()]
-                            ); ?>">
+                            ); ?>" data-toggle="tooltip"
+                               title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
                                 <div style="width: 50px;">
                                     <i class="fa fa-spin fa-spinner"></i>
                                 </div>
@@ -206,7 +208,8 @@ if ($tmpl == 'index') {
                             <a href="<?php echo $view['router']->path(
                                 'mautic_contact_index',
                                 ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.emailread').':'.$item->getId()]
-                            ); ?>">
+                            ); ?>" data-toggle="tooltip"
+                               title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
                                 <div style="width: 50px;">
                                     <i class="fa fa-spin fa-spinner"></i>
                                 </div>
