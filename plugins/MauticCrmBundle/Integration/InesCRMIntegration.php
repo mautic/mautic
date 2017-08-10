@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Company;
 
 class InesCRMIntegration extends CrmAbstractIntegration
 {
@@ -51,30 +52,71 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $this->getApiHelper()->createLead($mappedData);
     }
 
+    public function pushCompany($company, $config = []) {
+        $config = $this->mergeConfigToFeatureSettings($config);
+
+        $companyFields = [];
+        foreach ($config['companyFields'] as $k => $v) {
+            $companyFields[$k] = mb_substr($v, 7);
+        }
+
+        $mappedData = [];
+
+        foreach ($companyFields as $integrationField => $mauticField) {
+            $method = 'get' . ucfirst($mauticField);
+            $mappedData[$integrationField] = $company->$method();
+        }
+
+        $this->getApiHelper()->createCompany($mappedData);
+    }
+
     public function pushLeads($params = []) {
         $config                  = $this->mergeConfigToFeatureSettings();
         list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
         $fetchAll                = $params['fetchAll'];
         $limit                   = $params['limit'];
 
-        $leadRepo = $this->em->getRepository(Lead::class);
-        $qb = $leadRepo->createQueryBuilder('l');
-        $qb->where('l.email is not null')->andWhere('l.email != \'\'');
+        if (in_array('lead', $config['objects'])) {
+            $leadRepo = $this->em->getRepository(Lead::class);
+            $qb = $leadRepo->createQueryBuilder('l');
+            $qb->where('l.email is not null')->andWhere('l.email != \'\'');
 
-        if (!$fetchAll) {
-            $qb->andWhere('l.dateAdded >= :fromDate')
-               ->andWhere('l.dateAdded <= :toDate')
-               ->setParameters(compact('fromDate', 'toDate'));
-       }
+            if (!$fetchAll) {
+                $qb->andWhere('l.dateAdded >= :fromDate')
+                   ->andWhere('l.dateAdded <= :toDate')
+                   ->setParameters(compact('fromDate', 'toDate'));
+           }
 
-        if ($limit) {
-            $qb->setMaxResults($limit);
+            if ($limit) {
+                $qb->setMaxResults($limit);
+            }
+
+            $iterableLeads = $qb->getQuery()->iterate();
+
+            foreach($iterableLeads as $lead) {
+                $this->pushLead($lead[0], $config);
+            }
         }
 
-        $iterableLeads = $qb->getQuery()->iterate();
+        if (in_array('company', $config['objects'])) {
+            $companyRepo = $this->em->getRepository(Company::class);
+            $qb = $companyRepo->createQueryBuilder('c');
 
-        foreach($iterableLeads as $lead) {
-            $this->pushLead($lead[0]);
+            if (!$fetchAll) {
+                $qb->andWhere('c.dateAdded >= :fromDate')
+                   ->andWhere('c.dateAdded <= :toDate')
+                   ->setParameters(compact('fromDate', 'toDate'));
+           }
+
+            if ($limit) {
+                $qb->setMaxResults($limit);
+            }
+
+            $iterableLeads = $qb->getQuery()->iterate();
+
+            foreach($iterableLeads as $company) {
+                $this->pushCompany($company[0], $config);
+            }
         }
     }
 

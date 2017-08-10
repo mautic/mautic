@@ -20,4 +20,10 @@ class InesCRMApi extends CrmApi
             'form_params' => $mappedData
         ]);
     }
+
+    public function createCompany($mappedData) {
+        $this->client->request('POST', 'http://localhost:4567/push_company', [
+            'form_params' => $mappedData
+        ]);
+    }
 }
