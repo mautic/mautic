@@ -1047,7 +1047,7 @@ class MessageHelper
                      * sample 3:
                      * Diagnostic-Code: SMTP; 550 relaying to <xxxxx@yourdomain.com> prohibited by administrator
                      */
-                    elseif (preg_match('/Relay.*(?:denied|prohibited)/is', $diag_code)) {
+                    elseif (preg_match('/Relay.*(?:denied|prohibited|disallowed)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0108';
                     }
@@ -1587,6 +1587,9 @@ class MessageHelper
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0130';
                     } elseif (preg_match('/Host not found/i', $diag_code)) {
+                        $result['rule_cat'] = 'dns_unknown';
+                        $result['rule_no']  = '0130';
+                    } elseif (preg_match('/Domain not found/i', $diag_code)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0130';
                     } elseif (preg_match('/Host or domain name not found/i', $diag_code)) {
