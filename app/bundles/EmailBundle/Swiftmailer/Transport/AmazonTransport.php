@@ -241,10 +241,6 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
 
         $payload = json_decode($request->getContent(), true);
 
-        if(empty($this->httpClient)) {
-            $this->httpClient = new Http;
-        }
-
         return $this->processJsonPayload($payload, $logger, $translator);
     }
 
@@ -256,7 +252,6 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
      * @param array $payload from Amazon SES
      * @param $logger
      * @param $translator
-     * @param Http $http
      *
      * @return array with bounced and unsubscribed email addresses
      */
