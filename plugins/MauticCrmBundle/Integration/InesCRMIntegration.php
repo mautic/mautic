@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Lead;
+
 class InesCRMIntegration extends CrmAbstractIntegration
 {
     public function getName()
@@ -32,7 +34,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     public function getSupportedFeatures()
     {
-        return ['push_lead'];
+        return ['push_lead', 'push_leads'];
     }
 
     public function pushLead($lead, $config = []) {
@@ -42,10 +44,38 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $mappedData = [];
 
         foreach ($leadFields as $integrationField => $mauticField) {
-            $mappedData[$integrationField] = $lead->getFieldValue($mauticField);
+            $method = 'get' . ucfirst($mauticField);
+            $mappedData[$integrationField] = $lead->$method();
         }
 
         $this->getApiHelper()->createLead($mappedData);
+    }
+
+    public function pushLeads($params = []) {
+        $config                  = $this->mergeConfigToFeatureSettings();
+        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
+        $fetchAll                = $params['fetchAll'];
+        $limit                   = $params['limit'];
+
+        $leadRepo = $this->em->getRepository(Lead::class);
+        $qb = $leadRepo->createQueryBuilder('l');
+        $qb->where('l.email is not null')->andWhere('l.email != \'\'');
+
+        if (!$fetchAll) {
+            $qb->andWhere('l.dateAdded >= :fromDate')
+               ->andWhere('l.dateAdded <= :toDate')
+               ->setParameters(compact('fromDate', 'toDate'));
+       }
+
+        if ($limit) {
+            $qb->setMaxResults($limit);
+        }
+
+        $iterableLeads = $qb->getQuery()->iterate();
+
+        foreach($iterableLeads as $lead) {
+            $this->pushLead($lead[0]);
+        }
     }
 
     public function getDataPriority()
