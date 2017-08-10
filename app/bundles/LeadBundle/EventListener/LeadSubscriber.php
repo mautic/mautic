@@ -126,7 +126,7 @@ class LeadSubscriber extends CommonSubscriber
                         'objectId'  => $lead->getId(),
                         'action'    => 'ipadded',
                         'details'   => $details['ipAddresses'],
-                        'ipAddress' => $this->request->server->get('REMOTE_ADDR'),
+                        'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
                     ];
                     $this->auditLogModel->writeToLog($log);
                 }

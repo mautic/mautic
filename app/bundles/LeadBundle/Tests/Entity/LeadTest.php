@@ -11,12 +11,14 @@
 
 namespace Mautic\LeadBundle\Tests;
 
+use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 
 class LeadTest extends \PHPUnit_Framework_TestCase
 {
+    use RequestTrait;
     public function testPreferredChannels()
     {
         $frequencyRules = [
@@ -102,6 +104,74 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $this->adjustPointsTest(5, $this->getLeadChangedArray(10, 15), $lead);
         $this->adjustPointsTest(10, $this->getLeadChangedArray(15, 150), $lead, 'times');
         $this->adjustPointsTest(10, $this->getLeadChangedArray(150, 15), $lead, 'divide');
+    }
+
+    public function testCustomFieldGetterSetters()
+    {
+        $lead = new Lead();
+
+        $fields = [
+            'core' => [
+                'notes' => [
+                    'alias' => 'notes',
+                    'label' => 'Notes',
+                    'type'  => 'textarea',
+                    'value' => 'Blah blah blah',
+                ],
+                'test' => [
+                    'alias' => 'test',
+                    'label' => 'Test',
+                    'type'  => 'textarea',
+                    'value' => 'Test blah',
+                ],
+                'boolean' => [
+                    'alias' => 'boolean',
+                    'label' => 'Boolean',
+                    'type'  => 'boolean',
+                    'value' => false,
+                ],
+                'dateField' => [
+                    'alias' => 'dateField',
+                    'label' => 'Date Time',
+                    'type'  => 'datetime',
+                    'value' => '12-12-2017 23:00:00',
+                ],
+                'multiselect' => [
+                    'alias' => 'multi',
+                    'label' => 'Multi Select',
+                    'type'  => 'multiselect',
+                    'value' => ['a', 'b', 'c'],
+                ],
+            ],
+        ];
+        $data = [
+            'notes'     => 'hello',
+            'test'      => 'test',
+            'boolean'   => 'yes',
+            'dateField' => '12-12-2017 22:03:59',
+            'multi'     => 'a|b',
+        ];
+
+        $this->cleanFields($data, $fields['core']['boolean']);
+
+        $this->cleanFields($data, $fields['core']['dateField']);
+
+        $this->cleanFields($data, $fields['core']['multiselect']);
+
+        $testDateObject = new \DateTime('12-12-2017 22:03:59');
+
+        $this->assertEquals($testDateObject->format('Y-m-d H:i'), $data['dateField']);
+        $this->assertEquals((int) true, $data['boolean']);
+        $this->assertEquals(['a', 'b'], $data['multi']);
+
+        $lead->setFields($fields);
+
+        // This should not killover with a segmentation fault due to a loop
+        $lead->setNotes('hello');
+
+        // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
+        $lead->setTest('hello');
+        $this->assertEquals('hello', $lead->getTest());
     }
 
     /**
