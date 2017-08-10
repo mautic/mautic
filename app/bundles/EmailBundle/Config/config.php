@@ -20,6 +20,10 @@ return [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'MauticEmailBundle:Email:execute',
             ],
+            'mautic_email_contacts' => [
+                'path'       => '/emails/contacts/{objectId}',
+                'controller' => 'MauticEmailBundle:Email:contacts',
+            ],
         ],
         'api' => [
             'mautic_api_emailstandard' => [
