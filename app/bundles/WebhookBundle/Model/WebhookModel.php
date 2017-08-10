@@ -560,7 +560,7 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * Get the queues and order by date so we get events in reversed chronological order.
+     * Get the queues and order by date so we get events.
      *
      * @param Webhook $webhook
      *
