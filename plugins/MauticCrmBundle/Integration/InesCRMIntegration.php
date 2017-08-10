@@ -53,8 +53,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    public function getAvailableLeadFields($settings = [])
-    {
+    public function getFormLeadFields($settings = []) {
         return [
             'ines_email' => [
                 'label' => 'Email address',
@@ -71,7 +70,34 @@ class InesCRMIntegration extends CrmAbstractIntegration
         ];
     }
 
-    public function getFormLeadFields($settings = []) {
-        return $this->getAvailableLeadFields($settings);
+    public function getFormCompanyFields($settings = []) {
+        return [
+            'ines_company_name' => [
+                'label' => 'Company Name',
+                'required' => false,
+            ],
+            'ines_company_address' => [
+                'label' => 'Company Address',
+                'required' => false,
+            ],
+        ];
+    }
+
+    public function appendToForm(&$builder, $data, $formArea)
+    {
+        if ($formArea == 'features') {
+            $builder->add('objects', 'choice', [
+                'choices' => [
+                    'lead'    => 'mautic.ines_crm.object.lead',
+                    'company' => 'mautic.ines_crm.object.company',
+                ],
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.ines_crm.form.objects_to_push_to',
+                'label_attr'  => ['class' => ''],
+                'empty_value' => false,
+                'required'    => false,
+            ]);
+        }
     }
 }
