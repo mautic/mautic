@@ -210,6 +210,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 return $content;
             }
 
+            http_response_code(500);
+
             if (!empty($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'])) {
                 header('Content-Type: application/json');
                 $content = json_encode(['newContent' => $content]);
