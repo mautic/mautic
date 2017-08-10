@@ -22,7 +22,7 @@ class SalesforceApi extends CrmApi
         parent::__construct($integration);
 
         $this->requestSettings['curl_options'] = [
-            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : CURL_SSLVERSION_TLSv1_1,
+            CURLOPT_SSLVERSION => defined('CURL_SSLVERSION_TLSv1_1') ? CURL_SSLVERSION_TLSv1_1 : 5,
         ];
     }
 
@@ -383,7 +383,7 @@ class SalesforceApi extends CrmApi
             $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', false, null, $this->integration->getQueryUrl());
             if (!empty($foundCampaignMembers['records'])) {
                 foreach ($foundCampaignMembers['records'] as $member) {
-                    $campaignMembers[$member[$idField]] = $member[$idField];
+                    $campaignMembers[$member[$idField]] = $member['Id'];
                 }
             }
         }

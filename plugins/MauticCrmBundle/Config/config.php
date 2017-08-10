@@ -92,10 +92,14 @@ return [
 
                 ],
             ],
+            'mautic.integration.dynamics' => [
+                'class'     => \MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration::class,
+                'arguments' => [
+                ],
+            ],
             'mautic.integration.connectwise' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration::class,
                 'arguments' => [
-
                 ],
             ],
         ],

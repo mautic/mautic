@@ -49,6 +49,12 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 'Set end date for updated values.'
             )
             ->addOption(
+                '--fetch-all',
+                null,
+                InputOption::VALUE_NONE,
+                'Get all CRM contacts whatever the date is. Should be used at instance initialization only'
+            )
+            ->addOption(
                 '--time-interval',
                 '-a',
                 InputOption::VALUE_OPTIONAL,
@@ -79,6 +85,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
         $endDate       = $input->getOption('end-date');
         $interval      = $input->getOption('time-interval');
         $limit         = $input->getOption('limit');
+        $fetchAll      = $input->getOption('fetch-all');
         $leadsExecuted = $contactsExecuted = null;
 
         if (!$interval) {
@@ -95,14 +102,17 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $config            = $integrationObject->mergeConfigToFeatureSettings();
             $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
+            defined('MAUTIC_CONSOLE_VERBOSITY') or define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
+
             if (!isset($config['objects'])) {
                 $config['objects'] = [];
             }
 
-            $params['start']  = $startDate;
-            $params['end']    = $endDate;
-            $params['limit']  = $limit;
-            $params['output'] = $output;
+            $params['start']    = $startDate;
+            $params['end']      = $endDate;
+            $params['limit']    = $limit;
+            $params['fetchAll'] = $fetchAll;
+            $params['output']   = $output;
 
             // set this constant to ensure that all contacts have the same date modified time and date synced time to prevent a pull/push loop
             define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
@@ -112,29 +122,47 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.leads', ['%integration%' => $integration]).'</info>');
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
+                    //Handle case when integration object are named "Contacts" and "Leads"
+                    $leadObjectName = 'Lead';
+                    if (in_array('Leads', $config['objects'])) {
+                        $leadObjectName = 'Leads';
+                    }
+                    $contactObjectName = 'Contact';
+                    if (in_array(strtolower('Contacts'), array_map(function ($i) {
+                        return strtolower($i);
+                    }, $config['objects']), true)) {
+                        $contactObjectName = 'Contacts';
+                    }
+
                     $updated = $created = $processed = 0;
-                    if (in_array('Lead', $config['objects'])) {
-                        $results = $integrationObject->getLeads($params, null, $leadsExecuted, [], 'Lead');
+                    if (in_array($leadObjectName, $config['objects'])) {
+                        $leadList = [];
+                        $results  = $integrationObject->getLeads($params, null, $leadsExecuted, $leadList, $leadObjectName);
                         if (is_array($results)) {
                             list($justUpdated, $justCreated) = $results;
-                            $updated += intval($justUpdated);
-                            $created += intval($justCreated);
+                            $updated += (int) $justUpdated;
+                            $created += (int) $justCreated;
                         } else {
-                            $processed += intval($results);
+                            $processed += (int) $results;
                         }
-                        $output->writeln('');
                     }
-                    if (in_array('Contact', $config['objects'])) {
-                        $results = $integrationObject->getLeads($params, null, $contactsExecuted, [], 'Contact');
+                    if (in_array(strtolower($contactObjectName), array_map(function ($i) {
+                        return strtolower($i);
+                    }, $config['objects']), true)) {
+                        $output->writeln('');
+                        $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
+                        $contactList = [];
+                        $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, $contactObjectName);
                         if (is_array($results)) {
                             list($justUpdated, $justCreated) = $results;
-                            $updated += intval($justUpdated);
-                            $created += intval($justCreated);
+                            $updated += (int) $justUpdated;
+                            $created += (int) $justCreated;
                         } else {
-                            $processed += intval($results);
+                            $processed += (int) $results;
                         }
-                        $output->writeln('');
                     }
+
+                    $output->writeln('');
 
                     if ($processed) {
                         $output->writeln(
@@ -151,40 +179,40 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         );
                     }
                 }
-            }
 
-            if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects'])
-                && in_array(
-                    'company',
-                    $config['objects']
-                )
-            ) {
-                $updated = $created = $processed = 0;
-                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
-                $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
+                if ($integrationObject !== null && method_exists($integrationObject, 'getCompanies') && isset($config['objects'])
+                    && in_array(
+                        'company',
+                        $config['objects']
+                    )
+                ) {
+                    $updated = $created = $processed = 0;
+                    $output->writeln('<info>'.$translator->trans('mautic.plugin.command.fetch.companies', ['%integration%' => $integration]).'</info>');
+                    $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.starting').'</comment>');
 
-                $results = $integrationObject->getCompanies($params);
-                if (is_array($results)) {
-                    list($justUpdated, $justCreated) = $results;
-                    $updated += intval($justUpdated);
-                    $created += intval($justCreated);
-                } else {
-                    $processed += intval($results);
-                }
-                $output->writeln('');
-                if ($processed) {
-                    $output->writeln(
-                        '<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed])
-                        .'</comment>'."\n"
-                    );
-                } else {
-                    $output->writeln(
-                        '<comment>'.$translator->trans(
-                            'mautic.plugin.command.fetch.companies.events_executed_breakout',
-                            ['%updated%' => $updated, '%created%' => $created]
-                        )
-                        .'</comment>'."\n"
-                    );
+                    $results = $integrationObject->getCompanies($params);
+                    if (is_array($results)) {
+                        list($justUpdated, $justCreated) = $results;
+                        $updated += (int) $justUpdated;
+                        $created += (int) $justCreated;
+                    } else {
+                        $processed += (int) $results;
+                    }
+                    $output->writeln('');
+                    if ($processed) {
+                        $output->writeln(
+                            '<comment>'.$translator->trans('mautic.plugin.command.fetch.companies.events_executed', ['%events%' => $processed])
+                            .'</comment>'."\n"
+                        );
+                    } else {
+                        $output->writeln(
+                            '<comment>'.$translator->trans(
+                                'mautic.plugin.command.fetch.companies.events_executed_breakout',
+                                ['%updated%' => $updated, '%created%' => $created]
+                            )
+                            .'</comment>'."\n"
+                        );
+                    }
                 }
             }
 

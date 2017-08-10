@@ -55,9 +55,11 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 abstract class AbstractIntegration
 {
-    const FIELD_TYPE_STRING = 'string';
-    const FIELD_TYPE_BOOL   = 'boolean';
-    const FIELD_TYPE_NUMBER = 'number';
+    const FIELD_TYPE_STRING   = 'string';
+    const FIELD_TYPE_BOOL     = 'boolean';
+    const FIELD_TYPE_NUMBER   = 'number';
+    const FIELD_TYPE_DATETIME = 'datetime';
+    const FIELD_TYPE_DATE     = 'date';
 
     /**
      * @var bool
@@ -961,6 +963,8 @@ abstract class AbstractIntegration
                         }
                     }
                 }
+            } elseif (isset($settings['post_data'])) {
+                $parameters = $settings['post_data'];
             }
         }
 
@@ -1267,7 +1271,7 @@ abstract class AbstractIntegration
         $defaultUrl = $this->router->generate(
             'mautic_integration_auth_callback',
             ['integration' => $this->getName()],
-            true //absolute
+            UrlGeneratorInterface::ABSOLUTE_URL //absolute
         );
 
         /** @var PluginIntegrationAuthCallbackUrlEvent $event */
@@ -1301,7 +1305,7 @@ abstract class AbstractIntegration
 
                     if ($state && $state !== $givenState) {
                         $this->session->remove($this->getName().'_csrf_token');
-                        throw new ApiErrorException('mautic.integration.auth.invalid.state');
+                        throw new ApiErrorException($this->translator->trans('mautic.integration.auth.invalid.state'));
                     }
                 }
 
@@ -1690,7 +1694,7 @@ abstract class AbstractIntegration
             }
 
             // Check if required fields are missing
-            $required = $this->getRequiredFields($integrationFields);
+            $required = $this->getRequiredFields($integrationFields, $fieldType);
             if (array_diff_key($required, $mappedFields)) {
                 $missingRequiredFields[$fieldType] = true;
             }
@@ -1728,21 +1732,31 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param array $fields
+     * @param array  $fields
+     * @param string $fieldType
      *
      * @return array
      */
-    public function getRequiredFields(array $fields)
+    public function getRequiredFields(array $fields, $fieldType = '')
     {
+        //use $fieldType to determine if email should be required. we use email as unique identifier for contacts only,
+        // if any other fieldType use integrations own field types
         $requiredFields = [];
         foreach ($fields as $field => $details) {
-            if ((is_array($details) && !empty($details['required'])) || 'email' === $field
-                || (isset($details['optionLabel'])
-                    && strtolower(
-                        $details['optionLabel']
-                    ) == 'email')
-            ) {
-                $requiredFields[$field] = $field;
+            if ('leadFields' === $fieldType) {
+                if ((is_array($details) && !empty($details['required'])) || 'email' === $field
+                    || (isset($details['optionLabel'])
+                        && strtolower(
+                            $details['optionLabel']
+                        ) == 'email')
+                ) {
+                    $requiredFields[$field] = $field;
+                }
+            } else {
+                if ((is_array($details) && !empty($details['required']))
+                ) {
+                    $requiredFields[$field] = $field;
+                }
             }
         }
 
@@ -1788,12 +1802,10 @@ abstract class AbstractIntegration
 
         foreach ($availableFields as $key => $field) {
             $integrationKey = $matchIntegrationKey = $this->convertLeadFieldKey($key, $field);
-            if (!isset($config['leadFields'][$integrationKey])) {
-                continue;
-            }
-
             if (is_array($integrationKey)) {
                 list($integrationKey, $matchIntegrationKey) = $integrationKey;
+            } elseif (!isset($config['leadFields'][$integrationKey])) {
+                continue;
             }
 
             if (isset($leadFields[$integrationKey])) {
@@ -2452,12 +2464,19 @@ abstract class AbstractIntegration
     public function cleanPushData($value, $fieldType = self::FIELD_TYPE_STRING)
     {
         $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
-
         switch ($fieldType) {
             case self::FIELD_TYPE_BOOL:
                 return (bool) $clean;
             case self::FIELD_TYPE_NUMBER:
                 return (float) $clean;
+            case self::FIELD_TYPE_DATETIME:
+                $dateTimeValue = new \DateTime($value);
+
+                return (!empty($clean)) ? $dateTimeValue->format('c') : '';
+            case self::FIELD_TYPE_DATE:
+                $dateTimeValue = new \DateTime($value);
+
+                return (!empty($clean)) ? $dateTimeValue->format('Y-m-d') : '';
             default:
                 return $clean;
         }
@@ -2564,8 +2583,8 @@ abstract class AbstractIntegration
                     [],
                     false
                 );
-
                 $entity->setLastSyncDate($this->getLastSyncDate($internalEntityObject, $params, false));
+                $integrationEntities[$internalEntityId] = $entity;
             } else {
                 $integrationEntities[$internalEntityId]->setLastSyncDate($this->getLastSyncDate($internalEntityObject, $params, false));
             }
@@ -2584,7 +2603,8 @@ abstract class AbstractIntegration
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        if (!$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
+        $isNew = method_exists($entity, 'isNew') && $entity->isNew();
+        if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */
             $changes = $entity->getChanges(true);
@@ -2641,7 +2661,7 @@ abstract class AbstractIntegration
                 if (isset($fields['i_'.$i]) && isset($fields['m_'.$i])) {
                     $formattedFields[$fields['i_'.$i]] = $fields['m_'.$i];
                 } else {
-                    break;
+                    continue;
                 }
             }
         }

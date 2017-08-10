@@ -65,7 +65,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead(Lead $lead,  array $config = [])
+    public function pushLead($lead,  $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -223,10 +223,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $config = $this->mergeConfigToFeatureSettings([]);
 
         // Match that data with mapped lead fields
-        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'company');
+        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
         $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
         if (!empty($fieldsToUpdateInMautic)) {
-            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
+            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
             $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
         } else {
             $newMatchedFields = $matchedFields;
@@ -253,7 +253,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         if (!$company->isNew()) {
-            $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'company');
+            $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
             $matchedFields  = array_intersect_key($matchedFields, array_flip($fieldsToUpdate));
             if (!isset($matchedFields['companyname'])) {
                 if (isset($matchedFields['companywebsite'])) {
@@ -443,5 +443,20 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
     {
         return $fieldsToUpdate;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function getSyncTimeframeDates(array $params)
+    {
+        $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
+            : null;
+        $toDate = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
+            : null;
+
+        return [$fromDate, $toDate];
     }
 }

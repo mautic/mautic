@@ -86,6 +86,14 @@ class HubspotIntegration extends CrmAbstractIntegration
     /**
      * @return array
      */
+    public function getSupportedFeatures()
+    {
+        return ['push_lead', 'get_leads'];
+    }
+
+    /**
+     * @return array
+     */
     public function getFormSettings()
     {
         $enableDataPriority = $this->getDataPriority();
@@ -270,7 +278,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
-                    'label'       => 'mautic.hubspot.form.objects_to_pull_from',
+                    'label'       => $this->getTranslator()->trans('mautic.crm.form.objects_to_pull_from', ['%crm%' => 'Hubspot']),
                     'label_attr'  => ['class' => ''],
                     'empty_value' => false,
                     'required'    => false,
@@ -496,7 +504,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead(Lead $lead, array $config = [])
+    public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

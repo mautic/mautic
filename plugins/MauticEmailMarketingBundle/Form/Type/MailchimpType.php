@@ -164,6 +164,9 @@ class MailchimpType extends AbstractType
             $builder->addEventListener(FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) use ($formModifier) {
                     $data = $event->getData();
+                    if (isset($data['leadFields']['leadFields'])) {
+                        $data['leadFields'] = $data['leadFields']['leadFields'];
+                    }
                     $formModifier($event->getForm(), $data);
                 }
             );
@@ -171,6 +174,9 @@ class MailchimpType extends AbstractType
             $builder->addEventListener(FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($formModifier) {
                     $data = $event->getData();
+                    if (isset($data['leadFields']['leadFields'])) {
+                        $data['leadFields'] = $data['leadFields']['leadFields'];
+                    }
                     $formModifier($event->getForm(), $data);
                 }
             );
