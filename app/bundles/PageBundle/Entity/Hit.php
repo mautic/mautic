@@ -868,7 +868,7 @@ class Hit
      */
     public function getDeviceStat()
     {
-        return $this->deviceStat;
+        return $this->device;
     }
 
     /**
