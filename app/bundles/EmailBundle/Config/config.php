@@ -210,6 +210,10 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailform',
             ],
+            'mautic.form.type.email.utm_tags' => [
+                'class' => 'Mautic\EmailBundle\Form\Type\EmailUtmTagsType',
+                'alias' => 'utm_tags',
+            ],
             'mautic.form.type.emailvariant' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\VariantType',
                 'arguments' => 'mautic.factory',
@@ -303,7 +307,7 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
                     'setUsername'      => ['%mautic.mailer_user%'],
-                    'setPassword'      => ['%mautic.mailer_password%'],
+                    'setPassword'      => ['%mautic.mailer_api_key%'],
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],

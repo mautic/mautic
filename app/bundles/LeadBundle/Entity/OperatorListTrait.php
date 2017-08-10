@@ -24,6 +24,9 @@ trait OperatorListTrait
                 '!like',
                 'regexp',
                 '!regexp',
+                'startsWith',
+                'endsWith',
+                'contains',
             ],
         ],
         'select' => [
@@ -155,6 +158,21 @@ trait OperatorListTrait
             'expr'        => 'date', //special case
             'negate_expr' => 'date',
             'hide'        => true,
+        ],
+        'startsWith' => [
+            'label'       => 'mautic.core.operator.starts.with',
+            'expr'        => 'startsWith',
+            'negate_expr' => 'startsWith',
+        ],
+        'endsWith' => [
+            'label'       => 'mautic.core.operator.ends.with',
+            'expr'        => 'endsWith',
+            'negate_expr' => 'endsWith',
+        ],
+        'contains' => [
+            'label'       => 'mautic.core.operator.contains',
+            'expr'        => 'contains',
+            'negate_expr' => 'contains',
         ],
     ];
 

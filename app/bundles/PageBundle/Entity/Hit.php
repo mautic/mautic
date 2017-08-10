@@ -279,6 +279,7 @@ class Hit
         $metadata->setGroupPrefix('hit')
             ->addProperties(
                 [
+                    'id',
                     'dateHit',
                     'dateLeft',
                     'page',
@@ -867,7 +868,7 @@ class Hit
      */
     public function getDeviceStat()
     {
-        return $this->deviceStat;
+        return $this->device;
     }
 
     /**

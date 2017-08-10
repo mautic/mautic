@@ -88,8 +88,9 @@ class ReportSubscriber extends CommonSubscriber
                 $downloadPrefix  = 'ad.';
                 $downloadColumns = [
                     $downloadPrefix.'date_download' => [
-                        'label' => 'mautic.asset.report.download.date_download',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.asset.report.download.date_download',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$downloadPrefix.'date_download)',
                     ],
                     $downloadPrefix.'code' => [
                         'label' => 'mautic.asset.report.download.code',
@@ -146,7 +147,6 @@ class ReportSubscriber extends CommonSubscriber
         if ($context == 'assets') {
             $queryBuilder->from(MAUTIC_TABLE_PREFIX.'assets', 'a');
             $event->addCategoryLeftJoin($queryBuilder, 'a');
-            $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
         } elseif ($context == 'asset.downloads') {
             $event->applyDateFilters($queryBuilder, 'date_download', 'ad');
 

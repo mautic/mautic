@@ -103,7 +103,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0];
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $leadField = InputHelper::alphanum($request->query->get('field'));
+        $leadField = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
         if (!empty($leadField)) {
             if (strpos($leadField, 'company') === 0) {
                 $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$leadField, $filter]);
@@ -550,7 +550,7 @@ class AjaxController extends CommonAjaxController
                     "MauticLeadBundle:Lead:{$template}.html.php",
                     [
                         'items'         => $results['results'],
-                        'noContactList' => $emailRepo->getDoNotEmailList(),
+                        'noContactList' => $emailRepo->getDoNotEmailList(array_keys($results['results'])),
                         'permissions'   => $permissions,
                         'security'      => $this->get('mautic.security'),
                         'highlight'     => true,

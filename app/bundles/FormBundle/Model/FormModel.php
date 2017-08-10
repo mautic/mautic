@@ -23,6 +23,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -450,14 +451,14 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead        = $this->leadModel->getCurrentLead();
+        $lead        = ($this->request) ? $this->leadModel->getCurrentLead() : null;
         $style       = '';
 
         if (!empty($theme)) {
             $theme .= '|';
         }
 
-        if ($entity->usesProgressiveProfiling()) {
+        if ($lead && $entity->usesProgressiveProfiling()) {
             $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
@@ -531,6 +532,7 @@ class FormModel extends CommonFormModel
                 'formPages'     => $pages,
                 'lastFormPage'  => $lastPage,
                 'style'         => $style,
+                'inBuilder'     => false,
             ]
         );
 
@@ -753,6 +755,10 @@ class FormModel extends CommonFormModel
     {
         $formName = $form->generateFormName();
         $lead     = $this->leadModel->getCurrentLead();
+
+        if (!$lead instanceof Lead) {
+            return;
+        }
 
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */

@@ -181,7 +181,9 @@ class LeadField extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->addField('object', 'string');
+        $builder->createField('object', 'string')
+            ->nullable()
+            ->build();
 
         $builder->createField('properties', 'array')
             ->nullable()
