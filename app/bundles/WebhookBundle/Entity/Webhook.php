@@ -203,6 +203,17 @@ class Webhook extends FormEntity
                 ]
             )
         );
+
+        $metadata->addPropertyConstraint(
+            'eventsOrderbyDir',
+            new Assert\Choice(
+                [
+                    null,
+                    Criteria::ASC,
+                    Criteria::DESC,
+                ]
+            )
+        );
     }
 
     /**
