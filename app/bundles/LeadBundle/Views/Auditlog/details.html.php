@@ -12,28 +12,64 @@
 $details = $event['details'];
 $type    = $event['eventType'];
 $text    = '';
+$objects = isset($details['fields']) ? $details['fields'] : [];
+unset($objects['dateModified']);
+foreach ($details as $key => $value) {
+    if (!array_key_exists($key, $objects) && 'fields' !== $key && 'dateIdentified' !== $key && 'dateModified' !== $key) {
+        $objects[$key] = $value;
+    }
+}
+if (0 === count($objects)) {
+    return '';
+}
 switch ($type) {
-    case 'create':
-        $text = $view['translator']->trans('mautic.lead.audit.created');
-        if (isset($details['ipAddresses']) && is_array($details['ipAddresses'])) {
-            $text .= ' '.$view['translator']->trans('mautic.lead.audit.originip').' '.implode(', ', array_splice($details['ipAddresses'], 1));
+    case 'create' :
+        $text = '<table class="table">';
+        $text .= '<tr>';
+        $text .= '<th>Field/Object</th><th>New Value</th><th>Old Value</th>';
+        $text .= '</tr>';
+        foreach ($objects as $field => $values) {
+            $text .= '<tr>';
+            if (is_array($values)) {
+                if (count($values) >= 2) {
+                    $text .= "<td>$field</td><td>${values[1]}</td><td>${values[0]}</td>";
+                } else {
+                    $v = '';
+                    foreach ($values as $k => $value) {
+                        $v = $k.': '.implode(', ', $value);
+                    }
+                    $text .= "<td>$field</td><td>$v</td><td>&nbsp;</td>";
+                }
+            } else {
+                $text .= "<td>$field</td><td>${values}</td><td>&nbsp;</td>";
+            }
+            $text .= '</tr>';
         }
+        $text .= '</table>';
         break;
     case 'delete':
         $text = $view['translator']->trans('mautic.lead.audit.deleted');
         break;
     case 'update':
-        $text = $view['translator']->trans('mautic.lead.audit.updated');
-        if (!isset($details['fields'])) {
-            break;
-        }
         $text = '<table class="table">';
         $text .= '<tr>';
-        $text .= '<th>Field</th><th>New Value</th><th>Old Value</th>';
+        $text .= '<th>Field/Object</th><th>New Value</th><th>Old Value</th>';
         $text .= '</tr>';
-        foreach ($details['fields'] as $field => $values) {
+        foreach ($objects as $field => $values) {
             $text .= '<tr>';
-            $text .= "<td>$field</td><td>${values[1]}</td><td>${values[0]}</td>";
+            if (is_array($values)) {
+                if (count($values) >= 2) {
+                    $text .= "<td>$field</td><td>${values[1]}</td><td>${values[0]}</td>";
+                } else {
+                    $v = '';
+                    foreach ($values as $k => $value) {
+                        $v = $k.': '.implode(', ', $value);
+                    }
+                    $text .= "<td>$field</td><td>$v</td><td>&nbsp;</td>";
+                }
+            } else {
+                $text .= "<td>$field</td><td>${values}</td><td>&nbsp;</td>";
+            }
             $text .= '</tr>';
         }
         $text .= '</table>';
