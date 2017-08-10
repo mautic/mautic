@@ -69,7 +69,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', $mockHttp);
+        $transport = new AmazonTransport($mockHttp);
         $transport->processJsonPayload($jsonPayload, $logger, $translator);
     }
 
@@ -98,7 +98,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http());
+        $transport = new AmazonTransport(new Http());
         $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('nope@nope.com', $rows[2]['emails']);
@@ -130,7 +130,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http());
+        $transport = new AmazonTransport(new Http());
         $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
@@ -162,7 +162,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http());
+        $transport = new AmazonTransport(new Http());
         $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);

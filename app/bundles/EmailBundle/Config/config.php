@@ -294,12 +294,12 @@ return [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
-                    '%mautic.mailer_amazon_region%',
                     'mautic.http.connector',
                 ],
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
                     'setPassword' => ['%mautic.mailer_password%'],
+                    'setRegion'   => ['%mautic.mailer_amazon_region%'],
                 ],
             ],
             'mautic.transport.mandrill' => [
