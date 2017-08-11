@@ -66,7 +66,7 @@ class TrackingHelper
         ];
         $result = [];
         foreach ($keys as $key => $service) {
-            if (($id = $this->coreParametersHelper->getParameter($key.'_id')) && $this->coreParametersHelper->getParameter($key.'_event')) {
+            if (($id = $this->coreParametersHelper->getParameter($key.'_id'))) {
                 $result[$key] = $service;
             }
         }
@@ -109,6 +109,11 @@ class TrackingHelper
         return (array) $sesionValue;
     }
 
+    /**
+     * @param $service
+     *
+     * @return bool|mixed
+     */
     public function displayInitCode($service)
     {
         $pixelId = $this->coreParametersHelper->getParameter($service.'_id');
@@ -123,6 +128,17 @@ class TrackingHelper
         return false;
     }
 
+    /**
+     * @return array|Lead|null
+     */
+    public function getLead()
+    {
+        return $this->leadModel->getCurrentLead();
+    }
+
+    /**
+     * @return bool
+     */
     protected function isLandingPage()
     {
         $server = $this->request->getCurrentRequest()->server;

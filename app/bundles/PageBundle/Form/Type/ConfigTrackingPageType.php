@@ -66,15 +66,6 @@ class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
-            'facebook_pixel_matching',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.event.facebook.pixel.advanced.matching',
-                'data'  => (bool) $options['data']['facebook_pixel_matching'],
-            ]
-        );
-
-        $builder->add(
             'facebook_pixel_trackingpage_enabled',
             'yesno_button_group',
             [
@@ -93,15 +84,6 @@ class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
-            'facebook_pixel_event',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.tracking.custom.event.enabled',
-                'data'  => (bool) $options['data']['facebook_pixel_event'],
-            ]
-        );
-
-        $builder->add(
             'google_analytics_id',
             'text',
             [
@@ -110,15 +92,6 @@ class ConfigTrackingPageType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'google_analytics_user_id',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.event.google.analytics.user.id',
-                'data'  => (bool) $options['data']['google_analytics_user_id'],
             ]
         );
 
@@ -137,15 +110,6 @@ class ConfigTrackingPageType extends AbstractType
             [
                 'label' => 'mautic.page.config.form.tracking.landingpage.enabled',
                 'data'  => (bool) $options['data']['google_analytics_landingpage_enabled'],
-            ]
-        );
-
-        $builder->add(
-            'google_analytics_event',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.tracking.custom.event.enabled',
-                'data'  => (bool) $options['data']['google_analytics_event'],
             ]
         );
     }

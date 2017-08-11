@@ -44,9 +44,10 @@
 
     </div>
     <div class="panel-body">
+        <?php echo $view['form']->row($form['facebook_pixel_id']); ?>
         <div class="row">
             <?php foreach ($form->children as $name => $f): ?>
-                <?php if (in_array($name, ['facebook_pixel_trackingpage_enabled', 'facebook_pixel_landingpage_enabled', 'facebook_pixel_matching', 'facebook_pixel_id', 'facebook_pixel_event'])) {
+                <?php if (in_array($name, ['facebook_pixel_trackingpage_enabled', 'facebook_pixel_landingpage_enabled'])) {
                 ?>
                     <div class="col-md-6">
                         <?php echo $view['form']->row($f); ?>
@@ -63,10 +64,10 @@
 
     </div>
     <div class="panel-body">
-
+        <?php echo $view['form']->row($form['google_analytics_id']); ?>
         <div class="row">
             <?php foreach ($form->children as $name => $f): ?>
-                <?php if (in_array($name, ['google_analytics_trackingpage_enabled', 'google_analytics_landingpage_enabled', 'google_analytics_user_id', 'google_analytics_id', 'google_analytics_event'])) {
+                <?php if (in_array($name, ['google_analytics_trackingpage_enabled', 'google_analytics_landingpage_enabled'])) {
                 ?>
                     <div class="col-md-6">
                         <?php echo $view['form']->row($f); ?>
