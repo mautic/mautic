@@ -271,6 +271,10 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'daterange',
             ],
+            'mautic.form.type.datetime' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\DateTimeType',
+                'alias' => 'date_time',
+            ],
             'mautic.form.type.builder.section' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\BuilderSectionType',
                 'arguments' => 'mautic.factory',
