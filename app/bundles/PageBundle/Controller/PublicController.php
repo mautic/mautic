@@ -380,7 +380,7 @@ class PublicController extends CommonFormController
 
         /** @var TrackingHelper $trackingHelper */
         $trackingHelper = $this->get('mautic.page.helper.tracking');
-        $sessionValue   = $trackingHelper->getSession();
+        $sessionValue   = $trackingHelper->getSession(true);
 
         return new JsonResponse(
             [

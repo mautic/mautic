@@ -82,7 +82,7 @@ class TrackingHelper
     public function updateSession($values)
     {
         $sessionName = $this->getSessionName();
-        $this->session->set($sessionName, serialize(array_merge($this->getSession($key), $values)));
+        $this->session->set($sessionName, serialize(array_merge($values, $this->getSession())));
 
         return (array) $values;
     }
@@ -93,11 +93,11 @@ class TrackingHelper
     public function getSession($remove = false)
     {
         $sessionName = $this->getSessionName();
-        $sesionValue = (array) unserialize($this->session->get($sessionName));
+        $sesionValue = unserialize($this->session->get($sessionName));
         if ($remove) {
             $this->session->remove($sessionName);
         }
 
-        return $sesionValue;
+        return (array) $sesionValue;
     }
 }

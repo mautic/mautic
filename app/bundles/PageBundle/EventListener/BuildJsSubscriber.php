@@ -537,7 +537,7 @@ MauticJS.setTrackedEvents = function(events) {
                 }
                 
                 if (typeof ga  !== 'undefined' && typeof events.google_analytics_event !== 'undefined') {
-                 var e = response.response.google_analytics_event; 
+                 var e = events.google_analytics_event; 
                      for(var i = 0; i < e.length; i++) {
                          if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
                              	ga('send', {
