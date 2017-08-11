@@ -563,9 +563,8 @@ img{max-height:200px}.frequency{width:45px!important}.fa-user:before,.fa-buildin
 td{border-bottom:none!important;border-top:none!important}.frequency-values{padding-left:10px;padding-top:27px;padding-bottom:15px}.frequency-select{width:145px !important;float:right;padding-right:5px}.frequency-label{padding:8px}.frequency-date{width:100px;float:left}.panel-companies
 .primary{color:#fdb933}.building::before{content:"\f1ad";font-family:"FontAwesome";padding-right:3px}.user::before{content:"\f007";font-family:"FontAwesome";padding-right:3px}#notification-preview .panel-body
 span{color:rgba(0, 0, 0, 0.5)}#notification-preview .panel-body
+span.fa{line-height:64px;opacity:0.5}#notification-preview .panel-body
 h4{margin-bottom:5px}#notification-preview .panel-body
-img{width:50px;margin:15px
-0 0 6px}#notification-preview .panel-body
 .icon{width:100px;height:80px;float:left}#notification-preview .panel-body
 .text{width:calc(100% - 120px);float:left}.col-page-id{width:75px}.page-builder .builder-panel .panel-body{padding:5px
 0}.symbol-hashtag:before{content:'#'}.shuffle-item.integration{width:100px}.integration-disabled

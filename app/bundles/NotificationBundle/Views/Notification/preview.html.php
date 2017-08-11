@@ -10,7 +10,6 @@
 /* @var \Mautic\NotificationBundle\Entity\Notification $notification */
 $url    = $notification->getUrl();
 $button = $notification->getButton();
-$icon = $notification->getNotificationIcon();
 
 ?>
 <label>Preview</label>
@@ -18,11 +17,11 @@ $icon = $notification->getNotificationIcon();
     <div class="panel-body">
         <div class="row">
             <div class="icon height-auto text-center">
-                <img src="../../../<?php echo $icon ?>" />
+                <span class="fa fa-bell fs-48"></span>
             </div>
             <div class="text height-auto bg-white">
-                <h4><?php echo $notification->getHeading()?></h4>
-                <p><?php echo $notification->getMessage()?></p>
+                <h4><?php if ($notification->getHeading()) {echo $notification->getHeading();} else {echo 'Your notification header';}?></h4>
+                <p><?php if ($notification->getMessage()) {echo $notification->getMessage();} else {echo 'The message body of your notification';}?></p>
                 <span><?php echo $_SERVER['HTTP_HOST']; ?></span>
             </div>
         </div>

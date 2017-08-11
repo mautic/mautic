@@ -675,14 +675,4 @@ class Notification extends FormEntity
 
         return $this;
     }
-
-    /**
-     * @param string $notificationIcon
-     *
-     * @return $this
-     */
-    public function getNotificationIcon()
-    {
-        return 'app/bundles/NotificationBundle/Assets/img/notification.svg';
-    }
 }
