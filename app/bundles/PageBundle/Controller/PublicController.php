@@ -387,7 +387,7 @@ class PublicController extends CommonFormController
                 'success' => 1,
                 'id'      => ($lead) ? $lead->getId() : null,
                 'sid'     => $trackingId,
-                's'       => $sessionValue,
+                'events'  => $sessionValue,
             ]
         );
     }
@@ -543,31 +543,6 @@ class PublicController extends CommonFormController
         }
 
         return new Response();
-    }
-
-    /**
-     * Tracking Pixel event.
-     */
-    public function trackingPixelEventAction()
-    {
-        if (!$this->get('mautic.security')->isAnonymous()) {
-            return new JsonResponse(
-                [
-                    'success' => 0,
-                ]
-            );
-        }
-
-        /** @var TrackingHelper $trackingHelper */
-        $trackingHelper = $this->get('mautic.page.helper.tracking');
-        $sessionValue   = $trackingHelper->getSession(true);
-
-        return new JsonResponse(
-            [
-                'success'  => empty($sessionValue) ? 0 : 1,
-                'response' => $sessionValue,
-            ]
-        );
     }
 
     /**

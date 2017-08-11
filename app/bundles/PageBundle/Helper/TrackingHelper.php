@@ -75,17 +75,14 @@ class TrackingHelper
     }
 
     /**
-     * @param $key
-     * @param $action
-     * @param $label
+     * @param array $values
      *
      * @return array
      */
-    public function setSession($key, $values)
+    public function updateSession($values)
     {
         $sessionName = $this->getSessionName();
-
-        $this->session->set($sessionName, serialize($values));
+        $this->session->set($sessionName, serialize(array_merge($this->getSession($key), $values)));
 
         return (array) $values;
     }

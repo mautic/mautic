@@ -50,10 +50,6 @@ return [
                 'path'       => '/video/hit',
                 'controller' => 'MauticPageBundle:Public:hitVideo',
             ],
-            'mautic_tracking_pixel_event' => [
-                'path'       => '/tracking/pixel/event',
-                'controller' => 'MauticPageBundle:Public:trackingPixelEvent',
-            ],
         ],
         'api' => [
             'mautic_api_pagesstandard' => [

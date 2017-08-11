@@ -210,11 +210,12 @@ class CampaignSubscriber extends CommonSubscriber
         if (empty($config['services'])) {
             return $event->setResult(false);
         }
+
         $values = [];
         foreach ($config['services'] as $service) {
             $values[$service][] = ['category' => $config['category'], 'action' => $config['action'], 'label' => $config['label']];
         }
-        $this->trackingHelper->setSession($service, $values);
+        $this->trackingHelper->updateSession($values);
 
         return $event->setResult(true);
     }

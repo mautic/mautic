@@ -514,43 +514,44 @@ JS;
      */
     public function onBuildJsForTrackingEvent(BuildJsEvent $event)
     {
-        $trackingPixelEventCORSUrl = $this->router->generate(
-            'mautic_tracking_pixel_event',
-            [],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-
-        $js = <<<JS
-       setTimeout(function(){
-        MauticJS.makeCORSRequest('GET', '{$trackingPixelEventCORSUrl}', {}, function(response, xhr) {
-        if(response.success == 0){
-            return;
-        }else{
-             if (typeof fbq  !== 'undefined' && typeof response.response.facebook_pixel_event !== 'undefined') {
-                 var fb = response.response.facebook_pixel_event; 
-                     for(var i = 0; i < fb.length; i++) {
-                         if(typeof fb[i]['action']  !== 'undefined' && typeof fb[i]['label']  !== 'undefined' )
-                            fbq('trackCustom', fb[i]['action'], {
-                                eventLabel: fb[i]['label']
+        $js = <<<'JS'
+        MauticJS.mtcEventSet=false;
+        document.addEventListener('mauticPageEventDelivered', function(e) {
+            var detail   = e.detail;
+            if (!MauticJS.mtcEventSet && detail.response && detail.response.events) {
+                MauticJS.setTrackedEvents(detail.response.events);
+            }
+      });
+      
+      
+MauticJS.setTrackedEvents = function(events) {
+        MauticJS.mtcEventSet=true;
+       if (typeof fbq  !== 'undefined' && typeof events.facebook_pixel_event !== 'undefined') {
+                 var e = events.facebook_pixel_event; 
+                     for(var i = 0; i < e.length; i++) {
+                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
+                            fbq('trackCustom', e[i]['action'], {
+                                eventLabel: e[i]['label']
                             });
                      }
                 }
                 
-                if (typeof ga  !== 'undefined' && typeof response.response.google_analytics_event !== 'undefined') {
-                 var fb = response.response.google_analytics_event; 
-                     for(var i = 0; i < fb.length; i++) {
-                         if(typeof fb[i]['action']  !== 'undefined' && typeof fb[i]['label']  !== 'undefined' )
+                if (typeof ga  !== 'undefined' && typeof events.google_analytics_event !== 'undefined') {
+                 var e = response.response.google_analytics_event; 
+                     for(var i = 0; i < e.length; i++) {
+                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
                              	ga('send', {
                                     hitType: 'event',
-                                    eventCategory: fb[i]['category'],
-                                    eventAction: fb[i]['action'],
-                                    eventLabel: fb[i]['label'],
+                                    eventCategory: e[i]['category'],
+                                    eventAction: e[i]['action'],
+                                    eventLabel: e[i]['label'],
 			                     });
                      }
                 }
-			}
-	    });
-        }, 1000);
+
+};
+
+   
 JS;
         $event->appendJs($js, 'Mautic 3rd party tracking pixels');
     }
