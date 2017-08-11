@@ -282,6 +282,33 @@ MauticJS.setTrackedContact = function(response) {
     }
 };
 
+MauticJS.setTrackedEvents = function(response) {
+    if (response.events) {
+         if (typeof fbq  !== 'undefined' && typeof response.response.facebook_pixel_event !== 'undefined') {
+                 var fb = response.response.facebook_pixel_event; 
+                     for(var i = 0; i < fb.length; i++) {
+                         if(typeof fb[i]['action']  !== 'undefined' && typeof fb[i]['label']  !== 'undefined' )
+                            fbq('trackCustom', fb[i]['action'], {
+                                eventLabel: fb[i]['label']
+                            });
+                     }
+                }
+                
+                if (typeof ga  !== 'undefined' && typeof response.response.google_analytics_event !== 'undefined') {
+                 var fb = response.response.google_analytics_event; 
+                     for(var i = 0; i < fb.length; i++) {
+                         if(typeof fb[i]['action']  !== 'undefined' && typeof fb[i]['label']  !== 'undefined' )
+                             	ga('send', {
+                                    hitType: 'event',
+                                    eventCategory: fb[i]['category'],
+                                    eventAction: fb[i]['action'],
+                                    eventLabel: fb[i]['label'],
+			                     });
+                     }
+                }
+    }
+};
+
 // Register events that should happen after the first event is delivered
 MauticJS.postEventDeliveryQueue = [];
 MauticJS.firstDeliveryMade      = false;
@@ -295,6 +322,7 @@ document.addEventListener('mauticPageEventDelivered', function(e) {
         MauticJS.getTrackedContact();
     } else if (detail.response && detail.response.id) {
         MauticJS.setTrackedContact(detail.response);
+        MauticJS.setTrackedEvents(detail.response);
     }
     
     if (!isImage && typeof detail.event[3] === 'object' && typeof detail.event[3].onload === 'function') {

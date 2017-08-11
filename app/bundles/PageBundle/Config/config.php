@@ -322,9 +322,7 @@ return [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
-        'pixel_in_campaign_enabled' => false,
-        'google_analytics_id'       => '',
-        'google_adwords_id'         => '',
-        'facebook_pixel_id'         => '',
+        'google_analytics_event' => false,
+        'facebook_pixel_event'   => false,
     ],
 ];

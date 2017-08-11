@@ -50,20 +50,15 @@ class TrackingHelper
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function isEnabledCampaignAction()
-    {
-        return (bool) $this->coreParametersHelper->getParameter('pixel_in_campaign_enabled');
-    }
-
     public function getEnabledServices()
     {
         $keys = [
-            'google_analytics_id' => 'Google Analytics',
-            'facebook_pixel_id'   => 'Facebook Pixel',
+            'google_analytics_event' => 'Google Analytics',
+            'facebook_pixel_event'   => 'Facebook Pixel',
         ];
         $result = [];
         foreach ($keys as $key => $service) {
-            if (1 == 1 || $id = $this->coreParametersHelper->getParameter($key)) {
+            if ($id = $this->coreParametersHelper->getParameter($key)) {
                 $result[$key] = $service;
             }
         }

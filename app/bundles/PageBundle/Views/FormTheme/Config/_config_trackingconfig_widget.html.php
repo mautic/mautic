@@ -26,16 +26,20 @@
     mt('send', 'pageview');
 &lt;/script&gt;</pre>
         </div>
+
+        <?php echo $view['form']->row($form['track_contact_by_ip']); ?>
+        <?php echo $view['form']->row($form['track_by_tracking_url']); ?>
+        <?php echo $view['form']->row($form['track_by_fingerprint']); ?>
+
     </div>
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.tracking.pixels'); ?></h3>
 
     </div>
     <div class="panel-body">
-        <?php echo $view['form']->row($form['pixel_in_campaign_enabled']); ?>
-        <?php echo $view['form']->row($form['facebook_pixel_id']); ?>
-        <?php echo $view['form']->row($form['google_analytics_id']); ?>
-        <?php echo $view['form']->row($form['google_adwords_id']); ?>
+        <p><?php echo $view['translator']->trans('mautic.config.tab.tracking.info'); ?></p>
 
+        <?php echo $view['form']->row($form['google_analytics_event']); ?>
+        <?php echo $view['form']->row($form['facebook_pixel_event']); ?>
     </div>
 </div>

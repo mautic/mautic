@@ -26,50 +26,47 @@ class ConfigTrackingPageType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'pixel_in_campaign_enabled',
+            'track_contact_by_ip',
             'yesno_button_group',
             [
-                'label' => 'mautic.page.config.form.pixel.campaign.enabled',
-                'data'  => (bool) $options['data']['pixel_in_campaign_enabled'],
+                'label' => 'mautic.page.config.form.track_contact_by_ip',
+                'data'  => (bool) $options['data']['track_contact_by_ip'],
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.form.track_contact_by_ip.tooltip',
+                ],
             ]
         );
 
-        $builder->add(
-            'google_analytics_id',
-            'text',
-            [
-                'label' => 'mautic.page.config.form.google.analytics.id',
-                'attr'  => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_trackingconfig_pixel_in_campaign_enabled_1":"checked"}',
-                ],
-                'required' => false,
-            ]
-        );
-        $smtpServiceShowConditions = '{"config_emailconfig_mailer_transport":["smtp"]}';
-        $builder->add(
-            'google_adwords_id',
-            'text',
-            [
-                'label' => 'mautic.page.config.form.google.adwords.id',
-                'attr'  => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_trackingconfig_pixel_in_campaign_enabled_1":"checked"}',
-                ],
-                'required' => false,
-            ]
-        );
+        $builder->add('track_by_tracking_url', 'yesno_button_group', [
+            'label' => 'mautic.page.config.form.track.by.tracking.url',
+            'data'  => (bool) $options['data']['track_by_tracking_url'],
+            'attr'  => [
+                'tooltip' => 'mautic.page.config.form.track.by.tracking.url.tooltip',
+            ],
+        ]);
+
+        $builder->add('track_by_fingerprint', 'yesno_button_group', [
+            'label' => 'mautic.page.config.form.track.by.fingerprint',
+            'data'  => (bool) $options['data']['track_by_fingerprint'],
+            'attr'  => [
+                'tooltip' => 'mautic.page.config.form.track.by.fingerprint.tooltip',
+            ],
+        ]);
 
         $builder->add(
-            'facebook_pixel_id',
-            'text',
+            'google_analytics_event',
+            'yesno_button_group',
             [
-                'label' => 'mautic.page.config.form.facebook.pixel.id',
-                'attr'  => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"config_trackingconfig_pixel_in_campaign_enabled_1":"checked"}',
-                ],
-                'required' => false,
+                'label' => 'mautic.page.config.form.event.google.analytics.enabled',
+                'data'  => (bool) $options['data']['google_analytics_event'],
+            ]
+        );
+        $builder->add(
+            'facebook_pixel_event',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.page.config.form.event.facebook.pixel.enabled',
+                'data'  => (bool) $options['data']['facebook_pixel_event'],
             ]
         );
     }

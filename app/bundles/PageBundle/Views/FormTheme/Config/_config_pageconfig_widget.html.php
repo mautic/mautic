@@ -16,9 +16,6 @@
     </div>
     <div class="panel-body">
         <?php foreach ($form->children as $name => $f): ?>
-            <?php if ('track_contact_by_ip' == $name && 'track_by_fingerprint' == $name) {
-    continue;
-} ?>
             <div class="row">
                 <div class="col-md-6">
                     <?php echo $view['form']->row($f); ?>

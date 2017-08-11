@@ -378,11 +378,16 @@ class PublicController extends CommonFormController
 
         list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
 
+        /** @var TrackingHelper $trackingHelper */
+        $trackingHelper = $this->get('mautic.page.helper.tracking');
+        $sessionValue   = $trackingHelper->getSession();
+
         return new JsonResponse(
             [
                 'success' => 1,
                 'id'      => ($lead) ? $lead->getId() : null,
                 'sid'     => $trackingId,
+                's'       => $sessionValue,
             ]
         );
     }

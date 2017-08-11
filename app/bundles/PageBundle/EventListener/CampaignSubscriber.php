@@ -88,7 +88,7 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addDecision('page.pagehit', $pageHitTrigger);
 
         $trackingServices = $this->trackingHelper->getEnabledServices();
-        if ($this->trackingHelper->isEnabledCampaignAction() && !empty($trackingServices)) {
+        if (!empty($trackingServices)) {
             $action = [
                 'label'                  => 'mautic.page.tracking.pixel.event.send',
                 'description'            => 'mautic.page.tracking.pixel.event.send_desc',
@@ -212,7 +212,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
         $values = [];
         foreach ($config['services'] as $service) {
-            $values[$service][] = ['action' => $config['action'], 'label' => $config['label']];
+            $values[$service][] = ['category' => $config['category'], 'action' => $config['action'], 'label' => $config['label']];
         }
         $this->trackingHelper->setSession($service, $values);
 
