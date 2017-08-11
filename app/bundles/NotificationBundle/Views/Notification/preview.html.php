@@ -10,24 +10,25 @@
 /* @var \Mautic\NotificationBundle\Entity\Notification $notification */
 $url    = $notification->getUrl();
 $button = $notification->getButton();
+$icon = $notification->getNotificationIcon();
 
 ?>
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            <?php echo $notification->getHeading()?>
-            <?php if ($url) : ?>
-            <span class="pull-right">
-                <a href="<?php echo $url; ?>" target="_blank"><span class="fa fa-external-link"></span></a>
-            </span>
-            <?php endif; ?>
-        </h3>
-    </div>
+<label>Preview</label>
+<div id="notification-preview" class="panel panel-default">
     <div class="panel-body">
-        <p><?php echo $notification->getMessage()?></p>
+        <div class="row">
+            <div class="icon height-auto text-center">
+                <img src="../../../<?php echo $icon ?>" />
+            </div>
+            <div class="text height-auto bg-white">
+                <h4><?php echo $notification->getHeading()?></h4>
+                <p><?php echo $notification->getMessage()?></p>
+                <span><?php echo $_SERVER['HTTP_HOST']; ?></span>
+            </div>
+        </div>
         <?php if ($url && $button) : ?>
-            <br>
-            <p><a href="<?php echo $url ?>" class="btn btn-primary"><?php echo $button ?></a></p>
+            <hr>
+            <a href="<?php echo $url ?>"><?php echo $button ?></a>
         <?php endif; ?>
     </div>
 </div>
