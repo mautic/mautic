@@ -20,8 +20,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'account'  => 'mautic.ines_crm.form.account',
-            'username' => 'mautic.ines_crm.form.username',
+            'compte'   => 'mautic.ines_crm.form.account',
+            'userName' => 'mautic.ines_crm.form.username',
             'password' => 'mautic.ines_crm.form.password',
         ];
     }
@@ -126,6 +126,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function getFormLeadFields($settings = []) {
+
+        // TODO: display the actual fields
+        $this->getApiHelper()->getLeadFields();
+
         return [
             'ines_email' => [
                 'label' => 'Email address',
