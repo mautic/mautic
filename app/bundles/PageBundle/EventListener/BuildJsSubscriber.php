@@ -15,6 +15,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\PageBundle\Helper\TrackingHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -28,13 +29,20 @@ class BuildJsSubscriber extends CommonSubscriber
     protected $assetsHelper;
 
     /**
+     * @var TrackingHelper
+     */
+    protected $trackingHelper;
+
+    /**
      * BuildJsSubscriber constructor.
      *
-     * @param AssetsHelper $assetsHelper
+     * @param AssetsHelper   $assetsHelper
+     * @param TrackingHelper $trackingHelper
      */
-    public function __construct(AssetsHelper $assetsHelper)
+    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper)
     {
-        $this->assetsHelper = $assetsHelper;
+        $this->assetsHelper   = $assetsHelper;
+        $this->trackingHelper = $trackingHelper;
     }
 
     /**
@@ -514,7 +522,33 @@ JS;
      */
     public function onBuildJsForTrackingEvent(BuildJsEvent $event)
     {
-        $js = <<<'JS'
+        $js = '';
+
+        if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
+            $js .= <<<JS
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', '{$id}', 'auto');
+  ga('send', 'pageview');
+
+JS;
+        }
+
+        if ($id = $this->trackingHelper->displayInitCode('facebook_pixel')) {
+            $js .= <<<JS
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '{$id}'); // Insert your pixel ID here.
+fbq('track', 'PageView');
+JS;
+        }
+        $js .= <<<'JS'
         MauticJS.mtcEventSet=false;
         document.addEventListener('mauticPageEventDelivered', function(e) {
             var detail   = e.detail;
@@ -526,8 +560,8 @@ JS;
       
 MauticJS.setTrackedEvents = function(events) {
         MauticJS.mtcEventSet=true;
-       if (typeof fbq  !== 'undefined' && typeof events.facebook_pixel_event !== 'undefined') {
-                 var e = events.facebook_pixel_event; 
+       if (typeof fbq  !== 'undefined' && typeof events.facebook_pixel !== 'undefined') {
+                 var e = events.facebook_pixel; 
                      for(var i = 0; i < e.length; i++) {
                          if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
                             fbq('trackCustom', e[i]['action'], {
@@ -536,8 +570,8 @@ MauticJS.setTrackedEvents = function(events) {
                      }
                 }
                 
-                if (typeof ga  !== 'undefined' && typeof events.google_analytics_event !== 'undefined') {
-                 var e = events.google_analytics_event; 
+                if (typeof ga  !== 'undefined' && typeof events.google_analytics !== 'undefined') {
+                 var e = events.google_analytics; 
                      for(var i = 0; i < e.length; i++) {
                          if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
                              	ga('send', {

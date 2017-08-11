@@ -14,6 +14,7 @@ namespace Mautic\PageBundle\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
@@ -37,28 +38,35 @@ class TrackingHelper
     protected $coreParametersHelper;
 
     /**
+     * @var RequestStack
+     */
+    protected $request;
+
+    /**
      * BuildJsSubscriber constructor.
      *
      * @param LeadModel            $leadModel
      * @param Session              $session
      * @param CoreParametersHelper $coreParametersHelper
+     * @param RequestStack         $request
      */
-    public function __construct(LeadModel $leadModel, Session $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(LeadModel $leadModel, Session $session, CoreParametersHelper $coreParametersHelper, RequestStack $request)
     {
         $this->leadModel            = $leadModel;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->request              = $request;
     }
 
     public function getEnabledServices()
     {
         $keys = [
-            'google_analytics_event' => 'Google Analytics',
-            'facebook_pixel_event'   => 'Facebook Pixel',
+            'google_analytics' => 'Google Analytics',
+            'facebook_pixel'   => 'Facebook Pixel',
         ];
         $result = [];
         foreach ($keys as $key => $service) {
-            if ($id = $this->coreParametersHelper->getParameter($key)) {
+            if (($id = $this->coreParametersHelper->getParameter($key.'_id')) && $this->coreParametersHelper->getParameter($key.'_event')) {
                 $result[$key] = $service;
             }
         }
@@ -99,5 +107,29 @@ class TrackingHelper
         }
 
         return (array) $sesionValue;
+    }
+
+    public function displayInitCode($service)
+    {
+        $pixelId = $this->coreParametersHelper->getParameter($service.'_id');
+
+        if ($pixelId && $this->coreParametersHelper->getParameter($service.'_landingpage_enabled') && $this->isLandingPage()) {
+            return $pixelId;
+        }
+        if ($pixelId && $this->coreParametersHelper->getParameter($service.'_trackingpage_enabled') && !$this->isLandingPage()) {
+            return $pixelId;
+        }
+
+        return false;
+    }
+
+    protected function isLandingPage()
+    {
+        $server = $this->request->getCurrentRequest()->server;
+        if (strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->getParameter('site_url')) === false) {
+            return false;
+        }
+
+        return true;
     }
 }

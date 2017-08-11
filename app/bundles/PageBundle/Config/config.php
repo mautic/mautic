@@ -103,6 +103,7 @@ return [
                     'mautic.page.helper.token',
                     'mautic.helper.integration',
                     'mautic.page.model.page',
+                    'mautic.page.helper.tracking',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [
@@ -168,6 +169,7 @@ return [
                 'class'     => 'Mautic\PageBundle\EventListener\BuildJsSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
+                    'mautic.page.helper.tracking',
                 ],
             ],
             'mautic.page.maintenance.subscriber' => [
@@ -303,6 +305,7 @@ return [
                     'mautic.lead.model.lead',
                     'session',
                     'mautic.helper.core_parameters',
+                    'request_stack',
                 ],
             ],
         ],
@@ -318,7 +321,15 @@ return [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
-        'google_analytics_event' => false,
-        'facebook_pixel_event'   => false,
+        'google_analytics_id'                   => null,
+        'google_analytics_event'                => false,
+        'google_analytics_user_id'              => false,
+        'google_analytics_trackingpage_enabled' => false,
+        'google_analytics_landingpage_enabled'  => false,
+        'facebook_pixel_id'                     => null,
+        'facebook_pixel_event'                  => false,
+        'facebook_pixel_matching'               => false,
+        'facebook_pixel_trackingpage_enabled'   => false,
+        'facebook_pixel_landingpage_enabled'    => false,
     ],
 ];

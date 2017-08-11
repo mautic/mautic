@@ -26,20 +26,55 @@
     mt('send', 'pageview');
 &lt;/script&gt;</pre>
         </div>
+        <div class="row">
+            <?php foreach ($form->children as $name => $f): ?>
+                <?php if (in_array($name, ['track_contact_by_ip', 'track_by_tracking_url', 'track_by_fingerprint'])) {
+    ?>
+                        <div class="col-md-6">
+                            <?php echo $view['form']->row($f); ?>
+                        </div>
+                    <?php
 
-        <?php echo $view['form']->row($form['track_contact_by_ip']); ?>
-        <?php echo $view['form']->row($form['track_by_tracking_url']); ?>
-        <?php echo $view['form']->row($form['track_by_fingerprint']); ?>
-
+}
+            endforeach; ?>
+        </div>
     </div>
     <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.tracking.pixels'); ?></h3>
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.tracking.facebook.pixel'); ?></h3>
 
     </div>
     <div class="panel-body">
-        <p><?php echo $view['translator']->trans('mautic.config.tab.tracking.info'); ?></p>
+        <div class="row">
+            <?php foreach ($form->children as $name => $f): ?>
+                <?php if (in_array($name, ['facebook_pixel_trackingpage_enabled', 'facebook_pixel_landingpage_enabled', 'facebook_pixel_matching', 'facebook_pixel_id', 'facebook_pixel_event'])) {
+                ?>
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($f); ?>
+                    </div>
+                    <?php
 
-        <?php echo $view['form']->row($form['google_analytics_event']); ?>
-        <?php echo $view['form']->row($form['facebook_pixel_event']); ?>
+            }
+            endforeach; ?>
+        </div>
+    </div>
+
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.config.tab.tracking.google.analytics'); ?></h3>
+
+    </div>
+    <div class="panel-body">
+
+        <div class="row">
+            <?php foreach ($form->children as $name => $f): ?>
+                <?php if (in_array($name, ['google_analytics_trackingpage_enabled', 'google_analytics_landingpage_enabled', 'google_analytics_user_id', 'google_analytics_id', 'google_analytics_event'])) {
+                ?>
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($f); ?>
+                    </div>
+                    <?php
+
+            }
+            endforeach; ?>
+        </div>
     </div>
 </div>
