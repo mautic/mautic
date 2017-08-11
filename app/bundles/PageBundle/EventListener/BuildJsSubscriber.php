@@ -524,7 +524,8 @@ JS;
     {
         $js = '';
 
-        $lead = $this->trackingHelper->getLead();
+        $lead   = $this->trackingHelper->getLead();
+        $leadId = ($lead && $lead->getId()) ? $lead->getId() : '';
         if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
             $js .= <<<JS
             dataLayer = window.dataLayer ? window.dataLayer : [];
@@ -534,11 +535,31 @@ JS;
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
   ga('create', '{$id}', 'auto');
   ga('send', 'pageview');
-  ga('set', 'userId', {$lead->getId()});
+  ga('set', 'userId', {$leadId});
 JS;
         }
 
         if ($id = $this->trackingHelper->displayInitCode('facebook_pixel')) {
+            $customMatch = [];
+            if ($lead && $lead->getId()) {
+                $fieldsToMatch = [
+                    'fn' => 'firstname',
+                    'ln' => 'lastname',
+                    'em' => 'email',
+                    'ph' => 'phone',
+                    'ct' => 'city',
+                    'st' => 'state',
+                    'zp' => 'zipcode',
+                ];
+                foreach ($fieldsToMatch as $key => $fieldToMatch) {
+                    $par = 'get'.ucfirst($fieldToMatch);
+                    if ($value = $lead->{$par}()) {
+                        $customMatch[$key] = $value;
+                    }
+                }
+            }
+            $customMatch = json_encode($customMatch);
+
             $js .= <<<JS
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
@@ -546,7 +567,7 @@ n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
 document,'script','https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '{$id}'); // Insert your pixel ID here.
-fbq('track', 'PageView');
+fbq('track', 'PageView', {$customMatch});
 JS;
         }
         $js .= <<<'JS'
