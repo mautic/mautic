@@ -99,8 +99,13 @@ trait RequestTrait
      */
     public function cleanFields(&$fieldData, $leadField)
     {
+        // This will catch null values or non-existent values to prevent null from converting to false/0
+        if (!isset($fieldData[$leadField['alias']])) {
+            return;
+        }
+
         switch ($leadField['type']) {
-            // Adjust the boolean values from text to boolean
+            // Adjust the boolean values from text to boolean. Do not convert null to false.
             case 'boolean':
                 $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
                 break;
