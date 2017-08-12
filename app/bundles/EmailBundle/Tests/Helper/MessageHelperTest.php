@@ -78,6 +78,7 @@ BODY;
         return [
             "mailbox full-1" => ["full", "554 5.2.2 <user@domain.fr>: Recipient address rejected: Quota exceeded (mailbox for user is full)"],
             "mailbox full-2" => ["full", "The email account that you tried to reach is over quota."],
+            "mailbox full-3" => ["full", "452 4.2.2 <user@domain.com> Mailbox is full / Blocks limit exceeded / Inode limit exceeded"],
             "unknown-1" => ["unknown", "550 5.1.1 The email account that you tried to reach does not exist."],
             "spam-1" => ["antispam", "550-5.7.1 [193.198.1.11] Our system has detected that this message is\r550-5.7.1 likely unsolicited mail."]
         ];
