@@ -11,14 +11,30 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 trait FilterTrait
 {
+    /**
+     * @var Connection
+     */
+    protected $connection;
+
+    /**
+     * @param Connection $connection
+     */
+    public function setConnection(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
+
     /**
      * @param                     $eventName
      * @param FormEvent           $event
@@ -32,8 +48,8 @@ trait FilterTrait
         $fieldType = $data['type'];
         $fieldName = $data['field'];
 
-        $type = 'text';
-        $attr = [
+        $type        = 'text';
+        $attr        = [
             'class' => 'form-control',
         ];
         $displayType = 'hidden';
@@ -129,7 +145,7 @@ trait FilterTrait
                         'onchange'             => 'Mautic.createLeadTag(this)',
                     ]
                 );
-                $type = 'choice';
+                $type                                       = 'choice';
                 break;
             case 'stage':
                 $customOptions['choices']                   = $options['stage'];
@@ -263,16 +279,35 @@ trait FilterTrait
                 break;
         }
 
+        $customOptions['constraints'] = [];
         if (in_array($data['operator'], ['empty', '!empty'])) {
             $attr['disabled'] = 'disabled';
         } elseif ($data['operator']) {
-            $customOptions['constraints'] = [
-                new NotBlank(
-                    [
-                        'message' => 'mautic.core.value.required',
-                    ]
-                ),
-            ];
+            $customOptions['constraints'][] = new NotBlank(
+                [
+                    'message' => 'mautic.core.value.required',
+                ]
+            );
+
+            if (in_array($data['operator'], ['regexp', '!regexp']) && $this->connection) {
+                // Let's add a custom valdiator to test the regex
+                $customOptions['constraints'][] =
+                    new Callback(
+                        function ($regex, ExecutionContextInterface $context) {
+                            // Let's test the regex's syntax by making a fake query
+                            try {
+                                $qb = $this->connection->createQueryBuilder();
+                                $qb->select('l.id')
+                                    ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+                                    ->where('l.id REGEXP \''.str_replace(["\'", "'"], ["'", "\'"], $regex).'\'')
+                                    ->setMaxResults(1);
+                                $qb->execute()->fetchAll();
+                            } catch (\Exception $exception) {
+                                $context->buildViolation('mautic.core.regex.invalid')->addViolation();
+                            }
+                        }
+                    );
+            }
         }
 
         // @todo implement in UI
@@ -286,11 +321,11 @@ trait FilterTrait
                         'label' => false,
                         'attr'  => $attr,
                     ],
-                    'label' => false,
+                    'label'   => false,
                 ]
             );
         } else {
-            if (isset($customOptions['constraints']) && is_array($customOptions['constraints'])) {
+            if (!empty($customOptions['constraints'])) {
                 foreach ($customOptions['constraints'] as $i => $constraint) {
                     if (get_class($constraint) === 'NotBlank') {
                         array_splice($customOptions['constraints'], $i, 1);
@@ -306,7 +341,8 @@ trait FilterTrait
                         'attr'           => $attr,
                         'data'           => isset($data['filter']) ? $data['filter'] : '',
                         'error_bubbling' => false,
-                    ], $customOptions
+                    ],
+                    $customOptions
                 )
             );
         }

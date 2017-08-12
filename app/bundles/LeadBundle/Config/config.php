@@ -416,9 +416,14 @@ return [
                 'alias'     => 'leadlist_choices',
             ],
             'mautic.form.type.leadlist_filter' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\FilterType',
-                'alias'     => 'leadlist_filter',
-                'arguments' => ['mautic.factory'],
+                'class'       => 'Mautic\LeadBundle\Form\Type\FilterType',
+                'alias'       => 'leadlist_filter',
+                'arguments'   => ['mautic.factory'],
+                'methodCalls' => [
+                    'setConnection' => [
+                        'database_connection',
+                    ],
+                ],
             ],
             'mautic.form.type.leadfield' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\FieldType',
