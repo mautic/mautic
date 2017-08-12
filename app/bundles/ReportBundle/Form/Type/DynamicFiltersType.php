@@ -30,19 +30,18 @@ class DynamicFiltersType extends AbstractType
             if (isset($filter['dynamic'])) {
                 $column     = $filter['column'];
                 $definition = $options['filterDefinitions']->definitions[$column];
-
-                $args = [
+                $args       = [
                     'label'      => $definition['label'],
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'    => ('datetime' === $definition['type']) ? '' : 'form-control',
+                        'class'    => 'form-control',
                         'onchange' => "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',this.value,'list','.report-content');",
                     ],
                     'required' => false,
                 ];
 
                 switch ($definition['type']) {
-                    case 'bool' :
+                    case 'bool':
                     case 'boolean':
                         $type                      = 'button_group';
                         $args['choices_as_values'] = true;
@@ -59,9 +58,11 @@ class DynamicFiltersType extends AbstractType
                         }
                         break;
                     case 'datetime':
-                        $type                = 'date_time';
-                        $args['time_attr']   = ['class' => 'form-control'];
-                        $args['time_widget'] = 'single_text';
+                        $type           = 'datetime';
+                        $args['input']  = 'string';
+                        $args['widget'] = 'single_text';
+                        $args['format'] = 'Y-m-d H:i:s';
+                        $args['attr']['class'] .= ' datetimepicker';
                         break;
                     case 'multiselect':
                     case 'select':
