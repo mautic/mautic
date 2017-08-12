@@ -29,6 +29,8 @@ class ListModelFunctionalTest extends MauticWebTestCase
         $segmentTestExcludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-exclude-segment-manual-members');
         $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-without-other-filters');
         $segmentTestIncludeWithUnrelatedManualRemovalRef    = $this->fixtures->getReference('segment-test-include-segment-with-unrelated-segment-manual-removal');
+        $segmentMembershipRegex                             = $this->fixtures->getReference('segment-membership-regexp');
+
 
         // These expect filters to be part of the $lists passed to getLeadsByList so pass the entity
         $segmentContacts = $repo->getLeadsByList(
@@ -52,6 +54,7 @@ class ListModelFunctionalTest extends MauticWebTestCase
                 $segmentTestExcludeMembershipManualMembersRef,
                 $segmentTestExcludeMembershipWithoutOtherFiltersRef,
                 $segmentTestIncludeWithUnrelatedManualRemovalRef,
+                $segmentMembershipRegex,
             ],
             ['countOnly' => true]
         );
@@ -168,6 +171,12 @@ class ListModelFunctionalTest extends MauticWebTestCase
             11,
             $segmentContacts[$segmentTestIncludeWithUnrelatedManualRemovalRef->getId()]['count'],
             'There should be 11 contacts in the segment-test-include-segment-with-unrelated-segment-manual-removal segment where a contact has been manually removed form another list'
+        );
+
+        $this->assertEquals(
+            11,
+            $segmentContacts[$segmentMembershipRegex->getId()]['count'],
+            'There should be 11 contacts that match the regex with dayrep.com in it'
         );
     }
 

@@ -1000,12 +1000,12 @@ class LeadListRepository extends CommonRepository
                             break;
                         case 'regexp':
                         case 'notRegexp':
-                            $parameters[$parameter] = $details['filter'];
-                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $not = ($func === 'notRegexp') ? ' NOT' : '';
                             $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                    $alias.'.'.$column.$not.' REGEXP '.$exprParameter
+                                    $alias.'.'.$column.$not.' REGEXP \''.str_replace(["\'", "'"], ["'", "\'"], $details['filter']).'\''
+
                                 )
                             );
                             break;
@@ -1038,14 +1038,17 @@ class LeadListRepository extends CommonRepository
                     }
                     // Specific lead
                     if (!empty($leadId)) {
-                        $subqb->andWhere($subqb->expr()
-                            ->eq($alias.'.lead_id', $leadId));
+                        $subqb->andWhere(
+                            $subqb->expr()
+                                ->eq($alias.'.lead_id', $leadId)
+                        );
                     }
 
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
                 case 'device_model':
-                    $operand = in_array($func, ['eq', 'like', 'regexp', 'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
+                    $ignoreAutoFilter = true;
+                    $operand          = in_array($func, ['eq', 'like', 'regexp', 'notRegexp']) ? 'EXISTS' : 'NOT EXISTS';
 
                     $column = $details['field'];
                     $subqb  = $this->getEntityManager()->getConnection()
@@ -1075,20 +1078,22 @@ class LeadListRepository extends CommonRepository
                             break;
                         case 'regexp':
                         case 'notRegexp':
-                            $parameters[$parameter] = $details['filter'];
-                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $not = ($func === 'notRegexp') ? ' NOT' : '';
                             $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                    $alias.'.'.$column.$not.' REGEXP '.$exprParameter
+                                    $alias.'.'.$column.$not.' REGEXP \''.str_replace(["\'", "'"], ["'", "\'"], $details['filter']).'\''
+
                                 )
                             );
                             break;
                     }
                     // Specific lead
                     if (!empty($leadId)) {
-                        $subqb->andWhere($subqb->expr()
-                            ->eq($alias.'.lead_id', $leadId));
+                        $subqb->andWhere(
+                            $subqb->expr()
+                                ->eq($alias.'.lead_id', $leadId)
+                        );
                     }
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
@@ -1113,10 +1118,15 @@ class LeadListRepository extends CommonRepository
                         case 'neq':
                             $parameters[$parameter] = $details['filter'];
 
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                    ->eq($alias.'.'.$column, $exprParameter), $q->expr()
-                                    ->eq($alias.'.lead_id', 'l.id')));
+                            $subqb->where(
+                                $q->expr()
+                                    ->andX(
+                                        $q->expr()
+                                            ->eq($alias.'.'.$column, $exprParameter),
+                                        $q->expr()
+                                            ->eq($alias.'.lead_id', 'l.id')
+                                    )
+                            );
                             break;
                         case 'between':
                         case 'notBetween':
@@ -1129,34 +1139,48 @@ class LeadListRepository extends CommonRepository
                             $field                   = $column;
 
                             if ($func == 'between') {
-                                $subqb->where($q->expr()
-                                    ->andX(
-                                        $q->expr()->gte($alias.'.'.$field, $exprParameter),
-                                        $q->expr()->lt($alias.'.'.$field, $exprParameter2),
-                                        $q->expr()->eq($alias.'.lead_id', 'l.id')
-                                    ));
+                                $subqb->where(
+                                    $q->expr()
+                                        ->andX(
+                                            $q->expr()->gte($alias.'.'.$field, $exprParameter),
+                                            $q->expr()->lt($alias.'.'.$field, $exprParameter2),
+                                            $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                        )
+                                );
                             } else {
-                                $subqb->where($q->expr()
-                                    ->andX(
-                                        $q->expr()->lt($alias.'.'.$field, $exprParameter),
-                                        $q->expr()->gte($alias.'.'.$field, $exprParameter2),
-                                        $q->expr()->eq($alias.'.lead_id', 'l.id')
-                                    ));
+                                $subqb->where(
+                                    $q->expr()
+                                        ->andX(
+                                            $q->expr()->lt($alias.'.'.$field, $exprParameter),
+                                            $q->expr()->gte($alias.'.'.$field, $exprParameter2),
+                                            $q->expr()->eq($alias.'.lead_id', 'l.id')
+                                        )
+                                );
                             }
                             break;
                         default:
                             $parameters[$parameter] = $details['filter'];
 
-                            $subqb->where($q->expr()
-                                ->andX($q->expr()
-                                    ->$func($alias.'.'.$column, $exprParameter), $q->expr()
-                                    ->eq($alias.'.lead_id', 'l.id')));
+                            $subqb->where(
+                                $q->expr()
+                                    ->andX(
+                                        $q->expr()
+                                            ->$func(
+                                                $alias.'.'.$column,
+                                                $exprParameter
+                                            ),
+                                        $q->expr()
+                                            ->eq($alias.'.lead_id', 'l.id')
+                                    )
+                            );
                             break;
                     }
                     // Specific lead
                     if (!empty($leadId)) {
-                        $subqb->andWhere($subqb->expr()
-                            ->eq($alias.'.lead_id', $leadId));
+                        $subqb->andWhere(
+                            $subqb->expr()
+                                ->eq($alias.'.lead_id', $leadId)
+                        );
                     }
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
@@ -1180,20 +1204,32 @@ class LeadListRepository extends CommonRepository
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                     if ($details['filter'] == 1) {
-                        $subqb->where($q->expr()
-                            ->andX($q->expr()
-                                ->isNotNull($alias.'.'.$column),  $q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
+                        $subqb->where(
+                            $q->expr()
+                                ->andX(
+                                    $q->expr()
+                                        ->isNotNull($alias.'.'.$column),
+                                    $q->expr()
+                                        ->eq($alias.'.lead_id', 'l.id')
+                                )
+                        );
                     } else {
-                        $subqb->where($q->expr()
-                            ->andX($q->expr()
-                                ->isNull($alias.'.'.$column),  $q->expr()
-                                ->eq($alias.'.lead_id', 'l.id')));
+                        $subqb->where(
+                            $q->expr()
+                                ->andX(
+                                    $q->expr()
+                                        ->isNull($alias.'.'.$column),
+                                    $q->expr()
+                                        ->eq($alias.'.lead_id', 'l.id')
+                                )
+                        );
                     }
                     // Specific lead
                     if (!empty($leadId)) {
-                        $subqb->andWhere($subqb->expr()
-                            ->eq($alias.'.lead_id', $leadId));
+                        $subqb->andWhere(
+                            $subqb->expr()
+                                ->eq($alias.'.lead_id', $leadId)
+                        );
                     }
 
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
@@ -1214,21 +1250,29 @@ class LeadListRepository extends CommonRepository
                         ->select($alias2.'.id')
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias2);
 
-                    $subqb2->where($q->expr()
-                        ->andX(
-                            $q->expr()->eq($alias2.'.lead_id', 'l.id'),
-                            $q->expr()->gt($alias2.'.date_hit', '('.$alias.'.date_hit - INTERVAL 30 MINUTE)'),
-                            $q->expr()->lt($alias2.'.date_hit', $alias.'.date_hit')
-                        ));
+                    $subqb2->where(
+                        $q->expr()
+                            ->andX(
+                                $q->expr()->eq($alias2.'.lead_id', 'l.id'),
+                                $q->expr()->gt($alias2.'.date_hit', '('.$alias.'.date_hit - INTERVAL 30 MINUTE)'),
+                                $q->expr()->lt($alias2.'.date_hit', $alias.'.date_hit')
+                            )
+                    );
 
                     $parameters[$parameter] = $details['filter'];
 
-                    $subqb->where($q->expr()
-                        ->andX($q->expr()
-                            ->eq($alias.'.lead_id', 'l.id'), $q->expr()
-                            ->isNull($alias.'.email_id'), $q->expr()
-                            ->isNull($alias.'.redirect_id'),
-                            sprintf('%s (%s)', 'NOT EXISTS', $subqb2->getSQL())));
+                    $subqb->where(
+                        $q->expr()
+                            ->andX(
+                                $q->expr()
+                                    ->eq($alias.'.lead_id', 'l.id'),
+                                $q->expr()
+                                    ->isNull($alias.'.email_id'),
+                                $q->expr()
+                                    ->isNull($alias.'.redirect_id'),
+                                sprintf('%s (%s)', 'NOT EXISTS', $subqb2->getSQL())
+                            )
+                    );
 
                     $opr = '';
                     switch ($func) {
@@ -1270,9 +1314,13 @@ class LeadListRepository extends CommonRepository
                         ->from(MAUTIC_TABLE_PREFIX.$table, $alias);
 
                     $parameters[$parameter] = $details['filter'];
-                    $subqb->where($q->expr()
-                        ->andX($q->expr()
-                            ->eq($alias.'.lead_id', 'l.id')));
+                    $subqb->where(
+                        $q->expr()
+                            ->andX(
+                                $q->expr()
+                                    ->eq($alias.'.lead_id', 'l.id')
+                            )
+                    );
 
                     $opr = '';
                     switch ($func) {
@@ -1403,7 +1451,12 @@ class LeadListRepository extends CommonRepository
 
                                 // Left join membership to account for manually added and removed
                                 $membershipAlias = $this->generateRandomParameterName();
-                                $subQb->leftJoin($alias, MAUTIC_TABLE_PREFIX.$table, $membershipAlias, "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id")
+                                $subQb->leftJoin(
+                                    $alias,
+                                    MAUTIC_TABLE_PREFIX.$table,
+                                    $membershipAlias,
+                                    "$membershipAlias.lead_id = $alias.id AND $membershipAlias.leadlist_id = $id"
+                                )
                                     ->where(
                                         $subQb->expr()->orX(
                                             $filterExpr,
@@ -1479,7 +1532,15 @@ class LeadListRepository extends CommonRepository
                             break;
                     }
 
-                    $subQb = $this->createFilterExpressionSubQuery($table, $alias, $column, $details['filter'],  $parameters, $leadId, $subQueryFilters);
+                    $subQb = $this->createFilterExpressionSubQuery(
+                        $table,
+                        $alias,
+                        $column,
+                        $details['filter'],
+                        $parameters,
+                        $leadId,
+                        $subQueryFilters
+                    );
 
                     $groupExpr->add(
                         sprintf('%s (%s)', $func, $subQb->getSQL())
@@ -1499,12 +1560,12 @@ class LeadListRepository extends CommonRepository
                     switch ($func) {
                         case 'empty':
                             $groupExpr->add(
-                               $q->expr()->isNull('l.stage_id')
+                                $q->expr()->isNull('l.stage_id')
                             );
                             break;
                         case 'notEmpty':
                             $groupExpr->add(
-                               $q->expr()->isNotNull('l.stage_id')
+                                $q->expr()->isNotNull('l.stage_id')
                             );
                             break;
                         case 'eq':
@@ -1660,7 +1721,8 @@ class LeadListRepository extends CommonRepository
                             switch ($func) {
                                 case 'like':
                                 case 'notLike':
-                                    $parameters[$parameter] = (strpos($details['filter'], '%') === false) ? '%'.$details['filter'].'%' : $details['filter'];
+                                    $parameters[$parameter] = (strpos($details['filter'], '%') === false) ? '%'.$details['filter'].'%'
+                                        : $details['filter'];
                                     break;
                                 case 'startsWith':
                                     $func                   = 'like';
@@ -1682,18 +1744,17 @@ class LeadListRepository extends CommonRepository
                             break;
                         case 'regexp':
                         case 'notRegexp':
-                            $ignoreAutoFilter       = true;
-                            $parameters[$parameter] = $details['filter'];
-                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
+                            $ignoreAutoFilter = true;
+                            $not              = ($func === 'notRegexp') ? ' NOT' : '';
                             $groupExpr->add(
-                                $field.$not.' REGEXP '.$exprParameter
+                                // Escape single quotes while accounting for those that may already be escaped
+                                $field.$not.' REGEXP \''.str_replace(["\'", "'"], ["'", "\'"], $details['filter']).'\''
                             );
                             break;
                         default:
                             $groupExpr->add($q->expr()->$func($field, $exprParameter));
                     }
             }
-
             if (!$ignoreAutoFilter) {
                 if (!is_array($details['filter'])) {
                     switch ($details['type']) {
