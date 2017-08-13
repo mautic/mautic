@@ -27,6 +27,7 @@ trait RegexTrait
     protected function prepareRegex($regex)
     {
         $search = [
+            "\\\\'",
             "\\'",
             "'",
             '\\\\$',
@@ -48,6 +49,7 @@ trait RegexTrait
         ];
 
         $replace = [
+            "'",
             "'",
             "\\'",
             "\\$",
