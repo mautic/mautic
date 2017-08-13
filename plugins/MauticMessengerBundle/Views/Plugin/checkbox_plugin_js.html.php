@@ -1,6 +1,6 @@
 window.fbAsyncInit = function() {
 FB.init({
-appId      : '<?php echo $featureSettings['messenger_app_id']; ?>',
+appId      : '<?php echo $apiKeys['messenger_app_id']; ?>',
 xfbml      : true,
 version    : 'v2.6'
 });
@@ -27,8 +27,8 @@ console.log("Plugin was hidden");
 
 function confirmOptIn() {
 FB.AppEvents.logEvent('MessengerCheckboxUserConfirmation', null, {
-'app_id':'<?php echo $featureSettings['messenger_app_id']; ?>',
-'page_id':'<?php echo $featureSettings['messenger_page_id']; ?>',
+'app_id':'<?php echo $apiKeys['messenger_app_id']; ?>',
+'page_id':'<?php echo $apiKeys['messenger_page_id']; ?>',
 'user_ref':'<?php echo $userRef; ?>'
 });
 console.log(<?php echo $userRef; ?>);
@@ -46,6 +46,6 @@ fjs.parentNode.insertBefore(js, fjs);
 var elems = document.querySelectorAll('.messengerCheckboxPlugin');
 
 for (var i = 0; i < elems.length; i++) {
-elems[i].innerHTML = '<div class="fb-messenger-checkbox" origin="https://e0367573.ngrok.io" page_id="<?php echo $featureSettings['messenger_page_id']; ?>" messenger_app_id="<?php echo $featureSettings['messenger_app_id']; ?>" user_ref="<?php echo rand().time().rand(); ?>" prechecked="true" allow_login="true" size="large"></div>';
+elems[i].innerHTML = '<div class="fb-messenger-checkbox" origin="<?php echo $view['assets']->getBaseUrl(); ?>" page_id="<?php echo $apiKeys['messenger_page_id']; ?>" messenger_app_id="<?php echo $apiKeys['messenger_app_id']; ?>" user_ref="<?php echo rand().time().rand(); ?>" prechecked="true" allow_login="true" size="large"></div>';
 };
 

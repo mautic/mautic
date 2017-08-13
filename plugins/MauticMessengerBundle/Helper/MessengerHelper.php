@@ -11,52 +11,49 @@
 
 namespace MauticPlugin\MauticMessengerBundle\Helper;
 
-use Mautic\CoreBundle\Exception as MauticException;
 use Joomla\Http\Http;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use  Mautic\CoreBundle\Helper\TemplatingHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class MessengerHelper
 {
-
     /**
      * @var array
      */
     protected static $cache = [];
 
     /**
-     * @var Http $connector ;
+     * @var Http ;
      */
     protected $connector;
 
     /**
-     * @var RequestStack $request ;
+     * @var RequestStack ;
      */
     protected $request;
 
     /**
-     * @var CoreParametersHelper $coreParameterHelper
+     * @var CoreParametersHelper
      */
     protected $coreParameterHelper;
 
     /**
-     * @var LeadModel $leadModel
+     * @var LeadModel
      */
     protected $leadModel;
 
     /**
-     * @var TemplatingHelper $templateHelper
+     * @var TemplatingHelper
      */
     protected $templateHelper;
 
     /**
-     * @var IntegrationHelper $integrationHelper
+     * @var IntegrationHelper
      */
     protected $integrationHelper;
-
 
     public function __construct(
         Http $connector,
@@ -66,12 +63,12 @@ class MessengerHelper
         IntegrationHelper $integrationHelper,
         TemplatingHelper $templatingHelper
     ) {
-        $this->connector = $connector;
-        $this->request = $request->getCurrentRequest();
+        $this->connector           = $connector;
+        $this->request             = $request->getCurrentRequest();
         $this->coreParameterHelper = $coreParametersHelper;
-        $this->leadModel = $leadModel;
-        $this->integrationHelper = $integrationHelper;
-        $this->templateHelper = $templatingHelper;
+        $this->leadModel           = $leadModel;
+        $this->integrationHelper   = $integrationHelper;
+        $this->templateHelper      = $templatingHelper;
     }
 
     public function subscribeApp()
@@ -96,6 +93,7 @@ class MessengerHelper
 
     /**
      * @param string $template
+     *
      * @return string|void
      */
     public function getTemplateContent($template = 'MauticMessengerBundle:Plugin:checkbox_plugin.html.php')
@@ -105,14 +103,16 @@ class MessengerHelper
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
-        $settings = $integration->getIntegrationSettings();
+        $settings        = $integration->getIntegrationSettings();
         $featureSettings = $settings->getFeatureSettings();
+        $apiKeys         = $integration->getDecryptedApiKeys();
 
         return $this->templateHelper->getTemplating()->render(
             $template,
             [
-                'userRef' => $this->getUserRef(),
+                'userRef'         => $this->getUserRef(),
                 'featureSettings' => $featureSettings,
+                'apiKeys'         => $apiKeys,
             ]
         );
     }
@@ -120,12 +120,11 @@ class MessengerHelper
     private function getUserRef()
     {
         if (!isset(self::$cache['userRef'])) {
-            $lead = $this->leadModel->getCurrentLead();
-            $userRef = $lead->getId().time().mt_rand();
+            $lead                   = $this->leadModel->getCurrentLead();
+            $userRef                = $lead->getId().time().mt_rand();
             self::$cache['userRef'] = $userRef;
         }
 
         return self::$cache['userRef'];
     }
-
 }

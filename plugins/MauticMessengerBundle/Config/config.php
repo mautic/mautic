@@ -1,13 +1,14 @@
 <?php
+
 return [
-    'name' => 'Messenger Integration',
+    'name'        => 'Messenger Integration',
     'description' => '',
-    'author' => 'kuzmany.biz',
-    'version' => '1.0.0',
-    'routes' => [
+    'author'      => 'kuzmany.biz',
+    'version'     => '1.0.0',
+    'routes'      => [
         'main' => [
             'mautic_messenger_index' => [
-                'path' => '/messenger/{page}',
+                'path'       => '/messenger/{page}',
                 'controller' => 'MauticMessengerBundle:Messenger:index',
             ],
             'mautic_messenger_action' => [
@@ -17,15 +18,15 @@ return [
         ],
         'public' => [
             'messenger_callback' => [
-                'path' => '/messenger/callback',
+                'path'       => '/messenger/callback',
                 'controller' => 'MauticMessengerBundle:Messenger:callback',
             ],
             'messenger_checkbox_plugin' => [
-                'path' => '/messenger/checkbox',
+                'path'       => '/messenger/checkbox',
                 'controller' => 'MauticMessengerBundle:Messenger:checkbox',
             ],
             'messenger_checkbox_plugin_js' => [
-                'path' => '/messenger/checkbox.js',
+                    'path'   => '/messenger/checkbox.js',
                 'controller' => 'MauticMessengerBundle:Messenger:checkboxJs',
             ],
         ],
@@ -44,28 +45,28 @@ return [
                 'alias' => 'messenger_facebook',
             ],
             'mautic.form.type.messenger.checkbox' => [
-                'class' => 'MauticPlugin\MauticMessengerBundle\Form\Type\FormFieldMessengerCheckboxType',
-                'alias' => 'messenger_checkbox',
+                'class'     => 'MauticPlugin\MauticMessengerBundle\Form\Type\FormFieldMessengerCheckboxType',
+                'alias'     => 'messenger_checkbox',
                 'arguments' => [
-                    'mautic.plugin.helper.messenger'
+                    'mautic.plugin.helper.messenger',
                 ],
             ],
             'mautic.form.type.messenger.send_to_messenger' => [
-                'class' => 'MauticPlugin\MauticMessengerBundle\Form\Type\SendToMessengerType',
-                'alias' => 'messenger_send_to_messenger',
-                'arguments'=> ['mautic.messengerMessage.model.messengerMessage']
+                'class'     => 'MauticPlugin\MauticMessengerBundle\Form\Type\SendToMessengerType',
+                'alias'     => 'messenger_send_to_messenger',
+                'arguments' => ['mautic.messengerMessage.model.messengerMessage'],
             ],
         ],
         'events' => [
             'mautic.plugin.messenger.formbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticMessengerBundle\EventListener\FormSubscriber',
+                'class'     => 'MauticPlugin\MauticMessengerBundle\EventListener\FormSubscriber',
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.plugin.messenger.campaignbundle.subscriber' => [
-                'class' => 'MauticPlugin\MauticMessengerBundle\EventListener\CampaignSubscriber',
+                'class'     => 'MauticPlugin\MauticMessengerBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.campaign.model.event',
                     'mautic.lead.model.lead',
@@ -80,7 +81,7 @@ return [
         ],
         'helpers' => [
             'mautic.plugin.helper.messenger' => [
-                'class' => 'MauticPlugin\MauticMessengerBundle\Helper\MessengerHelper',
+                'class'     => 'MauticPlugin\MauticMessengerBundle\Helper\MessengerHelper',
                 'arguments' => [
                     'mautic.http.connector',
                     'request_stack',
@@ -93,7 +94,7 @@ return [
         ],
         'models' => [
             'mautic.messengerMessage.model.messengerMessage' => [
-                'class'     => 'MauticPlugin\MauticMessengerBundle\Model\MessengerMessageModel',
+                'class' => 'MauticPlugin\MauticMessengerBundle\Model\MessengerMessageModel',
             ],
         ],
     ],
@@ -101,7 +102,7 @@ return [
         'main' => [
             'items' => [
                 'mautic.plugin.messenger.messages' => [
-                    'route' => 'mautic_messenger_index',
+                    'route'  => 'mautic_messenger_index',
                     'access' => ['messenger:messages:viewown', 'messenger:messages:viewother'],
                     'checks' => [
                         'integration' => [
@@ -110,12 +111,12 @@ return [
                             ],
                         ],
                     ],
-                    'parent' => 'mautic.core.channels',
+                    'parent'   => 'mautic.core.channels',
                     'priority' => 100,
                 ],
             ],
         ],
     ],
-    'parameters' => array(),
+    'parameters' => [],
 
 ];
