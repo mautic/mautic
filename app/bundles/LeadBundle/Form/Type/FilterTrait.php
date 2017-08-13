@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
+use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -22,6 +23,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 trait FilterTrait
 {
+    use RegexTrait;
+
     /**
      * @var Connection
      */
@@ -299,7 +302,7 @@ trait FilterTrait
                                 $qb = $this->connection->createQueryBuilder();
                                 $qb->select('l.id')
                                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                                    ->where('l.id REGEXP \''.str_replace(["\'", "'"], ["'", "\'"], $regex).'\'')
+                                    ->where('l.id REGEXP \''.$this->prepareRegex($regex).'\'')
                                     ->setMaxResults(1);
                                 $qb->execute()->fetchAll();
                             } catch (\Exception $exception) {

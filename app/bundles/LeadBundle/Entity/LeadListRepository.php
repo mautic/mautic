@@ -34,6 +34,7 @@ class LeadListRepository extends CommonRepository
 {
     use OperatorListTrait;
     use ExpressionHelperTrait;
+    use RegexTrait;
 
     /**
      * @var bool
@@ -1004,7 +1005,7 @@ class LeadListRepository extends CommonRepository
                             $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                    $alias.'.'.$column.$not.' REGEXP \''.str_replace(["\'", "'"], ["'", "\'"], $details['filter']).'\''
+                                    $alias.'.'.$column.$not.' REGEXP \''.$this->prepareRegex($details['filter']).'\''
 
                                 )
                             );
@@ -1082,7 +1083,7 @@ class LeadListRepository extends CommonRepository
                             $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                    $alias.'.'.$column.$not.' REGEXP \''.str_replace(["\'", "'"], ["'", "\'"], $details['filter']).'\''
+                                    $alias.'.'.$column.$not.' REGEXP \''.$this->prepareRegex($details['filter']).'\''
 
                                 )
                             );
@@ -1748,7 +1749,7 @@ class LeadListRepository extends CommonRepository
                             $not              = ($func === 'notRegexp') ? ' NOT' : '';
                             $groupExpr->add(
                                 // Escape single quotes while accounting for those that may already be escaped
-                                $field.$not.' REGEXP \''.str_replace(["\'", "'"], ["'", "\'"], $details['filter']).'\''
+                                $field.$not.' REGEXP \''.$this->prepareRegex($details['filter']).'\''
                             );
                             break;
                         default:
