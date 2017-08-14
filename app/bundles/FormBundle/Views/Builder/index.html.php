@@ -109,6 +109,7 @@ if (!isset($inBuilder)) {
                                             'id'            => $field['id'],
                                             'formId'        => $formId,
                                             'contactFields' => $contactFields,
+                                            'companyFields' => $companyFields,
                                             'inBuilder'     => $inBuilder,
                                         ]
                                     ); ?>

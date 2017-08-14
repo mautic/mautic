@@ -129,7 +129,31 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
             <div role="tabpanel" class="tab-pane" id="leadfields">
                 <div class="row">
                     <div class="col-md-6">
-                        <?php echo $view['form']->row($form['leadField']); ?>
+                        <?php $fieldGroups = $form['leadField']->vars['choices'];
+                        ?>
+                        <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display: none;">
+                            <option value=""></option>
+                            <?php
+                            foreach ($fieldGroups as $object => $group):
+                            $header = $object;
+                            $icon   = ($object == 'company') ? 'building' : 'user';
+                            ?>
+                            <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
+                                <?php
+                                foreach ($group->choices as $subGroup => $fields):
+                                    foreach ($fields->choices as $field) :
+                                        $attr  = (!empty($field->attr)) ? $field->attr : [];
+                                        $label = $field->label;
+                                        $value = $field->value;
+                                        $data  = (!empty($field->data)) ? $field->data : '';
+                                        ?>
+                                        <option value="<?php echo $value?>" class="segment-filter <?php echo $icon; ?>"><?php echo $label; ?></option>
+                                    <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            </optgroup>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php unset($form['leadField']); ?>
                     </div>
                 </div>
             </div>
