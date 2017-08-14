@@ -11,11 +11,10 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-
 trait RegexTrait
 {
     /**
-     * Ensure that special characters are escaped correctly
+     * Ensure that special characters are escaped correctly.
      *
      * The end goal is to have two backslashes so in PHP, we need 8 because when the regex is used in the query
      * PHP will recognize it as 2
@@ -28,15 +27,15 @@ trait RegexTrait
     {
         $search = [
             '\\\\',
-            "\\",
+            '\\',
             "\\\\'",
             "\\'",
             "'",
         ];
 
         $replace = [
-            "\\",
-            "\\\\",
+            '\\',
+            '\\\\',
             "'",
             "'",
             "\\'",

@@ -51,8 +51,8 @@ trait FilterTrait
         $fieldType = $data['type'];
         $fieldName = $data['field'];
 
-        $type        = 'text';
-        $attr        = [
+        $type = 'text';
+        $attr = [
             'class' => 'form-control',
         ];
         $displayType = 'hidden';
@@ -148,7 +148,7 @@ trait FilterTrait
                         'onchange'             => 'Mautic.createLeadTag(this)',
                     ]
                 );
-                $type                                       = 'choice';
+                $type = 'choice';
                 break;
             case 'stage':
                 $customOptions['choices']                   = $options['stage'];
@@ -324,7 +324,7 @@ trait FilterTrait
                         'label' => false,
                         'attr'  => $attr,
                     ],
-                    'label'   => false,
+                    'label' => false,
                 ]
             );
         } else {

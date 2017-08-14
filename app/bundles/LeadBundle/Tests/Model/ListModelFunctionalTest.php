@@ -31,7 +31,6 @@ class ListModelFunctionalTest extends MauticWebTestCase
         $segmentTestIncludeWithUnrelatedManualRemovalRef    = $this->fixtures->getReference('segment-test-include-segment-with-unrelated-segment-manual-removal');
         $segmentMembershipRegex                             = $this->fixtures->getReference('segment-membership-regexp');
 
-
         // These expect filters to be part of the $lists passed to getLeadsByList so pass the entity
         $segmentContacts = $repo->getLeadsByList(
             [
