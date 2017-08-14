@@ -130,6 +130,7 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                 <div class="row">
                     <div class="col-md-6">
                         <?php $fieldGroups = $form['leadField']->vars['choices'];
+                              $data        = $form['leadField']->vars['data'];
                         ?>
                         <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display: none;">
                             <option value=""></option>
@@ -145,9 +146,10 @@ $propertiesTabError = (isset($form['properties']) && ($view['form']->containsErr
                                         $attr  = (!empty($field->attr)) ? $field->attr : [];
                                         $label = $field->label;
                                         $value = $field->value;
-                                        $data  = (!empty($field->data)) ? $field->data : '';
                                         ?>
-                                        <option value="<?php echo $value?>" class="segment-filter <?php echo $icon; ?>"><?php echo $label; ?></option>
+                                        <option value="<?php echo $value?>" class="segment-filter <?php echo $icon; ?>" <?php if ($data === $value) {
+                                            echo 'Selected';
+                                        } ?> ><?php echo $label; ?></option>
                                     <?php endforeach; ?>
                                 <?php endforeach; ?>
                             </optgroup>
