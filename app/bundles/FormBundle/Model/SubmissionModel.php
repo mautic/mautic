@@ -29,6 +29,7 @@ use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -965,7 +966,7 @@ class SubmissionModel extends CommonFormModel
             $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
         }
 
-        if (!empty($company)) {
+        if (!empty($company) and $companyEntity instanceof Company) {
             // Save after the lead in for new leads created through the API and maybe other places
             $this->companyModel->addLeadToCompany($companyEntity, $lead);
             $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
