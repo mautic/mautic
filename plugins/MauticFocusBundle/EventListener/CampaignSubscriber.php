@@ -17,9 +17,11 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use MauticPlugin\MauticFocusBundle\Entity as FocusEntity;
+use Mautic\PageBundle\Helper\TrackingHelper;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -34,15 +36,29 @@ class CampaignSubscriber extends CommonSubscriber
     protected $focusModel;
 
     /**
+     * @var TrackingHelper
+     */
+    protected $trackingHelper;
+
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param EventModel $eventModel
-     * @param FocusModel $focusModel
+     * @param EventModel      $eventModel
+     * @param FocusModel      $focusModel
+     * @param TrackingHelper  $trackingHelper
+     * @param RouterInterface $router
      */
-    public function __construct(EventModel $eventModel, FocusModel $focusModel)
+    public function __construct(EventModel $eventModel, FocusModel $focusModel, TrackingHelper $trackingHelper, RouterInterface $router)
     {
         $this->campaignEventModel = $eventModel;
         $this->focusModel         = $focusModel;
+        $this->trackingHelper     = $trackingHelper;
+        $this->router             = $router;
     }
 
     /**
@@ -62,11 +78,11 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $action = [
-            'label'           => 'mautic.focus.campaign.event.show_focus',
-            'description'     => 'mautic.focus.campaign.event.show_focus_descr',
-            'eventName'       => FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-            'formType'        => 'focusshow_list',
-            'formTypeOptions' => ['update_select' => 'campaignevent_properties_focus'],
+            'label'                  => 'mautic.focus.campaign.event.show_focus',
+            'description'            => 'mautic.focus.campaign.event.show_focus_descr',
+            'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+            'formType'               => 'focusshow_list',
+            'formTypeOptions'        => ['update_select' => 'campaignevent_properties_focus'],
             'connectionRestrictions' => [
                 'anchor' => [
                     'decision.inaction',
@@ -86,26 +102,14 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        $currentEvent = $event->getEvent();
-        if ($currentEvent['properties']['focus'] > 0) {
-            /**
-             * log leads, campaign in to focus_campaign table.
-             */
-            $entity = new FocusEntity\FocusCampaign();
-            $entity->setCampaign($this->em->getReference(Campaign::class, $currentEvent['campaign']['id']));
-            $entity->setFocus($this->em->getReference(FocusEntity\Focus::class, $currentEvent['properties']['focus']));
-            $entity->setLead($event->getLead());
-            $entity->setLeadEventLog($event->getLogEntry());
-            $this->focusModel->getFocusCampaignRepository()->saveEntity($entity);
-
-            /*
-             * Set current LeadEventLog as failed (log to LeadEventFailedLog), since
-             * event completion is based on action from focus page
-             */
-            $this->campaignEventModel->setEventStatus($event->getLogEntry(), false, 'No user interaction');
-
-            $focus = $this->focusModel->getEntity($currentEvent['properties']['focus']);
-            $this->focusModel->saveEntity($focus);
+        $focusId = (int) $event->getConfig()['focus'];
+        if (!$focusId) {
+            return $event->setResult(false);
         }
+        $values                 = [];
+        $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], true)];
+        $this->trackingHelper->updateSession($values);
+
+        return $event->setResult(true);
     }
 }

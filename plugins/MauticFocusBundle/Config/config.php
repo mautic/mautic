@@ -96,6 +96,8 @@ return [
                 'arguments' => [
                     'mautic.campaign.model.event',
                     'mautic.focus.model.focus',
+                    'mautic.page.helper.tracking',
+                    'router',
                 ],
             ],
         ],

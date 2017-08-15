@@ -603,9 +603,16 @@ MauticJS.setTrackedEvents = function(events) {
                                     eventLabel: e[i]['label'],
 			                     });
                      }
+                }        
+                
+                if (typeof events.focus_item !== 'undefined') {
+                 var e = events.focus_item; 
+                    for(var i = 0; i < e.length; i++) {
+                         if(typeof e[i]['id']  !== 'undefined' && typeof e[i]['js']  !== 'undefined' ){
+                             MauticJS.insertScript(e[i]['js']);
+                     }
+                   }
                 }
-                //MauticJS.insertScript('http://google.com/ga.js');
-
 };
 
    
