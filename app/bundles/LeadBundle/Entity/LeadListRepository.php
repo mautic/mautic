@@ -582,13 +582,16 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param array        $filters
-     * @param array        $parameters
-     * @param QueryBuilder $q
+     * @param array             $filters
+     * @param array             $parameters
+     * @param QueryBuilder      $q
+     * @param QueryBuilder|null $parameterQ
+     * @param null              $listId
+     * @param bool              $isNot
      *
-     * @return QueryBuilder
+     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $not = false)
+    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $isNot = false)
     {
         if (null === $parameterQ) {
             $parameterQ = $q;
@@ -598,7 +601,7 @@ class LeadListRepository extends CommonRepository
         $this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0;
 
         $this->listFiltersInnerJoinCompany = false;
-        $expr                              = $this->getListFilterExpr($filters, $parameters, $q, $not, null, 'lead', $listId);
+        $expr                              = $this->getListFilterExpr($filters, $parameters, $q, $isNot, null, 'lead', $listId);
 
         if ($this->hasCompanyFilter) {
             $this->applyCompanyFieldFilters($q);
@@ -638,45 +641,20 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @param $filters
-     *
-     * @return array
-     */
-    public function arrangeFilters($filters)
-    {
-        $objectFilters = [];
-        if (empty($filters)) {
-            $objectFilters['lead'][] = $filters;
-        }
-        foreach ($filters as $filter) {
-            $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
-            switch ($object) {
-                case 'company':
-                    $objectFilters['company'][] = $filter;
-                    break;
-                default:
-                    $objectFilters['lead'][] = $filter;
-                    break;
-            }
-        }
-
-        return $objectFilters;
-    }
-
-    /**
      * This is a public method that can be used by 3rd party.
      * Do not change the signature.
      *
      * @param              $filters
      * @param              $parameters
      * @param QueryBuilder $q
-     * @param bool         $not
-     * @param int|null     $leadId
+     * @param bool         $isNot
+     * @param null         $leadId
      * @param string       $object
+     * @param null         $listId
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $not = false, $leadId = null, $object = 'lead', $listId = null)
+    public function getListFilterExpr($filters, &$parameters, QueryBuilder $q, $isNot = false, $leadId = null, $object = 'lead', $listId = null)
     {
         if (!count($filters)) {
             return $q->expr()->andX();
@@ -717,7 +695,7 @@ class LeadListRepository extends CommonRepository
 
             // DBAL does not have a not() function so we have to use the opposite
             $operatorDetails = $options[$details['operator']];
-            $func            = $not ? $operatorDetails['negate_expr'] : $operatorDetails['expr'];
+            $func            = $isNot ? $operatorDetails['negate_expr'] : $operatorDetails['expr'];
 
             if ($object === 'lead') {
                 $field = "l.{$details['field']}";
@@ -773,7 +751,7 @@ class LeadListRepository extends CommonRepository
                 $relativeDateStrings = $this->getRelativeDateStrings();
                 // Check if the column type is a date/time stamp
                 $isTimestamp = ($details['type'] === 'datetime' || $columnType instanceof UTCDateTimeType);
-                $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func, $not) {
+                $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func, $isNot) {
                     $key             = array_search($string, $relativeDateStrings);
                     $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
                     $requiresBetween = in_array($func, ['eq', 'neq']) && $isTimestamp;
@@ -1001,12 +979,12 @@ class LeadListRepository extends CommonRepository
                             break;
                         case 'regexp':
                         case 'notRegexp':
-                            $not = ($func === 'notRegexp') ? ' NOT' : '';
+                            $parameters[$parameter] = $this->prepareRegex($details['filter']);
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                             $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                    $alias.'.'.$column.$not.' REGEXP \''.$this->prepareRegex($details['filter']).'\''
-
+                                    $alias.'.'.$column.$not.' REGEXP '.$exprParameter
                                 )
                             );
                             break;
@@ -1079,12 +1057,12 @@ class LeadListRepository extends CommonRepository
                             break;
                         case 'regexp':
                         case 'notRegexp':
-                            $not = ($func === 'notRegexp') ? ' NOT' : '';
+                            $parameters[$parameter] = $this->prepareRegex($details['filter']);
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                             $subqb->where(
                                 $q->expr()->andX(
                                     $q->expr()->eq($alias.'.lead_id', 'l.id'),
-                                    $alias.'.'.$column.$not.' REGEXP \''.$this->prepareRegex($details['filter']).'\''
-
+                                    $alias.'.'.$column.$not.' REGEXP '.$exprParameter
                                 )
                             );
                             break;
@@ -1415,10 +1393,10 @@ class LeadListRepository extends CommonRepository
                             $listQb->expr()->in('l.id', $filterListIds)
                         );
                         $filterLists = $listQb->execute()->fetchAll();
-                        $isNot       = 'NOT EXISTS' === $func;
+                        $not         = 'NOT EXISTS' === $func;
 
                         // Each segment's filters must be appended as ORs so that each list is evaluated individually
-                        $existsExpr = ($isNot) ? $listQb->expr()->andX() : $listQb->expr()->orX();
+                        $existsExpr = ($not) ? $listQb->expr()->andX() : $listQb->expr()->orX();
 
                         foreach ($filterLists as $list) {
                             $alias = $this->generateRandomParameterName();
@@ -1745,11 +1723,12 @@ class LeadListRepository extends CommonRepository
                             break;
                         case 'regexp':
                         case 'notRegexp':
-                            $ignoreAutoFilter = true;
-                            $not              = ($func === 'notRegexp') ? ' NOT' : '';
+                            $ignoreAutoFilter       = true;
+                            $parameters[$parameter] = $this->prepareRegex($details['filter']);
+                            $not                    = ($func === 'notRegexp') ? ' NOT' : '';
                             $groupExpr->add(
-                                // Escape single quotes while accounting for those that may already be escaped
-                                $field.$not.' REGEXP \''.$this->prepareRegex($details['filter']).'\''
+                            // Escape single quotes while accounting for those that may already be escaped
+                                $field.$not.' REGEXP '.$exprParameter
                             );
                             break;
                         default:
@@ -1803,6 +1782,32 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
+     * @param $filters
+     *
+     * @return array
+     */
+    public function arrangeFilters($filters)
+    {
+        $objectFilters = [];
+        if (empty($filters)) {
+            $objectFilters['lead'][] = $filters;
+        }
+        foreach ($filters as $filter) {
+            $object = (isset($filter['object'])) ? $filter['object'] : 'lead';
+            switch ($object) {
+                case 'company':
+                    $objectFilters['company'][] = $filter;
+                    break;
+                default:
+                    $objectFilters['lead'][] = $filter;
+                    break;
+            }
+        }
+
+        return $objectFilters;
+    }
+
+    /**
      * @param EventDispatcherInterface $dispatcher
      */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
@@ -1815,6 +1820,7 @@ class LeadListRepository extends CommonRepository
      * @param       $alias
      * @param       $column
      * @param       $value
+     * @param array $parameters
      * @param null  $leadId
      * @param array $subQueryFilters
      *

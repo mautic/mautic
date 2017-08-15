@@ -16,9 +16,6 @@ trait RegexTrait
     /**
      * Ensure that special characters are escaped correctly.
      *
-     * The end goal is to have two backslashes so in PHP, we need 8 because when the regex is used in the query
-     * PHP will recognize it as 2
-     *
      * @param $regex
      *
      * @return mixed
@@ -27,18 +24,10 @@ trait RegexTrait
     {
         $search = [
             '\\\\',
-            '\\',
-            "\\\\'",
-            "\\'",
-            "'",
         ];
 
         $replace = [
             '\\',
-            '\\\\',
-            "'",
-            "'",
-            "\\'",
         ];
 
         return str_replace($search, $replace, $regex);

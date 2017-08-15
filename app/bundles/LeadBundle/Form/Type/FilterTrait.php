@@ -302,7 +302,8 @@ trait FilterTrait
                                 $qb = $this->connection->createQueryBuilder();
                                 $qb->select('l.id')
                                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                                    ->where('l.id REGEXP \''.$this->prepareRegex($regex).'\'')
+                                    ->where('l.id REGEXP :regex')
+                                    ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
                                 $qb->execute()->fetchAll();
                             } catch (\Exception $exception) {
