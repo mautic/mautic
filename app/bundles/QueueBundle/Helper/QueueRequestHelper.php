@@ -18,7 +18,7 @@ class QueueRequestHelper
     /**
      * @param Request $request
      */
-    static public function flattenRequest(Request $request)
+    public static function flattenRequest(Request $request)
     {
         return [
             'attributes' => $request->attributes->all(),
@@ -34,7 +34,7 @@ class QueueRequestHelper
     /**
      * @param array $request
      */
-    static public function buildRequest(array $request)
+    public static function buildRequest(array $request)
     {
         if (!isset($request['attributes'])) {
             throw new \InvalidArgumentException(

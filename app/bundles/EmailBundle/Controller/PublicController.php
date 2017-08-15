@@ -107,7 +107,7 @@ class PublicController extends CommonFormController
         if ($queueService->isQueueEnabled()) {
             $msg = [
                 'request' => $this->request,
-                'idHash'  => $idHash
+                'idHash'  => $idHash,
             ];
             $queueService->publishToQueue(QueueName::EMAIL_HIT, $msg);
         } else {

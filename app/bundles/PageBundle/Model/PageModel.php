@@ -585,7 +585,7 @@ class PageModel extends FormModel
      */
     public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
+        $ipAddress                          = $this->ipLookupHelper->getIpAddress();
         list($hit, $trackingNewlyGenerated) = $this->generateHit(
             $page,
             $request,
@@ -974,7 +974,7 @@ class PageModel extends FormModel
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -1040,7 +1040,7 @@ class PageModel extends FormModel
         $filters['lead_id'] = [
             'expression' => 'isNull',
         ];
-        $returnQ            = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
+        $returnQ = $query->getCountQuery('page_hits', 'id', 'date_hit', $filters);
 
         if (!$canViewOthers) {
             $this->limitQueryToCreator($allQ);
@@ -1090,7 +1090,7 @@ class PageModel extends FormModel
     /**
      * Get bar chart data of hits.
      *
-     * @param char     $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char     $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param DateTime $dateFrom
      * @param DateTime $dateTo
      * @param string   $dateFormat
