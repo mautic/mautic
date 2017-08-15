@@ -132,8 +132,15 @@ class LeadTimelineEvent extends Event
      * @param bool        $forTimeline
      * @param string|null $siteDomain
      */
-    public function __construct(Lead $lead = null, array $filters = [], array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true, $siteDomain = null)
-    {
+    public function __construct(
+        Lead $lead = null,
+        array $filters = [],
+        array $orderBy = null,
+        $page = 1,
+        $limit = 25,
+        $forTimeline = true,
+        $siteDomain = null
+    ) {
         $this->lead    = $lead;
         $this->filters = !empty($filters)
             ? $filters
@@ -148,6 +155,14 @@ class LeadTimelineEvent extends Event
         $this->limit       = $limit;
         $this->forTimeline = $forTimeline;
         $this->siteDomain  = $siteDomain;
+
+        if (!empty($filters['dateFrom'])) {
+            $this->dateFrom = new \DateTime($filters['dateFrom']);
+        }
+
+        if (!empty($filters['dateTo'])) {
+            $this->dateTo = new \DateTime($filters['dateTo']);
+        }
     }
 
     /**
