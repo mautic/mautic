@@ -286,13 +286,18 @@ class LeadSubscriber extends CommonSubscriber
     public function onTimelineGenerate(Events\LeadTimelineEvent $event)
     {
         $eventTypes = [
-            'lead.create'       => 'mautic.lead.event.create',
-            'lead.identified'   => 'mautic.lead.event.identified',
-            'lead.ipadded'      => 'mautic.lead.event.ipadded',
             'lead.utmtagsadded' => 'mautic.lead.event.utmtagsadded',
             'lead.donotcontact' => 'mautic.lead.event.donotcontact',
             'lead.imported'     => 'mautic.lead.event.imported',
         ];
+
+        // Following events takes the event from the lead itself, so not applicable for API
+        // where we are getting events for all leads.
+        if ($event->isForTimeline()) {
+            $eventTypes['lead.create']     = 'mautic.lead.event.create';
+            $eventTypes['lead.identified'] = 'mautic.lead.event.identified';
+            $eventTypes['lead.ipadded']    = 'mautic.lead.event.ipadded';
+        }
 
         $filters = $event->getEventFilters();
 
