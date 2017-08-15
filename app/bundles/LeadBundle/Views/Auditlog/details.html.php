@@ -23,7 +23,7 @@ if (0 === count($objects)) {
     return '';
 }
 switch ($type) {
-    case 'create' :
+    case 'create':
         $text = '<table class="table">';
         $text .= '<tr>';
         $text .= '<th>Field/Object</th><th>New Value</th><th>Old Value</th>';
