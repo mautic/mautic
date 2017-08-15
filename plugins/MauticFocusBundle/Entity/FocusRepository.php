@@ -103,4 +103,15 @@ class FocusRepository extends CommonRepository
     {
         return 'f';
     }
+
+    /**
+     * @return array
+     */
+    public function getFocusList($currentId)
+    {
+        $q = $this->createQueryBuilder('f');
+        $q->select('partial f.{id, name, description}')
+            ->orderBy('f.name');
+        return $q->getQuery()->getArrayResult();
+    }
 }

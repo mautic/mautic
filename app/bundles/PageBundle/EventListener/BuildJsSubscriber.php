@@ -604,6 +604,7 @@ MauticJS.setTrackedEvents = function(events) {
 			                     });
                      }
                 }
+                //MauticJS.insertScript('http://google.com/ga.js');
 
 };
 
