@@ -64,12 +64,12 @@ final class FocusEvents
     const TOKEN_REPLACEMENT = 'mautic.focus_token_replacement';
 
     /**
-     * The mautic.focus.on_campaign_trigger_decision event is fired when the campaign decision triggers.
+     * The mautic.focus.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
      * Mautic\CampaignBundle\Event\CampaignExecutionEvent
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.focus.on_campaign_trigger_decision';
+    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.focus.on_campaign_trigger_action';
 }

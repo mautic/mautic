@@ -52,7 +52,7 @@ class CampaignSubscriber extends CommonSubscriber
     {
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
-            FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDescision', 0],
+            FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -64,17 +64,27 @@ class CampaignSubscriber extends CommonSubscriber
         $action = [
             'label'           => 'mautic.focus.campaign.event.show_focus',
             'description'     => 'mautic.focus.campaign.event.show_focus_descr',
-            'eventName'       => FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+            'eventName'       => FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'formType'        => 'focusshow_list',
             'formTypeOptions' => ['update_select' => 'campaignevent_properties_focus'],
+            'connectionRestrictions' => [
+                'anchor' => [
+                    'decision.inaction',
+                ],
+                'source' => [
+                    'decision' => [
+                        'page.pagehit',
+                    ],
+                ],
+            ],
         ];
-        $event->addDecision('focus.show', $action);
+        $event->addAction('focus.show', $action);
     }
 
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
         $currentEvent = $event->getEvent();
         if ($currentEvent['properties']['focus'] > 0) {
