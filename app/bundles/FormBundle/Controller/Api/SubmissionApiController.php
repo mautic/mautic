@@ -52,7 +52,13 @@ class SubmissionApiController extends CommonApiController
             return $form;
         }
 
-        $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, ['form' => $form]);
+        $this->extraGetEntitiesArguments = array_merge(
+            $this->extraGetEntitiesArguments,
+            [
+                'form'            => $form,
+                'flatten_results' => true
+            ]
+        );
 
         return parent::getEntitiesAction();
     }

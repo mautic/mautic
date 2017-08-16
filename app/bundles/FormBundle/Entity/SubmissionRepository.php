@@ -100,7 +100,7 @@ class SubmissionRepository extends CommonRepository
 
         //loop over results to put form submission results in something that can be assigned to the entities
         $values = [];
-
+        $flattenResults = !empty($args['flatten_results']);
         foreach ($results as $result) {
             $submissionId = $result['submission_id'];
             unset($result['submission_id']);
@@ -108,8 +108,12 @@ class SubmissionRepository extends CommonRepository
             $values[$submissionId] = [];
             foreach ($result as $k => $r) {
                 if (isset($fields[$k])) {
-                    $values[$submissionId][$k]          = $fields[$k];
-                    $values[$submissionId][$k]['value'] = $r;
+                    if ($flattenResults) {
+                        $values[$submissionId][$k] = $r;
+                    } else {
+                        $values[$submissionId][$k]          = $fields[$k];
+                        $values[$submissionId][$k]['value'] = $r;
+                    }
                 }
             }
         }
