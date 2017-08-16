@@ -786,7 +786,6 @@ class MessageHelper
             $result['email']    = $match[1];
         }
 
-
         /*
         * rule: mailbox full;
         * sample:
