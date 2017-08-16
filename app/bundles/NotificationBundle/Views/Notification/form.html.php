@@ -38,7 +38,7 @@ $view['slots']->set('headerTitle', $header);
                                 <?php echo $view['form']->row($form['button']); ?>
                             </div>
                             <div class="col-md-6">
-                                <?php include("preview.html.php"); ?>
+                                <?php include 'preview.html.php'; ?>
                             </div>
                         </div>
                     </div>
