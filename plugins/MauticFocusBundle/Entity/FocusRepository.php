@@ -110,8 +110,8 @@ class FocusRepository extends CommonRepository
     public function getFocusList($currentId)
     {
         $q = $this->createQueryBuilder('f');
-        $q->select('partial f.{id, name, description}')
-            ->orderBy('f.name');
+        $q->select('partial f.{id, name, description}')->orderBy('f.name');
+
         return $q->getQuery()->getArrayResult();
     }
 }
