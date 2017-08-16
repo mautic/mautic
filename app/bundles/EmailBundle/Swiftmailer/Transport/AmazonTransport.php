@@ -123,7 +123,7 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
             'Destination' => [],
             'Message'     => [
                 'Subject' => [
-                    'Data'    => $this->message->getSubject(),
+                    'Data'    => empty($this->message->getSubject()) ? '' : $this->message->getSubject(),
                     'Charset' => 'UTF-8',
                 ],
                 'Body' => [
@@ -156,7 +156,6 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
                 $payload['Destination']['BccAddresses'][] = $email;
             }
         }
-
         return $payload;
     }
 
