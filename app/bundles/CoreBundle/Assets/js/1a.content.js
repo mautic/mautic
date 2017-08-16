@@ -96,7 +96,9 @@ Mautic.loadContent = function (route, link, method, target, showPageLoading, cal
  */
 Mautic.generatePageTitle = function(route){
 
-    if( -1 !== route.indexOf('view') ){
+    if (-1 !== route.indexOf('timeline')) {
+        return
+    } else if (-1 !== route.indexOf('view')) {
         //loading view of module title
         var currentModule = route.split('/')[3];
 
@@ -653,7 +655,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 
     if (contentSpecific && typeof Mautic[contentSpecific + "OnLoad"] == 'function') {
-        if (typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
+        if (inModal || typeof Mautic.loadedContent[contentSpecific] == 'undefined') {
             Mautic.loadedContent[contentSpecific] = true;
             Mautic[contentSpecific + "OnLoad"](container, response);
         }

@@ -95,14 +95,18 @@ class FormEventHelper
         }
     }
 
-    public static function scoreContactsCompanies($action, $factory, $config)
+    /**
+     * @param $action
+     * @param $factory
+     */
+    public static function scoreContactsCompanies($action, $factory)
     {
         $properties = $action->getProperties();
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $factory->getModel('lead');
-        $lead      = $leadModel->getCurrentLead();
-        $score     = $properties['score'];
+        if ($lead = $leadModel->getCurrentLead()) {
+            $score = $properties['score'];
 
         if (!empty($score)) {
             /** CAPTIVEA.CORE START REPLACE **/

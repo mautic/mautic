@@ -177,6 +177,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->build();
 
         $builder->createField('score', 'integer')
+            ->nullable()
             ->build();
 
         /** CAPTIVEA.CORE START **/

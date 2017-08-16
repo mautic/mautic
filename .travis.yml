@@ -1,3 +1,5 @@
+dist: precise
+
 language: php
 
 services:
