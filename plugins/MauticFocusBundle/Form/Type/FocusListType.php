@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -13,17 +13,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FocusListType extends AbstractType
 {
     /**
-     * @var FocusRepository
+     * @var FocusModel
      */
+    protected $focusModel;
+
     private $repo;
 
     /**
-     * @param MauticFactory $factory
+     * @param FocusModel $focusModel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(FocusModel $focusModel)
     {
-        $this->repo = $factory->getModel('focus')->getRepository();
-        $this->repo->setCurrentUser($factory->getUser());
+        $this->focusModel = $focusModel;
+        $this->repo       = $this->focusModel->getRepository();
     }
 
     /**

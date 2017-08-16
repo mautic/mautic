@@ -11,10 +11,10 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -22,14 +22,17 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class FocusShowType extends AbstractType
 {
-    protected $factory;
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
 
     /**
-     * @param MauticFactory $factory
+     * @param RouterInterface $router
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(RouterInterface $router)
     {
-        $this->factory = $factory;
+        $this->router = $router;
     }
 
     /**
@@ -61,7 +64,7 @@ class FocusShowType extends AbstractType
         );
 
         if (!empty($options['update_select'])) {
-            $windowUrl = $this->factory->getRouter()->generate(
+            $windowUrl = $this->router->generate(
                 'mautic_focus_action',
                 [
                     'objectAction' => 'new',
@@ -86,7 +89,7 @@ class FocusShowType extends AbstractType
             );
 
             // create button edit focus
-            $windowUrlEdit = $this->factory->getRouter()->generate(
+            $windowUrlEdit = $this->router->generate(
                 'mautic_focus_action',
                 [
                     'objectAction' => 'edit',

@@ -125,12 +125,12 @@ return [
             ],
             'mautic.focus.form.type.focusshow_list' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'router',
                 'alias'     => 'focusshow_list',
             ],
             'mautic.focus.form.type.focus_list' => [
                 'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => 'mautic.focus.model.focus',
                 'alias'     => 'focus_list',
             ],
         ],
