@@ -6,7 +6,7 @@
 
 return [
     'name'        => 'Multi scoring',
-    'description' => 'do stuff',
+    'description' => 'Allow multiple score categories, in order to manage different scoring channels.',
     'version'     => '0.1',
     'author'      => 'Captivea',
     'routes' => [

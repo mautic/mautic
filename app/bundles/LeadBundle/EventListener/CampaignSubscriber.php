@@ -352,7 +352,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $isFine = $this->leadModel->scoreContactsCompany($lead, $score);
             } else {
                 $lead = $this->em->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
-                $primaryCompany = $lead->getPrimaryCompany();// it's an array... or null. depends.
+                $primaryCompany = $lead->getPrimaryCompany(); // methods getEntityWithPrimaryCompany/getPrimaryCompany may provide mixed results
                 if(!empty($primaryCompany) && !empty($primaryCompany['id'])) {
                     $primaryCompanyObject = $this->em->getRepository('MauticLeadBundle:Company')->find($primaryCompany['id']);
                     $modPoints = $this->em->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);

@@ -111,7 +111,7 @@ class FormEventHelper
                 $scoringCategory = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($config['scoringCategory']);
                 if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
                     $lead = $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
-                    $primaryCompany = $lead->getPrimaryCompany();// it's an array... or null. depends.
+                    $primaryCompany = $lead->getPrimaryCompany(); // may provide mixed results
                     if(!empty($primaryCompany) && !empty($primaryCompany['id'])) {
                         $primaryCompanyObject = $factory->getEntityManager()->getRepository('MauticLeadBundle:Company')->find($primaryCompany['id']);
                         $modPoints = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);

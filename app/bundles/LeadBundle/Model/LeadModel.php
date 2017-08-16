@@ -1311,14 +1311,14 @@ class LeadModel extends FormModel
         foreach($mergeFrom->getScoringValues() as $sv) {
             $scoringValue = $this->em->getRepository('MauticScoringBundle:ScoringValue')->findOneBy(array('scoringCategory' => $sv->getScoringCategory()->getId(), 'lead' => $mergeWith->getId()));
             if(empty($scoringValue)) {
-                $scoringValue = new \Mautic\ScoringBundle\Entity\ScoringValue;
+                $scoringValue = new \Mautic\ScoringBundle\Entity\ScoringValue();
                 $scoringValue->setScore(0);
                 $scoringValue->setScoringCategory($sv->getScoringCategory());
                 $scoringValue->setLead($mergeWith);
             }
             $scoringValue->setScore($scoringValue->getScore() + $sv->getScore());
             $this->em->persist($scoringValue);
-            // don't flush, else we'll clog doctrine with persistent
+            // don't flush, else we'll clog doctrine because of the lead which need to be persisted
         }
         /** CAPTIVEA.CORE END **/
 

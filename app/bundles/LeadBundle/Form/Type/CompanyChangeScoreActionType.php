@@ -66,7 +66,7 @@ class CompanyChangeScoreActionType extends AbstractType
         
         /** CAPTIVEA.CORE START **/
         $choices = array();
-        $r = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(array('isPublished' => true)); // we will have a hard time with that
+        $r = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(array('isPublished' => true));
         foreach($r as $l) {
             $choices[$l->getId()] = $l->getName();
         }

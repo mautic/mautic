@@ -15,10 +15,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/** CAPTIVEA.CORE START **/
-use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
-/** CAPTIVEA.CORE END **/
-
 /**
  * Class FormSubmitActionPointsChangeType.
  */
@@ -63,7 +59,7 @@ class FormSubmitActionPointsChangeType extends AbstractType
         
         /** CAPTIVEA.CORE START **/
         $choices = array();
-        $r = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(array('isPublished' => true)); // we will have a hard time with that
+        $r = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(array('isPublished' => true));
         foreach($r as $l) {
             $choices[$l->getId()] = $l->getName();
         }

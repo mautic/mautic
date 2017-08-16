@@ -442,6 +442,7 @@ class CompanyController extends FormController
         $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
 
         /** CAPTIVEA.CORE START **/
+        // we want to list all scoring categories (excepted the global one)
         $allScoringCategoriesWithValues = array();
         $scoringCategories = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList(true);
         foreach($scoringCategories as $scoringCategory) {

@@ -676,7 +676,7 @@ class LeadListRepository extends CommonRepository
         }
 
         /** CAPTIVEA.CORE START **/
-        $snowflakes = null;
+        $snowflakes = null; // we need a trick to keep the values
         /** CAPTIVEA.CORE END **/
 
         $groups    = [];
@@ -694,13 +694,13 @@ class LeadListRepository extends CommonRepository
 //            } elseif ($object == 'company') {
 //                $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
 //            }
-            $matches = array();
+            $matches = array(); // we should add the scoringCompanyValue/ScoringValue objects (as for lead/company) instead
             if(preg_match('`^scoringCategory_([0-9]+)$`i', $details['field'], $matches)) {
                 $snowflakes = array(
                     'type' => 'scoringCategory',
                     'subValue' => intval($matches[1]),
                 );
-                $details['field'] = 'snowflake';
+                $details['field'] = 'snowflake'; // got a special case
                 $column = null;
             } else {
                 if ($object == 'lead') {
@@ -709,6 +709,7 @@ class LeadListRepository extends CommonRepository
                     $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
                 }
             }
+            /** CAPTIVEA.CORE END REPLACE **/
 
             // DBAL does not have a not() function so we have to use the opposite
             $operatorDetails = $options[$details['operator']];

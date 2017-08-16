@@ -668,7 +668,7 @@ class ListModel extends FormModel
                         'isPublished' => true,
                     ],
                 ]);
-        // as the filter criteria does not works for unrecognized bools ( 'isGlobalScore' => false, )... dunno why tho
+        // ( 'isGlobalScore' => false, ) filter seems to lead to a crash ?
         foreach($scoringCategories as $category) {
             if(!$category->getIsGlobalScore()) {
                 $choices['lead']['scoringCategory_'.$category->getId()] = [

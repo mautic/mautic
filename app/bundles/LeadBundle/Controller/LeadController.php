@@ -348,6 +348,7 @@ class LeadController extends FormController
         $emailRepo = $this->getModel('email')->getRepository();
 
         /** CAPTIVEA.CORE START **/
+        // we want to list all scoring categories (excepted the global one)
         $allScoringCategoriesWithValues = array();
         $scoringCategories = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList(true);
         foreach($scoringCategories as $scoringCategory) {
