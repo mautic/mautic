@@ -368,7 +368,7 @@ class SalesforceApi extends CrmApi
     /**
      * @param       $campaignId
      * @param       $object
-     * @param array $presonIds
+     * @param array $personIds
      *
      * @return array
      */

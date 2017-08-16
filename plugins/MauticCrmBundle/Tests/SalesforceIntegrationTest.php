@@ -405,6 +405,98 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     {
     }
 
+    public function testGetCampaigns()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $sf->expects($this->once())
+            ->method('makeRequest')
+            ->with(
+                'https://sftest.com/services/data/v34.0/query',
+                [
+                    'q' => 'Select Id, Name from Campaign where isDeleted = false',
+                ]
+            );
+
+        $sf->getCampaigns();
+    }
+
+    public function testGetCampaignMembers()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $sf->expects($this->once())
+            ->method('makeRequest')
+            ->with(
+                'https://sftest.com/services/data/v34.0/query',
+                [
+                    'q' => "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '1'",
+                ]
+            );
+
+        $sf->getCampaignMembers(1, []);
+    }
+
+    public function testGetCampaignMemberStatus()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $sf->expects($this->once())
+            ->method('makeRequest')
+            ->with(
+                'https://sftest.com/services/data/v34.0/query',
+                [
+                    'q' => "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='1'",
+                ]
+            );
+
+        $sf->getCampaignMemberStatus(1);
+    }
+
+    public function testPushToCampaign()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $lead = new Lead();
+
+        $lead->setFirstname('Lead1');
+        $lead->setEmail('Lead1@sftest.com');
+        $lead->setId(1);
+
+        $sf->expects($this->any())
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function () {
+                    $args = func_get_args();
+
+                    // Checking for campaign members should return empty array for testing purposes
+                    if (strpos($args[0], '/query') !== false && strpos($args[1]['q'], 'CampaignMember') !== false) {
+                        return [];
+                    }
+
+                    if (strpos($args[0], '/composite') !== false) {
+                        $this->assertSame(
+                            '1-CampaignMemberNew-null-1',
+                            $args[1]['compositeRequest'][0]['referenceId'],
+                            'The composite request when pushing a campaign member should contain the correct referenceId.'
+                        );
+
+                        return true;
+                    }
+                }
+            );
+
+        $sf->pushLeadToCampaign($lead, 1, 'Active', ['Lead' => [1]]);
+    }
+
     public function testExportingContactActivity()
     {
         $this->sfObjects     = ['Contact'];
@@ -858,11 +950,17 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                         // Determine what to return by analyzing the URL and query parameters
                         switch (true) {
                             case strpos($args[0], '/query') !== false:
-                                // Extract emails
-                                preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
-                                $emails = explode("','", $match[1]);
+                                if (isset($args[1]['q']) && strpos($args[0], 'from CampaignMember') !== false) {
+                                    return [];
+                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Campaign') !== false) {
+                                    return 'fetched campaigns';
+                                } else {
+                                    // Extract emails
+                                    preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
+                                    $emails = explode("','", $match[1]);
 
-                                return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
+                                    return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
+                                }
                             case strpos($args[0], '/composite') !== false:
                                 return $this->getSalesforceCompositeResponse($args[1]);
                         }
@@ -1158,10 +1256,13 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             } else {
                 $contactId = '';
                 $parts     = explode('-', $subrequest['referenceId']);
+
                 if (count($parts) === 3) {
                     list($contactId, $sfObject, $id) = $parts;
                 } elseif (count($parts) === 2) {
                     list($contactId, $sfObject) = $parts;
+                } elseif (count($parts) === 4) {
+                    list($contactId, $sfObject, $empty, $campaignId) = $parts;
                 }
                 $response[] = [
                     'body' => [
