@@ -931,10 +931,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         unset($results);
 
         /** @var EmailModel $emailModel */
-        $emailModel = $this->factory->getModel('email');
-        $emailRepo  = $emailModel->getStatRepository();
-        $results    = $emailRepo->getLeadStats(null, $options);
-        $emailStats = [];
+        $emailModel            = $this->factory->getModel('email');
+        $emailRepo             = $emailModel->getStatRepository();
+        $emailOptions          = $options;
+        $emailOptions['state'] = 'read';
+        $results               = $emailRepo->getLeadStats(null, $emailOptions);
+        $emailStats            = [];
         foreach ($results as $result) {
             if (!isset($emailStats[$result['lead_id']])) {
                 $emailStats[$result['lead_id']] = [];
@@ -968,10 +970,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if ((int) $row['delta'] > 0) {
                         $subject = 'added';
                     } else {
-                        $subject = 'subtracted';
+                        $subject      = 'subtracted';
                         $row['delta'] *= -1;
                     }
-                    $pointsString = $translator->transChoice(
+                    $pointsString                = $translator->transChoice(
                         "mautic.salesforce.activity.points_{$subject}",
                         $row['delta'],
                         ['%points%' => $row['delta']]
