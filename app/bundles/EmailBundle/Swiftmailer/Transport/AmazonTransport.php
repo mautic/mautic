@@ -11,18 +11,18 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
+use Aws\Ses\SesClient;
+use bandwidthThrottle\tokenBucket\BlockingConsumer;
+use bandwidthThrottle\tokenBucket\Rate;
+use bandwidthThrottle\tokenBucket\storage\FileStorage;
+use bandwidthThrottle\tokenBucket\TokenBucket;
 use Joomla\Http\Exception\UnexpectedResponseException;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Mautic\EmailBundle\Helper\MailHelper;
-use Aws\Ses\SesClient;
-use bandwidthThrottle\tokenBucket\Rate;
-use bandwidthThrottle\tokenBucket\TokenBucket;
-use bandwidthThrottle\tokenBucket\BlockingConsumer;
-use bandwidthThrottle\tokenBucket\storage\FileStorage;
 
 /**
  * Class AmazonTransport.
@@ -77,17 +77,17 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
      */
     public function getApiEndpoint()
     {
-        $client = SesClient::factory(array(
+        $client = SesClient::factory([
             'region' => $this->getRegion(),
-            'key' => $this->getUsername(),
+            'key'    => $this->getUsername(),
             'secret' => $this->getPassword(),
-        ));
+        ]);
 
         /**
          * AWS SES has a limit of how many messages can be sent in a 24h time slot. The remaining messages are calculated
          * from the api. The transport will fail when the quota is exceeded.
          */
-        $quota = $client->getSendQuota();
+        $quota                     = $client->getSendQuota();
         $this->emailQuoteRemaining = $quota->get('Max24HourSend') - $quota->get('SentLast24Hours');
         if ($this->emailQuoteRemaining > 0) {
             $this->started = true;
@@ -101,9 +101,9 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
          */
         $this->maxSendRate = floor($quota->get('MaxSendRate'));
         // Initialize a token bucket to track the sending limit
-        $storage = new FileStorage(tempnam(sys_get_temp_dir(), 'MauticBucket'));
-        $rate = new Rate($this->maxSendRate, Rate::SECOND);
-        $bucket = new TokenBucket($this->maxSendRate, $rate, $storage);
+        $storage        = new FileStorage(tempnam(sys_get_temp_dir(), 'MauticBucket'));
+        $rate           = new Rate($this->maxSendRate, Rate::SECOND);
+        $bucket         = new TokenBucket($this->maxSendRate, $rate, $storage);
         $this->consumer = new BlockingConsumer($bucket);
         $bucket->bootstrap($this->maxSendRate);
 
@@ -118,27 +118,27 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
     public function getPayload()
     {
         /*Email formatting for the amazon SES API*/
-        $payload = array(
-            'Source' => current(array_keys($this->message->getFrom())),
-            'Destination' => array(),
-            'Message' => array(
-                'Subject' => array(
-                    'Data' => $this->message->getSubject(),
+        $payload = [
+            'Source'      => current(array_keys($this->message->getFrom())),
+            'Destination' => [],
+            'Message'     => [
+                'Subject' => [
+                    'Data'    => $this->message->getSubject(),
                     'Charset' => 'UTF-8',
-                ),
-                'Body' => array(
-                    'Text' => array(
-                        'Data' => MailHelper::getPlainTextFromMessage($this->message),
+                ],
+                'Body' => [
+                    'Text' => [
+                        'Data'    => MailHelper::getPlainTextFromMessage($this->message),
                         'Charset' => 'UTF-8',
-                    ),
-                    'Html' => array(
-                        'Data' => $this->message->getBody(),
+                    ],
+                    'Html' => [
+                        'Data'    => $this->message->getBody(),
                         'Charset' => 'UTF-8',
-                    ),
-                ),
-            ),
+                    ],
+                ],
+            ],
             'ReturnPath' => current(array_keys($this->message->getFrom())),
-        );
+        ];
 
         $to = $this->message->getTo();
         foreach ($to as $email => $name) {
@@ -169,10 +169,10 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
      *
      * @throws \Exception
      */
-    public function post($settings = array())
+    public function post($settings = [])
     {
         $payload = empty($settings['payload']) ? $this->getPayload() : $settings['payload'];
-        $client = empty($settings['client']) ? $this->getApiEndpoint() : $settings['client'];
+        $client  = empty($settings['client']) ? $this->getApiEndpoint() : $settings['client'];
 
         try {
             $this->consumer->consume(1);
@@ -182,7 +182,7 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
             throw new \Exception('The Email was not send! '.$e->getMessage());
         }
 
-        return array();
+        return [];
     }
 
     public function getHeaders()
@@ -236,7 +236,7 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
         $translator = $factory->getTranslator();
-        $logger = $factory->getLogger();
+        $logger     = $factory->getLogger();
         $logger->debug('Receiving webHook from Amazon');
 
         $payload = json_decode($request->getContent(), true);
@@ -261,11 +261,11 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
         $rows = [
             DoNotContact::BOUNCED => [
                 'hashIds' => [],
-                'emails' => [],
+                'emails'  => [],
             ],
             DoNotContact::UNSUBSCRIBED => [
                 'hashIds' => [],
-                'emails' => [],
+                'emails'  => [],
             ],
         ];
 
@@ -282,11 +282,11 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
                     $logger->info('Callback to SubscribeURL from Amazon SNS successfully');
                 } else {
                     $requestFailed = true;
-                    $reason = 'HTTP Code '.$response->code.', '.$response->body;
+                    $reason        = 'HTTP Code '.$response->code.', '.$response->body;
                 }
             } catch (UnexpectedResponseException $e) {
                 $requestFailed = true;
-                $reason = $e->getMessage();
+                $reason        = $e->getMessage();
             }
 
             if ($requestFailed) {
