@@ -32,7 +32,7 @@ class SubmissionApiController extends CommonApiController
         $this->entityNameOne    = 'submission';
         $this->entityNameMulti  = 'submissions';
         $this->permissionBase   = 'forms:form';
-        $this->serializerGroups = [];
+        $this->serializerGroups = ['submissionDetails', 'formList', 'ipAddressList', 'leadBasicList', 'pageList'];
 
         parent::initialize($event);
     }
@@ -56,7 +56,8 @@ class SubmissionApiController extends CommonApiController
             $this->extraGetEntitiesArguments,
             [
                 'form'            => $form,
-                'flatten_results' => true
+                'flatten_results' => true,
+                'return_entities' => true,
             ]
         );
 
