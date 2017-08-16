@@ -288,6 +288,7 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
+     *
      * @return JsonResponse
      */
     protected function getEmailCountStatsAction(Request $request)
