@@ -21,18 +21,21 @@ $button = $notification->getButton();
             </div>
             <div class="text height-auto bg-white">
                 <h4>
-                    <?php if ($notification->getHeading()) {
+                    <?php 
+                    if ($notification->getHeading()) {
                         echo $notification->getHeading();
                     } else {
                         echo 'Your notification header';
-                    }?>  
+                    }
+                    ?>  
                 </h4>
                 <p>
-                    <?php if ($notification->getMessage()) {
+                    <?php 
+                    if ($notification->getMessage()) {
                         echo $notification->getMessage();
                     } else {
                         echo 'The message body of your notification';
-                    }?> 
+                    }?>  
                 </p>
                 <span><?php echo $_SERVER['HTTP_HOST']; ?></span>
             </div>
