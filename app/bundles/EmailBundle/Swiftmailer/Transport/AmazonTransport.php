@@ -156,6 +156,7 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
                 $payload['Destination']['BccAddresses'][] = $email;
             }
         }
+
         return $payload;
     }
 
