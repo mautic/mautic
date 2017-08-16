@@ -92,7 +92,6 @@ class IntegrationSubscriber extends CommonSubscriber
             $xml = $doc->saveXML();
         }
 
-
         if (defined('IN_MAUTIC_CONSOLE') && defined('MAUTIC_CONSOLE_VERBOSITY')
             && MAUTIC_CONSOLE_VERBOSITY >= ConsoleOutput::VERBOSITY_VERY_VERBOSE) {
             $output = new ConsoleOutput();
