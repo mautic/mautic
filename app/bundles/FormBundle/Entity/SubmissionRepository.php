@@ -240,7 +240,7 @@ class SubmissionRepository extends CommonRepository
     public function getSubmissions(array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted"')
+        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted", fs.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id');
 

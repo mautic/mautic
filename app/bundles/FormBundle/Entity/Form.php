@@ -289,7 +289,6 @@ class Form extends FormEntity
                     'fields',
                     'actions',
                     'template',
-                    'submissionCount',
                     'inKioskMode',
                     'renderStyle',
                     'formType',
