@@ -229,7 +229,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         $isRequired = function (array $field, $object) {
             switch (true) {
-                case 'Leads' === $object && 'webtolead_email1' === $field['name']:
+                case 'Leads' === $object && ('webtolead_email1' === $field['name'] || 'email1' === $field['name']):
                     return true;
                 case 'Contacts' === $object && 'email1' === $field['name']:
                     return true;
@@ -969,8 +969,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                         $mauticObjectReference = 'lead';
                         $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
-
-                        $company = null;
+                        $detachClass           = Lead::class;
+                        $company               = null;
                         if ($entity && isset($dataObject['account_id'.$newName]) && trim($dataObject['account_id'.$newName]) != '') {
                             $integrationCompanyEntity = $integrationEntityRepo->findOneBy(
                                 [
@@ -986,10 +986,13 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                 $company      = $companyRepo->find($companyId);
 
                                 $companyModel->addLeadToCompany($company, $entity);
+                                $this->em->clear(Company::class);
+                                $this->em->detach($entity);
                             }
                         }
                     } elseif ($object == 'Accounts') {
                         $entity                = $this->getMauticCompany($dataObject, true, null);
+                        $detachClass           = Company::class;
                         $mauticObjectReference = 'company';
                     } else {
                         $this->logIntegrationError(
@@ -1025,6 +1028,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $integrationEntities[] = $integrationEntity;
                         }
                         $this->em->detach($entity);
+                        $this->em->clear($detachClass);
                         unset($entity);
                     } else {
                         continue;
@@ -1554,12 +1558,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     protected function processCompositeResponse($response, array $sugarcrmIdMapping = [])
     {
-        $created = 0;
-        $errored = 0;
-        $updated = 0;
-        $object  = 'Lead';
+        $created         = 0;
+        $errored         = 0;
+        $updated         = 0;
+        $object          = 'Lead';
+        $persistEntities = [];
         if (is_array($response)) {
-            $persistEntities = [];
             foreach ($response as $item) {
                 $contactId = $integrationEntityId = null;
                 if (!empty($item['reference_id'])) {

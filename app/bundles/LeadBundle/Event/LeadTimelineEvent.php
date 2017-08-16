@@ -105,26 +105,64 @@ class LeadTimelineEvent extends Event
     protected $chartQuery;
 
     /**
+     * @var bool
+     */
+    protected $forTimeline = true;
+
+    /**
+     * @var
+     */
+    protected $siteDomain;
+
+    /**
+     * @var array
+     */
+    protected $serializerGroups = [
+        'ipAddressList',
+    ];
+
+    /**
      * LeadTimelineEvent constructor.
      *
-     * @param Lead       $lead
-     * @param array      $filters
-     * @param array|null $orderBy
-     * @param int        $page
-     * @param int        $limit   Limit per type
+     * @param Lead|null   $lead
+     * @param array       $filters
+     * @param array|null  $orderBy
+     * @param int         $page
+     * @param int         $limit       Limit per type
+     * @param bool        $forTimeline
+     * @param string|null $siteDomain
      */
-    public function __construct(Lead $lead, array $filters = [], array $orderBy = null, $page = 1, $limit = 25)
-    {
+    public function __construct(
+        Lead $lead = null,
+        array $filters = [],
+        array $orderBy = null,
+        $page = 1,
+        $limit = 25,
+        $forTimeline = true,
+        $siteDomain = null
+    ) {
         $this->lead    = $lead;
-        $this->filters = !empty($filters) ? $filters :
+        $this->filters = !empty($filters)
+            ? $filters
+            :
             [
                 'search'        => '',
                 'includeEvents' => [],
                 'excludeEvents' => [],
             ];
-        $this->orderBy = $orderBy;
-        $this->page    = $page;
-        $this->limit   = $limit;
+        $this->orderBy     = $orderBy;
+        $this->page        = $page;
+        $this->limit       = $limit;
+        $this->forTimeline = $forTimeline;
+        $this->siteDomain  = $siteDomain;
+
+        if (!empty($filters['dateFrom'])) {
+            $this->dateFrom = new \DateTime($filters['dateFrom']);
+        }
+
+        if (!empty($filters['dateTo'])) {
+            $this->dateTo = new \DateTime($filters['dateTo']);
+        }
     }
 
     /**
@@ -161,6 +199,39 @@ class LeadTimelineEvent extends Event
             if (!isset($this->events[$data['event']])) {
                 $this->events[$data['event']] = [];
             }
+
+            if (!$this->isForTimeline()) {
+                // standardize the payload
+                $keepThese = [
+                    'event'      => true,
+                    'eventId'    => true,
+                    'eventLabel' => true,
+                    'eventType'  => true,
+                    'timestamp'  => true,
+                    'contactId'  => true,
+                    'extra'      => true,
+                ];
+
+                $data = array_intersect_key($data, $keepThese);
+
+                // Rename extra to details
+                if (isset($data['extra'])) {
+                    $data['details'] = $data['extra'];
+                    $this->prepareDetailsForAPI($data['details']);
+                    unset($data['extra']);
+                }
+
+                // Ensure a full URL
+                if ($this->siteDomain && isset($data['eventLabel']) && is_array($data['eventLabel']) && isset($data['eventLabel']['href'])) {
+                    if (!empty($data['eventLabel']['isExternal'])) {
+                        // If this does not have a http, then assume a Mautic URL
+                        if (strpos($data['eventLabel']['href'], '://') === false) {
+                            $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
+                        }
+                    }
+                }
+            }
+
             $this->events[$data['event']][] = $data;
         }
     }
@@ -294,7 +365,7 @@ class LeadTimelineEvent extends Event
     public function getEventLimit()
     {
         return [
-            'leadId' => $this->lead->getId(),
+            'leadId' => ($this->lead instanceof Lead) ? $this->lead->getId() : null,
             'limit'  => $this->limit,
             'start'  => (1 >= $this->page) ? 0 : ($this->page - 1) * $this->limit,
         ];
@@ -328,6 +399,16 @@ class LeadTimelineEvent extends Event
     public function getLead()
     {
         return $this->lead;
+    }
+
+    /**
+     * Returns the lead ID if any.
+     *
+     * @return int|null
+     */
+    public function getLeadId()
+    {
+        return ($this->lead instanceof Lead) ? $this->lead->getId() : null;
     }
 
     /**
@@ -475,5 +556,66 @@ class LeadTimelineEvent extends Event
     public function getChartQuery()
     {
         return $this->chartQuery;
+    }
+
+    /**
+     * Check if the data is to be display for the contact's timeline or used for the API.
+     *
+     * @return bool
+     */
+    public function isForTimeline()
+    {
+        return $this->forTimeline;
+    }
+
+    /**
+     * Add a serializer group for API formatting.
+     *
+     * @param $group
+     */
+    public function addSerializerGroup($group)
+    {
+        if (is_array($group)) {
+            $this->serializerGroups = array_merge(
+                $this->serializerGroups,
+                $group
+            );
+        } else {
+            $this->serializerGroups[$group] = $group;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getSerializerGroups()
+    {
+        return $this->serializerGroups;
+    }
+
+    /**
+     * Convert all snake case keys o camel case for API congruency.
+     *
+     * @param array $details
+     */
+    protected function prepareDetailsForAPI(array &$details)
+    {
+        foreach ($details as $key => &$detailValues) {
+            if (is_array($detailValues)) {
+                $this->prepareDetailsForAPI($detailValues);
+            }
+
+            if ('lead_id' === $key) {
+                // Don't include this as it should be included in parent as contactId
+                unset($details[$key]);
+                continue;
+            }
+
+            if (strstr($key, '_')) {
+                $newKey           = lcfirst(str_replace('_', '', ucwords($key, '_')));
+                $details[$newKey] = $details[$key];
+                unset($details[$key]);
+            }
+        }
     }
 }

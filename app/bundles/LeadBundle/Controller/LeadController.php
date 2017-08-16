@@ -44,6 +44,8 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
+                'lead:imports:view',
+                'lead:imports:create',
             ],
             'RETURN_ARRAY'
         );

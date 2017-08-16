@@ -142,6 +142,16 @@ class LeadModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var
+     */
+    protected $leadTrackingId;
+
+    /**
+     * @var bool
+     */
+    protected $leadTrackingCookieGenerated = false;
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack         $requestStack
@@ -584,8 +594,11 @@ class LeadModel extends FormModel
 
                 // Only update fields that are part of the passed $data array
                 if (array_key_exists($alias, $data)) {
+                    if (!$bindWithForm) {
+                        $this->cleanFields($data, $field);
+                    }
                     $curValue = $field['value'];
-                    $newValue = $data[$alias];
+                    $newValue = isset($data[$alias]) ? $data[$alias] : '';
 
                     if (is_array($newValue)) {
                         $newValue = implode('|', $newValue);
@@ -1108,40 +1121,42 @@ class LeadModel extends FormModel
      */
     public function getTrackingCookie($forceRegeneration = false)
     {
-        static $trackingId = false, $generated = false;
-
-        if ($forceRegeneration) {
-            $generated = true;
-
-            $oldTrackingId = $this->request->cookies->get('mautic_session_id');
-            $trackingId    = hash('sha1', uniqid(mt_rand()));
-
-            //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
-
-            return [$trackingId, $oldTrackingId];
+        if (!$this->request) {
+            return [null, false];
         }
 
-        if (empty($trackingId)) {
+        if ($forceRegeneration) {
+            $this->leadTrackingCookieGenerated = true;
+
+            $oldTrackingId        = $this->request->cookies->get('mautic_session_id');
+            $this->leadTrackingId = hash('sha1', uniqid(mt_rand()));
+
+            //create a tracking cookie with a expire of two years
+            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
+
+            return [$this->leadTrackingId, $oldTrackingId];
+        }
+
+        if (empty($this->leadTrackingId)) {
             //check for the tracking cookie or sid from query
-            if ($this->request && !$trackingId = $this->request->cookies->get('mautic_session_id')) {
-                $trackingId = ('GET' == $this->request->getMethod())
+            if ($this->request && !$this->leadTrackingId = $this->request->cookies->get('mautic_session_id')) {
+                $this->leadTrackingId = ('GET' == $this->request->getMethod())
                     ?
                     $this->request->query->get('mtc_sid')
                     :
                     $this->request->request->get('mtc_sid');
             }
-            $generated = false;
-            if (empty($trackingId)) {
-                $trackingId = hash('sha1', uniqid(mt_rand()));
-                $generated  = true;
+            $this->leadTrackingCookieGenerated = false;
+            if (empty($this->leadTrackingId)) {
+                $this->leadTrackingId              = hash('sha1', uniqid(mt_rand()));
+                $this->leadTrackingCookieGenerated = true;
             }
 
             //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
+            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
         }
 
-        return [$trackingId, $generated];
+        return [$this->leadTrackingId, $this->leadTrackingCookieGenerated];
     }
 
     /**
@@ -1151,6 +1166,10 @@ class LeadModel extends FormModel
      */
     public function setLeadCookie($leadId)
     {
+        if (!$this->request) {
+            return;
+        }
+
         // Remove the old if set
         $oldTrackingId                = $this->request->cookies->get('mautic_session_id');
         list($trackingId, $generated) = $this->getTrackingCookie();
@@ -1868,46 +1887,7 @@ class LeadModel extends FormModel
                 }
 
                 try {
-                    switch ($leadField['type']) {
-                        // Adjust the boolean values from text to boolean
-                        case 'boolean':
-                            $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
-                            break;
-                        // Ensure date/time entries match what symfony expects
-                        case 'datetime':
-                        case 'date':
-                        case 'time':
-                            // Prevent zero based date placeholders
-                            $dateTest = (int) str_replace(['/', '-', ' '], '', $fieldData[$leadField['alias']]);
-
-                            if (!$dateTest) {
-                                // Date placeholder was used so just ignore it to allow import of the field
-                                unset($fieldData[$leadField['alias']]);
-                            } else {
-                                switch ($leadField['type']) {
-                                    case 'datetime':
-                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d H:i');
-                                        break;
-                                    case 'date':
-                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('Y-m-d');
-                                        break;
-                                    case 'time':
-                                        $fieldData[$leadField['alias']] = (new \DateTime($fieldData[$leadField['alias']]))->format('H:i');
-                                        break;
-                                }
-                            }
-                            break;
-                        case 'multiselect':
-                            if (strpos($fieldData[$leadField['alias']], '|') !== false) {
-                                $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
-                            } else {
-                                $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
-                            }
-                            break;
-                        case 'number':
-                            $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
-                            break;
-                    }
+                    $this->cleanFields($fieldData, $leadField);
                 } catch (\Exception $exception) {
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
@@ -2516,22 +2496,23 @@ class LeadModel extends FormModel
     /**
      * Get timeline/engagement data.
      *
-     * @param Lead       $lead
+     * @param Lead|null  $lead
      * @param null       $filters
      * @param array|null $orderBy
      * @param int        $page
      * @param int        $limit
+     * @param bool       $forTimeline
      *
      * @return array
      */
-    public function getEngagements(Lead $lead, $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    public function getEngagements(Lead $lead = null, $filters = null, array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true)
     {
         $event = $this->dispatcher->dispatch(
             LeadEvents::TIMELINE_ON_GENERATE,
-            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit)
+            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->getParameter('site_url'))
         );
 
-        return [
+        $payload = [
             'events'   => $event->getEvents(),
             'filters'  => $filters,
             'order'    => $orderBy,
@@ -2541,6 +2522,8 @@ class LeadModel extends FormModel
             'limit'    => $limit,
             'maxPages' => $event->getMaxPage(),
         ];
+
+        return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
     /**

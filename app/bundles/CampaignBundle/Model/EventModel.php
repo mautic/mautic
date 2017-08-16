@@ -210,14 +210,18 @@ class EventModel extends CommonFormModel
                 unset($deletedEvents[$k]);
             }
 
-            $deletedKeys[] = $deleteMe;
+            if (isset($deletedEvents[$k])) {
+                $deletedKeys[] = $deleteMe;
+            }
         }
 
-        // wipe out any references to these events to prevent restraint violations
-        $this->getRepository()->nullEventRelationships($deletedKeys);
+        if (count($deletedEvents)) {
+            // wipe out any references to these events to prevent restraint violations
+            $this->getRepository()->nullEventRelationships($deletedKeys);
 
-        // delete the events
-        $this->deleteEntities($deletedEvents);
+            // delete the events
+            $this->deleteEntities($deletedEvents);
+        }
     }
 
     /**
