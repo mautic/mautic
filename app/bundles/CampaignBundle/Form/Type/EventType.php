@@ -58,7 +58,6 @@ class EventType extends AbstractType
                 'immediate' => 'mautic.campaign.form.type.immediate',
                 'interval'  => 'mautic.campaign.form.type.interval',
                 'date'      => 'mautic.campaign.form.type.date',
-                    
             ];
 
             if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['anchorEventType']
