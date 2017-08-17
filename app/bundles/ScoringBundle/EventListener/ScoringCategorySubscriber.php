@@ -9,8 +9,6 @@ namespace Mautic\ScoringBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\ScoringBundle\Event as Events;
-use Mautic\ScoringBundle\ScoringEvents;
 
 /**
  * Class ScoringCategorySubscriber.

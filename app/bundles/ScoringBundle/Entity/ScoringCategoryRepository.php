@@ -1,4 +1,5 @@
 <?php
+
 namespace Mautic\ScoringBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -6,7 +7,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * Class ScoringCategoryRepository.
  */
-class ScoringCategoryRepository extends CommonRepository {
+class ScoringCategoryRepository extends CommonRepository
+{
     /**
      * {@inheritdoc}
      */
@@ -21,13 +23,16 @@ class ScoringCategoryRepository extends CommonRepository {
 
         return parent::getEntities($args);
     }
-    
+
     /**
-     * Get the list of entities, sort by asked criterias
-     * @param boolean $publishedOnly default as false
+     * Get the list of entities, sort by asked criterias.
+     *
+     * @param bool $publishedOnly default as false
+     *
      * @return ScoringCategory[]
      */
-    public function getSpecializedList($publishedOnly = false) {
+    public function getSpecializedList($publishedOnly = false)
+    {
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias())
@@ -35,7 +40,7 @@ class ScoringCategoryRepository extends CommonRepository {
             ->where($this->getTableAlias().'.isGlobalScore=0') // yeah...
             ->orderBy($this->getTableAlias().'.orderIndex', 'ASC')
             ->addOrderBy($this->getTableAlias().'.name', 'ASC');
-        if($publishedOnly) {
+        if ($publishedOnly) {
             $q->andWhere($this->getTableAlias().'.isPublished=1');
         }
 
@@ -47,26 +52,31 @@ class ScoringCategoryRepository extends CommonRepository {
     /**
      * {@inheritdoc}
      */
-    public function getTableAlias() {
+    public function getTableAlias()
+    {
         return 's';
     }
-    
+
     /**
-     * Bufferized result - as this computation is heavy and may be called a lot
+     * Bufferized result - as this computation is heavy and may be called a lot.
+     *
      * @var array
      */
-    protected $usedSomewhere = array();
-    
+    protected $usedSomewhere = [];
+
     /**
      * Check a lot of things, to see if the scoreCategory is used anywhere.
      * That method should never be called, as we got Doctrine and Foreign keys
-     * But it exists because we need to display a warning at deletion before doing anything else
-     * @param integer $id
-     * @return boolean
+     * But it exists because we need to display a warning at deletion before doing anything else.
+     *
+     * @param int $id
+     *
+     * @return bool
      */
-    public function isUsedSomewhere($id) {
-        if(!array_key_exists($id, $this->usedSomewhere)) {
-            $this->usedSomewhere[$id] = 
+    public function isUsedSomewhere($id)
+    {
+        if (!array_key_exists($id, $this->usedSomewhere)) {
+            $this->usedSomewhere[$id] =
                 // grab ALL ACTIONS, TRIGGERS, CAMPAIGNS, SEGMENTS
                 !empty($this->_em->getRepository('MauticPointBundle:Point')->findByScoreCategory($id))
                 ||
@@ -74,6 +84,7 @@ class ScoringCategoryRepository extends CommonRepository {
                 ||
                 !empty($this->_em->getRepository('MauticCampaignBundle:Event')->findByScoreCategory($id));
         }
+
         return $this->usedSomewhere[$id];
     }
 }

@@ -265,17 +265,17 @@ class CampaignModel extends CommonFormModel
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($event, $func)) {
-                    /** CAPTIVEA.CORE START **/
-                    // we need an object there. 
+                    /* CAPTIVEA.CORE START **/
+                    // we need an object there.
                     // For some reasons bound to the use of modified Forms and a false behaviour of Doctrine (maybe an old version ?), we need to retrieve the correct object
-                    if('scoringCategory' === $f) {
-                        if(!is_object($v) && !empty($v)) {
+                    if ('scoringCategory' === $f) {
+                        if (!is_object($v) && !empty($v)) {
                             $v = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($v);
-                        } elseif(is_object($v)) {
+                        } elseif (is_object($v)) {
                             $v = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($v->getId());
                         }
                     }
-                    /** CAPTIVEA.CORE END **/
+                    /* CAPTIVEA.CORE END **/
                     $event->$func($v);
                 }
             }

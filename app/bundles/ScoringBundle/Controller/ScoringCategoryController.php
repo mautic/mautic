@@ -1,31 +1,33 @@
 <?php
+
 namespace Mautic\ScoringBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\ScoringBundle\Entity\ScoringCategory;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of ScoringCategoryController
+ * Description of ScoringCategoryController.
  *
  * @author captivea-qch
  */
-class ScoringCategoryController extends FormController {
+class ScoringCategoryController extends FormController
+{
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction() {
+    public function batchDeleteAction()
+    {
         $globalScorings = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->findByIsGlobalScore(true);
-        
+
         // we need to remove any isGlobalScore from a batch delete, cuz they ca'nt be batchDeleted
         $ids = array_map('intval', json_decode($this->request->query->get('ids'), true));
-        foreach($globalScorings as $gs) {
-            if(in_array($gs->getId(), $ids)) {
+        foreach ($globalScorings as $gs) {
+            if (in_array($gs->getId(), $ids)) {
                 unset($ids[array_search($gs->getId(), $ids)]);
             }
         }
         $this->request->query->set('ids', json_encode(array_map('strval', array_values($ids))));
+
         return $this->batchDeleteStandard();
     }
 
@@ -48,16 +50,17 @@ class ScoringCategoryController extends FormController {
     public function editAction($objectId, $ignorePost = false)
     {
         // $objectId can be an ID or... the plain entity. Because why not ?
-        if(!empty($objectId)) {
-            if(!is_object($objectId)) {
+        if (!empty($objectId)) {
+            if (!is_object($objectId)) {
                 $sc = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->find($objectId); // we may have an anticiped ID...
-                if(!empty($sc) && $sc->getIsGlobalScore()) { // they have to go through URI to come there, so this is acceptable
+                if (!empty($sc) && $sc->getIsGlobalScore()) { // they have to go through URI to come there, so this is acceptable
                     throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
                 }
-            } elseif($objectId->getIsGlobalScore()) {
+            } elseif ($objectId->getIsGlobalScore()) {
                 throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
             }
         }
+
         return $this->editStandard($objectId, $ignorePost);
     }
 
@@ -78,7 +81,7 @@ class ScoringCategoryController extends FormController {
     {
         return $this->newStandard();
     }
-    
+
     /**
      * @param $objectId
      *
@@ -130,8 +133,9 @@ class ScoringCategoryController extends FormController {
     {
         return 'mautic.scoring.scoringCategory';
     }
-    
-    protected function getPermissionBase() {
+
+    protected function getPermissionBase()
+    {
         return 'point:scoringCategory';
     }
 }

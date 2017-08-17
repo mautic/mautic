@@ -1,12 +1,14 @@
 <?php
+
 namespace Mautic\ScoringBundle;
 
 /**
- * Description of ScoringEvents
+ * Description of ScoringEvents.
  *
  * @author captivea-qch
  */
-final class ScoringEvents {
+final class ScoringEvents
+{
     /**
      * The mautic.scoringcategory_pre_save event is thrown right before a form is persisted.
      *

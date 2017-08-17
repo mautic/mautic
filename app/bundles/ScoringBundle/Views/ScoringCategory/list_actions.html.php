@@ -14,11 +14,15 @@ if (is_array($item)) {
 
 ?>
 <div class="input-group input-group-sm">
-    <span class="input-group-addon"><?php if(!is_array($item) && $item->isUsedAnywhere()) { ?>
+    <span class="input-group-addon"><?php if (!is_array($item) && $item->isUsedAnywhere()) {
+    ?>
         <input type="checkbox" disabled="disabled" readonly="readonly" />
-        <?php } else { ?>
+        <?php 
+} else {
+    ?>
         <input type="checkbox" data-target="tbody" data-toggle="selectrow" class="list-checkbox" name="cb<?php echo $id; ?>" value="<?php echo $id; ?>"/>
-        <?php } ?>
+        <?php 
+} ?>
     </span>
 
     <div class="input-group-btn">
@@ -68,28 +72,28 @@ if (is_array($item)) {
                 );
             endif;
             if (!empty($templateButtons['delete'])) {
-                if(!is_array($item) && $item->isUsedAnywhere()) {
-                    $listelems = array();
-                    foreach($item->getUsedByEvents() as $ue) {
+                if (!is_array($item) && $item->isUsedAnywhere()) {
+                    $listelems = [];
+                    foreach ($item->getUsedByEvents() as $ue) {
                         $listelems[] = $ue->getName().' ('.$view['translator']->trans('mautic.scoring.scoringCategory.usedin.events').')';
                     }
-                    foreach($item->getUsedByPoints() as $up) {
+                    foreach ($item->getUsedByPoints() as $up) {
                         $listelems[] = $up->getName().' ('.$view['translator']->trans('mautic.scoring.scoringCategory.usedin.points').')';
                     }
-                    foreach($item->getUsedByTriggers() as $ut) {
+                    foreach ($item->getUsedByTriggers() as $ut) {
                         $listelems[] = $ut->getName().' ('.$view['translator']->trans('mautic.scoring.scoringCategory.usedin.triggers').')';
                     }
                     $message = $view['translator']->trans('mautic.scoring.scoringCategory.deleteused', ['%listing%' => implode("\r\n"."\r\n", $listelems)]); // don't ask me for the nl2br
                     $view['buttons']->addButton(
                         [
                             'confirm' => [
-                                'btnClass'      => false,
-                                'btnText'       => $view['translator']->trans('mautic.core.form.delete'),
-                                'confirmText'   => $view['translator']->trans('mautic.core.form.cancel'),
+                                'btnClass'        => false,
+                                'btnText'         => $view['translator']->trans('mautic.core.form.delete'),
+                                'confirmText'     => $view['translator']->trans('mautic.core.form.cancel'),
                                 'confirmCallback' => 'dismissConfirmation',
-                                'cancelText'   => false,
-                                'iconClass' => 'fa fa-fw fa-trash-o text-danger',
-                                'message'       => $message,
+                                'cancelText'      => false,
+                                'iconClass'       => 'fa fa-fw fa-trash-o text-danger',
+                                'message'         => $message,
                             ],
                             'priority' => -1,
                         ]

@@ -669,44 +669,44 @@ class ListModel extends FormModel
                     ],
                 ]);
         // ( 'isGlobalScore' => false, ) filter seems to lead to a crash ?
-        foreach($scoringCategories as $category) {
-            if(!$category->getIsGlobalScore()) {
+        foreach ($scoringCategories as $category) {
+            if (!$category->getIsGlobalScore()) {
                 $choices['lead']['scoringCategory_'.$category->getId()] = [
                     'label'      => 'Score Category : '.$category->getName(),
                     'properties' => [
                         'type' => 'number',
                     ],
-                    'operators' => array(
-                        '=' => 'equals',
-                        'gt' => 'greater than',
-                        'gte' => 'greater than or equal',
-                        'lt' => 'less than',
-                        'lte' => 'less than or equal',
-                        'empty' => 'empty',
+                    'operators' => [
+                        '='      => 'equals',
+                        'gt'     => 'greater than',
+                        'gte'    => 'greater than or equal',
+                        'lt'     => 'less than',
+                        'lte'    => 'less than or equal',
+                        'empty'  => 'empty',
                         '!empty' => 'not empty',
-                    ),
-                    'object'    => 'lead',
+                    ],
+                    'object' => 'lead',
                 ];
                 $choices['company']['scoringCategory_'.$category->getId()] = [
                     'label'      => 'Score Category : '.$category->getName(),
                     'properties' => [
                         'type' => 'number',
                     ],
-                    'operators' => array(
-                        '=' => 'equals',
-                        'gt' => 'greater than',
-                        'gte' => 'greater than or equal',
-                        'lt' => 'less than',
-                        'lte' => 'less than or equal',
-                        'empty' => 'empty',
+                    'operators' => [
+                        '='      => 'equals',
+                        'gt'     => 'greater than',
+                        'gte'    => 'greater than or equal',
+                        'lt'     => 'less than',
+                        'lte'    => 'less than or equal',
+                        'empty'  => 'empty',
                         '!empty' => 'not empty',
-                    ),
-                    'object'    => 'company',
+                    ],
+                    'object' => 'company',
                 ];
             }
         }
-        /** CAPTIVEA.CORE END **/
-        
+        /* CAPTIVEA.CORE END **/
+
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
             $event = new LeadListFiltersChoicesEvent($choices, $this->getOperatorsForFieldType(), $this->translator);

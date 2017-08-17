@@ -6,37 +6,37 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
- * Description of ScoringValue
+ * Description of ScoringValue.
  *
  * @author captivea-qch
  */
-class ScoringValue {
+class ScoringValue
+{
     /**
      * @var \Mautic\LeadBundle\Entity\Lead
      */
     private $lead;
-    
+
     /**
      * @var \Mautic\ScoringBundle\Entity\ScoringCategory
      */
     private $scoringCategory;
-    
+
     /**
-     *
      * @var float
      */
     private $score;
-    
-    
+
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata) {
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('scoring_values')
             ->setCustomRepositoryClass('Mautic\ScoringBundle\Entity\ScoringValueRepository');
-        
+
         $builder->addLead(false, 'CASCADE', true, 'scoringValues');
         $builder->createManyToOne('scoringCategory', 'Mautic\ScoringBundle\Entity\ScoringCategory')
                 ->isPrimaryKey()
@@ -46,7 +46,7 @@ class ScoringValue {
         $builder->createField('score', 'integer')
             ->build();
     }
-    
+
     /**
      * Set lead.
      *
@@ -54,7 +54,8 @@ class ScoringValue {
      *
      * @return $this
      */
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead = null) {
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead = null)
+    {
         $this->lead = $lead;
 
         return $this;
@@ -65,10 +66,11 @@ class ScoringValue {
      *
      * @return \Mautic\LeadBundle\Entity\Lead
      */
-    public function getLead() {
+    public function getLead()
+    {
         return $this->lead;
     }
-    
+
     /**
      * Set scoringCategory.
      *
@@ -76,7 +78,8 @@ class ScoringValue {
      *
      * @return $this
      */
-    public function setScoringCategory(ScoringCategory $scoringCategory = null) {
+    public function setScoringCategory(ScoringCategory $scoringCategory = null)
+    {
         $this->scoringCategory = $scoringCategory;
 
         return $this;
@@ -87,25 +90,28 @@ class ScoringValue {
      *
      * @return \Mautic\ScoringBundle\Entity\ScoringCategory
      */
-    public function getScoringCategory() {
+    public function getScoringCategory()
+    {
         return $this->scoringCategory;
     }
-    
+
     /**
-     * 
-     * @param integer $score
+     * @param int $score
+     *
      * @return $this
      */
-    public function setScore($score) {
+    public function setScore($score)
+    {
         $this->score = intval($score);
+
         return $this;
     }
-    
+
     /**
-     * 
-     * @return integer
+     * @return int
      */
-    public function getScore() {
+    public function getScore()
+    {
         return $this->score;
     }
 }

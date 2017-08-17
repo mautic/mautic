@@ -9,7 +9,7 @@ return [
     'description' => 'Allow multiple score categories, in order to manage different scoring channels.',
     'version'     => '0.1',
     'author'      => 'Captivea',
-    'routes' => [
+    'routes'      => [
         'main' => [
             'mautic_scoring_index' => [
                 'path'       => '/scoring',
@@ -41,7 +41,7 @@ return [
     ],
     'services' => [
         'events' => [],
-        'forms' => [
+        'forms'  => [
             'mautic.scoring.type.scoringcategory_list' => [
                 'class'     => 'Mautic\ScoringBundle\Form\Type\ScoringCategoryListType',
                 'arguments' => 'mautic.factory',

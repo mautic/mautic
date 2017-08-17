@@ -8,14 +8,9 @@ namespace Mautic\ScoringBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -32,7 +27,7 @@ class ScoringCategory extends FormEntity
      * @var string
      */
     private $name;
-    
+
     /**
      * @var string
      */
@@ -42,7 +37,7 @@ class ScoringCategory extends FormEntity
      * @var bool
      */
     private $published;
-    
+
     /**
      * @var \DateTime
      */
@@ -67,110 +62,108 @@ class ScoringCategory extends FormEntity
      * @var float
      */
     private $globalScoreModifier = 0.00;
-    
+
     /**
-     * @var boolean
+     * @var bool
      */
     private $isGlobalScore = false;
-    
+
     /**
-     *
      * @var array
      */
     private $leadValues;
-    
+
     /**
-     *
-     * @var array 
+     * @var array
      */
     private $companyValues;
-    
+
     /**
-     *
-     * @var array 
+     * @var array
      */
     private $usedByPoints;
-    
+
     /**
-     *
-     * @var array 
+     * @var array
      */
     private $usedByTriggers;
-    
+
     /**
-     *
-     * @var array 
+     * @var array
      */
     private $usedByEvents;
 
-    public function __clone() {
+    public function __clone()
+    {
         $this->id        = null;
         $this->published = false;
-        
+
         parent::__clone();
     }
 
-    public function __construct() {
-        $this->leadValues = new ArrayCollection();
-        $this->companyValues = new ArrayCollection();
-        $this->usedByEvents = new ArrayCollection();
-        $this->usedByPoints = new ArrayCollection();
+    public function __construct()
+    {
+        $this->leadValues     = new ArrayCollection();
+        $this->companyValues  = new ArrayCollection();
+        $this->usedByEvents   = new ArrayCollection();
+        $this->usedByPoints   = new ArrayCollection();
         $this->usedByTriggers = new ArrayCollection();
     }
 
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata) {
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('scoring_categories')
             ->setCustomRepositoryClass('Mautic\ScoringBundle\Entity\ScoringCategoryRepository');
 
         $builder->addIdColumns();
-        
+
         $builder->addPublishDates();
-        
+
         $builder->createField('orderIndex', 'integer')
             ->columnName('order_index')
             ->build();
-        
+
         $builder->createField('updateGlobalScore', 'boolean')
             ->columnName('update_global_score')
             ->build();
-        
+
         $builder->createField('globalScoreModifier', 'float')
             ->columnName('global_score_modifier')
             ->build();
-        
+
         $builder->createField('isGlobalScore', 'boolean')
             ->columnName('is_global_score')
             ->build();
-        
+
         $builder->createOneToMany('leadValues', 'Mautic\ScoringBundle\Entity\ScoringValue')
                 ->mappedBy('scoringCategory')
                 ->cascadeAll()
                 ->fetchLazy()
                 ->build();
-        
+
         $builder->createOneToMany('companyValues', 'Mautic\ScoringBundle\Entity\ScoringCompanyValue')
                 ->mappedBy('scoringCategory')
                 ->cascadeAll()
                 ->fetchLazy()
                 ->build();
-        
+
         $builder->createOneToMany('usedByPoints', 'Mautic\PointBundle\Entity\Point')
                 ->mappedBy('scoringCategory')
                 ->cascadeAll()
                 ->fetchLazy()
                 ->build();
-        
+
         $builder->createOneToMany('usedByTriggers', 'Mautic\PointBundle\Entity\Trigger')
                 ->mappedBy('scoringCategory')
                 ->cascadeAll()
                 ->fetchLazy()
                 ->build();
-        
+
         $builder->createOneToMany('usedByEvents', 'Mautic\CampaignBundle\Entity\Event')
                 ->mappedBy('scoringCategory')
                 ->cascadeAll()
@@ -181,7 +174,8 @@ class ScoringCategory extends FormEntity
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata) {
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
@@ -191,116 +185,135 @@ class ScoringCategory extends FormEntity
             )
         );
     }
-    
+
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
-    
+
     /**
      * @return string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
-    
+
     /**
      * @return float
      */
-    public function getGlobalScoreModifier() {
+    public function getGlobalScoreModifier()
+    {
         return $this->globalScoreModifier;
     }
-    
+
     /**
      * @return int
      */
-    public function getOrderIndex() {
+    public function getOrderIndex()
+    {
         return $this->orderIndex;
     }
-    
+
     /**
      * @return bool
      */
-    public function getPublished() {
+    public function getPublished()
+    {
         return $this->published;
     }
-    
+
     /**
      * @return bool
      */
-    public function getUpdateGlobalScore() {
+    public function getUpdateGlobalScore()
+    {
         return $this->updateGlobalScore;
     }
-    
+
     /**
-     * 
      * @param string $name
+     *
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
+
         return $this;
     }
-    
+
     /**
-     * 
      * @param string $description
+     *
      * @return $this
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
+
         return $this;
     }
-    
+
     /**
-     * 
      * @param float $globalScoreModifier
+     *
      * @return $this
      */
-    public function setGlobalScoreModifier($globalScoreModifier) {
+    public function setGlobalScoreModifier($globalScoreModifier)
+    {
         $this->globalScoreModifier = max(0.00, floatval($globalScoreModifier));
+
         return $this;
     }
-    
+
     /**
-     * 
      * @param int $orderIndex
+     *
      * @return $this
      */
-    public function setOrderIndex($orderIndex) {
+    public function setOrderIndex($orderIndex)
+    {
         $this->orderIndex = max(1, intval($orderIndex));
+
         return $this;
     }
-    
+
     /**
-     * 
      * @param bool $published
+     *
      * @return $this
      */
-    public function setPublished($published) {
-        $this->published = !!$published;
+    public function setPublished($published)
+    {
+        $this->published = (bool) $published;
+
         return $this;
     }
-    
+
     /**
-     * 
      * @param bool $updateGlobalScore
+     *
      * @return $this
      */
-    public function setUpdateGlobalScore($updateGlobalScore) {
-        $this->updateGlobalScore = !!$updateGlobalScore;
+    public function setUpdateGlobalScore($updateGlobalScore)
+    {
+        $this->updateGlobalScore = (bool) $updateGlobalScore;
+
         return $this;
     }
-    
+
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
-    
+
     /**
      * Set publishUp.
      *
@@ -350,24 +363,27 @@ class ScoringCategory extends FormEntity
     {
         return $this->publishDown;
     }
-    
+
     /**
      * @return bool
      */
-    public function getIsGlobalScore() {
+    public function getIsGlobalScore()
+    {
         return $this->isGlobalScore;
     }
-    
+
     /**
-     * 
      * @param bool $isGlobalScore
+     *
      * @return $this
      */
-    public function setIsGlobalScore($isGlobalScore) {
-        $this->isGlobalScore = !!$isGlobalScore;
+    public function setIsGlobalScore($isGlobalScore)
+    {
+        $this->isGlobalScore = (bool) $isGlobalScore;
+
         return $this;
     }
-    
+
     /**
      * @param \Mautic\ScoringBundle\Entity\ScoringValue $leadValue
      *
@@ -390,14 +406,16 @@ class ScoringCategory extends FormEntity
 
     /**
      * @param ArrayCollection $leadValues
+     *
      * @return $this
      */
     public function setLeadValues(ArrayCollection $leadValues)
     {
         $this->leadValues = $leadValues;
+
         return $this;
     }
-    
+
     /**
      * @return ArrayCollection
      */
@@ -405,8 +423,7 @@ class ScoringCategory extends FormEntity
     {
         return $this->leadValues;
     }
-    
-        
+
     /**
      * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue
      *
@@ -429,14 +446,16 @@ class ScoringCategory extends FormEntity
 
     /**
      * @param ArrayCollection $leadValues
+     *
      * @return $this
      */
     public function setCompanyValues(ArrayCollection $companyValues)
     {
         $this->companyValues = $companyValues;
+
         return $this;
     }
-    
+
     /**
      * @return ArrayCollection
      */
@@ -444,9 +463,9 @@ class ScoringCategory extends FormEntity
     {
         return $this->companyValues;
     }
-    
+
     /**
-     * @param integer $key
+     * @param int                                 $key
      * @param \Mautic\CampaignBundle\Entity\Event $event
      *
      * @return $this
@@ -457,7 +476,7 @@ class ScoringCategory extends FormEntity
             $this->changes['usedByEvents']['added'][$event->getId()] = [$event->getId(), $changes];
         }
         $this->usedByEvents[$event->getId()] = $event;
-        
+
         return $this;
     }
 
@@ -470,7 +489,7 @@ class ScoringCategory extends FormEntity
 
         $this->usedByEvents->removeElement($event);
     }
-    
+
     /**
      * @return ArrayCollection
      */
@@ -478,7 +497,7 @@ class ScoringCategory extends FormEntity
     {
         return $this->usedByEvents;
     }
-    
+
     /**
      * @param \Mautic\PointBundle\Entity\Point $point
      *
@@ -501,14 +520,16 @@ class ScoringCategory extends FormEntity
 
     /**
      * @param ArrayCollection $points
+     *
      * @return $this
      */
     public function setUsedByPoints(ArrayCollection $points)
     {
         $this->usedByPoints = $points;
+
         return $this;
     }
-    
+
     /**
      * @return ArrayCollection
      */
@@ -516,7 +537,7 @@ class ScoringCategory extends FormEntity
     {
         return $this->usedByPoints;
     }
-    
+
     /**
      * @param \Mautic\PointBundle\Entity\Trigger $trigger
      *
@@ -539,14 +560,16 @@ class ScoringCategory extends FormEntity
 
     /**
      * @param ArrayCollection $triggers
+     *
      * @return $this
      */
     public function setUsedByTriggers(ArrayCollection $triggers)
     {
         $this->usedByTriggers = $triggers;
+
         return $this;
     }
-    
+
     /**
      * @return ArrayCollection
      */
@@ -554,11 +577,12 @@ class ScoringCategory extends FormEntity
     {
         return $this->usedByTriggers;
     }
-    
+
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isUsedAnywhere() {
+    public function isUsedAnywhere()
+    {
         return !$this->getUsedByEvents()->isEmpty()
             || !$this->getUsedByPoints()->isEmpty()
             || !$this->getUsedByTriggers()->isEmpty();

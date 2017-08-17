@@ -174,9 +174,9 @@ return [
             ],
             'mautic.campaignrange.type.action' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
-                /** CAPTIVEA.CORE START **/
+                /* CAPTIVEA.CORE START **/
                 'arguments' => 'mautic.factory',
-                /** CAPTIVEA.CORE END **/
+                /* CAPTIVEA.CORE END **/
                 'alias' => 'campaignevent',
             ],
             'mautic.campaign.type.campaignlist' => [

@@ -13,12 +13,11 @@ namespace Mautic\ScoringBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\ScoringBundle\Entity\ScoringCategory;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-
 use Mautic\ScoringBundle\Event\ScoringCategoryBuilderEvent;
 use Mautic\ScoringBundle\Event\ScoringCategoryEvent;
 use Mautic\ScoringBundle\ScoringEvents;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class ScoringCategoryModel.
@@ -49,8 +48,7 @@ class ScoringCategoryModel extends CommonFormModel
     {
         return 'point:scoringCategory';
     }
-    
-    
+
     /**
      * {@inheritdoc}
      *
@@ -65,6 +63,7 @@ class ScoringCategoryModel extends CommonFormModel
         if (!empty($action)) {
             $options['action'] = $action;
         }
+
         return $formFactory->create(\Mautic\ScoringBundle\Form\Type\ScoringCategoryType::class, $entity, $options);
     }
 
@@ -78,7 +77,7 @@ class ScoringCategoryModel extends CommonFormModel
         if ($id === null) {
             return new ScoringCategory();
         }
-        
+
         return parent::getEntity($id);
     }
 

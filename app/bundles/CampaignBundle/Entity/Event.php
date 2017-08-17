@@ -136,12 +136,10 @@ class Event
 
     /** CAPTIVEA.CORE START **/
     /**
-     *
-     * @var \Mautic\ScoringBundle\Entity\ScoringCategory 
+     * @var \Mautic\ScoringBundle\Entity\ScoringCategory
      */
     private $scoringCategory = null;
     /** CAPTIVEA.CORE END **/
-
     public function __construct()
     {
         $this->log      = new ArrayCollection();
@@ -254,12 +252,12 @@ class Event
             ->columnName('channel_id')
             ->nullable()
             ->build();
-        /** CAPTIVEA.CORE START **/
+        /* CAPTIVEA.CORE START **/
         $builder->createManyToOne('scoringCategory', 'Mautic\ScoringBundle\Entity\ScoringCategory')
             ->inversedBy('usedByEvents')
             ->addJoinColumn('scoringcategory_id', 'id', true, false, 'SET NULL')
             ->build();
-        /** CAPTIVEA.CORE END **/
+        /* CAPTIVEA.CORE END **/
     }
 
     /**
@@ -847,26 +845,28 @@ class Event
 
         return $this;
     }
-    
+
     /** CAPTIVEA.CORE START **/
-    
+
     /**
-     * 
      * @return \Mautic\ScoringBundle\Entity\ScoringCategory
      */
-    public function getScoringCategory() {
-       return $this->scoringCategory; 
-}
-    
+    public function getScoringCategory()
+    {
+        return $this->scoringCategory;
+    }
+
     /**
-     * 
      * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
+     *
      * @return $this
      */
-    public function setScoringCategory(\Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory = null) {
+    public function setScoringCategory(\Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory = null)
+    {
         $this->scoringCategory = $scoringCategory;
+
         return $this;
     }
-    
-    /** CAPTIVEA.CORE END **/
+
+    /* CAPTIVEA.CORE END **/
 }

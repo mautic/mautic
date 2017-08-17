@@ -6,7 +6,6 @@
 
 namespace Mautic\ScoringBundle\Security\Permissions;
 
-use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -17,15 +16,17 @@ class ScoringPermissions extends \Mautic\PointBundle\Security\Permissions\PointP
     /**
      * {@inheritdoc}
      */
-    public function __construct($params) {
+    public function __construct($params)
+    {
         parent::__construct($params);
         $this->addStandardPermissions('scoringCategory');
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data) {
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    {
         parent::buildForm($builder, $options, $data);
         $this->addStandardFormFields('point', 'scoringCategory', $builder, $data);
     }

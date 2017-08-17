@@ -392,22 +392,26 @@ $view['slots']->set(
                     <hr>
                 <?php endif; ?>
             </div>
-            <?php /** CAPTIVEA.CORE START **/ if(!empty($scoringValues)) { ?>
+            <?php /** CAPTIVEA.CORE START **/ if (!empty($scoringValues)) {
+                        ?>
             <div class="panel-heading">
                 <div class="panel-title">
                     <?php echo $view['translator']->trans('mautic.scoring.lead.scoringCategoryTitle'); ?>
                 </div>
             </div>
             <div class="panel-body pt-sm">
-                <?php foreach($scoringValues as $sv) { ?>
+                <?php foreach ($scoringValues as $sv) {
+                            ?>
                 <h6 class="fw-sb col-md-9">
                     <?php echo $sv['category']; ?>
                 </h6>
                 <p class="text-muted col-md-3">
                     <?php echo $sv['value']; ?>
                     points
-                </p><?php } ?>
-            </div><?php } /** CAPTIVEA.CORE END **/ ?>
+                </p><?php 
+                        } ?>
+            </div><?php 
+                    } /* CAPTIVEA.CORE END **/ ?>
             <?php if ($doNotContact) : ?>
                 <div id="bounceLabel<?php echo $doNotContact['id']; ?>">
                     <div class="panel-heading text-center">

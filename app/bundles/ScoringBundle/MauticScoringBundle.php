@@ -1,17 +1,17 @@
 <?php
+
 namespace Mautic\ScoringBundle;
+
 /*
  * @author      Captivea (QCH)
- * 
+ *
  */
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 
-
 /**
- * Class MauticScoringBundle
+ * Class MauticScoringBundle.
  */
-class MauticScoringBundle extends PluginBundleBase {
-
+class MauticScoringBundle extends PluginBundleBase
+{
 }
-

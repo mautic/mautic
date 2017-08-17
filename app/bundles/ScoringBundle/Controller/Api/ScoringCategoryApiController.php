@@ -1,20 +1,20 @@
 <?php
+
 namespace Mautic\ScoringBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Description of ScoringCategoryApiController
+ * Description of ScoringCategoryApiController.
  *
  * @author captivea-qch
  */
-class ScoringCategoryApiController extends CommonApiController {
+class ScoringCategoryApiController extends CommonApiController
+{
     use LeadAccessTrait;
-    
+
     /**
      * {@inheritdoc}
      */

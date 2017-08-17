@@ -1,26 +1,29 @@
 <?php
+
 namespace Mautic\ScoringBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Description of ScoringCompanyValueRepository
+ * Description of ScoringCompanyValueRepository.
  *
  * @author captivea-qch
  */
-class ScoringCompanyValueRepository extends CommonRepository {
+class ScoringCompanyValueRepository extends CommonRepository
+{
     /**
-     * 
      * @param \Mautic\LeadBundle\Entity\Company $company
-     * @param ScoringCategory $scoringCategory
-     * @return integer
+     * @param ScoringCategory                   $scoringCategory
+     *
+     * @return int
      */
-    public function adjustPoints(\Mautic\LeadBundle\Entity\Company $company, ScoringCategory $scoringCategory, $points, $operator = 'plus') {
+    public function adjustPoints(\Mautic\LeadBundle\Entity\Company $company, ScoringCategory $scoringCategory, $points, $operator = 'plus')
+    {
         $modifiedPoints = 0;
-        if(!empty($company)) {
-            $scoringValue = $this->findOneBy(array('company' => $company, 'scoringCategory' => $scoringCategory));
-            if(empty($scoringValue)) {
-                $scoringValue = new ScoringCompanyValue;
+        if (!empty($company)) {
+            $scoringValue = $this->findOneBy(['company' => $company, 'scoringCategory' => $scoringCategory]);
+            if (empty($scoringValue)) {
+                $scoringValue = new ScoringCompanyValue();
                 $scoringValue->setCompany($company);
                 $scoringValue->setScoringCategory($scoringCategory);
                 $scoringValue->setScore(0);
@@ -46,11 +49,12 @@ class ScoringCompanyValueRepository extends CommonRepository {
             $this->_em->persist($scoringValue);
             $this->_em->flush();
 
-            if($scoringCategory->getUpdateGlobalScore()) {
-                $modifier = $scoringCategory->getGlobalScoreModifier();
+            if ($scoringCategory->getUpdateGlobalScore()) {
+                $modifier       = $scoringCategory->getGlobalScoreModifier();
                 $modifiedPoints = round(($modifier * $points) / 100);
             }
         }
+
         return $modifiedPoints;
     }
 }

@@ -207,9 +207,9 @@ class CampaignSubscriber extends CommonSubscriber
             /** CAPTIVEA.CORE START REPLACE **/
             //$lead->adjustPoints($points);
             $scoringCategoryId = $event->getConfig()['scoringCategory'];
-            if(!empty($scoringCategoryId)) {
+            if (!empty($scoringCategoryId)) {
                 $scoringCategory = $this->em->getRepository('MauticScoringBundle:ScoringCategory')->find($scoringCategoryId);
-                if(empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
+                if (empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
                     $lead->adjustPoints($points);
                 } else {
                     $this->em->getRepository('MauticScoringBundle:ScoringValue')->adjustPoints($lead, $scoringCategory, $points);
@@ -217,24 +217,24 @@ class CampaignSubscriber extends CommonSubscriber
             } else {
                 $lead->adjustPoints($points);
             }
-            /** CAPTIVEA.CORE END REPLACE **/
+/** CAPTIVEA.CORE END REPLACE **/
 
             //add a lead point change log
             $log = new PointsChangeLog();
             $log->setDelta($points);
             $log->setLead($lead);
             $log->setType('campaign');
-            
-            /** CAPTIVEA.CORE START REPLACE **/
+
+/** CAPTIVEA.CORE START REPLACE **/
             // $log->setEventName("{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}");
             $strEvent = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
-            if(empty($scoringCategory)) {
+            if (empty($scoringCategory)) {
                 $log->setEventName($strEvent);
             } else {
                 $log->setEventName($strEvent.' ('.$scoringCategory->getName().') ');
             }
-            /** CAPTIVEA.CORE END REPLACE **/
-                    
+            /* CAPTIVEA.CORE END REPLACE **/
+
             $log->setActionName("{$event->getEvent()['id']}: {$event->getEvent()['name']}");
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
@@ -342,28 +342,28 @@ class CampaignSubscriber extends CommonSubscriber
         $score = $event->getConfig()['score'];
         $lead  = $event->getLead();
 
-        /** CAPTIVEA.CORE START REPLACE **/
+/** CAPTIVEA.CORE START REPLACE **/
         //if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
-        $isFine = false;
+        $isFine            = false;
         $scoringCategoryId = $event->getConfig()['scoringCategory'];
-        if(!empty($scoringCategoryId)) {
+        if (!empty($scoringCategoryId)) {
             $scoringCategory = $this->em->getRepository('MauticScoringBundle:ScoringCategory')->find($scoringCategoryId);
-            if(empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
+            if (empty($scoringCategory) || $scoringCategory->getIsGlobalScore()) {
                 $isFine = $this->leadModel->scoreContactsCompany($lead, $score);
             } else {
-                $lead = $this->em->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
+                $lead           = $this->em->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
                 $primaryCompany = $lead->getPrimaryCompany(); // methods getEntityWithPrimaryCompany/getPrimaryCompany may provide mixed results
-                if(!empty($primaryCompany) && !empty($primaryCompany['id'])) {
+                if (!empty($primaryCompany) && !empty($primaryCompany['id'])) {
                     $primaryCompanyObject = $this->em->getRepository('MauticLeadBundle:Company')->find($primaryCompany['id']);
-                    $modPoints = $this->em->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);
-                    $isFine = $this->leadModel->scoreContactsCompany($lead, $modPoints);
+                    $modPoints            = $this->em->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);
+                    $isFine               = $this->leadModel->scoreContactsCompany($lead, $modPoints);
                 }
             }
         } else {
             $isFine = $this->leadModel->scoreContactsCompany($lead, $score);
         }
-        if(!$isFine) {
-        /** CAPTIVEA.CORE END REPLACE **/
+        if (!$isFine) {
+            /* CAPTIVEA.CORE END REPLACE **/
             return $event->setFailed('mautic.lead.no_company');
         } else {
             return $event->setResult(true);

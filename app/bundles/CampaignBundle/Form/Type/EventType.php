@@ -25,9 +25,8 @@ class EventType extends AbstractType
     use PropertiesTrait;
 
     /** CAPTIVEA.CORE START **/
-    
+
     /**
-     *
      * @var MauticFactory
      */
     private $factory;
@@ -35,10 +34,11 @@ class EventType extends AbstractType
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(\Mautic\CoreBundle\Factory\MauticFactory $factory) {
+    public function __construct(\Mautic\CoreBundle\Factory\MauticFactory $factory)
+    {
         $this->factory = $factory;
     }
-    
+
     /** CAPTIVEA.CORE END **/
 
     /**
@@ -60,32 +60,32 @@ class EventType extends AbstractType
             ]
         );
 
-        /** CAPTIVEA.CORE START **/
+        /* CAPTIVEA.CORE START **/
         if (in_array($options['data']['eventType'], ['action']) && in_array($options['data']['type'], ['lead.changepoints'])) {
-            $scoringChoices = array();
-            $r = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(array('isPublished' => true)); // we will have a hard time with that
-            foreach($r as $l) {
+            $scoringChoices = [];
+            $r              = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(['isPublished' => true]); // we will have a hard time with that
+            foreach ($r as $l) {
                 $scoringChoices[$l->getId()] = $l->getName();
             }
             $builder->add(
                 'scoringCategory',
                 'choice',
                 [
-                    'choices' => $scoringChoices,
+                    'choices'    => $scoringChoices,
                     'label'      => 'mautic.campaign.form.type.scoringCategory',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],
-                    'required' => false,
-                    'multiple' => false,
+                    'required'    => false,
+                    'multiple'    => false,
                     'empty_value' => false,
-                    'data' => (empty($options['data']['scoringCategory'])) ? null : (is_object($options['data']['scoringCategory'])? $options['data']['scoringCategory']->getId():$options['data']['scoringCategory']),
+                    'data'        => (empty($options['data']['scoringCategory'])) ? null : (is_object($options['data']['scoringCategory']) ? $options['data']['scoringCategory']->getId() : $options['data']['scoringCategory']),
                 ]
             );
         }
-        /** CAPTIVEA.CORE END **/
-        
+        /* CAPTIVEA.CORE END **/
+
         $builder->add(
             'anchor',
             'hidden',

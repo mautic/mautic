@@ -76,12 +76,10 @@ class Point extends FormEntity
 
     /** CAPTIVEA.CORE START **/
     /**
-     *
-     * @var \Mautic\ScoringBundle\Entity\ScoringCategory 
+     * @var \Mautic\ScoringBundle\Entity\ScoringCategory
      */
     private $scoringCategory = null;
     /** CAPTIVEA.CORE END **/
-    
     public function __clone()
     {
         $this->id = null;
@@ -114,11 +112,11 @@ class Point extends FormEntity
             ->length(50)
             ->build();
 
-        /** CAPTIVEA.CORE START **/
+        /* CAPTIVEA.CORE START **/
         $builder->createManyToOne('scoringCategory', 'Mautic\ScoringBundle\Entity\ScoringCategory')
             ->addJoinColumn('scoringcategory_id', 'id', true, false, 'SET NULL')
             ->build();
-        /** CAPTIVEA.CORE END **/
+        /* CAPTIVEA.CORE END **/
 
         $builder->addPublishDates();
 
@@ -416,27 +414,28 @@ class Point extends FormEntity
     {
         $this->delta = (int) $delta;
     }
-    
+
     /** CAPTIVEA.CORE START **/
-    
+
     /**
-     * 
      * @return \Mautic\ScoringBundle\Entity\ScoringCategory
      */
-    public function getScoringCategory() {
-       return $this->scoringCategory; 
+    public function getScoringCategory()
+    {
+        return $this->scoringCategory;
     }
-    
+
     /**
-     * 
      * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
+     *
      * @return $this
      */
-    public function setScoringCategory(\Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory) {
+    public function setScoringCategory(\Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory)
+    {
         $this->scoringCategory = $scoringCategory;
+
         return $this;
     }
-    
-    /** CAPTIVEA.CORE END **/
-    
+
+    /* CAPTIVEA.CORE END **/
 }

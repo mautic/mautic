@@ -12,13 +12,13 @@
 namespace Mautic\PointBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\PointBundle\Entity\Point;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 
 /**
  * Class PointType.
@@ -36,9 +36,8 @@ class PointType extends AbstractType
     private $translator;
 
     /** CAPTIVEA.CORE START **/
-    
+
     /**
-     *
      * @var MauticFactory
      */
     private $factory;
@@ -51,9 +50,9 @@ class PointType extends AbstractType
     {
         $this->translator = $factory->getTranslator();
         $this->security   = $factory->getSecurity();
-        /** CAPTIVEA.CORE START **/
+        /* CAPTIVEA.CORE START **/
         $this->factory = $factory;
-        /** CAPTIVEA.CORE END **/
+        /* CAPTIVEA.CORE END **/
     }
 
     /**
@@ -147,8 +146,8 @@ class PointType extends AbstractType
             )
                 ->addModelTransformer($transformer)
         );
-        /** CAPTIVEA.CORE END **/
-        
+        /* CAPTIVEA.CORE END **/
+
         $builder->add('isPublished', 'yesno_button_group', [
             'read_only' => $readonly,
             'data'      => $data,

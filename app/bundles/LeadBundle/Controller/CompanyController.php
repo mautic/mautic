@@ -441,24 +441,24 @@ class CompanyController extends FormController
         sort($groups);
         $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
 
-        /** CAPTIVEA.CORE START **/
+/** CAPTIVEA.CORE START **/
         // we want to list all scoring categories (excepted the global one)
-        $allScoringCategoriesWithValues = array();
-        $scoringCategories = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList(true);
-        foreach($scoringCategories as $scoringCategory) {
-            $allScoringCategoriesWithValues[$scoringCategory->getId()] = array(
+        $allScoringCategoriesWithValues = [];
+        $scoringCategories              = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList(true);
+        foreach ($scoringCategories as $scoringCategory) {
+            $allScoringCategoriesWithValues[$scoringCategory->getId()] = [
                 'category' => $scoringCategory->getName(),
-                'value' => 0,
-            );
+                'value'    => 0,
+            ];
         }
-        foreach($entity->getScoringValues() as $scoringValue) {
+        foreach ($entity->getScoringValues() as $scoringValue) {
             $scat = $scoringValue->getScoringCategory();
-            if(!empty($scat)) {
+            if (!empty($scat)) {
                 $allScoringCategoriesWithValues[$scat->getId()]['value'] = $scoringValue->getScore();
             }
         }
-        /** CAPTIVEA.CORE END **/
-        
+        /* CAPTIVEA.CORE END **/
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -467,9 +467,9 @@ class CompanyController extends FormController
                     'form'   => $form->createView(),
                     'fields' => $fields,
                     'groups' => $groups,
-                    /** CAPTIVEA.CORE START **/
+                    /* CAPTIVEA.CORE START **/
                     'allScoringCategoriesWithValues' => $allScoringCategoriesWithValues,
-                    /** CAPTIVEA.CORE END **/
+                    /* CAPTIVEA.CORE END **/
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [

@@ -283,29 +283,28 @@ class PointModel extends CommonFormModel
 
                 if ($pointsChange) {
                     $delta = $action->getDelta();
-                    
-                    /** CAPTIVEA.CORE START REPLACE **/
+
+/** CAPTIVEA.CORE START REPLACE **/
                     //$lead->adjustPoints($delta);
                     $scoringCategory = $action->getScoringCategory();
-                    if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
+                    if (!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
                         $this->em->getRepository('MauticScoringBundle:ScoringValue')->adjustPoints($lead, $scoringCategory, $delta);
                     } else {
                         $lead->adjustPoints($delta);
                     }
                     /** CAPTIVEA.CORE END REPLACE **/
-                    
                     $parsed = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
-                        /** CAPTIVEA.CORE START REPLACE **/
+                        /* CAPTIVEA.CORE START REPLACE **/
                         // $action->getId().': '.$action->getName()
                         (
-                            (!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore())?
+                            (!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) ?
                                 $action->getId().': '.$action->getName().' ('.$scoringCategory->getName().') '
                                 :
                                 ($action->getId().': '.$action->getName())
                         ),
-                        /** CAPTIVEA.CORE END REPLACE **/
+                        /* CAPTIVEA.CORE END REPLACE **/
                         $parsed[1],
                         $delta,
                         $ipAddress

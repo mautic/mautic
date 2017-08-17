@@ -680,7 +680,6 @@ class LeadListRepository extends CommonRepository
         /** CAPTIVEA.CORE START **/
         $snowflakes = null; // we need a trick to keep the values
         /** CAPTIVEA.CORE END **/
-
         $groups    = [];
         $groupExpr = $q->expr()->andX();
 
@@ -691,20 +690,20 @@ class LeadListRepository extends CommonRepository
                 $object = $details['object'];
             }
 
-            /** CAPTIVEA.CORE START REPLACE **/
+/** CAPTIVEA.CORE START REPLACE **/
 //            if ($object == 'lead') {
 //                $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
 //            } elseif ($object == 'company') {
 //                $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
 //            }
-            $matches = array(); // we should add the scoringCompanyValue/ScoringValue objects (as for lead/company) instead
-            if(preg_match('`^scoringCategory_([0-9]+)$`i', $details['field'], $matches)) {
-                $snowflakes = array(
-                    'type' => 'scoringCategory',
+            $matches = []; // we should add the scoringCompanyValue/ScoringValue objects (as for lead/company) instead
+            if (preg_match('`^scoringCategory_([0-9]+)$`i', $details['field'], $matches)) {
+                $snowflakes = [
+                    'type'     => 'scoringCategory',
                     'subValue' => intval($matches[1]),
-                );
+                ];
                 $details['field'] = 'snowflake'; // got a special case
-                $column = null;
+                $column           = null;
             } else {
                 if ($object == 'lead') {
                     $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
@@ -712,7 +711,7 @@ class LeadListRepository extends CommonRepository
                     $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
                 }
             }
-            /** CAPTIVEA.CORE END REPLACE **/
+/** CAPTIVEA.CORE END REPLACE **/
 
             // DBAL does not have a not() function so we have to use the opposite
             $operatorDetails = $options[$details['operator']];
@@ -1619,17 +1618,17 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
 
                     break;
-                /** CAPTIVEA.CORE START **/
+                /* CAPTIVEA.CORE START **/
                 case 'snowflake':
-                    if(!empty($snowflakes) && ('scoringCategory' === $snowflakes['type'])) {
+                    if (!empty($snowflakes) && ('scoringCategory' === $snowflakes['type'])) {
                         if ('company' === $object) {
                             // Must tell getLeadsByList how to best handle the relationship with the companies table
                             if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'])) {
                                 $this->listFiltersInnerJoinCompany = true;
                             }
                         }
-                        
-                        $field = 'scoringv.score';
+
+                        $field                            = 'scoringv.score';
                         $parameters['s__scoringCategory'] = $snowflakes['subValue'];
                         if ($object == 'lead') {
                             $q->leftJoin('l', 'scoring_values', 'scoringv', 'scoringv.scoringcategory_id=:s__scoringCategory and scoringv.lead_id=l.id');
@@ -1724,7 +1723,7 @@ class LeadListRepository extends CommonRepository
                         }
                     }
                     break;
-                /** CAPTIVEA.CORE END **/
+                /* CAPTIVEA.CORE END **/
                 default:
                     if (!$column) {
                         // Column no longer exists so continue

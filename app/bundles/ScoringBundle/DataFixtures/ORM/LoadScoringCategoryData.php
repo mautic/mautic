@@ -1,4 +1,5 @@
 <?php
+
 namespace Mautic\ScoringBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
@@ -9,13 +10,14 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Description of LoadScoringCategoryData
+ * Description of LoadScoringCategoryData.
  *
  * @author captivea-qch
  */
-class LoadScoringCategoryData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface {
+class LoadScoringCategoryData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+{
     const REFKEY = 'scoringcategory-global';
-    
+
     /**
      * @var ContainerInterface
      */
@@ -24,15 +26,16 @@ class LoadScoringCategoryData extends AbstractFixture implements OrderedFixtureI
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null) {
+    public function setContainer(ContainerInterface $container = null)
+    {
         $this->container = $container;
     }
 
     /**
      * @param ObjectManager $manager
      */
-    public function load(ObjectManager $manager) {
-        
+    public function load(ObjectManager $manager)
+    {
         $globalScoring = new ScoringCategory();
         $globalScoring->setName($this->container->get('translator')->trans('mautic.scoring.scoringCategory.globalscore.name'));
         $globalScoring->setIsGlobalScore(true);
@@ -42,7 +45,7 @@ class LoadScoringCategoryData extends AbstractFixture implements OrderedFixtureI
         $globalScoring->setPublishUp(new \DateTime());
         $globalScoring->setPublished(true);
         $manager->persist($globalScoring);
-        
+
         $this->setReference(static::REFKEY, $globalScoring); // keep it; we may need to update entire database to get that to work
     }
 

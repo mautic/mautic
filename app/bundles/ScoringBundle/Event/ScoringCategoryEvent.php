@@ -16,7 +16,7 @@ class ScoringCategoryEvent extends CommonEvent
 {
     /**
      * @param ScoringCategory $scoringCategory
-     * @param bool  $isNew
+     * @param bool            $isNew
      */
     public function __construct(ScoringCategory &$scoringCategory, $isNew = false)
     {

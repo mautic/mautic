@@ -36,7 +36,7 @@ if ($tmpl == 'index') {
                         'default'    => true,
                     ]
                 );
-                
+
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
@@ -55,7 +55,7 @@ if ($tmpl == 'index') {
                     <td>
                         <?php
                         $templateButtonsActions = [];
-                        if(!$item->isGlobalScore()) { // we want to display the checkbox with no actions...
+                        if (!$item->isGlobalScore()) { // we want to display the checkbox with no actions...
                             $templateButtonsActions = [
                                 'edit'   => $permissions['point:scoringCategory:edit'],
                                 'clone'  => $permissions['point:scoringCategory:create'],
@@ -68,14 +68,15 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => $templateButtonsActions,
-                                'routeBase' => 'scoring',
+                                'routeBase'       => 'scoring',
                             ]
                         );
                         ?>
                     </td>
                     <td>
                         <div>
-                            <?php if($item->isGlobalScore()) { ?>
+                            <?php if ($item->isGlobalScore()) {
+                            ?>
                                 <i class="fa fa-fw fa-lg fa-toggle-on text-muted has-click-event scoring-scoringcategory-publish-icon-global"
                                    data-toggle="tooltip"
                                    data-container="body"
@@ -86,7 +87,9 @@ if ($tmpl == 'index') {
                             <span>
                                 <?php echo $item->getName(); ?>
                             </span>
-                            <?php } else { echo $view->render(
+                            <?php 
+                        } else {
+                            echo $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 ['item' => $item, 'model' => 'scoring.scoringcategory']
                             ); ?>
@@ -95,7 +98,8 @@ if ($tmpl == 'index') {
                                 ['objectAction' => 'edit', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
-                            </a><?php } ?>
+                            </a><?php 
+                        } ?>
                         </div>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
