@@ -19,6 +19,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 /* CAPTIVEA.CORE START **/
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Doctrine\ORM\EntityManager;
 
 /** CAPTIVEA.CORE END **/
 
@@ -40,9 +41,9 @@ class TriggerType extends AbstractType
     /** CAPTIVEA.CORE START **/
 
     /**
-     * @var MauticFactory
+     * @var EntityManager
      */
-    private $factory;
+    private $entityManager;
     /** CAPTIVEA.CORE END **/
 
     /**
@@ -53,7 +54,7 @@ class TriggerType extends AbstractType
         $this->translator = $factory->getTranslator();
         $this->security   = $factory->getSecurity();
         /* CAPTIVEA.CORE START **/
-        $this->factory = $factory;
+        $this->entityManager = $factory->getEntityManager();
         /* CAPTIVEA.CORE END **/
     }
 
@@ -149,7 +150,7 @@ class TriggerType extends AbstractType
 
         /** CAPTIVEA.CORE START **/
         $transformer = new IdToEntityModelTransformer(
-            $this->factory->getEntityManager(),
+            $this->entityManager,
             'MauticScoringBundle:ScoringCategory'
         );
 
