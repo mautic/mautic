@@ -51,6 +51,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\ScoringBundle\Entity\ScoringValue;
 use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
@@ -1331,7 +1332,7 @@ class LeadModel extends FormModel
         foreach ($mergeFrom->getScoringValues() as $sv) {
             $scoringValue = $this->em->getRepository('MauticScoringBundle:ScoringValue')->findOneBy(['scoringCategory' => $sv->getScoringCategory()->getId(), 'lead' => $mergeWith->getId()]);
             if (empty($scoringValue)) {
-                $scoringValue = new \Mautic\ScoringBundle\Entity\ScoringValue();
+                $scoringValue = new ScoringValue();
                 $scoringValue->setScore(0);
                 $scoringValue->setScoringCategory($sv->getScoringCategory());
                 $scoringValue->setLead($mergeWith);

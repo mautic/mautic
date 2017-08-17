@@ -43,15 +43,15 @@ class FormEventHelper
 
         $oldPoints = $lead->getPoints();
 
-        /** CAPTIVEA.CORE START REPLACE **/
+        /* CAPTIVEA.CORE START REPLACE **/
         // $lead->adjustPoints($config['points'], $config['operator']);
-        // 
+
         // $newPoints = $lead->getPoints();
-        // 
+
         // $event->setDelta($newPoints - $oldPoints);
-        if(!empty($config['scoringCategory'])) {
+        if (!empty($config['scoringCategory'])) {
             $scoringCategory = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($config['scoringCategory']);
-            if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
+            if (!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
                 $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringValue')->adjustPoints($lead, $scoringCategory, $config['points'], $config['operator']);
                 $event->setEventName($form->getId().':'.$form->getName().' ('.$scoringCategory->getName().')');
                 $event->setDelta($config['points']);
@@ -65,8 +65,8 @@ class FormEventHelper
             $newPoints = $lead->getPoints();
             $event->setDelta($newPoints - $oldPoints);
         }
-        /** CAPTIVEA.CORE END REPLACE **/
-        
+        /* CAPTIVEA.CORE END REPLACE **/
+
         $lead->addPointsChangeLog($event);
 
         $model->saveEntity($lead, false);
@@ -110,16 +110,16 @@ class FormEventHelper
         }
 
         if (!empty($score)) {
-            /** CAPTIVEA.CORE START REPLACE **/
+            /* CAPTIVEA.CORE START REPLACE **/
             //$lead->adjustPoints($config['points'], $config['operator']);
-            if(!empty($config['scoringCategory'])) {
+            if (!empty($config['scoringCategory'])) {
                 $scoringCategory = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->find($config['scoringCategory']);
-                if(!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
-                    $lead = $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
+                if (!empty($scoringCategory) && !$scoringCategory->getIsGlobalScore()) {
+                    $lead           = $factory->getEntityManager()->getRepository('MauticLeadBundle:Lead')->getEntityWithPrimaryCompany($lead);
                     $primaryCompany = $lead->getPrimaryCompany(); // may provide mixed results
-                    if(!empty($primaryCompany) && !empty($primaryCompany['id'])) {
+                    if (!empty($primaryCompany) && !empty($primaryCompany['id'])) {
                         $primaryCompanyObject = $factory->getEntityManager()->getRepository('MauticLeadBundle:Company')->find($primaryCompany['id']);
-                        $modPoints = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);
+                        $modPoints            = $factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCompanyValue')->adjustPoints($primaryCompanyObject, $scoringCategory, $score);
                         $leadModel->scoreContactsCompany($lead, $modPoints);
                     }
                 } else {
@@ -128,7 +128,7 @@ class FormEventHelper
             } else {
                 $leadModel->scoreContactsCompany($lead, $score);
             }
-            /** CAPTIVEA.CORE END REPLACE **/
+            /* CAPTIVEA.CORE END REPLACE **/
         }
     }
 }

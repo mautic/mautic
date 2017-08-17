@@ -19,6 +19,8 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\ScoringBundle\Entity\ScoringCategory;
+use Mautic\ScoringBundle\Entity\ScoringValue;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 
@@ -828,9 +830,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /** CAPTIVEA.CORE START **/
     /**
-     * @param int                                          $points
-     * @param string                                       $operator
-     * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
+     * @param int             $points
+     * @param string          $operator
+     * @param ScoringCategory $scoringCategory
      *
      * @return $this
      */
@@ -1989,11 +1991,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /** CAPTIVEA.CORE START **/
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringValue $scoringValue
+     * @param ScoringValue $scoringValue
      *
      * @return $this
      */
-    public function addScoringValue(\Mautic\ScoringBundle\Entity\ScoringValue $scoringValue)
+    public function addScoringValue(ScoringValue $scoringValue)
     {
         $this->scoringValues[] = $scoringValue;
 
@@ -2001,9 +2003,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringValue $scoringValue
+     * @param ScoringValue $scoringValue
      */
-    public function removeScoringValue(\Mautic\ScoringBundle\Entity\ScoringValue $scoringValue)
+    public function removeScoringValue(ScoringValue $scoringValue)
     {
         $this->scoringValues->removeElement($scoringValue);
     }

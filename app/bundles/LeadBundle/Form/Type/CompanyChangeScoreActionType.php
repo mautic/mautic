@@ -11,13 +11,13 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 
 /* CAPTIVEA.CORE START **/
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
-use Doctrine\ORM\EntityManager;
+
 /** CAPTIVEA.CORE END **/
 
 /**
@@ -26,9 +26,8 @@ use Doctrine\ORM\EntityManager;
 class CompanyChangeScoreActionType extends AbstractType
 {
     /** CAPTIVEA.CORE START **/
-    
+
     /**
-     *
      * @var EntityManager
      */
     private $entityManager;

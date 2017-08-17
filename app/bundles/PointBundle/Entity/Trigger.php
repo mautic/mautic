@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\ScoringBundle\Entity\ScoringCategory;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -76,7 +77,7 @@ class Trigger extends FormEntity
 
     /** CAPTIVEA.CORE START **/
     /**
-     * @var \Mautic\ScoringBundle\Entity\ScoringCategory
+     * @var ScoringCategory
      */
     private $scoringCategory = null;
     /** CAPTIVEA.CORE END **/
@@ -405,7 +406,7 @@ class Trigger extends FormEntity
     /** CAPTIVEA.CORE START **/
 
     /**
-     * @return \Mautic\ScoringBundle\Entity\ScoringCategory
+     * @return ScoringCategory
      */
     public function getScoringCategory()
     {
@@ -413,11 +414,11 @@ class Trigger extends FormEntity
     }
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
+     * @param ScoringCategory $scoringCategory
      *
      * @return $this
      */
-    public function setScoringCategory(\Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory = null)
+    public function setScoringCategory(ScoringCategory $scoringCategory = null)
     {
         $this->scoringCategory = $scoringCategory;
 

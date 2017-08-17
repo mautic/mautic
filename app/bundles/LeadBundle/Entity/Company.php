@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Model\FieldModel;
 /* CAPTIVEA.CORE START **/
+use Mautic\ScoringBundle\Entity\ScoringCompanyValue;
 use Mautic\UserBundle\Entity\User;
 
 /** CAPTIVEA.CORE END **/
@@ -588,11 +589,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     /** CAPTIVEA.CORE START **/
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $scoringValue
+     * @param ScoringCompanyValue $scoringValue
      *
      * @return $this
      */
-    public function addScoringValue(\Mautic\ScoringBundle\Entity\ScoringCompanyValue $scoringValue)
+    public function addScoringValue(ScoringCompanyValue $scoringValue)
     {
         $this->scoringValues[] = $scoringValue;
 
@@ -600,9 +601,9 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $scoringValue
+     * @param ScoringCompanyValue $scoringValue
      */
-    public function removeScoringValue(\Mautic\ScoringBundle\Entity\ScoringCompanyValue $scoringValue)
+    public function removeScoringValue(ScoringCompanyValue $scoringValue)
     {
         $this->scoringValues->removeElement($scoringValue);
     }

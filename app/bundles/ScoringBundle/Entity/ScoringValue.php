@@ -18,7 +18,7 @@ class ScoringValue
     private $lead;
 
     /**
-     * @var \Mautic\ScoringBundle\Entity\ScoringCategory
+     * @var ScoringCategory
      */
     private $scoringCategory;
 
@@ -74,7 +74,7 @@ class ScoringValue
     /**
      * Set scoringCategory.
      *
-     * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
+     * @param ScoringCategory $scoringCategory
      *
      * @return $this
      */
@@ -88,7 +88,7 @@ class ScoringValue
     /**
      * Get scoringCategory.
      *
-     * @return \Mautic\ScoringBundle\Entity\ScoringCategory
+     * @return ScoringCategory
      */
     public function getScoringCategory()
     {

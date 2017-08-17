@@ -385,11 +385,11 @@ class ScoringCategory extends FormEntity
     }
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringValue $leadValue
+     * @param ScoringValue $leadValue
      *
      * @return $this
      */
-    public function addLeadValue(\Mautic\ScoringBundle\Entity\ScoringValue $leadValue)
+    public function addLeadValue(ScoringValue $leadValue)
     {
         $this->leadValues[] = $leadValue;
 
@@ -397,9 +397,9 @@ class ScoringCategory extends FormEntity
     }
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringValue $leadValue
+     * @param ScoringValue $leadValue
      */
-    public function removeLeadValue(\Mautic\ScoringBundle\Entity\ScoringValue $leadValue)
+    public function removeLeadValue(ScoringValue $leadValue)
     {
         $this->leadValues->removeElement($leadValue);
     }
@@ -425,11 +425,11 @@ class ScoringCategory extends FormEntity
     }
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue
+     * @param ScoringCompanyValue $companyValue
      *
      * @return $this
      */
-    public function addCompanyValue(\Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue)
+    public function addCompanyValue(ScoringCompanyValue $companyValue)
     {
         $this->companyValues[] = $companyValue;
 
@@ -437,9 +437,9 @@ class ScoringCategory extends FormEntity
     }
 
     /**
-     * @param \Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue
+     * @param ScoringCompanyValue $companyValue
      */
-    public function removeCompanyValue(\Mautic\ScoringBundle\Entity\ScoringCompanyValue $companyValue)
+    public function removeCompanyValue(ScoringCompanyValue $companyValue)
     {
         $this->companyValues->removeElement($companyValue);
     }

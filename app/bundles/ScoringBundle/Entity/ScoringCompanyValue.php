@@ -18,7 +18,7 @@ class ScoringCompanyValue
     private $company;
 
     /**
-     * @var \Mautic\ScoringBundle\Entity\ScoringCategory
+     * @var ScoringCategory
      */
     private $scoringCategory;
 
@@ -77,7 +77,7 @@ class ScoringCompanyValue
     /**
      * Set scoringCategory.
      *
-     * @param \Mautic\ScoringBundle\Entity\ScoringCategory $scoringCategory
+     * @param ScoringCategory $scoringCategory
      *
      * @return $this
      */
@@ -91,7 +91,7 @@ class ScoringCompanyValue
     /**
      * Get scoringCategory.
      *
-     * @return \Mautic\ScoringBundle\Entity\ScoringCategory
+     * @return ScoringCategory
      */
     public function getScoringCategory()
     {

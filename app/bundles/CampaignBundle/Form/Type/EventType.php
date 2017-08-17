@@ -11,13 +11,12 @@
 
 namespace Mautic\CampaignBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\PropertiesTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-
-use Doctrine\ORM\EntityManager;
 
 /**
  * Class EventType.
