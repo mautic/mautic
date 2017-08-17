@@ -107,6 +107,7 @@ class FormEventHelper
         $leadModel = $factory->getModel('lead');
         if ($lead = $leadModel->getCurrentLead()) {
             $score = $properties['score'];
+        }
 
         if (!empty($score)) {
             /** CAPTIVEA.CORE START REPLACE **/
