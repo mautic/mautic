@@ -38,7 +38,7 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $this->callback(
                     function ($type) {
-                        return (LeadEvents::LEAD_POST_SAVE.'_new' === $type);
+                        return LeadEvents::LEAD_POST_SAVE.'_new' === $type;
                     }
                 )
             );
@@ -72,7 +72,7 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $this->callback(
                     function ($type) {
-                        return (LeadEvents::LEAD_POST_SAVE.'_update' === $type);
+                        return LeadEvents::LEAD_POST_SAVE.'_update' === $type;
                     }
                 )
             );
@@ -110,7 +110,7 @@ class WebhookSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher->addSubscriber($webhookSubscriber);
 
-        $lead = new Lead();
+        $lead  = new Lead();
         $event = new LeadEvent($lead, false);
         $dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
     }
