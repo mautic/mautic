@@ -333,13 +333,16 @@ Mautic.closeBuilder = function(model) {
         panelWidth = (mQuery('.builder-content').css('right') == '0px') ? 0 : mQuery('.builder-panel').width(),
         spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2,
+        closeBtn = mQuery('.btn-close-builder'),
+        overlay = mQuery('#builder-overlay'),
+        builder = mQuery('.builder'),
         customHtml;
     mQuery('.builder-spinner').css({
         left: spinnerLeft,
         top: spinnerTop
     });
-    mQuery('#builder-overlay').removeClass('hide');
-    mQuery('.btn-close-builder').prop('disabled', true);
+    overlay.removeClass('hide');
+    closeBtn.prop('disabled', true);
 
     try {
         if (Mautic.codeMode) {
@@ -379,13 +382,13 @@ Mautic.closeBuilder = function(model) {
     }
 
     // Kill the overlay
-    mQuery('#builder-overlay').remove();
+    overlay.remove();
 
     // Hide builder
-    mQuery('.builder').removeClass('builder-active').addClass('hide');
-    mQuery('.btn-close-builder').prop('disabled', false);
+    builder.removeClass('builder-active').addClass('hide');
+    closeBtn.prop('disabled', false);
     mQuery('body').css('overflow-y', '');
-    mQuery('.builder').addClass('hide');
+    builder.addClass('hide');
     Mautic.stopIconSpinPostEvent();
     mQuery('#builder-template-content').remove();
 };
