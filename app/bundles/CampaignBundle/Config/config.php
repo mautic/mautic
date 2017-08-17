@@ -175,7 +175,7 @@ return [
             'mautic.campaignrange.type.action' => [
                 'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
                 /* CAPTIVEA.CORE START **/
-                'arguments' => 'mautic.factory',
+                'arguments' => 'doctrine.orm.entity_manager',
                 /* CAPTIVEA.CORE END **/
                 'alias' => 'campaignevent',
             ],

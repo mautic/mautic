@@ -17,6 +17,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Doctrine\ORM\EntityManager;
+
 /**
  * Class EventType.
  */
@@ -27,16 +29,16 @@ class EventType extends AbstractType
     /** CAPTIVEA.CORE START **/
 
     /**
-     * @var MauticFactory
+     * @var EntityManager
      */
-    private $factory;
+    private $entityManager;
 
     /**
-     * @param MauticFactory $factory
+     * @param EntityManager $entityManager
      */
-    public function __construct(\Mautic\CoreBundle\Factory\MauticFactory $factory)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->factory = $factory;
+        $this->entityManager = $entityManager;
     }
 
     /** CAPTIVEA.CORE END **/
@@ -63,7 +65,7 @@ class EventType extends AbstractType
         /* CAPTIVEA.CORE START **/
         if (in_array($options['data']['eventType'], ['action']) && in_array($options['data']['type'], ['lead.changepoints'])) {
             $scoringChoices = [];
-            $r              = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(['isPublished' => true]); // we will have a hard time with that
+            $r              = $this->entityManager->getRepository('MauticScoringBundle:ScoringCategory')->findBy(['isPublished' => true]); // we will have a hard time with that
             foreach ($r as $l) {
                 $scoringChoices[$l->getId()] = $l->getName();
             }

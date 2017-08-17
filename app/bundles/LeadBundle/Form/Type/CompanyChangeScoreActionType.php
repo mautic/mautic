@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /* CAPTIVEA.CORE START **/
 use Symfony\Component\Validator\Constraints\NotEqualTo;
-
+use Doctrine\ORM\EntityManager;
 /** CAPTIVEA.CORE END **/
 
 /**
@@ -26,14 +26,19 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 class CompanyChangeScoreActionType extends AbstractType
 {
     /** CAPTIVEA.CORE START **/
-    private $factory;
+    
+    /**
+     *
+     * @var EntityManager
+     */
+    private $entityManager;
 
     /**
-     * @param MauticFactory $factory
+     * @param EntityManager $entityManager
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->factory = $factory;
+        $this->entityManager = $entityManager;
     }
 
     /** CAPTIVEA.CORE END **/
@@ -66,7 +71,7 @@ class CompanyChangeScoreActionType extends AbstractType
 
         /** CAPTIVEA.CORE START **/
         $choices = [];
-        $r       = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(['isPublished' => true]);
+        $r       = $this->entityManager->getRepository('MauticScoringBundle:ScoringCategory')->findBy(['isPublished' => true]);
         foreach ($r as $l) {
             $choices[$l->getId()] = $l->getName();
         }

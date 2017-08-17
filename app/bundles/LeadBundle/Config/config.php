@@ -596,7 +596,7 @@ return [
             'mautic.form.type.company_change_score' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
                 /* CAPTIVEA.CORE START **/
-                'arguments' => ['mautic.factory'],
+                'arguments' => ['doctrine.orm.entity_manager'],
                 /* CAPTIVEA.CORE END **/
                 'alias' => 'scorecontactscompanies_action',
             ],
