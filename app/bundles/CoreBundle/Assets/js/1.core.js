@@ -287,6 +287,26 @@ var Mautic = {
     /**
      * Activate label loading spinner
      *
+     * @param button (jQuery element)
+     */
+    activateButtonLoadingIndicator: function (button) {
+        button.prop('disabled', true);
+        button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+    },
+
+    /**
+     * Remove the spinner from label
+     *
+     * @param button (jQuery element)
+     */
+    removeButtonLoadingIndicator: function (button) {
+        button.prop('disabled', false);
+        button.find('.fa-spinner').remove();
+    },
+
+    /**
+     * Activate label loading spinner
+     *
      * @param el
      */
     activateLabelLoadingIndicator: function (el) {
