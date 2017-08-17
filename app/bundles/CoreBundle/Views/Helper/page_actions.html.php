@@ -90,6 +90,7 @@ foreach ($templateButtons as $action => $enabled) {
                 'btnText'   => $view['translator']->trans('mautic.core.form.'.$action),
                 'priority'  => $priority,
                 'primary'   => $primary,
+                'tooltip'   => $tooltip,
             ]
         );
     }
@@ -101,7 +102,12 @@ if ($view['buttons']->getButtonCount() > 0) {
     $dropdownOpenHtml = '<button type="button" class="btn btn-default btn-nospin  dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>'
         ."\n";
     $dropdownOpenHtml .= '<ul class="dropdown-menu dropdown-menu-right" role="menu">'."\n";
-    echo $view['buttons']->renderButtons($dropdownOpenHtml, '</ul>');
+    echo $view['buttons']->renderButtons($dropdownOpenHtml, [
+        '</ul>',
+        [
+            'buttonHelp'  => (isset($buttonHelp)) ? $buttonHelp : '',
+        ]
+    ]);
 
     echo '</div>';
 }
