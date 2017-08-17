@@ -4307,9 +4307,6 @@ lesshat-selector { -lh-property: 0 ;
   background-color: #d5d4d4;
   overflow-y: auto;
 }
-.builder-panel .btn-close-builder {
-  width: 100%;
-}
 .builder-content {
   position: fixed;
   left: 0;
@@ -4341,9 +4338,6 @@ lesshat-selector { -lh-property: 0 ;
   padding: 15px;
   background-color: #d5d4d4;
   overflow-y: auto;
-}
-.builder-panel-slot .btn-close-builder {
-  width: 100%;
 }
 .builder-content-slot {
   left: 50%;

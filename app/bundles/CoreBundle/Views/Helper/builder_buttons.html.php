@@ -16,6 +16,9 @@
         <button type="button" class="btn btn-primary btn-close-builder" onclick="<?php echo $onclick; ?>">
             <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
         </button>
+        <button type="button" class="btn btn-primary btn-apply-builder" onclick="<?php echo $onclick; ?>">
+            <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
+        </button>
     </div>
     <div class="col-xs-6 text-right">
         <button type="button" class="btn btn-default btn-undo btn-nospin" data-toggle="tooltip" data-placement="left" title="<?php echo $view['translator']->trans('mautic.core.undo'); ?>">
