@@ -207,13 +207,13 @@ class FieldType extends AbstractType
             'defaultValue',
             'text',
             [
-                'label'      => 'mautic.core.defaultvalue',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
+                'label'       => 'mautic.core.defaultvalue',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.field.help.defaultvalue',
                 ],
-                'required'   => false,
+                'required'    => false,
             ]
         );
 
