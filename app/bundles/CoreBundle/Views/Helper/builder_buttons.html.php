@@ -16,7 +16,7 @@
         <button type="button" class="btn btn-primary btn-close-builder" onclick="<?php echo $onclick; ?>">
             <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
         </button>
-        <button type="button" class="btn btn-primary btn-apply-builder" onclick="<?php echo $onclick; ?>">
+        <button type="button" class="btn btn-primary btn-apply-builder">
             <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
         </button>
     </div>

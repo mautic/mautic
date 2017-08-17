@@ -68,10 +68,18 @@ Mautic.launchBuilder = function (formName, actionName) {
     var builderPanel = mQuery('.builder-panel');
     var builderContent = mQuery('.builder-content');
     var btnCloseBuilder = mQuery('.btn-close-builder');
+    var applyBtn = mQuery('.btn-apply-builder');
     var panelHeight = (builderContent.css('right') == '0px') ? builderPanel.height() : 0;
     var panelWidth = (builderContent.css('right') == '0px') ? 0 : builderPanel.width();
     var spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2;
     var spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
+
+    applyBtn.on('click', function(e){
+        Mautic.activateButtonLoadingIndicator(applyBtn);
+        Mautic.moveBuilderContentToTextarea(function() {
+            mQuery('.btn-apply').trigger('click');
+        });
+    });
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
     builderPanel.on('scroll', function(e) {
@@ -95,6 +103,27 @@ Mautic.launchBuilder = function (formName, actionName) {
         btnCloseBuilder.prop('disabled', false);
     });
 };
+
+/**
+ * Checks if the builder is active
+ *
+ * @return bool
+ */
+Mautic.isBuilderActive = function() {
+    var builder = mQuery('.builder');
+    return builder.length && builder.hasClass('builder-active');
+}
+
+/**
+ * Processes the Apply's button response
+ *
+ * @param  object response
+ */
+Mautic.processBuilderApply = function(response) {
+    console.log('processBuilderApply', response);
+    Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-builder'));
+    // Todo: handle validation errors
+}
 
 /**
  * Frmats code style in the CodeMirror editor
@@ -335,8 +364,8 @@ Mautic.closeBuilder = function(model) {
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2,
         closeBtn = mQuery('.btn-close-builder'),
         overlay = mQuery('#builder-overlay'),
-        builder = mQuery('.builder'),
-        customHtml;
+        builder = mQuery('.builder');
+
     mQuery('.builder-spinner').css({
         left: spinnerLeft,
         top: spinnerTop
@@ -345,37 +374,21 @@ Mautic.closeBuilder = function(model) {
     closeBtn.prop('disabled', true);
 
     try {
-        if (Mautic.codeMode) {
-            customHtml = Mautic.builderCodeMirror.getValue();
-            Mautic.killLivePreview();
-            Mautic.destroyCodeMirror();
-            delete Mautic.codeMode;
-        } else {
-            // Trigger slot:destroy event
-            document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+        Mautic.moveBuilderContentToTextarea(function() {
+            if (Mautic.codeMode) {
+                customHtml = Mautic.builderCodeMirror.getValue();
+                Mautic.killLivePreview();
+                Mautic.destroyCodeMirror();
+                delete Mautic.codeMode;
+            } else {
+                // Trigger slot:destroy event
+                document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
 
-            var xs = new XMLSerializer();
-            var themeHtml = mQuery('iframe#builder-template-content').contents();
+                // Clear the customize forms
+                mQuery('#slot-form-container, #section-form-container').html('');
+            }
+        });
 
-            // Remove Mautic's assets
-            themeHtml.find('[data-source="mautic"]').remove();
-            themeHtml.find('.atwho-container').remove();
-            themeHtml.find('.fr-image-overlay, .fr-quick-insert, .fr-tooltip, .fr-toolbar, .fr-popup, .fr-image-resizer').remove();
-
-            // Remove the slot focus highlight
-            themeHtml.find('[data-slot-focus], [data-section-focus]').remove();
-
-            // Clear the customize forms
-            mQuery('#slot-form-container, #section-form-container').html('');
-
-            customHtml = xs.serializeToString(themeHtml.get(0));
-        }
-
-        // Convert dynamic slot definitions into tokens
-        customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
-
-        // Store the HTML content to the HTML textarea
-        mQuery('.builder-html').val(customHtml);
     } catch (error) {
         // prevent from being able to close builder
         console.error(error);
@@ -392,6 +405,90 @@ Mautic.closeBuilder = function(model) {
     Mautic.stopIconSpinPostEvent();
     mQuery('#builder-template-content').remove();
 };
+
+/**
+ * Moves the HTML from the builder to the textarea and sanitizes it along the way.
+ *
+ * @param Function callback
+ */
+Mautic.moveBuilderContentToTextarea = function(callback) {
+    var customHtml;
+    try {
+        if (Mautic.codeMode) {
+            customHtml = Mautic.builderCodeMirror.getValue();
+
+            // Convert dynamic slot definitions into tokens
+            customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+
+            // Store the HTML content to the HTML textarea
+            mQuery('.builder-html').val(customHtml);
+            callback();
+        } else {
+            var builderHtml = mQuery('iframe#builder-template-content').contents();
+
+            // The content has to be cloned so the sanitization won't affect the HTML in the builder
+            Mautic.cloneHtmlContent(Mautic.domToString(builderHtml), function(themeHtml) {
+                Mautic.sanitizeHtmlBeforeSave(themeHtml);
+
+                // Store the HTML content to the HTML textarea
+                mQuery('.builder-html').val(customHtml);
+                callback();
+            });
+        }
+    } catch (error) {
+        // prevent from being able to close builder
+        console.error(error);
+    }
+}
+
+/**
+ * Serializes DOM (full HTML document) to string
+ *
+ * @param  object dom
+ * @return string
+ */
+Mautic.domToString = function(dom) {
+    var xs = new XMLSerializer();
+    return xs.serializeToString(dom.get(0));
+}
+
+/**
+ * Removes stuff the Builder needs for it's magic but cannot be in the HTML result
+ *
+ * @param  object htmlContent
+ */
+Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
+    // Remove Mautic's assets
+    htmlContent.find('[data-source="mautic"]').remove();
+    htmlContent.find('.atwho-container').remove();
+    htmlContent.find('.fr-image-overlay, .fr-quick-insert, .fr-tooltip, .fr-toolbar, .fr-popup, .fr-image-resizer').remove();
+
+    // Remove the slot focus highlight
+    htmlContent.find('[data-slot-focus], [data-section-focus]').remove();
+
+    customHtml = Mautic.domToString(htmlContent);
+
+    // Convert dynamic slot definitions into tokens
+    customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
+}
+
+/**
+ * Clones full HTML document by creating a virtual iframe, putting the HTML into it and
+ * reading it back. This is async process.
+ *
+ * @param  object   content
+ * @param  Function callback(clonedContent)
+ */
+Mautic.cloneHtmlContent = function(content, callback) {
+    var id = 'iframe-helper';
+    var iframeHelper = mQuery('<iframe id="'+id+'" />');
+    iframeHelper.hide();
+    mQuery('body').append(iframeHelper);
+    Mautic.buildBuilderIframe(content, id, function() {
+        callback(mQuery('iframe#'+id).contents());
+        iframeHelper.remove();
+    });
+}
 
 Mautic.destroySlots = function() {
     // Trigger destroy slots event
