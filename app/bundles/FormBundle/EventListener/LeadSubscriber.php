@@ -67,6 +67,7 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'form.submitted';
         $eventTypeName = $this->translator->trans('mautic.form.event.submitted');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup(['formList', 'submissionEventDetails']);
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
@@ -89,6 +90,7 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$row['id'],
                         'eventLabel' => [
                             'label' => $form->getName(),
                             'href'  => $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form->getId()]),
@@ -102,6 +104,7 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => 'fa-pencil-square-o',
+                        'contactId'       => $row['lead_id'],
                     ]
                 );
             }
