@@ -698,9 +698,9 @@ class LeadListRepository extends CommonRepository
                 $column           = null;
             } else {
                 if ($object == 'lead') {
-                    $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
+                    $column = isset($this->leadTableSchema[$details['field']]) ? $this->leadTableSchema[$details['field']] : false;
                 } elseif ($object == 'company') {
-                    $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
+                    $column = isset($this->companyTableSchema[$details['field']]) ? $this->companyTableSchema[$details['field']] : false;
                 }
             }
 
