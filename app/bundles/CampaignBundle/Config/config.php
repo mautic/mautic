@@ -173,11 +173,9 @@ return [
                 'alias'     => 'campaign',
             ],
             'mautic.campaignrange.type.action' => [
-                'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
-                /* CAPTIVEA.CORE START **/
+                'class'     => 'Mautic\CampaignBundle\Form\Type\EventType',
                 'arguments' => 'doctrine.orm.entity_manager',
-                /* CAPTIVEA.CORE END **/
-                'alias' => 'campaignevent',
+                'alias'     => 'campaignevent',
             ],
             'mautic.campaign.type.campaignlist' => [
                 'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignListType',

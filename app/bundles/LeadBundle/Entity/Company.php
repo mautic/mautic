@@ -17,11 +17,8 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Model\FieldModel;
-/* CAPTIVEA.CORE START **/
 use Mautic\ScoringBundle\Entity\ScoringCompanyValue;
 use Mautic\UserBundle\Entity\User;
-
-/** CAPTIVEA.CORE END **/
 
 /**
  * Class Company.
@@ -112,19 +109,16 @@ class Company extends FormEntity implements CustomFieldEntityInterface
      */
     private $description;
 
-    /** CAPTIVEA.CORE START **/
     /**
      * @var array
      */
     private $scoringValues;
-    /** CAPTIVEA.CORE END **/
 
-    /** CAPTIVEA.CORE START **/
     public function __construct()
     {
         $this->scoringValues = new ArrayCollection();
     }
-    /** CAPTIVEA.CORE END **/
+
     public function __clone()
     {
         $this->id = null;
@@ -181,13 +175,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->nullable()
             ->build();
 
-        /* CAPTIVEA.CORE START **/
         $builder->createOneToMany('scoringValues', 'Mautic\ScoringBundle\Entity\ScoringCompanyValue')
                 ->mappedBy('company')
                 ->cascadeAll()
                 ->fetchLazy()
                 ->build();
-        /* CAPTIVEA.CORE END **/
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -586,8 +578,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
         return $this;
     }
 
-    /** CAPTIVEA.CORE START **/
-
     /**
      * @param ScoringCompanyValue $scoringValue
      *
@@ -627,6 +617,4 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     {
         return $this->scoringValues;
     }
-
-    /* CAPTIVEA.CORE END **/
 }

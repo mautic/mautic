@@ -13,20 +13,14 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\AbstractType;
-
-/* CAPTIVEA.CORE START **/
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
-
-/** CAPTIVEA.CORE END **/
 
 /**
  * Class CompanyChangeScoreActionType.
  */
 class CompanyChangeScoreActionType extends AbstractType
 {
-    /** CAPTIVEA.CORE START **/
-
     /**
      * @var EntityManager
      */
@@ -39,8 +33,6 @@ class CompanyChangeScoreActionType extends AbstractType
     {
         $this->entityManager = $entityManager;
     }
-
-    /** CAPTIVEA.CORE END **/
 
     /**
      * @param FormBuilderInterface $builder
@@ -68,7 +60,6 @@ class CompanyChangeScoreActionType extends AbstractType
             ]
         );
 
-        /** CAPTIVEA.CORE START **/
         $choices = [];
         $r       = $this->entityManager->getRepository('MauticScoringBundle:ScoringCategory')->findBy(['isPublished' => true]);
         foreach ($r as $l) {
@@ -85,7 +76,6 @@ class CompanyChangeScoreActionType extends AbstractType
                 'data'       => (empty($options['data']['scoringCategory'])) ? null : (is_object($options['data']['scoringCategory']) ? $options['data']['scoringCategory']->getId() : $options['data']['scoringCategory']),
             ]
         );
-        /* CAPTIVEA.CORE END **/
     }
 
     /**

@@ -17,11 +17,8 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Symfony\Component\Form\AbstractType;
-/* CAPTIVEA.CORE START **/
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-/** CAPTIVEA.CORE END **/
 
 /**
  * Class TriggerType.
@@ -38,24 +35,19 @@ class TriggerType extends AbstractType
      */
     private $translator;
 
-    /** CAPTIVEA.CORE START **/
-
     /**
      * @var EntityManager
      */
     private $entityManager;
-    /** CAPTIVEA.CORE END **/
 
     /**
      * @param MauticFactory $factory
      */
     public function __construct(MauticFactory $factory)
     {
-        $this->translator = $factory->getTranslator();
-        $this->security   = $factory->getSecurity();
-        /* CAPTIVEA.CORE START **/
+        $this->translator    = $factory->getTranslator();
+        $this->security      = $factory->getSecurity();
         $this->entityManager = $factory->getEntityManager();
-        /* CAPTIVEA.CORE END **/
     }
 
     /**
@@ -148,7 +140,6 @@ class TriggerType extends AbstractType
             $data     = false;
         }
 
-        /** CAPTIVEA.CORE START **/
         $transformer = new IdToEntityModelTransformer(
             $this->entityManager,
             'MauticScoringBundle:ScoringCategory'
@@ -170,7 +161,6 @@ class TriggerType extends AbstractType
             )
                 ->addModelTransformer($transformer)
         );
-        /* CAPTIVEA.CORE END **/
 
         $builder->add(
             'isPublished',

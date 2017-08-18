@@ -1328,7 +1328,6 @@ class LeadModel extends FormModel
         $mergeWith->setPoints($mergeWithPoints + $mergeFromPoints);
         $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points to lead');
 
-        /* CAPTIVEA.CORE START **/
         foreach ($mergeFrom->getScoringValues() as $sv) {
             $scoringValue = $this->em->getRepository('MauticScoringBundle:ScoringValue')->findOneBy(['scoringCategory' => $sv->getScoringCategory()->getId(), 'lead' => $mergeWith->getId()]);
             if (empty($scoringValue)) {
@@ -1341,7 +1340,6 @@ class LeadModel extends FormModel
             $this->em->persist($scoringValue);
             // don't flush, else we'll clog doctrine because of the lead which need to be persisted
         }
-/** CAPTIVEA.CORE END **/
 
         //merge tags
         $mergeFromTags = $mergeFrom->getTags();

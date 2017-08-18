@@ -57,7 +57,6 @@ class FormSubmitActionPointsChangeType extends AbstractType
             'data'       => $default,
         ]);
 
-        /** CAPTIVEA.CORE START **/
         $choices = [];
         $r       = $this->factory->getEntityManager()->getRepository('MauticScoringBundle:ScoringCategory')->findBy(['isPublished' => true]);
         foreach ($r as $l) {
@@ -74,7 +73,6 @@ class FormSubmitActionPointsChangeType extends AbstractType
                 'data'       => (empty($options['data']['scoringCategory'])) ? null : (is_object($options['data']['scoringCategory']) ? $options['data']['scoringCategory']->getId() : $options['data']['scoringCategory']),
             ]
         );
-        /* CAPTIVEA.CORE END **/
     }
 
     /**

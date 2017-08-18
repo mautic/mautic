@@ -135,12 +135,11 @@ class Event
      */
     private $changes;
 
-    /** CAPTIVEA.CORE START **/
     /**
      * @var ScoringCategory
      */
     private $scoringCategory = null;
-    /** CAPTIVEA.CORE END **/
+
     public function __construct()
     {
         $this->log      = new ArrayCollection();
@@ -253,12 +252,11 @@ class Event
             ->columnName('channel_id')
             ->nullable()
             ->build();
-        /* CAPTIVEA.CORE START **/
+
         $builder->createManyToOne('scoringCategory', 'Mautic\ScoringBundle\Entity\ScoringCategory')
             ->inversedBy('usedByEvents')
             ->addJoinColumn('scoringcategory_id', 'id', true, false, 'SET NULL')
             ->build();
-        /* CAPTIVEA.CORE END **/
     }
 
     /**
@@ -847,8 +845,6 @@ class Event
         return $this;
     }
 
-    /** CAPTIVEA.CORE START **/
-
     /**
      * @return ScoringCategory
      */
@@ -868,6 +864,4 @@ class Event
 
         return $this;
     }
-
-    /* CAPTIVEA.CORE END **/
 }

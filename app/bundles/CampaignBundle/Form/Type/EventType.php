@@ -25,8 +25,6 @@ class EventType extends AbstractType
 {
     use PropertiesTrait;
 
-    /** CAPTIVEA.CORE START **/
-
     /**
      * @var EntityManager
      */
@@ -39,8 +37,6 @@ class EventType extends AbstractType
     {
         $this->entityManager = $entityManager;
     }
-
-    /** CAPTIVEA.CORE END **/
 
     /**
      * @param FormBuilderInterface $builder
@@ -61,7 +57,6 @@ class EventType extends AbstractType
             ]
         );
 
-        /* CAPTIVEA.CORE START **/
         if (in_array($options['data']['eventType'], ['action']) && in_array($options['data']['type'], ['lead.changepoints'])) {
             $scoringChoices = [];
             $r              = $this->entityManager->getRepository('MauticScoringBundle:ScoringCategory')->findBy(['isPublished' => true]); // we will have a hard time with that
@@ -85,7 +80,6 @@ class EventType extends AbstractType
                 ]
             );
         }
-        /* CAPTIVEA.CORE END **/
 
         $builder->add(
             'anchor',

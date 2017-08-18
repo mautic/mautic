@@ -18,8 +18,8 @@
         <?php echo $view['form']->row($form['points']); ?>
     </div>
 </div>
-<?php /** CAPTIVEA.CORE START **/ ?><div class="row">
+<div class="row">
     <div class="col-xs-12">
         <?php echo $view['form']->row($form['scoringCategory']); ?>
     </div>
-</div><?php /** CAPTIVEA.CORE END **/ ?>
+</div>

@@ -441,7 +441,6 @@ class CompanyController extends FormController
         sort($groups);
         $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
 
-/** CAPTIVEA.CORE START **/
         // we want to list all scoring categories (excepted the global one)
         $allScoringCategoriesWithValues = [];
         $scoringCategories              = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList(true);
@@ -457,19 +456,16 @@ class CompanyController extends FormController
                 $allScoringCategoriesWithValues[$scat->getId()]['value'] = $scoringValue->getScore();
             }
         }
-        /* CAPTIVEA.CORE END **/
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'   => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                    'fields' => $fields,
-                    'groups' => $groups,
-                    /* CAPTIVEA.CORE START **/
+                    'tmpl'                           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'entity'                         => $entity,
+                    'form'                           => $form->createView(),
+                    'fields'                         => $fields,
+                    'groups'                         => $groups,
                     'allScoringCategoriesWithValues' => $allScoringCategoriesWithValues,
-                    /* CAPTIVEA.CORE END **/
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [

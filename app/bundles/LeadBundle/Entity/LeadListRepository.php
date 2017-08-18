@@ -677,11 +677,9 @@ class LeadListRepository extends CommonRepository
             $options = $event->getOperators();
         }
 
-        /** CAPTIVEA.CORE START **/
         $snowflakes = null; // we need a trick to keep the values
-        /** CAPTIVEA.CORE END **/
-        $groups    = [];
-        $groupExpr = $q->expr()->andX();
+        $groups     = [];
+        $groupExpr  = $q->expr()->andX();
 
         $defaultObject = $object;
         foreach ($filters as $k => $details) {
@@ -690,12 +688,6 @@ class LeadListRepository extends CommonRepository
                 $object = $details['object'];
             }
 
-/** CAPTIVEA.CORE START REPLACE **/
-//            if ($object == 'lead') {
-//                $column = isset($leadTable[$details['field']]) ? $leadTable[$details['field']] : false;
-//            } elseif ($object == 'company') {
-//                $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
-//            }
             $matches = []; // we should add the scoringCompanyValue/ScoringValue objects (as for lead/company) instead
             if (preg_match('`^scoringCategory_([0-9]+)$`i', $details['field'], $matches)) {
                 $snowflakes = [
@@ -711,7 +703,6 @@ class LeadListRepository extends CommonRepository
                     $column = isset($companyTable[$details['field']]) ? $companyTable[$details['field']] : false;
                 }
             }
-/** CAPTIVEA.CORE END REPLACE **/
 
             // DBAL does not have a not() function so we have to use the opposite
             $operatorDetails = $options[$details['operator']];
@@ -1618,7 +1609,6 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
 
                     break;
-                /* CAPTIVEA.CORE START **/
                 case 'snowflake':
                     if (!empty($snowflakes) && ('scoringCategory' === $snowflakes['type'])) {
                         if ('company' === $object) {
@@ -1723,7 +1713,6 @@ class LeadListRepository extends CommonRepository
                         }
                     }
                     break;
-                /* CAPTIVEA.CORE END **/
                 default:
                     if (!$column) {
                         // Column no longer exists so continue

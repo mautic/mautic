@@ -349,7 +349,6 @@ class LeadController extends FormController
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
         $emailRepo = $this->getModel('email')->getRepository();
 
-/** CAPTIVEA.CORE START **/
         // we want to list all scoring categories (excepted the global one)
         $allScoringCategoriesWithValues = [];
         $scoringCategories              = $this->getDoctrine()->getRepository('MauticScoringBundle:ScoringCategory')->getSpecializedList(true);
@@ -365,15 +364,12 @@ class LeadController extends FormController
                 $allScoringCategoriesWithValues[$scat->getId()]['value'] = $scoringValue->getScore();
             }
         }
-        /* CAPTIVEA.CORE END **/
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'lead' => $lead,
-                    /* CAPTIVEA.CORE START **/
-                    'scoringValues' => $allScoringCategoriesWithValues,
-                    /* CAPTIVEA.CORE END **/
+                    'lead'              => $lead,
+                    'scoringValues'     => $allScoringCategoriesWithValues,
                     'avatarPanelState'  => $this->request->cookies->get('mautic_lead_avatar_panel', 'expanded'),
                     'fields'            => $fields,
                     'companies'         => $companies,

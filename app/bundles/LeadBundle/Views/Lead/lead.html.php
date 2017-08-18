@@ -392,7 +392,7 @@ $view['slots']->set(
                     <hr>
                 <?php endif; ?>
             </div>
-            <?php /** CAPTIVEA.CORE START **/ if (!empty($scoringValues)) {
+            <?php if (!empty($scoringValues)) {
                         ?>
             <div class="panel-heading">
                 <div class="panel-title">
@@ -411,7 +411,7 @@ $view['slots']->set(
                 </p><?php 
                         } ?>
             </div><?php 
-                    } /* CAPTIVEA.CORE END **/ ?>
+                    } ?>
             <?php if ($doNotContact) : ?>
                 <div id="bounceLabel<?php echo $doNotContact['id']; ?>">
                     <div class="panel-heading text-center">

@@ -55,7 +55,6 @@ if ($tmpl == 'index') {
                     ]
                 );
 
-                /* CAPTIVEA.CORE START **/
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
@@ -65,7 +64,6 @@ if ($tmpl == 'index') {
                         'class'      => 'visible-md visible-lg col-point-scoreCategory',
                     ]
                 );
-                /* CAPTIVEA.CORE END **/
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
@@ -141,14 +139,14 @@ if ($tmpl == 'index') {
                         <?php $color    = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
-                    <?php /** CAPTIVEA.CORE START **/ ?><td class="visible-md visible-lg">
+                    <td class="visible-md visible-lg">
                         <?php $scoringCategory = $item->getScoringCategory(); ?>
                         <?php $scatName        = (empty($scoringCategory) || $scoringCategory->getIsGlobalScore())
                             ? $view['translator']->trans(
                                 'mautic.scoring.scoringCategory.globalscore.name'
                             ) : $scoringCategory->getName(); ?>
                         <span style="white-space: nowrap;"><span><?php echo $scatName; ?></span></span>
-                    </td><?php /** CAPTIVEA.CORE END **/ ?>
+                    </td>
                     <td><?php echo $item->getPoints(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>

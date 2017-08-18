@@ -204,8 +204,6 @@ class CampaignSubscriber extends CommonSubscriber
         $somethingHappened = false;
 
         if ($lead !== null && !empty($points)) {
-            /** CAPTIVEA.CORE START REPLACE **/
-            //$lead->adjustPoints($points);
             $scoringCategoryId = $event->getConfig()['scoringCategory'];
             if (!empty($scoringCategoryId)) {
                 $scoringCategory = $this->em->getRepository('MauticScoringBundle:ScoringCategory')->find($scoringCategoryId);
@@ -217,7 +215,6 @@ class CampaignSubscriber extends CommonSubscriber
             } else {
                 $lead->adjustPoints($points);
             }
-/** CAPTIVEA.CORE END REPLACE **/
 
             //add a lead point change log
             $log = new PointsChangeLog();
@@ -225,15 +222,12 @@ class CampaignSubscriber extends CommonSubscriber
             $log->setLead($lead);
             $log->setType('campaign');
 
-/** CAPTIVEA.CORE START REPLACE **/
-            // $log->setEventName("{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}");
             $strEvent = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
             if (empty($scoringCategory)) {
                 $log->setEventName($strEvent);
             } else {
                 $log->setEventName($strEvent.' ('.$scoringCategory->getName().') ');
             }
-            /* CAPTIVEA.CORE END REPLACE **/
 
             $log->setActionName("{$event->getEvent()['id']}: {$event->getEvent()['name']}");
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
@@ -342,8 +336,6 @@ class CampaignSubscriber extends CommonSubscriber
         $score = $event->getConfig()['score'];
         $lead  = $event->getLead();
 
-/** CAPTIVEA.CORE START REPLACE **/
-        //if (!$this->leadModel->scoreContactsCompany($lead, $score)) {
         $isFine            = false;
         $scoringCategoryId = $event->getConfig()['scoringCategory'];
         if (!empty($scoringCategoryId)) {
@@ -363,7 +355,6 @@ class CampaignSubscriber extends CommonSubscriber
             $isFine = $this->leadModel->scoreContactsCompany($lead, $score);
         }
         if (!$isFine) {
-            /* CAPTIVEA.CORE END REPLACE **/
             return $event->setFailed('mautic.lead.no_company');
         } else {
             return $event->setResult(true);

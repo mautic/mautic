@@ -75,12 +75,11 @@ class Point extends FormEntity
      **/
     private $category;
 
-    /** CAPTIVEA.CORE START **/
     /**
      * @var ScoringCategory
      */
     private $scoringCategory = null;
-    /** CAPTIVEA.CORE END **/
+
     public function __clone()
     {
         $this->id = null;
@@ -113,11 +112,9 @@ class Point extends FormEntity
             ->length(50)
             ->build();
 
-        /* CAPTIVEA.CORE START **/
         $builder->createManyToOne('scoringCategory', 'Mautic\ScoringBundle\Entity\ScoringCategory')
             ->addJoinColumn('scoringcategory_id', 'id', true, false, 'SET NULL')
             ->build();
-        /* CAPTIVEA.CORE END **/
 
         $builder->addPublishDates();
 
@@ -416,8 +413,6 @@ class Point extends FormEntity
         $this->delta = (int) $delta;
     }
 
-    /** CAPTIVEA.CORE START **/
-
     /**
      * @return ScoringCategory
      */
@@ -437,6 +432,4 @@ class Point extends FormEntity
 
         return $this;
     }
-
-    /* CAPTIVEA.CORE END **/
 }

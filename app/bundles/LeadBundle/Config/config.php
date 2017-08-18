@@ -594,11 +594,9 @@ return [
                 'alias' => 'company_merge',
             ],
             'mautic.form.type.company_change_score' => [
-                'class' => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
-                /* CAPTIVEA.CORE START **/
+                'class'     => 'Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType',
                 'arguments' => ['doctrine.orm.entity_manager'],
-                /* CAPTIVEA.CORE END **/
-                'alias' => 'scorecontactscompanies_action',
+                'alias'     => 'scorecontactscompanies_action',
             ],
             'mautic.form.type.config.form' => [
                 'class' => Mautic\LeadBundle\Form\Type\ConfigType::class,

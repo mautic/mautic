@@ -661,7 +661,6 @@ class ListModel extends FormModel
             ],
         ];
 
-        /** CAPTIVEA.CORE START **/
         $scoringCategories = $this->em->getRepository('MauticScoringBundle:ScoringCategory')->getEntities(
                 [
                     'filter' => [
@@ -705,7 +704,6 @@ class ListModel extends FormModel
                 ];
             }
         }
-        /* CAPTIVEA.CORE END **/
 
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {

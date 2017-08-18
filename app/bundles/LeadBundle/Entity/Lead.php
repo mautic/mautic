@@ -19,7 +19,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
-use Mautic\ScoringBundle\Entity\ScoringCategory;
 use Mautic\ScoringBundle\Entity\ScoringValue;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
@@ -244,12 +243,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     private $channelRules = [];
 
-    /** CAPTIVEA.CORE START **/
     /**
      * @var array
      */
     private $scoringValues;
-    /** CAPTIVEA.CORE END **/
 
     /**
      * Constructor.
@@ -265,9 +262,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->stageChangeLog   = new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
-        /* CAPTIVEA.CORE START **/
-        $this->scoringValues = new ArrayCollection();
-        /* CAPTIVEA.CORE END **/
+        $this->scoringValues    = new ArrayCollection();
     }
 
     /**
@@ -424,13 +419,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->fetchExtraLazy()
             ->build();
 
-        /* CAPTIVEA.CORE START **/
         $builder->createOneToMany('scoringValues', 'Mautic\ScoringBundle\Entity\ScoringValue')
                 ->mappedBy('lead')
                 ->cascadeAll()
                 ->fetchLazy()
                 ->build();
-        /* CAPTIVEA.CORE END **/
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -827,20 +820,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
         return $this;
     }
-
-    /** CAPTIVEA.CORE START **/
-    /**
-     * @param int             $points
-     * @param string          $operator
-     * @param ScoringCategory $scoringCategory
-     *
-     * @return $this
-     */
-    public function adjustCategorizedScore($points, $operator, $scoringCategory)
-    {
-        $scoringCategory->a();
-    }
-    /** CAPTIVEA.CORE END **/
 
     /**
      * Set points.
@@ -1988,8 +1967,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         return $rules;
     }
 
-    /** CAPTIVEA.CORE START **/
-
     /**
      * @param ScoringValue $scoringValue
      *
@@ -2029,6 +2006,4 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     {
         return $this->scoringValues;
     }
-
-    /* CAPTIVEA.CORE END **/
 }

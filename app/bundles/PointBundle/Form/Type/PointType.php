@@ -35,13 +35,10 @@ class PointType extends AbstractType
      */
     private $translator;
 
-    /** CAPTIVEA.CORE START **/
-
     /**
      * @var MauticFactory
      */
     private $factory;
-    /** CAPTIVEA.CORE END **/
 
     /**
      * @param MauticFactory $factory
@@ -50,9 +47,7 @@ class PointType extends AbstractType
     {
         $this->translator = $factory->getTranslator();
         $this->security   = $factory->getSecurity();
-        /* CAPTIVEA.CORE START **/
-        $this->factory = $factory;
-        /* CAPTIVEA.CORE END **/
+        $this->factory    = $factory;
     }
 
     /**
@@ -124,7 +119,6 @@ class PointType extends AbstractType
             $data     = true;
         }
 
-        /** CAPTIVEA.CORE START **/
         $transformer = new IdToEntityModelTransformer(
             $this->factory->getEntityManager(),
             'MauticScoringBundle:ScoringCategory'
@@ -146,7 +140,6 @@ class PointType extends AbstractType
             )
                 ->addModelTransformer($transformer)
         );
-        /* CAPTIVEA.CORE END **/
 
         $builder->add('isPublished', 'yesno_button_group', [
             'read_only' => $readonly,
