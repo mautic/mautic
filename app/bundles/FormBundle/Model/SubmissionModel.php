@@ -960,18 +960,19 @@ class SubmissionModel extends CommonFormModel
         }
 
         $companyFieldMatches = $getCompanyData($leadFieldMatches);
+        if (!empty($companyFieldMatches)) {
+            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
+            if ($leadAdded) {
+                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            }
 
-        list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
-        if ($leadAdded) {
-            $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            if (!empty($company) and $companyEntity instanceof Company) {
+                // Save after the lead in for new leads created through the API and maybe other places
+                $this->companyModel->addLeadToCompany($companyEntity, $lead);
+                $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+            }
+            $this->em->clear(CompanyChangeLog::class);
         }
-
-        if (!empty($company) and $companyEntity instanceof Company) {
-            // Save after the lead in for new leads created through the API and maybe other places
-            $this->companyModel->addLeadToCompany($companyEntity, $lead);
-            $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
-        }
-        $this->em->clear(CompanyChangeLog::class);
 
         return $lead;
     }
