@@ -232,6 +232,7 @@ class ButtonHelper extends Helper
     {
         $this->fetchCustomButtons();
         $this->orderButtons();
+        $this->generateTooltipAttributes();
 
         $content              = '';
         $dropdownHtmlAppended = false;

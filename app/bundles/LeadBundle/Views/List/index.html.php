@@ -18,7 +18,7 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'templateButtons' => [
-                'new'  => true, // this is intentional. Each user can segment leads
+                'new' => true, // this is intentional. Each user can segment leads
             ],
             'routeBase' => 'segment',
             'langVar'   => 'lead.list',

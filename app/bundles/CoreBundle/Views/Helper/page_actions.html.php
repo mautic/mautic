@@ -105,7 +105,7 @@ if ($view['buttons']->getButtonCount() > 0) {
     echo $view['buttons']->renderButtons($dropdownOpenHtml, [
         '</ul>',
         [
-            'buttonHelp'  => (isset($buttonHelp)) ? $buttonHelp : '',
+            'buttonHelp' => (isset($buttonHelp)) ? $buttonHelp : '',
         ]
     ]);
 

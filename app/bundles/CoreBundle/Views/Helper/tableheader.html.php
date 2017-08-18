@@ -43,7 +43,7 @@ if (!empty($checkall)):
         <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="<?php echo $target; ?>">
     </span>
 
-    <div class="input-group-btn">
+    <div class="input-group-btn" <?php if ($tooltip): ?> data-toggle="tooltip" title="" data-placement="top" data-original-title="<?php echo $view['translator']->trans($tooltip); ?>"<?php endif; ?>>
         <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
             <i class="fa fa-angle-down "></i>
         </button>
