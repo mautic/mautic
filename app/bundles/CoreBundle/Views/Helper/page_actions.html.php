@@ -106,7 +106,7 @@ if ($view['buttons']->getButtonCount() > 0) {
         '</ul>',
         [
             'buttonHelp' => (isset($buttonHelp)) ? $buttonHelp : '',
-        ]
+        ],
     ]);
 
     echo '</div>';
