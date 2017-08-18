@@ -50,11 +50,14 @@ class SubmissionRepository extends CommonRepository
 
         //DBAL
         if (!isset($args['viewOnlyFields'])) {
-            $args['viewOnlyFields'] = ['button', 'freetext',  'freehtml', 'pagebreak', 'captcha'];
+            $args['viewOnlyFields'] = ['button', 'freetext', 'freehtml', 'pagebreak', 'captcha'];
         }
-        $viewOnlyFields = array_map(function ($value) {
-            return '"'.$value.'"';
-        }, $args['viewOnlyFields']);
+        $viewOnlyFields = array_map(
+            function ($value) {
+                return '"'.$value.'"';
+            },
+            $args['viewOnlyFields']
+        );
 
         //Get the list of custom fields
         $fq = $this->_em->getConnection()->createQueryBuilder();
@@ -81,7 +84,7 @@ class SubmissionRepository extends CommonRepository
             ->from($this->getResultsTableName($form->getId(), $form->getAlias()), 'r')
             ->innerJoin('r', MAUTIC_TABLE_PREFIX.'form_submissions', 's', 'r.submission_id = s.id')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'ip_addresses', 'i', 's.ip_id = i.id')
-        ->where('r.form_id = '.$form->getId());
+            ->where('r.form_id = '.$form->getId());
 
         $this->buildWhereClause($dq, $args);
 
@@ -99,8 +102,8 @@ class SubmissionRepository extends CommonRepository
         $results = $dq->execute()->fetchAll();
 
         //loop over results to put form submission results in something that can be assigned to the entities
-        $values = [];
-
+        $values         = [];
+        $flattenResults = !empty($args['flatten_results']);
         foreach ($results as $result) {
             $submissionId = $result['submission_id'];
             unset($result['submission_id']);
@@ -108,8 +111,12 @@ class SubmissionRepository extends CommonRepository
             $values[$submissionId] = [];
             foreach ($result as $k => $r) {
                 if (isset($fields[$k])) {
-                    $values[$submissionId][$k]          = $fields[$k];
-                    $values[$submissionId][$k]['value'] = $r;
+                    if ($flattenResults) {
+                        $values[$submissionId][$k] = $r;
+                    } else {
+                        $values[$submissionId][$k]          = $fields[$k];
+                        $values[$submissionId][$k]['value'] = $r;
+                    }
                 }
             }
         }
@@ -130,9 +137,11 @@ class SubmissionRepository extends CommonRepository
             $order .= ' ELSE '.$count.' END) AS HIDDEN ORD';
 
             //ORM - generates lead entities
-            $q = $this
+            $returnEntities = !empty($args['return_entities']);
+            $leadSelect     = $returnEntities ? 'l' : 'partial l.{id}';
+            $q              = $this
                 ->createQueryBuilder('s');
-            $q->select('s, partial l.{id}, p, i,'.$order)
+            $q->select('s, p, i,'.$leadSelect.','.$order)
                 ->leftJoin('s.ipAddress', 'i')
                 ->leftJoin('s.page', 'p')
                 ->leftJoin('s.lead', 'l');
@@ -143,10 +152,14 @@ class SubmissionRepository extends CommonRepository
             )->setParameter('ids', $ids);
 
             $q->orderBy('ORD', 'ASC');
-            $results = $q->getQuery()->getArrayResult();
+            $results = $returnEntities ? $q->getQuery()->getResult() : $q->getQuery()->getArrayResult();
 
             foreach ($results as &$r) {
-                $r['results'] = $values[$r['id']];
+                if ($r instanceof Submission) {
+                    $r->setResults($values[$r->getId()]);
+                } else {
+                    $r['results'] = $values[$r['id']];
+                }
             }
         }
 
@@ -227,7 +240,7 @@ class SubmissionRepository extends CommonRepository
     public function getSubmissions(array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted"')
+        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted", fs.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id');
 
