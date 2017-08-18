@@ -1460,8 +1460,12 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
                             $sugarFieldMappings = $this->prepareFieldsForPush($availableFields);
 
-                            $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarFieldMappings['Contacts'], $config);
-                            $leadSugarFields    = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord,  $sugarFieldMappings['Leads'], $config);
+                            if (isset($sugarFieldMappings['Contacts']) && !empty($sugarFieldMappings['Contacts'])) {
+                                $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarFieldMappings['Contacts'], $config);
+                            }
+                            if (isset($sugarFieldMappings['Leads']) && !empty($sugarFieldMappings['Leads'])) {
+                                $leadSugarFields = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord,  $sugarFieldMappings['Leads'], $config);
+                            }
                             $this->buildCompositeBody(
                                 $mauticData,
                                 $availableFields,
