@@ -102,6 +102,8 @@ Mautic.launchBuilder = function (formName, actionName) {
         mQuery('#builder-overlay').addClass('hide');
         btnCloseBuilder.prop('disabled', false);
     });
+
+    mQuery('form[name=emailform], form[name=page]').on('onMauticFormResponse', Mautic.processBuilderApply);
 };
 
 /**
@@ -119,16 +121,16 @@ Mautic.isBuilderActive = function() {
  *
  * @param  object response
  */
-Mautic.processBuilderApply = function(response) {
-    console.log('processBuilderApply', response);
-    var applyBtn = mQuery('.btn-apply-builder');
-    Mautic.removeButtonLoadingIndicator(applyBtn);
+Mautic.processBuilderApply = function(event, response) {
+    var builder = mQuery('.builder');
+    if (builder.hasClass('page-builder') || builder.hasClass('email-builder')) {
+        var applyBtn = mQuery('.btn-apply-builder');
+        Mautic.removeButtonLoadingIndicator(applyBtn);
 
-    if (response.validationError) {
-        console.log(response.validationError);
-        applyBtn.attr('disabled', true);
-        mQuery('#builder-errors').show('fast').text(response.validationError);
-
+        if (response.validationError) {
+            applyBtn.attr('disabled', true);
+            mQuery('#builder-errors').show('fast').text(response.validationError);
+        }
     }
 }
 

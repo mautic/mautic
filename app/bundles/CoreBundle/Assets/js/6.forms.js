@@ -161,7 +161,7 @@ Mautic.postMauticForm = function(form) {
     MauticVars.formSubmitInProgress = true;
     Mautic.postForm(form, function (response) {
         if (Mautic.isBuilderActive()) {
-            Mautic.processBuilderApply(response);
+            mQuery(form).trigger('onMauticFormResponse', response);
         } else if (response.inMain) {
             Mautic.processPageContent(response);
         } else {
