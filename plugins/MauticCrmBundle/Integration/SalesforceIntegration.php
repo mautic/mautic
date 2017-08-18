@@ -532,11 +532,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.salesforce.blanks',
+                        'updateBlanks' => 'mautic.integrations.blanks',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
-                    'label'       => 'mautic.salesforce.form.blanks',
+                    'label'       => 'mautic.integrations.form.blanks',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
@@ -592,7 +592,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $objects = (!is_array($object)) ? [$object] : $object;
 
         if (is_string($object) && 'Account' === $object) {
-            return isset($fields['companyFields']) ? $fields['companyFields'] : [];
+            return isset($fields['companyFields']) ? $fields['companyFields'] : $fields;
         }
 
         if (isset($fields['leadFields'])) {

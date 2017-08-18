@@ -1094,11 +1094,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 'choice',
                 [
                     'choices' => [
-                        'updateBlanks' => 'mautic.salesforce.blanks',
+                        'updateBlanks' => 'mautic.integrations.blanks',
                     ],
                     'expanded'    => true,
                     'multiple'    => true,
-                    'label'       => 'mautic.salesforce.form.blanks',
+                    'label'       => 'mautic.integrations.form.blanks',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
