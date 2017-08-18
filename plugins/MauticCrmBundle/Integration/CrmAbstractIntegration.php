@@ -222,20 +222,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
 
-        // Match that data with mapped lead fields
-        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
-        $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
-        if (!empty($fieldsToUpdateInMautic)) {
-            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], array_flip($fieldsToUpdateInMautic));
-            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
-        } else {
-            $newMatchedFields = $matchedFields;
-        }
-        if (!isset($newMatchedFields['companyname'])) {
-            if (isset($newMatchedFields['companywebsite'])) {
-                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
-            }
-        }
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
 
         // Find unique identifier fields used by the integration
@@ -246,23 +232,21 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $company         = new Company();
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
-            if (empty($newMatchedFields)) {
-                return;
-            }
             $company = $existingCompany[2];
         }
 
         if (!$company->isNew()) {
             $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
+            $fieldsToUpdate = array_intersect_key($config['companyFields'], $fieldsToUpdate);
             $matchedFields  = array_intersect_key($matchedFields, array_flip($fieldsToUpdate));
             if (!isset($matchedFields['companyname'])) {
                 if (isset($matchedFields['companywebsite'])) {
                     $matchedFields['companyname'] = $matchedFields['companywebsite'];
                 }
             }
+            $companyModel->setFieldValues($company, $matchedFields, false, false);
         }
 
-        $companyModel->setFieldValues($company, $matchedFields, false, false);
         $companyModel->saveEntity($company, false);
 
         return $company;

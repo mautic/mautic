@@ -590,7 +590,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $objects = (!is_array($object)) ? [$object] : $object;
-
         if (is_string($object) && 'Account' === $object) {
             return isset($fields['companyFields']) ? $fields['companyFields'] : $fields;
         }
