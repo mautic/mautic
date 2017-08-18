@@ -260,7 +260,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         if (!empty($message['recipients']['cc'])) {
             foreach ($message['recipients']['cc'] as $cc) {
                 $sparkPostMessage['cc'][] = [
-                    'address' => $cc
+                    'address' => $cc,
                 ];
             }
         }
@@ -268,7 +268,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         if (!empty($message['recipients']['bcc'])) {
             foreach ($message['recipients']['bcc'] as $bcc) {
                 $sparkPostMessage['bcc'][] = [
-                    'address' => $bcc
+                    'address' => $bcc,
                 ];
             }
         }
