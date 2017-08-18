@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -26,6 +27,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EmailController extends FormController
 {
     use BuilderControllerTrait;
+    use FormErrorMessagesTrait;
 
     /**
      * @param int $page
@@ -614,6 +616,7 @@ class EmailController extends FormController
                             'objectAction' => 'new',
                         ]
                     ),
+                    'validationError' => $this->getFormErrorForBuilder($form),
                 ],
             ]
         );
@@ -818,6 +821,7 @@ class EmailController extends FormController
                             'objectId'     => $entity->getId(),
                         ]
                     ),
+                    'validationError' => $this->getFormErrorForBuilder($form),
                 ],
             ]
         );

@@ -28,4 +28,7 @@
             <span><i class="fa fa-repeat"></i></span>
         </button>
     </div>
+    <div class="col-xs-12 mt-15">
+        <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;"></div>
+    </div>
 </div>

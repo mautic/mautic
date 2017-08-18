@@ -121,8 +121,15 @@ Mautic.isBuilderActive = function() {
  */
 Mautic.processBuilderApply = function(response) {
     console.log('processBuilderApply', response);
-    Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-builder'));
-    // Todo: handle validation errors
+    var applyBtn = mQuery('.btn-apply-builder');
+    Mautic.removeButtonLoadingIndicator(applyBtn);
+
+    if (response.validationError) {
+        console.log(response.validationError);
+        applyBtn.attr('disabled', true);
+        mQuery('#builder-errors').show('fast').text(response.validationError);
+
+    }
 }
 
 /**
