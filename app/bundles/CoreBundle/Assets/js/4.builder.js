@@ -76,7 +76,7 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     applyBtn.on('click', function(e){
         Mautic.activateButtonLoadingIndicator(applyBtn);
-        Mautic.moveBuilderContentToTextarea(function() {
+        Mautic.sendBuilderContentToTextarea(function() {
             mQuery('.btn-apply').trigger('click');
         });
     });
@@ -374,9 +374,8 @@ Mautic.closeBuilder = function(model) {
     closeBtn.prop('disabled', true);
 
     try {
-        Mautic.moveBuilderContentToTextarea(function() {
+        Mautic.sendBuilderContentToTextarea(function() {
             if (Mautic.codeMode) {
-                customHtml = Mautic.builderCodeMirror.getValue();
                 Mautic.killLivePreview();
                 Mautic.destroyCodeMirror();
                 delete Mautic.codeMode;
@@ -387,31 +386,31 @@ Mautic.closeBuilder = function(model) {
                 // Clear the customize forms
                 mQuery('#slot-form-container, #section-form-container').html('');
             }
+
+            // Kill the overlay
+            overlay.remove();
+
+            // Hide builder
+            builder.removeClass('builder-active').addClass('hide');
+            closeBtn.prop('disabled', false);
+            mQuery('body').css('overflow-y', '');
+            builder.addClass('hide');
+            Mautic.stopIconSpinPostEvent();
+            mQuery('#builder-template-content').remove();
         });
 
     } catch (error) {
         // prevent from being able to close builder
         console.error(error);
     }
-
-    // Kill the overlay
-    overlay.remove();
-
-    // Hide builder
-    builder.removeClass('builder-active').addClass('hide');
-    closeBtn.prop('disabled', false);
-    mQuery('body').css('overflow-y', '');
-    builder.addClass('hide');
-    Mautic.stopIconSpinPostEvent();
-    mQuery('#builder-template-content').remove();
 };
 
 /**
- * Moves the HTML from the builder to the textarea and sanitizes it along the way.
+ * Copies the HTML from the builder to the textarea and sanitizes it along the way.
  *
  * @param Function callback
  */
-Mautic.moveBuilderContentToTextarea = function(callback) {
+Mautic.sendBuilderContentToTextarea = function(callback) {
     var customHtml;
     try {
         if (Mautic.codeMode) {
@@ -427,11 +426,11 @@ Mautic.moveBuilderContentToTextarea = function(callback) {
             var builderHtml = mQuery('iframe#builder-template-content').contents();
 
             // The content has to be cloned so the sanitization won't affect the HTML in the builder
-            Mautic.cloneHtmlContent(Mautic.domToString(builderHtml), function(themeHtml) {
+            Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
                 Mautic.sanitizeHtmlBeforeSave(themeHtml);
 
                 // Store the HTML content to the HTML textarea
-                mQuery('.builder-html').val(customHtml);
+                mQuery('.builder-html').val(Mautic.domToString(themeHtml));
                 callback();
             });
         }
@@ -482,9 +481,7 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
 Mautic.cloneHtmlContent = function(content, callback) {
     var id = 'iframe-helper';
     var iframeHelper = mQuery('<iframe id="'+id+'" />');
-    iframeHelper.hide();
-    mQuery('body').append(iframeHelper);
-    Mautic.buildBuilderIframe(content, id, function() {
+    Mautic.buildBuilderIframe(Mautic.domToString(content), id, function() {
         callback(mQuery('iframe#'+id).contents());
         iframeHelper.remove();
     });
