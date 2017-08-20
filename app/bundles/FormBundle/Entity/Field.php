@@ -843,6 +843,11 @@ class Field
 
         if ($this->showWhenValueExists === false) {
 
+            // Hide the field if the value is already known from the lead profile
+            if ($lead !== null && $this->leadField && !empty($lead->getFieldValue($this->leadField))) {
+                return true;
+            }
+
             // Hide the field if there is the value condition and if we already know the value for this field
             if ($submissions) {
                 foreach ($submissions as $submission) {
@@ -850,11 +855,6 @@ class Field
                         return false;
                     }
                 }
-            }
-
-            // Hide the field if the value is already known from the lead profile
-            if ($lead !== null && $this->leadField && !empty($lead->getFieldValue($this->leadField))) {
-                return false;
             }
         }
 

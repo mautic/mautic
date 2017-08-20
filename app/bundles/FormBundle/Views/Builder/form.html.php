@@ -49,6 +49,9 @@ if (!isset($inBuilder)) {
 
                         $template = $params['template'];
                     else:
+                        if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill()) {
+                            $f->setType('hidden');
+                        }
                         $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
                     endif;
 
