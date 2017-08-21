@@ -39,7 +39,14 @@ if (!isset($inBuilder)) {
                     echo "\n          <div class=\"mauticform-page-wrapper mauticform-page-$pageCount\" data-mautic-form-page=\"$pageCount\"$lastFieldAttribute>\n";
                 endif;
 
-                if ($f->showForContact($submissions, $lead, $form)):
+                // hidden field with autofill
+                $forceHidden = false;
+                if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill()) {
+                    $forceHidden = true;
+                    $f->setType('hidden');
+                }
+
+                if ($f->showForContact($submissions, $lead, $form) || $forceHidden):
                     if ($f->isCustom()):
                         if (!isset($fieldSettings[$f->getType()])):
                             continue;
@@ -49,9 +56,6 @@ if (!isset($inBuilder)) {
 
                         $template = $params['template'];
                     else:
-                        if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill()) {
-                            $f->setType('hidden');
-                        }
                         $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
                     endif;
 
