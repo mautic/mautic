@@ -498,8 +498,8 @@ return [
                 'alias'     => 'lead_field_import',
             ],
             'mautic.form.type.lead_quickemail' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\EmailType',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Type\EmailType::class,
+                'arguments' => ['mautic.helper.user'],
                 'alias'     => 'lead_quickemail',
             ],
             'mautic.form.type.lead_tags' => [
