@@ -38,15 +38,7 @@ if (!isset($inBuilder)) {
                     $lastFieldAttribute = ($lastFormPage === $fieldId) ? ' data-mautic-form-pagebreak-lastpage="true"' : '';
                     echo "\n          <div class=\"mauticform-page-wrapper mauticform-page-$pageCount\" data-mautic-form-page=\"$pageCount\"$lastFieldAttribute>\n";
                 endif;
-
-                // hidden field with autofill
-                $forceHidden = false;
-                if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill()) {
-                    $forceHidden = true;
-                    $f->setType('hidden');
-                }
-
-                if ($f->showForContact($submissions, $lead, $form) || $forceHidden):
+                if ($f->showForContact($submissions, $lead, $form)):
                     if ($f->isCustom()):
                         if (!isset($fieldSettings[$f->getType()])):
                             continue;
@@ -56,6 +48,9 @@ if (!isset($inBuilder)) {
 
                         $template = $params['template'];
                     else:
+                        if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill() && $lead && !empty($lead->getFieldValue($f->getLeadField()))) {
+                            $f->setType('hidden');
+                        }
                         $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
                     endif;
 
