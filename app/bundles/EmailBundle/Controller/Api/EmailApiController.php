@@ -123,9 +123,10 @@ class EmailApiController extends CommonApiController
                 return $lead;
             }
 
-            $post     = $this->request->request->all();
-            $tokens   = (!empty($post['tokens'])) ? $post['tokens'] : [];
-            $response = ['success' => false];
+            $post      = $this->request->request->all();
+            $tokens    = (!empty($post['tokens'])) ? $post['tokens'] : [];
+            $ignoreDNC = isset($post['ignoreDNC']) ? $post['ignoreDNC'] : false;
+            $response  = ['success' => false];
 
             $cleanTokens = [];
 
@@ -146,6 +147,7 @@ class EmailApiController extends CommonApiController
                 [
                     'source'        => ['api', 0],
                     'tokens'        => $cleanTokens,
+                    'ignoreDNC'     => $ignoreDNC,
                     'return_errors' => true,
                 ]
             );
