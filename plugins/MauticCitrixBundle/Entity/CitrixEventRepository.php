@@ -13,9 +13,12 @@ namespace MauticPlugin\MauticCitrixBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 class CitrixEventRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * Fetch the base event data from the database.
      *
@@ -48,6 +51,38 @@ class CitrixEventRepository extends CommonRepository
             ->setParameter('product', $product);
 
         return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @param       $product
+     * @param null  $leadId
+     * @param array $options
+     *
+     * @return array
+     */
+    public function getEventsForTimeline($product, $leadId = null, array $options = [])
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'plugin_citrix_events', 'c')
+            ->select('c.*');
+
+        $query->where(
+            $query->expr()->eq('c.product', ':product')
+        )
+            ->setParameter('product', $product);
+
+        if ($leadId) {
+            $query->andWhere('c.lead_id = '.(int) $leadId);
+        }
+
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere($query->expr()->orX(
+                $query->expr()->like('c.event_name', $query->expr()->literal('%'.$options['search'].'%')),
+                $query->expr()->like('c.product', $query->expr()->literal('%'.$options['search'].'%'))
+            ));
+        }
+
+        return $this->getTimelineResults($query, $options, 'c.event_name', 'c.event_date', [], ['event_date']);
     }
 
     /**
