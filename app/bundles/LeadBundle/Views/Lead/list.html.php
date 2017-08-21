@@ -57,7 +57,7 @@ if ($permissions['lead:leads:editown'] || $permissions['lead:leads:editother']) 
                 'data-header' => $view['translator']->trans('mautic.lead.batch.owner'),
             ],
             'btnText'   => $view['translator']->trans('mautic.lead.batch.owner'),
-            'iconClass' => 'fa fa-clock-o',
+            'iconClass' => 'fa fa-user',
         ],
         [
             'attr' => [
