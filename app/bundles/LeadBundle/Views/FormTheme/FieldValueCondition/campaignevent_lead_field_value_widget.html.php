@@ -39,9 +39,11 @@
         <div class="row">
             <div class="form-group col-xs-12 ">
                 <select id="lead-field-custom-date-unit" class="form-control chosen" autocomplete="false" onchange="Mautic.updateLeadFieldValueOptions(mQuery('#campaignevent_properties_value'), true)">
-                    <?php foreach (["i", "h", "d", "m", "y"] as $interval): ?>
-                    <?php $selected = ("d" === $interval) ? " selected" : ""; ?>
-                    <option<?php echo $selected; ?> value="<?php echo $interval;?>"><?php echo $view['translator']->trans('mautic.campaign.event.intervalunit.choice.'.$interval); ?></option>
+                    <?php foreach (['i', 'h', 'd', 'm', 'y'] as $interval): ?>
+                    <?php $selected = ('d' === $interval) ? ' selected' : ''; ?>
+                    <option<?php echo $selected; ?> value="<?php echo $interval; ?>">
+                        <?php echo $view['translator']->trans('mautic.campaign.event.intervalunit.choice.'.$interval); ?>
+                    </option>
                     <?php endforeach; ?>
                 </select>
             </div>

@@ -808,7 +808,7 @@ class AjaxController extends CommonAjaxController
                             );
 
                             $dataArray['optionsAttr']['custom'] = [
-                                'data-custom' => 1
+                                'data-custom' => 1,
                             ];
                         }
                         break;

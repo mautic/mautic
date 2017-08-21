@@ -11,7 +11,6 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -133,7 +132,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                                     $fieldHelper->setTranslator($this->translator);
                                     $fieldValues = $fieldHelper->getDateChoices();
                                     $customText  = $this->translator->trans('mautic.campaign.event.timed.choice.custom');
-                                    $customValue = (empty($data['value']) || isset($fieldValues[$data['value']])) ? "custom" : $data['value'];
+                                    $customValue = (empty($data['value']) || isset($fieldValues[$data['value']])) ? 'custom' : $data['value'];
                                     $fieldValues = array_merge(
                                         [
                                             $customValue => $customText,
@@ -171,14 +170,14 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     'value',
                     'choice',
                     [
-                        'choices'     => $fieldValues,
-                        'label'       => 'mautic.form.field.form.value',
-                        'label_attr'  => ['class' => 'control-label'],
-                        'attr'        => [
-                            'class'                          => 'form-control',
-                            'onchange'                       => 'Mautic.updateLeadFieldValueOptions(this)',
-                            'data-toggle'                    => $fieldType,
-                            'data-onload-callback'           => 'updateLeadFieldValueOptions',
+                        'choices'    => $fieldValues,
+                        'label'      => 'mautic.form.field.form.value',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'                => 'form-control',
+                            'onchange'             => 'Mautic.updateLeadFieldValueOptions(this)',
+                            'data-toggle'          => $fieldType,
+                            'data-onload-callback' => 'updateLeadFieldValueOptions',
                         ],
                         'choice_attr' => $choiceAttr,
                         'required'    => true,
@@ -225,7 +224,7 @@ class CampaignEventLeadFieldValueType extends AbstractType
                     'attr'       => [
                         'onchange' => 'Mautic.updateLeadFieldValues(this)',
                     ],
-                    'choices'    => $this->leadModel->getOperatorsForFieldType(null == $fieldType ? 'default' : $fieldType, ['date']),
+                    'choices' => $this->leadModel->getOperatorsForFieldType(null == $fieldType ? 'default' : $fieldType, ['date']),
                 ]
             );
         };

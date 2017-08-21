@@ -533,7 +533,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
                 ],
-                'alias'     => 'campaignevent_lead_field_value',
+                'alias' => 'campaignevent_lead_field_value',
             ],
             'mautic.form.type.campaignevent_lead_tags' => [
                 'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType::class,
