@@ -36,9 +36,44 @@ return [
                 'method'     => 'POST',
             ],
         ],
+
+        /* INES CRM integration log page */
+        'main' => [
+            'ines_logs' => [
+                'path'       => '/ines/logs',
+                'controller' => 'MauticCrmBundle:Ines:logs',
+            ],
+        ],
+
+        /* Mautic API endpoint to retrieve INES mapping and config */
+        'api' => [
+            'plugin_crm_bundle_ines_get_mapping_api' => [
+                'path'       => '/ines/getMapping',
+                'controller' => 'MauticCrmBundle:Api:inesGetMapping',
+                'method'     => 'GET',
+            ],
+        ],
     ],
     'services' => [
         'events' => [
+
+        ],
+
+    ],
+    'services' => [
+        'models' => [
+            'mautic.crm.model.ines_sync_log' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\Model\InesSyncLogModel',
+                'arguments' => 'doctrine.orm.entity_manager',
+            ],
+        ],
+        'events' => [
+            'mautic.crm.leadbundle.subscriber' => [
+                'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber',
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
+            ],
             'mautic_integration.pipedrive.lead.subscriber' => [
                 'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber',
                 'arguments' => [
