@@ -288,19 +288,19 @@ $view['slots']->set(
                     </li>
                 <?php endif; ?>
                 <li class="">
-<<<<<<< HEAD
                     <a href="#integration-container" role="tab" data-toggle="tab">
                     <span class="label label-primary mr-sm" id="IntegrationCount">
                         <?php echo count($integrations); ?>
                     </span>
                         <?php echo $view['translator']->trans('mautic.lead.lead.tab.integration'); ?>
-=======
+                    </a>
+                </li>
+                <li class="">
                     <a href="#auditlog-container" role="tab" data-toggle="tab">
                     <span class="label label-primary mr-sm" id="AuditLogCount">
                         <?php echo $auditlog['total']; ?>
                     </span>
                         <?php echo $view['translator']->trans('mautic.lead.lead.tab.auditlog'); ?>
->>>>>>> upstream/staging
                     </a>
                 </li>
                 <?php if ($places): ?>
