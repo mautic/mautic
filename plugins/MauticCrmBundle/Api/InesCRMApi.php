@@ -69,12 +69,10 @@ class InesCRMApi extends CrmApi
         ]);
     }
 
-    public function getLeadFields() {
+    public function getCustomFields() {
         $client = $this->automationSyncClient;
         $this->setAuthHeaders($client);
 
-        $response = $client->GetSyncInfo();
-
-        // TODO: Do something with the response
+        return $client->GetSyncInfo();
     }
 }
