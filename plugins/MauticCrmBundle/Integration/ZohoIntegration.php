@@ -856,7 +856,12 @@ class ZohoIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
-
+        if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
+            unset($leadFields[$key]);
+        }
+        if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
+            unset($leadFields[$key]);
+        }
         if (empty($leadFields)) {
             return [0, 0, 0];
         }
@@ -916,7 +921,8 @@ class ZohoIntegration extends CrmAbstractIntegration
 
             foreach ($toUpdate as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
-                    $key = mb_strtolower($this->cleanPushData($lead['email']));
+                    $key  = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead = $this->getCompoundMauticFields($lead);
                     if (isset($isContact[$key])) {
                         $isContact[$key] = $lead; // lead-converted
                     } else {
@@ -954,6 +960,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
                     $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead                       = $this->getCompoundMauticFields($lead);
                     $lead['integration_entity'] = 'Leads';
                     $leadsToCreateInZ[$key]     = $lead;
                 }

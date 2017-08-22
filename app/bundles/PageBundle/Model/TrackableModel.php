@@ -269,7 +269,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         foreach ($content as &$text) {
-            if (preg_match('/<a(.*?) href/i', $text)) {
+            if (preg_match('/<(.*?) href/i', $text)) {
                 // Parse as HTML
                 $trackableUrls = array_merge(
                     $trackableUrls,
@@ -296,13 +296,13 @@ class TrackableModel extends AbstractCommonModel
 
             // Replace URLs in content with tokens
             foreach ($content as &$text) {
-                $type = (preg_match('/<a(.*?) href/i', $text)) ? 'html' : 'text';
+                $type = (preg_match('/<(.*?) href/i', $text)) ? 'html' : 'text';
                 $text = $this->prepareContentWithTrackableTokens($text, $type);
             }
         } elseif (!empty($this->contentReplacements['first_pass'])) {
             // Replace URLs in content with tokens
             foreach ($content as &$text) {
-                $type = (preg_match('/<a(.*?) href/i', $text)) ? 'html' : 'text';
+                $type = (preg_match('/<(.*?) href/i', $text)) ? 'html' : 'text';
                 $text = $this->prepareContentWithTrackableTokens($text, $type);
             }
         }
@@ -361,8 +361,8 @@ class TrackableModel extends AbstractCommonModel
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 $content = preg_replace(
-                    '/<a(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
-                    '<a$1 href=$2'.$replace.'$3$2$4>',
+                    '/<(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
+                    '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
             }
