@@ -210,14 +210,18 @@ class EventModel extends CommonFormModel
                 unset($deletedEvents[$k]);
             }
 
-            $deletedKeys[] = $deleteMe;
+            if (isset($deletedEvents[$k])) {
+                $deletedKeys[] = $deleteMe;
+            }
         }
 
-        // wipe out any references to these events to prevent restraint violations
-        $this->getRepository()->nullEventRelationships($deletedKeys);
+        if (count($deletedEvents)) {
+            // wipe out any references to these events to prevent restraint violations
+            $this->getRepository()->nullEventRelationships($deletedKeys);
 
-        // delete the events
-        $this->deleteEntities($deletedEvents);
+            // delete the events
+            $this->deleteEntities($deletedEvents);
+        }
     }
 
     /**
@@ -250,8 +254,15 @@ class EventModel extends CommonFormModel
             return false;
         }*/
 
-        //get the current lead
-        $lead   = $this->leadModel->getCurrentLead();
+        // get the current lead
+        $lead = $this->leadModel->getCurrentLead();
+
+        if (!$lead instanceof Lead) {
+            $this->logger->debug('CAMPAIGN: unidentifiable contact; abort');
+
+            return false;
+        }
+
         $leadId = $lead->getId();
         $this->logger->debug('CAMPAIGN: Current Lead ID# '.$leadId);
 

@@ -393,7 +393,7 @@ class PublicController extends CommonFormController
         return new JsonResponse(
             [
                 'success' => 1,
-                'id'      => $lead->getId(),
+                'id'      => ($lead) ? $lead->getId() : null,
                 'sid'     => $trackingId,
             ]
         );
@@ -440,7 +440,7 @@ class PublicController extends CommonFormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
         $lead      = $leadModel->getCurrentLead();
-        $leadArray = $lead->getProfileFields();
+        $leadArray = ($lead) ? $lead->getProfileFields() : [];
         $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
 
         return $this->redirect($url);
@@ -567,7 +567,7 @@ class PublicController extends CommonFormController
 
             list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
             $data                                = [
-                'id'  => $lead->getId(),
+                'id'  => ($lead) ? $lead->getId() : null,
                 'sid' => $trackingId,
             ];
         }

@@ -154,10 +154,11 @@ $container->loadFromExtension('mautic_core');
 $engines = ['php', 'twig'];
 
 // Decide on secure cookie based on site_url setting
-$secureCookie = isset($parameters['site_url']) && substr(ltrim($parameters['site_url']), 0, 5) === 'https';
+$secureCookie = $container->hasParameter('mautic.site_url') && substr(ltrim($container->getParameter('mautic.site_url')), 0, 5) === 'https';
 
 // Generate session name
-$key         = isset($parameters['secret_key']) ? $parameters['secret_key'] : uniqid();
+// Cannot use $parameters here directly because that fails spectaculary if parameters_local file exists
+$key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
 $sessionName = md5(md5($paths['local_config']).$key);
 
 $container->loadFromExtension('framework', [

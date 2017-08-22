@@ -14,7 +14,7 @@ namespace Mautic\ConfigBundle\Controller;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Class ConfigController.
  */
-class ConfigController extends AbstractFormController
+class ConfigController extends FormController
 {
     /**
      * Controller action for editing the application configuration.

@@ -11,14 +11,14 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicController extends AbstractFormController
+class PublicController extends FormController
 {
     /**
      * Write a notification.

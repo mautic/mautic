@@ -15,6 +15,7 @@ use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -116,6 +117,7 @@ class EmailApiController extends CommonApiController
                 return $this->accessDenied();
             }
 
+            /** @var Lead $lead */
             $lead = $this->checkLeadAccess($leadId, 'edit');
             if ($lead instanceof Response) {
                 return $lead;
@@ -125,12 +127,16 @@ class EmailApiController extends CommonApiController
             $tokens   = (!empty($post['tokens'])) ? $post['tokens'] : [];
             $response = ['success' => false];
 
-            $cleantokens = array_map(
-                function ($v) {
-                    return InputHelper::clean($v);
-                },
-                $tokens
-            );
+            $cleanTokens = [];
+
+            foreach ($tokens as $token => $value) {
+                $value = InputHelper::clean($value);
+                if (!preg_match('/^{.*?}$/', $token)) {
+                    $token = '{'.$token.'}';
+                }
+
+                $cleanTokens[$token] = $value;
+            }
 
             $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
 
@@ -139,7 +145,7 @@ class EmailApiController extends CommonApiController
                 $leadFields,
                 [
                     'source'        => ['api', 0],
-                    'tokens'        => $cleantokens,
+                    'tokens'        => $cleanTokens,
                     'return_errors' => true,
                 ]
             );
