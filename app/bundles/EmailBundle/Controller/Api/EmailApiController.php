@@ -13,7 +13,9 @@ namespace Mautic\EmailBundle\Controller\Api;
 
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,8 +34,15 @@ class EmailApiController extends CommonApiController
         $this->entityClass      = 'Mautic\EmailBundle\Entity\Email';
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
-        $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];
-        $this->dataInputMasks   = [
+        $this->serializerGroups = [
+            'emailDetails',
+            'categoryList',
+            'publishDetails',
+            'assetList',
+            'formList',
+            'leadListList',
+        ];
+        $this->dataInputMasks = [
             'customHtml'     => 'html',
             'dynamicContent' => [
                 'content' => 'html',
@@ -156,6 +165,79 @@ class EmailApiController extends CommonApiController
                 $response['success'] = $result;
             } else {
                 $response['failed'] = $result;
+            }
+
+            $view = $this->view($response, Codes::HTTP_OK);
+
+            return $this->handleView($view);
+        }
+
+        return $this->notFound();
+    }
+
+    /**
+     * Sends custom content to a specific lead.
+     *
+     * @param string $content
+     * @param int    $contactId
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function sendCustomLeadAction($contactId)
+    {
+        /** @var Lead $lead */
+        $lead = $this->checkLeadAccess($contactId, 'edit');
+        if ($lead instanceof Response) {
+            return $lead;
+        }
+
+        $post      = $this->request->request->all();
+        $fromEmail = (!empty($post['fromEmail'])) ? $post['fromEmail'] : '';
+        $fromName  = (!empty($post['fromName'])) ? $post['fromName'] : '';
+        $subject   = (!empty($post['subject'])) ? $post['subject'] : '';
+        $content   = (!empty($post['content'])) ? $post['content'] : '';
+
+        $leadFields       = $lead->getProfileFields();
+        $leadFields['id'] = $lead->getId();
+        $leadEmail        = $leadFields['email'];
+        $leadName         = $leadFields['firstname'].' '.$leadFields['lastname'];
+
+        // Set onwer ID to be the current user ID so it will use his signature
+        $leadFields['owner_id'] = $this->get('mautic.helper.user')->getUser()->getId();
+
+        $response = ['success' => false];
+        if ($lead && $lead->getEmail()) {
+            /** @var MailHelper $mailer */
+            $mailer = $this->get('mautic.helper.mailer')->getMailer();
+
+            // To lead
+            $mailer->addTo(
+                $leadEmail,
+                $leadName
+            );
+
+            $mailer->setFrom(
+                $fromEmail,
+                $fromName
+            );
+
+            // Set Content
+            $mailer->setBody($content);
+            $mailer->parsePlainText($content);
+
+            // Set lead
+            $mailer->setLead($leadFields);
+            $mailer->setIdHash();
+
+            // Ensure safe emoji for notification
+            $subject = EmojiHelper::toHtml($subject);
+            $mailer->setSubject($subject);
+
+            if ($mailer->send(true, false, false)) {
+                $mailer->createEmailStat();
+                $response['success'] = true;
             }
 
             $view = $this->view($response, Codes::HTTP_OK);
