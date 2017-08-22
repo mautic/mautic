@@ -529,6 +529,10 @@ return [
                 'class' => 'Mautic\LeadBundle\Form\Type\StageType',
                 'alias' => 'lead_batch_stage',
             ],
+            'mautic.form.type.lead_batch_owner' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\OwnerType',
+                'alias' => 'lead_batch_owner',
+            ],
             'mautic.form.type.lead_merge' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\MergeType',
                 'alias' => 'lead_merge',
