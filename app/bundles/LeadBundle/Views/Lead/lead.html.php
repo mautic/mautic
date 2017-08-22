@@ -21,6 +21,13 @@ $leadName       = ($isAnonymous) ? $view['translator']->trans($lead->getPrimaryI
 $leadActualName = $lead->getName();
 $leadCompany    = $lead->getCompany();
 
+$fields['core']['isp']['value']          = $lead->getIsp();
+$fields['core']['isp']['alias']          = 'ip-isp';
+$fields['core']['isp']['label']          = $view['translator']->trans('mautic.lead.field.ip-isp');
+$fields['core']['organization']['value'] = $lead->getOrganization();
+$fields['core']['organization']['alias'] = 'ip-organization';
+$fields['core']['organization']['label'] = $view['translator']->trans('mautic.lead.field.ip-organization');
+
 $view['slots']->set('mauticContent', 'lead');
 
 $avatar = '';
@@ -201,13 +208,13 @@ $view['slots']->set(
                                                     <?php if ($group == 'core' && $field['alias'] == 'country' && !empty($flag)): ?>
                                                     <img class="mr-sm" src="<?php echo $flag; ?>" alt="" style="max-height: 24px;"/>
                                                     <span class="mt-1"><?php echo $field['value']; ?>
-                                                    <?php else: ?>
-                                                        <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
-                                                            <?php echo implode(', ', $field['value']); ?>
                                                         <?php else: ?>
-                                                            <?php echo $field['value']; ?>
+                                                            <?php if (is_array($field['value']) && 'multiselect' === $field['type']): ?>
+                                                                <?php echo implode(', ', $field['value']); ?>
+                                                            <?php else: ?>
+                                                                <?php echo $field['value']; ?>
+                                                            <?php endif; ?>
                                                         <?php endif; ?>
-                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -365,7 +372,7 @@ $view['slots']->set(
                         <a href="javascript:void(0)"
                            class="arrow text-muted text-center<?php echo ($avatarPanelState == 'expanded') ? ''
                                : ' collapsed'; ?>" data-toggle="collapse" data-target="#lead-avatar-block"><span
-                                class="caret"></span></a>
+                                    class="caret"></span></a>
                     </div>
                     <div class="collapse<?php echo ($avatarPanelState == 'expanded') ? ' in' : ''; ?>"
                          id="lead-avatar-block">
@@ -432,10 +439,10 @@ $view['slots']->set(
                 </div>
             </div>
             <div class="panel-body pt-sm">
-            <?php if ($lead->getOwner()) : ?>
-                <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?></h6>
-                <p class="text-muted"><?php echo $lead->getOwner()->getName(); ?></p>
-            <?php endif; ?>
+                <?php if ($lead->getOwner()) : ?>
+                    <h6 class="fw-sb"><?php echo $view['translator']->trans('mautic.lead.lead.field.owner'); ?></h6>
+                    <p class="text-muted"><?php echo $lead->getOwner()->getName(); ?></p>
+                <?php endif; ?>
 
                 <h6 class="fw-sb">
                     <?php echo $view['translator']->trans('mautic.lead.field.address'); ?>
@@ -477,13 +484,13 @@ $view['slots']->set(
                 <div class="panel-body pt-sm">
                     <ul class="media-list media-list-feed">
                         <?php foreach ($upcomingEvents as $event) : ?>
-                        <?php
+                            <?php
                             $metadata = unserialize($event['metadata']);
                             $errors   = false;
                             if (!empty($metadata['errors'])):
                                 $errors = (is_array($metadata['errors'])) ? implode('<br />', $metadata['errors']) : $metadata['errors'];
                             endif;
-                        ?>
+                            ?>
                             <li class="media">
                                 <div class="media-object pull-left mt-xs">
                                     <span class="figure"></span>
@@ -498,7 +505,7 @@ $view['slots']->set(
                                         ['%event%' => $event['event_name'], '%link%' => $link]
                                     ); ?>
                                     <?php if (!empty($errors)): ?>
-                                    <i class="fa fa-warning text-danger" data-toggle="tooltip" title="<?php echo $errors; ?>"></i>
+                                        <i class="fa fa-warning text-danger" data-toggle="tooltip" title="<?php echo $errors; ?>"></i>
                                     <?php endif; ?>
                                     <p class="fs-12 dark-sm timeline-campaign-event-date-<?php echo $event['event_id']; ?>"><?php echo $view['date']->toFull($event['trigger_date'], 'utc'); ?></p>
                                 </div>
