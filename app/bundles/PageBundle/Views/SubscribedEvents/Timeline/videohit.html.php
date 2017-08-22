@@ -52,5 +52,5 @@ $icon = (isset($event['icon'])) ? $event['icon'] : '';
     <dd class="ellipsis"><?php echo $event['extra']['hit']['url'] ? $view['assets']->makeLinks($event['extra']['hit']['url']) : $view['translator']->trans('mautic.core.unknown'); ?></dd>
 </dl>
 <div class="small">
-    <?php echo $event['extra']['hit']['user_agent']; ?>
+    <?php echo InputHelper::clean($event['extra']['hit']['user_agent']); ?>
 </div>
