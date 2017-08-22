@@ -125,7 +125,7 @@ class SugarcrmApi extends CrmApi
             //if not found then go ahead and make an API call to find all the records with that email
             if (isset($fields['email1']) && empty($sugarLeadRecords)) {
                 $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
-                $sugarLeadRecords = $sLeads['entry_list'];
+                $sugarLeadRecords = isset($sLeads['entry_list']) ? $sLeads['entry_list'] : [];
             }
             $leadFields = [];
             foreach ($fields as $name => $value) {
