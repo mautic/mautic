@@ -58,6 +58,19 @@ Mautic.leadOnLoad = function (container, response) {
         Mautic.leadTimelineOnLoad(container, response);
     }
 
+    // Auditlog filters
+    var auditlogForm = mQuery(container + ' #auditlog-filters');
+    if (auditlogForm.length) {
+        auditlogForm.on('change', function() {
+            auditlogForm.submit();
+        }).on('keyup', function() {
+            auditlogForm.delay(200).submit();
+        }).on('submit', function(e) {
+            e.preventDefault();
+            Mautic.refreshLeadAuditLog(auditlogForm);
+        });
+    }
+
     //Note type filters
     var noteForm = mQuery(container + ' #note-filters');
     if (noteForm.length) {
@@ -161,6 +174,43 @@ Mautic.leadTimelineOnLoad = function (container, response) {
                 mQuery(this).removeClass('active');
             } else {
                 mQuery('#timeline-details-'+detailsId).removeClass('hide');
+                mQuery(this).addClass('active');
+            }
+        }
+    });
+
+    // auditlog
+    mQuery("#contact-auditlog a[data-activate-details='all']").on('click', function() {
+        if (mQuery(this).find('span').first().hasClass('fa-level-down')) {
+            mQuery("#contact-auditlog a[data-activate-details!='all']").each(function () {
+                var detailsId = mQuery(this).data('activate-details');
+                if (detailsId && mQuery('#auditlog-details-'+detailsId).length) {
+                    mQuery('#auditlog-details-' + detailsId).removeClass('hide');
+                    mQuery(this).addClass('active');
+                }
+            });
+            mQuery(this).find('span').first().removeClass('fa-level-down').addClass('fa-level-up');
+        } else {
+            mQuery("#contact-auditlog a[data-activate-details!='all']").each(function () {
+                var detailsId = mQuery(this).data('activate-details');
+                if (detailsId && mQuery('#auditlog-details-'+detailsId).length) {
+                    mQuery('#auditlog-details-' + detailsId).addClass('hide');
+                    mQuery(this).removeClass('active');
+                }
+            });
+            mQuery(this).find('span').first().removeClass('fa-level-up').addClass('fa-level-down');
+        }
+    });
+    mQuery("#contact-auditlog a[data-activate-details!='all']").on('click', function() {
+        var detailsId = mQuery(this).data('activate-details');
+        if (detailsId && mQuery('#auditlog-details-'+detailsId).length) {
+            var activateDetailsState = mQuery(this).hasClass('active');
+
+            if (activateDetailsState) {
+                mQuery('#auditlog-details-'+detailsId).addClass('hide');
+                mQuery(this).removeClass('active');
+            } else {
+                mQuery('#auditlog-details-'+detailsId).removeClass('hide');
                 mQuery(this).addClass('active');
             }
         }
@@ -728,6 +778,14 @@ Mautic.clearLeadSocialProfile = function(network, leadId, event) {
             Mautic.processAjaxError(request, textStatus, errorThrown);
             Mautic.stopIconSpinPostEvent();
         }
+    });
+};
+
+Mautic.refreshLeadAuditLog = function(form) {
+    Mautic.postForm(mQuery(form), function (response) {
+        response.target = '#auditlog-table';
+        mQuery('#AuditLogCount').html(response.auditLogCount);
+        Mautic.processPageContent(response);
     });
 };
 
