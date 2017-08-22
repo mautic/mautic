@@ -7,6 +7,34 @@ use Mautic\LeadBundle\Entity\Company;
 
 class InesCRMIntegration extends CrmAbstractIntegration
 {
+    private $defaultContactFields;
+
+    private $defaultCompanyFields;
+
+    public function __construct(MauticFactory $factory = null) {
+        parent::__construct($factory);
+
+        $defaultFields = json_decode(self::INES_DEFAULT_FIELDS_JSON);
+        $defaultContactFields = [];
+        $defaultCompanyFields = [];
+
+        foreach ($defaultFields as $f) {
+            $fieldValue = [
+                'label' => $f->inesLabel,
+                'required' => $f->isMappingRequired,
+            ];
+
+            if ($f->concept === 'contact') {
+                $defaultContactFields[$f->inesKey] = $fieldValue;
+            } else if ($f->concept === 'client') {
+                $defaultCompanyFields[$f->inesKey] = $fieldValue;
+            }
+        }
+
+        $this->defaultContactFields = $defaultContactFields;
+        $this->defaultCompanyFields = $defaultCompanyFields;
+    }
+
     public function getName()
     {
         return 'InesCRM';
@@ -126,18 +154,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function getFormLeadFields($settings = []) {
-        $defaultFields = json_decode(self::INES_DEFAULT_FIELDS_JSON);
-
-        $leadFields = [];
-
-        foreach ($defaultFields as $f) {
-            if ($f->concept === 'contact') {
-                $leadFields[$f->inesKey] = [
-                    'label' => $f->inesLabel,
-                    'required' => $f->isMappingRequired,
-                ];
-            }
-        }
+        $leadFields = $this->defaultContactFields;
 
         $customFields = $this->getApiHelper()->getCustomFields()
                              ->GetSyncInfoResult
@@ -155,18 +172,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function getFormCompanyFields($settings = []) {
-        $defaultFields = json_decode(self::INES_DEFAULT_FIELDS_JSON);
-
-        $companyFields = [];
-
-        foreach ($defaultFields as $f) {
-            if ($f->concept === 'client') {
-                $companyFields[$f->inesKey] = [
-                    'label' => $f->inesLabel,
-                    'required' => $f->isMappingRequired,
-                ];
-            }
-        }
+        $companyFields = $this->defaultCompanyFields;
 
         $customFields = $this->getApiHelper()->getCustomFields()
                              ->GetSyncInfoResult
