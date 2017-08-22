@@ -594,7 +594,10 @@ class MailHelper
                 foreach ($this->metadata as $fromKey => $metadatum) {
                     $this->errors = [];
 
-                    if ($useOwnerAsMailer && 'default' !== $fromKey) {
+                    if ($from = $this->message->getFrom()) {
+                        // The from email and name were set directly for the message
+                        $this->setFrom($from);
+                    } elseif ($useOwnerAsMailer && 'default' !== $fromKey) {
                         $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
                     } else {
                         $this->setFrom($this->from);
