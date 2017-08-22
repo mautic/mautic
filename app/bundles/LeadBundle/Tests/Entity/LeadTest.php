@@ -176,7 +176,7 @@ class LeadTest extends \PHPUnit_Framework_TestCase
 
         $testDateObject = new \DateTime('12-12-2017 22:03:59');
 
-        $this->assertEquals($testDateObject->format('Y-m-d H:i'), $data['dateField']);
+        $this->assertEquals($testDateObject->format('Y-m-d H:i:s'), $data['dateField']);
         $this->assertEquals((int) true, $data['boolean']);
         $this->assertEquals(['a', 'b'], $data['multi']);
     }

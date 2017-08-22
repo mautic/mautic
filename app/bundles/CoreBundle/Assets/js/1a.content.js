@@ -1180,7 +1180,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
     var format = mQuery(el).data('format');
     if (type == 'datetime') {
         mQuery(el).datetimepicker({
-            format: (format) ? format : 'Y-m-d H:i',
+            format: (format) ? format : 'Y-m-d H:i:s',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
@@ -1199,7 +1199,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
     } else if (type == 'time') {
         mQuery(el).datetimepicker({
             datepicker: false,
-            format: (format) ? format : 'H:i',
+            format: (format) ? format : 'H:i:s',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
