@@ -10,7 +10,7 @@
  */
 $class = (empty($action['allowCampaignForm'])) ? 'action-standalone-only' : '';
 if (empty($action['allowCampaignForm']) && !$isStandalone):
-    $class .= " hide";
+    $class .= ' hide';
 endif;
 ?>
 
@@ -20,9 +20,9 @@ endif;
         data-target="#formComponentModal"
         data-href="<?php echo $view['router']->path('mautic_formaction_action', [
             'objectAction' => 'new',
-            'type' => $type,
-            'tmpl' => 'action',
-            'formId' => $formId
+            'type'         => $type,
+            'tmpl'         => 'action',
+            'formId'       => $formId,
         ]); ?>">
     <?php echo $view['translator']->trans($action['label']); ?>
 </option>
