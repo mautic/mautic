@@ -237,7 +237,7 @@ Mautic.getLeadId = function() {
 
 Mautic.leadEmailOnLoad = function(container, response) {
     // Some hacky editations made on every form submit because of Froala (more at: https://github.com/froala/wysiwyg-editor/issues/1372)
-    mQuery('[name="lead_quickemail"]').on('click.ajaxform', function() {
+    mQuery('[name="lead_quickemail"]').on('submit.ajaxform', function() {
         var emailHtml = mQuery('.fr-iframe').contents();
         var textarea = mQuery(this).find('#lead_quickemail_body');
         mQuery.each(emailHtml.find('td, th, table'), function() {
@@ -1173,7 +1173,7 @@ Mautic.createLeadUtmTag = function (el) {
 
 Mautic.leadBatchSubmit = function() {
     if (Mautic.batchActionPrecheck()) {
-        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length) {
+        if (mQuery('#lead_batch_remove').val() || mQuery('#lead_batch_add').val() || mQuery('#lead_batch_dnc_reason').length || mQuery('#lead_batch_stage_addstage').length || mQuery('#lead_batch_owner_addowner').length) {
             var ids = Mautic.getCheckedListIds(false, true);
 
             if (mQuery('#lead_batch_ids').length) {
@@ -1182,6 +1182,8 @@ Mautic.leadBatchSubmit = function() {
                 mQuery('#lead_batch_dnc_ids').val(ids);
             } else if (mQuery('#lead_batch_stage_addstage').length) {
                 mQuery('#lead_batch_stage_ids').val(ids);
+            }else if (mQuery('#lead_batch_owner_addowner').length) {
+                mQuery('#lead_batch_owner_ids').val(ids);
             }
 
             return true;

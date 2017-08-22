@@ -34,7 +34,7 @@ trait LeadDetailsTrait
 
         if (null == $filters) {
             $filters = $session->get(
-                'mautic.gmail.timeline.filters',
+                'mautic.plugin.timeline.filters',
                 [
                     'search'        => '',
                     'includeEvents' => [],
@@ -44,14 +44,14 @@ trait LeadDetailsTrait
         }
 
         if (null == $orderBy) {
-            if (!$session->has('mautic.gmail.timeline.orderby')) {
-                $session->set('mautic.gmail.timeline.orderby', 'timestamp');
-                $session->set('mautic.gmail.timeline.orderbydir', 'DESC');
+            if (!$session->has('mautic.plugin.timeline.orderby')) {
+                $session->set('mautic.plugin.timeline.orderby', 'timestamp');
+                $session->set('mautic.plugin.timeline.orderbydir', 'DESC');
             }
 
             $orderBy = [
-                $session->get('mautic.gmail.timeline.orderby'),
-                $session->get('mautic.gmail.timeline.orderbydir'),
+                $session->get('mautic.plugin.timeline.orderby'),
+                $session->get('mautic.plugin.timeline.orderbydir'),
             ];
         }
 
@@ -99,6 +99,36 @@ trait LeadDetailsTrait
         $result['total'] = count($result['events']);
 
         return $result;
+    }
+
+    /**
+     * Makes sure that the event filter array is in the right format.
+     *
+     * @param mixed $filters
+     *
+     * @return array
+     *
+     * @throws InvalidArgumentException if not an array
+     */
+    public function sanitizeEventFilter($filters)
+    {
+        if (!is_array($filters)) {
+            throw new \InvalidArgumentException('filters parameter must be an array');
+        }
+
+        if (!isset($filters['search'])) {
+            $filters['search'] = '';
+        }
+
+        if (!isset($filters['includeEvents'])) {
+            $filters['includeEvents'] = [];
+        }
+
+        if (!isset($filters['excludeEvents'])) {
+            $filters['excludeEvents'] = [];
+        }
+
+        return $filters;
     }
 
     /**
