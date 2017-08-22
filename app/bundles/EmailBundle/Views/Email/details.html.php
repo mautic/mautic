@@ -233,6 +233,11 @@ if (!$isEmbedded) {
                         <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
                     </a>
                 </li>
+                <li>
+                    <a href="#contacts-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.email.associated.contacts'); ?>
+                    </a>
+                </li>
                 <?php if ($showVariants): ?>
                     <li>
                         <a href="#variants-container" role="tab" data-toggle="tab">
@@ -255,6 +260,10 @@ if (!$isEmbedded) {
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
                 <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', ['trackables' => $trackables]); ?>
+            </div>
+
+            <div class="tab-pane bdr-w-0" id="contacts-container">
+                <?php echo $contacts; ?>
             </div>
 
             <?php if ($showVariants): ?>

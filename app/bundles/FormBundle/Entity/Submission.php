@@ -129,6 +129,19 @@ class Submission
                     'results',
                 ]
             )
+            ->setGroupPrefix('submissionEvent')
+            ->addProperties(
+                [
+                    'id',
+                    'ipAddress',
+                    'form',
+                    'trackingId',
+                    'dateSubmitted',
+                    'referer',
+                    'page',
+                    'results',
+                ]
+            )
             ->build();
     }
 

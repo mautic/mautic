@@ -44,6 +44,8 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
+                'lead:imports:view',
+                'lead:imports:create',
             ],
             'RETURN_ARRAY'
         );
@@ -323,8 +325,10 @@ class LeadController extends FormController
         $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $companyModel  = $this->getModel('lead.company');
+        /* @var \Mautic\LeadBundle\Model\CompanyModel $model */
+
+        $companyModel = $this->getModel('lead.company');
+
         $companiesRepo = $companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
@@ -364,6 +368,7 @@ class LeadController extends FormController
                     'engagementData'    => $this->getEngagementData($lead),
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
+                    'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',
@@ -1829,6 +1834,103 @@ class LeadController extends FormController
                     'viewParameters' => [
                         'form' => $this->createForm(
                             'lead_batch_stage',
+                            [],
+                            [
+                                'items'  => $items,
+                                'action' => $route,
+                            ]
+                        )->createView(),
+                    ],
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'passthroughVars' => [
+                        'activeLink'    => '#mautic_contact_index',
+                        'mauticContent' => 'leadBatch',
+                        'route'         => $route,
+                    ],
+                ]
+            );
+        }
+    }
+
+    /**
+     * Bulk edit lead owner.
+     *
+     * @param int $objectId
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function batchOwnersAction($objectId = 0)
+    {
+        if ($this->request->getMethod() == 'POST') {
+            /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+            $model = $this->getModel('lead');
+            $data  = $this->request->request->get('lead_batch_owner', [], true);
+            $ids   = json_decode($data['ids'], true);
+
+            $entities = [];
+            if (is_array($ids)) {
+                $entities = $model->getEntities(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
+                                    'column' => 'l.id',
+                                    'expr'   => 'in',
+                                    'value'  => $ids,
+                                ],
+                            ],
+                        ],
+                        'ignore_paginator' => true,
+                    ]
+                );
+            }
+            $count = 0;
+            foreach ($entities as $lead) {
+                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+                    ++$count;
+
+                    if (!empty($data['addowner'])) {
+                        $userModel = $this->getModel('user');
+                        $user      = $userModel->getEntity((int) $data['addowner']);
+                        $lead->setOwner($user);
+                    }
+                }
+            }
+            // Save entities
+            $model->saveEntities($entities);
+            $this->addFlash(
+                'mautic.lead.batch_leads_affected',
+                [
+                    'pluralCount' => $count,
+                    '%count%'     => $count,
+                ]
+            );
+
+            return new JsonResponse(
+                [
+                    'closeModal' => true,
+                    'flashes'    => $this->getFlashContent(),
+                ]
+            );
+        } else {
+            $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
+            $items = [];
+            foreach ($users as $user) {
+                $items[$user['id']] = $user['firstName'].' '.$user['lastName'];
+            }
+
+            $route = $this->generateUrl(
+                'mautic_contact_action',
+                [
+                    'objectAction' => 'batchOwners',
+                ]
+            );
+
+            return $this->delegateView(
+                [
+                    'viewParameters' => [
+                        'form' => $this->createForm(
+                            'lead_batch_owner',
                             [],
                             [
                                 'items'  => $items,

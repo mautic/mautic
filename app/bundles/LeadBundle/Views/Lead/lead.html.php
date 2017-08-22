@@ -288,11 +288,19 @@ $view['slots']->set(
                     </li>
                 <?php endif; ?>
                 <li class="">
+<<<<<<< HEAD
                     <a href="#integration-container" role="tab" data-toggle="tab">
                     <span class="label label-primary mr-sm" id="IntegrationCount">
                         <?php echo count($integrations); ?>
                     </span>
                         <?php echo $view['translator']->trans('mautic.lead.lead.tab.integration'); ?>
+=======
+                    <a href="#auditlog-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="AuditLogCount">
+                        <?php echo $auditlog['total']; ?>
+                    </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.auditlog'); ?>
+>>>>>>> upstream/staging
                     </a>
                 </li>
                 <?php if ($places): ?>
@@ -358,6 +366,19 @@ $view['slots']->set(
                 ); ?>
             </div>
             <!--/ #integration-container -->
+
+            <!-- #auditlog-container -->
+            <div class="tab-pane fade bdr-w-0" id="auditlog-container">
+                <?php echo $view->render(
+                    'MauticLeadBundle:Auditlog:list.html.php',
+                    [
+                        'events' => $auditlog,
+                        'lead'   => $lead,
+                        'tmpl'   => 'index',
+                    ]
+                ); ?>
+            </div>
+            <!--/ #auditlog-container -->
 
             <!-- custom content -->
             <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
