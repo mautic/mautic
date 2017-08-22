@@ -120,8 +120,12 @@ return [
                 'method'     => 'POST',
             ],
             'mautic_api_getcontactevents' => [
-                'path'       => '/contacts/{id}/events',
-                'controller' => 'MauticLeadBundle:Api\LeadApi:getEvents',
+                'path'       => '/contacts/{id}/activity',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getActivity',
+            ],
+            'mautic_api_getcontactsevents' => [
+                'path'       => '/contacts/activity',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getAllActivity',
             ],
             'mautic_api_getcontactnotes' => [
                 'path'       => '/contacts/{id}/notes',
@@ -252,6 +256,11 @@ return [
                 'path'       => '/contacts/{id}/dnc/remove/{channel}',
                 'controller' => 'MauticLeadBundle:Api\LeadApi:removeDnc',
                 'method'     => 'POST',
+            ],
+            // @deprecated 2.10.0 to be removed in 3.0
+            'bc_mautic_api_getcontactevents' => [
+                'path'       => '/contacts/{id}/events',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getEvents',
             ],
         ],
     ],
@@ -416,9 +425,14 @@ return [
                 'alias'     => 'leadlist_choices',
             ],
             'mautic.form.type.leadlist_filter' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\FilterType',
-                'alias'     => 'leadlist_filter',
-                'arguments' => ['mautic.factory'],
+                'class'       => 'Mautic\LeadBundle\Form\Type\FilterType',
+                'alias'       => 'leadlist_filter',
+                'arguments'   => ['mautic.factory'],
+                'methodCalls' => [
+                    'setConnection' => [
+                        'database_connection',
+                    ],
+                ],
             ],
             'mautic.form.type.leadfield' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\FieldType',
@@ -484,8 +498,8 @@ return [
                 'alias'     => 'lead_field_import',
             ],
             'mautic.form.type.lead_quickemail' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\EmailType',
-                'arguments' => ['mautic.factory'],
+                'class'     => \Mautic\LeadBundle\Form\Type\EmailType::class,
+                'arguments' => ['mautic.helper.user'],
                 'alias'     => 'lead_quickemail',
             ],
             'mautic.form.type.lead_tags' => [
@@ -514,6 +528,10 @@ return [
             'mautic.form.type.lead_batch_stage' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\StageType',
                 'alias' => 'lead_batch_stage',
+            ],
+            'mautic.form.type.lead_batch_owner' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\OwnerType',
+                'alias' => 'lead_batch_owner',
             ],
             'mautic.form.type.lead_merge' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\MergeType',

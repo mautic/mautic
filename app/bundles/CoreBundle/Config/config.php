@@ -338,6 +338,11 @@ return [
                 'arguments' => [
                     'translator',
                 ],
+                'methodCalls' => [
+                    'setConnection' => [
+                        'database_connection',
+                    ],
+                ],
             ],
             'mautic.form.type.entity_lookup' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\EntityLookupType::class,

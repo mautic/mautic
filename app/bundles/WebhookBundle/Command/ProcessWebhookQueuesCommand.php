@@ -43,10 +43,11 @@ class ProcessWebhookQueuesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var \Mautic\WebhookBundle\Model\WebhookModel $model */
-        $model = $this->getContainer()->get('mautic.webhook.model.webhook');
+        $model  = $this->getContainer()->get('mautic.webhook.model.webhook');
+        $params = $this->getContainer()->get('mautic.helper.core_parameters');
 
         // check to make sure we are in queue mode
-        if ($this->getContainer()->get('mautic.helper.core_parameters')->getParameter('queue_mode') != 'command_process') {
+        if ($params->getParameter('queue_mode') != $model::COMMAND_PROCESS) {
             $output->writeLn('Webhook Bundle is in immediate process mode. To use the command function change to command mode.');
 
             return 0;

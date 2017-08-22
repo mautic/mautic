@@ -42,7 +42,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
     public function load(ObjectManager $manager)
     {
         $segments = [
-            [
+            [ // ID 2
                 'name'    => 'Segment Test 1',
                 'alias'   => 'segment-test-1',
                 'public'  => true,
@@ -58,7 +58,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
-            [
+            [ // ID 3
                 'name'    => 'Segment Test 2',
                 'alias'   => 'segment-test-2',
                 'public'  => false,
@@ -82,7 +82,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
-            [
+            [ // ID 4
                 'name'    => 'Segment Test 3',
                 'alias'   => 'segment-test-3',
                 'public'  => true,
@@ -98,7 +98,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
-            [
+            [ // ID 5
                 'name'    => 'Segment Test 4',
                 'alias'   => 'segment-test-4',
                 'public'  => true,
@@ -114,7 +114,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
-            [
+            [ // ID 6
                 'name'    => 'Segment Test 5',
                 'alias'   => 'segment-test-5',
                 'public'  => true,
@@ -125,6 +125,320 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'field'    => 'hit_url',
                         'operator' => '!like',
                         'filter'   => 'test.com',
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 7
+                'name'    => 'Like segment test with field percent sign at end',
+                'alias'   => 'like-percent-end',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'title',
+                        'operator' => 'like',
+                        'filter'   => 'Mr%',
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 8
+                'name'     => 'Segment without filters',
+                'alias'    => 'segment-test-without-filters',
+                'public'   => true,
+                'filters'  => [],
+                'populate' => true,
+            ],
+            [ // ID 9
+                'name'    => 'Segment with manual members added and removed',
+                'alias'   => 'segment-test-manual-membership',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                ],
+                'populate'        => true,
+                'manually_add'    => [48, 49, 50],
+                'manually_remove' => [3, 4],
+            ],
+            [ // ID 10
+                'name'    => 'Include segment membership with filters',
+                'alias'   => 'segment-test-include-segment-with-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [3, 4],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 11
+                'name'    => 'Exclude segment membership with filters',
+                'alias'   => 'segment-test-exclude-segment-with-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United States',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => '!in',
+                        'filter'   => [3],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 12
+                'name'    => 'Include segment membership without filters',
+                'alias'   => 'segment-test-include-segment-without-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [8],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 13
+                'name'    => 'Exclude segment membership without filters',
+                'alias'   => 'segment-test-exclude-segment-without-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => '!in',
+                        'filter'   => [8],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 14
+                'name'    => 'Include segment membership with mixed filters',
+                'alias'   => 'segment-test-include-segment-mixed-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [4, 8],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 15
+                'name'    => 'Exclude segment membership with mixed filters',
+                'alias'   => 'segment-test-exclude-segment-mixed-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => '!in',
+                        'filter'   => [4, 8],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 16
+                'name'    => 'Segment membership with mixed include and exclude',
+                'alias'   => 'segment-test-mixed-include-exclude-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [7],
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => '!in',
+                        'filter'   => [4],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 17
+                'name'    => 'Segment membership with including segment that has manual membership',
+                'alias'   => 'segment-test-include-segment-manual-members',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [9],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 18
+                'name'    => 'Segment membership with excluded segment that has manual membership',
+                'alias'   => 'segment-test-exclude-segment-manual-members',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'title',
+                        'operator' => 'like',
+                        'filter'   => 'Mr%',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => '!in',
+                        'filter'   => [9],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 19
+                'name'    => 'Segment membership with excluded segment without other filters',
+                'alias'   => 'segment-test-exclude-segment-without-other-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => '!in',
+                        'filter'   => [9],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => false,
+            ],
+            [ // ID 20
+                'name'    => 'Segment with filters and only manually removed contacts',
+                'alias'   => 'segment-test-filters-and-removed',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                ],
+                'populate'        => true,
+                'manually_remove' => [3, 4],
+            ],
+            [ // ID 21
+                'name'    => 'Segment with same filters as another that has manually removed contacts',
+                'alias'   => 'segment-test-include-segment-with-segment-manual-removal-same-filters',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'country',
+                        'operator' => '=',
+                        'filter'   => 'United Kingdom',
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 22
+                'name'    => 'Segment membership with including segment that has a contact thats been removed from non-related segment',
+                'alias'   => 'segment-test-include-segment-with-unrelated-segment-manual-removal',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'leadlist',
+                        'field'    => 'leadlist',
+                        'operator' => 'in',
+                        'filter'   => [21],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 23
+                'name'    => 'Segment membership based on regex with special characters',
+                'alias'   => 'segment-membership-regexp',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'email',
+                        'operator' => 'regexp',
+                        'filter'   => '^.*(#|!|\\\\$|%|&|\\\\*|\\\\(|\\\\)|\\\\^|\\\\?|\\\\+|-|dayrep\\\\.com|http|gmail|abc|qwe|[0-9]).*$',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'email',
+                        'operator' => '!empty',
+                        'filter'   => null,
                         'display'  => '',
                     ],
                 ],
@@ -155,6 +469,18 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
 
         if ($listConfig['populate']) {
             $this->container->get('mautic.lead.model.list')->rebuildListLeads($list);
+        }
+
+        if (!empty($listConfig['manually_add'])) {
+            foreach ($listConfig['manually_add'] as $lead) {
+                $this->container->get('mautic.lead.model.lead')->addToLists($lead, $list);
+            }
+        }
+
+        if (!empty($listConfig['manually_remove'])) {
+            foreach ($listConfig['manually_remove'] as $lead) {
+                $this->container->get('mautic.lead.model.lead')->removeFromLists($lead, $list);
+            }
         }
     }
 

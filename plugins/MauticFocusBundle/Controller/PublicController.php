@@ -56,9 +56,10 @@ class PublicController extends CommonController
             /** @var \MauticPlugin\MauticFocusBundle\Model\FocusModel $model */
             $model = $this->getModel('focus');
             $focus = $model->getEntity($id);
+            $lead  = $this->getModel('lead')->getCurrentLead();
 
-            if ($focus && $focus->isPublished()) {
-                $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $this->getModel('lead')->getCurrentLead());
+            if ($focus && $focus->isPublished() && $lead) {
+                $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $lead);
             }
         }
 
