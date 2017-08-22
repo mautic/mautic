@@ -748,6 +748,13 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $leadFields            = array_unique(array_values($config['leadFields']));
         $totalUpdated          = $totalCreated          = $totalErrors          = 0;
 
+        if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
+            unset($leadFields[$key]);
+        }
+        if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
+            unset($leadFields[$key]);
+        }
+
         if (empty($leadFields)) {
             return [0, 0, 0];
         }
@@ -786,6 +793,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             foreach ($toUpdate as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
                     $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead                       = $this->getCompoundMauticFields($lead);
                     $lead['integration_entity'] = $object;
                     $leadsToUpdateInD[$key]     = $lead;
                     $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
@@ -803,6 +811,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             foreach ($leadsToCreate as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
                     $key                        = mb_strtolower($this->cleanPushData($lead['email']));
+                    $lead                       = $this->getCompoundMauticFields($lead);
                     $lead['integration_entity'] = $object;
                     $leadsToCreateInD[$key]     = $lead;
                 }

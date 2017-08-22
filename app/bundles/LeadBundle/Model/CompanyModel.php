@@ -369,7 +369,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        unset($lead, $persistCompany, $companies);
+        //unset($lead, $persistCompany, $companies);
 
         return $contactAdded;
     }

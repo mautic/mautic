@@ -31,18 +31,18 @@ trait RequestTrait
                 switch ($type) {
                     case 'yesno_button_group':
                         if (is_object($entity)) {
-                            // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
                             $setter = 'set'.ucfirst($name);
-                            $data   = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
-
+                            // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
+                            $data = filter_var($params[$name], FILTER_VALIDATE_BOOLEAN);
+                            $data = (bool) $data;
                             try {
-                                $entity->$setter((int) $data);
-
+                                $entity->$setter($data);
                                 // Manually handled so remove from form processing
                                 unset($form[$name], $params[$name]);
+                                break;
                             } catch (\InvalidArgumentException $exception) {
-                                // Setter not found
                             }
+                            $params[$name] = $data;
                         }
                         break;
                     case 'choice':
@@ -63,16 +63,23 @@ trait RequestTrait
                             // Date placeholder was used so just ignore it to allow import of the field
                             unset($params[$name]);
                         } else {
-                            switch ($type) {
-                                case 'datetime':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('Y-m-d H:i');
-                                    break;
-                                case 'date':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('Y-m-d');
-                                    break;
-                                case 'time':
-                                    $params[$name] = (new \DateTime($params[$name]))->format('H:i');
-                                    break;
+                            if (($timestamp = strtotime($params[$name])) === false) {
+                                $timestamp = null;
+                            }
+                            if ($timestamp) {
+                                switch ($type) {
+                                    case 'datetime':
+                                        $params[$name] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                        break;
+                                    case 'date':
+                                        $params[$name] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                        break;
+                                    case 'time':
+                                        $params[$name] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                        break;
+                                }
+                            } else {
+                                unset($params[$name]);
                             }
                         }
                         break;
@@ -91,5 +98,64 @@ trait RequestTrait
         }
 
         $params = InputHelper::_($params, $masks);
+    }
+
+    /**
+     * @param $fieldData
+     * @param $leadField
+     */
+    public function cleanFields(&$fieldData, $leadField)
+    {
+        // This will catch null values or non-existent values to prevent null from converting to false/0
+        if (!isset($fieldData[$leadField['alias']])) {
+            return;
+        }
+
+        switch ($leadField['type']) {
+            // Adjust the boolean values from text to boolean. Do not convert null to false.
+            case 'boolean':
+                $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                break;
+            // Ensure date/time entries match what symfony expects
+            case 'datetime':
+            case 'date':
+            case 'time':
+                // Prevent zero based date placeholders
+                $dateTest = (int) str_replace(['/', '-', ' '], '', $fieldData[$leadField['alias']]);
+                if (!$dateTest) {
+                    // Date placeholder was used so just ignore it to allow import of the field
+                    unset($fieldData[$leadField['alias']]);
+                } else {
+                    if (($timestamp = strtotime($fieldData[$leadField['alias']])) === false) {
+                        $timestamp = null;
+                    }
+                    if ($timestamp) {
+                        switch ($leadField['type']) {
+                            case 'datetime':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d H:i:s', $timestamp)))->format('Y-m-d H:i:s');
+                                break;
+                            case 'date':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('Y-m-d', $timestamp)))->format('Y-m-d');
+                                break;
+                            case 'time':
+                                $fieldData[$leadField['alias']] = (new \DateTime(date('H:i:s', $timestamp)))->format('H:i:s');
+                                break;
+                        }
+                    }
+                }
+                break;
+            case 'multiselect':
+                if (!is_array($fieldData[$leadField['alias']])) {
+                    if (strpos($fieldData[$leadField['alias']], '|') !== false) {
+                        $fieldData[$leadField['alias']] = explode('|', $fieldData[$leadField['alias']]);
+                    } else {
+                        $fieldData[$leadField['alias']] = [$fieldData[$leadField['alias']]];
+                    }
+                }
+                break;
+            case 'number':
+                $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
+                break;
+        }
     }
 }

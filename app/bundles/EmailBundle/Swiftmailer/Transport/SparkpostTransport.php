@@ -258,11 +258,19 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         ];
 
         if (!empty($message['recipients']['cc'])) {
-            $sparkPostMessage['cc'] = array_values($message['recipients']['cc']);
+            foreach ($message['recipients']['cc'] as $cc) {
+                $sparkPostMessage['cc'][] = [
+                    'address' => $cc,
+                ];
+            }
         }
 
         if (!empty($message['recipients']['bcc'])) {
-            $sparkPostMessage['bcc'] = array_values($message['recipients']['bcc']);
+            foreach ($message['recipients']['bcc'] as $bcc) {
+                $sparkPostMessage['bcc'][] = [
+                    'address' => $bcc,
+                ];
+            }
         }
 
         if (!empty($message['attachments'])) {

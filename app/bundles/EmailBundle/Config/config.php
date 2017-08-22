@@ -20,6 +20,10 @@ return [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'MauticEmailBundle:Email:execute',
             ],
+            'mautic_email_contacts' => [
+                'path'       => '/emails/contacts/{objectId}',
+                'controller' => 'MauticEmailBundle:Email:contacts',
+            ],
         ],
         'api' => [
             'mautic_api_emailstandard' => [
@@ -263,6 +267,10 @@ return [
                 'class' => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
                 'alias' => 'email_dashboard_emails_in_time_widget',
             ],
+            'mautic.form.type.email_to_user' => [
+                'class' => Mautic\EmailBundle\Form\Type\EmailToUserType::class,
+                'alias' => 'email_to_user',
+            ],
         ],
         'other' => [
             'mautic.validator.leadlistaccess' => [
@@ -307,7 +315,7 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
                     'setUsername'      => ['%mautic.mailer_user%'],
-                    'setPassword'      => ['%mautic.mailer_password%'],
+                    'setPassword'      => ['%mautic.mailer_api_key%'],
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],

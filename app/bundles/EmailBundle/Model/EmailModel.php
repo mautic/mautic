@@ -34,6 +34,7 @@ use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -1230,12 +1231,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                     // Check to see if failed recipients were stored by the transport
                     if (!empty($sendFailures['failures'])) {
-                        $failures = $sendFailures;
+                        $failedEmailAddresses = $sendFailures['failures'];
                         unset($sendFailures['failures']);
                         $error = implode('; ', $sendFailures);
 
                         // Prevent the stat from saving
-                        foreach ($failures as $failedEmail) {
+                        foreach ($failedEmailAddresses as $failedEmail) {
                             /** @var Stat $stat */
                             $stat = $statEntities[$failedEmail];
                             // Add lead ID to list of failures
@@ -1243,7 +1244,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                             $errorMessages[$stat->getLead()->getId()] = $error;
                             // Down sent counts
                             $emailId = $stat->getEmail()->getId();
-                            ++$emailSentCounts[$emailId];
+                            --$emailSentCounts[$emailId];
 
                             if ($stat->getId()) {
                                 $deleteEntities[] = $stat;
@@ -1466,33 +1467,45 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead(s).
      *
-     * @param       $email
-     * @param       $users
-     * @param mixed $lead
-     * @param array $tokens
-     * @param array $assetAttachments
-     * @param bool  $saveStat
+     * @param Email     $email
+     * @param array|int $users
+     * @param array     $lead
+     * @param array     $tokens
+     * @param array     $assetAttachments
+     * @param bool      $saveStat
+     * @param array     $to
+     * @param array     $cc
+     * @param array     $bcc
      *
      * @return mixed
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmailToUser($email, $users, $lead = null, $tokens = [], $assetAttachments = [], $saveStat = true)
-    {
+    public function sendEmailToUser(
+        Email $email,
+        $users,
+        array $lead = null,
+        array $tokens = [],
+        array $assetAttachments = [],
+        $saveStat = true,
+        array $to = [],
+        array $cc = [],
+        array $bcc = []
+    ) {
         if (!$emailId = $email->getId()) {
             return false;
         }
 
+        // In case only user ID was provided
         if (!is_array($users)) {
-            $user  = ['id' => $users];
-            $users = [$user];
+            $users = [['id' => $users]];
         }
 
-        //get email settings
+        // Get email settings
         $emailSettings = &$this->getEmailSettings($email, false);
 
-        //noone to send to so bail
-        if (empty($users)) {
+        // No one to send to so bail
+        if (empty($users) && empty($to)) {
             return false;
         }
 
@@ -1500,8 +1513,34 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
+        $mailer->setCc($cc);
+        $mailer->setBcc($bcc);
 
         $errors = [];
+
+        foreach ($to as $toAddress) {
+            $idHash = uniqid();
+            $mailer->setIdHash($idHash, $saveStat);
+
+            if (!$mailer->addTo($toAddress)) {
+                $errors[] = "{$toAddress}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
+            } else {
+                if (!$mailer->queue(true)) {
+                    $errorArray = $mailer->getErrors();
+                    unset($errorArray['failures']);
+                    $errors[] = "{$toAddress}: ".implode('; ', $errorArray);
+                }
+
+                if ($saveStat) {
+                    $saveEntities[] = $mailer->createEmailStat(false, $toAddress);
+                }
+
+                // Clear CC and BCC to do not duplicate the send several times
+                $mailer->setCc([]);
+                $mailer->setBcc([]);
+            }
+        }
+
         foreach ($users as $user) {
             $idHash = uniqid();
             $mailer->setIdHash($idHash, $saveStat);
@@ -1532,6 +1571,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 if ($saveStat) {
                     $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
                 }
+
+                // Clear CC and BCC to do not duplicate the send several times
+                $mailer->setCc([]);
+                $mailer->setBcc([]);
             }
         }
 
@@ -1550,6 +1593,35 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         unset($mailer);
 
         return $errors;
+    }
+
+    /**
+     * Dispatches EmailSendEvent so you could get tokens form it or tokenized content.
+     *
+     * @param Email  $email
+     * @param array  $leadFields
+     * @param string $idHash
+     * @param array  $tokens
+     *
+     * @return EmailSendEvent
+     */
+    public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = [])
+    {
+        $event = new EmailSendEvent(
+            null,
+            [
+                'content'      => $email->getCustomHtml(),
+                'email'        => $email,
+                'idHash'       => $idHash,
+                'tokens'       => $tokens,
+                'internalSend' => true,
+                'lead'         => $leadFields,
+            ]
+        );
+
+        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+
+        return $event;
     }
 
     /**

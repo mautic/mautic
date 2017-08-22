@@ -54,9 +54,12 @@ class SugarcrmApi extends CrmApi
                 return $response;
             }
         } else {
-            $request_url                 = sprintf('%s/rest/v10/%s', $tokenData['sugarcrm_url'], $sMethod);
-            $settings['request_timeout'] = 50;
-            $response                    = $this->integration->makeRequest($request_url, $data, $method, $settings);
+            $request_url = sprintf('%s/rest/v10/%s', $tokenData['sugarcrm_url'], $sMethod);
+            $settings    = [
+                'request_timeout'   => 50,
+                'encode_parameters' => 'json',
+            ];
+            $response = $this->integration->makeRequest($request_url, $data, $method, $settings);
 
             if (isset($response['error'])) {
                 throw new ApiErrorException(isset($response['error_message']) ? $response['error_message'] : $response['error']['message'], ($response['error'] == 'invalid_grant') ? 1 : 500);
@@ -122,7 +125,7 @@ class SugarcrmApi extends CrmApi
             //if not found then go ahead and make an API call to find all the records with that email
             if (isset($fields['email1']) && empty($sugarLeadRecords)) {
                 $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
-                $sugarLeadRecords = $sLeads['entry_list'];
+                $sugarLeadRecords = isset($sLeads['entry_list']) ? $sLeads['entry_list'] : [];
             }
             $leadFields = [];
             foreach ($fields as $name => $value) {
@@ -171,11 +174,18 @@ class SugarcrmApi extends CrmApi
                     $sugarLeadId = (isset($sLeadRecord['integration_entity_id']) ? $sLeadRecord['integration_entity_id'] : $sLeadRecord['id']);
                     $sugarObject = (isset($sLeadRecord['integration_entity']) ? $sLeadRecord['integration_entity'] : 'Leads');
                     //update the converted contact if found and not the Lead
+                    $config                = $this->integration->mergeConfigToFeatureSettings();
+                    $fieldsToUpdateInSugar = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
+
                     if (isset($sLeadRecord['contact_id']) && $sLeadRecord['contact_id'] != null && $sLeadRecord['contact_id'] != '') {
                         unset($fields['Company']); //because this record is not in the Contact object
-                        $createdLeadData[] = $this->request("Contacts/$sugarLeadId", $fields, 'PUT', 'Contacts');
+                        $fieldsToUpdateInContactsSugar = $this->integration->cleanSugarData($config, $fieldsToUpdateInSugar, 'Contacts');
+                        $contactSugarFields            = array_diff_key($fields, $fieldsToUpdateInContactsSugar);
+                        $createdLeadData[]             = $this->request("Contacts/$sugarLeadId", $contactSugarFields, 'PUT', 'Contacts');
                     } else {
-                        $createdLeadData[] = $this->request("$sugarObject/$sugarLeadId", $fields, 'PUT', $sugarObject);
+                        $fieldsToUpdateInLeadsSugar = $this->integration->cleanSugarData($config, $fieldsToUpdateInSugar, 'Leads');
+                        $leadSugarFields            = array_diff_key($fields, $fieldsToUpdateInLeadsSugar);
+                        $createdLeadData[]          = $this->request("$sugarObject/$sugarLeadId", $leadSugarFields, 'PUT', $sugarObject);
                     }
                 }
             } else {
