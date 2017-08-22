@@ -61,17 +61,16 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'asset.download';
         $eventTypeName = $this->translator->trans('mautic.asset.event.download');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('assetList');
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\AssetBundle\Entity\DownloadRepository $downloadRepository */
         $downloadRepository = $this->em->getRepository('MauticAssetBundle:Download');
-        $downloads          = $downloadRepository->getLeadDownloads($lead->getId(), $event->getQueryOptions());
+        $downloads          = $downloadRepository->getLeadDownloads($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $downloads);
@@ -84,6 +83,7 @@ class LeadSubscriber extends CommonSubscriber
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$download['download_id'],
                         'eventLabel' => [
                             'label' => $download['title'],
                             'href'  => $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $download['asset_id']]),
@@ -96,6 +96,7 @@ class LeadSubscriber extends CommonSubscriber
                         'timestamp'       => $download['dateDownload'],
                         'icon'            => 'fa-download',
                         'contentTemplate' => 'MauticAssetBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contactId'       => $download['lead_id'],
                     ]
                 );
             }

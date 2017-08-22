@@ -213,3 +213,12 @@ function getTotal($a, $f, $t, $allrows, $ac)
     </div>
 </div>
 <?php endif; ?>
+<script>
+    mQuery(document).ready(function() {
+        mQuery('.datetimepicker').datetimepicker({
+            format:'Y-m-d H:i:s',
+            closeOnDateSelect: true,
+            validateOnBlur: false
+        });
+    });
+</script>

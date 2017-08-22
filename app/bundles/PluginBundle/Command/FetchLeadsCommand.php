@@ -152,7 +152,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         $output->writeln('');
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                         $contactList = [];
-                        $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, 'Contact');
+                        $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, $contactObjectName);
                         if (is_array($results)) {
                             list($justUpdated, $justCreated) = $results;
                             $updated += (int) $justUpdated;

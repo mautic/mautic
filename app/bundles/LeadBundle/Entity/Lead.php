@@ -279,8 +279,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->build();
 
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
-            ->cascadeDetach()
-            ->cascadeMerge()
+            ->fetchLazy()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
 

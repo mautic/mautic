@@ -1230,12 +1230,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                     // Check to see if failed recipients were stored by the transport
                     if (!empty($sendFailures['failures'])) {
-                        $failures = $sendFailures;
+                        $failedEmailAddresses = $sendFailures['failures'];
                         unset($sendFailures['failures']);
                         $error = implode('; ', $sendFailures);
 
                         // Prevent the stat from saving
-                        foreach ($failures as $failedEmail) {
+                        foreach ($failedEmailAddresses as $failedEmail) {
                             /** @var Stat $stat */
                             $stat = $statEntities[$failedEmail];
                             // Add lead ID to list of failures
@@ -1243,7 +1243,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                             $errorMessages[$stat->getLead()->getId()] = $error;
                             // Down sent counts
                             $emailId = $stat->getEmail()->getId();
-                            ++$emailSentCounts[$emailId];
+                            --$emailSentCounts[$emailId];
 
                             if ($stat->getId()) {
                                 $deleteEntities[] = $stat;

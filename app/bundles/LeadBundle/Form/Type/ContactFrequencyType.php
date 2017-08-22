@@ -176,7 +176,19 @@ class ContactFrequencyType extends AbstractType
             }
         }
 
-        if (!$options['public_view'] || $showContactSegments) {
+        if (!$options['public_view']) {
+            $builder->add(
+                'lead_lists',
+                'leadlist_choices',
+                [
+                    'label'      => 'mautic.lead.form.list',
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => true,
+                    'expanded'   => $options['public_view'],
+                    'required'   => false,
+                ]
+            );
+        } elseif ($showContactSegments) {
             $builder->add(
                 'lead_lists',
                 'leadlist_choices',

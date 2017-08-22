@@ -35,9 +35,13 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
      * @param         $template
      * @param array   $vars
      */
-    public function __construct(Request $request, $template, array $vars = [])
+    public function __construct(Request $request = null, $template = null, array $vars = [])
     {
         parent::__construct($request);
+
+        if (empty($template)) {
+            throw new \InvalidArgumentException('$template is required');
+        }
 
         $this->template = $template;
         $this->vars     = $vars;
