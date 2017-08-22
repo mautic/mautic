@@ -126,37 +126,61 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function getFormLeadFields($settings = []) {
+        $defaultFields = json_decode(self::INES_DEFAULT_FIELDS_JSON);
 
-        // TODO: display the actual fields
-        $this->getApiHelper()->getLeadFields();
+        $leadFields = [];
 
-        return [
-            'ines_email' => [
-                'label' => 'Email address',
-                'required' => true,
-            ],
-            'ines_firstname' => [
-                'label' => 'First name',
+        foreach ($defaultFields as $f) {
+            if ($f->concept === 'contact') {
+                $leadFields[$f->inesKey] = [
+                    'label' => $f->inesLabel,
+                    'required' => $f->isMappingRequired,
+                ];
+            }
+        }
+
+        $customFields = $this->getApiHelper()->getCustomFields()
+                             ->GetSyncInfoResult
+                             ->ContactCustomFields
+                             ->CustomFieldToAuto;
+
+        foreach ($customFields as $f) {
+            $leadFields['ines_custom_' . $f->InesID] = [
+                'label' => $f->InesName,
                 'required' => false,
-            ],
-            'ines_lastname' => [
-                'label' => 'Last name',
-                'required' => false,
-            ],
-        ];
+            ];
+        }
+
+        return $leadFields;
     }
 
     public function getFormCompanyFields($settings = []) {
-        return [
-            'ines_company_name' => [
-                'label' => 'Company Name',
+        $defaultFields = json_decode(self::INES_DEFAULT_FIELDS_JSON);
+
+        $companyFields = [];
+
+        foreach ($defaultFields as $f) {
+            if ($f->concept === 'client') {
+                $companyFields[$f->inesKey] = [
+                    'label' => $f->inesLabel,
+                    'required' => $f->isMappingRequired,
+                ];
+            }
+        }
+
+        $customFields = $this->getApiHelper()->getCustomFields()
+                             ->GetSyncInfoResult
+                             ->CompanyCustomFields
+                             ->CustomFieldToAuto;
+
+        foreach ($customFields as $f) {
+            $companyFields['ines_custom_' . $f->InesID] = [
+                'label' => $f->InesName,
                 'required' => false,
-            ],
-            'ines_company_address' => [
-                'label' => 'Company Address',
-                'required' => false,
-            ],
-        ];
+            ];
+        }
+
+        return $companyFields;
     }
 
     public function appendToForm(&$builder, $data, $formArea)
@@ -176,4 +200,623 @@ class InesCRMIntegration extends CrmAbstractIntegration
             ]);
         }
     }
+
+    const INES_DEFAULT_FIELDS_JSON = <<<'JSON'
+        [
+            {
+                "concept": "contact",
+                "inesKey": "InternalContactRef",
+                "inesLabel": "INES reference (contact)",
+                "isCustomField": false,
+                "isMappingRequired": true,
+                "autoMapping": "ines_contact_ref",
+                "excludeFromEcrasableConfig": true,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_ref",
+                    "type": "number"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "InternalCompanyRef",
+                "inesLabel": "INES reference (soci\u00e9t\u00e9)",
+                "isCustomField": false,
+                "isMappingRequired": true,
+                "autoMapping": "ines_client_ref",
+                "excludeFromEcrasableConfig": true,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_ref",
+                    "type": "number"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "PrimaryMailAddress",
+                "inesLabel": "Primary Email Address",
+                "isCustomField": false,
+                "isMappingRequired": true,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": true,
+                "mauticCustomFieldToCreate": false
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Genre",
+                "inesLabel": "Genre (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_civilite"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "LastName",
+                "inesLabel": "Last name (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": "lastname",
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": false
+            },
+            {
+                "concept": "contact",
+                "inesKey": "FirstName",
+                "inesLabel": "First name (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": "firstname",
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": false
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Function",
+                "inesLabel": "Function (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_fonction"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Type",
+                "inesLabel": "Type (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_type",
+                    "type": "select",
+                    "valuesFromWS": "GetTypeContactList",
+                    "firstValueAsDefault": true
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Service",
+                "inesLabel": "Service (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_service"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "BussinesTelephone",
+                "inesLabel": "Business phone (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_tel_bureau",
+                    "type": "tel"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "HomeTelephone",
+                "inesLabel": "Home phone (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_tel_domicile",
+                    "type": "tel"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "MobilePhone",
+                "inesLabel": "Mobile mobile (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_tel_mobile",
+                    "type": "tel"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Fax",
+                "inesLabel": "Fax (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_fax",
+                    "type": "tel"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "HomeAddress",
+                "inesLabel": "Address 1 (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_adr1"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "BusinessAddress",
+                "inesLabel": "Address 2 (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_adr2"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "ZipCode",
+                "inesLabel": "Zip code (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_cp"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "City",
+                "inesLabel": "City (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_ville"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "State",
+                "inesLabel": "State (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_region"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Country",
+                "inesLabel": "Country (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_pays"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Language",
+                "inesLabel": "Language (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_lang"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Author",
+                "inesLabel": "Author (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_resp",
+                    "type": "select",
+                    "valuesFromWS": "GetUserInfoFromUserRef"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Comment",
+                "inesLabel": "Comment (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_remarque"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Confidentiality",
+                "inesLabel": "Confidentiality (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_diffusion",
+                    "type": "select",
+                    "values": {
+                        "-1": "lecture seule",
+                        "0": "lecture \/ \u00e9criture",
+                        "1": "confidentiel"
+                    }
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "DateOfBirth",
+                "inesLabel": "Date of birth (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_birthday",
+                    "type": "date"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "Rang",
+                "inesLabel": "Rang (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_etat",
+                    "type": "select",
+                    "values": [
+                        "secondaire",
+                        "principal",
+                        "archiv\u00e9"
+                    ]
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "SecondaryMailAddress",
+                "inesLabel": "Secondary email (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_email2"
+                }
+            },
+            {
+                "concept": "contact",
+                "inesKey": "NPai",
+                "inesLabel": "NPAI (contact)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": "ines_contact_npai",
+                "excludeFromEcrasableConfig": true,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_contact_npai",
+                    "type": "boolean"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "CompanyName",
+                "inesLabel": "Company name",
+                "isCustomField": false,
+                "isMappingRequired": true,
+                "autoMapping": "company",
+                "excludeFromEcrasableConfig": true,
+                "mauticCustomFieldToCreate": false
+            },
+            {
+                "concept": "client",
+                "inesKey": "Type",
+                "inesLabel": "Type (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_type",
+                    "type": "select",
+                    "valuesFromWS": "GetTypeClientList",
+                    "firstValueAsDefault": true
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Manager",
+                "inesLabel": "Manager (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_resp_dossier",
+                    "type": "select",
+                    "valuesFromWS": "GetUserInfoFromUserRef"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "SalesResponsable",
+                "inesLabel": "Sales responsable (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_commercial",
+                    "type": "select",
+                    "valuesFromWS": "GetUserInfoFromRHRef"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "TechnicalResponsable",
+                "inesLabel": "Technical responsable (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_resp_tech",
+                    "type": "select",
+                    "valuesFromWS": "GetUserInfoFromUserRef"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Phone",
+                "inesLabel": "Phone (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_tel",
+                    "type": "tel"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Fax",
+                "inesLabel": "Fax (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_fax",
+                    "type": "tel"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Address1",
+                "inesLabel": "Address 1 (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_adr1"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Address2",
+                "inesLabel": "Address 2 (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_adr2"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "ZipCode",
+                "inesLabel": "Zip code (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_cp"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "City",
+                "inesLabel": "City (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_ville"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "State",
+                "inesLabel": "State (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_region"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Country",
+                "inesLabel": "Country (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_pays"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Origin",
+                "inesLabel": "Origin (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_origine",
+                    "type": "select",
+                    "valuesFromWS": "GetOriginList"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Website",
+                "inesLabel": "Website (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_site_web",
+                    "type": "url"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Confidentiality",
+                "inesLabel": "Confidentiality (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_diffusion",
+                    "type": "select",
+                    "values": {
+                        "-1": "lecture seule",
+                        "0": "lecture \/ \u00e9criture",
+                        "1": "confidentiel"
+                    }
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Comments",
+                "inesLabel": "Comments (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_remarque"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "CustomerNumber",
+                "inesLabel": "Customer number (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_num_client",
+                    "type": "number"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Language",
+                "inesLabel": "Language (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_lang"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Activity",
+                "inesLabel": "Activity (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_activite"
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "Scoring",
+                "inesLabel": "Scoring (company)",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                    "alias": "ines_client_score"
+                }
+            }
+        ]
+JSON;
 }
