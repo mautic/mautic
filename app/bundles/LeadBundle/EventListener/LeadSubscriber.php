@@ -87,7 +87,7 @@ class LeadSubscriber extends CommonSubscriber
                 return;
             }
 
-            $check = base64_encode($lead->getId().serialize($details));
+            $check = base64_encode($lead->getId().md5(json_encode($details)));
             if (!in_array($check, $preventLoop)) {
                 $preventLoop[] = $check;
 
