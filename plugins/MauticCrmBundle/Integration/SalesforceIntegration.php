@@ -835,8 +835,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                         // Extract a list of lead Ids
                         $leadIds = [];
+                        $sfIds   = [];
                         foreach ($salesForceIds as $ids) {
                             $leadIds[] = $ids['internal_entity_id'];
+                            $sfIds[]   = $ids['integration_entity_id'];
                         }
 
                         // Collect lead activity for this batch
@@ -845,6 +847,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             $endDate,
                             $leadIds
                         );
+
+                        $this->logger->debug('SALESFORCE: Syncing activity for '.count($leadActivity).' contacts ('.implode(', ', array_keys($leadActivity)).')');
+                        $this->logger->debug('SALESFORCE: Syncing activity for '.var_export($sfIds, true));
 
                         $salesForceLeadData = [];
                         foreach ($salesForceIds as $ids) {
@@ -859,11 +864,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     ['integration' => 'Salesforce', 'leadId' => $leadId],
                                     UrlGeneratorInterface::ABSOLUTE_URL
                                 );
+                            } else {
+                                $this->logger->debug('SALESFORCE: No activity found for contact ID '.$leadId);
                             }
                         }
 
                         if (!empty($salesForceLeadData)) {
                             $apiHelper->createLeadActivity($salesForceLeadData, $object);
+                        } else {
+                            $this->logger->debug('SALESFORCE: No contact activity to sync');
                         }
 
                         // Get the next batch
@@ -922,10 +931,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
         unset($results);
 
         /** @var EmailModel $emailModel */
-        $emailModel = $this->factory->getModel('email');
-        $emailRepo  = $emailModel->getStatRepository();
-        $results    = $emailRepo->getLeadStats(null, $options);
-        $emailStats = [];
+        $emailModel            = $this->factory->getModel('email');
+        $emailRepo             = $emailModel->getStatRepository();
+        $emailOptions          = $options;
+        $emailOptions['state'] = 'read';
+        $results               = $emailRepo->getLeadStats(null, $emailOptions);
+        $emailStats            = [];
         foreach ($results as $result) {
             if (!isset($emailStats[$result['lead_id']])) {
                 $emailStats[$result['lead_id']] = [];
@@ -1266,15 +1277,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getCampaigns()
     {
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-        $campaigns         = [];
+        $campaigns = [];
         try {
             $campaigns = $this->getApiHelper()->getCampaigns();
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
-            if (!$silenceExceptions) {
-                throw $e;
-            }
         }
 
         return $campaigns;
@@ -1470,15 +1477,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getCampaignMemberStatus($campaignId)
     {
-        $silenceExceptions    = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
         $campaignMemberStatus = [];
         try {
             $campaignMemberStatus = $this->getApiHelper()->getCampaignMemberStatus($campaignId);
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
-            if (!$silenceExceptions) {
-                throw $e;
-            }
         }
 
         return $campaignMemberStatus;

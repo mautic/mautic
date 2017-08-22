@@ -60,6 +60,12 @@ return [
                     'mautic.citrix.model.citrix',
                 ],
             ],
+            'mautic.citrix.stats.subscriber' => [
+                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.fieldslist.citrixlist' => [

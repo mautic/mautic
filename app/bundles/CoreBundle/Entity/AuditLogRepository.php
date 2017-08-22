@@ -68,35 +68,42 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $options
+     * @param Lead|null $lead
+     * @param array     $options
      *
      * @return array
      */
-    public function getLeadIpLogs(Lead $lead, array $options = [])
+    public function getLeadIpLogs(Lead $lead = null, array $options = [])
     {
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sqb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
-        $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
-
         $sqb
-            ->select('MAX(l.date_added) as date_added, l.ip_address')
+            ->select('MAX(l.date_added) as date_added, MIN(l.id) as id, l.ip_address, l.object_id as lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'audit_log', 'l')
             ->where(
                 $sqb->expr()->andX(
                     $sqb->expr()->eq('l.bundle', $sqb->expr()->literal('lead')),
                     $sqb->expr()->eq('l.object', $sqb->expr()->literal('lead')),
-                    $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded')),
-                    $sqb->expr()->eq('l.object_id', $lead->getId()),
-                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getUtcTimestamp()))
+                    $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded'))
                 )
             )
             ->groupBy('l.ip_address');
 
+        if ($lead instanceof Lead) {
+            // Just a check to ensure reused IDs (happens with innodb) doesn't infect data
+            $dt = new DateTimeHelper($lead->getDateAdded(), 'Y-m-d H:i:s', 'local');
+
+            $sqb->andWhere(
+                $sqb->expr()->andX(
+                    $sqb->expr()->eq('l.object_id', $lead->getId()),
+                    $sqb->expr()->gte('l.date_added', $sqb->expr()->literal($dt->getUtcTimestamp()))
+                )
+            );
+        }
+
         $qb
-            ->select('ip.date_added, ip.ip_address')
+            ->select('ip.date_added, ip.ip_address, ip.lead_id, ip.id')
             ->from(sprintf('(%s)', $sqb->getSQL()), 'ip');
 
         return $this->getTimelineResults($qb, $options, 'ip.ip_address', 'ip.date_added', [], ['date_added']);

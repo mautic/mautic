@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\EventListener;
+namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonStatsSubscriber;
@@ -34,17 +34,7 @@ class StatsSubscriber extends CommonStatsSubscriber
         $this->addContactRestrictedRepositories(
             $em,
             [
-                'MauticLeadBundle:CompanyChangeLog',
-                'MauticLeadBundle:PointsChangeLog',
-                'MauticLeadBundle:StagesChangeLog',
-                'MauticLeadBundle:CompanyLead',
-                'MauticLeadBundle:LeadCategory',
-                'MauticLeadBundle:LeadDevice',
-                'MauticLeadBundle:LeadEventLog',
-                'MauticLeadBundle:ListLead',
-                'MauticLeadBundle:DoNotContact',
-                'MauticLeadBundle:FrequencyRule',
-                'MauticLeadBundle:UtmTag',
+                'MauticCitrixBundle:CitrixEvent',
             ]
         );
     }
