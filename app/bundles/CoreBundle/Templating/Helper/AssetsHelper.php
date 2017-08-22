@@ -623,11 +623,9 @@ class AssetsHelper
         }
 
         // Insert all link
-        $result = preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
+        return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
             return $links[$match[1] - 1];
         }, $text);
-
-        return $result;
     }
 
     /**
