@@ -43,6 +43,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     use DynamicContentEntityTrait;
 
     /**
+     * @var string
+     */
+    private $ccAddress;
+
+    /**
+     * @var string
+     */
+    private $toAddress;
+
+    /**
      * @var int
      */
     private $id;
@@ -232,6 +242,16 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->nullable()
             ->build();
 
+        $builder->createField('toAddress', 'string')
+            ->columnName('to_address')
+            ->nullable()
+            ->build();
+
+        $builder->createField('ccAddress', 'string')
+            ->columnName('cc_address')
+            ->nullable()
+            ->build();
+
         $builder->createField('fromAddress', 'string')
             ->columnName('from_address')
             ->nullable()
@@ -347,33 +367,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             )
         );
 
-        $metadata->addPropertyConstraint(
-            'fromAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'replyToAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'bccAddress',
-            new \Symfony\Component\Validator\Constraints\Email(
-                [
-                    'message' => 'mautic.core.email.required',
-                ]
-            )
-        );
-
         $metadata->addConstraint(new Callback([
             'callback' => function (Email $email, ExecutionContextInterface $context) {
                 $type = $email->getEmailType();
@@ -441,6 +434,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             )
             ->addProperties(
                 [
+                    'toAddress',
+                    'ccAddress',
                     'fromAddress',
                     'fromName',
                     'replyToAddress',
@@ -702,6 +697,46 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setFromAddress($fromAddress)
     {
         $this->fromAddress = $fromAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getToAddress()
+    {
+        return $this->toAddress;
+    }
+
+    /**
+     * @param $toAddress
+     *
+     * @return Email
+     */
+    public function setToAddress($toAddress)
+    {
+        $this->toAddress = $toAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCcAddress()
+    {
+        return $this->ccAddress;
+    }
+
+    /**
+     * @param $ccAddress
+     *
+     * @return $this
+     */
+    public function setCcAddress($ccAddress)
+    {
+        $this->ccAddress = $ccAddress;
 
         return $this;
     }
