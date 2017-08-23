@@ -29,6 +29,7 @@
         <server name="DB_PASSWD" value="" />
         <server name="DB_NAME" value="mautictest" />
         <const name="MAUTIC_TABLE_PREFIX" value="" />
+        <const name="MAUTIC_ENV" value="test" />
     </php>
 
     <filter>
