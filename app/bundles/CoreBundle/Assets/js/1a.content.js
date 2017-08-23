@@ -313,6 +313,18 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateDateTimeInputs(this, 'time');
     });
 
+    // Initialize callback options
+    mQuery(container + " *[data-onload-callback]").each(function() {
+        var callback = function(el) {
+            if (typeof window["Mautic"][mQuery(el).attr('data-onload-callback')] == 'function') {
+                window["Mautic"][mQuery(el).attr('data-onload-callback')].apply('window', [el]);
+            }
+        }
+
+        mQuery(document).ready(callback(this));
+    });
+
+
     mQuery(container + " input[data-toggle='color']").each(function() {
         Mautic.activateColorPicker(this);
     });
