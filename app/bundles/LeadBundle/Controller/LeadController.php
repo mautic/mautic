@@ -1320,8 +1320,7 @@ class LeadController extends FormController
 
                         $mailer->setFrom(
                             $email['from'],
-                            empty($email['fromname']) ? null : $email['fromname'],
-                            true
+                            empty($email['fromname']) ? null : $email['fromname']
                         );
 
                         // Set Content
