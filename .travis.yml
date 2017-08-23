@@ -14,8 +14,8 @@ before_install:
   # Create mautictest database
   - mysql -e 'CREATE DATABASE mautictest;'
 
-  # turn off XDebug
-  - phpenv config-rm xdebug.ini || return
+  # turn off XDebug for everything except 7.1
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} != "7.1" ]]; then phpenv config-rm xdebug.ini || return; fi
 
   # install dependencies in parallel
   - travis_retry composer global require hirak/prestissimo
@@ -37,3 +37,6 @@ script:
   # Check if the code standards weren't broken.
   # Run it only on PHP 7.1 which should be the fastest. No need to run it for all PHP versions
   - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then bin/php-cs-fixer fix -v --dry-run --diff; fi
+
+after_success:
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} == "7.1" ]]; then travis_retry php bin/coveralls -x build/clover.xml; fi

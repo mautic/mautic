@@ -31,6 +31,9 @@
 /vendor/*
 !/vendor/.htaccess
 
+/build/clover.xml
+/build/coveralls-upload.json
+
 /bin/*
 /bundles
 /node_modules
