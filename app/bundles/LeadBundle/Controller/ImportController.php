@@ -45,6 +45,47 @@ class ImportController extends FormController
     }
 
     /**
+     * Get items for index list.
+     *
+     * @param $start
+     * @param $limit
+     * @param $filter
+     * @param $orderBy
+     * @param $orderByDir
+     * @param $args
+     *
+     * @return array
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    {
+        $object = $this->get('session')->get('mautic.import.object');
+        $model  = $this->getModel($this->getModelName());
+
+        $filter['force'][] = [
+            'column' => $model->getRepository()->getTableAlias().'.object',
+            'expr'   => 'eq',
+            'value'  => $object,
+        ];
+
+        $items = $model->getEntities(
+            array_merge(
+                [
+                    'start'      => $start,
+                    'limit'      => $limit,
+                    'filter'     => $filter,
+                    'orderBy'    => $orderBy,
+                    'orderByDir' => $orderByDir,
+                ],
+                $args
+            )
+        );
+
+        $count = count($items);
+
+        return [$count, $items];
+    }
+
+    /**
      * @param $objectId
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response

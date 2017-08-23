@@ -899,7 +899,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $repo  = $model->getRepository();
 
         if (!$permissions[$this->getPermissionBase().':viewother']) {
-            $filter['force'] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+            $filter['force'][] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
