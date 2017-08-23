@@ -578,7 +578,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturnCallback(
                 function () {
-                    $args   = func_get_args();
+                    $args = func_get_args();
                     $emails = array_column($args[1], 'email');
 
                     return $this->getSalesforceObjects($emails, 0, 1);
@@ -605,7 +605,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                         'company'                           => 'Contact1',
                         'email'                             => 'Contact1@sftest.com',
                         'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
-                        'mauticContactIsContactableByEmail' => 0
+                        'mauticContactIsContactableByEmail' => 0,
 
                     ],
                     'contact2@sftest.com' => [
@@ -618,7 +618,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                         'company'                           => 'Contact2',
                         'email'                             => 'Contact2@sftest.com',
                         'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
-                        'mauticContactIsContactableByEmail' => 0
+                        'mauticContactIsContactableByEmail' => 0,
                     ],
                 ],
                 'FirstName,LastName,Email'
