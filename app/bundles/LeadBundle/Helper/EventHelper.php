@@ -45,7 +45,9 @@ class EventHelper
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $factory->getModel('lead');
-        $lead      = $leadModel->getCurrentLead();
+        if (!$lead = $leadModel->getCurrentLead()) {
+            return;
+        }
 
         $queryReferer = [];
 

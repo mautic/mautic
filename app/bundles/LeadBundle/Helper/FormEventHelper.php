@@ -76,17 +76,22 @@ class FormEventHelper
         }
     }
 
+    /**
+     * @param $action
+     * @param $factory
+     */
     public static function scoreContactsCompanies($action, $factory)
     {
         $properties = $action->getProperties();
 
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $factory->getModel('lead');
-        $lead      = $leadModel->getCurrentLead();
-        $score     = $properties['score'];
+        if ($lead = $leadModel->getCurrentLead()) {
+            $score = $properties['score'];
 
-        if (!empty($score)) {
-            $leadModel->scoreContactsCompany($lead, $score);
+            if (!empty($score)) {
+                $leadModel->scoreContactsCompany($lead, $score);
+            }
         }
     }
 }

@@ -99,6 +99,16 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $integrationHelper = $container->get('mautic.helper.integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
+
+            if (!$integrationObject->isAuthorized()) {
+                $output->writeln(sprintf('<error>ERROR:</error> <info>'.$translator->trans('mautic.plugin.command.notauthorized').'</info>', $integration));
+
+                return null;
+            }
+
+            // Tell audit log to use integration name
+            define('MAUTIC_AUDITLOG_USER', $integration);
+
             $config            = $integrationObject->mergeConfigToFeatureSettings();
             $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
@@ -152,7 +162,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                         $output->writeln('');
                         $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.contacts.starting').'</comment>');
                         $contactList = [];
-                        $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, 'Contact');
+                        $results     = $integrationObject->getLeads($params, null, $contactsExecuted, $contactList, $contactObjectName);
                         if (is_array($results)) {
                             list($justUpdated, $justCreated) = $results;
                             $updated += (int) $justUpdated;

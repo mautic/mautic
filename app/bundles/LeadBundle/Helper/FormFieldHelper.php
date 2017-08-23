@@ -243,20 +243,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
             '+P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
         ];
 
-        $daysOptions = [];
-        for ($dayInterval = 2; $dayInterval <= 31; ++$dayInterval) {
-            $daysOptions['+P'.$dayInterval.'D'] = '+ '.$dayInterval.' days';
-        }
-
-        $options = array_merge($options, $daysOptions);
-
-        $beforeDaysOptions = [];
-        for ($dayInterval = 2; $dayInterval <= 31; ++$dayInterval) {
-            $beforeDaysOptions['-P'.$dayInterval.'D'] = $dayInterval.' days before';
-        }
-
-        $options = array_merge($options, $beforeDaysOptions);
-
         return $options;
     }
 }

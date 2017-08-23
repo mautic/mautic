@@ -103,7 +103,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0];
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $leadField = InputHelper::alphanum($request->query->get('field'));
+        $leadField = InputHelper::alphanum($request->query->get('field'), false, false, ['_']);
         if (!empty($leadField)) {
             if (strpos($leadField, 'company') === 0) {
                 $results = $this->getModel('lead.company')->getLookupResults('companyfield', [$leadField, $filter]);
@@ -763,7 +763,7 @@ class AjaxController extends CommonAjaxController
         $alias     = InputHelper::clean($request->request->get('alias'));
         $operator  = InputHelper::clean($request->request->get('operator'));
         $changed   = InputHelper::clean($request->request->get('changed'));
-        $dataArray = ['success' => 0, 'options' => null, 'operators' => null, 'disabled' => false];
+        $dataArray = ['success' => 0, 'options' => null, 'optionsAttr' => [], 'operators' => null, 'disabled' => false];
         $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
 
         if ($leadField) {
@@ -800,6 +800,16 @@ class AjaxController extends CommonAjaxController
                             $fieldHelper = new FormFieldHelper();
                             $fieldHelper->setTranslator($this->get('translator'));
                             $options = $fieldHelper->getDateChoices();
+                            $options = array_merge(
+                                [
+                                    'custom' => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),
+                                ],
+                                $options
+                            );
+
+                            $dataArray['optionsAttr']['custom'] = [
+                                'data-custom' => 1,
+                            ];
                         }
                         break;
                     default:
