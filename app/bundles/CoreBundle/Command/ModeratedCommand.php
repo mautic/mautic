@@ -51,9 +51,9 @@ abstract class ModeratedCommand extends ContainerAwareCommand
             ->addOption(
                 '--lock_mode',
                 '-x',
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Force use of PID or FILE LOCK for semaphore. Allowed value are "pid" or "file_lock". By default, lock will try with pid, if not available will use file system',
-                null
+                'pid'
             );
     }
 
@@ -67,6 +67,13 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     {
         $this->output         = $output;
         $this->lockExpiration = $input->getOption('timeout');
+        $lockMode             = $input->getOption('lock_mode');
+
+        if (!in_array($lockMode, ['pid', 'file_lock'])) {
+            $output->writeln('<error>Unknown locking method specified.</error>');
+
+            return false;
+        }
 
         // Allow multiple runs of the same command if executing different IDs, etc
         $this->moderationKey = $this->getName().$moderationKey;
@@ -89,7 +96,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         );
 
         // Check if the command is currently running
-        if (!$this->checkStatus($input->getOption('force'), $input->getOption('lock_mode'))) {
+        if (!$this->checkStatus($input->getOption('force'), $lockMode)) {
             $output->writeln('<error>Script in progress. Can force execution by using --force.</error>');
 
             return false;
