@@ -72,12 +72,14 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $leadFields = $config['leadFields'];
         $mappedData = [];
 
+        $mappedData['AutomationRef'] = $lead->getId();
+
         foreach ($leadFields as $integrationField => $mauticField) {
             $method = 'get' . ucfirst($mauticField);
             $mappedData[$integrationField] = $lead->$method();
         }
 
-        $this->getApiHelper()->createLead($mappedData);
+        $this->getApiHelper()->createLead($mappedData, $lead->getCompany());
     }
 
     public function pushCompany($company, $config = []) {
