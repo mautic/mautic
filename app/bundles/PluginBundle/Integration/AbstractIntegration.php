@@ -1651,7 +1651,8 @@ abstract class AbstractIntegration
         $missingRequiredFields  = [];
 
         // add special case in order to prevent it from being removed
-        $mauticLeadFields['mauticContactTimelineLink'] = '';
+        $mauticLeadFields['mauticContactTimelineLink']         = '';
+        $mauticLeadFields['mauticContactIsContactableByEmail'] = '';
 
         //make sure now non-existent aren't saved
         $settings = [
@@ -1811,6 +1812,11 @@ abstract class AbstractIntegration
             if (isset($leadFields[$integrationKey])) {
                 if ('mauticContactTimelineLink' === $leadFields[$integrationKey]) {
                     $matched[$integrationKey] = $this->getContactTimelineLink($leadId);
+
+                    continue;
+                }
+                if ('mauticContactIsContactableByEmail' === $leadFields[$integrationKey]) {
+                    $matched[$integrationKey] = $lead->getDoNotContact();
 
                     continue;
                 }
@@ -2671,5 +2677,29 @@ abstract class AbstractIntegration
         }
 
         return $fields;
+    }
+
+    public function getLeadDonotContact($leadId, $channel = 'email')
+    {
+        $isContactable = 0;
+        $lead          = $this->leadModel->getEntity($leadId);
+        if ($lead) {
+            $isContactableReason = $this->leadModel->isContactable($lead, $channel);
+            if ($isContactableReason === 0) {
+                $isContactable = 1;
+            }
+        }
+
+        return $isContactable;
+    }
+
+    public function getCompoundMauticFields($lead)
+    {
+        if ($lead['internal_entity_id']) {
+            $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);
+            $lead['mauticContactIsContactableByEmail'] = $this->getLeadDonotContact($lead['internal_entity_id']);
+        }
+
+        return $lead;
     }
 }

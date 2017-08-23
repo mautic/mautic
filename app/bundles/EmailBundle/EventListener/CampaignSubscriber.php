@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -56,8 +57,12 @@ class CampaignSubscriber extends CommonSubscriber
      * @param EventModel        $eventModel
      * @param MessageQueueModel $messageQueueModel
      */
-    public function __construct(LeadModel $leadModel, EmailModel $emailModel, EventModel $eventModel, MessageQueueModel $messageQueueModel)
-    {
+    public function __construct(
+        LeadModel $leadModel,
+        EmailModel $emailModel,
+        EventModel $eventModel,
+        MessageQueueModel $messageQueueModel
+    ) {
         $this->leadModel          = $leadModel;
         $this->emailModel         = $emailModel;
         $this->campaignEventModel = $eventModel;
@@ -70,9 +75,12 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
-            EmailEvents::EMAIL_ON_OPEN                => ['onEmailOpen', 0],
-            EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
+            EmailEvents::EMAIL_ON_OPEN              => ['onEmailOpen', 0],
+            EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION => [
+                ['onCampaignTriggerActionSendEmailToContact', 0],
+                ['onCampaignTriggerActionSendEmailToUser', 1],
+            ],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
         ];
     }
@@ -109,6 +117,19 @@ class CampaignSubscriber extends CommonSubscriber
                 'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
                 'channel'         => 'email',
                 'channelIdField'  => 'email',
+            ]
+        );
+
+        $event->addAction(
+            'email.send.to.user',
+            [
+                'label'          => 'mautic.email.campaign.event.send.to.user',
+                'description'    => 'mautic.email.campaign.event.send.to.user_descr',
+                'eventName'      => EmailEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'       => 'email_to_user',
+                'formTheme'      => 'MauticEmailBundle:FormTheme\EmailSendList',
+                'channel'        => 'email',
+                'channelIdField' => 'email',
             ]
         );
     }
@@ -148,69 +169,143 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
+     * Triggers the action which sends email to contact.
+     *
      * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent|null
      */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerActionSendEmailToContact(CampaignExecutionEvent $event)
     {
-        $emailSent                   = false;
-        $lead                        = $event->getLead();
-        $leadCredentials             = ($lead instanceof Lead) ? $lead->getProfileFields() : $lead;
-        $leadCredentials['owner_id'] = (
-            ($lead instanceof Lead) && ($owner = $lead->getOwner())
-        ) ? $owner->getId() : 0;
+        if (!$event->checkContext('email.send')) {
+            return;
+        }
 
-        if (!empty($leadCredentials['email'])) {
-            $config  = $event->getConfig();
-            $emailId = (int) $config['email'];
+        $leadCredentials = $event->getLeadFields();
 
-            $email   = $this->emailModel->getEntity($emailId);
-            $type    = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
-            $options = [
-                'source'         => ['campaign.event', $event->getEvent()['id']],
-                'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
-                'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
-                'email_type'     => $type,
-                'return_errors'  => true,
-                'dnc_as_error'   => true,
-            ];
-
-            $event->setChannel('email', $emailId);
-
-            if ($email != null && $email->isPublished()) {
-                // Determine if this email is transactional/marketing
-                $stats = [];
-                if ('marketing' == $type) {
-                    // Determine if this lead has received the email before
-                    $leadIds   = implode(',', [$leadCredentials['id']]);
-                    $stats     = $this->emailModel->getStatRepository()->checkContactsSentEmail($leadIds, $emailId);
-                    $emailSent = true; // Assume it was sent to prevent the campaign event from getting rescheduled over and over
-                }
-
-                if (empty($stats)) {
-                    $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
-                }
-
-                if (is_array($emailSent)) {
-                    $errors = implode('<br />', $emailSent);
-
-                    // Add to the metadata of the failed event
-                    $emailSent = [
-                        'result' => false,
-                        'errors' => $errors,
-                    ];
-                } elseif (true !== $emailSent) {
-                    $emailSent = [
-                        'result' => false,
-                        'errors' => $emailSent,
-                    ];
-                }
-            } else {
-                return $event->setFailed('Email not found or published');
-            }
-        } else {
+        if (empty($leadCredentials['email'])) {
             return $event->setFailed('Contact does not have an email');
         }
 
+        $config  = $event->getConfig();
+        $emailId = (int) $config['email'];
+        $email   = $this->emailModel->getEntity($emailId);
+
+        if (!$email || !$email->isPublished()) {
+            return $event->setFailed('Email not found or published');
+        }
+
+        $emailSent = false;
+        $type      = (isset($config['email_type'])) ? $config['email_type'] : 'transactional';
+        $options   = [
+            'source'         => ['campaign.event', $event->getEvent()['id']],
+            'email_attempts' => (isset($config['attempts'])) ? $config['attempts'] : 3,
+            'email_priority' => (isset($config['priority'])) ? $config['priority'] : 2,
+            'email_type'     => $type,
+            'return_errors'  => true,
+            'dnc_as_error'   => true,
+        ];
+
+        $event->setChannel('email', $emailId);
+
+        // Determine if this email is transactional/marketing
+        $stats = [];
+        if ('marketing' == $type) {
+            // Determine if this lead has received the email before
+            $leadIds   = implode(',', [$leadCredentials['id']]);
+            $stats     = $this->emailModel->getStatRepository()->checkContactsSentEmail($leadIds, $emailId);
+            $emailSent = true; // Assume it was sent to prevent the campaign event from getting rescheduled over and over
+        }
+
+        if (empty($stats)) {
+            $emailSent = $this->emailModel->sendEmail($email, $leadCredentials, $options);
+        }
+
+        if (is_array($emailSent)) {
+            $errors = implode('<br />', $emailSent);
+
+            // Add to the metadata of the failed event
+            $emailSent = [
+                'result' => false,
+                'errors' => $errors,
+            ];
+        } elseif (true !== $emailSent) {
+            $emailSent = [
+                'result' => false,
+                'errors' => $emailSent,
+            ];
+        }
+
         return $event->setResult($emailSent);
+    }
+
+    /**
+     * Triggers the action which sends email to user, contact owner or specified email addresses.
+     *
+     * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent|null
+     */
+    public function onCampaignTriggerActionSendEmailToUser(CampaignExecutionEvent $event)
+    {
+        if (!$event->checkContext('email.send.to.user')) {
+            return;
+        }
+
+        $config  = $event->getConfig();
+        $emailId = (int) $config['useremail']['email'];
+        $email   = $this->emailModel->getEntity($emailId);
+
+        if (!$email || !$email->isPublished()) {
+            $event->setFailed('Email not found or published');
+
+            return;
+        }
+
+        $transformer     = new ArrayStringTransformer();
+        $leadCredentials = $event->getLeadFields();
+        $toOwner         = empty($config['to_owner']) ? false : $config['to_owner'];
+        $ownerId         = empty($leadCredentials['owner_id']) ? null : $leadCredentials['owner_id'];
+        $userIds         = empty($config['user_id']) ? [] : $config['user_id'];
+        $to              = empty($config['to']) ? [] : $transformer->reverseTransform($config['to']);
+        $cc              = empty($config['cc']) ? [] : $transformer->reverseTransform($config['cc']);
+        $bcc             = empty($config['bcc']) ? [] : $transformer->reverseTransform($config['bcc']);
+        $users           = $this->transformToUserIds($userIds, $ownerId);
+        $idHash          = 'xxxxxxxxxxxxxx'; // bogus ID since it goes to users, not contacts
+        $tokens          = $this->emailModel->dispatchEmailSendEvent($email, $leadCredentials, $idHash)->getTokens();
+        $errors          = $this->emailModel->sendEmailToUser($email, $users, $leadCredentials, $tokens, [], false, $to, $cc, $bcc);
+
+        if ($errors) {
+            $event->setFailed(implode(', ', $errors));
+        }
+
+        return $event->setResult(empty($errors));
+    }
+
+    /**
+     * Transform user IDs and owner ID in format we get them from the campaign
+     * event form to the format the sendEmailToUser expects it.
+     * The owner ID will be added only if it's not already present in the user IDs array.
+     *
+     * @param array $userIds
+     * @param int   $ownerId
+     *
+     * @return array
+     */
+    public function transformToUserIds(array $userIds, $ownerId)
+    {
+        $users = [];
+
+        if ($userIds) {
+            foreach ($userIds as $userId) {
+                $users[] = ['id' => $userId];
+            }
+        }
+
+        if ($ownerId && !in_array($ownerId, $userIds)) {
+            $users[] = ['id' => $ownerId];
+        }
+
+        return $users;
     }
 }

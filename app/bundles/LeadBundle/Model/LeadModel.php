@@ -2496,22 +2496,23 @@ class LeadModel extends FormModel
     /**
      * Get timeline/engagement data.
      *
-     * @param Lead       $lead
+     * @param Lead|null  $lead
      * @param null       $filters
      * @param array|null $orderBy
      * @param int        $page
      * @param int        $limit
+     * @param bool       $forTimeline
      *
      * @return array
      */
-    public function getEngagements(Lead $lead, $filters = null, array $orderBy = null, $page = 1, $limit = 25)
+    public function getEngagements(Lead $lead = null, $filters = null, array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true)
     {
         $event = $this->dispatcher->dispatch(
             LeadEvents::TIMELINE_ON_GENERATE,
-            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit)
+            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->getParameter('site_url'))
         );
 
-        return [
+        $payload = [
             'events'   => $event->getEvents(),
             'filters'  => $filters,
             'order'    => $orderBy,
@@ -2521,6 +2522,8 @@ class LeadModel extends FormModel
             'limit'    => $limit,
             'maxPages' => $event->getMaxPage(),
         ];
+
+        return ($forTimeline) ? $payload : [$payload, $event->getSerializerGroups()];
     }
 
     /**

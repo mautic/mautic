@@ -84,30 +84,28 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Loads data for specified lead events.
      *
-     * @param string $bundle
-     * @param string $object
-     * @param Lead   $lead
-     * @param array  $options
+     * @param string    $bundle
+     * @param string    $object
+     * @param Lead|null $lead
+     * @param array     $options
      *
      * @return array
      */
-    public function getEventsByLead($bundle, $object, Lead $lead, array $options)
+    public function getEventsByLead($bundle, $object, Lead $lead = null, array $options)
     {
-        if (empty($lead)) {
-            return [];
-        }
-
         $alias = $this->getTableAlias();
-
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', $alias)
-            ->where($alias.'.lead_id = :lead')
-            ->setParameter('lead', $lead->getId())
-            ->andWhere($alias.'.bundle = :bundle')
+            ->where($alias.'.bundle = :bundle')
             ->setParameter('bundle', $bundle)
             ->andWhere($alias.'.object = :object')
             ->setParameter('object', $object);
+
+        if ($lead) {
+            $qb->andWhere($alias.'.lead_id = :lead')
+                ->setParameter('lead', $lead->getId());
+        }
 
         if (!empty($options['search'])) {
             $qb->andWhere($qb->expr()->like($alias.'.properties', $qb->expr()->literal('%'.$options['search'].'%')));

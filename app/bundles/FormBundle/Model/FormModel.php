@@ -525,6 +525,7 @@ class FormModel extends CommonFormModel
                 'fieldSettings' => $this->getCustomComponents()['fields'],
                 'fields'        => $fields,
                 'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
                 'form'          => $entity,
                 'theme'         => $theme,
                 'submissions'   => $submissions,
