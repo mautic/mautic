@@ -158,13 +158,13 @@ There are many more ways in which automation can be used throughout Mautic to im
 
 There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. You can choose whether you want to submit your feature to the community as a pull request or whether to build it as a plugin or theme.
 
-Read more about plugins and themes in the [Mautic Developer Docummentation](https://developer.mautic.org).
+Read more about plugins and themes in the [Mautic Developer Documentation](https://developer.mautic.org).
 
 ## Connecting - API, Webhooks
 
 Mautic have a REST API which you can use to connect it with another app. You can use the webhooks to send the updates which happen in Mautic to another app.
 
-Read more about API and webhooks in the [Mautic Developer Docummentation](https://developer.mautic.org).
+Read more about API and webhooks in the [Mautic Developer Documentation](https://developer.mautic.org).
 
 ## Translations
 

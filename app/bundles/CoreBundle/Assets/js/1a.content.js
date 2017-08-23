@@ -96,7 +96,9 @@ Mautic.loadContent = function (route, link, method, target, showPageLoading, cal
  */
 Mautic.generatePageTitle = function(route){
 
-    if( -1 !== route.indexOf('view') ){
+    if (-1 !== route.indexOf('timeline')) {
+        return
+    } else if (-1 !== route.indexOf('view')) {
         //loading view of module title
         var currentModule = route.split('/')[3];
 
@@ -310,6 +312,18 @@ Mautic.onPageLoad = function (container, response, inModal) {
     mQuery(container + " *[data-toggle='time']").each(function() {
         Mautic.activateDateTimeInputs(this, 'time');
     });
+
+    // Initialize callback options
+    mQuery(container + " *[data-onload-callback]").each(function() {
+        var callback = function(el) {
+            if (typeof window["Mautic"][mQuery(el).attr('data-onload-callback')] == 'function') {
+                window["Mautic"][mQuery(el).attr('data-onload-callback')].apply('window', [el]);
+            }
+        }
+
+        mQuery(document).ready(callback(this));
+    });
+
 
     mQuery(container + " input[data-toggle='color']").each(function() {
         Mautic.activateColorPicker(this);
@@ -1190,7 +1204,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
     var format = mQuery(el).data('format');
     if (type == 'datetime') {
         mQuery(el).datetimepicker({
-            format: (format) ? format : 'Y-m-d H:i',
+            format: (format) ? format : 'Y-m-d H:i:s',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,
@@ -1209,7 +1223,7 @@ Mautic.activateDateTimeInputs = function(el, type) {
     } else if (type == 'time') {
         mQuery(el).datetimepicker({
             datepicker: false,
-            format: (format) ? format : 'H:i',
+            format: (format) ? format : 'H:i:s',
             lazyInit: true,
             validateOnBlur: false,
             allowBlank: true,

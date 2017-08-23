@@ -20,7 +20,7 @@ Mautic.emailOnLoad = function (container, response) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
 
         if (mQuery('table.email-list').length) {
-            mQuery('td.col-stats').each(function() {
+            mQuery('td.col-stats').each(function () {
                 var id = mQuery(this).attr('data-stats');
                 // Process the request one at a time or the xhr will cancel the previous
                 Mautic.ajaxActionRequest(
@@ -29,18 +29,18 @@ Mautic.emailOnLoad = function (container, response) {
                     function (response) {
                         if (response.success && mQuery('#sent-count-' + id + ' div').length) {
                             if (response.pending) {
-                                mQuery('#pending-' + id).html(response.pending);
+                                mQuery('#pending-' + id + ' > a').html(response.pending);
                                 mQuery('#pending-' + id).removeClass('hide');
                             }
 
                             if (response.queued) {
-                                mQuery('#queued-' + id).html(response.queued);
+                                mQuery('#queued-' + id + ' > a').html(response.queued);
                                 mQuery('#queued-' + id).removeClass('hide');
                             }
 
-                            mQuery('#sent-count-' + id).html(response.sentCount);
-                            mQuery('#read-count-' + id).html(response.readCount);
-                            mQuery('#read-percent-' + id).html(response.readPercent);
+                            mQuery('#sent-count-' + id + ' > a').html(response.sentCount);
+                            mQuery('#read-count-' + id + ' > a').html(response.readCount);
+                            mQuery('#read-percent-' + id + ' > a').html(response.readPercent);
                         }
                     },
                     false,

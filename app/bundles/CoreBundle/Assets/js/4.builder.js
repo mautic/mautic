@@ -794,9 +794,9 @@ Mautic.sectionBackgroundChanged = function(element, color) {
 Mautic.rgb2hex = function(orig) {
     var rgb = orig.replace(/\s/g,'').match(/^rgba?\((\d+),(\d+),(\d+)/i);
     return (rgb && rgb.length === 4) ? "#" +
-        ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-        ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-        ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
+    ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+    ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+    ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : orig;
 };
 
 Mautic.initSlots = function(slotContainers) {
@@ -1372,6 +1372,8 @@ Mautic.initSlotListeners = function() {
             } else {
                 params.slot.find('img').closest('div').css('text-align', values[params.field.val()]);
             }
+        } else if (fieldParam === 'border-radius') {
+            params.slot.find('a.button').css(fieldParam, params.field.val() + 'px');
         } else if (fieldParam === 'button-size') {
             var bg_clr = params.slot.attr('data-param-background-color');
             var values = [
@@ -1379,7 +1381,7 @@ Mautic.initSlotListeners = function() {
                 {borderWidth: '20px 23px', padding: '0', fontSize: '20px', borderColor : bg_clr, borderStyle: 'solid'},
                 {borderWidth: '25px 40px', padding: '0', fontSize: '30px', borderColor : bg_clr, borderStyle: 'solid'}
             ];
-            params.slot.find('a').css(values[params.field.val()]);
+            params.slot.find('a.button').css(values[params.field.val()]);
         } else if (fieldParam === 'caption-color') {
             params.slot.find('.imagecard-caption').css('background-color', '#' + params.field.val());
         } else if (fieldParam === 'background-color' || fieldParam === 'color') {
@@ -1392,9 +1394,9 @@ Mautic.initSlotListeners = function() {
                     if ('imagecard' === type) {
                         params.slot.find('.imagecard').css(fieldParam, '#' + color);
                     } else {
-                        params.slot.find('a').css(fieldParam, '#' + color);
-                        params.slot.find('a').attr('background', '#' + color);
-                        params.slot.find('a').css('border-color', '#' + color);
+                        params.slot.find('a.button').css(fieldParam, '#' + color);
+                        params.slot.find('a.button').attr('background', '#' + color);
+                        params.slot.find('a.button').css('border-color', '#' + color);
                     }
                 } else if (fieldParam === 'color') {
                     if ('imagecard' === type) {
@@ -1402,7 +1404,7 @@ Mautic.initSlotListeners = function() {
                     } else if ('imagecaption' === type) {
                         params.slot.find('figcaption').css(fieldParam, '#' + color);
                     } else {
-                        params.slot.find('a').css(fieldParam, '#' + color);
+                        params.slot.find('a.button').css(fieldParam, '#' + color);
                     }
                 }
             }
