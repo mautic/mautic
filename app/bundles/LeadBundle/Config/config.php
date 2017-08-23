@@ -78,6 +78,20 @@ return [
                     'leadId' => '\d+',
                 ],
             ],
+            'mautic_contact_auditlog_action' => [
+                'path'         => '/contacts/auditlog/{leadId}/{page}',
+                'controller'   => 'MauticLeadBundle:Auditlog:index',
+                'requirements' => [
+                    'leadId' => '\d+',
+                ],
+            ],
+            'mautic_contact_auditlog_export_action' => [
+                'path'         => '/contacts/auditlog/batchExport/{leadId}',
+                'controller'   => 'MauticLeadBundle:Auditlog:batchExport',
+                'requirements' => [
+                    'leadId' => '\d+',
+                ],
+            ],
             'mautic_contact_import_index' => [
                 'path'       => '/contacts/import/{page}',
                 'controller' => 'MauticLeadBundle:Import:index',
@@ -546,8 +560,12 @@ return [
             ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
-                'arguments' => ['mautic.factory'],
-                'alias'     => 'campaignevent_lead_field_value',
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.field',
+                ],
+                'alias' => 'campaignevent_lead_field_value',
             ],
             'mautic.form.type.campaignevent_lead_tags' => [
                 'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType::class,

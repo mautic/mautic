@@ -420,7 +420,7 @@ class LeadApiController extends CommonApiController
     public function getAllActivityAction($lead = null)
     {
         $canViewOwn    = $this->security->isGranted('lead:leads:viewown');
-        $canViewOthers = $this->security->isGranted('lead:leads:others');
+        $canViewOthers = $this->security->isGranted('lead:leads:viewother');
 
         if (!$canViewOthers && !$canViewOwn) {
             return $this->accessDenied();
