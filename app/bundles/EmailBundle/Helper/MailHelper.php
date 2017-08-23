@@ -214,6 +214,13 @@ class MailHelper
     protected $fatal = false;
 
     /**
+     * Flag whether to use only the globally set From email and name or whether to switch to mailer is owner.
+     *
+     * @var bool
+     */
+    protected $useGlobalFrom = false;
+
+    /**
      * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of the number of sends and restart the connection once met.
      *
      * @var int
@@ -594,10 +601,7 @@ class MailHelper
                 foreach ($this->metadata as $fromKey => $metadatum) {
                     $this->errors = [];
 
-                    if ($from = $this->message->getFrom()) {
-                        // The from email and name were set directly for the message
-                        $this->setFrom($from);
-                    } elseif ($useOwnerAsMailer && 'default' !== $fromKey) {
+                    if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
                         $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
                     } else {
                         $this->setFrom($this->from);
@@ -660,10 +664,11 @@ class MailHelper
     {
         unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
 
-        $this->eventTokens  = $this->queuedRecipients  = $this->errors  = [];
-        $this->lead         = $this->idHash         = $this->contentHash         = null;
-        $this->internalSend = $this->fatal = false;
-        $this->idHashState  = true;
+        $this->eventTokens   = $this->queuedRecipients   = $this->errors   = [];
+        $this->lead          = $this->idHash          = $this->contentHash          = null;
+        $this->internalSend  = $this->fatal  = false;
+        $this->idHashState   = true;
+        $this->useGlobalFrom = false;
 
         $this->logger->clear();
 
@@ -1230,16 +1235,22 @@ class MailHelper
     }
 
     /**
-     * Set from address (defaults to system).
+     * Set from email address and name (defaults to system unles isGlobal is true).
      *
-     * @param $address
-     * @param $name
+     * @param string $fromEmail
+     * @param string $fromName
+     * @param bool   $isGlobal
      */
-    public function setFrom($address, $name = null)
+    public function setFrom($fromEmail, $fromName = null, $isGlobal = false)
     {
+        if ($isGlobal) {
+            $this->from          = [$fromEmail => $fromName];
+            $this->useGlobalFrom = true;
+        }
+
         try {
-            $name = $this->cleanName($name);
-            $this->message->setFrom($address, $name);
+            $fromName = $this->cleanName($fromName);
+            $this->message->setFrom($fromEmail, $fromName);
         } catch (\Exception $e) {
             $this->logError($e, 'from');
         }
