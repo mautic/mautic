@@ -15,17 +15,19 @@ use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
 
 class LeadRepositoryTest extends \PHPUnit_Framework_TestCase
 {
-    use CustomFieldRepositoryTrait;
-
     public function testBooleanWithPrepareDbalFieldsForSave()
     {
+        $trait  = $this->getMockForTrait(CustomFieldRepositoryTrait::class);
         $fields = [
             'true'   => true,
             'false'  => false,
             'string' => 'blah',
         ];
 
-        $this->prepareDbalFieldsForSave($fields);
+        $reflection = new \ReflectionObject($trait);
+        $method     = $reflection->getMethod('prepareDbalFieldsForSave');
+        $method->setAccessible(true);
+        $method->invokeArgs($trait, [&$fields]);
 
         $this->assertEquals(1, $fields['true']);
         $this->assertEquals(0, $fields['false']);
