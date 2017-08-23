@@ -18,6 +18,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 
@@ -37,15 +38,22 @@ class CampaignSubscriber extends CommonSubscriber
     protected $campaignEventModel;
 
     /**
+     * @var TrackingHelper
+     */
+    protected $trackingHelper;
+
+    /**
      * CampaignSubscriber constructor.
      *
-     * @param PageModel  $pageModel
-     * @param EventModel $campaignEventModel
+     * @param PageModel      $pageModel
+     * @param EventModel     $campaignEventModel
+     * @param TrackingHelper $trackingHelper
      */
-    public function __construct(PageModel $pageModel, EventModel $campaignEventModel)
+    public function __construct(PageModel $pageModel, EventModel $campaignEventModel, TrackingHelper $trackingHelper)
     {
         $this->pageModel          = $pageModel;
         $this->campaignEventModel = $campaignEventModel;
+        $this->trackingHelper     = $trackingHelper;
     }
 
     /**
@@ -57,6 +65,7 @@ class CampaignSubscriber extends CommonSubscriber
             CampaignEvents::CAMPAIGN_ON_BUILD        => ['onCampaignBuild', 0],
             PageEvents::PAGE_ON_HIT                  => ['onPageHit', 0],
             PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
+            PageEvents::ON_CAMPAIGN_TRIGGER_ACTION   => ['onCampaignTriggerAction', 0],
         ];
     }
 
@@ -77,6 +86,27 @@ class CampaignSubscriber extends CommonSubscriber
             'channelIdField' => 'pages',
         ];
         $event->addDecision('page.pagehit', $pageHitTrigger);
+
+        $trackingServices = $this->trackingHelper->getEnabledServices();
+        if (!empty($trackingServices)) {
+            $action = [
+                'label'                  => 'mautic.page.tracking.pixel.event.send',
+                'description'            => 'mautic.page.tracking.pixel.event.send_desc',
+                'eventName'              => PageEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'               => 'tracking_pixel_send_action',
+                'connectionRestrictions' => [
+                    'anchor' => [
+                        'decision.inaction',
+                    ],
+                    'source' => [
+                        'decision' => [
+                            'page.pagehit',
+                        ],
+                    ],
+                ],
+            ];
+            $event->addAction('tracking.pixel.send', $action);
+        }
     }
 
     /**
@@ -169,5 +199,24 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         return $event->setResult(false);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    {
+        $config = $event->getConfig();
+        if (empty($config['services'])) {
+            return $event->setResult(false);
+        }
+
+        $values = [];
+        foreach ($config['services'] as $service) {
+            $values[$service][] = ['category' => $config['category'], 'action' => $config['action'], 'label' => $config['label']];
+        }
+        $this->trackingHelper->updateSession($values);
+
+        return $event->setResult(true);
     }
 }
