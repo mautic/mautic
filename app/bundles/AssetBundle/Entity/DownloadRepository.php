@@ -57,18 +57,21 @@ class DownloadRepository extends CommonRepository
     /**
      * Get a lead's page downloads.
      *
-     * @param       $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      *
      * @return array
      */
-    public function getLeadDownloads($leadId, array $options = [])
+    public function getLeadDownloads($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('a.id as asset_id, d.date_download as dateDownload, a.title')
+            ->select('a.id as asset_id, d.date_download as dateDownload, a.title, d.id as download_id, d.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'd')
-            ->leftJoin('d', MAUTIC_TABLE_PREFIX.'assets', 'a', 'd.asset_id = a.id')
-            ->where('d.lead_id = '.(int) $leadId);
+            ->leftJoin('d', MAUTIC_TABLE_PREFIX.'assets', 'a', 'd.asset_id = a.id');
+
+        if ($leadId) {
+            $query->where('d.lead_id = '.(int) $leadId);
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->like('a.title', $query->expr()->literal('%'.$options['search'].'%')));
