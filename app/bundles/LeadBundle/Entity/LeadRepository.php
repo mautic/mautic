@@ -814,6 +814,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.stage', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
                     $q,
