@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 /**
  * Class LeadListFilteringEvent.
  *
- * Please refer to LeadListRepository.php, inside getListFilterExpr method, for examples
+ * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples
  */
 class LeadListFilteringEvent extends CommonEvent
 {

@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class MailHelper.
@@ -88,7 +89,7 @@ class MailHelper
     protected $errors = [];
 
     /**
-     * @var null
+     * @var array|Lead
      */
     protected $lead = null;
 
@@ -934,8 +935,6 @@ class MailHelper
 
     /**
      * Set plain text for $this->message, replacing if necessary.
-     *
-     * @return null|string
      */
     protected function setMessagePlainText()
     {
@@ -1057,8 +1056,8 @@ class MailHelper
     /**
      * Add to address.
      *
-     * @param      $address
-     * @param null $name
+     * @param string $address
+     * @param null   $name
      *
      * @return bool
      */
@@ -1082,8 +1081,8 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param $addresses
-     * @param $name
+     * @param mixed $addresses
+     * @param sting $name
      *
      * @return bool
      */
@@ -1106,8 +1105,8 @@ class MailHelper
     /**
      * Add cc address.
      *
-     * @param      $address
-     * @param null $name
+     * @param mixed $address
+     * @param null  $name
      *
      * @return bool
      */
@@ -1130,8 +1129,8 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param $addresses
-     * @param $name
+     * @param mixed  $addresses
+     * @param string $name
      *
      * @return bool
      */
@@ -1154,8 +1153,8 @@ class MailHelper
     /**
      * Add bcc address.
      *
-     * @param      $address
-     * @param null $name
+     * @param string $address
+     * @param null   $name
      *
      * @return bool
      */
@@ -1268,6 +1267,9 @@ class MailHelper
         }
     }
 
+    /**
+     * @return string|null
+     */
     public function getIdHash()
     {
         return $this->idHash;
@@ -1293,14 +1295,17 @@ class MailHelper
         $this->message->leadIdHash = $idHash;
     }
 
+    /**
+     * @return array|Lead
+     */
     public function getLead()
     {
         return $this->lead;
     }
 
     /**
-     * @param null $lead
-     * @param bool internalSend  Set to true if the email is not being sent to this lead
+     * @param array|Lead $lead
+     * @param bool       $internalSend Set to true if the email is not being sent to this lead
      */
     public function setLead($lead, $interalSend = false)
     {
@@ -1532,6 +1537,14 @@ class MailHelper
     }
 
     /**
+     * @return array
+     */
+    public function getGlobalTokens()
+    {
+        return $this->globalTokens;
+    }
+
+    /**
      * Parses html into basic plaintext.
      *
      * @param string $content
@@ -1595,7 +1608,7 @@ class MailHelper
 
         $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
 
-        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens());
+        $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
 
         unset($event);
     }

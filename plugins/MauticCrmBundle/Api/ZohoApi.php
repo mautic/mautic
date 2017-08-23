@@ -154,4 +154,16 @@ class ZohoApi extends CrmApi
 
         return $data;
     }
+
+    public function getSearchRecords($selectColumns, $searchColumn, $searchValue, $object = 'Leads')
+    {
+        $parameters = [
+            'selectColumns' => 'All',
+            'searchColumn'  => $searchColumn, // search by email
+            'searchValue'   => $searchValue, // email value
+            'newFormat'     => 2,
+        ];
+
+        return $this->request('getSearchRecordsByPDC', $parameters, 'GET', $object, true);
+    }
 }

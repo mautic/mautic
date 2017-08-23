@@ -162,17 +162,17 @@ trait OperatorListTrait
         'startsWith' => [
             'label'       => 'mautic.core.operator.starts.with',
             'expr'        => 'startsWith',
-            'negate_expr' => false,
+            'negate_expr' => 'startsWith',
         ],
         'endsWith' => [
             'label'       => 'mautic.core.operator.ends.with',
             'expr'        => 'endsWith',
-            'negate_expr' => false,
+            'negate_expr' => 'endsWith',
         ],
         'contains' => [
             'label'       => 'mautic.core.operator.contains',
             'expr'        => 'contains',
-            'negate_expr' => false,
+            'negate_expr' => 'contains',
         ],
     ];
 

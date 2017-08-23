@@ -54,6 +54,18 @@ return [
                 'path'            => '/forms',
                 'controller'      => 'MauticFormBundle:Api\FormApi',
             ],
+            'mautic_api_formresults' => [
+                'path'       => '/forms/{formId}/submissions',
+                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntities',
+            ],
+            'mautic_api_formresult' => [
+                'path'       => '/forms/{formId}/submissions/{submissionId}',
+                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntity',
+            ],
+            'mautic_api_contactformresults' => [
+                'path'       => '/forms/{formId}/submissions/contact/{contactId}',
+                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntitiesForContact',
+            ],
             'mautic_api_formdeletefields' => [
                 'path'       => '/forms/{formId}/fields/delete',
                 'controller' => 'MauticFormBundle:Api\FormApi:deleteFields',

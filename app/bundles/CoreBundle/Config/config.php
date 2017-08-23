@@ -338,6 +338,11 @@ return [
                 'arguments' => [
                     'translator',
                 ],
+                'methodCalls' => [
+                    'setConnection' => [
+                        'database_connection',
+                    ],
+                ],
             ],
             'mautic.form.type.entity_lookup' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\EntityLookupType::class,
@@ -378,8 +383,12 @@ return [
             ],
             'mautic.helper.template.analytics' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
-                'arguments' => 'mautic.factory',
                 'alias'     => 'analytics',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.cookie',
+                    'mautic.lead.model.lead',
+                ],
             ],
             'mautic.helper.template.mautibot' => [
                 'class' => 'Mautic\CoreBundle\Templating\Helper\MautibotHelper',

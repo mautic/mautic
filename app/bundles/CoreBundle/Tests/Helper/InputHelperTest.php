@@ -19,9 +19,9 @@ use Mautic\CoreBundle\Helper\InputHelper;
 class InputHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @testdox The guessTimezoneFromOffset returns correct values
+     * @testdox The html returns correct values
      *
-     * @covers \Mautic\CoreBundle\Helper\InputHelperTest::guessTimezoneFromOffset
+     * @covers \Mautic\CoreBundle\Helper\InputHelper::html
      */
     public function testHtmlFilter()
     {
@@ -38,7 +38,8 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
         $xhtml1Doctype = '<!DOCTYPE html PUBLIC
   "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
-        $cdata = '<![CDATA[content]]>';
+        $cdata  = '<![CDATA[content]]>';
+        $script = '<script>for (let i = 0; i < 10; i += 1) {console.log(i);}</script>';
 
         $samples = [
             $outlookXML                => $outlookXML,
@@ -46,6 +47,7 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
             $html5DoctypeWithContent   => $html5DoctypeWithContent,
             $xhtml1Doctype             => $xhtml1Doctype,
             $cdata                     => $cdata,
+            $script                    => $script,
             '<applet>content</applet>' => 'content',
         ];
 

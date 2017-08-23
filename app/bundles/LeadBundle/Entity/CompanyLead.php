@@ -74,6 +74,7 @@ class CompanyLead
 
         $builder->createField('primary', 'boolean')
             ->columnName('is_primary')
+            ->nullable()
             ->build();
 
         // @deprecated 2.9 to be removed in 3.0
