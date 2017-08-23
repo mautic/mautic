@@ -578,7 +578,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $sf->method('getSalesforceObjectsByEmails')
             ->willReturnCallback(
                 function () {
-                    $args = func_get_args();
+                    $args   = func_get_args();
                     $emails = array_column($args[1], 'email');
 
                     return $this->getSalesforceObjects($emails, 0, 1);
@@ -596,29 +596,32 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 'Contact',
                 [
                     'contact1@sftest.com' => [
-                        'integration_entity_id'     => 'SF1',
-                        'integration_entity'        => 'Contact',
-                        'id'                        => 1,
-                        'internal_entity_id'        => 1,
-                        'firstname'                 => 'Contact1',
-                        'lastname'                  => 'Contact1',
-                        'company'                   => 'Contact1',
-                        'email'                     => 'Contact1@sftest.com',
-                        'mauticContactTimelineLink' => 'mautic_plugin_timeline_view',
+                        'integration_entity_id'             => 'SF1',
+                        'integration_entity'                => 'Contact',
+                        'id'                                => 1,
+                        'internal_entity_id'                => 1,
+                        'firstname'                         => 'Contact1',
+                        'lastname'                          => 'Contact1',
+                        'company'                           => 'Contact1',
+                        'email'                             => 'Contact1@sftest.com',
+                        'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
+                        'mauticContactIsContactableByEmail' => 0
+
                     ],
                     'contact2@sftest.com' => [
-                        'integration_entity_id'     => 'SF2',
-                        'integration_entity'        => 'Contact',
-                        'id'                        => 2,
-                        'internal_entity_id'        => 2,
-                        'firstname'                 => 'Contact2',
-                        'lastname'                  => 'Contact2',
-                        'company'                   => 'Contact2',
-                        'email'                     => 'Contact2@sftest.com',
-                        'mauticContactTimelineLink' => 'mautic_plugin_timeline_view',
+                        'integration_entity_id'             => 'SF2',
+                        'integration_entity'                => 'Contact',
+                        'id'                                => 2,
+                        'internal_entity_id'                => 2,
+                        'firstname'                         => 'Contact2',
+                        'lastname'                          => 'Contact2',
+                        'company'                           => 'Contact2',
+                        'email'                             => 'Contact2@sftest.com',
+                        'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
+                        'mauticContactIsContactableByEmail' => 0
                     ],
                 ],
-                'LastName'
+                'FirstName,LastName,Email'
             );
 
         $sf->pushLeads();
