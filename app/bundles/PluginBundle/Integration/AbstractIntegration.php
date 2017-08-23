@@ -55,9 +55,11 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 abstract class AbstractIntegration
 {
-    const FIELD_TYPE_STRING = 'string';
-    const FIELD_TYPE_BOOL   = 'boolean';
-    const FIELD_TYPE_NUMBER = 'number';
+    const FIELD_TYPE_STRING   = 'string';
+    const FIELD_TYPE_BOOL     = 'boolean';
+    const FIELD_TYPE_NUMBER   = 'number';
+    const FIELD_TYPE_DATETIME = 'datetime';
+    const FIELD_TYPE_DATE     = 'date';
 
     /**
      * @var bool
@@ -1649,7 +1651,8 @@ abstract class AbstractIntegration
         $missingRequiredFields  = [];
 
         // add special case in order to prevent it from being removed
-        $mauticLeadFields['mauticContactTimelineLink'] = '';
+        $mauticLeadFields['mauticContactTimelineLink']         = '';
+        $mauticLeadFields['mauticContactIsContactableByEmail'] = '';
 
         //make sure now non-existent aren't saved
         $settings = [
@@ -1809,6 +1812,11 @@ abstract class AbstractIntegration
             if (isset($leadFields[$integrationKey])) {
                 if ('mauticContactTimelineLink' === $leadFields[$integrationKey]) {
                     $matched[$integrationKey] = $this->getContactTimelineLink($leadId);
+
+                    continue;
+                }
+                if ('mauticContactIsContactableByEmail' === $leadFields[$integrationKey]) {
+                    $matched[$integrationKey] = $lead->getDoNotContact();
 
                     continue;
                 }
@@ -2462,12 +2470,19 @@ abstract class AbstractIntegration
     public function cleanPushData($value, $fieldType = self::FIELD_TYPE_STRING)
     {
         $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
-
         switch ($fieldType) {
             case self::FIELD_TYPE_BOOL:
                 return (bool) $clean;
             case self::FIELD_TYPE_NUMBER:
                 return (float) $clean;
+            case self::FIELD_TYPE_DATETIME:
+                $dateTimeValue = new \DateTime($value);
+
+                return (!empty($clean)) ? $dateTimeValue->format('c') : '';
+            case self::FIELD_TYPE_DATE:
+                $dateTimeValue = new \DateTime($value);
+
+                return (!empty($clean)) ? $dateTimeValue->format('Y-m-d') : '';
             default:
                 return $clean;
         }
@@ -2662,5 +2677,29 @@ abstract class AbstractIntegration
         }
 
         return $fields;
+    }
+
+    public function getLeadDonotContact($leadId, $channel = 'email')
+    {
+        $isContactable = 0;
+        $lead          = $this->leadModel->getEntity($leadId);
+        if ($lead) {
+            $isContactableReason = $this->leadModel->isContactable($lead, $channel);
+            if ($isContactableReason === 0) {
+                $isContactable = 1;
+            }
+        }
+
+        return $isContactable;
+    }
+
+    public function getCompoundMauticFields($lead)
+    {
+        if ($lead['internal_entity_id']) {
+            $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);
+            $lead['mauticContactIsContactableByEmail'] = $this->getLeadDonotContact($lead['internal_entity_id']);
+        }
+
+        return $lead;
     }
 }

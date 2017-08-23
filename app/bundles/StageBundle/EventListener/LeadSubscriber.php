@@ -45,16 +45,15 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'stage.changed';
         $eventTypeName = $this->translator->trans('mautic.stage.event.changed');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('stageList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var StagesChangeLogRepository $logRepository */
         $logRepository = $this->em->getRepository('MauticLeadBundle:StagesChangeLog');
-        $logs          = $logRepository->getLeadTimelineEvents($lead->getId(), $event->getQueryOptions());
+        $logs          = $logRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);
@@ -81,7 +80,8 @@ class LeadSubscriber extends CommonSubscriber
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon' => 'fa-tachometer',
+                        'icon'      => 'fa-tachometer',
+                        'contactId' => $log['lead_id'],
                     ]
                 );
             }

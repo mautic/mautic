@@ -117,7 +117,10 @@ class SalesforceApi extends CrmApi
 
         //try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
-            $findContact = 'select Id from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
+            $fields      = $this->integration->getFieldsForQuery('Contact');
+            $fields[]    = 'Id';
+            $fields      = implode(', ', array_unique($fields));
+            $findContact = 'select '.$fields.' from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
             $response    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -126,7 +129,10 @@ class SalesforceApi extends CrmApi
         }
 
         if (!empty($data['Lead']['Email'])) {
-            $findLead = 'select Id from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
+            $fields   = $this->integration->getFieldsForQuery('Lead');
+            $fields[] = 'Id';
+            $fields   = implode(', ', array_unique($fields));
+            $findLead = 'select '.$fields.' from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
             $response = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -212,20 +218,15 @@ class SalesforceApi extends CrmApi
      */
     public function createLeadActivity(array $activity, $object)
     {
-        $config   = $this->integration->getIntegrationSettings()->getFeatureSettings();
-        $contacts = $leads = [];
-
+        $config              = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
         $mActivityObjectName = $namespace.'mautic_timeline__c';
+        $activityData        = [];
 
         if (!empty($activity)) {
             foreach ($activity as $sfId => $records) {
-                foreach ($records['records'] as $key => $record) {
-                    $activityData['records'][$key] = [
-                        'attributes' => [
-                            'type'        => $mActivityObjectName,
-                            'referenceId' => $record['id'].'-'.$sfId,
-                        ],
+                foreach ($records['records'] as $record) {
+                    $body = [
                         $namespace.'ActivityDate__c' => $record['dateAdded']->format('c'),
                         $namespace.'Description__c'  => $record['description'],
                         'Name'                       => $record['name'],
@@ -234,24 +235,34 @@ class SalesforceApi extends CrmApi
                     ];
 
                     if ($object === 'Lead') {
-                        $activityData['records'][$key][$namespace.'WhoId__c'] = $sfId;
+                        $body[$namespace.'WhoId__c'] = $sfId;
                     } elseif ($object === 'Contact') {
-                        $activityData['records'][$key][$namespace.'contact_id__c'] = $sfId;
+                        $body[$namespace.'contact_id__c'] = $sfId;
                     }
+
+                    $activityData[] = [
+                        'method'      => 'POST',
+                        'url'         => '/services/data/v38.0/sobjects/'.$mActivityObjectName,
+                        'referenceId' => $record['id'].'-'.$sfId,
+                        'body'        => $body,
+                    ];
                 }
             }
 
             if (!empty($activityData)) {
-                //todo: log posted activities so that they don't get sent over again
-                $queryUrl = $this->integration->getQueryUrl();
-                $results  = $this->request(
-                    'composite/tree/'.$mActivityObjectName,
-                    $activityData,
-                    'POST',
-                    false,
-                    null,
-                    $queryUrl
-                );
+                $request              = [];
+                $request['allOrNone'] = 'false';
+                $chunked              = array_chunk($activityData, 25);
+                $results              = [];
+                foreach ($chunked as $chunk) {
+                    // We can only submit 25 at a time
+                    if ($chunk) {
+                        $request['compositeRequest'] = $chunk;
+                        $result                      = $this->syncMauticToSalesforce($request);
+                        $results[]                   = $result;
+                        $this->integration->getLogger()->debug('SALESFORCE: Activity response '.var_export($result, true));
+                    }
+                }
 
                 return $results;
             }
@@ -279,24 +290,7 @@ class SalesforceApi extends CrmApi
             }
         }
 
-        $fields = $this->integration->getIntegrationSettings()->getFeatureSettings();
-        switch ($object) {
-            case 'company':
-            case 'Account':
-              $fields = array_keys(array_filter($fields['companyFields']));
-                break;
-            default:
-                $mixedFields = array_filter($fields['leadFields']);
-                $fields      = [];
-                foreach ($mixedFields as $sfField => $mField) {
-                    if (strpos($sfField, '__'.$object) !== false) {
-                        $fields[] = str_replace('__'.$object, '', $sfField);
-                    }
-                    if (strpos($sfField, '-'.$object) !== false) {
-                        $fields[] = str_replace('-'.$object, '', $sfField);
-                    }
-                }
-        }
+        $fields = $this->integration->getFieldsForQuery($object);
 
         if (!empty($query['nextUrl'])) {
             $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
@@ -368,7 +362,7 @@ class SalesforceApi extends CrmApi
     /**
      * @param       $campaignId
      * @param       $object
-     * @param array $presonIds
+     * @param array $personIds
      *
      * @return array
      */
@@ -383,7 +377,7 @@ class SalesforceApi extends CrmApi
             $foundCampaignMembers = $this->request('query', ['q' => $query], 'GET', false, null, $this->integration->getQueryUrl());
             if (!empty($foundCampaignMembers['records'])) {
                 foreach ($foundCampaignMembers['records'] as $member) {
-                    $campaignMembers[$member[$idField]] = $member[$idField];
+                    $campaignMembers[$member[$idField]] = $member['Id'];
                 }
             }
         }

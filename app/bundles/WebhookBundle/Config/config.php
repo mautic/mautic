@@ -59,6 +59,13 @@ return [
                 'class' => \Mautic\WebhookBundle\Form\Type\ConfigType::class,
                 'alias' => 'webhookconfig',
             ],
+            'mautic.campaign.type.action.sendwebhook' => [
+                'class'     => \Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType::class,
+                'arguments' => [
+                    'arguments' => 'translator',
+                ],
+                'alias' => 'campaignevent_sendwebhook',
+            ],
         ],
         'events' => [
             'mautic.webhook.config.subscriber' => [
@@ -75,6 +82,12 @@ return [
                 'class'     => \Mautic\WebhookBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.campaign.subscriber' => [
+                'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.http.connector',
                 ],
             ],
         ],
