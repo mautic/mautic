@@ -60,6 +60,7 @@ if (!isset($inBuilder)) {
                             'formName'      => $formName,
                             'fieldPage'     => ($pageCount - 1), // current page,
                             'contactFields' => $contactFields,
+                            'companyFields' => $companyFields,
                             'inBuilder'     => $inBuilder,
                         ]
                     );

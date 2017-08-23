@@ -387,7 +387,7 @@ class CommonApiController extends FOSRestController implements MauticController
                     'string' => $this->request->query->get('search', ''),
                     'force'  => $this->listFilters,
                 ],
-                'orderBy'        => $this->request->query->get('orderBy', ''),
+                'orderBy'        => $this->addAliasIfNotPresent($this->request->query->get('orderBy', ''), $tableAlias),
                 'orderByDir'     => $this->request->query->get('orderByDir', 'ASC'),
                 'withTotalCount' => true, //for repositories that break free of Paginator
             ],
@@ -423,6 +423,36 @@ class CommonApiController extends FOSRestController implements MauticController
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Adds the repository alias to the column name if it doesn't exist.
+     *
+     * @param string $column name
+     *
+     * @return string $column name with alias prefix
+     */
+    protected function addAliasIfNotPresent($columns, $alias)
+    {
+        if (!$columns) {
+            return $columns;
+        }
+
+        $columns = explode(',', trim($columns));
+        $prefix  = $alias.'.';
+
+        array_walk(
+            $columns,
+            function (&$column, $key, $prefix) {
+                $column = trim($column);
+                if (strpos($column, $prefix) === false) {
+                    $column = $prefix.$column;
+                }
+            },
+            $prefix
+        );
+
+        return implode(',', $columns);
     }
 
     /**
