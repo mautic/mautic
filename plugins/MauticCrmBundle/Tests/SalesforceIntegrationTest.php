@@ -554,7 +554,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
          */
         $sf->expects($this->exactly(1))
             ->method('makeRequest')
-            ->with('https://sftest.com/services/data/v34.0/composite/tree/mautic_timeline__c')
+            ->with('https://sftest.com/services/data/v38.0/composite/')
             ->willReturnCallback(
                 function () {
                     return $this->getSalesforceCompositeResponse(func_get_arg(1));
@@ -651,6 +651,9 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         return 1;
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getMockFactory()
     {
         defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
@@ -1200,6 +1203,10 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @param $id
+     * @param $records
+     */
     protected function addSpecialCases($id, &$records)
     {
         switch ($this->specialSfCase) {
