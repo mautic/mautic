@@ -1059,7 +1059,7 @@ class LeadModel extends FormModel
                 }
             } elseif (!$oldLead) {
                 // New lead, set the tracking cookie
-                $this->setLeadCookie($lead->getId(), true);
+                $this->setLeadCookie($lead->getId());
             }
         }
     }
@@ -2227,7 +2227,7 @@ class LeadModel extends FormModel
     /**
      * Get bar chart data of contacts.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat

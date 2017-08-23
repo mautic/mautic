@@ -32,7 +32,7 @@ script:
   - bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
 
   # Run PHPSTAN analysis for PHP 7+
-  - if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.6" ]]; then ~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/CampaignBundle app/bundles/WebhookBundle; fi
+  - if [[ ${TRAVIS_PHP_VERSION:0:3} != "5.6" ]]; then ~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/CampaignBundle app/bundles/WebhookBundle app/bundles/LeadBundle; fi
 
   # Check if the code standards weren't broken.
   # Run it only on PHP 7.1 which should be the fastest. No need to run it for all PHP versions

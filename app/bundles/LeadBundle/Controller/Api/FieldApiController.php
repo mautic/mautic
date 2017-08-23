@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
