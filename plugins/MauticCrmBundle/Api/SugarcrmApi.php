@@ -125,7 +125,7 @@ class SugarcrmApi extends CrmApi
             //if not found then go ahead and make an API call to find all the records with that email
             if (isset($fields['email1']) && empty($sugarLeadRecords)) {
                 $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
-                $sugarLeadRecords = $sLeads['entry_list'];
+                $sugarLeadRecords = isset($sLeads['entry_list']) ? $sLeads['entry_list'] : [];
             }
             $leadFields = [];
             foreach ($fields as $name => $value) {
@@ -568,19 +568,20 @@ class SugarcrmApi extends CrmApi
      */
     public function getLeads($query, $object)
     {
-        $tokenData = $this->integration->getKeys();
-        $data      = ['filter' => 'all'];
-        $fields    = $this->integration->getIntegrationSettings()->getFeatureSettings();
+        $tokenData       = $this->integration->getKeys();
+        $data            = ['filter' => 'all'];
+        $availableFields = $this->integration->getIntegrationSettings()->getFeatureSettings();
 
         switch ($object) {
             case 'company':
             case 'Account':
             case 'Accounts':
-                $fields = array_keys(array_filter($fields['companyFields']));
+                $fields = array_keys(array_filter($availableFields['companyFields']));
                 break;
             default:
-                $mixedFields = array_filter($fields['leadFields']);
+                $mixedFields = array_filter($availableFields['leadFields']);
                 $fields      = [];
+                $object      = ($object == 'Contact') ? 'Contacts' : 'Leads';
                 foreach ($mixedFields as $sugarField => $mField) {
                     if (strpos($sugarField, '__'.$object) !== false) {
                         $fields[] = str_replace('__'.$object, '', $sugarField);
@@ -610,14 +611,12 @@ class SugarcrmApi extends CrmApi
                 if (isset($query['checkemail'])) {
                     $qry[]    = ' leads.deleted=0 ';
                     $qry[]    = " leads.id IN (SELECT bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (eabr.email_address_id = ea.id) WHERE bean_module = 'Leads' AND ea.email_address IN ('".implode("','", $query['checkemail'])."') AND eabr.deleted=0) ";
-                    $fields   = []; //Do not need previous fields
                     $fields[] = 'contact_id';
                     $fields[] = 'deleted';
                 }
                 if (isset($query['checkemail_contacts'])) {
                     $qry[]    = ' contacts.deleted=0 ';
                     $qry[]    = " contacts.id IN (SELECT bean_id FROM email_addr_bean_rel eabr JOIN email_addresses ea ON (eabr.email_address_id = ea.id) WHERE bean_module = 'Contacts' AND ea.email_address IN ('".implode("','", $query['checkemail_contacts'])."') AND eabr.deleted=0) ";
-                    $fields   = []; //Do not need previous fields
                     $fields[] = 'deleted';
                 }
 

@@ -86,16 +86,15 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'point.gained';
         $eventTypeName = $this->translator->trans('mautic.point.event.gained');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('pointList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $logRepository = $this->em->getRepository('MauticLeadBundle:PointsChangeLog');
-        $logs          = $logRepository->getLeadTimelineEvents($lead->getId(), $event->getQueryOptions());
+        $logs          = $logRepository->getLeadTimelineEvents($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $logs);
@@ -112,7 +111,8 @@ class LeadSubscriber extends CommonSubscriber
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon' => 'fa-calculator',
+                        'icon'      => 'fa-calculator',
+                        'contactId' => $log['lead_id'],
                     ]
                 );
             }
