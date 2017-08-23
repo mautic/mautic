@@ -751,18 +751,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
         unset($fields['dateModified']);
 
-        if (!empty($fields['lastActive']) && !empty($data[$fields['lastActive']])) {
-            $lastActive = new DateTimeHelper($data[$fields['lastActive']]);
-            $company->setLastActive($lastActive->getUtcDateTime());
-        }
-        unset($fields['lastActive']);
-
-        if (!empty($fields['dateIdentified']) && !empty($data[$fields['dateIdentified']])) {
-            $dateIdentified = new DateTimeHelper($data[$fields['dateIdentified']]);
-            $company->setDateIdentified($dateIdentified->getUtcDateTime());
-        }
-        unset($fields['dateIdentified']);
-
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
             $userRepo      = $this->em->getRepository('MauticUserBundle:User');
             $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
