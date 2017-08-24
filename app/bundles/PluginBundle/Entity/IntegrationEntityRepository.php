@@ -436,6 +436,8 @@ class IntegrationEntityRepository extends CommonRepository
             }, $rows);
             if (count($plugins) > 0) {
                 $q->andWhere($q->expr()->in('i.integration', $plugins));
+            } else {
+                return [];
             }
         } else {
             $q->andWhere($q->expr()->eq('i.integration', ':integration'));
