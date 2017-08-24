@@ -164,6 +164,15 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addCondition('lead.field_value', $trigger);
 
         $trigger = [
+            'label'       => 'mautic.lead.lead.events.device',
+            'description' => 'mautic.lead.lead.events.device_descr',
+            'formType'    => 'campaignevent_lead_device',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.device', $trigger);
+
+        $trigger = [
             'label'       => 'mautic.lead.lead.events.tags',
             'description' => 'mautic.lead.lead.events.tags_descr',
             'formType'    => 'campaignevent_lead_tags',
@@ -352,7 +361,35 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setResult(false);
         }
 
-        if ($event->checkContext('lead.tags')) {
+        if ($event->checkContext('lead.device')) {
+            $deviceRepo = $this->leadModel->getDeviceRepository();
+            $result     = false;
+
+            $deviceType   = $event->getConfig()['device_type'];
+            $deviceBrands = $event->getConfig()['device_brand'];
+            $deviceOs     = $event->getConfig()['device_os'];
+
+            if (!empty($deviceType)) {
+                $result = false;
+                if (!empty($deviceRepo->getDevice($lead, $deviceType))) {
+                    $result = true;
+                }
+            }
+
+            if (!empty($deviceBrands)) {
+                $result = false;
+                if (!empty($deviceRepo->getDevice($lead, null, $deviceBrands))) {
+                    $result = true;
+                }
+            }
+
+            if (!empty($deviceOs)) {
+                $result = false;
+                if (!empty($deviceRepo->getDevice($lead, null, null, null, $deviceOs))) {
+                    $result = true;
+                }
+            }
+        } elseif ($event->checkContext('lead.tags')) {
             $tagRepo = $this->leadModel->getTagRepository();
             $result  = $tagRepo->checkLeadByTags($lead, $event->getConfig()['tags']);
         } elseif ($event->checkContext('lead.segments')) {

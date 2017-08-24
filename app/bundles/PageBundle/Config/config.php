@@ -124,6 +124,7 @@ return [
                 'arguments' => [
                     'mautic.page.model.page',
                     'mautic.campaign.model.event',
+                    'mautic.lead.model.lead',
                     'mautic.page.helper.tracking',
                 ],
             ],
