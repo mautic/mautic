@@ -32,7 +32,6 @@ class ImportController extends FormController
     const STEP_IMPORT_FROM_CSV = 4;
 
     /**
-     * @param
      * @param int $page
      *
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
