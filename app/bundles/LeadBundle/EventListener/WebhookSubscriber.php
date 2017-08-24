@@ -94,7 +94,7 @@ class WebhookSubscriber extends CommonSubscriber
             return;
         }
 
-        $changes = $lead->getChanges();
+        $changes = $lead->getChanges(true);
         $this->webhookModel->queueWebhooksByType(
         // Consider this a new contact if it was just identified, otherwise consider it updated
             !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
