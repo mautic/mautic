@@ -339,13 +339,13 @@ class MailHelper
         if (!$isQueueFlush) {
             if ($useOwnerAsMailer) {
                 if ($owner = $this->getContactOwner($this->lead)) {
-                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], false);
+                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], null);
                     $ownerSignature = $this->getContactOwnerSignature($owner);
                 } else {
-                    $this->setFrom($this->from, null, false);
+                    $this->setFrom($this->from, null, null);
                 }
             } elseif (!$from = $this->message->getFrom()) {
-                $this->setFrom($this->from, null, false);
+                $this->setFrom($this->from, null, null);
             }
         } // from is set in flushQueue
 
@@ -602,9 +602,9 @@ class MailHelper
                     $this->errors = [];
 
                     if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
-                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], false);
+                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
                     } else {
-                        $this->setFrom($this->from, null, false);
+                        $this->setFrom($this->from, null, null);
                     }
 
                     foreach ($metadatum['contacts'] as $email => $contact) {
@@ -1239,7 +1239,7 @@ class MailHelper
      *
      * @param string|array $fromEmail
      * @param string       $fromName
-     * @param bool         $isGlobal
+     * @param bool|null    $isGlobal
      */
     public function setFrom($fromEmail, $fromName = null, $isGlobal = true)
     {
@@ -1249,7 +1249,9 @@ class MailHelper
             } else {
                 $this->from = [$fromEmail => $fromName];
             }
+        }
 
+        if (null !== $isGlobal) {
             $this->useGlobalFrom = $isGlobal;
         }
 
@@ -1396,7 +1398,7 @@ class MailHelper
                 $fromEmail = key($this->from);
             }
 
-            $this->setFrom($fromEmail, $fromName, false);
+            $this->setFrom($fromEmail, $fromName, null);
             $this->from = [$fromEmail => $fromName];
         } else {
             $this->from = $this->systemFrom;
