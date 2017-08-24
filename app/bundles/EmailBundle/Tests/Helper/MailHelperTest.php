@@ -212,7 +212,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
             $mailer->queue();
         }
 
-        $mailer->flushQueue();
+        $mailer->flushQueue([]);
 
         $this->assertEmpty($mailer->getErrors()['failures']);
 
@@ -247,6 +247,9 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 }
             }
         }
+
+        // Validate that the message object only has the contacts for the last "from" group to ensure we aren't sending duplicates
+        $this->assertEquals(['contact3@somewhere.com' => null], $mailer->message->getTo());
     }
 
     public function testGlobalFromThatAllFromAddressesAreTheSame()

@@ -525,6 +525,7 @@ class MailHelper
 
                 $this->metadata[$fromKey]['contacts'][$email] =
                     [
+                        'name'        => $name,
                         'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
                         'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
                         'hashId'      => $this->idHash,
@@ -595,10 +596,13 @@ class MailHelper
             if (count($this->metadata) && empty($this->fatal)) {
                 $errors             = $this->errors;
                 $errors['failures'] = [];
-
-                $result = true;
+                $result             = true;
 
                 foreach ($this->metadata as $fromKey => $metadatum) {
+                    // Whatever is in the message "to" should be ignored as we will send to the contacts grouped by from addresses
+                    // This prevents mailers such as sparkpost from sending duplicates to contacts
+                    $this->message->setTo([]);
+
                     $this->errors = [];
 
                     if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
@@ -614,14 +618,13 @@ class MailHelper
                         if (!empty($contact['leadId'])) {
                             $this->queueAssetDownloadEntry($email, $contact);
                         }
+
+                        $this->message->addTo($email, $contact['name']);
                     }
 
                     if (!$this->send(false, true)) {
                         $result = false;
                     }
-
-                    // Clear metadata for the previous recipients
-                    $this->message->clearMetadata();
 
                     // Merge errors
                     if (isset($this->errors['failures'])) {
@@ -632,6 +635,9 @@ class MailHelper
                     if (!empty($this->errors)) {
                         $errors = array_merge($errors, $this->errors);
                     }
+
+                    // Clear metadata for the previous recipients
+                    $this->message->clearMetadata();
                 }
 
                 $this->errors = $errors;
