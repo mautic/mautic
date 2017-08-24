@@ -214,7 +214,7 @@ class EmailType extends AbstractType
                 'attr'       => [
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
-                    'tooltip'     => 'mautic.core.form.publishdown.help',
+                    'tooltip'     => 'mautic.email.form.publishdown.help',
                 ],
                 'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
