@@ -212,7 +212,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
             $mailer->queue();
         }
 
-        $mailer->flushQueue();
+        $mailer->flushQueue([]);
 
         $this->assertEmpty($mailer->getErrors()['failures']);
 
@@ -247,6 +247,37 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
                 }
             }
         }
+
+        // Validate that the message object only has the contacts for the last "from" group to ensure we aren't sending duplicates
+        $this->assertEquals(['contact3@somewhere.com' => null], $mailer->message->getTo());
+    }
+
+    public function testGlobalFromThatAllFromAddressesAreTheSame()
+    {
+        $mockFactory = $this->getMockFactory();
+
+        $transport   = new BatchTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
+
+        $mailer->setSubject('Hello');
+        $mailer->setFrom('override@owner.com');
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue();
+
+        $this->assertEmpty($mailer->getErrors()['failures']);
+
+        $fromAddresses = $transport->getFromAddresses();
+
+        $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
     }
 
     public function testStandardOwnerAsMailer()
