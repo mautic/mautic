@@ -67,8 +67,6 @@ class ListType extends AbstractType
     {
         $this->translator = $translator;
 
-        $this->tooltip = $tooltip;
-
         $this->fieldChoices = $listModel->getChoiceFields();
 
         // Locales
