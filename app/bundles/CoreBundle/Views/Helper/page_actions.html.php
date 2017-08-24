@@ -90,7 +90,7 @@ foreach ($templateButtons as $action => $enabled) {
                 'btnText'   => $view['translator']->trans('mautic.core.form.'.$action),
                 'priority'  => $priority,
                 'primary'   => $primary,
-                'tooltip'   => $tooltip
+                'tooltip'   => $tooltip,
             ]
         );
     }
