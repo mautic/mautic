@@ -101,7 +101,6 @@ class LeadSubscriber extends CommonSubscriber
                     $event->getQueryOptions()
                 );
 
-
                 // Add total number to counter
                 $event->addToCounter($eventType, $citrixEvents);
 
@@ -119,12 +118,12 @@ class LeadSubscriber extends CommonSubscriber
 
                             $event->addEvent(
                                 [
-                                    'event'           => $eventType,
-                                    'eventId'         => $eventType.$citrixEvent['id'],
-                                    'eventLabel'      => $eventTypeName.' - '.$entity->getEventDesc(),
-                                    'eventType'       => $eventTypeLabel,
-                                    'timestamp'       => $entity->getEventDate(),
-                                    'extra'           => [
+                                    'event'      => $eventType,
+                                    'eventId'    => $eventType.$citrixEvent['id'],
+                                    'eventLabel' => $eventTypeName.' - '.$entity->getEventDesc(),
+                                    'eventType'  => $eventTypeLabel,
+                                    'timestamp'  => $entity->getEventDate(),
+                                    'extra'      => [
                                         'eventName' => $entity->getEventNameOnly(),
                                         'eventId'   => $entity->getEventId(),
                                         'eventDesc' => $entity->getEventDesc(),
