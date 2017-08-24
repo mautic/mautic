@@ -272,7 +272,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($mailer->getErrors()['failures']);
 
-        $fromAddresses = $transport->getFromAddresses();;
+        $fromAddresses = $transport->getFromAddresses();
 
         $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
     }
