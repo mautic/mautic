@@ -170,10 +170,16 @@ class PageSubscriber extends CommonSubscriber
     public function onPageHit(QueueConsumerEvent $event)
     {
         $payload                = $event->getPayload();
-        $hitId                  = $payload['hitId'];
         $request                = $payload['request'];
         $trackingNewlyGenerated = $payload['isNew'];
-        $this->pageModel->processPageHit($hitId, $request, $trackingNewlyGenerated, false);
+        $hitRepo                = $this->em->getRepository('MauticPageBundle:Hit');
+        $pageRepo               = $this->em->getRepository('MauticPageBundle:Page');
+        $leadRepo               = $this->em->getRepository('MauticLeadBundle:Lead');
+        $hit                    = $hitRepo->find((int) $payload['hitId']);
+        $page                   = $pageRepo->find((int) $payload['pageId']);
+        $lead                   = $leadRepo->find((int) $payload['leadId']);
+
+        $this->pageModel->processPageHit($hit, $page, $request, $lead, $trackingNewlyGenerated, false);
         $event->setResult(QueueConsumerResults::ACKNOWLEDGE);
     }
 }
