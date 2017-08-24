@@ -292,10 +292,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                 foreach ($fields['fields'] as $fieldInfo) {
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id'))
                                         || !isset($fieldInfo['name'])
-                                        || in_array(
+                                        || (in_array(
                                             $fieldInfo['type'],
                                             ['reference']
-                                        )
+                                        ) && $fieldInfo['name'] != 'AccountId')
                                     ) {
                                         continue;
                                     }
@@ -309,6 +309,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                         default: $type = 'string';
                                     }
                                     if ($sfObject !== 'company') {
+                                        if ($fieldInfo['name'] == 'AccountId') {
+                                            $fieldInfo['label'] = 'Company';
+                                        }
                                         $salesFields[$sfObject][$fieldInfo['name'].'__'.$sfObject] = [
                                             'type'        => $type,
                                             'label'       => $sfObject.'-'.$fieldInfo['label'],
@@ -410,8 +413,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (isset($dataObject) && $dataObject) {
                     $entity = false;
                     switch ($object) {
-                        case 'Lead':
                         case 'Contact':
+                            //get company from account id and assign company name
+                            if ($dataObject['AccountId__'.$object]) {
+                                $companyQuery   = 'Select Name from Account where Id = \''.$dataObject['AccountId__'.$object].'\' and IsDeleted = false';
+                                $contactCompany = $this->getApiHelper()->getLeads($companyQuery, 'Account');
+                                if (!empty($contactCompany['records'])) {
+                                    foreach ($contactCompany['records'] as $company) {
+                                        if (!empty($company['Name'])) {
+                                            $dataObject['AccountId__'.$object] = $company['Name'];
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    unset($dataObject['AccountId__'.$object]); //no company was found in Salesforce
+                                }
+                            }
+                        case 'Lead':
                             // Set owner so that it maps if configured to do so
                             if (!empty($dataObject['Owner__Lead']['Email'])) {
                                 $dataObject['owner_email'] = $dataObject['Owner__Lead']['Email'];
@@ -654,6 +672,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 foreach (['Contact', 'Lead'] as $object) {
                     if (!empty($existingPersons[$object])) {
                         $fieldsToUpdate = $mappedData[$object]['update'];
+                        print_r($fieldsToUpdate);
+                        die();
                         $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPersons[$object], $mappedData, $config);
                         $personFound    = true;
                         if (!empty($fieldsToUpdate)) {
@@ -1798,6 +1818,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             //use a composite patch here that can update and create (one query) every 200 records
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
+                if (isset($sfRecord['AccountId'])) {
+                    unset($sfRecord['AccountId']);
+                }
                 $fields = $this->getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config);
             } else {
                 $fields = $objectFields;
