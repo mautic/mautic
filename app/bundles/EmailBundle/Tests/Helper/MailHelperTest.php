@@ -249,6 +249,34 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    public function testGlobalFromThatAllFromAddressesAreTheSame()
+    {
+        $mockFactory = $this->getMockFactory();
+
+        $transport   = new BatchTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
+
+        $mailer->setSubject('Hello');
+        $mailer->setFrom('override@owner.com');
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue();
+
+        $this->assertEmpty($mailer->getErrors()['failures']);
+
+        $fromAddresses = $transport->getFromAddresses();;
+
+        $this->assertEquals(['override@owner.com'], array_unique($fromAddresses));
+    }
+
     public function testStandardOwnerAsMailer()
     {
         $mockFactory = $this->getMockFactory();

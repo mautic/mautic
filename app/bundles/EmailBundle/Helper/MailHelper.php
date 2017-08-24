@@ -1235,7 +1235,7 @@ class MailHelper
     }
 
     /**
-     * Set from email address and name (defaults to system unles isGlobal is true).
+     * Set from email address and name (defaults to determining automatically unless isGlobal is true).
      *
      * @param string|array $fromEmail
      * @param string       $fromName
@@ -1243,13 +1243,15 @@ class MailHelper
      */
     public function setFrom($fromEmail, $fromName = null, $isGlobal = true)
     {
-        if (is_array($fromEmail)) {
-            $this->from = $fromEmail;
-        } else {
-            $this->from = [$fromEmail => $fromName];
-        }
+        if ($isGlobal) {
+            if (is_array($fromEmail)) {
+                $this->from = $fromEmail;
+            } else {
+                $this->from = [$fromEmail => $fromName];
+            }
 
-        $this->useGlobalFrom = $isGlobal;
+            $this->useGlobalFrom = $isGlobal;
+        }
 
         try {
             $fromName = $this->cleanName($fromName);
