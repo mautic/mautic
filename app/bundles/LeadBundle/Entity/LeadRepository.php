@@ -120,7 +120,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $results = $this->getEntities(['qb' => $q, 'ignore_paginator' => true]);
 
         if (count($results) && $indexByColumn) {
-            /** @var Lead $lead */
+            /* @var Lead $lead */
             $leads = [];
             foreach ($results as $lead) {
                 $fieldKey = $lead->getFieldValue($field);
