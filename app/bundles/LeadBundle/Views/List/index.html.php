@@ -22,6 +22,7 @@ $view['slots']->set(
             ],
             'routeBase' => 'segment',
             'langVar'   => 'lead.list',
+            'tooltip'   => 'mautic.lead.lead.segment.add.help',
         ]
     )
 );

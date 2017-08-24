@@ -14,6 +14,11 @@ use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 if (!isset($item)) {
     $item = null;
 }
+
+if (!isset($tooltip)) {
+    $tooltip = null;
+}
+
 $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_PAGE_ACTIONS, ButtonHelper::TYPE_BUTTON_DROPDOWN, $item);
 include 'action_button_helper.php';
 
@@ -90,6 +95,7 @@ foreach ($templateButtons as $action => $enabled) {
                 'btnText'   => $view['translator']->trans('mautic.core.form.'.$action),
                 'priority'  => $priority,
                 'primary'   => $primary,
+                'tooltip'   => $tooltip,
             ]
         );
     }
