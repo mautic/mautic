@@ -174,6 +174,7 @@ return [
                 'class'     => 'Mautic\EmailBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'mautic.email.model.email',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.email.dashboard.subscriber' => [
@@ -226,6 +227,10 @@ return [
             'mautic.form.type.email_list' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailListType',
                 'alias' => 'email_list',
+            ],
+            'mautic.form.type.email_click_decision' => [
+                'class' => 'Mautic\EmailBundle\Form\Type\EmailClickDecisionType',
+                'alias' => 'email_click_decision',
             ],
             'mautic.form.type.emailopen_list' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailOpenType',

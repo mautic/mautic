@@ -253,7 +253,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         if (count($result)) {
             return $all ? $result : $result[0];
         } else {
-            return null;
+            return;
         }
     }
 
@@ -814,6 +814,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.stage', [], null, 'en_US'):
                 $this->applySearchQueryRelationship(
                     $q,
@@ -902,7 +903,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     $this->generateFilterExpression($q, 'mq.channel_id', $eqExpr, $unique, null)
                 );
                 $q->andWhere('mq.channel = \'email\' and mq.status = \''.MessageQueue::STATUS_PENDING.'\'');
-                $filter->strict = 1;
+                $filter->strict  = 1;
+                $returnParameter = true;
+                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");

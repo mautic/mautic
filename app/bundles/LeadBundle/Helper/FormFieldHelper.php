@@ -96,9 +96,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'region' => [
             'properties' => [],
         ],
-        'timezone' => [
-            'properties' => [],
-        ],
         'locale' => [
             'properties' => [],
         ],

@@ -83,10 +83,8 @@ class CampaignEventLeadFieldValueType extends AbstractType
             ]
         );
 
-        $ff = $builder->getFormFactory();
-
         // function to add 'template' choice field dynamically
-        $func = function (FormEvent $e) use ($ff) {
+        $func = function (FormEvent $e) {
             $data = $e->getData();
             $form = $e->getForm();
 

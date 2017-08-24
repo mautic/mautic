@@ -95,7 +95,6 @@ class ContactFrequencyType extends AbstractType
                             'precision'  => 0,
                             'label'      => 'mautic.lead.list.frequency.number',
                             'label_attr' => ['class' => 'text-muted fw-n'],
-                            'required'   => true,
                             'attr'       => array_merge(
                                 $attr,
                                 [
