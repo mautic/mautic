@@ -15,6 +15,7 @@ use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -236,7 +237,9 @@ class EmailApiController extends CommonApiController
             $mailer->setSubject($subject);
 
             if ($mailer->send(true, false, false)) {
-                $mailer->createEmailStat();
+                /** @var Stat $stat */
+                $stat                = $mailer->createEmailStat();
+                $response['stat_id'] = ($stat && $stat->getId()) ? $stat->getId() : 0;
                 $response['success'] = true;
             }
 
