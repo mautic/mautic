@@ -11,6 +11,7 @@
 
 namespace Mautic\WebhookBundle\Form\Type;
 
+use Doctrine\Common\Collections\Criteria;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\WebhookBundle\Form\DataTransformer\EventsToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
@@ -125,6 +126,21 @@ class WebhookType extends AbstractType
         );
 
         $builder->add('isPublished', 'yesno_button_group');
+
+        $builder->add('eventsOrderbyDir', 'choice', [
+            'choices' => [
+                ''             => 'mautic.core.form.default',
+                Criteria::ASC  => 'mautic.webhook.config.event.orderby.chronological',
+                Criteria::DESC => 'mautic.webhook.config.event.orderby.reverse.chronological',
+            ],
+            'label' => 'mautic.webhook.config.event.orderby',
+            'attr'  => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
+            ],
+            'empty_value' => '',
+            'required'    => false,
+        ]);
     }
 
     /**

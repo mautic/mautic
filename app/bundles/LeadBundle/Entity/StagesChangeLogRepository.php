@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -23,17 +24,20 @@ class StagesChangeLogRepository extends CommonRepository
     /**
      * Get a lead's stage log.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      *
      * @return array
      */
-    public function getLeadTimelineEvents($leadId, array $options = [])
+    public function getLeadTimelineEvents($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'ls')
-            ->select('ls.stage_id as reference, ls.event_name as eventName, ls.action_name as actionName, ls.date_added as dateAdded')
-            ->where('ls.lead_id = '.(int) $leadId);
+            ->select('ls.stage_id as reference, ls.event_name as eventName, ls.action_name as actionName, ls.date_added as dateAdded, ls.lead_id');
+
+        if ($leadId) {
+            $query->where('ls.lead_id = '.(int) $leadId);
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->orX(
@@ -54,8 +58,10 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     *
+     * @deprecated 2.10 - to be removed in 3.0 - never used in the codebase
      */
-    public function getMostStages($query, $limit = 10, $offset = 0)
+    public function getMostStages(QueryBuilder $query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -74,8 +80,10 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     *
+     * @deprecated 2.10 - to be removed in 3.0 - never used in the codebase
      */
-    public function getMostLeads($query, $limit = 10, $offset = 0)
+    public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -94,8 +102,10 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     *
+     * @deprecated 2.10 - to be removed in 3.0 - never used in the codebase
      */
-    public function countValue($query, $column, $value)
+    public function countValue(QueryBuilder $query, $column, $value)
     {
         $query->select('count('.$column.') as quantity')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
@@ -111,8 +121,8 @@ class StagesChangeLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      *
-     * @param $fromLeadId
-     * @param $toLeadId
+     * @param int $fromLeadId
+     * @param int $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -126,7 +136,7 @@ class StagesChangeLogRepository extends CommonRepository
     /**
      * Get the current stage assigned to a lead.
      *
-     * @param $leadId
+     * @param int $leadId
      *
      * @return mixed
      */

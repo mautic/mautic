@@ -9,11 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Tests;
+namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Helper\Progress;
+use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
 class ImportModelTest extends StandardImportTestHelper
 {

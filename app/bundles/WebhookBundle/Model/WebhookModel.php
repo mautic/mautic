@@ -11,6 +11,7 @@
 
 namespace Mautic\WebhookBundle\Model;
 
+use Doctrine\Common\Collections\Criteria;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\Serializer;
 use Joomla\Http\Http;
@@ -38,6 +39,12 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  */
 class WebhookModel extends FormModel
 {
+    /**
+     *  2 possible types of the processing of the webhooks.
+     */
+    const COMMAND_PROCESS   = 'command_process';
+    const IMMEDIATE_PROCESS = 'immediate_process';
+
     /**
      * Whet queue mode is turned on.
      *
@@ -74,6 +81,8 @@ class WebhookModel extends FormModel
     protected $webhookTimeout;
 
     /**
+     * The key is queue ID, the value is the WebhookQueue object.
+     *
      * @var array
      */
     protected $webhookQueueIdList = [];
@@ -96,6 +105,14 @@ class WebhookModel extends FormModel
     protected $notificationModel;
 
     /**
+     * Queued events default order by dir
+     * Possible values: ['ASC', 'DESC'].
+     *
+     * @var string
+     */
+    protected $eventsOrderByDir;
+
+    /**
      * WebhookModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
@@ -113,6 +130,7 @@ class WebhookModel extends FormModel
         $this->webhookTimeout    = (int) $coreParametersHelper->getParameter('webhook_timeout', 15);
         $this->logMax            = (int) $coreParametersHelper->getParameter('webhook_log_max', 1000);
         $this->queueMode         = $coreParametersHelper->getParameter('queue_mode');
+        $this->eventsOrderByDir  = $coreParametersHelper->getParameter('events_orderby_dir', Criteria::ASC);
         $this->serializer        = $serializer;
         $this->notificationModel = $notificationModel;
     }
@@ -234,11 +252,13 @@ class WebhookModel extends FormModel
 
             $webhook->addQueue($this->queueWebhook($webhook, $event, $payload, $serializationGroups));
 
-            // add the queuelist and save everything
-            $this->saveEntity($webhook);
+            // add the queuelist and save everything if command process
+            if ($this->queueMode == self::COMMAND_PROCESS) {
+                $this->saveEntity($webhook);
+            }
         }
 
-        if ($this->queueMode == 'immediate_process') {
+        if ($this->queueMode == self::IMMEDIATE_PROCESS) {
             $this->processWebhooks($webhookList);
         }
 
@@ -293,9 +313,6 @@ class WebhookModel extends FormModel
      */
     public function processWebhook(Webhook $webhook)
     {
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
-        $webhookQueueRepo = $this->getQueueRepository();
-
         // instantiate new http class
         $http = new Http();
 
@@ -317,7 +334,13 @@ class WebhookModel extends FormModel
 
         try {
             $response = $http->post($webhook->getWebhookUrl(), $payload, $headers, $this->webhookTimeout);
-            $this->addLog($webhook, $response->code, (microtime(true) - $start));
+
+            // remove successfully processed queues from the Webhook object so they won't get stored again
+            foreach ($this->webhookQueueIdList as $id => $queue) {
+                $webhook->removeQueue($queue);
+            }
+
+            $this->addLog($webhook, $response->code, (microtime(true) - $start), $response->body);
 
             // throw an error exception if we don't get a 200 back
             if ($response->code >= 300 && $response->code < 200) {
@@ -346,10 +369,15 @@ class WebhookModel extends FormModel
             return false;
         }
 
-        if ($this->queueMode === 'command_process' && !empty($this->webhookQueueIdList)) {
+        // Run this on command as well as immediate send because if switched from queue to immediate
+        // it can have some rows in the queue which will be send in every webhook forever
+        if (!empty($this->webhookQueueIdList)) {
+
+            /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
+            $webhookQueueRepo = $this->getQueueRepository();
 
             // delete all the queued items we just processed
-            $webhookQueueRepo->deleteQueuesById($this->webhookQueueIdList);
+            $webhookQueueRepo->deleteQueuesById(array_keys($this->webhookQueueIdList));
             $queueCount = $webhookQueueRepo->getQueueCountByWebhookId($webhook->getId());
 
             // reset the array to blank so none of the IDs are repeated
@@ -488,8 +516,13 @@ class WebhookModel extends FormModel
             return $payload;
         }
 
-        $queuesArray = $this->getWebhookQueues($webhook);
-        $payload     = [];
+        $payload = [];
+
+        if ($this->queueMode === self::COMMAND_PROCESS) {
+            $queuesArray = $this->getWebhookQueues($webhook);
+        } else {
+            $queuesArray = [$webhook->getQueues()];
+        }
 
         /* @var WebhookQueue $queue */
         foreach ($queuesArray as $queues) {
@@ -510,8 +543,16 @@ class WebhookModel extends FormModel
                 // its important to decode the payload form the DB as we re-encode it with the
                 $payload[$type][] = $queuePayload;
 
-                $this->webhookQueueIdList[] = $queue->getId();
-                $this->em->clear(WebhookQueue::class);
+                // Add to the webhookQueueIdList only if ID exists. That means if it was stored to DB.
+                // That means if not sent via immediate send.
+                if ($queue->getId()) {
+                    $this->webhookQueueIdList[$queue->getId()] = $queue;
+                    $this->em->clear(WebhookQueue::class);
+                } else {
+                    // remove the queue from the webhook right away so it won't get persisted to DB
+                    // This happens on immediate send only
+                    $webhook->removeQueue($queue);
+                }
             }
         }
 
@@ -519,7 +560,7 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * Get the queues and order by date so we get events in chronological order.
+     * Get the queues and order by date so we get events.
      *
      * @param Webhook $webhook
      *
@@ -535,11 +576,12 @@ class WebhookModel extends FormModel
                 'iterator_mode' => true,
                 'start'         => $this->webhookStart,
                 'limit'         => $this->webhookLimit,
-                'orderBy'       => 'e.dateAdded', // e is the default prefix unless you define getTableAlias in your repo class,
+                'orderBy'       => $queueRepo->getTableAlias().'.dateAdded',
+                'orderByDir'    => $this->getEventsOrderbyDir($webhook),
                 'filter'        => [
                     'force' => [
                         [
-                            'column' => 'IDENTITY(e.webhook)',
+                            'column' => 'IDENTITY('.$queueRepo->getTableAlias().'.webhook)',
                             'expr'   => 'eq',
                             'value'  => $webhook->getId(),
                         ],
@@ -549,6 +591,24 @@ class WebhookModel extends FormModel
         );
 
         return $queues;
+    }
+
+    /**
+     * Returns either Webhook's orderbyDir or the value from configuration as default.
+     *
+     * @param Webhook|null $webhook
+     *
+     * @return string
+     */
+    public function getEventsOrderbyDir(Webhook $webhook = null)
+    {
+        // Try to get the value from Webhook
+        if ($webhook && $orderByDir = $webhook->getEventsOrderbyDir()) {
+            return $orderByDir;
+        }
+
+        // Use the global config value if it's not set in the Webhook
+        return $this->eventsOrderByDir;
     }
 
     /**
