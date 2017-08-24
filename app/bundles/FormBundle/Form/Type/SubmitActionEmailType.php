@@ -11,12 +11,12 @@
 
 namespace Mautic\FormBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\Email;
 
 /**
  * Class SubmitActionEmailType.
@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints\Email;
 class SubmitActionEmailType extends AbstractType
 {
     use FormFieldTrait;
+    use ToBcBccFieldsTrait;
 
     /**
      * @var TranslatorInterface
@@ -110,65 +111,7 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'to',
-            'text',
-            [
-                'label'      => 'mautic.form.action.sendemail.to',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'placeholder' => 'mautic.core.optional',
-                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails',
-                ],
-                'required'    => false,
-                'constraints' => new Email(
-                    [
-                        'message' => 'mautic.core.email.required',
-                    ]
-                ),
-            ]
-        );
-
-        $builder->add(
-            'cc',
-            'text',
-            [
-                'label'      => 'mautic.form.action.sendemail.cc',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'placeholder' => 'mautic.core.optional',
-                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails',
-                ],
-                'required'    => false,
-                'constraints' => new Email(
-                    [
-                        'message' => 'mautic.core.email.required',
-                    ]
-                ),
-            ]
-        );
-
-        $builder->add(
-            'bcc',
-            'text',
-            [
-                'label'      => 'mautic.form.action.sendemail.bcc',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'       => 'form-control',
-                    'placeholder' => 'mautic.core.optional',
-                    'tooltip'     => 'mautic.form.action.sendemail.multiple.emails',
-                ],
-                'required'    => false,
-                'constraints' => new Email(
-                    [
-                        'message' => 'mautic.core.email.required',
-                    ]
-                ),
-            ]
-        );
+        $this->addToBcBccFields($builder);
     }
 
     /**

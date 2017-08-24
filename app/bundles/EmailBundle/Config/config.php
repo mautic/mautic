@@ -267,6 +267,10 @@ return [
                 'class' => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
                 'alias' => 'email_dashboard_emails_in_time_widget',
             ],
+            'mautic.form.type.email_to_user' => [
+                'class' => Mautic\EmailBundle\Form\Type\EmailToUserType::class,
+                'alias' => 'email_to_user',
+            ],
         ],
         'other' => [
             'mautic.validator.leadlistaccess' => [

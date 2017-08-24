@@ -763,7 +763,7 @@ class AjaxController extends CommonAjaxController
         $alias     = InputHelper::clean($request->request->get('alias'));
         $operator  = InputHelper::clean($request->request->get('operator'));
         $changed   = InputHelper::clean($request->request->get('changed'));
-        $dataArray = ['success' => 0, 'options' => null, 'operators' => null, 'disabled' => false];
+        $dataArray = ['success' => 0, 'options' => null, 'optionsAttr' => [], 'operators' => null, 'disabled' => false];
         $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
 
         if ($leadField) {
@@ -800,6 +800,16 @@ class AjaxController extends CommonAjaxController
                             $fieldHelper = new FormFieldHelper();
                             $fieldHelper->setTranslator($this->get('translator'));
                             $options = $fieldHelper->getDateChoices();
+                            $options = array_merge(
+                                [
+                                    'custom' => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),
+                                ],
+                                $options
+                            );
+
+                            $dataArray['optionsAttr']['custom'] = [
+                                'data-custom' => 1,
+                            ];
                         }
                         break;
                     default:

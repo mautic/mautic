@@ -117,7 +117,10 @@ class SalesforceApi extends CrmApi
 
         //try searching for lead as this has been changed before in updated done to the plugin
         if (isset($config['objects']) && false !== array_search('Contact', $config['objects']) && !empty($data['Contact']['Email'])) {
-            $findContact = 'select Id from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
+            $fields      = $this->integration->getFieldsForQuery('Contact');
+            $fields[]    = 'Id';
+            $fields      = implode(', ', array_unique($fields));
+            $findContact = 'select '.$fields.' from Contact where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Contact']['Email'])).'\'';
             $response    = $this->request('query', ['q' => $findContact], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -126,7 +129,10 @@ class SalesforceApi extends CrmApi
         }
 
         if (!empty($data['Lead']['Email'])) {
-            $findLead = 'select Id from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
+            $fields   = $this->integration->getFieldsForQuery('Lead');
+            $fields[] = 'Id';
+            $fields   = implode(', ', array_unique($fields));
+            $findLead = 'select '.$fields.' from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
             $response = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
@@ -284,24 +290,7 @@ class SalesforceApi extends CrmApi
             }
         }
 
-        $fields = $this->integration->getIntegrationSettings()->getFeatureSettings();
-        switch ($object) {
-            case 'company':
-            case 'Account':
-              $fields = array_keys(array_filter($fields['companyFields']));
-                break;
-            default:
-                $mixedFields = array_filter($fields['leadFields']);
-                $fields      = [];
-                foreach ($mixedFields as $sfField => $mField) {
-                    if (strpos($sfField, '__'.$object) !== false) {
-                        $fields[] = str_replace('__'.$object, '', $sfField);
-                    }
-                    if (strpos($sfField, '-'.$object) !== false) {
-                        $fields[] = str_replace('-'.$object, '', $sfField);
-                    }
-                }
-        }
+        $fields = $this->integration->getFieldsForQuery($object);
 
         if (!empty($query['nextUrl'])) {
             $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
@@ -373,7 +362,7 @@ class SalesforceApi extends CrmApi
     /**
      * @param       $campaignId
      * @param       $object
-     * @param array $presonIds
+     * @param array $personIds
      *
      * @return array
      */

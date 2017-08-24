@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 
 /**
@@ -44,7 +45,7 @@ class IdentifyCompanyHelper
                 }
             } else {
                 //create new company
-                $companyEntity = $companyModel->getEntity();
+                $companyEntity = new Company();
                 $companyModel->setFieldValues($companyEntity, $company, true);
                 $companyModel->saveEntity($companyEntity);
                 $company['id'] = $companyEntity->getId();
