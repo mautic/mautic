@@ -870,8 +870,7 @@ class PageModel extends FormModel
 
         if ($flag == 'unique' || $flag == 'total_and_unique') {
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter, 'distinct(t.lead_id)');
-            $q->groupBy('DATE_FORMAT(t.date_hit, \'%Y-%m-%d\')');
-
+            
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);
             }
