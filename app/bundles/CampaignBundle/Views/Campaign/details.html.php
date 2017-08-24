@@ -139,22 +139,27 @@ switch (true) {
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#preview-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
+                    </a>
+                </li>
                 <?php if ($decisions): ?>
-                    <li class="<?php if ('decision' == $firstTab): echo 'active'; endif; ?>">
+                    <li class="">
                         <a href="#decisions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.decisions.header'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
                 <?php if ($actions): ?>
-                    <li class="<?php if ('action' == $firstTab): echo 'active'; endif; ?>">
+                    <li class="">
                         <a href="#actions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.actions.header'); ?>
                         </a>
                     </li>
                 <?php endif; ?>
                 <?php if ($conditions): ?>
-                    <li class="<?php if ('condition' == $firstTab): echo 'active'; endif; ?>">
+                    <li class="">
                         <a href="#conditions-container" role="tab" data-toggle="tab">
                             <?php echo $view['translator']->trans('mautic.campaign.event.conditions.header'); ?>
                         </a>
@@ -173,18 +178,21 @@ switch (true) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #events-container -->
+            <div class="active tab-pane fade in bdr-w-0" id="preview-container">
+                <?php echo $actions; ?>
+            </div>
             <?php if ($decisions): ?>
-                <div class="<?php if ('decision' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="decisions-container">
+                <div class="tab-pane fade in bdr-w-0" id="decisions-container">
                     <?php echo $decisions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($actions): ?>
-                <div class="<?php if ('action' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="actions-container">
+                <div class="tab-pane fade in bdr-w-0" id="actions-container">
                     <?php echo $actions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($conditions): ?>
-                <div class="<?php if ('condition' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="conditions-container">
+                <div class="tab-pane fade in bdr-w-0" id="conditions-container">
                     <?php echo $conditions; ?>
                 </div>
             <?php endif; ?>
