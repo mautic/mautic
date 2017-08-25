@@ -132,6 +132,16 @@ class SubmitActionEmailType extends AbstractType
             ]
         );
 
+        $default = (isset($options['data']['set_replyto'])) ? $options['data']['set_replyto'] : false;
+        $builder->add(
+            'set_replyto',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.form.action.sendemail.setreplyto',
+                'data'  => $default,
+            ]
+        );
+
         $default = (isset($options['data']['email_to_owner'])) ? $options['data']['email_to_owner'] : false;
         $builder->add(
           'email_to_owner',
