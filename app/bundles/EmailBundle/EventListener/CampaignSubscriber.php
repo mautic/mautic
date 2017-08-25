@@ -106,6 +106,23 @@ class CampaignSubscriber extends CommonSubscriber
             ]
         );
 
+        $event->addDecision(
+            'email.click',
+            [
+                'label'                  => 'mautic.email.campaign.event.click',
+                'description'            => 'mautic.email.campaign.event.click_descr',
+                'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'formType'               => 'email_click_decision',
+                'connectionRestrictions' => [
+                    'source' => [
+                        'action' => [
+                            'email.send',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
         $event->addAction(
             'email.send',
             [
@@ -155,14 +172,33 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $eventDetails = $event->getEventDetails();
         $eventParent  = $event->getEvent()['parent'];
-
+        $eventConfig  = $event->getConfig();
         if ($eventDetails == null) {
             return $event->setResult(false);
         }
-
-        //check to see if the parent event is a "send email" event and that it matches the current email opened
+        //check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
         if (!empty($eventParent) && $eventParent['type'] === 'email.send') {
-            return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+            // click decision
+            if ($event->checkContext('email.click')) {
+                $hit = $eventDetails;
+                if ($eventDetails->getEmail()->getId() == (int) $eventParent['properties']['email']) {
+                    if (!empty($eventConfig['urls']['list'])) {
+                        $limitToUrl = $eventConfig['urls']['list'];
+                        foreach ($limitToUrl as $url) {
+                            if (preg_match('/'.$url.'/i', $hit->getUrl())) {
+                                return $event->setResult(true);
+                            }
+                        }
+                    } else {
+                        return $event->setResult(true);
+                    }
+                }
+
+                return $event->setResult(false);
+            } elseif ($event->checkContext('email.open')) {
+                // open decision
+                return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+            }
         }
 
         return $event->setResult(false);

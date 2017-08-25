@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -57,8 +58,10 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     *
+     * @deprecated 2.10 - to be removed in 3.0 - never used in the codebase
      */
-    public function getMostStages($query, $limit = 10, $offset = 0)
+    public function getMostStages(QueryBuilder $query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -77,8 +80,10 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     *
+     * @deprecated 2.10 - to be removed in 3.0 - never used in the codebase
      */
-    public function getMostLeads($query, $limit = 10, $offset = 0)
+    public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -97,8 +102,10 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     *
+     * @deprecated 2.10 - to be removed in 3.0 - never used in the codebase
      */
-    public function countValue($query, $column, $value)
+    public function countValue(QueryBuilder $query, $column, $value)
     {
         $query->select('count('.$column.') as quantity')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
@@ -114,8 +121,8 @@ class StagesChangeLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      *
-     * @param $fromLeadId
-     * @param $toLeadId
+     * @param int $fromLeadId
+     * @param int $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -129,7 +136,7 @@ class StagesChangeLogRepository extends CommonRepository
     /**
      * Get the current stage assigned to a lead.
      *
-     * @param $leadId
+     * @param int $leadId
      *
      * @return mixed
      */

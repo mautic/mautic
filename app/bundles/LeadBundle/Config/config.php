@@ -567,6 +567,10 @@ return [
                 ],
                 'alias' => 'campaignevent_lead_field_value',
             ],
+            'mautic.form.type.campaignevent_lead_device' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType',
+                'alias' => 'campaignevent_lead_device',
+            ],
             'mautic.form.type.campaignevent_lead_tags' => [
                 'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType::class,
                 'arguments' => ['translator'],

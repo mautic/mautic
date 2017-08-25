@@ -614,6 +614,18 @@ class CommonApiController extends FOSRestController implements MauticController
     }
 
     /**
+     * Alias for notFound method. It's used in the LeadAccessTrait.
+     *
+     * @param array $args
+     *
+     * @return Response
+     */
+    public function postActionRedirect($args = [])
+    {
+        return $this->notFound('mautic.contact.error.notfound');
+    }
+
+    /**
      * Returns a 403 Access Denied.
      *
      * @param string $msg

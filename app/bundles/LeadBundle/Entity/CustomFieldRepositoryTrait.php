@@ -377,7 +377,7 @@ trait CustomFieldRepositoryTrait
     /**
      * @param $fields
      */
-    private function prepareDbalFieldsForSave(&$fields)
+    protected function prepareDbalFieldsForSave(&$fields)
     {
         // Ensure booleans are integers
         foreach ($fields as $field => &$value) {

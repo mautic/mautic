@@ -120,7 +120,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $results = $this->getEntities(['qb' => $q, 'ignore_paginator' => true]);
 
         if (count($results) && $indexByColumn) {
-            /** @var Lead $lead */
+            /* @var Lead $lead */
             $leads = [];
             foreach ($results as $lead) {
                 $fieldKey = $lead->getFieldValue($field);
@@ -253,7 +253,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         if (count($result)) {
             return $all ? $result : $result[0];
         } else {
-            return null;
+            return;
         }
     }
 
@@ -811,6 +811,23 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     ],
                     $innerJoinTables,
                     $this->generateFilterExpression($q, 'comp.companyname', $likeExpr, $unique, null)
+                );
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage', [], null, 'en_US'):
+                $this->applySearchQueryRelationship(
+                    $q,
+                    [
+                        [
+                            'from_alias' => 'l',
+                            'table'      => 'stages',
+                            'alias'      => 's',
+                            'condition'  => 'l.stage_id = s.id',
+                        ],
+                    ],
+                    $innerJoinTables,
+                    $this->generateFilterExpression($q, 's.name', $likeExpr, $unique, null)
                 );
                 $returnParameter = true;
                 break;

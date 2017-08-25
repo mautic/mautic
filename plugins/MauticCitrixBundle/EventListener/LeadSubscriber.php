@@ -85,71 +85,57 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         foreach ($activeProducts as $product) {
-            $eventTypeRegistered      = $product.'.registered';
-            $eventTypeRegisteredLabel = $this->translator->trans('plugin.citrix.timeline.event.'.$product.'.registered');
-            $eventTypeRegisteredName  = $this->translator->trans('plugin.citrix.timeline.'.$product.'.registered');
-            $event->addEventType($eventTypeRegistered, $eventTypeRegisteredName);
+            foreach ([CitrixEventTypes::REGISTERED, CitrixEventTypes::ATTENDED] as $type) {
+                $eventType = $product.'.'.$type;
+                if (!$event->isApplicable($eventType)) {
+                    continue;
+                }
 
-            $eventTypeAttended      = $product.'.attended';
-            $eventTypeAttendedLabel = $this->translator->trans('plugin.citrix.timeline.event.'.$product.'.attended');
-            $eventTypeAttendedName  = $this->translator->trans('plugin.citrix.timeline.'.$product.'.attended');
-            $event->addEventType($eventTypeAttended, $eventTypeAttendedName);
+                $eventTypeLabel = $this->translator->trans('plugin.citrix.timeline.event.'.$product.'.'.$type);
+                $eventTypeName  = $this->translator->trans('plugin.citrix.timeline.'.$product.'.'.$type);
+                $event->addEventType($eventType, $eventTypeName);
 
-            $isApplicable = [
-                CitrixEventTypes::REGISTERED => $event->isApplicable($eventTypeRegistered),
-                CitrixEventTypes::ATTENDED   => $event->isApplicable($eventTypeAttended),
-            ];
+                $citrixEvents = $this->model->getRepository()->getEventsForTimeline(
+                    [$product, $type],
+                    $event->getLeadId(),
+                    $event->getQueryOptions()
+                );
 
-            $citrixEvents = $this->model->getRepository()->getEventsForTimeline($product, $event->getLeadId(), $event->getQueryOptions());
+                // Add total number to counter
+                $event->addToCounter($eventType, $citrixEvents);
 
-            if ($citrixEvents['total']) {
-                // Use a single entity class to help parse the name, description, etc without hydrating entities for every single event
-                $entity = new CitrixEvent();
+                if (!$event->isEngagementCount()) {
+                    if ($citrixEvents['total']) {
+                        // Use a single entity class to help parse the name, description, etc without hydrating entities for every single event
+                        $entity = new CitrixEvent();
 
-                foreach ($citrixEvents['results'] as $citrixEvent) {
-                    $entity->setProduct($citrixEvent['product'])
-                        ->setEventName($citrixEvent['event_name'])
-                        ->setEventDesc($citrixEvent['event_desc'])
-                        ->setEventType($citrixEvent['event_type'])
-                        ->setEventDate($citrixEvent['event_date']);
+                        foreach ($citrixEvents['results'] as $citrixEvent) {
+                            $entity->setProduct($citrixEvent['product'])
+                                ->setEventName($citrixEvent['event_name'])
+                                ->setEventDesc($citrixEvent['event_desc'])
+                                ->setEventType($citrixEvent['event_type'])
+                                ->setEventDate($citrixEvent['event_date']);
 
-                    $eventType = $entity->getEventType();
-                    if ($eventType === CitrixEventTypes::REGISTERED) {
-                        $timelineEventType      = $eventTypeRegistered;
-                        $timelineEventTypeLabel = $eventTypeRegisteredLabel;
-                        $timelineEventLabel     = $eventTypeRegisteredName.' - '.$entity->getEventDesc();
-                    } else {
-                        if ($eventType === CitrixEventTypes::ATTENDED) {
-                            $timelineEventType      = $eventTypeAttended;
-                            $timelineEventTypeLabel = $eventTypeAttendedLabel;
-                            $timelineEventLabel     = $eventTypeAttendedName.' - '.$entity->getEventDesc();
-                        } else {
-                            continue;
+                            $event->addEvent(
+                                [
+                                    'event'      => $eventType,
+                                    'eventId'    => $eventType.$citrixEvent['id'],
+                                    'eventLabel' => $eventTypeName.' - '.$entity->getEventDesc(),
+                                    'eventType'  => $eventTypeLabel,
+                                    'timestamp'  => $entity->getEventDate(),
+                                    'extra'      => [
+                                        'eventName' => $entity->getEventNameOnly(),
+                                        'eventId'   => $entity->getEventId(),
+                                        'eventDesc' => $entity->getEventDesc(),
+                                        'joinUrl'   => $entity->getJoinUrl(),
+                                    ],
+                                    'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.php',
+                                    'contactId'       => $citrixEvent['lead_id'],
+
+                                ]
+                            );
                         }
                     }
-
-                    if (!$isApplicable[$eventType]) {
-                        continue;
-                    }
-
-                    $event->addEvent(
-                        [
-                            'event'      => $timelineEventType,
-                            'eventId'    => $timelineEventType.$citrixEvent['id'],
-                            'eventLabel' => $timelineEventLabel,
-                            'eventType'  => $timelineEventTypeLabel,
-                            'timestamp'  => $entity->getEventDate(),
-                            'extra'      => [
-                                'eventName' => $entity->getEventNameOnly(),
-                                'eventId'   => $entity->getEventId(),
-                                'eventDesc' => $entity->getEventDesc(),
-                                'joinUrl'   => $entity->getJoinUrl(),
-                            ],
-                            'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.php',
-                            'contactId'       => $citrixEvent['lead_id'],
-
-                        ]
-                    );
                 }
             }
         } // foreach $product

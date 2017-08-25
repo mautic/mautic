@@ -456,7 +456,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')
     {
         foreach ($objectFields as $integrationField => $mauticField) {
-            if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object])) {
+            if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $integrationData[$integrationField.'__'.$object]) {
                 $matchedFields[$mauticField] = $integrationData[$integrationField.'__'.$object];
             }
         }
@@ -473,7 +473,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
     {
         //check if update blank fields is selected
-        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks') {
+        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks' && !empty($sfRecord)) {
             foreach ($sfRecord as $fieldName => $sfField) {
                 if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
                     continue; // this will be treated differently
