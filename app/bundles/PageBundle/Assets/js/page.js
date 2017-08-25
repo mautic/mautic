@@ -3,7 +3,7 @@ Mautic.pageOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'page.page');
     }
-console.log(mQuery(container + ' #page_template'));
+
     if (mQuery(container + ' #page_template').length) {
         Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
 
@@ -21,15 +21,6 @@ console.log(mQuery(container + ' #page_template'));
         // Preload tokens for code mode builder
         Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(){});
         Mautic.initSelectTheme(mQuery('#page_template'));
-
-        Mautic.prepareVersioning(
-            function (content) {
-                console.log('undo');
-            },
-            function (content) {
-                console.log('redo');
-            }
-        );
     }
 };
 
