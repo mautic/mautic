@@ -434,7 +434,11 @@ class IntegrationEntityRepository extends CommonRepository
             $plugins = array_map(function ($i) {
                 return "'${i['name']}'";
             }, $rows);
-            $q->andWhere($q->expr()->in('i.integration', $plugins));
+            if (count($plugins) > 0) {
+                $q->andWhere($q->expr()->in('i.integration', $plugins));
+            } else {
+                return [];
+            }
         } else {
             $q->andWhere($q->expr()->eq('i.integration', ':integration'));
             $q->setParameter('integration', $integration);
