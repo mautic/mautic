@@ -450,7 +450,6 @@ class PageModel extends FormModel
      */
     public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
-
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
             return;
@@ -508,9 +507,9 @@ class PageModel extends FormModel
         if ($this->queueService->isQueueEnabled()) {
             $msg = [
                 'hitId'   => $hit->getId(),
-                'pageId'  => $page->getId(),
+                'pageId'  => $page ? $page->getId() : null,
                 'request' => $request,
-                'leadId'  => $lead->getId(),
+                'leadId'  => $lead ? $lead->getId() : null,
                 'isNew'   => $trackingNewlyGenerated,
             ];
             $this->queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
