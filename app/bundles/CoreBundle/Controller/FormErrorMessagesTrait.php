@@ -76,7 +76,12 @@ trait FormErrorMessagesTrait
         }
 
         $validationErrors = $this->getFormErrorMessages($form);
-        $validationError  = $this->getFormErrorMessage($validationErrors);
+
+        if (!$validationErrors) {
+            return null;
+        }
+
+        $validationError = $this->getFormErrorMessage($validationErrors);
 
         return $this->get('translator')->trans('mautic.core.form.builder.error', ['%error%' => $validationError]);
     }
