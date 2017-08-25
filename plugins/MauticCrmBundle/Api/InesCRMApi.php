@@ -62,8 +62,7 @@ class InesCRMApi extends CrmApi
         $this->setAuthHeaders($client);
 
         try {
-            $return = $client->AddClientWithContacts($mappedData);
-            print_r($return);die();
+            return $client->AddClientWithContacts($mappedData);
         } catch (\Exception $e) {
             print_r($e);die();
         }
