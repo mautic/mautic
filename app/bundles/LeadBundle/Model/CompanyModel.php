@@ -741,8 +741,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $company = ($found) ? $this->em->getReference('MauticLeadBundle:Company', $found['id']) : new Company();
             $merged  = $found;
         } else {
-            $company = new Company();
-            $merged  = false;
+            return null;
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
