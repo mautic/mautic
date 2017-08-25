@@ -990,6 +990,9 @@ Mautic.processSaveOnCampaignBuilder = function(event, response) {
         var applyBtn = mQuery('.btn-apply-campaign-builder');
         Mautic.removeButtonLoadingIndicator(applyBtn);
 
+        // Enable the form toolbar buttons again
+        mQuery('#toolbar button').prop('disabled', false);
+
         if (response.validationError) {
             applyBtn.attr('disabled', true);
             mQuery('#builder-errors').show('fast').text(response.validationError);

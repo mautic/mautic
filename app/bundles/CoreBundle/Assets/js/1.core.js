@@ -291,7 +291,9 @@ var Mautic = {
      */
     activateButtonLoadingIndicator: function (button) {
         button.prop('disabled', true);
-        button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+        if (!button.find('.fa-spinner.fa-spin').length) {
+            button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+        }
     },
 
     /**

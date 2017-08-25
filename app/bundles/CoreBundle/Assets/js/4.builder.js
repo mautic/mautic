@@ -74,11 +74,11 @@ Mautic.launchBuilder = function (formName, actionName) {
     var spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2;
     var spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
-    applyBtn.on('click', function(e){
+    applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
             mQuery('.btn-apply').trigger('click');
-        });
+        }, true);
     });
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
@@ -90,6 +90,7 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     // Disable the close button until everything is loaded
     btnCloseBuilder.prop('disabled', true);
+    applyBtn.prop('disabled', true);
 
     // Insert the Mautic assets to the header
     var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
@@ -101,9 +102,10 @@ Mautic.launchBuilder = function (formName, actionName) {
     Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
         mQuery('#builder-overlay').addClass('hide');
         btnCloseBuilder.prop('disabled', false);
+        applyBtn.prop('disabled', false);
     });
 
-    mQuery('form[name=emailform], form[name=page]').on('onMauticFormResponse', Mautic.processBuilderApply);
+    mQuery('form[name=emailform], form[name=page]').off('onMauticFormResponse').on('onMauticFormResponse', Mautic.processBuilderApply);
 };
 
 /**
@@ -126,6 +128,9 @@ Mautic.processBuilderApply = function(event, response) {
     if (builder.hasClass('page-builder') || builder.hasClass('email-builder')) {
         var applyBtn = mQuery('.btn-apply-builder');
         Mautic.removeButtonLoadingIndicator(applyBtn);
+
+        // Enable the form toolbar buttons again
+        mQuery('#toolbar button').prop('disabled', false);
 
         if (response.validationError) {
             applyBtn.attr('disabled', true);
@@ -233,8 +238,7 @@ Mautic.buildBuilderIframe = function(themeHtml, id, onLoadCallback) {
             id: id
         }).appendTo('.builder-content');
     }
-
-    builder.on('load', function() {
+    builder.off('load').on('load', function() {
         if (typeof onLoadCallback === 'function') {
             onLoadCallback();
         }
@@ -406,7 +410,7 @@ Mautic.closeBuilder = function(model) {
             builder.addClass('hide');
             Mautic.stopIconSpinPostEvent();
             mQuery('#builder-template-content').remove();
-        });
+        }, false);
 
     } catch (error) {
         // prevent from being able to close builder
@@ -418,8 +422,9 @@ Mautic.closeBuilder = function(model) {
  * Copies the HTML from the builder to the textarea and sanitizes it along the way.
  *
  * @param Function callback
+ * @param bool keepBuilderContent
  */
-Mautic.sendBuilderContentToTextarea = function(callback) {
+Mautic.sendBuilderContentToTextarea = function(callback, keepBuilderContent) {
     var customHtml;
     try {
         if (Mautic.codeMode) {
@@ -434,19 +439,28 @@ Mautic.sendBuilderContentToTextarea = function(callback) {
         } else {
             var builderHtml = mQuery('iframe#builder-template-content').contents();
 
-            // The content has to be cloned so the sanitization won't affect the HTML in the builder
-            Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
-                Mautic.sanitizeHtmlBeforeSave(themeHtml);
-
-                // Store the HTML content to the HTML textarea
-                mQuery('.builder-html').val(Mautic.domToString(themeHtml));
+            if (keepBuilderContent) {
+                // The content has to be cloned so the sanitization won't affect the HTML in the builder
+                Mautic.cloneHtmlContent(builderHtml, function(themeHtml) {
+                    Mautic.sanitizeHtmlAndStoreToTextarea(themeHtml);
+                    callback();
+                });
+            } else {
+                Mautic.sanitizeHtmlAndStoreToTextarea(builderHtml);
                 callback();
-            });
+            }
         }
     } catch (error) {
         // prevent from being able to close builder
         console.error(error);
     }
+}
+
+Mautic.sanitizeHtmlAndStoreToTextarea = function(html) {
+    Mautic.sanitizeHtmlBeforeSave(html);
+
+    // Store the HTML content to the HTML textarea
+    mQuery('.builder-html').val(Mautic.domToString(html));
 }
 
 /**
