@@ -76,13 +76,22 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $mappedData['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $lead->getId();
 
         foreach ($leadFields as $integrationField => $mauticField) {
-            if (substr($integrationField, 0, 12) !== 'ines_custom_') {
+            if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
                 $method = 'get' . ucfirst($mauticField);
                 $mappedData['client']['Contacts']['ContactInfoAuto'][0][$integrationField] = $lead->$method();
             }
         }
 
-        $this->getApiHelper()->createLead($mappedData);
+        $mappedData['client']['Contacts']['ContactInfoAuto'][0]['InternalRef'] = 0;
+
+        $response = $this->getApiHelper()->createLead($mappedData);
+        $inesContactRef = $response->AddClientWithContactsResult->Contacts->ContactInfoAuto->InternalRef;
+
+        $method = 'set' . ucfirst($leadFields['InternalRef']);
+        $lead->$method($inesContactRef);
+
+        $leadRepo = $this->em->getRepository(Lead::class);
+        $leadRepo->saveEntity($lead);
     }
 
     public function pushCompany($company, $config = []) {
@@ -325,7 +334,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
         [
             {
                 "concept": "contact",
-                "inesKey": "InternalContactRef",
+                "inesKey": "InternalRef",
                 "inesLabel": "INES reference (contact)",
                 "isCustomField": false,
                 "isMappingRequired": true,
@@ -337,8 +346,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 }
             },
             {
-                "concept": "contact",
-                "inesKey": "InternalCompanyRef",
+                "concept": "client",
+                "inesKey": "InternalRef",
                 "inesLabel": "INES reference (soci\u00e9t\u00e9)",
                 "isCustomField": false,
                 "isMappingRequired": true,
