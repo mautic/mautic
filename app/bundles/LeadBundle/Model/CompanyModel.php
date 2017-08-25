@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
@@ -723,7 +724,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $fields = array_flip($fields);
 
         // Let's check for an existing company by name
-        $hasName = (!empty($fields['companyname']) && !empty($data[$fields['companyname']]));
+        $hasName  = (!empty($fields['companyname']) && !empty($data[$fields['companyname']]));
+        $hasEmail = (!empty($fields['companyemail']) && !empty($data[$fields['companyemail']]));
+
+        if ($hasEmail) {
+            MailHelper::validateEmail($data[$fields['companyemail']]);
+        }
 
         if ($hasName) {
             $companyName    = isset($fields['companyname']) ? $data[$fields['companyname']] : null;
