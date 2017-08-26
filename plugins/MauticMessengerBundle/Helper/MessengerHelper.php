@@ -106,13 +106,16 @@ class MessengerHelper
         $settings        = $integration->getIntegrationSettings();
         $featureSettings = $settings->getFeatureSettings();
         $apiKeys         = $integration->getDecryptedApiKeys();
+        $lead            = $this->leadModel->getCurrentLead();
 
         return $this->templateHelper->getTemplating()->render(
             $template,
             [
+                'contactId'       => ($lead && $lead->getId()) ? $lead->getId() : 0,
                 'userRef'         => $this->getUserRef(),
                 'featureSettings' => $featureSettings,
                 'apiKeys'         => $apiKeys,
+                'formName'        => $_REQUEST['formname'],
             ]
         );
     }
@@ -120,8 +123,7 @@ class MessengerHelper
     private function getUserRef()
     {
         if (!isset(self::$cache['userRef'])) {
-            $lead                   = $this->leadModel->getCurrentLead();
-            $userRef                = $lead->getId().time().mt_rand();
+            $userRef                = time().mt_rand();
             self::$cache['userRef'] = $userRef;
         }
 

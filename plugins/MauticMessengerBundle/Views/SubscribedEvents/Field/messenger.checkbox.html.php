@@ -18,13 +18,13 @@ $label = (!$field['showLabel']) ? '' :
                     {$field['label']}
                 </h3>
 HTML;
-$scr = str_replace('http://','https://',$view['router']->url('messenger_checkbox_plugin_js'));
+$scr  = str_replace('http://', 'https://', $view['router']->url('messenger_checkbox_plugin_js'));
 $html = <<<HTML
 
             <div $containerAttr>{$label}
                 <div $inputAttr>
                 <div class="messengerCheckboxPlugin"></div>
-                    <script type="text/javascript" src="{$scr}"></script>
+                    <script type="text/javascript" src="{$scr}?formname={$formName}"></script>
                 </div>
             </div>
 
