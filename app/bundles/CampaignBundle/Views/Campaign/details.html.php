@@ -7,6 +7,7 @@
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -32,11 +33,21 @@ $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $campaign])
 );
+$preview = trim($view->render('MauticCampaignBundle:Campaign:preview.html.php', [
+    'campaignId'      => $campaign->getId(),
+    'campaignEvents'  => $campaign->getEvents(),
+    'campaignSources' => $campaign->getSources(),
+    'eventSettings'   => $campaign->getSettings(),
+    'canvasSettings'  => $entity->getCanvasSettings(),
+]));
 $decisions  = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['decision']]));
 $actions    = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['action']]));
 $conditions = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['condition']]));
 
 switch (true) {
+    case !empty($preview):
+        $firstTab = 'preview';
+        break;
     case !empty($decisions):
         $firstTab = 'decision';
         break;
@@ -139,6 +150,13 @@ switch (true) {
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
+                <?php if ($preview): ?>
+                     <li class="<?php if ('preview' == $firstTab): echo 'active'; endif; ?>">
+                        <a href="#preview-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.campaign.preview.header'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <?php if ($decisions): ?>
                     <li class="<?php if ('decision' == $firstTab): echo 'active'; endif; ?>">
                         <a href="#decisions-container" role="tab" data-toggle="tab">
@@ -173,6 +191,9 @@ switch (true) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #events-container -->
+            <div class="<?php if ('preview' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="preview-container">
+                <?php echo $preview; ?>
+            </div>
             <?php if ($decisions): ?>
                 <div class="<?php if ('decision' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="decisions-container">
                     <?php echo $decisions; ?>
