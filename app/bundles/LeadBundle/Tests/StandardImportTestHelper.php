@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
@@ -116,13 +117,23 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->method('getEventLogRepository')
             ->will($this->returnValue($logRepository));
 
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $companyModel->setEntityManager($entityManager);
+
+        $companyModel->expects($this->any())
+            ->method('getEventLogRepository')
+            ->willReturn($logRepository);
+
         $notificationModel = $this->getMockBuilder(NotificationModel::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $notificationModel->setEntityManager($entityManager);
 
-        $importModel = new ImportModel($pathsHelper, $leadModel, $notificationModel, $coreParametersHelper);
+        $importModel = new ImportModel($pathsHelper, $leadModel, $notificationModel, $coreParametersHelper, $companyModel);
         $importModel->setEntityManager($entityManager);
         $importModel->setTranslator($translator);
 

@@ -30,7 +30,7 @@ if ($permissions['lead:leads:create']) {
     if ($permissions['lead:imports:create']) {
         $pageButtons[] = [
             'attr' => [
-                'href' => $view['router']->path('mautic_contact_import_action', ['objectAction' => 'new']),
+                'href' => $view['router']->path('mautic_import_action', ['object' => 'contacts', 'objectAction' => 'new']),
             ],
             'iconClass' => 'fa fa-upload',
             'btnText'   => 'mautic.lead.lead.import',
@@ -40,7 +40,7 @@ if ($permissions['lead:leads:create']) {
     if ($permissions['lead:imports:view']) {
         $pageButtons[] = [
             'attr' => [
-                'href' => $view['router']->path('mautic_contact_import_index'),
+                'href' => $view['router']->path('mautic_import_index', ['object' => 'contacts']),
             ],
             'iconClass' => 'fa fa-history',
             'btnText'   => 'mautic.lead.lead.import.index',

@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -45,6 +46,11 @@ class ImportModel extends FormModel
     protected $leadModel;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * @var NotificationModel
      */
     protected $notificationModel;
@@ -66,18 +72,21 @@ class ImportModel extends FormModel
      * @param LeadModel            $leadModel
      * @param NotificationModel    $notificationModel
      * @param CoreParametersHelper $config
+     * @param CompanyModel         $companyModel
      */
     public function __construct(
         PathsHelper $pathsHelper,
         LeadModel $leadModel,
         NotificationModel $notificationModel,
-        CoreParametersHelper $config
+        CoreParametersHelper $config,
+        CompanyModel $companyModel
     ) {
         $this->pathsHelper       = $pathsHelper;
         $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->config            = $config;
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
+        $this->companyModel      = $companyModel;
     }
 
     /**
@@ -246,6 +255,8 @@ class ImportModel extends FormModel
      *
      * @param Import   $import
      * @param Progress $progress
+     *
+     * @return bool
      */
     public function process(Import $import, Progress $progress)
     {
@@ -253,7 +264,7 @@ class ImportModel extends FormModel
             $file = new \SplFileObject($import->getFilePath());
         } catch (\Exception $e) {
             $import->setStatusInfo('SplFileObject cannot read the file');
-            $import->setStatus($import::FAILED);
+            $import->setStatus(Import::FAILED);
             $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
@@ -271,6 +282,11 @@ class ImportModel extends FormModel
         }
 
         $batchSize = $config['batchlimit'];
+
+        // Convert to field names
+        array_walk($headers, function (&$val) {
+            $val = strtolower(InputHelper::alphanum($val, false, '_'));
+        });
 
         while ($batchSize && !$file->eof()) {
             $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
@@ -302,7 +318,9 @@ class ImportModel extends FormModel
                 $data = array_combine($headers, $data);
 
                 try {
-                    $merged = $this->leadModel->importLead(
+                    $entityModel = $import->getObject() === 'company' ? $this->companyModel : $this->leadModel;
+
+                    $merged = $entityModel->import(
                         $import->getMatchedFields(),
                         $data,
                         $import->getDefault('owner'),
@@ -311,11 +329,12 @@ class ImportModel extends FormModel
                         true,
                         $eventLog
                     );
+
                     if ($merged) {
-                        $this->logDebug('Contact on line '.$lineNumber.' has been updated', $import);
+                        $this->logDebug('Entity on line '.$lineNumber.' has been updated', $import);
                         $import->increaseUpdatedCount();
                     } else {
-                        $this->logDebug('Contact on line '.$lineNumber.' has been created', $import);
+                        $this->logDebug('Entity on line '.$lineNumber.' has been created', $import);
                         $import->increaseInsertedCount();
                     }
                 } catch (\Exception $e) {
