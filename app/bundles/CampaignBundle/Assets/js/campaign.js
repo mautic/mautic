@@ -957,6 +957,10 @@ Mautic.closeCampaignBuilder = function() {
 
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
     mQuery('.btn-close-builder').prop('disabled', true);
+
+    Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-campaign-builder'));
+    mQuery('#builder-errors').hide('fast').text('');
+
     Mautic.updateConnections(function(err, response) {
         mQuery('body').css('overflow-y', '');
 

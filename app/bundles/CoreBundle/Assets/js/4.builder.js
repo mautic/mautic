@@ -73,11 +73,12 @@ Mautic.launchBuilder = function (formName, actionName) {
     var panelWidth = (builderContent.css('right') == '0px') ? 0 : builderPanel.width();
     var spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2;
     var spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
+    var builderForms = mQuery('form[name=emailform], form[name=page]');
 
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
-            Mautic.inBuilderSubmissionOn(applyBtn.closest('form'));
+            Mautic.inBuilderSubmissionOn(builderForms);
             mQuery('.btn-apply').trigger('click');
             Mautic.inBuilderSubmissionOff();
         }, true);
@@ -107,7 +108,7 @@ Mautic.launchBuilder = function (formName, actionName) {
         applyBtn.prop('disabled', false);
     });
 
-    mQuery('form[name=emailform], form[name=page]').off('onMauticFormResponse').on('onMauticFormResponse', Mautic.processBuilderApply);
+    builderForms.off('onMauticFormResponse').on('onMauticFormResponse', Mautic.processBuilderApply);
 };
 
 /**
@@ -396,6 +397,8 @@ Mautic.closeBuilder = function(model) {
     });
     overlay.removeClass('hide');
     closeBtn.prop('disabled', true);
+
+    mQuery('#builder-errors').hide('fast').text('');
 
     try {
         Mautic.sendBuilderContentToTextarea(function() {
