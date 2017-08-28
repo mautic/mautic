@@ -376,8 +376,7 @@ Mautic.launchCampaignEditor = function() {
     Mautic.stopIconSpinPostEvent();
     mQuery('body').css('overflow-y', 'hidden');
 
-    mQuery('.builder').addClass('builder-active');
-    mQuery('.builder').removeClass('hide');
+    mQuery('.builder').addClass('builder-active').removeClass('hide');
 
     // Center new source
     if (mQuery('#CampaignEvent_newsource').length) {
@@ -965,7 +964,7 @@ Mautic.closeCampaignBuilder = function() {
             mQuery('#builder-overlay').remove();
             mQuery('body').css('overflow-y', '');
             if (response.success) {
-                mQuery('.builder').addClass('hide');
+                mQuery('.builder').addClass('hide').removeClass('builder-active');
             }
             mQuery('.btn-close-builder').prop('disabled', false);
         }
