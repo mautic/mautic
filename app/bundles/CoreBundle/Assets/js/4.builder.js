@@ -73,12 +73,12 @@ Mautic.launchBuilder = function (formName, actionName) {
     var panelWidth = (builderContent.css('right') == '0px') ? 0 : builderPanel.width();
     var spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2;
     var spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
-    var builderForms = mQuery('form[name=emailform], form[name=page]');
+    var form = mQuery('form[name='+formName+']');
 
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
-            Mautic.inBuilderSubmissionOn(builderForms);
+            Mautic.inBuilderSubmissionOn(form);
             mQuery('.btn-apply').trigger('click');
             Mautic.inBuilderSubmissionOff();
         }, true);
@@ -107,8 +107,6 @@ Mautic.launchBuilder = function (formName, actionName) {
         btnCloseBuilder.prop('disabled', false);
         applyBtn.prop('disabled', false);
     });
-
-    builderForms.off('onMauticFormResponse').on('onMauticFormResponse', Mautic.processBuilderApply);
 };
 
 /**
@@ -135,21 +133,12 @@ Mautic.inBuilderSubmissionOff = function(form) {
  *
  * @param  object response
  */
-Mautic.processBuilderApply = function(event, response) {
-    var builder = mQuery('.builder');
-    if (builder.hasClass('page-builder') || builder.hasClass('email-builder')) {
-        var applyBtn = mQuery('.btn-apply-builder');
-        Mautic.removeButtonLoadingIndicator(applyBtn);
-
-        // Enable the form toolbar buttons again
-        mQuery('#toolbar button').prop('disabled', false);
-
-        if (response.validationError) {
-            applyBtn.attr('disabled', true);
-            mQuery('#builder-errors').show('fast').text(response.validationError);
-        }
+Mautic.processBuilderErrors = function(response) {
+    if (response.validationError) {
+        mQuery('.btn-apply-builder').attr('disabled', true);
+        mQuery('#builder-errors').show('fast').text(response.validationError);
     }
-}
+};
 
 /**
  * Frmats code style in the CodeMirror editor

@@ -161,9 +161,7 @@ Mautic.ajaxifyForm = function (formName) {
 Mautic.postMauticForm = function(form) {
     MauticVars.formSubmitInProgress = true;
     Mautic.postForm(form, function (response) {
-        if (response.inBuilder) {
-            mQuery(form).trigger('onMauticFormResponse', response);
-        } else if (response.inMain) {
+        if (response.inMain) {
             Mautic.processPageContent(response);
         } else {
             Mautic.processModalContent(response, '#' + response.modalId);

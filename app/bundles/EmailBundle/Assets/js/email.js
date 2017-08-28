@@ -16,6 +16,12 @@ Mautic.emailOnLoad = function (container, response) {
                 console.log('redo');
             }
         );
+
+        // Open the builder directly when saved from the builder
+        if (response && response.inBuilder) {
+            Mautic.launchBuilder('emailform');
+            Mautic.processBuilderErrors(response);
+        }
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
 

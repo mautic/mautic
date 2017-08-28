@@ -13,7 +13,7 @@
     <button type="button" class="btn btn-primary btn-close-campaign-builder" onclick="Mautic.closeCampaignBuilder();">
         <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
     </button>
-    <button type="button" class="btn btn-primary btn-apply-campaign-builder" onclick="Mautic.saveCampaignFromBuilder();">
+    <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">
         <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
     </button>
     <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>

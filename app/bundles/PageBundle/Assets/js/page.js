@@ -1,5 +1,5 @@
 //PageBundle
-Mautic.pageOnLoad = function (container) {
+Mautic.pageOnLoad = function (container, response) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'page.page');
     }
@@ -21,6 +21,12 @@ Mautic.pageOnLoad = function (container) {
         // Preload tokens for code mode builder
         Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(){});
         Mautic.initSelectTheme(mQuery('#page_template'));
+    }
+
+    // Open the builder directly when saved from the builder
+    if (response && response.inBuilder) {
+        Mautic.launchBuilder('page');
+        Mautic.processBuilderErrors(response);
     }
 };
 

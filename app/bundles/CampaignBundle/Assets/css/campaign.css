@@ -9,7 +9,7 @@
     z-index: 1040;
 }
 
-.btn-apply-campaign-builder {
+.campaign-builder .btn-apply-builder {
     position: fixed;
     top: 15px;
     right: 142px;

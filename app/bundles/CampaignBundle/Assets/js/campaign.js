@@ -4,7 +4,7 @@
  *
  * @param container
  */
-Mautic.campaignOnLoad = function (container) {
+Mautic.campaignOnLoad = function (container, response) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
@@ -98,6 +98,12 @@ Mautic.campaignOnLoad = function (container) {
         });
 
         Mautic.prepareCampaignCanvas();
+
+        // Open the builder directly when saved from the builder
+        if (response && response.inBuilder) {
+            Mautic.launchCampaignEditor();
+            Mautic.processBuilderErrors(response);
+        }
     }
 };
 
@@ -389,8 +395,6 @@ Mautic.launchCampaignEditor = function() {
         Mautic.campaignBuilderInstance.setSuspendDrawing(false, true);
     }
     Mautic.campaignBuilderInstance.repaintEverything();
-
-    mQuery('form[name=campaign]').on('onMauticFormResponse', Mautic.processSaveOnCampaignBuilder);
 };
 
 /**
@@ -958,7 +962,7 @@ Mautic.closeCampaignBuilder = function() {
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
     mQuery('.btn-close-builder').prop('disabled', true);
 
-    Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-campaign-builder'));
+    Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-builder'));
     mQuery('#builder-errors').hide('fast').text('');
 
     Mautic.updateConnections(function(err, response) {
@@ -976,7 +980,7 @@ Mautic.closeCampaignBuilder = function() {
 };
 
 Mautic.saveCampaignFromBuilder = function() {
-    Mautic.activateButtonLoadingIndicator(mQuery('.btn-apply-campaign-builder'));
+    Mautic.activateButtonLoadingIndicator(mQuery('.btn-apply-builder'));
     Mautic.updateConnections(function(err) {
         if (!err) {
             var applyBtn = mQuery('.btn-apply');
@@ -985,28 +989,6 @@ Mautic.saveCampaignFromBuilder = function() {
             Mautic.inBuilderSubmissionOff();
         }
     });
-};
-
-/**
- * Processes the Apply's button response
- *
- * @param  object response
- */
-Mautic.processSaveOnCampaignBuilder = function(event, response) {
-    var builder = mQuery('.builder');
-    if (builder.hasClass('campaign-builder')) {
-        var applyBtn = mQuery('.btn-apply-campaign-builder');
-        Mautic.removeButtonLoadingIndicator(applyBtn);
-
-        // Enable the form toolbar buttons again
-        mQuery('#toolbar button').prop('disabled', false);
-        Mautic.stopIconSpinPostEvent();
-
-        if (response.validationError) {
-            applyBtn.attr('disabled', true);
-            mQuery('#builder-errors').show('fast').text(response.validationError);
-        }
-    }
 };
 
 Mautic.updateConnections = function(callback) {
