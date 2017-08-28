@@ -39,7 +39,6 @@ class ReportFilterDataTransformer implements DataTransformerInterface
         if (!is_array($filters)) {
             return [];
         }
-
         foreach ($filters as &$f) {
             if (!isset($this->columns[$f['column']])) {
                 // Likely being called by form.pre_set_data after post
@@ -51,11 +50,11 @@ class ReportFilterDataTransformer implements DataTransformerInterface
                 $f['value'] = $dt->toLocalString();
             }
             if (in_array($type, ['multiselect'])) {
-                $tmpVal     = $f['value'];
+                $tmpVal     = ($f['value'] && !is_array($f['value'])) ? [$f['value']]: $f['value'];
                 $f['value'] = ($tmpVal) ? implode(',', $tmpVal) : '';
             }
         }
-
+        
         return $filters;
     }
 
