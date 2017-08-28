@@ -4307,9 +4307,6 @@ lesshat-selector { -lh-property: 0 ;
   background-color: #d5d4d4;
   overflow-y: auto;
 }
-.builder-panel .btn-close-builder {
-  width: 100%;
-}
 .builder-content {
   position: fixed;
   left: 0;
@@ -4323,10 +4320,6 @@ lesshat-selector { -lh-property: 0 ;
 }
 .code-mode .builder-content {
   width: 50%;
-}
-.code-mode .btn-close-builder {
-  width: 150px;
-  float: right;
 }
 .builder-panel .panel a.btn {
   white-space: normal;
@@ -4342,9 +4335,6 @@ lesshat-selector { -lh-property: 0 ;
   background-color: #d5d4d4;
   overflow-y: auto;
 }
-.builder-panel-slot .btn-close-builder {
-  width: 100%;
-}
 .builder-content-slot {
   left: 50%;
   width: 50%;
@@ -4354,10 +4344,6 @@ lesshat-selector { -lh-property: 0 ;
 }
 .code-mode .builder-content-slot {
   width: 50%;
-}
-.code-mode .btn-close-builder {
-  width: 150px;
-  float: right;
 }
 .builder-panel-slot .panel a.btn {
   white-space: normal;
