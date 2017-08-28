@@ -974,7 +974,12 @@ Mautic.closeCampaignBuilder = function() {
 Mautic.saveCampaignFromBuilder = function() {
     Mautic.activateButtonLoadingIndicator(mQuery('.btn-apply-campaign-builder'));
     Mautic.updateConnections(function(err) {
-        if (!err) mQuery('.btn-apply').trigger('click');
+        if (!err) {
+            var applyBtn = mQuery('.btn-apply');
+            Mautic.inBuilderSubmissionOn(applyBtn.closest('form'));
+            applyBtn.trigger('click');
+            Mautic.inBuilderSubmissionOff();
+        }
     });
 };
 
@@ -991,6 +996,7 @@ Mautic.processSaveOnCampaignBuilder = function(event, response) {
 
         // Enable the form toolbar buttons again
         mQuery('#toolbar button').prop('disabled', false);
+        Mautic.stopIconSpinPostEvent();
 
         if (response.validationError) {
             applyBtn.attr('disabled', true);
@@ -1000,7 +1006,7 @@ Mautic.processSaveOnCampaignBuilder = function(event, response) {
 };
 
 Mautic.updateConnections = function(callback) {
-    var nodes       = [];
+    var nodes = [];
 
     mQuery("#CampaignCanvas .list-campaign-event").each(function (idx, elem) {
         nodes.push({

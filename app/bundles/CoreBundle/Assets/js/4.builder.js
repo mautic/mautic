@@ -77,7 +77,9 @@ Mautic.launchBuilder = function (formName, actionName) {
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
+            Mautic.inBuilderSubmissionOn(applyBtn.closest('form'));
             mQuery('.btn-apply').trigger('click');
+            Mautic.inBuilderSubmissionOff();
         }, true);
     });
 
@@ -109,13 +111,22 @@ Mautic.launchBuilder = function (formName, actionName) {
 };
 
 /**
- * Checks if the builder is active
+ * Adds a hidded field which adds inBuilder=1 param to the request and will be returned in the response
  *
- * @return bool
+ * @param jQuery object of form
  */
-Mautic.isBuilderActive = function() {
-    var builder = mQuery('.builder');
-    return builder.length && builder.hasClass('builder-active');
+Mautic.inBuilderSubmissionOn = function(form) {
+    var inBuilder = mQuery('<input type="hidden" name="inBuilder" value="1" />');
+    form.append(inBuilder);
+}
+
+/**
+ * Removes the hidded field which adds inBuilder=1 param to the request
+ *
+ * @param jQuery object of form
+ */
+Mautic.inBuilderSubmissionOff = function(form) {
+    mQuery('input[name="inBuilder"]').remove();
 }
 
 /**
