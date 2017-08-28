@@ -59,6 +59,13 @@ return [
                 'class' => \Mautic\WebhookBundle\Form\Type\ConfigType::class,
                 'alias' => 'webhookconfig',
             ],
+            'mautic.campaign.type.action.sendwebhook' => [
+                'class'     => \Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType::class,
+                'arguments' => [
+                    'arguments' => 'translator',
+                ],
+                'alias' => 'campaignevent_sendwebhook',
+            ],
         ],
         'events' => [
             'mautic.webhook.config.subscriber' => [
@@ -75,6 +82,12 @@ return [
                 'class'     => \Mautic\WebhookBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.campaign.subscriber' => [
+                'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.http.connector',
                 ],
             ],
         ],
@@ -97,5 +110,6 @@ return [
         'webhook_disable_limit' => 100, // How many times the webhook response can fail until the webhook will be unpublished
         'webhook_timeout'       => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
         'queue_mode'            => 'immediate_process', // Trigger the webhook immediately or queue it for faster response times
+        'events_orderby_dir'    => \Doctrine\Common\Collections\Criteria::ASC, // Order the queued events chronologically or the other way around
     ],
 ];

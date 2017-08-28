@@ -463,6 +463,9 @@ class ListModel extends FormModel
                             '!like',
                             'regexp',
                             '!regexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
                         ],
                     ]
                 ),
@@ -531,6 +534,9 @@ class ListModel extends FormModel
                             '!like',
                             'regexp',
                             '!regexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
                         ],
                     ]
                 ),
@@ -550,6 +556,9 @@ class ListModel extends FormModel
                             '!like',
                             'regexp',
                             '!regexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
                         ],
                     ]
                 ),
@@ -569,6 +578,9 @@ class ListModel extends FormModel
                             '!like',
                             'regexp',
                             '!regexp',
+                            'startsWith',
+                            'endsWith',
+                            'contains',
                         ],
                     ]
                 ),

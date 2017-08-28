@@ -42,8 +42,8 @@ CREATE TABLE {$this->prefix}plugin_crm_pipedrive_owners (
   id INT AUTO_INCREMENT NOT NULL,
   email VARCHAR(255) NOT NULL,
   owner_id INT DEFAULT NULL,
-  INDEX mtc_email (email),
-  INDEX mtc_owner_id (owner_id),
+  INDEX {$this->prefix}email (email),
+  INDEX {$this->prefix}owner_id (owner_id),
   PRIMARY KEY(id)
 ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
 SQL;

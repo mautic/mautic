@@ -29,6 +29,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
+    const FIELD_ALIAS = '';
+
     /**
      * Used to determine social identity.
      *
@@ -279,8 +281,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->build();
 
         $builder->createManyToOne('owner', 'Mautic\UserBundle\Entity\User')
-            ->cascadeDetach()
-            ->cascadeMerge()
+            ->fetchLazy()
             ->addJoinColumn('owner_id', 'id', true, false, 'SET NULL')
             ->build();
 

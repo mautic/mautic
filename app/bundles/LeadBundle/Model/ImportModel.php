@@ -19,7 +19,9 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
@@ -150,18 +152,20 @@ class ImportModel extends FormModel
                 ->setStatusInfo($this->translator->trans('mautic.lead.import.ghost.limit.hit', ['%limit%' => $ghostDelay]))
                 ->removeFile();
 
-            $this->notificationModel->addNotification(
-                $this->translator->trans(
-                    'mautic.lead.import.result.info',
-                    ['%import%' => $this->generateLink($import)]
-                ),
-                'info',
-                false,
-                $this->translator->trans('mautic.lead.import.failed'),
-                'fa-download',
-                null,
-                $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
-            );
+            if ($import->getCreatedBy()) {
+                $this->notificationModel->addNotification(
+                    $this->translator->trans(
+                        'mautic.lead.import.result.info',
+                        ['%import%' => $this->generateLink($import)]
+                    ),
+                    'info',
+                    false,
+                    $this->translator->trans('mautic.lead.import.failed'),
+                    'fa-download',
+                    null,
+                    $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+                );
+            }
         }
 
         $this->saveEntities($imports);
@@ -219,18 +223,20 @@ class ImportModel extends FormModel
         // Save the end changes so the user could see it
         $this->saveEntity($import);
 
-        $this->notificationModel->addNotification(
-            $this->translator->trans(
-                'mautic.lead.import.result.info',
-                ['%import%' => $this->generateLink($import)]
-            ),
-            'info',
-            false,
-            $this->translator->trans('mautic.lead.import.completed'),
-            'fa-download',
-            null,
-            $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
-        );
+        if ($import->getCreatedBy()) {
+            $this->notificationModel->addNotification(
+                $this->translator->trans(
+                    'mautic.lead.import.result.info',
+                    ['%import%' => $this->generateLink($import)]
+                ),
+                'info',
+                false,
+                $this->translator->trans('mautic.lead.import.completed'),
+                'fa-download',
+                null,
+                $this->em->getReference('MauticUserBundle:User', $import->getCreatedBy())
+            );
+        }
 
         return true;
     }
@@ -454,7 +460,7 @@ class ImportModel extends FormModel
     /**
      * Get line chart data of imported rows.
      *
-     * @param char      $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat

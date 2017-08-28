@@ -95,7 +95,6 @@ class ContactFrequencyType extends AbstractType
                             'precision'  => 0,
                             'label'      => 'mautic.lead.list.frequency.number',
                             'label_attr' => ['class' => 'text-muted fw-n'],
-                            'required'   => true,
                             'attr'       => array_merge(
                                 $attr,
                                 [
@@ -176,7 +175,19 @@ class ContactFrequencyType extends AbstractType
             }
         }
 
-        if (!$options['public_view'] || $showContactSegments) {
+        if (!$options['public_view']) {
+            $builder->add(
+                'lead_lists',
+                'leadlist_choices',
+                [
+                    'label'      => 'mautic.lead.form.list',
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => true,
+                    'expanded'   => $options['public_view'],
+                    'required'   => false,
+                ]
+            );
+        } elseif ($showContactSegments) {
             $builder->add(
                 'lead_lists',
                 'leadlist_choices',

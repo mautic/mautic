@@ -13,6 +13,7 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
@@ -193,19 +194,18 @@ class LeadSubscriber extends CommonSubscriber
     protected function addTimelineEvents(LeadTimelineEvent $event, $eventTypeKey, $eventTypeName)
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('campaignList');
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $logRepository */
         $logRepository             = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
         $options                   = $event->getQueryOptions();
         $options['scheduledState'] = ('campaign.event' === $eventTypeKey) ? false : true;
-        $logs                      = $logRepository->getLeadLogs($lead->getId(), $options);
+        $logs                      = $logRepository->getLeadLogs($event->getLeadId(), $options);
         $eventSettings             = $this->campaignModel->getEvents();
 
         // Add total number to counter
@@ -229,9 +229,18 @@ class LeadSubscriber extends CommonSubscriber
                         .'" class="fa fa-warning text-danger"></i>';
                 }
 
+                $extra = [
+                    'log' => $log,
+                ];
+
+                if ($event->isForTimeline()) {
+                    $extra['campaignEventSettings'] = $eventSettings;
+                }
+
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$log['log_id'],
                         'eventLabel' => [
                             'label' => $label,
                             'href'  => $this->router->generate(
@@ -239,14 +248,12 @@ class LeadSubscriber extends CommonSubscriber
                                 ['objectAction' => 'view', 'objectId' => $log['campaign_id']]
                             ),
                         ],
-                        'eventType' => $eventTypeName,
-                        'timestamp' => $log['dateTriggered'],
-                        'extra'     => [
-                            'log'                   => $log,
-                            'campaignEventSettings' => $eventSettings,
-                        ],
+                        'eventType'       => $eventTypeName,
+                        'timestamp'       => $log['dateTriggered'],
+                        'extra'           => $extra,
                         'contentTemplate' => $template,
                         'icon'            => 'fa-clock-o',
+                        'contactId'       => $log['lead_id'],
                     ]
                 );
             }

@@ -355,7 +355,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $currentCompanyName = $lead->getCompany();
             if ($currentCompanyName !== $companyName) {
                 $lead->addUpdatedField('company', $companyName)
-                    ->setDateModified(new \DateTime);
+                    ->setDateModified(new \DateTime());
                 $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             }
         }
@@ -369,7 +369,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        unset($lead, $persistCompany, $companies);
+        //unset($lead, $persistCompany, $companies);
 
         return $contactAdded;
     }
@@ -377,8 +377,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * Remove a lead from company.
      *
-     * @param      $companies
-     * @param      $lead
+     * @param   $companies
+     * @param   $lead
      *
      * @throws \Doctrine\ORM\ORMException
      */

@@ -91,8 +91,9 @@ class ReportSubscriber extends CommonSubscriber
                     'type'  => 'string',
                 ],
                 $prefix.'variant_start_date' => [
-                    'label' => 'mautic.page.report.variant_start_date',
-                    'type'  => 'datetime',
+                    'label'          => 'mautic.page.report.variant_start_date',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$prefix.'variant_start_date)',
                 ],
                 $prefix.'variant_hits' => [
                     'label' => 'mautic.page.report.variant_hits',
@@ -116,12 +117,14 @@ class ReportSubscriber extends CommonSubscriber
                 $redirectHit = 'r.';
                 $hitColumns  = [
                     $hitPrefix.'date_hit' => [
-                        'label' => 'mautic.page.report.hits.date_hit',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.page.report.hits.date_hit',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$hitPrefix.'date_hit)',
                     ],
                     $hitPrefix.'date_left' => [
-                        'label' => 'mautic.page.report.hits.date_left',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.page.report.hits.date_left',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$hitPrefix.'date_left)',
                     ],
                     $hitPrefix.'country' => [
                         'label' => 'mautic.page.report.hits.country',
@@ -258,7 +261,6 @@ class ReportSubscriber extends CommonSubscriber
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'tp', 'p.id = tp.id')
                     ->leftJoin('p', MAUTIC_TABLE_PREFIX.'pages', 'vp', 'p.id = vp.id');
                 $event->addCategoryLeftJoin($qb, 'p');
-                $event->addCampaignByChannelJoin($qb, 'p', 'page');
                 break;
             case 'page.hits':
                 $event->applyDateFilters($qb, 'date_hit', 'ph');

@@ -65,7 +65,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead(Lead $lead,  array $config = [])
+    public function pushLead($lead,  $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -97,7 +97,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param array $params
      */
-    public function getLeads($params = [])
+    public function getLeads($params, $query, &$executed, $result = [],  $object = 'Lead')
     {
         $executed = null;
 
@@ -222,20 +222,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
         $config = $this->mergeConfigToFeatureSettings([]);
 
-        // Match that data with mapped lead fields
-        $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'company');
-        $matchedFields          = $this->populateMauticLeadData($data, $config, 'company');
-        if (!empty($fieldsToUpdateInMautic)) {
-            $fieldsToUpdateInMautic = array_intersect_key($config['companyFields'], $fieldsToUpdateInMautic);
-            $newMatchedFields       = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
-        } else {
-            $newMatchedFields = $matchedFields;
-        }
-        if (!isset($newMatchedFields['companyname'])) {
-            if (isset($newMatchedFields['companywebsite'])) {
-                $newMatchedFields['companyname'] = $newMatchedFields['companywebsite'];
-            }
-        }
         $matchedFields = $this->populateMauticLeadData($data, $config, 'company');
 
         // Find unique identifier fields used by the integration
@@ -246,23 +232,21 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $company         = new Company();
         $existingCompany = IdentifyCompanyHelper::identifyLeadsCompany($matchedFields, null, $companyModel);
         if ($existingCompany[2]) {
-            if (empty($newMatchedFields)) {
-                return;
-            }
             $company = $existingCompany[2];
         }
 
         if (!$company->isNew()) {
-            $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'company');
+            $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
+            $fieldsToUpdate = array_intersect_key($config['companyFields'], $fieldsToUpdate);
             $matchedFields  = array_intersect_key($matchedFields, array_flip($fieldsToUpdate));
             if (!isset($matchedFields['companyname'])) {
                 if (isset($matchedFields['companywebsite'])) {
                     $matchedFields['companyname'] = $matchedFields['companywebsite'];
                 }
             }
+            $companyModel->setFieldValues($company, $matchedFields, false, false);
         }
 
-        $companyModel->setFieldValues($company, $matchedFields, false, false);
         $companyModel->saveEntity($company, false);
 
         return $company;
@@ -335,6 +319,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
             $fieldsToUpdateInMautic = array_intersect_key($leadFields, $fieldsToUpdateInMautic);
             $matchedFields          = array_intersect_key($matchedFields, array_flip($fieldsToUpdateInMautic));
+            if ((isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks')) {
+                $matchedFields = $this->getBlankFieldsToUpdateInMautic($matchedFields, $lead->getFields(true), $leadFields, $data, $object);
+            }
         }
 
         $leadModel->setFieldValues($lead, $matchedFields, false, false);
@@ -443,5 +430,86 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     protected function cleanPriorityFields($fieldsToUpdate, $objects = null)
     {
         return $fieldsToUpdate;
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function getSyncTimeframeDates(array $params)
+    {
+        $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
+            : null;
+        $toDate = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
+            : null;
+
+        return [$fromDate, $toDate];
+    }
+
+    /**
+     * @param $fields
+     * @param $sfRecord
+     * @param $config
+     * @param $objectFields
+     */
+    public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')
+    {
+        foreach ($objectFields as $integrationField => $mauticField) {
+            if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $integrationData[$integrationField.'__'.$object]) {
+                $matchedFields[$mauticField] = $integrationData[$integrationField.'__'.$object];
+            }
+        }
+
+        return $matchedFields;
+    }
+
+    /**
+     * @param $fields
+     * @param $sfRecord
+     * @param $config
+     * @param $objectFields
+     */
+    public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
+    {
+        //check if update blank fields is selected
+        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks' && !empty($sfRecord)) {
+            foreach ($sfRecord as $fieldName => $sfField) {
+                if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
+                    continue; // this will be treated differently
+                }
+                if (empty($sfField) && array_key_exists($fieldName, $objectFields['create']) && !array_key_exists($fieldName, $fields)) {
+                    //map to mautic field
+                    $fields[$fieldName] = $objectFields['create'][$fieldName];
+                }
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @param $fields
+     *
+     * @return array
+     */
+    protected function prepareFieldsForPush($fields)
+    {
+        $fieldMappings = [];
+        $required      = [];
+        $config        = $this->mergeConfigToFeatureSettings();
+
+        $leadFields = $config['leadFields'];
+        foreach ($fields as $key => $field) {
+            if ($field['required']) {
+                $required[$key] = $field;
+            }
+        }
+        $fieldMappings['required'] = [
+            'fields' => $required,
+        ];
+        $fieldMappings['create'] = $leadFields;
+
+        return $fieldMappings;
     }
 }

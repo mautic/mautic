@@ -23,7 +23,6 @@ use Symfony\Component\Form\FormBuilder;
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
-    private $client;
     /**
      * {@inheritdoc}
      *
@@ -264,6 +263,21 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+        $builder->add(
+            'updateBlanks',
+            'choice',
+            [
+                'choices' => [
+                    'updateBlanks' => 'mautic.integrations.blanks',
+                ],
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.integrations.form.blanks',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+            ]
+        );
         if ($formArea == 'features') {
             $builder->add(
                 'objects',
@@ -386,7 +400,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getLeads($params = [])
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
     {
         return $this->getRecords($params, 'Contact');
     }
@@ -402,6 +416,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $this->getRecords($params, 'company');
     }
 
+    /**
+     * @param $params
+     * @param $object
+     */
     public function getRecords($params, $object)
     {
         //todo data priority
@@ -439,6 +457,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         return $executed;
     }
+
     /**
      * Ammend mapped lead data before creating to Mautic.
      *
@@ -484,6 +503,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
+    /**
+     * @param $entity
+     * @param $object
+     * @param $mauticObjectReference
+     * @param $integrationEntityId
+     *
+     * @return IntegrationEntity|null|object
+     */
     public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId)
     {
         $integrationEntity = null;
@@ -521,7 +548,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead(Lead $lead,  array $config = [])
+    public function pushLead($lead,  $config = [])
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
@@ -540,8 +567,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
-        $leadFields         = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
-        $mappedData         = $this->populateLeadData(
+        $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
+
+        $cwContactExists = $this->amendLeadDataBeforeMauticPopulate($cwContactExists[0], $object);
+
+        $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
+        $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
+        //check for blank fields to update here
+        $mappedData = $this->populateLeadData(
             $lead,
             ['leadFields' => $leadFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']], 'update' => $personFound]
         );

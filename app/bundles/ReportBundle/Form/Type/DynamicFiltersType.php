@@ -27,11 +27,10 @@ class DynamicFiltersType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['report']->getFilters() as $filter) {
-            if (isset($filter['dynamic'])) {
+            if (isset($filter['dynamic']) && $filter['dynamic'] === 1) {
                 $column     = $filter['column'];
                 $definition = $options['filterDefinitions']->definitions[$column];
-
-                $args = [
+                $args       = [
                     'label'      => $definition['label'],
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
@@ -54,26 +53,31 @@ class DynamicFiltersType extends AbstractType
                             ],
                         ];
 
-                    if (isset($options['data'][$definition['alias']])) {
-                        $args['data'] = ((int) $options['data'][$definition['alias']] == 1);
-                    }
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'multiselect':
-                $args['attr']['onchange'] = "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',this,'list','.report-content');";
-                    $type                     = 'choice';
-                    $args['choices']          = $definition['list'];
-                    $args['multiple']         = true;
-                    break;case 'select':
-                    $type            = 'choice';
-                    $args['choices'] = $definition['list'];
-                    break;
-                default:
-                    $type = 'text';
-                    break;
-            }
+                        if (isset($options['data'][$definition['alias']])) {
+                            $args['data'] = ((int) $options['data'][$definition['alias']] == 1);
+                        }
+                        break;
+                    case 'datetime':
+                        $type           = 'datetime';
+                        $args['input']  = 'string';
+                        $args['widget'] = 'single_text';
+                        $args['format'] = 'Y-m-d H:i:s';
+                        $args['attr']['class'] .= ' datetimepicker';
+                        break;
+                    case 'multiselect':
+                        $args['attr']['onchange'] = "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',this,'list','.report-content');";
+                        $type                     = 'choice';
+                        $args['choices']          = $definition['list'];
+                        $args['multiple']         = true;
+                        break;
+                    case 'select':
+                        $type            = 'choice';
+                        $args['choices'] = $definition['list'];
+                        break;
+                    default:
+                        $type = 'text';
+                        break;
+                }
 
                 $builder->add($definition['alias'], $type, $args);
             }

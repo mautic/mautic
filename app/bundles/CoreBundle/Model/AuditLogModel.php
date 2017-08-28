@@ -52,9 +52,9 @@ class AuditLogModel extends AbstractCommonModel
         $log->setIpAddress($ipAddress);
         $log->setDateAdded(new \DateTime());
 
-        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->userHelper->getUser() : null;
+        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER') && !defined('MAUTIC_AUDITLOG_USER')) ? $this->userHelper->getUser() : null;
         $userId   = 0;
-        $userName = $this->translator->trans('mautic.core.system');
+        $userName = defined('MAUTIC_AUDITLOG_USER') ? MAUTIC_AUDITLOG_USER : $this->translator->trans('mautic.core.system');
         if ($user instanceof User && $user->getId()) {
             $userId   = $user->getId();
             $userName = $user->getName();

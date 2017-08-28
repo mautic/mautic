@@ -171,10 +171,16 @@ Mautic.getIntegrationFields = function(settings, page, el) {
     var object    = settings.object ? settings.object : 'lead';
     var fieldsTab = ('lead' === object) ? '#fields-tab' : '#'+object+'-fields-container';
 
-    if (el) {
+    if (el && mQuery(el).is('input')) {
         Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
-    }
 
+        var namePrefix = mQuery(el).attr('name').split('[')[0];
+        if ('integration_details' !== namePrefix) {
+            var nameParts = mQuery(el).attr('name').match(/\[.*?\]+/g);
+            nameParts = nameParts.slice(0, -1);
+            settings.prefix = namePrefix + nameParts.join('') + "[" + object + "Fields]";
+        }
+    }
     var fieldsContainer = '#'+object+'FieldsContainer';
 
     var inModal = mQuery(fieldsContainer).closest('.modal');
@@ -246,11 +252,13 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
     if (typeof settings == 'undefined') {
         settings = {};
     }
-    settings.name = mQuery('#campaignevent_properties_integration').attr('name');
-    var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
-    if(typeof mQuery('#campaignevent_properties_integration').val() == 'undefined') {
-        data = {integration:mQuery('#formaction_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
-    }
+
+    // Extract the name and ID prefixes
+    var prefix = mQuery(el).attr('name').split("[")[0];
+
+    settings.name = mQuery('#'+prefix+'_properties_integration').attr('name');
+    var data = {integration:mQuery('#'+prefix+'_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
+
     mQuery('.integration-campaigns-status').html('');
     mQuery('.integration-campaigns-status').removeClass('hide');
     Mautic.ajaxActionRequest('plugin:getIntegrationCampaignStatus', data,

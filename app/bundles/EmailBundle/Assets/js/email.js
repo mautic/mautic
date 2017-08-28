@@ -22,18 +22,18 @@ Mautic.emailOnLoad = function (container, response) {
                 function (response) {
                    if (response.success && mQuery('#sent-count-' + id + ' div').length) {
                        if (response.pending) {
-                           mQuery('#pending-' + id).html(response.pending);
+                           mQuery('#pending-' + id + ' > a').html(response.pending);
                            mQuery('#pending-' + id).removeClass('hide');
                        }
 
                        if (response.queued) {
-                           mQuery('#queued-' + id).html(response.queued);
+                           mQuery('#queued-' + id + ' > a').html(response.queued);
                            mQuery('#queued-' + id).removeClass('hide');
                        }
 
-                       mQuery('#sent-count-' + id).html(response.sentCount);
-                       mQuery('#read-count-' + id).html(response.readCount);
-                       mQuery('#read-percent-' + id).html(response.readPercent);
+                       mQuery('#sent-count-' + id + ' > a').html(response.sentCount);
+                       mQuery('#read-count-' + id + ' > a').html(response.readCount);
+                       mQuery('#read-percent-' + id + ' > a').html(response.readPercent);
                    }
                },
                 false,
@@ -325,7 +325,7 @@ Mautic.createNewDynamicContentFilter = function(el, jQueryVariant) {
     var filterHolder         = parentElement.find('.tab-content');
     var filterBlockPrototype = mQuery('#filterBlockPrototype');
     var filterIndex          = filterHolder.find('.tab-pane').length - 1;
-    var dynamicContentIndex  = $this.attr('id').match(/\d+$/)[0];
+    var dynamicContentIndex  = $this.parents('.tab-pane').attr('id').match(/\d+$/)[0];
 
     var filterPrototype   = filterBlockPrototype.data('prototype');
     var filterContainerId = '#emailform_dynamicContent_' + dynamicContentIndex + '_filters_' + filterIndex ;

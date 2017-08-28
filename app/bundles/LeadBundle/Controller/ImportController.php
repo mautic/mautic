@@ -32,7 +32,7 @@ class ImportController extends FormController
     /**
      * @param int $page
      *
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function indexAction($page = 1)
     {
@@ -93,7 +93,7 @@ class ImportController extends FormController
             $importModel->saveEntity($import);
         }
 
-        $this->resetImport($fullPath);
+        $this->resetImport($fullPath, false);
 
         return $this->indexAction();
     }
@@ -520,7 +520,7 @@ class ImportController extends FormController
     /**
      * Return full absolute path to the CSV file.
      *
-     * @return sting
+     * @return string
      */
     protected function getFullCsvPath()
     {
