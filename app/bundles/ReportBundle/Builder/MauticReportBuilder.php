@@ -301,10 +301,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $fieldOptions = $options['columns'][$field];
 
                     if (array_key_exists('channelData', $fieldOptions)) {
-                        $selectText .= $this->buildCaseSelect($fieldOptions['channelData']);
+                        $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
                     } elseif (isset($options['columns'][$field]['alias']) && $options['columns'][$field]['alias'] == 'tag') {
                         $selField = (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $field;
-                        $selectText .= "GROUP_CONCAT({$selField})";
+                        $selectText = "GROUP_CONCAT({$selField})";
                     } else {
                         // If there is a group by, and this field has groupByFormula
                         if (isset($groupByColumns) && isset($fieldOptions['groupByFormula'])) {
@@ -433,7 +433,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         if (!$filter['value']) {
                             break;
                         }
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->in('lt.id', $filter['value'])
                         );
                         break;
@@ -441,7 +441,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         if (!$filter['value']) {
                             break;
                         }
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->notIn('lt.id', $filter['value'])
                         );
                         break;
