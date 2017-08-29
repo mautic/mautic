@@ -31,6 +31,8 @@ class Message
     public $toString;
     public $cc      = [];
     public $replyTo = [];
+    public $inReplyTo = false;
+    public $returnPath = false;
 
     public $textPlain;
     public $textHtml;

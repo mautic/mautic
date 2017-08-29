@@ -888,6 +888,14 @@ class Mailbox
                 ) : null;
             }
         }
+        
+        if(isset($headObject->in_reply_to)){
+            $mail->inReplyTo = $headObject->in_reply_to;
+        }
+        
+        if(isset($headObject->return_path)){
+            $mail->returnPath = $headObject->return_path;
+        }
 
         $mailStructure = imap_fetchstructure($this->getImapStream(), $mailId, FT_UID);
 

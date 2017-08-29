@@ -123,6 +123,11 @@ class Stat
     private $openDetails = [];
 
     /**
+     * @var bool
+     */
+    private $isReplyed = false;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -170,7 +175,7 @@ class Stat
         $builder->createField('isFailed', 'boolean')
             ->columnName('is_failed')
             ->build();
-
+        
         $builder->createField('viewedInBrowser', 'boolean')
             ->columnName('viewed_in_browser')
             ->build();
@@ -212,6 +217,11 @@ class Stat
         $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
+        
+        $builder->createField('isReplyed', 'boolean')
+            ->columnName('is_replyed')
+            ->build();
+
     }
 
     /**
@@ -618,5 +628,30 @@ class Stat
         $this->storedCopy = $storedCopy;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsReplyed()
+    {
+        return $this->isReplyed;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isReplyed()
+    {
+        return $this->getIsReplyed();
+    }
+    
+    
+    /**
+     * @param mixed $isReplyed
+     */
+    public function setIsReplyed($isReplyed)
+    {
+        $this->isReplyed = $isReplyed;
     }
 }
