@@ -85,13 +85,13 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
         $mappedData = $this->getClientWithContactsTemplate();
 
-        $mappedData['client']['CompanyName'] = $company->getName();
+        $mappedData['client']['AutomationRef'] = $company->getId();
         $mappedData['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $lead->getId();
 
         foreach ($companyFields as $integrationField => $mauticField) {
             if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
                 $method = 'get' . ucfirst($mauticField);
-                $mappedData[$integrationField] = $company->$method($mauticField);
+                $mappedData['client'][$integrationField] = $company->$method($mauticField);
             }
         }
 
