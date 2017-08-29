@@ -31,61 +31,61 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     const OPERATORS = [
         'default' => [
-            'eq'         => 'mautic.core.operator.equals',
-            'gt'         => 'mautic.core.operator.greaterthan',
-            'gte'        => 'mautic.core.operator.greaterthanequals',
-            'lt'         => 'mautic.core.operator.lessthan',
-            'lte'        => 'mautic.core.operator.lessthanequals',
-            'neq'        => 'mautic.core.operator.notequals',
-            'like'       => 'mautic.core.operator.islike',
-            'notLike'    => 'mautic.core.operator.isnotlike',
-            'empty'      => 'mautic.core.operator.isempty',
-            'notEmpty'   => 'mautic.core.operator.isnotempty',
-            'contains'   => 'mautic.core.operator.contains',
+            'eq' => 'mautic.core.operator.equals',
+            'gt' => 'mautic.core.operator.greaterthan',
+            'gte' => 'mautic.core.operator.greaterthanequals',
+            'lt' => 'mautic.core.operator.lessthan',
+            'lte' => 'mautic.core.operator.lessthanequals',
+            'neq' => 'mautic.core.operator.notequals',
+            'like' => 'mautic.core.operator.islike',
+            'notLike' => 'mautic.core.operator.isnotlike',
+            'empty' => 'mautic.core.operator.isempty',
+            'notEmpty' => 'mautic.core.operator.isnotempty',
+            'contains' => 'mautic.core.operator.contains',
             'startsWith' => 'mautic.core.operator.starts.with',
-            'endsWith'   => 'mautic.core.operator.ends.with',
+            'endsWith' => 'mautic.core.operator.ends.with',
         ],
         'bool' => [
-            'eq'  => 'mautic.core.operator.equals',
+            'eq' => 'mautic.core.operator.equals',
             'neq' => 'mautic.core.operator.notequals',
         ],
         'int' => [
-            'eq'  => 'mautic.core.operator.equals',
-            'gt'  => 'mautic.core.operator.greaterthan',
+            'eq' => 'mautic.core.operator.equals',
+            'gt' => 'mautic.core.operator.greaterthan',
             'gte' => 'mautic.core.operator.greaterthanequals',
-            'lt'  => 'mautic.core.operator.lessthan',
+            'lt' => 'mautic.core.operator.lessthan',
             'lte' => 'mautic.core.operator.lessthanequals',
             'neq' => 'mautic.core.operator.notequals',
         ],
         'multiselect' => [
-            'in'    => 'mautic.core.operator.in',
+            'in' => 'mautic.core.operator.in',
             'notIn' => 'mautic.core.operator.notin',
         ],
         'select' => [
-            'eq'  => 'mautic.core.operator.equals',
+            'eq' => 'mautic.core.operator.equals',
             'neq' => 'mautic.core.operator.notequals',
         ],
         'text' => [
-            'eq'         => 'mautic.core.operator.equals',
-            'neq'        => 'mautic.core.operator.notequals',
-            'empty'      => 'mautic.core.operator.isempty',
-            'notEmpty'   => 'mautic.core.operator.isnotempty',
-            'like'       => 'mautic.core.operator.islike',
-            'notLike'    => 'mautic.core.operator.isnotlike',
-            'contains'   => 'mautic.core.operator.contains',
+            'eq' => 'mautic.core.operator.equals',
+            'neq' => 'mautic.core.operator.notequals',
+            'empty' => 'mautic.core.operator.isempty',
+            'notEmpty' => 'mautic.core.operator.isnotempty',
+            'like' => 'mautic.core.operator.islike',
+            'notLike' => 'mautic.core.operator.isnotlike',
+            'contains' => 'mautic.core.operator.contains',
             'startsWith' => 'mautic.core.operator.starts.with',
-            'endsWith'   => 'mautic.core.operator.ends.with',
+            'endsWith' => 'mautic.core.operator.ends.with',
         ],
     ];
 
     /**
      * Standard Channel Columns.
      */
-    const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
-    const CHANNEL_COLUMN_NAME            = 'channel.name';
-    const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
-    const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
-    const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
+    const CHANNEL_COLUMN_CATEGORY_ID = 'channel.category_id';
+    const CHANNEL_COLUMN_NAME = 'channel.name';
+    const CHANNEL_COLUMN_DESCRIPTION = 'channel.description';
+    const CHANNEL_COLUMN_DATE_ADDED = 'channel.date_added';
+    const CHANNEL_COLUMN_CREATED_BY = 'channel.created_by';
     const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
     /**
@@ -123,9 +123,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
     {
-        $this->entity            = $entity;
-        $this->dispatcher        = $dispatcher;
-        $this->db                = $db;
+        $this->entity = $entity;
+        $this->dispatcher = $dispatcher;
+        $this->db = $db;
         $this->channelListHelper = $channelListHelper;
     }
 
@@ -178,7 +178,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
-        $standardFilters       = $this->entity->getFilters();
+        $standardFilters = $this->entity->getFilters();
 
         // Setup filters
         if (isset($options['dynamicFilters'])) {
@@ -187,7 +187,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             foreach ($dynamicFilters as $key => $dynamicFilter) {
                 foreach ($standardFilters as $i => $filter) {
                     if ($filter['column'] === $key && $filter['dynamic']) {
-                        $value     = $dynamicFilter['value'];
+                        $value = $dynamicFilter['value'];
                         $condition = $filter['condition'];
 
                         switch ($condition) {
@@ -293,13 +293,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build SELECT clause
         if (!$selectOptions = $event->getSelectColumns()) {
-            $fields         = $this->entity->getColumns();
+            $fields = $this->entity->getColumns();
             $groupByColumns = $queryBuilder->getQueryPart('groupBy');
 
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
                     $fieldOptions = $options['columns'][$field];
-
                     if (array_key_exists('channelData', $fieldOptions)) {
                         $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
                     } elseif (isset($options['columns'][$field]['alias']) && $options['columns'][$field]['alias'] == 'tag') {
@@ -341,7 +340,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $queryBuilder->addSelect($selectColumns);
 
         // Add Aggregators
-        $aggregators      = $this->entity->getAggregators();
+        $aggregators = $this->entity->getAggregators();
         $aggregatorSelect = [];
 
         if ($aggregators && $groupByOptions) {
@@ -396,18 +395,18 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)
     {
-        $expr      = $queryBuilder->expr();
-        $groups    = [];
+        $expr = $queryBuilder->expr();
+        $groups = [];
         $groupExpr = $queryBuilder->expr()->andX();
 
         if (count($filters)) {
             foreach ($filters as $i => $filter) {
                 $exprFunction = isset($filter['expr']) ? $filter['expr'] : $filter['condition'];
-                $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
+                $paramName = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
 
                 if (array_key_exists('glue', $filter) && $filter['glue'] === 'or') {
                     if ($groupExpr->count()) {
-                        $groups[]  = $groupExpr;
+                        $groups[] = $groupExpr;
                         $groupExpr = $queryBuilder->expr()->andX();
                     }
                 }
@@ -452,7 +451,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         }
 
                         $columnValue = ":$paramName";
-                        $type        = $filterDefinitions[$filter['column']]['type'];
+                        $type = $filterDefinitions[$filter['column']]['type'];
                         if (isset($filterDefinitions[$filter['column']]['formula'])) {
                             $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
                         }
@@ -481,15 +480,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'email':
                                 switch ($exprFunction) {
                                     case 'startsWith':
-                                        $exprFunction    = 'like';
+                                        $exprFunction = 'like';
                                         $filter['value'] = $filter['value'].'%';
                                         break;
                                     case 'endsWith':
-                                        $exprFunction    = 'like';
+                                        $exprFunction = 'like';
                                         $filter['value'] = '%'.$filter['value'];
                                         break;
                                     case 'contains':
-                                        $exprFunction    = 'like';
+                                        $exprFunction = 'like';
                                         $filter['value'] = '%'.$filter['value'].'%';
                                         break;
                                 }

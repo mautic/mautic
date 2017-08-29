@@ -46,15 +46,15 @@ class ReportFilterDataTransformer implements DataTransformerInterface
             }
             $type = $this->columns[$f['column']]['type'];
             if (in_array($type, ['datetime', 'date', 'time'])) {
-                $dt         = new DateTimeHelper($f['value'], '', 'utc');
+                $dt = new DateTimeHelper($f['value'], '', 'utc');
                 $f['value'] = $dt->toLocalString();
             }
             if (in_array($type, ['multiselect'])) {
-                $tmpVal     = ($f['value'] && !is_array($f['value'])) ? [$f['value']]: $f['value'];
+                $tmpVal = ($f['value'] && !is_array($f['value'])) ? [$f['value']] : $f['value'];
                 $f['value'] = ($tmpVal) ? implode(',', $tmpVal) : '';
             }
         }
-        
+
         return $filters;
     }
 
@@ -76,7 +76,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
             }
             $type = $this->columns[$f['column']]['type'];
             if (in_array($type, ['datetime', 'date', 'time'])) {
-                $dt         = new DateTimeHelper($f['value'], '', 'local');
+                $dt = new DateTimeHelper($f['value'], '', 'local');
                 $f['value'] = $dt->toUtcString();
             }
         }
