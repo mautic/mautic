@@ -8,9 +8,13 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class InesCRMApi extends CrmApi
 {
-    private $translator;
+    const ROOT_URL = 'https://webservices.inescrm.com';
 
-    private $rootUrl = 'https://webservices.inescrm.com';
+    const LOGIN_WS_PATH = '/wslogin/login.asmx';
+
+    const AUTOMATION_SYNC_WS_PATH = '/ws/WSAutomationSync.asmx';
+
+    private $translator;
 
     // FIXME: to remove along with mock requests
     private $client;
@@ -26,12 +30,12 @@ class InesCRMApi extends CrmApi
         // FIXME: to remove along with mock requests
         $this->client = new GuzzleHttp\Client();
 
-        $this->loginClient = $this->makeClient('/wslogin/login.asmx');
+        $this->loginClient = $this->makeClient(self::LOGIN_WS_PATH);
         $this->automationSyncClient = $this->makeClient('/ws/WSAutomationSync.asmx');
     }
 
     private function makeClient($path) {
-        return new \SoapClient($this->rootUrl . $path . '?wsdl');
+        return new \SoapClient(self::ROOT_URL . $path . '?wsdl');
     }
 
     private function getSessionId() {
@@ -64,7 +68,7 @@ class InesCRMApi extends CrmApi
         try {
             return $client->AddClientWithContacts($mappedData);
         } catch (\Exception $e) {
-            print_r($e);die();
+            dump($e);die();
         }
     }
 
