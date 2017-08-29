@@ -69,11 +69,31 @@ class InesCRMIntegration extends CrmAbstractIntegration
     public function pushLead($lead, $config = []) {
         $config = $this->mergeConfigToFeatureSettings($config);
 
+        $companyFields = $config['companyFields'];
         $leadFields = $config['leadFields'];
+
+        $companyRepo = $this->em->getRepository(Company::class);
+        $leadRepo = $this->em->getRepository(Lead::class);
+
+        $lead = $leadRepo->getEntityWithPrimaryCompany($lead);
+        $company = $companyRepo->getEntity($lead->getPrimaryCompany()['id']);
+
+        if ($company === null) {
+            $this->logger->info('INES: Will not push contact without company');
+            return;
+        }
+
         $mappedData = $this->getClientWithContactsTemplate();
 
-        $mappedData['client']['CompanyName'] = $lead->getCompany();
+        $mappedData['client']['CompanyName'] = $company->getName();
         $mappedData['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $lead->getId();
+
+        foreach ($companyFields as $integrationField => $mauticField) {
+            if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                $method = 'get' . ucfirst($mauticField);
+                $mappedData[$integrationField] = $company->$method($mauticField);
+            }
+        }
 
         foreach ($leadFields as $integrationField => $mauticField) {
             if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
@@ -82,15 +102,22 @@ class InesCRMIntegration extends CrmAbstractIntegration
             }
         }
 
+        $mappedData['InternalRef'] = 0;
         $mappedData['client']['Contacts']['ContactInfoAuto'][0]['InternalRef'] = 0;
 
         $response = $this->getApiHelper()->createLead($mappedData);
-        $inesContactRef = $response->AddClientWithContactsResult->Contacts->ContactInfoAuto->InternalRef;
+        $result = $response->AddClientWithContactsResult;
 
-        $method = 'set' . ucfirst($leadFields['InternalRef']);
-        $lead->$method($inesContactRef);
+        $inesCompanyRef = $result->InternalRef;
+        $inesContactRef = $result->Contacts->ContactInfoAuto->InternalRef;
 
-        $leadRepo = $this->em->getRepository(Lead::class);
+        $companyMethod = 'set' . ucfirst($companyFields['InternalRef']);
+        $leadMethod = 'set' . ucfirst($leadFields['InternalRef']);
+
+        $company->$companyMethod($inesCompanyRef);
+        $lead->$leadMethod($inesContactRef);
+
+        $companyRepo->saveEntity($company);
         $leadRepo->saveEntity($lead);
     }
 
