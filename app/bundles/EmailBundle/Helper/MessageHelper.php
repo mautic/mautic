@@ -32,6 +32,8 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailReplyEvent;
 
 /**
  * Class MessageHelper.
@@ -2143,5 +2145,47 @@ class MessageHelper
         }
 
         return $results;
+    }
+    
+    public function processReplyMail($mailId, $refid){
+        $this->logger->debug('Processing reply mail.');
+        $imapHelper = $this->factory->get('mautic.helper.mailbox');
+        $mail = $imapHelper->getMail($refid);
+        
+        if ($mail->returnPath && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $mail->returnPath, $parts)) {
+            if (strstr($parts[2], '_')) {
+                // Has an ID hash so use it to find the lead
+                list($ignore, $hashId) = explode('_', $parts[2]);
+            }
+        }
+
+        if (empty($hashId)) {
+            $this->logger->debug('Could not find the email identifier(hashId).');
+            return false;
+        }
+        $em = $this->factory->getEntityManager();
+        // Search for the lead
+        $statRepository = $em->getRepository('MauticEmailBundle:Stat');
+        // Search by hashId
+        $stat = $statRepository->findOneBy(['trackingHash' => $hashId]);
+        if (!$stat) {
+            $this->logger->debug('Email Stat could not found');
+        }
+        $this->logger->debug('Stat found with ID# ' . $stat->getId());
+        if(!$stat){
+            $this->logger->debug('Could not find the replied email.');
+            return false;
+        }
+        
+        $stat->setIsReplyed(1);
+        $em->flush($stat);
+        $dispatcher = $this->factory->getDispatcher();
+        if($dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
+            $request = $this->factory->getRequest();
+            $event = new EmailReplyEvent($stat, $request);
+            $dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
+            unset($event);
+        }
+        return true;
     }
 }

@@ -23,6 +23,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\EmailBundle\Event\EmailReplyEvent;
 
 /**
  * Class CampaignSubscriber.
@@ -82,6 +83,7 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
+            EmailEvents::EMAIL_ON_REPLY                => ['onEmailReply', 0],
         ];
     }
 
@@ -136,6 +138,22 @@ class CampaignSubscriber extends CommonSubscriber
                 'channelIdField'  => 'email',
             ]
         );
+        
+        $event->addDecision(
+                'email.reply', 
+                [
+                    'label' => 'mautic.email.campaign.event.reply',
+                    'description' => 'mautic.email.campaign.event.reply_descr',
+                    'eventName' => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                    'connectionRestrictions' => [
+                        'source' => [
+                            'action' => [
+                                'email.send',
+                            ],
+                        ],
+                    ],
+                ]
+            );
 
         $event->addAction(
             'email.send.to.user',
@@ -344,4 +362,19 @@ class CampaignSubscriber extends CommonSubscriber
 
         return $users;
     }
+    
+    
+    /**
+     * Trigger campaign event for reply to an email.
+     *
+     * @param EmailReplyEvent $event
+     */
+    public function onEmailReply(EmailReplyEvent $event)
+    {
+        $email = $event->getEmail();
+        if ($email !== null) {
+            $this->campaignEventModel->triggerEvent('email.reply', $email, 'email', $email->getId());
+        }
+    }
+
 }
