@@ -12,6 +12,8 @@ class InesCRMApi extends CrmApi
 
     const LOGIN_WS_PATH = '/wslogin/login.asmx';
 
+    const ICM_WS_PATH = '/ws/wsicm.asmx';
+
     const AUTOMATION_SYNC_WS_PATH = '/ws/WSAutomationSync.asmx';
 
     private $translator;
@@ -20,6 +22,8 @@ class InesCRMApi extends CrmApi
     private $client;
 
     private $loginClient;
+
+    private $icmClient;
 
     private $automationSyncClient;
 
@@ -31,7 +35,8 @@ class InesCRMApi extends CrmApi
         $this->client = new GuzzleHttp\Client();
 
         $this->loginClient = $this->makeClient(self::LOGIN_WS_PATH);
-        $this->automationSyncClient = $this->makeClient('/ws/WSAutomationSync.asmx');
+        $this->icmClient = $this->makeClient(self::ICM_WS_PATH);
+        $this->automationSyncClient = $this->makeClient(self::AUTOMATION_SYNC_WS_PATH);
     }
 
     private function makeClient($path) {
@@ -61,7 +66,36 @@ class InesCRMApi extends CrmApi
         $client->__setSoapHeaders($headers);
     }
 
-    public function createLead($mappedData) {
+    public function getCustomFields() {
+        $client = $this->automationSyncClient;
+        $this->setAuthHeaders($client);
+
+        return $client->GetSyncInfo();
+    }
+
+    public function getClient($internalRef) {
+        $client = $this->icmClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->GetClient(['reference' => $internalRef]);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
+    }
+
+    public function getContact($internalRef) {
+        $client = $this->icmClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->GetContact(['reference' => $internalRef]);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
+    }
+
+    public function createClientWithContacts($mappedData) {
         $client = $this->automationSyncClient;
         $this->setAuthHeaders($client);
 
@@ -72,16 +106,32 @@ class InesCRMApi extends CrmApi
         }
     }
 
+    // FIXME: To be removed or changed to `createClient`
     public function createCompany($mappedData) {
         $this->client->request('POST', 'http://localhost:4567/push_company', [
             'form_params' => $mappedData
         ]);
     }
 
-    public function getCustomFields() {
-        $client = $this->automationSyncClient;
+    public function updateClient($inesClient) {
+        $client = $this->icmClient;
         $this->setAuthHeaders($client);
 
-        return $client->GetSyncInfo();
+        try {
+            return $client->UpdateClient(['client' => $inesClient]);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
+    }
+
+    public function updateContact($inesContact) {
+        $client = $this->icmClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->UpdateContact(['contact' => $inesContact]);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
     }
 }

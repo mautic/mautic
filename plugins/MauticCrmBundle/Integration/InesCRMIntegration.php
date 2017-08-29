@@ -72,6 +72,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $companyFields = $config['companyFields'];
         $leadFields = $config['leadFields'];
 
+        $apiHelper = $this->getApiHelper();
+
         $companyRepo = $this->em->getRepository(Company::class);
         $leadRepo = $this->em->getRepository(Lead::class);
 
@@ -79,46 +81,100 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $company = $companyRepo->getEntity($lead->getPrimaryCompany()['id']);
 
         if ($company === null) {
-            $this->logger->info('INES: Will not push contact without company');
+            $this->logger->debug('INES: Will not push contact without company', compact('lead', 'config'));
             return;
         }
 
-        $mappedData = $this->getClientWithContactsTemplate();
+        $companyInternalRefGetter = 'get' . ucfirst($companyFields['InternalRef']);
+        $leadInternalRefGetter = 'get' . ucfirst($leadFields['InternalRef']);
 
-        $mappedData['client']['AutomationRef'] = $company->getId();
-        $mappedData['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $lead->getId();
+        $clientInternalRef = $company->$companyInternalRefGetter();
+        $contactInternalRef = $lead->$leadInternalRefGetter();
 
-        foreach ($companyFields as $integrationField => $mauticField) {
-            if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
-                $method = 'get' . ucfirst($mauticField);
-                $mappedData['client'][$integrationField] = $company->$method($mauticField);
+        if (!$clientInternalRef) {
+            if (!$contactInternalRef) {
+                $this->logger->debug('INES: Will create Client and Contact', compact('lead', 'company', 'config'));
+
+                $mappedData = $this->getClientWithContactsTemplate();
+
+                $mappedData['client']['AutomationRef'] = $company->getId();
+                $mappedData['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $lead->getId();
+
+                foreach ($companyFields as $integrationField => $mauticField) {
+                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                        $method = 'get' . ucfirst($mauticField);
+                        $mappedData['client'][$integrationField] = $company->$method($mauticField);
+                    }
+                }
+
+                foreach ($leadFields as $integrationField => $mauticField) {
+                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                        $method = 'get' . ucfirst($mauticField);
+                        $mappedData['client']['Contacts']['ContactInfoAuto'][0][$integrationField] = $lead->$method();
+                    }
+                }
+
+                $mappedData['client']['InternalRef'] = 0;
+                $mappedData['client']['Contacts']['ContactInfoAuto'][0]['InternalRef'] = 0;
+
+                $response = $apiHelper->createClientWithContacts($mappedData);
+                $result = $response->AddClientWithContactsResult;
+
+                $inesClientRef = $result->InternalRef;
+                $inesContactRef = $result->Contacts->ContactInfoAuto->InternalRef;
+
+                $companyInternalRefSetter = 'set' . ucfirst($companyFields['InternalRef']);
+                $leadInternalRefSetter = 'set' . ucfirst($leadFields['InternalRef']);
+
+                $company->$companyInternalRefSetter($inesClientRef);
+                $lead->$leadInternalRefSetter($inesContactRef);
+
+                $companyRepo->saveEntity($company);
+                $leadRepo->saveEntity($lead);
+            } else {
+                $this->logger->debug('INES: Will create Client and update Contact', compact('lead', 'company', 'config'));
+            }
+        } else {
+            if (!$contactInternalRef) {
+                $this->logger->debug('INES: Will update Client and create Contact', compact('lead', 'company', 'config'));
+            } else {
+                $this->logger->debug('INES: Will update Client and Contact', compact('lead', 'company', 'config'));
+
+                $inesClient = $apiHelper->getClient($clientInternalRef)->GetClientResult;
+                $inesContact = $apiHelper->getContact($contactInternalRef)->GetContactResult;
+
+                $shouldUpdateClient = false;
+                $shouldUpdateContact = false;
+
+                foreach ($companyFields as $integrationField => $mauticField) {
+                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                        $method = 'get' . ucfirst($mauticField);
+                        if ((string) $inesClient->$integrationField !== (string) $company->$method($mauticField)) {
+                            $shouldUpdateClient = true;
+                            $inesClient->$integrationField = $company->$method($mauticField);
+                        }
+                    }
+                }
+
+                foreach ($leadFields as $integrationField => $mauticField) {
+                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                        $method = 'get' . ucfirst($mauticField);
+                        if ((string) $inesContact->$integrationField !== (string) $lead->$method($mauticField)) {
+                            $shouldUpdateContact = true;
+                            $inesContact->$integrationField = $lead->$method($mauticField);
+                        }
+                    }
+                }
+
+                if ($shouldUpdateClient) {
+                    $apiHelper->updateClient($inesClient);
+                }
+
+                if ($shouldUpdateContact) {
+                    $apiHelper->updateContact($inesContact);
+                }
             }
         }
-
-        foreach ($leadFields as $integrationField => $mauticField) {
-            if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
-                $method = 'get' . ucfirst($mauticField);
-                $mappedData['client']['Contacts']['ContactInfoAuto'][0][$integrationField] = $lead->$method();
-            }
-        }
-
-        $mappedData['InternalRef'] = 0;
-        $mappedData['client']['Contacts']['ContactInfoAuto'][0]['InternalRef'] = 0;
-
-        $response = $this->getApiHelper()->createLead($mappedData);
-        $result = $response->AddClientWithContactsResult;
-
-        $inesCompanyRef = $result->InternalRef;
-        $inesContactRef = $result->Contacts->ContactInfoAuto->InternalRef;
-
-        $companyMethod = 'set' . ucfirst($companyFields['InternalRef']);
-        $leadMethod = 'set' . ucfirst($leadFields['InternalRef']);
-
-        $company->$companyMethod($inesCompanyRef);
-        $lead->$leadMethod($inesContactRef);
-
-        $companyRepo->saveEntity($company);
-        $leadRepo->saveEntity($lead);
     }
 
     public function pushCompany($company, $config = []) {
