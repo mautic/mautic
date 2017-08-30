@@ -65,6 +65,9 @@ $container->loadFromExtension('doctrine', [
     ],
 ]);
 
+// Ensure the mautic.db_table_prefix is set to our phpunit configuration.
+$container->setParameter('mautic.db_table_prefix', MAUTIC_TABLE_PREFIX);
+
 $container->loadFromExtension('monolog', [
     'channels' => [
         'mautic',

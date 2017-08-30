@@ -1,46 +1,60 @@
 /** EmailBundle **/
 Mautic.emailOnLoad = function (container, response) {
-    var plaintext = mQuery('#emailform_plainText');
-
     if (mQuery('#emailform_plainText').length) {
         // @todo initiate the token dropdown
+        var plaintext = mQuery('#emailform_plainText');
+
+        Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
+        Mautic.initSelectTheme(mQuery('#emailform_template'));
+        Mautic.initEmailDynamicContent();
+
+        Mautic.prepareVersioning(
+            function (content) {
+                console.log('undo');
+            },
+            function (content) {
+                console.log('redo');
+            }
+        );
+
+        // Open the builder directly when saved from the builder
+        if (response && response.inBuilder) {
+            Mautic.launchBuilder('emailform');
+            Mautic.processBuilderErrors(response);
+        }
     } else if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'email');
-    }
 
-    Mautic.initAtWho(plaintext, plaintext.attr('data-token-callback'));
-    Mautic.initSelectTheme(mQuery('#emailform_template'));
-    Mautic.initEmailDynamicContent();
+        if (mQuery('table.email-list').length) {
+            mQuery('td.col-stats').each(function () {
+                var id = mQuery(this).attr('data-stats');
+                // Process the request one at a time or the xhr will cancel the previous
+                Mautic.ajaxActionRequest(
+                    'email:getEmailCountStats',
+                    {id: id},
+                    function (response) {
+                        if (response.success && mQuery('#sent-count-' + id + ' div').length) {
+                            if (response.pending) {
+                                mQuery('#pending-' + id + ' > a').html(response.pending);
+                                mQuery('#pending-' + id).removeClass('hide');
+                            }
 
-    if (mQuery('table.email-list').length) {
-        mQuery('td.col-stats').each(function() {
-           var id = mQuery(this).attr('data-stats');
-           // Process the request one at a time or the xhr will cancel the previous
-            Mautic.ajaxActionRequest(
-                'email:getEmailCountStats',
-                {id: id},
-                function (response) {
-                   if (response.success && mQuery('#sent-count-' + id + ' div').length) {
-                       if (response.pending) {
-                           mQuery('#pending-' + id).html(response.pending);
-                           mQuery('#pending-' + id).removeClass('hide');
-                       }
+                            if (response.queued) {
+                                mQuery('#queued-' + id + ' > a').html(response.queued);
+                                mQuery('#queued-' + id).removeClass('hide');
+                            }
 
-                       if (response.queued) {
-                           mQuery('#queued-' + id).html(response.queued);
-                           mQuery('#queued-' + id).removeClass('hide');
-                       }
+                            mQuery('#sent-count-' + id + ' > a').html(response.sentCount);
+                            mQuery('#read-count-' + id + ' > a').html(response.readCount);
+                            mQuery('#read-percent-' + id + ' > a').html(response.readPercent);
+                        }
+                    },
+                    false,
+                    true
+                );
 
-                       mQuery('#sent-count-' + id).html(response.sentCount);
-                       mQuery('#read-count-' + id).html(response.readCount);
-                       mQuery('#read-percent-' + id).html(response.readPercent);
-                   }
-               },
-                false,
-                true
-            );
-
-        });
+            });
+        }
     }
 };
 

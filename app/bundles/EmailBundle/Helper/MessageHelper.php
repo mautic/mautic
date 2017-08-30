@@ -703,7 +703,7 @@ class MessageHelper
         * xxxxx@yourdomain.com^M
         * *****************     End of message     ***************^M
         */
-        elseif (preg_match("/\s(\S+@\S+\w).*No such.*(?:alias|account|recipient|address|email|mailbox|user)>/i", $body, $match)) {
+        elseif (preg_match("/\s(\S+@\S+\w).*[\r\n]*.*No such.*(?:alias|account|recipient|address|email|mailbox|user)/i", $body, $match)) {
             $result['rule_cat'] = 'unknown';
             $result['rule_no']  = '0234';
             $result['email']    = $match[1];
@@ -770,6 +770,17 @@ class MessageHelper
         * mailbox is full (MTA-imposed quota exceeded while writing to file /mbx201/mbx011/A100/09/35/A1000935772/mail/.inbox):
         */
         elseif (preg_match("/\s(\S+@\S+\w)\s.*\n?.*mailbox.*full/i", $body, $match)) {
+            $result['rule_cat'] = 'full';
+            $result['rule_no']  = '0166';
+            $result['email']    = $match[1];
+
+        /*
+        * rule: mailbox full;
+        * sample:
+        * name@domain.com
+        * Delay reason: LMTP error after end of data: 452 4.2.2 <name@domain.com> Mailbox is full / Blocks limit exceeded / Inode limit exceeded
+        */
+        } elseif (preg_match("/\s<(\S+@\S+\w)>\sMailbox.*full/i", $body, $match)) {
             $result['rule_cat'] = 'full';
             $result['rule_no']  = '0166';
             $result['email']    = $match[1];
@@ -1047,7 +1058,7 @@ class MessageHelper
                      * sample 3:
                      * Diagnostic-Code: SMTP; 550 relaying to <xxxxx@yourdomain.com> prohibited by administrator
                      */
-                    elseif (preg_match('/Relay.*(?:denied|prohibited)/is', $diag_code)) {
+                    elseif (preg_match('/Relay.*(?:denied|prohibited|disallowed)/is', $diag_code)) {
                         $result['rule_cat'] = 'unknown';
                         $result['rule_no']  = '0108';
                     }
@@ -1587,6 +1598,12 @@ class MessageHelper
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0130';
                     } elseif (preg_match('/Host not found/i', $diag_code)) {
+                        $result['rule_cat'] = 'dns_unknown';
+                        $result['rule_no']  = '0130';
+                    } elseif (preg_match('/Domain not found/i', $diag_code)) {
+                        $result['rule_cat'] = 'dns_unknown';
+                        $result['rule_no']  = '0130';
+                    } elseif (preg_match('/Host or domain name not found/i', $diag_code)) {
                         $result['rule_cat'] = 'dns_unknown';
                         $result['rule_no']  = '0130';
                     }

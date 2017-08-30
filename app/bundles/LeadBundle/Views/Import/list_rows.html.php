@@ -18,7 +18,7 @@
         </td>
         <td>
             <div>
-                <?php if (in_array($item->getStatus(), [$item::QUEUED, $item::IN_PROGRESS, $item::STOPPED])) : ?>
+                <?php if (in_array($item->getStatus(), [$item::QUEUED, $item::IN_PROGRESS, $item::STOPPED]) && $permissions[$permissionBase.':publish']) : ?>
                 <?php echo $view->render(
                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                     ['item' => $item, 'model' => 'lead.import']
@@ -27,7 +27,7 @@
                 <?php if ($view['security']->hasEntityAccess(true, $permissions[$permissionBase.':viewother'], $item->getCreatedBy())) : ?>
                     <a href="<?php echo $view['router']->path(
                         $actionRoute,
-                        ['objectAction' => 'view', 'objectId' => $item->getId()]
+                        ['objectAction' => 'view', 'objectId' => $item->getId(), 'object' => $app->getRequest()->get('object', 'contacts')]
                     ); ?>" data-toggle="ajax">
                         <?php echo $item->getName(); ?>
                     </a>

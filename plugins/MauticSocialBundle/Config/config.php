@@ -54,10 +54,10 @@ return [
                 'class' => 'MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber',
             ],
             'mautic.social.campaignbundle.subscriber' => [
-                'class'     => 'MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber',
+                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
-                    'mautic.factory',
                     'mautic.social.helper.campaign',
+                    'mautic.helper.integration',
                 ],
             ],
             'mautic.social.configbundle.subscriber' => [

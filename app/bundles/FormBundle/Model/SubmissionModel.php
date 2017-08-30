@@ -29,7 +29,10 @@ use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -759,18 +762,19 @@ class SubmissionModel extends CommonFormModel
     /**
      * Create/update lead from form submit.
      *
-     * @param       $form
+     * @param Form  $form
      * @param array $leadFieldMatches
      *
      * @return Lead
      */
-    protected function createLeadFromSubmit($form, array $leadFieldMatches, $leadFields)
+    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields)
     {
         //set the mapped data
         $inKioskMode   = $form->isInKioskMode();
         $leadId        = null;
         $lead          = new Lead();
         $currentFields = $leadFieldMatches;
+        $companyFields = $this->leadFieldModel->getFieldListWithProperties('company');
 
         if (!$inKioskMode) {
             // Default to currently tracked lead
@@ -806,6 +810,19 @@ class SubmissionModel extends CommonFormModel
             }
 
             return ($uniqueOnly) ? $uniqueFieldsWithData : [$data, $uniqueFieldsWithData];
+        };
+
+        // Closure to get data and unique fields
+        $getCompanyData = function ($currentFields) use ($companyFields) {
+            $companyData = [];
+            foreach ($companyFields as $alias => $properties) {
+                if (isset($currentFields[$alias])) {
+                    $value               = $currentFields[$alias];
+                    $companyData[$alias] = $value;
+                }
+            }
+
+            return $companyData;
         };
 
         // Closure to help search for a conflict
@@ -940,6 +957,21 @@ class SubmissionModel extends CommonFormModel
         } else {
             // Set system current lead which will still allow execution of events without generating tracking cookies
             $this->leadModel->setSystemCurrentLead($lead);
+        }
+
+        $companyFieldMatches = $getCompanyData($leadFieldMatches);
+        if (!empty($companyFieldMatches)) {
+            list($company, $leadAdded, $companyEntity) = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $lead, $this->companyModel);
+            if ($leadAdded) {
+                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+            }
+
+            if (!empty($company) and $companyEntity instanceof Company) {
+                // Save after the lead in for new leads created through the API and maybe other places
+                $this->companyModel->addLeadToCompany($companyEntity, $lead);
+                $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+            }
+            $this->em->clear(CompanyChangeLog::class);
         }
 
         return $lead;

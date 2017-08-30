@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -23,18 +24,18 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get a lead's point log.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      *
      * @return array
      */
-    public function getLeadTimelineEvents($leadId, array $options = [])
+    public function getLeadTimelineEvents($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id');
+            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id, .lp.lead_id');
 
-        if (null !== $leadId) {
+        if ($leadId) {
             $query->where('lp.lead_id = '.(int) $leadId);
         }
 
@@ -58,7 +59,7 @@ class PointsChangeLogRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostPoints($query, $limit = 10, $offset = 0)
+    public function getMostPoints(QueryBuilder $query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
@@ -78,7 +79,7 @@ class PointsChangeLogRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostLeads($query, $limit = 10, $offset = 0)
+    public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0)
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
@@ -97,8 +98,10 @@ class PointsChangeLogRepository extends CommonRepository
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
+     *
+     * @deprecated 2.10 - to be removed in 3.0 - never used in the codebase
      */
-    public function countValue($query, $column, $value)
+    public function countValue(QueryBuilder $query, $column, $value)
     {
         $query->select('count('.$column.') as quantity')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
@@ -114,8 +117,8 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      *
-     * @param $fromLeadId
-     * @param $toLeadId
+     * @param int $fromLeadId
+     * @param int $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {

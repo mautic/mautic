@@ -89,7 +89,7 @@ class MailHelper
     protected $errors = [];
 
     /**
-     * @var null
+     * @var array|Lead
      */
     protected $lead = null;
 
@@ -214,6 +214,13 @@ class MailHelper
     protected $fatal = false;
 
     /**
+     * Flag whether to use only the globally set From email and name or whether to switch to mailer is owner.
+     *
+     * @var bool
+     */
+    protected $useGlobalFrom = false;
+
+    /**
      * Large batch mail sends may result on timeouts with SMTP servers. This will will keep track of the number of sends and restart the connection once met.
      *
      * @var int
@@ -332,13 +339,13 @@ class MailHelper
         if (!$isQueueFlush) {
             if ($useOwnerAsMailer) {
                 if ($owner = $this->getContactOwner($this->lead)) {
-                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name']);
+                    $this->setFrom($owner['email'], $owner['first_name'].' '.$owner['last_name'], null);
                     $ownerSignature = $this->getContactOwnerSignature($owner);
                 } else {
-                    $this->setFrom($this->from);
+                    $this->setFrom($this->from, null, null);
                 }
             } elseif (!$from = $this->message->getFrom()) {
-                $this->setFrom($this->from);
+                $this->setFrom($this->from, null, null);
             }
         } // from is set in flushQueue
 
@@ -518,6 +525,7 @@ class MailHelper
 
                 $this->metadata[$fromKey]['contacts'][$email] =
                     [
+                        'name'        => $name,
                         'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
                         'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
                         'hashId'      => $this->idHash,
@@ -588,16 +596,19 @@ class MailHelper
             if (count($this->metadata) && empty($this->fatal)) {
                 $errors             = $this->errors;
                 $errors['failures'] = [];
-
-                $result = true;
+                $result             = true;
 
                 foreach ($this->metadata as $fromKey => $metadatum) {
+                    // Whatever is in the message "to" should be ignored as we will send to the contacts grouped by from addresses
+                    // This prevents mailers such as sparkpost from sending duplicates to contacts
+                    $this->message->setTo([]);
+
                     $this->errors = [];
 
-                    if ($useOwnerAsMailer && 'default' !== $fromKey) {
-                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name']);
+                    if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
+                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
                     } else {
-                        $this->setFrom($this->from);
+                        $this->setFrom($this->from, null, null);
                     }
 
                     foreach ($metadatum['contacts'] as $email => $contact) {
@@ -607,14 +618,13 @@ class MailHelper
                         if (!empty($contact['leadId'])) {
                             $this->queueAssetDownloadEntry($email, $contact);
                         }
+
+                        $this->message->addTo($email, $contact['name']);
                     }
 
                     if (!$this->send(false, true)) {
                         $result = false;
                     }
-
-                    // Clear metadata for the previous recipients
-                    $this->message->clearMetadata();
 
                     // Merge errors
                     if (isset($this->errors['failures'])) {
@@ -625,6 +635,9 @@ class MailHelper
                     if (!empty($this->errors)) {
                         $errors = array_merge($errors, $this->errors);
                     }
+
+                    // Clear metadata for the previous recipients
+                    $this->message->clearMetadata();
                 }
 
                 $this->errors = $errors;
@@ -657,10 +670,11 @@ class MailHelper
     {
         unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
 
-        $this->eventTokens  = $this->queuedRecipients  = $this->errors  = [];
-        $this->lead         = $this->idHash         = $this->contentHash         = null;
-        $this->internalSend = $this->fatal = false;
-        $this->idHashState  = true;
+        $this->eventTokens   = $this->queuedRecipients   = $this->errors   = [];
+        $this->lead          = $this->idHash          = $this->contentHash          = null;
+        $this->internalSend  = $this->fatal  = false;
+        $this->idHashState   = true;
+        $this->useGlobalFrom = false;
 
         $this->logger->clear();
 
@@ -1056,8 +1070,8 @@ class MailHelper
     /**
      * Add to address.
      *
-     * @param      $address
-     * @param null $name
+     * @param string $address
+     * @param null   $name
      *
      * @return bool
      */
@@ -1081,8 +1095,8 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param $addresses
-     * @param $name
+     * @param mixed $addresses
+     * @param sting $name
      *
      * @return bool
      */
@@ -1105,8 +1119,8 @@ class MailHelper
     /**
      * Add cc address.
      *
-     * @param      $address
-     * @param null $name
+     * @param mixed $address
+     * @param null  $name
      *
      * @return bool
      */
@@ -1129,8 +1143,8 @@ class MailHelper
     /**
      * Set BCC address(es).
      *
-     * @param $addresses
-     * @param $name
+     * @param mixed  $addresses
+     * @param string $name
      *
      * @return bool
      */
@@ -1153,8 +1167,8 @@ class MailHelper
     /**
      * Add bcc address.
      *
-     * @param      $address
-     * @param null $name
+     * @param string $address
+     * @param null   $name
      *
      * @return bool
      */
@@ -1227,16 +1241,32 @@ class MailHelper
     }
 
     /**
-     * Set from address (defaults to system).
+     * Set from email address and name (defaults to determining automatically unless isGlobal is true).
      *
-     * @param $address
-     * @param $name
+     * @param string|array $fromEmail
+     * @param string       $fromName
+     * @param bool|null    $isGlobal
      */
-    public function setFrom($address, $name = null)
+    public function setFrom($fromEmail, $fromName = null, $isGlobal = true)
     {
+        if (null !== $isGlobal) {
+            if ($isGlobal) {
+                if (is_array($fromEmail)) {
+                    $this->from = $fromEmail;
+                } else {
+                    $this->from = [$fromEmail => $fromName];
+                }
+            } else {
+                // Reset the default to the system from
+                $this->from = $this->systemFrom;
+            }
+
+            $this->useGlobalFrom = $isGlobal;
+        }
+
         try {
-            $name = $this->cleanName($name);
-            $this->message->setFrom($address, $name);
+            $fromName = $this->cleanName($fromName);
+            $this->message->setFrom($fromEmail, $fromName);
         } catch (\Exception $e) {
             $this->logError($e, 'from');
         }
@@ -1296,7 +1326,7 @@ class MailHelper
     }
 
     /**
-     * @return Lead
+     * @return array|Lead
      */
     public function getLead()
     {
@@ -1304,8 +1334,8 @@ class MailHelper
     }
 
     /**
-     * @param null $lead
-     * @param bool internalSend  Set to true if the email is not being sent to this lead
+     * @param array|Lead $lead
+     * @param bool       $internalSend Set to true if the email is not being sent to this lead
      */
     public function setLead($lead, $interalSend = false)
     {
@@ -1377,7 +1407,7 @@ class MailHelper
                 $fromEmail = key($this->from);
             }
 
-            $this->setFrom($fromEmail, $fromName);
+            $this->setFrom($fromEmail, $fromName, null);
             $this->from = [$fromEmail => $fromName];
         } else {
             $this->from = $this->systemFrom;

@@ -13,19 +13,24 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailController extends FormController
 {
     use BuilderControllerTrait;
+    use FormErrorMessagesTrait;
+    use EntityContactsTrait;
 
     /**
      * @param int $page
@@ -455,6 +460,14 @@ class EmailController extends FormController
                         ['objectId' => $email->getId()],
                         true
                     ),
+                    'contacts' => $this->forward(
+                        'MauticEmailBundle:Email:contacts',
+                        [
+                            'objectId'   => $email->getId(),
+                            'page'       => $this->get('session')->get('mautic.email.contact.page', 1),
+                            'ignoreAjax' => true,
+                        ]
+                    )->getContent(),
                     'dateRangeForm' => $dateRangeForm->createView(),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:details.html.php',
@@ -614,6 +627,7 @@ class EmailController extends FormController
                             'objectAction' => 'new',
                         ]
                     ),
+                    'validationError' => $this->getFormErrorForBuilder($form),
                 ],
             ]
         );
@@ -818,6 +832,7 @@ class EmailController extends FormController
                             'objectId'     => $entity->getId(),
                         ]
                     ),
+                    'validationError' => $this->getFormErrorForBuilder($form),
                 ],
             ]
         );
@@ -1582,5 +1597,24 @@ class EmailController extends FormController
 
         // everything is ok
         return true;
+    }
+
+    /**
+     * @param     $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            ['email:emails:viewown', 'email:emails:viewother'],
+            'email',
+            'email_stats',
+            'email',
+            'email_id'
+        );
     }
 }
