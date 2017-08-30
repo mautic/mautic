@@ -460,11 +460,11 @@ Mautic.sendBuilderContentToTextarea = function(callback, keepBuilderContent) {
 }
 
 Mautic.sanitizeHtmlAndStoreToTextarea = function(html) {
-    Mautic.sanitizeHtmlBeforeSave(html);
+    var cleanHtml = Mautic.sanitizeHtmlBeforeSave(html);
 
     // Store the HTML content to the HTML textarea
-    mQuery('.builder-html').val(Mautic.domToString(html));
-}
+    mQuery('.builder-html').val(Mautic.domToString(cleanHtml));
+};
 
 /**
  * Serializes DOM (full HTML document) to string
@@ -473,9 +473,12 @@ Mautic.sanitizeHtmlAndStoreToTextarea = function(html) {
  * @return string
  */
 Mautic.domToString = function(dom) {
+    if (typeof dom === 'string') {
+        return dom;
+    }
     var xs = new XMLSerializer();
     return xs.serializeToString(dom.get(0));
-}
+};
 
 /**
  * Removes stuff the Builder needs for it's magic but cannot be in the HTML result
@@ -495,7 +498,9 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
 
     // Convert dynamic slot definitions into tokens
     customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
-}
+
+    return customHtml;
+};
 
 /**
  * Clones full HTML document by creating a virtual iframe, putting the HTML into it and
@@ -1658,7 +1663,7 @@ Mautic.convertDynamicContentTokenToSlot = function(token) {
 };
 
 Mautic.getDynamicContentDataForToken = function(token) {
-    var dynConName      = /\{dynamiccontent="(.*)"}/.exec(token)[1];
+    var dynConName      = /\{dynamiccontent="(.*)"\}/.exec(token)[1];
     var dynConTabs      = parent.mQuery('#dynamicContentTabs');
     var dynConTarget    = dynConTabs.find('a:contains("'+dynConName+'")').attr('href');
     var dynConContainer = parent.mQuery(dynConTarget);
@@ -1686,21 +1691,25 @@ Mautic.convertDynamicContentSlotsToTokens = function (builderHtml) {
 
     if (dynConSlots.length) {
         dynConSlots.each(function(i) {
-            var $this    = mQuery(this);
-            var dynConId = $this.attr('data-param-dec-id');
-
-            dynConId = '#emailform_dynamicContent_'+dynConId;
+            var $this     = mQuery(this);
+            var dynConNum = $this.attr('data-param-dec-id');
+            var dynConId  = '#emailform_dynamicContent_' + dynConNum;
 
             var dynConTarget = mQuery(dynConId);
-            var dynConName   = dynConTarget.find(dynConId+'_tokenName').val();
-            var dynConToken  = '{dynamiccontent="'+dynConName+'"}';
+            var dynConName   = dynConTarget.find(dynConId + '_tokenName').val();
+            var dynConToken  = '{dynamiccontent="' + dynConName+'"}';
 
             // Add the dynamic content tokens
             if (!Mautic.builderTokens.hasOwnProperty(dynConToken)) {
                 Mautic.builderTokens[dynConToken] = dynConName;
             }
 
-            builderHtml = builderHtml.replace(this.outerHTML, dynConToken);
+            // hack to convert builder HTML to jQuery and replace slot with token
+            var parser = new DOMParser();
+            var el = parser.parseFromString(builderHtml, "text/html");
+            var $b = mQuery(el);
+            $b.find('div[data-param-dec-id=' + dynConNum + ']').replaceWith(dynConToken);
+            builderHtml = Mautic.domToString($b);
 
             // If it's still wrapped in an atwho, remove that
             if ($this.parent().hasClass('atwho-inserted')) {

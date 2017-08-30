@@ -238,10 +238,13 @@ class TokenSubscriber extends CommonSubscriber
                     $groups[$groupNum] = !empty($leadVal);
                     break;
                 case 'like':
-                    $groups[$groupNum] = strpos($leadVal, $filterVal) !== false;
+                    $filterVal         = str_replace(['.', '*', '%'], ['\.', '\*', '.*'], $filterVal);
+                    $groups[$groupNum] = preg_match('/'.$filterVal.'/', $leadVal) === 1;
                     break;
                 case '!like':
-                    $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
+                    $filterVal         = str_replace(['.', '*'], ['\.', '\*'], $filterVal);
+                    $filterVal         = str_replace('%', '.*', $filterVal);
+                    $groups[$groupNum] = preg_match('/'.$filterVal.'/', $leadVal) !== 1;
                     break;
                 case 'in':
                     foreach ($leadVal as $k => $v) {
