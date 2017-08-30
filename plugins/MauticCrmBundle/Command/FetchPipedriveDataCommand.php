@@ -49,7 +49,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
         ];
 
         if ($integrationObject->isCompanySupportEnabled()) {
-            $types = ['company'  => PipedriveApi::ORGANIZATIONS_API_ENDPOINT] + $types;
+            $types = ['company' => PipedriveApi::ORGANIZATIONS_API_ENDPOINT] + $types;
         }
 
         if ($integrationObject->isDealSupportEnabled()) {

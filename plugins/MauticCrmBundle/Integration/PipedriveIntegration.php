@@ -321,8 +321,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     [
                         'label' => 'mautic.pipedrive.offer_product_comment',
                         'attr'  => [
-                            'class'        => 'form-control',
-                            'tooltip'      => 'mautic.pipedrive.product_comment.tooltip',
+                            'class'   => 'form-control',
+                            'tooltip' => 'mautic.pipedrive.product_comment.tooltip',
                             // 'data-hide-on' => $noProductChosen,
                             // 'data-show-on' => $pushDeal,
                         ],

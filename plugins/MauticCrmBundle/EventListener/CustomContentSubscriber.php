@@ -57,8 +57,8 @@ class CustomContentSubscriber extends CommonSubscriber
                     $deals = $this->em->getRepository('MauticCrmBundle:PipedriveDeal')->findByLead($lead);
 
                     $event->addTemplate('MauticCrmBundle:Integration:pipedrive_lead_tab.content.html.php', [
-                        'deals'      => $deals,
-                        'tmpl'       => 'index',
+                        'deals' => $deals,
+                        'tmpl'  => 'index',
                     ]);
                 }
             }

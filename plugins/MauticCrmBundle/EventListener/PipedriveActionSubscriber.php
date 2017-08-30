@@ -29,8 +29,8 @@ class PipedriveActionSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_ON_BUILD     => ['onFormBuilder', 0],
-            PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
+            FormEvents::FORM_ON_BUILD   => ['onFormBuilder', 0],
+            PointEvents::POINT_ON_BUILD => ['onPointBuild', 0],
             //PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
         ];
     }

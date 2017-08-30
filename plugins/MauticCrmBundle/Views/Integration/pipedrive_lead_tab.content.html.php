@@ -16,8 +16,8 @@ if ($tmpl == 'index') {
 <ul class="notes" id="deals">
     <?php foreach ($deals as $deal): ?>
         <?php echo $view->render('MauticCrmBundle:Integration:deal.html.php', [
-            'deal'        => $deal,
-            'lead'        => $lead,
+            'deal' => $deal,
+            'lead' => $lead,
         ]); ?>
     <?php endforeach; ?>
 </ul>
