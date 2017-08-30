@@ -88,11 +88,14 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $companyInternalRefGetter = 'get' . ucfirst($companyFields['InternalRef']);
         $leadInternalRefGetter = 'get' . ucfirst($leadFields['InternalRef']);
 
-        $clientInternalRef = $company->$companyInternalRefGetter();
-        $contactInternalRef = $lead->$leadInternalRefGetter();
+        $companyInternalRefSetter = 'set' . ucfirst($companyFields['InternalRef']);
+        $leadInternalRefSetter = 'set' . ucfirst($leadFields['InternalRef']);
 
-        if (!$clientInternalRef) {
-            if (!$contactInternalRef) {
+        $inesClientRef = $company->$companyInternalRefGetter();
+        $inesContactRef = $lead->$leadInternalRefGetter();
+
+        if (!$inesClientRef) {
+            if (!$inesContactRef) {
                 $this->logger->debug('INES: Will create Client and Contact', compact('lead', 'company', 'config'));
 
                 $mappedData = $this->getClientWithContactsTemplate();
@@ -123,9 +126,6 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $inesClientRef = $result->InternalRef;
                 $inesContactRef = $result->Contacts->ContactInfoAuto->InternalRef;
 
-                $companyInternalRefSetter = 'set' . ucfirst($companyFields['InternalRef']);
-                $leadInternalRefSetter = 'set' . ucfirst($leadFields['InternalRef']);
-
                 $company->$companyInternalRefSetter($inesClientRef);
                 $lead->$leadInternalRefSetter($inesContactRef);
 
@@ -135,13 +135,50 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $this->logger->debug('INES: Will create Client and update Contact', compact('lead', 'company', 'config'));
             }
         } else {
-            if (!$contactInternalRef) {
+            if (!$inesContactRef) {
                 $this->logger->debug('INES: Will update Client and create Contact', compact('lead', 'company', 'config'));
+
+                $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
+
+                $shouldUpdateClient = false;
+
+                foreach ($companyFields as $integrationField => $mauticField) {
+                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                        $method = 'get' . ucfirst($mauticField);
+                        if ((string) $inesClient->$integrationField !== (string) $company->$method($mauticField)) {
+                            $shouldUpdateClient = true;
+                            $inesClient->$integrationField = $company->$method($mauticField);
+                        }
+                    }
+                }
+
+                $mappedData = [
+                    'contact' => $this->getContactTemplate(),
+                    'AutomationRef' => $lead->getId(),
+                    'clientRef' => $inesClientRef,
+                    'scoring' => $lead->getPoints(),
+                    // TODO: add unsubscribe status
+                ];
+
+                foreach ($leadFields as $integrationField => $mauticField) {
+                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                        $method = 'get' . ucfirst($mauticField);
+                        $mappedData['contact'][$integrationField] = $lead->$method();
+                    }
+                }
+
+                $mappedData['contact']['InternalRef'] = 0;
+
+                $response = $apiHelper->createContact($mappedData);
+                $inesContactRef = $response->AddContactResult->InternalRef;
+
+                $lead->$leadInternalRefSetter($inesContactRef);
+                $leadRepo->saveEntity($lead);
             } else {
                 $this->logger->debug('INES: Will update Client and Contact', compact('lead', 'company', 'config'));
 
-                $inesClient = $apiHelper->getClient($clientInternalRef)->GetClientResult;
-                $inesContact = $apiHelper->getContact($contactInternalRef)->GetContactResult;
+                $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
+                $inesContact = $apiHelper->getContact($inesContactRef)->GetContactResult;
 
                 $shouldUpdateClient = false;
                 $shouldUpdateContact = false;

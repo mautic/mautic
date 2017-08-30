@@ -106,6 +106,17 @@ class InesCRMApi extends CrmApi
         }
     }
 
+    public function createContact($mappedData) {
+        $client = $this->automationSyncClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->AddContact($mappedData);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
+    }
+
     // FIXME: To be removed or changed to `createClient`
     public function createCompany($mappedData) {
         $this->client->request('POST', 'http://localhost:4567/push_company', [
