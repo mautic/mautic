@@ -179,9 +179,14 @@ class IntegrationEntityRepository extends CommonRepository
         $integrationEntity = ['Contact', 'Lead'],
         $excludeIntegrationIds = []
     ) {
+        if ($internalEntity == 'company') {
+            $joinTable = 'companies';
+        } else {
+            $joinTable = 'leads';
+        }
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i')
-            ->join('i', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = i.internal_entity_id');
+            ->join('i', MAUTIC_TABLE_PREFIX.$joinTable, 'l', 'l.id = i.internal_entity_id');
 
         if (false === $limit) {
             $q->select('count(i.integration_entity_id) as total');
@@ -228,7 +233,6 @@ class IntegrationEntityRepository extends CommonRepository
         $q->andWhere(
                 $q->expr()->andX(
                     $q->expr()->isNotNull('i.integration_entity_id'),
-                    $q->expr()->isNotNull('l.email'),
                     $q->expr()->orX(
                         $q->expr()->andX(
                             $q->expr()->isNotNull('i.last_sync_date'),
@@ -242,6 +246,14 @@ class IntegrationEntityRepository extends CommonRepository
                     )
                 )
             );
+
+        if ($internalEntity == 'lead') {
+            $q->andWhere(
+                $q->expr()->andX($q->expr()->isNotNull('l.email')));
+        } else {
+            $q->andWhere(
+                $q->expr()->andX($q->expr()->isNotNull('l.companyname')));
+        }
 
         if ($fromDate) {
             if ($toDate) {
@@ -305,10 +317,15 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return array|int
      */
-    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null)
+    public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null, $internalEntity = 'lead')
     {
+        if ($internalEntity == 'company') {
+            $joinTable = 'companies';
+        } else {
+            $joinTable = 'leads';
+        }
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+            ->from(MAUTIC_TABLE_PREFIX.$joinTable, 'l');
 
         if (false === $limit) {
             $q->select('count(*) as total');
@@ -317,13 +334,17 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         $q->where('l.date_identified is not null')
-            ->andWhere('l.email is not null')
             ->andWhere(
                 'not exists (select null from '.MAUTIC_TABLE_PREFIX
-                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "lead%" and i.internal_entity_id = l.id)'
+                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "'.$internalEntity.'%" and i.internal_entity_id = l.id)'
             )
             ->setParameter('integration', $integration);
 
+        if ($internalEntity = 'company') {
+            $q->andWhere('l.companyname is not null');
+        } else {
+            $q->andWhere('l.email is not null');
+        }
         if ($limit) {
             $q->setMaxResults($limit);
         }
