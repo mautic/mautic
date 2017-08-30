@@ -61,8 +61,8 @@ return [
                 ],
             ],
             'mautic.integration.lead_content_subscriber' => [
-                'class' => 'MauticPlugin\MauticCrmBundle\EventListener\CustomContentSubscriber',
-                'arguments' => [ 'doctrine.orm.default_entity_manager', 'mautic.helper.integration' ]
+                'class'     => 'MauticPlugin\MauticCrmBundle\EventListener\CustomContentSubscriber',
+                'arguments' => ['doctrine.orm.default_entity_manager', 'mautic.helper.integration'],
             ],
             // 'mautic.integration.pipedrive.form_actions.subscriber' => [
             //     'class' => 'MauticPlugin\MauticCrmBundle\EventListener\PipedriveActionSubscriber',

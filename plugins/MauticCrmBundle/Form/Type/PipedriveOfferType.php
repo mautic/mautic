@@ -45,7 +45,7 @@ class PipedriveOfferType extends AbstractType
 
         $stageChoices = [];
         foreach ($stages as $stage) {
-            $stageChoices[$stage->getPipeline()->getName()][$stage->getId()] =  $stage->getName();
+            $stageChoices[$stage->getPipeline()->getName()][$stage->getId()] = $stage->getName();
         }
 
         $productChoices = [];
@@ -59,7 +59,7 @@ class PipedriveOfferType extends AbstractType
             [
                 'label' => 'mautic.pipedrive.offer_name.label',
                 'attr'  => [
-                    'class' => 'form-control'
+                    'class' => 'form-control',
                 ],
             ]
         );
@@ -71,7 +71,7 @@ class PipedriveOfferType extends AbstractType
         $builder->add('product', 'choice', [
             'label'   => 'mautic.pipedrive.product.label',
             'choices' => $productChoices,
-            'attr' => [ 'tooltip' => 'mautic.pipedrive.product.tooltip'],
+            'attr'    => ['tooltip' => 'mautic.pipedrive.product.tooltip'],
         ]);
 
         $builder->add(
@@ -79,15 +79,15 @@ class PipedriveOfferType extends AbstractType
             'integer',
             [
                 'label' => 'mautic.pipedrive.offer_product_price',
-                'attr'  => [ 'class' => 'form-control']
+                'attr'  => ['class' => 'form-control'],
             ]
         );
         $builder->add(
             'product_comment',
             'textarea',
             [
-                'label' => 'mautic.pipedrive.offer_product_comment',
-                'attr'  => [ 'class' => 'form-control', 'tooltip' => 'mautic.pipedrive.product_comment.tooltip'],
+                'label'    => 'mautic.pipedrive.offer_product_comment',
+                'attr'     => ['class' => 'form-control', 'tooltip' => 'mautic.pipedrive.product_comment.tooltip'],
                 'required' => false,
             ]
         );

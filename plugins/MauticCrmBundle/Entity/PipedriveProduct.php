@@ -23,12 +23,12 @@ class PipedriveProduct
     private $name;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $active;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $selectable;
 
@@ -58,7 +58,7 @@ class PipedriveProduct
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getProductId()
     {
@@ -66,7 +66,7 @@ class PipedriveProduct
     }
 
     /**
-     * @param integer $productId
+     * @param int $productId
      *
      * @return PipedriveProduct
      */
@@ -98,7 +98,7 @@ class PipedriveProduct
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
@@ -106,7 +106,7 @@ class PipedriveProduct
     }
 
     /**
-     * @param boolean $active
+     * @param bool $active
      *
      * @return PipedriveProduct
      */
@@ -117,9 +117,8 @@ class PipedriveProduct
         return $this;
     }
 
-
     /**
-     * @return integer
+     * @return int
      */
     public function isSelectable()
     {
@@ -127,7 +126,7 @@ class PipedriveProduct
     }
 
     /**
-     * @param integer $selectable
+     * @param int $selectable
      *
      * @return PipedriveProduct
      */

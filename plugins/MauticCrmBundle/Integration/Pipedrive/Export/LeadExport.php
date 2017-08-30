@@ -6,8 +6,8 @@ use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveDeal;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveDealProduct;
-use MauticPlugin\MauticCrmBundle\Entity\PipedriveProduct;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveProduct;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -38,7 +38,6 @@ class LeadExport extends AbstractPipedrive
         return false;
     }
 
-
     public function createWithDeal(Lead $lead, $config, DealExport $dealExport)
     {
         if (!$this->create($lead)) {
@@ -51,7 +50,6 @@ class LeadExport extends AbstractPipedrive
             $this->em->getReference('MauticPlugin\MauticCrmBundle\Entity\PipedriveStage', $config['stage'])
         );
         $deal->setLead($lead);
-
 
         if ($config['product'] != null) {
             $dealProduct = new PipedriveDealProduct();

@@ -44,9 +44,8 @@ class PipedriveDeal
      */
     public function __construct()
     {
-        $this->dealProducts      = new ArrayCollection();
+        $this->dealProducts = new ArrayCollection();
     }
-
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -81,7 +80,7 @@ class PipedriveDeal
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getDealId()
     {
@@ -89,7 +88,7 @@ class PipedriveDeal
     }
 
     /**
-     * @param integer $dealId
+     * @param int $dealId
      *
      * @return PipedriveDeal
      */

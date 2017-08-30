@@ -20,7 +20,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
 {
     public function testCommandWithdisableIntegration()
     {
-        $this->installPipedriveIntegration(false,
+        $this->installPipedriveIntegration(
+            false,
             [
                 'objects' => [
                     'company',
@@ -35,7 +36,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ], [
+            ],
+            [
                 'url'   => 'Api/Get',
                 'token' => 'token',
             ]
@@ -66,7 +68,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
 
     public function testCommand()
     {
-        $this->installPipedriveIntegration(true,
+        $this->installPipedriveIntegration(
+            true,
             [
                 'objects' => [
                     'company',
@@ -81,7 +84,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ], [
+            ],
+            [
                 'url'   => 'Api/Get',
                 'token' => 'token',
             ]
@@ -112,7 +116,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
 
     public function testCommandWithoutDealSupport()
     {
-        $this->installPipedriveIntegration(true,
+        $this->installPipedriveIntegration(
+            true,
             [
                 'objects' => [
                 ],
@@ -126,7 +131,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ], [
+            ],
+            [
                 'url'   => 'Api/Get',
                 'token' => 'token',
             ]
@@ -146,11 +152,10 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
         $this->assertEquals(count($deals), 0);
     }
 
-
-
     public function testCommandWithDealSupport()
     {
-        $this->installPipedriveIntegration(true,
+        $this->installPipedriveIntegration(
+            true,
             [
                 'objects' => [
                     'company',
@@ -166,7 +171,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ], [
+            ],
+            [
                 'url'   => 'Api/Get',
                 'token' => 'token',
             ]
@@ -174,10 +180,10 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
 
         $this->executeCommand();
 
-        $deals               = $this->em->getRepository(PipedriveDeal::class)->findAll();
-        $pipelines           = $this->em->getRepository(PipedrivePipeline::class)->findAll();
-        $stages              = $this->em->getRepository(PipedriveStage::class)->findAll();
-        $products            = $this->em->getRepository(PipedriveProduct::class)->findAll();
+        $deals     = $this->em->getRepository(PipedriveDeal::class)->findAll();
+        $pipelines = $this->em->getRepository(PipedrivePipeline::class)->findAll();
+        $stages    = $this->em->getRepository(PipedriveStage::class)->findAll();
+        $products  = $this->em->getRepository(PipedriveProduct::class)->findAll();
 
         $this->assertEquals(count($pipelines), 3);
         $this->assertEquals(count($stages), 6);
@@ -209,7 +215,6 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
         $this->assertEquals($products[2]->isActive(), false);
         $this->assertEquals($products[2]->isSelectable(), false);
     }
-
 
     private function executeCommand()
     {

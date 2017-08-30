@@ -226,7 +226,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 ]
             );
         } elseif ($formArea == 'integration') {
-
             /**
              * formname can take several values like formaction or campaignevent
              * which makes it impossible to hardcode a value like below.
@@ -236,11 +235,10 @@ class PipedriveIntegration extends CrmAbstractIntegration
              * is not evaluated at that moment. After a click on it, it works as
              * expected.
              */
-
             $formName = 'formaction_properties_config';
             //            $dontPushDeal = '{"'. $formName . '_push_deal_0": "checked"}'; // does that even work ?
-            $pushDeal = '{"'. $formName . '_push_deal_1": "checked"}';
-            $noProductChosen = '{"'. $formName . '_product": ""}';
+            $pushDeal        = '{"'.$formName.'_push_deal_1": "checked"}';
+            $noProductChosen = '{"'.$formName.'_product": ""}';
 
             if ($this->isDealSupportEnabled()) {
                 $builder->add(
@@ -266,7 +264,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
                 $stageChoices = [];
                 foreach ($stages as $stage) {
-                    $stageChoices[$stage->getPipeline()->getName()][$stage->getId()] =  $stage->getName();
+                    $stageChoices[$stage->getPipeline()->getName()][$stage->getId()] = $stage->getName();
                 }
 
                 $productChoices = [];
@@ -289,17 +287,17 @@ class PipedriveIntegration extends CrmAbstractIntegration
                 $builder->add('stage', 'choice', [
                     'label'   => 'mautic.pipedrive.stage.label',
                     'choices' => $stageChoices,
-                    'attr' => [
+                    'attr'    => [
                         //'data-show-on' => $pushDeal,
                     ],
                 ]);
 
                 $builder->add('product', 'choice', [
-                    'label'   => 'mautic.pipedrive.product.label',
-                    'choices' => $productChoices,
+                    'label'       => 'mautic.pipedrive.product.label',
+                    'choices'     => $productChoices,
                     'placeholder' => 'mautic.pipedrive.product.placeholder',
-                    'attr' => [
-                        'tooltip' => 'mautic.pipedrive.product.tooltip',
+                    'attr'        => [
+                        'tooltip'      => 'mautic.pipedrive.product.tooltip',
                         'data-show-on' => $pushDeal,
                     ],
                 ]);
@@ -314,7 +312,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                             // 'data-hide-on' => $noProductChosen,
                             // 'data-show-on' => $pushDeal,
                         ],
-                        'data'  => (isset($data['product_price']))? $data['product_price'] : 0,
+                        'data'     => (isset($data['product_price'])) ? $data['product_price'] : 0,
                         'required' => false,
                     ]
                 );

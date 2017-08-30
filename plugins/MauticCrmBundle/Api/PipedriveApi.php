@@ -57,13 +57,11 @@ class PipedriveApi extends CrmApi
     {
         $params      = $this->getRequestParameters($data);
         $apiEndPoint = sprintf(self::DEAL_PRODUCT_API_ENDPOINT, $data['id']);
-        $url      = sprintf('%s/%s', $this->integration->getApiUrl(), $apiEndPoint);
-        $response = $this->transport->post($url, $params);
+        $url         = sprintf('%s/%s', $this->integration->getApiUrl(), $apiEndPoint);
+        $response    = $this->transport->post($url, $params);
 
         return $this->getResponseData($response);
     }
-
-
 
     /**
      * @param array $data

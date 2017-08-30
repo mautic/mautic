@@ -23,11 +23,11 @@ class DealExport extends AbstractPipedrive
         ];
 
         try {
-            $response = $this->getIntegration()->getApiHelper()->createDeal($params);
+            $response     = $this->getIntegration()->getApiHelper()->createDeal($params);
             $dealProducts = $deal->getDealProducts();
 
             if (count($dealProducts) > 0) {
-                $dealProduct = $dealProducts[0]; // only *one* product is allowed in integration form
+                $dealProduct   = $dealProducts[0]; // only *one* product is allowed in integration form
                 $productParams = [
                     'id'          => $response['id'],
                     'product_id'  => $dealProduct->getProduct()->getProductId(),

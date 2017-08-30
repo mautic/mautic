@@ -9,13 +9,13 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($deal instanceof \MauticPlugin\MauticCrmBundle\Entity\PipedriveDeal) {
-    $id     = $deal->getId();
-    $lead   = $deal->getLead();
-    $title  = $deal->getTitle();
+    $id    = $deal->getId();
+    $lead  = $deal->getLead();
+    $title = $deal->getTitle();
 } else {
-    $id     = $deal['id'];
-    $lead   = $deal['lead'];
-    $title  = $deal['title'];
+    $id    = $deal['id'];
+    $lead  = $deal['lead'];
+    $title = $deal['title'];
 }
 
 $icon = 'fa-forward';

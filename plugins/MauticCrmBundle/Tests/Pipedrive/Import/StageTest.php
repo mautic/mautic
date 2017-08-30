@@ -12,7 +12,7 @@ class StageTest extends PipedriveTest
     private $features = [
         'objects' => [
             'company',
-            'deal'
+            'deal',
         ],
         'leadFields' => [
             'first_name' => 'firstname',
@@ -33,7 +33,7 @@ class StageTest extends PipedriveTest
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $stage         = $this->em->getRepository(PipedriveStage::class)->find(1);
+        $stage        = $this->em->getRepository(PipedriveStage::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertEquals($responseData['status'], 'ok');
@@ -72,7 +72,7 @@ class StageTest extends PipedriveTest
         $this->installPipedriveIntegration(true, $this->features);
         $pipeline = $this->createPipeline(4, 'New Pipeline', true);
         $stage    = $this->createStage(16, 'Stage 1', 1, $pipeline);
-        $data = json_decode($this->getData('stage.updated'), true);
+        $data     = json_decode($this->getData('stage.updated'), true);
 
         $this->makeRequest('POST', json_encode($data));
 

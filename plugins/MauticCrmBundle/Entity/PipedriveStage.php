@@ -23,12 +23,12 @@ class PipedriveStage
     private $name;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $active = true;
 
     /**
-     * @var integer
+     * @var int
      */
     private $order;
 
@@ -36,7 +36,6 @@ class PipedriveStage
      * @var PipedrivePipeline
      */
     private $pipeline;
-
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -69,7 +68,7 @@ class PipedriveStage
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getStageId()
     {
@@ -77,7 +76,7 @@ class PipedriveStage
     }
 
     /**
-     * @param integer $stageId
+     * @param int $stageId
      *
      * @return PipedriveStage
      */
@@ -109,7 +108,7 @@ class PipedriveStage
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
@@ -117,7 +116,7 @@ class PipedriveStage
     }
 
     /**
-     * @param boolean $active
+     * @param bool $active
      *
      * @return PipedriveStage
      */
@@ -128,9 +127,8 @@ class PipedriveStage
         return $this;
     }
 
-
     /**
-     * @return integer
+     * @return int
      */
     public function getOrder()
     {
@@ -138,7 +136,7 @@ class PipedriveStage
     }
 
     /**
-     * @param integer $order
+     * @param int $order
      *
      * @return PipedriveStage
      */

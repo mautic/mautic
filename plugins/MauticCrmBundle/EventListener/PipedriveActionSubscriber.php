@@ -19,7 +19,7 @@ use Mautic\PointBundle\PointEvents;
 
 /**
  * Class PipedriveActionSubscriber.
- * inspired from EmailBundle/FormSubscriber
+ * inspired from EmailBundle/FormSubscriber.
  */
 class PipedriveActionSubscriber extends CommonSubscriber
 {
@@ -29,7 +29,7 @@ class PipedriveActionSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::FORM_ON_BUILD => ['onFormBuilder', 0],
+            FormEvents::FORM_ON_BUILD     => ['onFormBuilder', 0],
             PointEvents::POINT_ON_BUILD   => ['onPointBuild', 0],
             //PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
         ];
@@ -78,7 +78,6 @@ class PipedriveActionSubscriber extends CommonSubscriber
 
     //     $event->addAction('email.send', $action);
     // }
-
 
     // /**
     //  * @param TriggerBuilderEvent $event

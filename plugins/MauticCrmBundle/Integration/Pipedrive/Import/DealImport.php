@@ -3,8 +3,8 @@
 namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import;
 
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\MauticCrmBundle\Entity\PipedriveStage;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveDeal;
+use MauticPlugin\MauticCrmBundle\Entity\PipedriveStage;
 use Symfony\Component\HttpFoundation\Response;
 
 class DealImport extends AbstractImport
@@ -20,7 +20,7 @@ class DealImport extends AbstractImport
             $leadIntegrationEntity = $this->getLeadIntegrationEntity([
                 'integrationEntityId' => $data['person_id']['value'],
             ]);
-            $lead  = $this->em->getRepository(Lead::class)->findOneById($leadIntegrationEntity->getInternalEntityId());
+            $lead = $this->em->getRepository(Lead::class)->findOneById($leadIntegrationEntity->getInternalEntityId());
         } else {
             throw new \Exception('Person for deal not defined on pipedrive', Response::HTTP_NOT_FOUND);
         }
@@ -78,9 +78,9 @@ class DealImport extends AbstractImport
                     break;
                 case 'person_id':
                     $leadIntegrationEntity = $this->getLeadIntegrationEntity([
-                        'integrationEntityId' => $value
+                        'integrationEntityId' => $value,
                     ]);
-                    $lead  = $this->em->getRepository(Lead::class)->findOneById($leadIntegrationEntity->getInternalEntityId());
+                    $lead = $this->em->getRepository(Lead::class)->findOneById($leadIntegrationEntity->getInternalEntityId());
 
                     if (!$lead) {
                         throw new \Exception("Lead for deal doesn't exist", Response::HTTP_NOT_FOUND);

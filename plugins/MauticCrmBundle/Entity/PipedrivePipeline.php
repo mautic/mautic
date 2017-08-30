@@ -23,7 +23,7 @@ class PipedrivePipeline
     private $name;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $active;
 
@@ -50,7 +50,7 @@ class PipedrivePipeline
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getPipelineId()
     {
@@ -58,7 +58,7 @@ class PipedrivePipeline
     }
 
     /**
-     * @param integer $pipelineId
+     * @param int $pipelineId
      *
      * @return PipedrivePipeline
      */
@@ -90,7 +90,7 @@ class PipedrivePipeline
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
@@ -98,7 +98,7 @@ class PipedrivePipeline
     }
 
     /**
-     * @param boolean $active
+     * @param bool $active
      *
      * @return PipedrivePipeline
      */

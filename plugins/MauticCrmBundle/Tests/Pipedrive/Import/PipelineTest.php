@@ -11,7 +11,7 @@ class PipelineTest extends PipedriveTest
     private $features = [
         'objects' => [
             'company',
-            'deal'
+            'deal',
         ],
         'leadFields' => [
             'first_name' => 'firstname',
@@ -30,7 +30,7 @@ class PipelineTest extends PipedriveTest
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        $pipeline         = $this->em->getRepository(PipedrivePipeline::class)->find(1);
+        $pipeline     = $this->em->getRepository(PipedrivePipeline::class)->find(1);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertEquals($responseData['status'], 'ok');
@@ -75,8 +75,8 @@ class PipelineTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(true, $this->features);
         $pipeline = $this->createPipeline(4, 'New Pipeline', true);
-        $json = $this->getData('pipeline.deleted');
-        $data = json_decode($json, true);
+        $json     = $this->getData('pipeline.deleted');
+        $data     = json_decode($json, true);
 
         $this->assertEquals(count($this->em->getRepository(PipedrivePipeline::class)->findAll()), 1);
 

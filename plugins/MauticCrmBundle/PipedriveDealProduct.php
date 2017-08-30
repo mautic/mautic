@@ -35,7 +35,6 @@ class PipedriveDealProduct
      */
     private $quantity;
 
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -89,7 +88,6 @@ class PipedriveDealProduct
         return $this;
     }
 
-
     /**
      * @param PipedriveProduct $product
      *
@@ -109,11 +107,11 @@ class PipedriveDealProduct
      */
     public function getProduct()
     {
-        return $this->product ;
+        return $this->product;
     }
 
     /**
-     * @param int     $itemPrice
+     * @param int $itemPrice
      *
      * @return PipedriveDealProduct
      */
@@ -131,11 +129,11 @@ class PipedriveDealProduct
      */
     public function getItemPrice()
     {
-        return $this->itemPrice ;
+        return $this->itemPrice;
     }
 
     /**
-     * @param int     $quantity
+     * @param int $quantity
      *
      * @return PipedriveDealProduct
      */
@@ -153,6 +151,6 @@ class PipedriveDealProduct
      */
     public function getQuantity()
     {
-        return $this->quantity ;
+        return $this->quantity;
     }
 }

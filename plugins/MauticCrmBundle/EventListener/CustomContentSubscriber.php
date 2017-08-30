@@ -21,7 +21,7 @@ class CustomContentSubscriber extends CommonSubscriber
 
     public function __construct(EntityManager $em, IntegrationHelper $integrationHelper)
     {
-        $this->em = $em;
+        $this->em                = $em;
         $this->integrationHelper = $integrationHelper;
     }
 
@@ -37,13 +37,13 @@ class CustomContentSubscriber extends CommonSubscriber
 
     public function injectCustomContent(CustomContentEvent $event)
     {
-        $pipedriveIntegration  = $this->integrationHelper->getIntegrationObject('Pipedrive');
+        $pipedriveIntegration = $this->integrationHelper->getIntegrationObject('Pipedrive');
         if ($pipedriveIntegration->isDealSupportEnabled()) {
             $parameters = $event->getVars();
 
             if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
                 if (isset($parameters['lead'])) {
-                    $lead = $parameters['lead'];
+                    $lead  = $parameters['lead'];
                     $deals = $this->em->getRepository('MauticCrmBundle:PipedriveDeal')->findByLead($lead);
                     $event->addTemplate('MauticCrmBundle:Integration:pipedrive_lead_tab.html.php', [
                         'countDeals' => count($deals),
@@ -53,7 +53,7 @@ class CustomContentSubscriber extends CommonSubscriber
 
             if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs.content')) {
                 if (isset($parameters['lead'])) {
-                    $lead = $parameters['lead'];
+                    $lead  = $parameters['lead'];
                     $deals = $this->em->getRepository('MauticCrmBundle:PipedriveDeal')->findByLead($lead);
 
                     $event->addTemplate('MauticCrmBundle:Integration:pipedrive_lead_tab.content.html.php', [

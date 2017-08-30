@@ -8,7 +8,6 @@ use MauticPlugin\MauticCrmBundle\Entity\PipedriveDealProduct;
 
 class EventHelper
 {
-
     /**
      * @param               $lead
      * @param MauticFactory $factory
