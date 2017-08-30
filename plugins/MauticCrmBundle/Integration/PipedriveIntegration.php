@@ -234,7 +234,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
              * is not evaluated at that moment. After a click on it, it works as
              * expected.
              */
-            $formName = 'formaction_properties_config';
+            $formName        = 'formaction_properties_config';
             $pushDeal        = '{"'.$formName.'_push_deal_1": "checked"}';
             $noProductChosen = '{"'.$formName.'_product": ""}';
 
@@ -276,7 +276,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     [
                         'label' => 'mautic.pipedrive.offer_name.label',
                         'attr'  => [
-                            'class' => 'form-control',
+                            'class'        => 'form-control',
                             'data-show-on' => $pushDeal,
                         ],
                         'required' => true,
@@ -306,7 +306,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     [
                         'label' => 'mautic.pipedrive.offer_product_price',
                         'attr'  => [
-                            'class' => 'form-control',
+                            'class'        => 'form-control',
                             'data-hide-on' => $noProductChosen,
                             'data-show-on' => $pushDeal,
                         ],
@@ -320,8 +320,8 @@ class PipedriveIntegration extends CrmAbstractIntegration
                     [
                         'label' => 'mautic.pipedrive.offer_product_comment',
                         'attr'  => [
-                            'class'   => 'form-control',
-                            'tooltip' => 'mautic.pipedrive.product_comment.tooltip',
+                            'class'        => 'form-control',
+                            'tooltip'      => 'mautic.pipedrive.product_comment.tooltip',
                             'data-hide-on' => $noProductChosen,
                             'data-show-on' => $pushDeal,
                         ],
