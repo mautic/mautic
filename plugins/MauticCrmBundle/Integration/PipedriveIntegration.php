@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\MauticCrmBundle\Entity\PipedrivePipeline;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveProduct;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveStage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

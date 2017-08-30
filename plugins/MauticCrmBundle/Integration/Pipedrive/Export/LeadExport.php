@@ -7,7 +7,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveDeal;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveDealProduct;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
-use MauticPlugin\MauticCrmBundle\Entity\PipedriveProduct;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 

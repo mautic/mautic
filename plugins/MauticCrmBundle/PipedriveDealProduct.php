@@ -4,9 +4,6 @@ namespace  MauticPlugin\MauticCrmBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Entity\Lead;
-use  MauticPlugin\MauticCrmBundle\Entity\PipedriveDeal;
-use  MauticPlugin\MauticCrmBundle\Entity\PipedriveProduct;
 
 class PipedriveDealProduct
 {

@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Import;
 
-use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Entity\PipedrivePipeline;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 

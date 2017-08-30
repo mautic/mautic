@@ -2,12 +2,9 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export;
 
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveDeal;
-use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\AbstractPipedrive;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class DealExport extends AbstractPipedrive
 {
