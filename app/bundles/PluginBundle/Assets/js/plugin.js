@@ -252,6 +252,7 @@ Mautic.getIntegrationConfig = function (el, settings) {
             if (response.success) {
                 mQuery('.integration-config-container').html(response.html);
                 Mautic.onPageLoad('.integration-config-container', response);
+                mQuery(el.closest("form")).trigger("change");
             }
 
             Mautic.integrationConfigOnLoad('.integration-config-container');
