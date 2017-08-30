@@ -2150,13 +2150,34 @@ class MessageHelper
     public function processReplyMail($mailId, $refid){
         $this->logger->debug('Processing reply mail.');
         $imapHelper = $this->factory->get('mautic.helper.mailbox');
-        $mail = $imapHelper->getMail($refid);
+        $sendFolderName = '';
+        foreach($imapHelper->getListingFolders() as $folderNames){
+            if(strpos(strtolower($folderNames), 'sent') !== false){
+                $sendFolderName = $folderNames;
+                break;;
+            }
+        }
+        $imapHelper->switchFolder($sendFolderName);
+        $mailIds = $imapHelper->searchMailbox('TO '.$mailId);
+        $mails = $imapHelper->getMailsInfo($mailIds);
+        foreach($mails as $mail){
+            if($mail->message_id == $refid){
+                $this->checkMail($mail->uid, $imapHelper);
+            } 
+        }
         
+    }
+    
+    public function checkMail($mailUid, $imapHelper){
+        $mail = $imapHelper->getMail($mailUid);
         if ($mail->returnPath && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $mail->returnPath, $parts)) {
             if (strstr($parts[2], '_')) {
                 // Has an ID hash so use it to find the lead
                 list($ignore, $hashId) = explode('_', $parts[2]);
             }
+        }
+        if (empty($hashId) && preg_match('/email\/(.*?)\.gif/', $mail->textHtml, $parts)) {
+            $hashId = $parts[1];
         }
 
         if (empty($hashId)) {
@@ -2168,14 +2189,11 @@ class MessageHelper
         $statRepository = $em->getRepository('MauticEmailBundle:Stat');
         // Search by hashId
         $stat = $statRepository->findOneBy(['trackingHash' => $hashId]);
-        if (!$stat) {
-            $this->logger->debug('Email Stat could not found');
-        }
-        $this->logger->debug('Stat found with ID# ' . $stat->getId());
         if(!$stat){
             $this->logger->debug('Could not find the replied email.');
             return false;
         }
+        $this->logger->debug('Stat found with ID# ' . $stat->getId());
         
         $stat->setIsReplyed(1);
         $em->flush($stat);
