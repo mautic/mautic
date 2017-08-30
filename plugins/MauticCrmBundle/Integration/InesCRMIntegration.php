@@ -103,19 +103,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $mappedData['client']['AutomationRef'] = $company->getId();
                 $mappedData['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $lead->getId();
 
-                foreach ($companyFields as $integrationField => $mauticField) {
-                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
-                        $method = 'get' . ucfirst($mauticField);
-                        $mappedData['client'][$integrationField] = $company->$method($mauticField);
-                    }
-                }
-
-                foreach ($leadFields as $integrationField => $mauticField) {
-                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
-                        $method = 'get' . ucfirst($mauticField);
-                        $mappedData['client']['Contacts']['ContactInfoAuto'][0][$integrationField] = $lead->$method();
-                    }
-                }
+                $this->mapCompanyToInesClient($config, $company, $mappedData['client']);
+                $this->mapLeadToInesContact($config, $lead, $mappedData['client']['Contacts']['ContactInfoAuto'][0]);
 
                 $mappedData['client']['InternalRef'] = 0;
                 $mappedData['client']['Contacts']['ContactInfoAuto'][0]['InternalRef'] = 0;
@@ -140,17 +129,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
 
-                $shouldUpdateClient = false;
-
-                foreach ($companyFields as $integrationField => $mauticField) {
-                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
-                        $method = 'get' . ucfirst($mauticField);
-                        if ((string) $inesClient->$integrationField !== (string) $company->$method($mauticField)) {
-                            $shouldUpdateClient = true;
-                            $inesClient->$integrationField = $company->$method($mauticField);
-                        }
-                    }
-                }
+                $shouldUpdateClient = $this->mapCompanyUpdatesToInesClient($config, $company, $inesClient);
 
                 $mappedData = [
                     'contact' => $this->getContactTemplate(),
@@ -160,12 +139,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     // TODO: add unsubscribe status
                 ];
 
-                foreach ($leadFields as $integrationField => $mauticField) {
-                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
-                        $method = 'get' . ucfirst($mauticField);
-                        $mappedData['contact'][$integrationField] = $lead->$method();
-                    }
-                }
+                $this->mapLeadToInesContact($config, $lead, $mappedData['contact']);
 
                 $mappedData['contact']['InternalRef'] = 0;
 
@@ -180,28 +154,9 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
                 $inesContact = $apiHelper->getContact($inesContactRef)->GetContactResult;
 
-                $shouldUpdateClient = false;
-                $shouldUpdateContact = false;
 
-                foreach ($companyFields as $integrationField => $mauticField) {
-                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
-                        $method = 'get' . ucfirst($mauticField);
-                        if ((string) $inesClient->$integrationField !== (string) $company->$method($mauticField)) {
-                            $shouldUpdateClient = true;
-                            $inesClient->$integrationField = $company->$method($mauticField);
-                        }
-                    }
-                }
-
-                foreach ($leadFields as $integrationField => $mauticField) {
-                    if (substr($integrationField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
-                        $method = 'get' . ucfirst($mauticField);
-                        if ((string) $inesContact->$integrationField !== (string) $lead->$method($mauticField)) {
-                            $shouldUpdateContact = true;
-                            $inesContact->$integrationField = $lead->$method($mauticField);
-                        }
-                    }
-                }
+                $shouldUpdateClient = $this->mapCompanyUpdatesToInesClient($config, $company, $inesClient);
+                $shouldUpdateContact = $this->mapLeadUpdatesToInesContact($config, $lead, $inesContact);
 
                 if ($shouldUpdateClient) {
                     $apiHelper->updateClient($inesClient);
@@ -339,6 +294,55 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 'required'    => false,
             ]);
         }
+    }
+
+    private function mapFieldsFromMauticToInes($fields, $mauticObject, &$inesObject) {
+        foreach ($fields as $inesField => $mauticField) {
+            if (substr($inesField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                $method = 'get' . ucfirst($mauticField);
+                $inesObject[$inesField] = $mauticObject->$method($mauticField);
+            }
+        }
+    }
+
+    private function mapFieldUpdatesFromMauticToInes($fields, $mauticObject, $inesObject) {
+        $shouldUpdate = false;
+
+        foreach ($fields as $inesField => $mauticField) {
+            if (substr($inesField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+                $method = 'get' . ucfirst($mauticField);
+                if ((string) $inesObject->$inesField !== (string) $mauticObject->$method($mauticField)) {
+                    $shouldUpdate = true;
+                    $inesObject->$inesField = $mauticObject->$method($mauticField);
+                }
+            }
+        }
+
+        return $shouldUpdate;
+    }
+
+    private function mapCompanyToInesClient($config, $company, &$inesClient) {
+        $companyFields = $config['companyFields'];
+
+        $this->mapFieldsFromMauticToInes($companyFields, $company, $inesClient);
+    }
+
+    private function mapLeadToInesContact($config, $lead, &$inesContact) {
+        $leadFields = $config['leadFields'];
+
+        $this->mapFieldsFromMauticToInes($leadFields, $lead, $inesContact);
+    }
+
+    private function mapCompanyUpdatesToInesClient($config, $company, $inesClient) {
+        $companyFields = $config['companyFields'];
+
+        return $this->mapFieldUpdatesFromMauticToInes($companyFields, $company, $inesClient);
+    }
+
+    private function mapLeadUpdatesToInesContact($config, $lead, $inesContact) {
+        $leadFields = $config['leadFields'];
+
+        return $this->mapFieldUpdatesFromMauticToInes($leadFields, $lead, $inesContact);
     }
 
     private function getClientTemplate()
