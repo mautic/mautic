@@ -91,8 +91,6 @@ class PipedriveOfferType extends AbstractType
                 'required' => false,
             ]
         );
-
-
     }
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
@@ -109,5 +107,4 @@ class PipedriveOfferType extends AbstractType
     {
         return 'pipedrive_offer_action';
     }
-
 }

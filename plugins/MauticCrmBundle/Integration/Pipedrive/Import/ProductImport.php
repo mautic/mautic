@@ -38,12 +38,11 @@ class ProductImport extends AbstractImport
 
         $update = false;
         foreach ($data as $field => $value) {
-            switch($field) {
+            switch ($field) {
                 case 'name':
                     if ($value != $product->getName()) {
                         $product->setName($value);
                         $update = true;
-
                     }
                     break;
                 case 'active':

@@ -155,6 +155,4 @@ class PipedriveDealProduct
     {
         return $this->quantity ;
     }
-
-
 }

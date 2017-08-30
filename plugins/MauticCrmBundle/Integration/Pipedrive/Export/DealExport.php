@@ -39,8 +39,7 @@ class DealExport extends AbstractPipedrive
             }
 
             return true;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->getIntegration()->logIntegrationError($e);
         }
 

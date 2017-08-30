@@ -46,12 +46,11 @@ class StageImport extends AbstractImport
 
         $update = false;
         foreach ($data as $field => $value) {
-            switch($field) {
+            switch ($field) {
                 case 'name':
                     if ($value != $stage->getName()) {
                         $stage->setName($value);
                         $update = true;
-
                     }
                     break;
                 case 'active':

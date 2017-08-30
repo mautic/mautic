@@ -193,6 +193,4 @@ class PipedriveDeal
     {
         return $this->dealProducts;
     }
-
-
 }

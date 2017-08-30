@@ -59,12 +59,11 @@ class DealImport extends AbstractImport
 
         $update = false;
         foreach ($data as $field => $value) {
-            switch($field) {
+            switch ($field) {
                 case 'title':
                     if ($value != $deal->getTitle()) {
                         $deal->setTitle($value);
                         $update = true;
-
                     }
                     break;
                 case 'stage_id':

@@ -144,7 +144,6 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
         $this->assertEquals(count($stages), 0);
         $this->assertEquals(count($products), 0);
         $this->assertEquals(count($deals), 0);
-
     }
 
 

@@ -7,6 +7,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+
 /**
  * Class CustomContentSubscriber.
  */
@@ -32,15 +33,12 @@ class CustomContentSubscriber extends CommonSubscriber
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_CONTENT => ['injectCustomContent'],
         ];
-
     }
 
     public function injectCustomContent(CustomContentEvent $event)
     {
         $pipedriveIntegration  = $this->integrationHelper->getIntegrationObject('Pipedrive');
         if ($pipedriveIntegration->isDealSupportEnabled()) {
-
-
             $parameters = $event->getVars();
 
             if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
@@ -66,5 +64,4 @@ class CustomContentSubscriber extends CommonSubscriber
             }
         }
     }
-
 }

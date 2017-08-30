@@ -17,7 +17,6 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\PointEvents;
 
-
 /**
  * Class PipedriveActionSubscriber.
  * inspired from EmailBundle/FormSubscriber

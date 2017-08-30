@@ -46,5 +46,4 @@ class EventHelper
 
         return $dealExport->create($deal, $lead);
     }
-
 }
