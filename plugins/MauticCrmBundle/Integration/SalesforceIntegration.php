@@ -1084,54 +1084,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return str_replace($search, '', $key);
     }
-    /**
-     * @param array $params
-     *
-     * @return mixed
-     */
-    public function pushCompanies($params = [])
-    {
-        $limit                   = (isset($params['limit'])) ? $params['limit'] : 100;
-        list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
-        $config                  = $this->mergeConfigToFeatureSettings($params);
-        $integrationEntityRepo   = $this->getIntegrationEntityRepository();
-
-        $totalUpdated = 0;
-        $totalCreated = 0;
-        $totalErrors  = 0;
-
-        $mauticCompanyFieldString = implode(', c.', $config['companyFields']);
-        $mauticCompanyFieldString = 'c.'.$mauticCompanyFieldString;
-
-        if (empty($fieldMapping)) {
-            return [0, 0, 0, 0];
-        }
-
-        $originalLimit = $limit;
-        $progress      = false;
-
-        // Get a total number of companies to be updated and/or created for the progress counter
-        $totalToUpdate = array_sum(
-            $integrationEntityRepo->findLeadsToUpdate(
-                'Salesforce',
-                'company',
-                $mauticCompanyFieldString,
-                false,
-                $fromDate,
-                $toDate,
-                'Account',
-                []
-            )
-        );
-        $totalToCreate = (in_array('Lead', $supportedObjects)) ? $integrationEntityRepo->findLeadsToCreate(
-            'Salesforce',
-            $mauticLeadFieldString,
-            false,
-            $fromDate,
-            $toDate
-        ) : 0;
-        $totalCount = $totalToProcess = $totalToCreate + $totalToUpdate;
-    }
 
     /**
      * @param array $params
