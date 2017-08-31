@@ -29,9 +29,9 @@ class Message
 
     public $to = [];
     public $toString;
-    public $cc      = [];
-    public $replyTo = [];
-    public $inReplyTo = false;
+    public $cc         = [];
+    public $replyTo    = [];
+    public $inReplyTo  = false;
     public $returnPath = false;
 
     public $textPlain;

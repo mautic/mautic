@@ -889,11 +889,11 @@ class Mailbox
             }
         }
         
-        if(isset($headObject->in_reply_to)){
+        if(isset($headObject->in_reply_to)) {
             $mail->inReplyTo = $headObject->in_reply_to;
         }
         
-        if(isset($headObject->return_path)){
+        if(isset($headObject->return_path)) {
             $mail->returnPath = $headObject->return_path;
         }
 

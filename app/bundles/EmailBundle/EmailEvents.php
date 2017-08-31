@@ -175,9 +175,8 @@ final class EmailEvents
      */
     const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.email.on_campaign_trigger_decision';
     
-    
     /**
-     * The mautic.email_on_open event is dispatched when an reply came to an email.
+     * The mautic.email_on_reply event is dispatched when an reply came to an email.
      *
      * The event listener receives a
      * Mautic\EmailBundle\Event\EmailOpenEvent instance.
