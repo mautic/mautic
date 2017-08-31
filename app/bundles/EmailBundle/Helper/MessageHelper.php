@@ -30,10 +30,10 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\EmailBundle\MonitoredEmail\Message;
-use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
+use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
  * Class MessageHelper.
@@ -2147,28 +2147,29 @@ class MessageHelper
         return $results;
     }
     
-    public function processReplyMail($mailId, $refid){
+    public function processReplyMail($mailId, $refid)
+    {
         $this->logger->debug('Processing reply mail.');
-        $imapHelper = $this->factory->get('mautic.helper.mailbox');
+        $imapHelper     = $this->factory->get('mautic.helper.mailbox');
         $sendFolderName = '';
-        foreach($imapHelper->getListingFolders() as $folderNames){
-            if(strpos(strtolower($folderNames), 'sent') !== false){
+        foreach($imapHelper->getListingFolders() as $folderNames) {
+            if(strpos(strtolower($folderNames), 'sent') !== false) {
                 $sendFolderName = $folderNames;
-                break;;
+                break;
             }
         }
         $imapHelper->switchFolder($sendFolderName);
         $mailIds = $imapHelper->searchMailbox('TO '.$mailId);
-        $mails = $imapHelper->getMailsInfo($mailIds);
-        foreach($mails as $mail){
-            if($mail->message_id == $refid){
+        $mails   = $imapHelper->getMailsInfo($mailIds);
+        foreach ($mails as $mail) {
+            if ($mail->message_id == $refid) {
                 $this->checkMail($mail->uid, $imapHelper);
             } 
         }
-        
     }
     
-    public function checkMail($mailUid, $imapHelper){
+    public function checkMail($mailUid, $imapHelper)
+    {
         $mail = $imapHelper->getMail($mailUid);
         if ($mail->returnPath && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $mail->returnPath, $parts)) {
             if (strstr($parts[2], '_')) {
@@ -2189,18 +2190,20 @@ class MessageHelper
         $statRepository = $em->getRepository('MauticEmailBundle:Stat');
         // Search by hashId
         $stat = $statRepository->findOneBy(['trackingHash' => $hashId]);
-        if(!$stat){
+        if (!$stat) {
             $this->logger->debug('Could not find the replied email.');
+            
             return false;
         }
-        $this->logger->debug('Stat found with ID# ' . $stat->getId());
-        
+        $this->logger->debug('Stat found with ID# '.$stat->getId());
+        $leadModel = $this->factory->getModel('lead');
+        $leadModel->setCurrentLead($stat->getLead());
         $stat->setIsReplyed(1);
         $em->flush($stat);
         $dispatcher = $this->factory->getDispatcher();
         if($dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
             $request = $this->factory->getRequest();
-            $event = new EmailReplyEvent($stat, $request);
+            $event   = new EmailReplyEvent($stat, $request);
             $dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
             unset($event);
         }

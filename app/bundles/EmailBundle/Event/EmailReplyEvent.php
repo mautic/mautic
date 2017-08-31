@@ -37,9 +37,9 @@ class EmailReplyEvent extends CommonEvent
      */
     public function __construct(Stat $stat, $request)
     {
-        $this->entity    = $stat;
-        $this->email     = $stat->getEmail();
-        $this->request   = $request;
+        $this->entity  = $stat;
+        $this->email   = $stat->getEmail();
+        $this->request = $request;
     }
 
     /**

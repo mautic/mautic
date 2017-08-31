@@ -191,7 +191,7 @@ class EmailSubscriber extends CommonSubscriber
         // Listening for bounce_folder and unsubscribe_folder
         $isBounce      = $event->isApplicable('EmailBundle', 'bounces');
         $isUnsubscribe = $event->isApplicable('EmailBundle', 'unsubscribes');
-        $isReply = $event->isApplicable('EmailBundle', 'reply');
+        $isReply       = $event->isApplicable('EmailBundle', 'reply');
         /** @var \Mautic\EmailBundle\Helper\MessageHelper $messageHelper */
         $messageHelper = $this->factory->getHelper('message');
         if ($isBounce || $isUnsubscribe) {
@@ -206,7 +206,7 @@ class EmailSubscriber extends CommonSubscriber
             // Process the messages
             $messages = $event->getMessages();
             foreach ($messages as $message) {
-                if(!$message->inReplyTo){
+                if(!$message->inReplyTo) {
                     continue;
                 }
                 $messageHelper->processReplyMail($message->fromAddress, $message->inReplyTo);

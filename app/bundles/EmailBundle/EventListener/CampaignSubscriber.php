@@ -19,11 +19,11 @@ use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
+use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\EmailBundle\Event\EmailReplyEvent;
 
 /**
  * Class CampaignSubscriber.
@@ -89,7 +89,7 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionSendEmailToUser', 1],
             ],
             EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-            EmailEvents::EMAIL_ON_REPLY                => ['onEmailReply', 0],
+            EmailEvents::EMAIL_ON_REPLY               => ['onEmailReply', 0],
         ];
     }
 
@@ -144,13 +144,13 @@ class CampaignSubscriber extends CommonSubscriber
                 'channelIdField'  => 'email',
             ]
         );
-        
+
         $event->addDecision(
-                'email.reply', 
+                'email.reply',
                 [
-                    'label' => 'mautic.email.campaign.event.reply',
-                    'description' => 'mautic.email.campaign.event.reply_descr',
-                    'eventName' => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                    'label'                  => 'mautic.email.campaign.event.reply',
+                    'description'            => 'mautic.email.campaign.event.reply_descr',
+                    'eventName'              => EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
                     'connectionRestrictions' => [
                         'source' => [
                             'action' => [
@@ -222,6 +222,9 @@ class CampaignSubscriber extends CommonSubscriber
                 return $event->setResult(false);
             } elseif ($event->checkContext('email.open')) {
                 // open decision
+                return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
+            } elseif ($event->checkContext('email.reply')) {
+                // reply decision
                 return $event->setResult($eventDetails->getId() === (int) $eventParent['properties']['email']);
             }
         }
@@ -325,8 +328,8 @@ class CampaignSubscriber extends CommonSubscriber
 
         return $event;
     }
-    
-    
+
+
     /**
      * Trigger campaign event for reply to an email.
      *

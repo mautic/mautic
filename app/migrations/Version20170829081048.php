@@ -2,8 +2,8 @@
 
 namespace Mautic\Migrations;
 
-use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
@@ -25,7 +25,6 @@ class Version20170829081048 extends AbstractMauticMigration
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
-    
     
     /**
      * @param Schema $schema
