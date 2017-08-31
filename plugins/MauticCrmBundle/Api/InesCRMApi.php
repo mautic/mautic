@@ -12,7 +12,7 @@ class InesCRMApi extends CrmApi
 
     const LOGIN_WS_PATH = '/wslogin/login.asmx';
 
-    const ICM_WS_PATH = '/ws/wsicm.asmx';
+    const CONTACT_MANAGER_WS_PATH = '/ws/wsicm.asmx';
 
     const AUTOMATION_SYNC_WS_PATH = '/ws/WSAutomationSync.asmx';
 
@@ -23,7 +23,7 @@ class InesCRMApi extends CrmApi
 
     private $loginClient;
 
-    private $icmClient;
+    private $contactManagerClient;
 
     private $automationSyncClient;
 
@@ -35,7 +35,7 @@ class InesCRMApi extends CrmApi
         $this->client = new GuzzleHttp\Client();
 
         $this->loginClient = $this->makeClient(self::LOGIN_WS_PATH);
-        $this->icmClient = $this->makeClient(self::ICM_WS_PATH);
+        $this->contactManagerClient = $this->makeClient(self::CONTACT_MANAGER_WS_PATH);
         $this->automationSyncClient = $this->makeClient(self::AUTOMATION_SYNC_WS_PATH);
     }
 
@@ -74,7 +74,7 @@ class InesCRMApi extends CrmApi
     }
 
     public function getClient($internalRef) {
-        $client = $this->icmClient;
+        $client = $this->contactManagerClient;
         $this->setAuthHeaders($client);
 
         try {
@@ -85,7 +85,7 @@ class InesCRMApi extends CrmApi
     }
 
     public function getContact($internalRef) {
-        $client = $this->icmClient;
+        $client = $this->contactManagerClient;
         $this->setAuthHeaders($client);
 
         try {
@@ -125,7 +125,7 @@ class InesCRMApi extends CrmApi
     }
 
     public function updateClient($inesClient) {
-        $client = $this->icmClient;
+        $client = $this->contactManagerClient;
         $this->setAuthHeaders($client);
 
         try {
@@ -136,7 +136,7 @@ class InesCRMApi extends CrmApi
     }
 
     public function updateContact($inesContact) {
-        $client = $this->icmClient;
+        $client = $this->contactManagerClient;
         $this->setAuthHeaders($client);
 
         try {
