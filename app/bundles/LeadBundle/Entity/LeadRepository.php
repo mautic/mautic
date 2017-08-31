@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -44,6 +45,20 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @var TriggerModel
      */
     private $triggerModel;
+
+    /**
+     * @param Lead $entity
+     * @param bool   $flush
+     */
+    public function saveEntity($entity, $flush = true)
+    {
+        parent::saveEntity($entity, $flush);
+
+        // Check if points need to be appended
+        if ($changes = $entity->getPointChanges()) {
+            $this->updateContactPoints($changes, $entity->getId());
+        }
+    }
 
     /**
      * Used by search functions to search social profiles.
@@ -1130,6 +1145,40 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $q->andHaving($having);
             }
             $q->groupBy('l.id');
+        }
+    }
+
+    /**
+     * @param array $changes
+     * @param       $id
+     * @param int   $tries
+     */
+    protected function updateContactPoints(array $changes, $id, $tries = 1)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'leads')
+            ->where('id = '.$id);
+
+        $ph = 0;
+        // Keep operator in same order as was used in Lead::adjustPoints() in order to be congruent with what was calculated in PHP
+        // Again ignoring Aunt Sally here (PEMDAS)
+        foreach ($changes as $operator => $points) {
+            $qb->set('points', 'points '.$operator.' :points'.$ph)
+                ->setParameter('points'.$ph, $points, \PDO::PARAM_INT);
+
+            ++$ph;
+        }
+
+        try {
+            $qb->execute();
+        } catch (DriverException $exception) {
+            $message = $exception->getMessage();
+
+            if (strpos($message, 'Deadlock') !== false && $tries <= 3) {
+                ++$tries;
+
+                $this->updateContactPoints($changes, $id, $tries);
+            }
         }
     }
 }
