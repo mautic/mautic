@@ -96,8 +96,8 @@ class MessageQueueModel extends FormModel
 
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
         $frequencyRulesRepo     = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
-        $defaultFrequencyNumber = $this->coreParametersHelper->getParameter('email_frequency_number');
-        $defaultFrequencyTime   = $this->coreParametersHelper->getParameter('email_frequency_time');
+        $defaultFrequencyNumber = $this->coreParametersHelper->getParameter($channel.'_frequency_number');
+        $defaultFrequencyTime   = $this->coreParametersHelper->getParameter($channel.'_frequency_time');
 
         $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules(
             $channel,
