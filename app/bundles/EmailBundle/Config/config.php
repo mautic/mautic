@@ -107,6 +107,7 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.email.model.email',
+                    'mautic.helper.message',
                 ],
             ],
             'mautic.emailbuilder.subscriber' => [
@@ -301,7 +302,12 @@ return [
             ],
             'mautic.helper.message' => [
                 'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.lead.model.lead',
+                    'mautic.helper.mailbox',
+                    'event_dispatcher',
+                ],
             ],
             'mautic.helper.mailer' => [
                 'class'     => 'Mautic\EmailBundle\Helper\MailHelper',

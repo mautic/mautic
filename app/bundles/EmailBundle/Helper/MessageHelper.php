@@ -28,12 +28,15 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Model\LeadModel;
 
 /**
  * Class MessageHelper.
@@ -56,13 +59,31 @@ class MessageHelper
     protected $logger;
 
     /**
+     * @var Mailbox
+     */
+    protected $mailbox;
+
+    /**
+     * @var Mailbox
+     */
+    protected $leadModel;
+
+    /**
+     * @var Mailbox
+     */
+    protected $dispatcher;
+
+    /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, LeadModel $leadModel, Mailbox $mailbox, EventDispatcherInterface $dispatcher)
     {
-        $this->factory = $factory;
-        $this->db      = $factory->getDatabase();
-        $this->logger  = $this->factory->getLogger();
+        $this->factory    = $factory;
+        $this->db         = $factory->getDatabase();
+        $this->logger     = $this->factory->getLogger();
+        $this->mailbox    = $mailbox;
+        $this->leadModel  = $leadModel;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -2150,27 +2171,26 @@ class MessageHelper
     public function processReplyMail($mailId, $refid)
     {
         $this->logger->debug('Processing reply mail.');
-        $imapHelper     = $this->factory->get('mautic.helper.mailbox');
         $sendFolderName = '';
-        foreach($imapHelper->getListingFolders() as $folderNames) {
+        foreach($this->mailbox->getListingFolders() as $folderNames) {
             if(strpos(strtolower($folderNames), 'sent') !== false) {
                 $sendFolderName = $folderNames;
                 break;
             }
         }
-        $imapHelper->switchFolder($sendFolderName);
-        $mailIds = $imapHelper->searchMailbox('TO '.$mailId);
-        $mails   = $imapHelper->getMailsInfo($mailIds);
+        $this->mailbox->switchFolder($sendFolderName);
+        $mailIds = $this->mailbox->searchMailbox('TO '.$mailId);
+        $mails   = $this->mailbox->getMailsInfo($mailIds);
         foreach ($mails as $mail) {
             if ($mail->message_id == $refid) {
-                $this->checkMail($mail->uid, $imapHelper);
+                $this->checkMail($mail->uid);
             } 
         }
     }
     
-    public function checkMail($mailUid, $imapHelper)
+    public function checkMail($mailUid)
     {
-        $mail = $imapHelper->getMail($mailUid);
+        $mail = $this->mailbox->getMail($mailUid);
         if ($mail->returnPath && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $mail->returnPath, $parts)) {
             if (strstr($parts[2], '_')) {
                 // Has an ID hash so use it to find the lead
@@ -2196,15 +2216,12 @@ class MessageHelper
             return false;
         }
         $this->logger->debug('Stat found with ID# '.$stat->getId());
-        $leadModel = $this->factory->getModel('lead');
-        $leadModel->setCurrentLead($stat->getLead());
+        $this->leadModel->setCurrentLead($stat->getLead());
         $stat->setIsReplyed(1);
         $em->flush($stat);
-        $dispatcher = $this->factory->getDispatcher();
-        if($dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
-            $request = $this->factory->getRequest();
-            $event   = new EmailReplyEvent($stat, $request);
-            $dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
+        if($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
+            $event   = new EmailReplyEvent($stat);
+            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
             unset($event);
         }
         return true;
