@@ -90,7 +90,8 @@ class ApiSubscriber extends CommonSubscriber
                 $this->translator->trans(
                     'mautic.core.url.error.401',
                     [
-                        '%url%' => $request->getRequestUri(),
+                        '%url%'    => $request->getRequestUri(),
+                        '%reason%' => $this->translator->trans('mautic.core.error.reason.api.disabled'),
                     ]
                 )
             );
