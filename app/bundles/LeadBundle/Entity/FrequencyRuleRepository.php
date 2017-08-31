@@ -71,11 +71,12 @@ class FrequencyRuleRepository extends CommonRepository
 
         $q->groupBy("ch.$statContactColumn, fr.frequency_time, fr.frequency_number");
 
+        $havingWhere = 'WHERE '.$q->expr()->in("ch.$statContactColumn", $leadIds);
         if ($defaultFrequencyNumber != null) {
-            $q->having("(count(ch.$statContactColumn) >= IFNULL(fr.frequency_number,:defaultNumber))")
+            $q->having("(count(ch.$statContactColumn) >= IFNULL(fr.frequency_number,:defaultNumber) $havingWhere)")
                 ->setParameter('defaultNumber', $defaultFrequencyNumber);
         } else {
-            $q->having("(count(ch.$statContactColumn) >= fr.frequency_number)");
+            $q->having("(count(ch.$statContactColumn) >= fr.frequency_number $havingWhere)");
         }
 
         $results = $q->execute()->fetchAll();
