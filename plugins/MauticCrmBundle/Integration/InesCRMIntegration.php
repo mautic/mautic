@@ -100,14 +100,14 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $mappedData = $this->getClientWithContactsTemplate();
 
-                $mappedData['client']['AutomationRef'] = $company->getId();
-                $mappedData['client']['Contacts']['ContactInfoAuto'][0]['AutomationRef'] = $lead->getId();
+                $mappedData->client->AutomationRef = $company->getId();
+                $mappedData->client->Contacts->ContactInfoAuto[0]->AutomationRef = $lead->getId();
 
-                $this->mapCompanyToInesClient($config, $company, $mappedData['client']);
-                $this->mapLeadToInesContact($config, $lead, $mappedData['client']['Contacts']['ContactInfoAuto'][0]);
+                $this->mapCompanyToInesClient($config, $company, $mappedData->client);
+                $this->mapLeadToInesContact($config, $lead, $mappedData->client->Contacts->ContactInfoAuto[0]);
 
-                $mappedData['client']['InternalRef'] = 0;
-                $mappedData['client']['Contacts']['ContactInfoAuto'][0]['InternalRef'] = 0;
+                $mappedData->client->InternalRef = 0;
+                $mappedData->client->Contacts->ContactInfoAuto[0]->InternalRef = 0;
 
                 $response = $apiHelper->createClientWithContacts($mappedData);
                 $result = $response->AddClientWithContactsResult;
@@ -131,7 +131,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $shouldUpdateClient = $this->mapCompanyUpdatesToInesClient($config, $company, $inesClient);
 
-                $mappedData = [
+                $mappedData = (object) [
                     'contact' => $this->getContactTemplate(),
                     'AutomationRef' => $lead->getId(),
                     'clientRef' => $inesClientRef,
@@ -139,9 +139,9 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     // TODO: add unsubscribe status
                 ];
 
-                $this->mapLeadToInesContact($config, $lead, $mappedData['contact']);
+                $this->mapLeadToInesContact($config, $lead, $mappedData->contact);
 
-                $mappedData['contact']['InternalRef'] = 0;
+                $mappedData->contact->InternalRef = 0;
 
                 $response = $apiHelper->createContact($mappedData);
                 $inesContactRef = $response->AddContactResult->InternalRef;
@@ -296,11 +296,11 @@ class InesCRMIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function mapFieldsFromMauticToInes($fields, $mauticObject, &$inesObject) {
+    private function mapFieldsFromMauticToInes($fields, $mauticObject, $inesObject) {
         foreach ($fields as $inesField => $mauticField) {
             if (substr($inesField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
                 $method = 'get' . ucfirst($mauticField);
-                $inesObject[$inesField] = $mauticObject->$method($mauticField);
+                $inesObject->$inesField = $mauticObject->$method($mauticField);
             }
         }
     }
@@ -321,13 +321,13 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $shouldUpdate;
     }
 
-    private function mapCompanyToInesClient($config, $company, &$inesClient) {
+    private function mapCompanyToInesClient($config, $company, $inesClient) {
         $companyFields = $config['companyFields'];
 
         $this->mapFieldsFromMauticToInes($companyFields, $company, $inesClient);
     }
 
-    private function mapLeadToInesContact($config, $lead, &$inesContact) {
+    private function mapLeadToInesContact($config, $lead, $inesContact) {
         $leadFields = $config['leadFields'];
 
         $this->mapFieldsFromMauticToInes($leadFields, $lead, $inesContact);
@@ -347,7 +347,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     private function getClientTemplate()
     {
-        return [
+        return (object) [
             'Confidentiality' => 'Undefined',
             'CompanyName' => '',
             'Type' => 0, /* filled from INES config : company type */
@@ -400,7 +400,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     private function getContactTemplate()
     {
-        return [
+        return (object) [
             'Author' => 0,
             'BusinessAddress' => '',
             'BussinesTelephone' => '',
@@ -439,16 +439,14 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     private function getClientWithContactsTemplate($nbContacts = 1)
     {
-        $data = [
+        $data = (object) [
             'client' => $this->getClientTemplate()
         ];
 
-        $data['client']['Contacts'] = [
-            'ContactInfoAuto' => array()
-        ];
+        $data->client->Contacts->ContactInfoAuto = [];
 
         for($i = 0; $i < $nbContacts; $i += 1) {
-            $data['client']['Contacts']['ContactInfoAuto'][] = $this->getContactTemplate();
+            $data->client->Contacts->ContactInfoAuto[] = $this->getContactTemplate();
         }
 
         return $data;
