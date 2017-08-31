@@ -30,6 +30,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     use CustomFieldEntityTrait;
 
     const FIELD_ALIAS = '';
+    const POINTS_ADD = 'plus';
+    const POINTS_SUBTRACT = 'minus';
+    const POINTS_MULTIPLY = 'times';
+    const POINTS_DIVIDE = 'divide';
 
     /**
      * Used to determine social identity.
@@ -142,6 +146,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      * @var ArrayCollection
      */
     private $pointsChangeLog;
+
+    /**
+     * @var null
+     */
+    private $actualPoints = null;
 
     /**
      * @var ArrayCollection
@@ -341,12 +350,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->build();
 
         $builder->createOneToMany('eventLog', LeadEventLog::class)
-                ->mappedBy('lead')
-                ->cascadePersist()
-                ->cascadeMerge()
-                ->cascadeDetach()
-                ->fetchExtraLazy()
-                ->build();
+            ->mappedBy('lead')
+            ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
+            ->fetchExtraLazy()
+            ->build();
 
         $builder->createField('lastActive', 'datetime')
             ->columnName('last_active')
@@ -798,7 +807,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      *
      * @return Lead
      */
-    public function adjustPoints($points, $operator = 'plus')
+    public function adjustPoints($points, $operator = self::POINTS_ADD)
     {
         if (!$points = (int) $points) {
             return $this;
@@ -812,19 +821,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $oldPoints = $this->updatedPoints;
 
         switch ($operator) {
-            case 'plus':
+            case self::POINTS_ADD:
                 $this->updatedPoints += $points;
                 $operator            = '+';
                 break;
-            case 'minus':
+            case self::POINTS_SUBTRACT:
                 $this->updatedPoints -= $points;
                 $operator            = '-';
                 break;
-            case 'times':
+            case self::POINTS_MULTIPLY:
                 $this->updatedPoints *= $points;
                 $operator            = '*';
                 break;
-            case 'divide':
+            case self::POINTS_DIVIDE:
                 $this->updatedPoints /= $points;
                 $operator            = '/';
                 break;
@@ -874,7 +883,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getPoints()
     {
-        return $this->points;
+        return (null !== $this->actualPoints) ? $this->actualPoints : $this->points;
+    }
+
+    /**
+     * Set by the repository method when points are updated and requeried directly on the DB side
+     *
+     * @param $points
+     */
+    public function setActualPoints($points)
+    {
+        $this->actualPoints = (int) $points;
     }
 
     /**

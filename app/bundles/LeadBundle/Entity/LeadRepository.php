@@ -52,11 +52,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function saveEntity($entity, $flush = true)
     {
+        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
+        $pointChanges = $entity->getPointChanges();
+
         parent::saveEntity($entity, $flush);
 
         // Check if points need to be appended
-        if ($changes = $entity->getPointChanges()) {
-            $this->updateContactPoints($changes, $entity->getId());
+        if ($pointChanges) {
+            $newPoints = $this->updateContactPoints($pointChanges, $entity->getId());
+
+            // Set actual points so that code using getPoints knows the true value
+            $entity->setActualPoints($newPoints);
+
+            $changes = $entity->getChanges();
+            if (isset($changes['points'])) {
+                // Let's adjust the points to be more accurate in the change log
+                $changes['points'][1] = $newPoints;
+                $entity->setChanges($changes);
+            }
         }
     }
 
@@ -1180,5 +1193,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $this->updateContactPoints($changes, $id, $tries);
             }
         }
+
+        // Query new points
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('l.points')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where('l.id = '.$id)
+            ->execute()
+            ->fetchColumn();
     }
 }
