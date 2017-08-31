@@ -81,8 +81,8 @@ class LeadSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($details = $event->getChanges()) {
-            // Unset dateLastActive to prevent un-necessary audit log entries
-            unset($details['dateLastActive']);
+            // Unset dateLastActive and dateModified to prevent un-necessary audit log entries
+            unset($details['dateLastActive'], $details['dateModified']);
             if (empty($details)) {
                 return;
             }
