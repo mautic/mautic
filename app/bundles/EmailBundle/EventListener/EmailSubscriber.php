@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\EmailBundle\Helper\MessageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
@@ -40,17 +41,23 @@ class EmailSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
+     * @var MessageHelper
+     */
+    protected $messageHelper;
+
+    /**
      * EmailSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      * @param EmailModel     $emailModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, EmailModel $emailModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, EmailModel $emailModel, MessageHelper $messageHelper)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
         $this->emailModel     = $emailModel;
+        $this->messageHelper  = $messageHelper;
     }
 
     /**
@@ -188,16 +195,13 @@ class EmailSubscriber extends CommonSubscriber
         $isBounce      = $event->isApplicable('EmailBundle', 'bounces');
         $isUnsubscribe = $event->isApplicable('EmailBundle', 'unsubscribes');
         $isReply       = $event->isApplicable('EmailBundle', 'reply');
-        /** @var \Mautic\EmailBundle\Helper\MessageHelper $messageHelper */
-        $messageHelper = $this->factory->getHelper('message');
         if ($isBounce || $isUnsubscribe) {
             // Process the messages
             $messages = $event->getMessages();
             foreach ($messages as $message) {
-                $messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
+                $this->messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
             }
         }
-        
         if ($isReply) {
             // Process the messages
             $messages = $event->getMessages();
@@ -205,7 +209,7 @@ class EmailSubscriber extends CommonSubscriber
                 if(!$message->inReplyTo) {
                     continue;
                 }
-                $messageHelper->processReplyMail($message->fromAddress, $message->inReplyTo);
+                $this->messageHelper->processReplyMail($message->fromAddress, $message->inReplyTo);
             }
         }
     }

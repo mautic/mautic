@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class EmailReplyEvent.
@@ -22,24 +21,17 @@ use Symfony\Component\HttpFoundation\Request;
 class EmailReplyEvent extends CommonEvent
 {
     /**
-     * @var Request
-     */
-    private $request;
-
-    /**
      * @var Email
      */
     private $email;
 
     /**
      * @param Stat $stat
-     * @param Request $request
      */
-    public function __construct(Stat $stat, $request)
+    public function __construct(Stat $stat)
     {
         $this->entity  = $stat;
         $this->email   = $stat->getEmail();
-        $this->request = $request;
     }
 
     /**
@@ -50,16 +42,6 @@ class EmailReplyEvent extends CommonEvent
     public function getEmail()
     {
         return $this->email;
-    }
-
-    /**
-     * Get email request.
-     *
-     * @return string
-     */
-    public function getRequest()
-    {
-        return $this->request;
     }
 
     /**
