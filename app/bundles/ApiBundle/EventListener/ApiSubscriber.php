@@ -86,15 +86,7 @@ class ApiSubscriber extends CommonSubscriber
         $isApiRequest = $this->isApiRequest($event);
 
         if ($isApiRequest && !$apiEnabled) {
-            throw new AccessDeniedHttpException(
-                $this->translator->trans(
-                    'mautic.core.url.error.401',
-                    [
-                        '%url%'    => $request->getRequestUri(),
-                        '%reason%' => $this->translator->trans('mautic.core.error.reason.api.disabled'),
-                    ]
-                )
-            );
+            throw new AccessDeniedHttpException($this->translator->trans('mautic.core.error.api.disabled'));
         }
     }
 

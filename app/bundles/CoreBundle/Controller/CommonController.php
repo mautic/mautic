@@ -481,15 +481,14 @@ class CommonController extends Controller implements MauticController
     /**
      * Generates access denied message.
      *
-     * @param bool   $batch  Flag if a batch action is being performed
-     * @param string $msg    Message that is logged
-     * @param string $reason Message that is logged
+     * @param bool   $batch Flag if a batch action is being performed
+     * @param string $msg   Message that is logged
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|array
      *
      * @throws AccessDeniedHttpException
      */
-    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401', $reason = '')
+    public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401')
     {
         $anonymous = $this->get('mautic.security')->isAnonymous();
 
@@ -497,8 +496,7 @@ class CommonController extends Controller implements MauticController
             throw new AccessDeniedHttpException(
                 $this->translator->trans($msg,
                     [
-                        '%url%'    => $this->request->getRequestUri(),
-                        '%reason%' => $this->translator->trans($reason),
+                        '%url%' => $this->request->getRequestUri(),
                     ]
                 )
             );
