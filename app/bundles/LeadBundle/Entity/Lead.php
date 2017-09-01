@@ -29,11 +29,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
-    const FIELD_ALIAS = '';
-    const POINTS_ADD = 'plus';
+    const FIELD_ALIAS     = '';
+    const POINTS_ADD      = 'plus';
     const POINTS_SUBTRACT = 'minus';
     const POINTS_MULTIPLY = 'times';
-    const POINTS_DIVIDE = 'divide';
+    const POINTS_DIVIDE   = 'divide';
 
     /**
      * Used to determine social identity.
@@ -800,7 +800,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
     /**
      * Point changes are tracked and will be persisted as a direct DB query to avoid PHP memory overwrites with concurrent requests
-     * The risk in this is that the $changes['points'] may not be accurate but at least no points are lost
+     * The risk in this is that the $changes['points'] may not be accurate but at least no points are lost.
      *
      * @param int    $points
      * @param string $operator
@@ -823,19 +823,19 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         switch ($operator) {
             case self::POINTS_ADD:
                 $this->updatedPoints += $points;
-                $operator            = '+';
+                $operator = '+';
                 break;
             case self::POINTS_SUBTRACT:
                 $this->updatedPoints -= $points;
-                $operator            = '-';
+                $operator = '-';
                 break;
             case self::POINTS_MULTIPLY:
                 $this->updatedPoints *= $points;
-                $operator            = '*';
+                $operator = '*';
                 break;
             case self::POINTS_DIVIDE:
                 $this->updatedPoints /= $points;
-                $operator            = '/';
+                $operator = '/';
                 break;
             default:
                 throw new \UnexpectedValueException('Invalid operator');
@@ -871,7 +871,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function setPoints($points)
     {
         $this->isChanged('points', $points);
-        $this->points       = $points;
+        $this->points = $points;
 
         // Something is setting points directly so reset points updated by database
         $this->actualPoints = null;
@@ -891,7 +891,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set by the repository method when points are updated and requeried directly on the DB side
+     * Set by the repository method when points are updated and requeried directly on the DB side.
      *
      * @param $points
      */
