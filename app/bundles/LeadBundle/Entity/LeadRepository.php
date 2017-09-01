@@ -48,7 +48,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * @param Lead $entity
-     * @param bool   $flush
+     * @param bool $flush
      */
     public function saveEntity($entity, $flush = true)
     {
