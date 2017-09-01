@@ -77,8 +77,15 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $companyRepo = $this->em->getRepository(Company::class);
         $leadRepo = $this->em->getRepository(Lead::class);
 
-        $lead = $leadRepo->getEntityWithPrimaryCompany($lead);
-        $company = $companyRepo->getEntity($lead->getPrimaryCompany()['id']);
+        $company = null;
+        $companies = $companyRepo->getCompaniesByLeadId($lead->getId());
+
+        foreach ($companies as $c) {
+            if ($c['is_primary']) {
+                $company = $companyRepo->getEntity($c['id']);
+                break;
+            }
+        }
 
         if ($company === null) {
             $this->logger->debug('INES: Will not push contact without company', compact('lead', 'config'));
@@ -122,6 +129,28 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $leadRepo->saveEntity($lead);
             } else {
                 $this->logger->debug('INES: Will create Client and update Contact', compact('lead', 'company', 'config'));
+
+                $mappedData = (object) [
+                    'client' => $this->getClientTemplate(),
+                ];
+
+                $this->mapCompanyToInesClient($config, $company, $mappedData->client);
+                $mappedData->client->InternalRef = 0;
+
+                $response = $apiHelper->createClient($mappedData);
+                $inesClientRef = $response->AddClientResult->InternalRef;
+
+                $company->$companyInternalRefSetter($inesClientRef);
+                $companyRepo->saveEntity($company);
+
+                $inesContact = $apiHelper->getContact($inesContactRef)->GetContactResult;
+
+                // TODO: Figure out how to transfer a contact from a client to another
+                $shouldUpdateContact = $this->mapLeadUpdatesToInesContact($config, $lead, $inesContact);
+
+                if ($shouldUpdateContact) {
+                    $response = $apiHelper->updateContact($inesContact);
+                }
             }
         } else {
             if (!$inesContactRef) {
@@ -153,7 +182,6 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
                 $inesContact = $apiHelper->getContact($inesContactRef)->GetContactResult;
-
 
                 $shouldUpdateClient = $this->mapCompanyUpdatesToInesClient($config, $company, $inesClient);
                 $shouldUpdateContact = $this->mapLeadUpdatesToInesContact($config, $lead, $inesContact);
