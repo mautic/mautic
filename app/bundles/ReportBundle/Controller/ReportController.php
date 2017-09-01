@@ -630,8 +630,20 @@ class ReportController extends FormController
 
         // Setup dynamic filters
         $filterDefinitions = $model->getFilterList($entity->getSource());
-        $dynamicFilters    = $session->get('mautic.report.'.$objectId.'.filters', []);
-        $filterSettings    = [];
+        /** @var array $dynamicFilters */
+        $dynamicFilters = $session->get('mautic.report.'.$objectId.'.filters', []);
+        $filterSettings = [];
+
+        if (count($dynamicFilters) > 0 && count($entity->getFilters()) > 0) {
+            foreach ($entity->getFilters() as $fid => $filter) {
+                foreach ($dynamicFilters as $dfcol => &$dfval) {
+                    if (1 === $filter['dynamic'] && $filter['column'] === $dfcol) {
+                        $dfval['expr'] = $filter['condition'];
+                    }
+                }
+            }
+            unset($dfval);
+        }
 
         foreach ($dynamicFilters as $filter) {
             $filterSettings[$filterDefinitions->definitions[$filter['column']]['alias']] = $filter['value'];
