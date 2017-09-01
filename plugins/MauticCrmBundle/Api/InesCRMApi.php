@@ -106,6 +106,17 @@ class InesCRMApi extends CrmApi
         }
     }
 
+    public function createClient($mappedData) {
+        $client = $this->contactManagerClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->AddClient($mappedData);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
+    }
+
     public function createContact($mappedData) {
         $client = $this->automationSyncClient;
         $this->setAuthHeaders($client);
