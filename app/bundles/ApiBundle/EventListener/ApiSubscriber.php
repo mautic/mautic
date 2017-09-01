@@ -118,7 +118,11 @@ class ApiSubscriber extends CommonSubscriber
                     switch ($error) {
                         case 'access_denied':
                             if ($this->isBasicAuth($event->getRequest())) {
-                                $message = $this->translator->trans('mautic.api.error.basic.auth.disabled');
+                                if ($this->coreParametersHelper->getParameter('api_enable_basic_auth')) {
+                                    $message = $this->translator->trans('mautic.api.error.basic.auth.invalid.credentials');
+                                } else {
+                                    $message = $this->translator->trans('mautic.api.error.basic.auth.disabled');
+                                }
                             } else {
                                 $message = $this->translator->trans('mautic.api.auth.error.accessdenied');
                             }
