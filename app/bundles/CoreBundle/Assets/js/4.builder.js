@@ -1,4 +1,16 @@
 /**
+ * Parses the query string and returns a parameter value
+ * @param name
+ * @returns {string}
+ */
+Mautic.getUrlParameter = function (name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+/**
  * Launch builder
  *
  * @param formName
@@ -74,6 +86,10 @@ Mautic.launchBuilder = function (formName, actionName) {
     var spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2;
     var spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
     var form = mQuery('form[name='+formName+']');
+
+    if ("1" === Mautic.getUrlParameter('contentOnly')) {
+        applyBtn.hide();
+    }
 
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
