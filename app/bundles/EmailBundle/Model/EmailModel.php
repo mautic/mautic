@@ -1197,7 +1197,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
             return $singleEmail ? true : $errors;
         }
-
+// test
         // Hydrate contacts with company profile fields
         $this->getContactCompanies($sendTo);
 
