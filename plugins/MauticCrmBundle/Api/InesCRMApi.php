@@ -66,7 +66,7 @@ class InesCRMApi extends CrmApi
         $client->__setSoapHeaders($headers);
     }
 
-    public function getCustomFields() {
+    public function getSyncInfo() {
         $client = $this->automationSyncClient;
         $this->setAuthHeaders($client);
 
