@@ -115,6 +115,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $category;
 
     /**
+     * @var bool
+     */
+    private $isPreferenceCenter;
+
+    /**
      * Used to identify the page for the builder.
      *
      * @var
@@ -200,6 +205,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
         $builder->addCategory();
 
+        $builder->createField('isPreferenceCenter', 'boolean')
+            ->columnName('is_preference_center')
+            ->nullable()
+            ->build();
+
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
     }
@@ -283,6 +293,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     'metaDescription',
                     'redirectType',
                     'redirectUrl',
+                    'isPreferenceCenter',
                     'variantSettings',
                     'variantStartDate',
                     'variantParent',
@@ -581,6 +592,31 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public function getCategory()
     {
         return $this->category;
+    }
+
+    /**
+     * Set isPreferenceCenter.
+     *
+     * @param bool $isPreferenceCenter
+     *
+     * @return Page
+     */
+    public function setIsPreferenceCenter($isPreferenceCenter)
+    {
+        $this->isChanged('isPreferenceCenter', $isPreferenceCenter);
+        $this->isPreferenceCenter = $isPreferenceCenter;
+
+        return $this;
+    }
+
+    /**
+     * Get isPreferenceCenter.
+     *
+     * @return bool
+     */
+    public function getIsPreferenceCenter()
+    {
+        return $this->isPreferenceCenter;
     }
 
     /**
