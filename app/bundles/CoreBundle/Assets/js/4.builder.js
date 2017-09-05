@@ -93,7 +93,10 @@ Mautic.launchBuilder = function (formName, actionName) {
             Mautic.inBuilderSubmissionOn(form);
             var bgApplyBtn = mQuery('.btn-apply');
             if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
-                mQuery('.btn-save').trigger('click');
+                var frm = mQuery('.btn-save').closest('form');
+                Mautic.inBuilderSubmissionOn(frm);
+                frm.submit();
+                Mautic.inBuilderSubmissionOff();
             } else {
                 bgApplyBtn.trigger('click');
             }
