@@ -47,31 +47,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private $triggerModel;
 
     /**
-     * @param Lead $entity
-     * @param bool $flush
+     * @var
      */
-    public function saveEntity($entity, $flush = true)
-    {
-        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
-        $pointChanges = $entity->getPointChanges();
-
-        parent::saveEntity($entity, $flush);
-
-        // Check if points need to be appended
-        if ($pointChanges) {
-            $newPoints = $this->updateContactPoints($pointChanges, $entity->getId());
-
-            // Set actual points so that code using getPoints knows the true value
-            $entity->setActualPoints($newPoints);
-
-            $changes = $entity->getChanges();
-            if (isset($changes['points'])) {
-                // Let's adjust the points to be more accurate in the change log
-                $changes['points'][1] = $newPoints;
-                $entity->setChanges($changes);
-            }
-        }
-    }
+    private $pointChanges;
 
     /**
      * Used by search functions to search social profiles.
@@ -1201,5 +1179,35 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->where('l.id = '.$id)
             ->execute()
             ->fetchColumn();
+    }
+
+    /**
+     * @param $entity
+     */
+    protected function preSaveEntity($entity)
+    {
+        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
+        $this->pointChanges = $entity->getPointChanges();
+    }
+
+    /**
+     * @param $entity
+     */
+    protected function postSaveEntity($entity)
+    {
+        // Check if points need to be appended
+        if ($this->pointChanges) {
+            $newPoints = $this->updateContactPoints($this->pointChanges, $entity->getId());
+
+            // Set actual points so that code using getPoints knows the true value
+            $entity->setActualPoints($newPoints);
+
+            $changes = $entity->getChanges();
+            if (isset($changes['points'])) {
+                // Let's adjust the points to be more accurate in the change log
+                $changes['points'][1] = $newPoints;
+                $entity->setChanges($changes);
+            }
+        }
     }
 }
