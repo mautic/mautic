@@ -940,11 +940,6 @@ class SubmissionModel extends CommonFormModel
         //set the mapped fields
         $this->leadModel->setFieldValues($lead, $data, false, true, true);
 
-        if (!empty($event)) {
-            $event->setIpAddress($ipAddress);
-            $lead->addPointsChangeLog($event);
-        }
-
         // last active time
         $lead->setLastActive(new \DateTime());
 
