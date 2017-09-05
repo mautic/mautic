@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -44,6 +45,33 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @var TriggerModel
      */
     private $triggerModel;
+
+    /**
+     * @param Lead $entity
+     * @param bool $flush
+     */
+    public function saveEntity($entity, $flush = true)
+    {
+        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
+        $pointChanges = $entity->getPointChanges();
+
+        parent::saveEntity($entity, $flush);
+
+        // Check if points need to be appended
+        if ($pointChanges) {
+            $newPoints = $this->updateContactPoints($pointChanges, $entity->getId());
+
+            // Set actual points so that code using getPoints knows the true value
+            $entity->setActualPoints($newPoints);
+
+            $changes = $entity->getChanges();
+            if (isset($changes['points'])) {
+                // Let's adjust the points to be more accurate in the change log
+                $changes['points'][1] = $newPoints;
+                $entity->setChanges($changes);
+            }
+        }
+    }
 
     /**
      * Used by search functions to search social profiles.
@@ -1131,5 +1159,47 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
             $q->groupBy('l.id');
         }
+    }
+
+    /**
+     * @param array $changes
+     * @param       $id
+     * @param int   $tries
+     */
+    protected function updateContactPoints(array $changes, $id, $tries = 1)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'leads')
+            ->where('id = '.$id);
+
+        $ph = 0;
+        // Keep operator in same order as was used in Lead::adjustPoints() in order to be congruent with what was calculated in PHP
+        // Again ignoring Aunt Sally here (PEMDAS)
+        foreach ($changes as $operator => $points) {
+            $qb->set('points', 'points '.$operator.' :points'.$ph)
+                ->setParameter('points'.$ph, $points, \PDO::PARAM_INT);
+
+            ++$ph;
+        }
+
+        try {
+            $qb->execute();
+        } catch (DriverException $exception) {
+            $message = $exception->getMessage();
+
+            if (strpos($message, 'Deadlock') !== false && $tries <= 3) {
+                ++$tries;
+
+                $this->updateContactPoints($changes, $id, $tries);
+            }
+        }
+
+        // Query new points
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('l.points')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where('l.id = '.$id)
+            ->execute()
+            ->fetchColumn();
     }
 }
