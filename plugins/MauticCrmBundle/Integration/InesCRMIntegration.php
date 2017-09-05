@@ -7,6 +7,8 @@ use Mautic\LeadBundle\Entity\Company;
 
 class InesCRMIntegration extends CrmAbstractIntegration
 {
+    const INES_CUSTOM_FIELD_PREFIX = 'ines_custom_';
+
     private $defaultContactFields;
 
     private $defaultCompanyFields;
@@ -286,7 +288,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                              ->CustomFieldToAuto;
 
         foreach ($customFields as $f) {
-            $leadFields['ines_custom_' . $f->InesID] = [
+            $leadFields[self::INES_CUSTOM_FIELD_PREFIX . $f->InesID] = [
                 'label' => $f->InesName,
                 'required' => false,
             ];
@@ -304,7 +306,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                              ->CustomFieldToAuto;
 
         foreach ($customFields as $f) {
-            $companyFields['ines_custom_' . $f->InesID] = [
+            $companyFields[self::INES_CUSTOM_FIELD_PREFIX . $f->InesID] = [
                 'label' => $f->InesName,
                 'required' => false,
             ];
@@ -333,7 +335,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     private function mapFieldsFromMauticToInes($fields, $mauticObject, $inesObject) {
         foreach ($fields as $inesField => $mauticField) {
-            if (substr($inesField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+            if (substr($inesField, 0, 12) !== self::INES_CUSTOM_FIELD_PREFIX) { // FIXME: There's probably a better way to do this...
                 $method = 'get' . ucfirst($mauticField);
                 $inesObject->$inesField = $mauticObject->$method($mauticField);
             }
@@ -344,7 +346,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $shouldUpdate = false;
 
         foreach ($fields as $inesField => $mauticField) {
-            if (substr($inesField, 0, 12) !== 'ines_custom_') { // FIXME: There's probably a better way to do this...
+            if (substr($inesField, 0, 12) !== self::INES_CUSTOM_FIELD_PREFIX) { // FIXME: There's probably a better way to do this...
                 $method = 'get' . ucfirst($mauticField);
                 if ((string) $inesObject->$inesField !== (string) $mauticObject->$method($mauticField)) {
                     $shouldUpdate = true;
