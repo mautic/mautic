@@ -1173,7 +1173,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         // Query new points
-        return $this->getEntityManager()->getConnection()->createQueryBuilder()
+        return (int) $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.points')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where('l.id = '.$id)
@@ -1182,7 +1182,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param $entity
+     * @param Lead $entity
      */
     protected function preSaveEntity($entity)
     {
@@ -1191,7 +1191,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @param $entity
+     * @param Lead $entity
      */
     protected function postSaveEntity($entity)
     {
@@ -1203,6 +1203,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $entity->setActualPoints($newPoints);
 
             $changes = $entity->getChanges();
+
             if (isset($changes['points'])) {
                 // Let's adjust the points to be more accurate in the change log
                 $changes['points'][1] = $newPoints;
