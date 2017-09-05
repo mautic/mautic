@@ -276,8 +276,10 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         // Group by email to prevent duplicates from affecting this
-        if (false === $limit and $integrationEntity) {
+        if (false === $limit and $integrationEntity and !is_array($integrationEntity)) {
             $q->groupBy('i.integration_entity');
+        } else {
+            $q->groupBy('i.integration_entity', 'i.integration_entity_id');
         }
 
         if ($limit) {
@@ -332,15 +334,20 @@ class IntegrationEntityRepository extends CommonRepository
         } else {
             $q->select('l.id as internal_entity_id,'.$leadFields);
         }
+        if ($internalEntity == 'company') {
+            $q->where('not exists (select null from '.MAUTIC_TABLE_PREFIX
+                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "'.$internalEntity.'%" and i.internal_entity_id = l.id)')
+                ->setParameter('integration', $integration);
+        } else {
+            $q->where('l.date_identified is not null')
+                ->andWhere(
+                    'not exists (select null from '.MAUTIC_TABLE_PREFIX
+                    .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "'.$internalEntity.'%" and i.internal_entity_id = l.id)'
+                )
+                ->setParameter('integration', $integration);
+        }
 
-        $q->where('l.date_identified is not null')
-            ->andWhere(
-                'not exists (select null from '.MAUTIC_TABLE_PREFIX
-                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "'.$internalEntity.'%" and i.internal_entity_id = l.id)'
-            )
-            ->setParameter('integration', $integration);
-
-        if ($internalEntity = 'company') {
+        if ($internalEntity == 'company') {
             $q->andWhere('l.companyname is not null');
         } else {
             $q->andWhere('l.email is not null');
