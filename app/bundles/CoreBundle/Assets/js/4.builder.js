@@ -91,10 +91,11 @@ Mautic.launchBuilder = function (formName, actionName) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
             Mautic.inBuilderSubmissionOn(form);
-            if ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder) {
+            var bgApplyBtn = mQuery('.btn-apply');
+            if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
                 mQuery('.btn-save').trigger('click');
             } else {
-                mQuery('.btn-apply').trigger('click');
+                bgApplyBtn.trigger('click');
             }
             Mautic.inBuilderSubmissionOff();
         }, true);
