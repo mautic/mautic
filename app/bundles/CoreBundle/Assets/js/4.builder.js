@@ -1,4 +1,16 @@
 /**
+ * Parses the query string and returns a parameter value
+ * @param name
+ * @returns {string}
+ */
+Mautic.getUrlParameter = function (name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+/**
  * Launch builder
  *
  * @param formName
@@ -79,7 +91,15 @@ Mautic.launchBuilder = function (formName, actionName) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
             Mautic.inBuilderSubmissionOn(form);
-            mQuery('.btn-apply').trigger('click');
+            var bgApplyBtn = mQuery('.btn-apply');
+            if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
+                var frm = mQuery('.btn-save').closest('form');
+                Mautic.inBuilderSubmissionOn(frm);
+                frm.submit();
+                Mautic.inBuilderSubmissionOff();
+            } else {
+                bgApplyBtn.trigger('click');
+            }
             Mautic.inBuilderSubmissionOff();
         }, true);
     });
@@ -125,6 +145,7 @@ Mautic.inBuilderSubmissionOn = function(form) {
  * @param jQuery object of form
  */
 Mautic.inBuilderSubmissionOff = function(form) {
+    Mautic.isInBuilder = false;
     mQuery('input[name="inBuilder"]').remove();
 }
 

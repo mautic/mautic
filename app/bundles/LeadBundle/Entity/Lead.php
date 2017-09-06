@@ -874,8 +874,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $this->points = (int) $points;
 
         // Something is setting points directly so reset points updated by database
-        $this->actualPoints = null;
-        $this->pointChanges = [];
+        $this->resetPointChanges();
 
         return $this;
     }
@@ -887,7 +886,13 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getPoints()
     {
-        return (null !== $this->actualPoints) ? $this->actualPoints : $this->points;
+        if (null !== $this->actualPoints) {
+            return $this->actualPoints;
+        } elseif (null !== $this->updatedPoints) {
+            return $this->updatedPoints;
+        }
+
+        return $this->points;
     }
 
     /**
@@ -898,6 +903,20 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function setActualPoints($points)
     {
         $this->actualPoints = (int) $points;
+    }
+
+    /**
+     * Reset point changes.
+     *
+     * @return $this
+     */
+    public function resetPointChanges()
+    {
+        $this->actualPoints  = null;
+        $this->pointChanges  = [];
+        $this->updatedPoints = null;
+
+        return $this;
     }
 
     /**
