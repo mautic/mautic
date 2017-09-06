@@ -153,8 +153,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model->expects($this->once())
-            ->method('checkParallelImportLimit')
+        $model->method('checkParallelImportLimit')
             ->will($this->returnValue(false));
 
         $model->expects($this->once())
@@ -166,7 +165,11 @@ class ImportModelTest extends StandardImportTestHelper
 
         $model->setTranslator($this->getTranslatorMock());
 
-        $entity = $this->initImportEntity();
+        $entity = $this->initImportEntity(['canProceed']);
+
+        $entity->method('canProceed')
+            ->will($this->returnValue(true));
+
         $result = $model->startImport($entity, new Progress());
 
         $this->assertFalse($result);
@@ -196,7 +199,11 @@ class ImportModelTest extends StandardImportTestHelper
 
         $model->setTranslator($this->getTranslatorMock());
 
-        $entity = $this->initImportEntity();
+        $entity = $this->initImportEntity(['canProceed']);
+
+        $entity->method('canProceed')
+            ->will($this->returnValue(true));
+
         $result = $model->startImport($entity, new Progress());
 
         $this->assertFalse($result);
