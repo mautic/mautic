@@ -12,8 +12,10 @@
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Helper\Progress;
+use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 
 class ImportModelTest extends StandardImportTestHelper
@@ -51,6 +53,126 @@ class ImportModelTest extends StandardImportTestHelper
         $this->assertSame(4, $entity->getInsertedCount());
         $this->assertSame(2, $entity->getIgnoredCount());
         $this->assertSame(Import::IMPORTED, $entity->getStatus());
+    }
+
+    public function testCheckParallelImportLimitWhenMore()
+    {
+        $entity = $this->initImportEntity();
+        $model  = $this->getMockBuilder(ImportModel::class)
+            ->setMethods(['getParallelImportLimit', 'getRepository'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $model->expects($this->once())
+            ->method('getParallelImportLimit')
+            ->will($this->returnValue(4));
+
+        $repository = $this->getMockBuilder(ImportRepository::class)
+            ->setMethods(['countImportsWithStatuses'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('countImportsWithStatuses')
+            ->will($this->returnValue(5));
+
+        $model->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+
+        $result = $model->checkParallelImportLimit($entity);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCheckParallelImportLimitWhenEqual()
+    {
+        $entity = $this->initImportEntity();
+        $model  = $this->getMockBuilder(ImportModel::class)
+            ->setMethods(['getParallelImportLimit', 'getRepository'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $model->expects($this->once())
+            ->method('getParallelImportLimit')
+            ->will($this->returnValue(4));
+
+        $repository = $this->getMockBuilder(ImportRepository::class)
+            ->setMethods(['countImportsWithStatuses'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('countImportsWithStatuses')
+            ->will($this->returnValue(4));
+
+        $model->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+
+        $result = $model->checkParallelImportLimit($entity);
+
+        $this->assertFalse($result);
+    }
+
+    public function testCheckParallelImportLimitWhenLess()
+    {
+        $entity = $this->initImportEntity();
+        $model  = $this->getMockBuilder(ImportModel::class)
+            ->setMethods(['getParallelImportLimit', 'getRepository'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $model->expects($this->once())
+            ->method('getParallelImportLimit')
+            ->will($this->returnValue(6));
+
+        $repository = $this->getMockBuilder(ImportRepository::class)
+            ->setMethods(['countImportsWithStatuses'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository->expects($this->once())
+            ->method('countImportsWithStatuses')
+            ->will($this->returnValue(5));
+
+        $model->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+
+        $result = $model->checkParallelImportLimit($entity);
+
+        $this->assertTrue($result);
+    }
+
+    public function testStartImportWhenParallelLimitHit()
+    {
+        $model = $this->getMockBuilder(ImportModel::class)
+            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit', 'logDebug'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $model->expects($this->once())
+            ->method('checkParallelImportLimit')
+            ->will($this->returnValue(false));
+
+        $model->expects($this->once())
+            ->method('getParallelImportLimit')
+            ->will($this->returnValue(1));
+
+        $model->expects($this->once())
+            ->method('logDebug');
+
+        $model->setTranslator($this->getTranslatorMock());
+
+        $entity = $this->initImportEntity();
+        $result = $model->startImport($entity, new Progress());
+
+        $this->assertFalse($result);
+        $this->assertEquals(0, $entity->getProgressPercentage());
+        $this->assertSame(0, $entity->getInsertedCount());
+        $this->assertSame(0, $entity->getIgnoredCount());
+        $this->assertSame(Import::DELAYED, $entity->getStatus());
     }
 
     public function testIsEmptyCsvRow()
