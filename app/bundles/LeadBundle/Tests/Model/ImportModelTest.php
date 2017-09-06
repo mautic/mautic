@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\ORM\ORMException;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -162,6 +163,36 @@ class ImportModelTest extends StandardImportTestHelper
 
         $model->expects($this->once())
             ->method('logDebug');
+
+        $model->setTranslator($this->getTranslatorMock());
+
+        $entity = $this->initImportEntity();
+        $result = $model->startImport($entity, new Progress());
+
+        $this->assertFalse($result);
+        $this->assertEquals(0, $entity->getProgressPercentage());
+        $this->assertSame(0, $entity->getInsertedCount());
+        $this->assertSame(0, $entity->getIgnoredCount());
+        $this->assertSame(Import::DELAYED, $entity->getStatus());
+    }
+
+    public function testStartImportWhenDatabaseException()
+    {
+        $model = $this->getMockBuilder(ImportModel::class)
+            ->setMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $model->expects($this->once())
+            ->method('checkParallelImportLimit')
+            ->will($this->returnValue(true));
+
+        $model->expects($this->once())
+            ->method('logDebug');
+
+        $model->expects($this->once())
+            ->method('process')
+            ->will($this->throwException(new ORMException()));
 
         $model->setTranslator($this->getTranslatorMock());
 

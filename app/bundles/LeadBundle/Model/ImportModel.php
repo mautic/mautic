@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -216,7 +217,10 @@ class ImportModel extends FormModel
 
         if (!$this->checkParallelImportLimit($import)) {
             $parallelImportLimit = $this->getParallelImportLimit();
-            $info                = $this->translator->trans('mautic.lead.import.parallel.limit.hit', ['%limit%' => $parallelImportLimit]);
+            $info                = $this->translator->trans(
+                'mautic.lead.import.parallel.limit.hit',
+                ['%limit%' => $parallelImportLimit]
+            );
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
             $this->saveEntity($import);
             $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
@@ -233,7 +237,18 @@ class ImportModel extends FormModel
         $this->saveEntity($import);
         $this->logDebug('The background import is about to start', $import);
 
-        if (!$this->process($import, $progress)) {
+        try {
+            if (!$this->process($import, $progress)) {
+                return false;
+            }
+        } catch (ORMException $e) {
+            // The EntityManager is probably closed. Let's delay for re-trial.
+            $info = $this->translator->trans(
+                'mautic.lead.import.database.exception',
+                ['%message%' => $e->getMessage()]
+            );
+            $import->setStatus($import::DELAYED)->setStatusInfo($info);
+
             return false;
         }
 
