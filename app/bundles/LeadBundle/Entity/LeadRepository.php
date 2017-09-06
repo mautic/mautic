@@ -897,12 +897,29 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             case $this->translator->trans('mautic.lead.lead.searchcommand.emailpending'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.emailpending', [], null, 'en_US'):
                 /** @var EmailRepository $emailRepo */
-                $emailRepo       = $this->getEntityManager()->getRepository('MauticEmailBundle:Email');
-                $emailId         = (int) $string;
-                $email           = $emailRepo->getEntity($emailId);
-                $variantIds      = $email->getRelatedEntityIds();
-                $q               = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
-                $expr            = $q->getQueryPart('where');
+                $emailRepo  = $this->getEntityManager()->getRepository('MauticEmailBundle:Email');
+                $emailId    = (int) $string;
+                $email      = $emailRepo->getEntity($emailId);
+                $variantIds = $email->getRelatedEntityIds();
+                $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
+                if ($nq instanceof QueryBuilder) {
+                    $expr = $nq->getQueryPart('where');
+                } else {
+                    $this->applySearchQueryRelationship(
+                        $q,
+                        [
+                            [
+                                'from_alias' => 'l',
+                                'table'      => 'message_queue',
+                                'alias'      => 'mq',
+                                'condition'  => 'l.id = mq.lead_id',
+                            ],
+                        ],
+                        $innerJoinTables,
+                        $this->generateFilterExpression($q, 'mq.channel_id', $eqExpr, $unique, null)
+                    );
+                    $q->andWhere('mq.channel = \'email\' and mq.status = \''.MessageQueue::STATUS_PENDING.'\'');
+                }
                 $filter->strict  = 1;
                 $returnParameter = true;
                 break;
