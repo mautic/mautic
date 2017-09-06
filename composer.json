@@ -114,10 +114,13 @@
         "sensio/generator-bundle": "~3.0",
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "~4.3",
-        "phpunit/phpunit": "4.5",
+        "phpunit/phpunit": "^5.7",
         "phpunit/dbunit": "^2.0",
+        "sebastian/exporter": "~2.0",
+        "phpunit/phpunit-mock-objects": "~3.4.4",
         "friendsofphp/php-cs-fixer": "^1.12",
-        "symfony/var-dumper": "^3.2"
+        "symfony/var-dumper": "^3.2",
+        "phpunit/phpunit-selenium": "^3.0"
     },
     "repositories": [
         {
