@@ -1353,11 +1353,14 @@ class LeadModel extends FormModel
         //save the updated lead
         $this->saveEntity($mergeWith, false);
 
+        // Update merge records for the lead about to be deleted
+        $this->getMergeRecordRepository()->moveMergeRecord($mergeFrom->getId(), $mergeWith->getId());
+
         // Create an entry this contact was merged
         $mergeRecord = new MergeRecord();
         $mergeRecord->setContact($mergeWith)
             ->setDateAdded()
-            ->setName($mergeWith->getPrimaryIdentifier())
+            ->setName($mergeFrom->getPrimaryIdentifier())
             ->setMergedId($mergeFrom->getId());
         $this->getMergeRecordRepository()->saveEntity($mergeRecord);
 

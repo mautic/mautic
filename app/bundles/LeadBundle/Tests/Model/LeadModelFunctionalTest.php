@@ -20,33 +20,49 @@ class LeadModelFunctionalTest extends MauticWebTestCase
     {
         $model = $this->container->get('mautic.lead.model.lead');
 
-        $lead1 = new Lead();
-        $lead1->setFirstname('Bob')
+        $bob = new Lead();
+        $bob->setFirstname('Bob')
             ->setLastname('Smith')
             ->setEmail('bob.smith@test.com');
-        $model->saveEntity($lead1);
-        $lead1Id = $lead1->getId();
+        $model->saveEntity($bob);
+        $bobId = $bob->getId();
 
-        $lead2 = new Lead();
-        $lead2->setFirstname('Jane')
+        $jane = new Lead();
+        $jane->setFirstname('Jane')
             ->setLastname('Smith')
             ->setEmail('jane.smith@test.com');
-        $model->saveEntity($lead2);
-        $lead2Id = $lead2->getId();
+        $model->saveEntity($jane);
+        $janeId = $jane->getId();
 
-        $model->mergeLeads($lead1, $lead2, false);
+        $model->mergeLeads($bob, $jane, false);
 
         // Bob should have been merged into Jane
-        $jane = $model->getEntity($lead2Id);
-        $this->assertEquals($lead2Id, $jane->getId());
+        $jane = $model->getEntity($janeId);
+        $this->assertEquals($janeId, $jane->getId());
 
         // If Bob is queried, Jane should be returned
-        $jane = $model->getEntity($lead1Id);
-        $this->assertEquals($lead2Id, $jane->getId());
+        $jane = $model->getEntity($bobId);
+        $this->assertEquals($janeId, $jane->getId());
 
-        // If Jane is deleted, querying for Bob should result in null
-        $model->deleteEntity($jane);
-        $bob = $model->getEntity($lead1Id);
+        // Merge Jane into a third contact
+        $joey = new Lead();
+        $joey->setFirstname('Joey')
+            ->setLastname('Smith')
+            ->setEmail('joey.smith@test.com');
+        $model->saveEntity($joey);
+        $joeyId = $joey->getId();
+
+        $model->mergeLeads($jane, $joey, false);
+
+        // Query for Bob which should now return Joey
+        $joey = $model->getEntity($bobId);
+        $this->assertEquals($joeyId, $joey->getId());
+
+        // If Joey is deleted, querying for Bob or Jane should result in null
+        $model->deleteEntity($joey);
+        $bob = $model->getEntity($bobId);
         $this->assertNull($bob);
+        $jane = $model->getEntity($janeId);
+        $this->assertNull($jane);
     }
 }
