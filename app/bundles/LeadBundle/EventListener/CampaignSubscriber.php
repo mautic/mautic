@@ -209,6 +209,15 @@ class CampaignSubscriber extends CommonSubscriber
         ];
 
         $event->addCondition('lead.owner', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.campaigns',
+            'description' => 'mautic.lead.lead.events.campaigns_descr',
+            'formType'    => 'campaignevent_lead_campaigns',
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.campaigns', $trigger);
     }
 
     /**
@@ -426,6 +435,7 @@ class CampaignSubscriber extends CommonSubscriber
             $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
         } elseif ($event->checkContext('lead.owner')) {
             $result = $this->leadModel->getRepository()->checkLeadOwner($lead, $event->getConfig()['owner']);
+        } elseif ($event->checkContext('lead.campaigns')) {
         } elseif ($event->checkContext('lead.field_value')) {
             if ($event->getConfig()['operator'] === 'date') {
                 // Set the date in system timezone since this is triggered by cron

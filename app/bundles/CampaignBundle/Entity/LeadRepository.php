@@ -155,4 +155,40 @@ class LeadRepository extends CommonRepository
             $q->execute();
         }
     }
+
+    /**
+     * Check Lead tags by Ids.
+     *
+     * @param Lead $lead
+     * @param $tags
+     *
+     * @return bool
+     */
+    public function checkLeadInCampaigns(Lead $lead, $campaignIds, $options = [])
+    {
+        if (empty($tags)) {
+            return false;
+        }
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l');
+        $q->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('l.lead_id', ':leadId'),
+                    $q->expr()->in('l.campaign_id', ':campaignIds')
+                )
+            );
+
+        if (!empty($options['dataAddedLimit'])) {
+            $q->andWhere(
+                    $q->expr()->{$options['expr']}('l.date_added', ':date')
+                )->setParameter('date', $options['date']);
+        }
+
+        $q->setParameter('campaignIds', $campaignIds)
+            ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
+    }
 }
