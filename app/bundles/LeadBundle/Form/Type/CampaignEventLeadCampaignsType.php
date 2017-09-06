@@ -16,7 +16,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CampaignEventLeadSegmentsType.
+ * Class CampaignEventLeadCampaignsType.
  */
 class CampaignEventLeadCampaignsType extends AbstractType
 {
@@ -41,12 +41,12 @@ class CampaignEventLeadCampaignsType extends AbstractType
     {
         $builder->add('campaigns',
             'campaign_list', [
-            'label'      => 'mautic.lead.lead.events.campaigns',
+            'label'      => 'mautic.lead.lead.events.campaigns.membership',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class' => 'form-control',
             ],
-            'required' => false,
+            'required' => true,
         ]);
 
         $builder->add(
@@ -75,7 +75,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
                             'lte',
                         ],
                     ]),
-                'required'   => false,
+                'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
@@ -84,16 +84,14 @@ class CampaignEventLeadCampaignsType extends AbstractType
             ]
         );
 
-        $builder->add('date', 'datetime', [
-            'widget'     => 'single_text',
+        $builder->add('dateAdded', 'text', [
             'label'      => 'mautic.lead.lead.events.campaigns.date',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class'        => 'form-control',
-                'data-toggle'  => 'date',
+                'data-toggle'  => 'datetime',
                 'data-show-on' => '{"campaignevent_properties_dataAddedLimit_1":"checked"}',
             ],
-            'format'   => 'yyyy-MM-dd',
             'required' => false,
         ]);
     }

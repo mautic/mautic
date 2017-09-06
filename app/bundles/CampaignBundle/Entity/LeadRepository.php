@@ -157,37 +157,35 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * Check Lead tags by Ids.
+     * Check Lead in campaign.
      *
-     * @param Lead $lead
-     * @param $tags
+     * @param Lead  $lead
+     * @param array $options
      *
      * @return bool
      */
-    public function checkLeadInCampaigns(Lead $lead, $campaignIds, $options = [])
+    public function checkLeadInCampaigns($lead, $options = [])
     {
-        if (empty($tags)) {
+        if (empty($options['campaigns'])) {
             return false;
         }
-
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('l.id')
+        $q->select('l.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'l');
         $q->where(
                 $q->expr()->andX(
                     $q->expr()->eq('l.lead_id', ':leadId'),
-                    $q->expr()->in('l.campaign_id', ':campaignIds')
+                    $q->expr()->in('l.campaign_id', $options['campaigns'])
                 )
             );
 
         if (!empty($options['dataAddedLimit'])) {
             $q->andWhere(
-                    $q->expr()->{$options['expr']}('l.date_added', ':date')
-                )->setParameter('date', $options['date']);
+                    $q->expr()->{$options['expr']}('l.date_added', ':dateAdded')
+                )->setParameter('dateAdded', $options['dateAdded']);
         }
 
-        $q->setParameter('campaignIds', $campaignIds)
-            ->setParameter('leadId', $lead->getId());
+        $q->setParameter('leadId', $lead->getId());
 
         return (bool) $q->execute()->fetchColumn();
     }

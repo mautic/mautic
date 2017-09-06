@@ -375,6 +375,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
+                    'mautic.campaign.model.campaign',
                 ],
             ],
             'mautic.lead.reportbundle.subscriber' => [
