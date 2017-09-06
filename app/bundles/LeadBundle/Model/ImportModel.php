@@ -107,7 +107,6 @@ class ImportModel extends FormModel
 
     /**
      * Compares current number of imports in progress with the limit from the configuration.
-     * If the limit is hit, the import changes its status to delayed.
      *
      * @param Import $import
      *
@@ -115,17 +114,26 @@ class ImportModel extends FormModel
      */
     public function checkParallelImportLimit(Import $import)
     {
-        $parallelImportLimit = $this->config->getParameter('parallel_import_limit', 1);
-        $importsInProgress   = $this->getRepository()->countImportsWithStatuses([$import::IN_PROGRESS]);
+        $parallelImportLimit = $this->getParallelImportLimit();
+        $importsInProgress   = $this->getRepository()->countImportsWithStatuses([Import::IN_PROGRESS]);
 
-        if ($importsInProgress > $parallelImportLimit) {
-            $import->setStatus($import::DELAYED)
-                ->setStatusInfo($this->translator->trans('mautic.lead.import.parallel.limit.hit', ['%limit%' => $parallelImportLimit]));
-
+        if ($importsInProgress >= $parallelImportLimit) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Returns parallel import limit from the configuration.
+     *
+     * @param int $default
+     *
+     * @return int
+     */
+    public function getParallelImportLimit($default = 1)
+    {
+        return $this->config->getParameter('parallel_import_limit', $default);
     }
 
     /**
@@ -201,14 +209,17 @@ class ImportModel extends FormModel
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
+            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
 
         if (!$this->checkParallelImportLimit($import)) {
+            $parallelImportLimit = $this->getParallelImportLimit();
+            $info                = $this->translator->trans('mautic.lead.import.parallel.limit.hit', ['%limit%' => $parallelImportLimit]);
+            $import->setStatus($import::DELAYED)->setStatusInfo($info);
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
+            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
