@@ -19,6 +19,7 @@ Mautic.emailOnLoad = function (container, response) {
 
         // Open the builder directly when saved from the builder
         if (response && response.inBuilder) {
+            Mautic.isInBuilder = true;
             Mautic.launchBuilder('emailform');
             Mautic.processBuilderErrors(response);
         }
