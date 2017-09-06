@@ -38,6 +38,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\MergeRecord;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
@@ -307,6 +308,14 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return \Mautic\LeadBundle\Entity\MergeRecordRepository
+     */
+    public function getMergeRecordRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:MergeRecord');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -363,7 +372,14 @@ class LeadModel extends FormModel
             return new Lead();
         }
 
-        return parent::getEntity($id);
+        $entity = parent::getEntity($id);
+
+        if (null === $entity) {
+            // Check if this contact was merged into another and if so, return the new contact
+            $entity = $this->getMergeRecordRepository()->findMergedContact($id);
+        }
+
+        return $entity;
     }
 
     /**
@@ -862,6 +878,8 @@ class LeadModel extends FormModel
                 $lead = $this->getEntity($leadId);
 
                 if ($lead === null) {
+                    // Check if this contact was merged into another
+
                     $lead = $this->createNewContact($ip);
                 } else {
                     $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
@@ -1334,6 +1352,14 @@ class LeadModel extends FormModel
 
         //save the updated lead
         $this->saveEntity($mergeWith, false);
+
+        // Create an entry this contact was merged
+        $mergeRecord = new MergeRecord();
+        $mergeRecord->setContact($mergeWith)
+            ->setDateAdded()
+            ->setName($mergeWith->getPrimaryIdentifier())
+            ->setMergedId($mergeFrom->getId());
+        $this->getMergeRecordRepository()->saveEntity($mergeRecord);
 
         //post merge events
         if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
