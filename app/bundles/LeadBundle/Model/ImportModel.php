@@ -216,10 +216,9 @@ class ImportModel extends FormModel
         }
 
         if (!$this->checkParallelImportLimit($import)) {
-            $parallelImportLimit = $this->getParallelImportLimit();
-            $info                = $this->translator->trans(
+            $info = $this->translator->trans(
                 'mautic.lead.import.parallel.limit.hit',
-                ['%limit%' => $parallelImportLimit]
+                ['%limit%' => $this->getParallelImportLimit()]
             );
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
             $this->saveEntity($import);
@@ -388,6 +387,8 @@ class ImportModel extends FormModel
                 // clear unit of work of already imported data to save memory
                 $this->em->clear('Mautic\LeadBundle\Entity\Lead');
                 $this->em->clear('Mautic\LeadBundle\Entity\Company');
+
+                $this->dispatchEvent('batch_processed', $import);
 
                 // Stop the import loop if the import got unpublished
                 if (!$isPublished) {
@@ -645,6 +646,9 @@ class ImportModel extends FormModel
                 break;
             case 'post_delete':
                 $name = LeadEvents::IMPORT_POST_DELETE;
+                break;
+            case 'batch_processed':
+                $name = LeadEvents::IMPORT_BATCH_PROCESSED;
                 break;
             default:
                 return null;
