@@ -14,6 +14,8 @@ class InesCRMApi extends CrmApi
 
     const CONTACT_MANAGER_WS_PATH = '/ws/wsicm.asmx';
 
+    const CUSTOM_FIELD_WS_PATH = '/ws/wscf.asmx';
+
     const AUTOMATION_SYNC_WS_PATH = '/ws/WSAutomationSync.asmx';
 
     private $translator;
@@ -24,6 +26,8 @@ class InesCRMApi extends CrmApi
     private $loginClient;
 
     private $contactManagerClient;
+
+    private $customFieldClient;
 
     private $automationSyncClient;
 
@@ -36,6 +40,7 @@ class InesCRMApi extends CrmApi
 
         $this->loginClient = $this->makeClient(self::LOGIN_WS_PATH);
         $this->contactManagerClient = $this->makeClient(self::CONTACT_MANAGER_WS_PATH);
+        $this->customFieldClient = $this->makeClient(self::CUSTOM_FIELD_WS_PATH);
         $this->automationSyncClient = $this->makeClient(self::AUTOMATION_SYNC_WS_PATH);
     }
 
@@ -71,6 +76,39 @@ class InesCRMApi extends CrmApi
         $this->setAuthHeaders($client);
 
         return $client->GetSyncInfo();
+    }
+
+    public function getClientCustomFields($internalRef) {
+        $client = $this->customFieldClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->GetCompanyCF(['reference' => $internalRef]);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
+    }
+
+    public function getContactCustomFields($internalRef) {
+        $client = $this->customFieldClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->GetContactCF(['reference' => $internalRef]);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
+    }
+
+    public function updateContactCustomField($mappedData) {
+        $client = $this->customFieldClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->UpdateContactCF($mappedData);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
     }
 
     public function getClient($internalRef) {
