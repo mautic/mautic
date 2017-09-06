@@ -573,9 +573,10 @@ class CommonController extends Controller implements MauticController
             }
 
             if ($this->request->query->has('filterby')) {
-                $filter  = InputHelper::clean($this->request->query->get('filterby'), true);
-                $value   = InputHelper::clean($this->request->query->get('value'), true);
-                $filters = $session->get("$name.filters", []);
+                $filter     = InputHelper::clean($this->request->query->get('filterby'), true);
+                $filterType = InputHelper::clean($this->request->query->get('filterType'), true);
+                $value      = InputHelper::clean($this->request->query->get('value'), true);
+                $filters    = $session->get("$name.filters", []);
 
                 if ($value == '') {
                     if (isset($filters[$filter])) {
@@ -584,7 +585,7 @@ class CommonController extends Controller implements MauticController
                 } else {
                     $filters[$filter] = [
                         'column' => $filter,
-                        'expr'   => 'like',
+                        'expr'   => ($filterType && in_array($filterType, ['in', 'like'])) ? $filterType : 'like',
                         'value'  => $value,
                         'strict' => false,
                     ];

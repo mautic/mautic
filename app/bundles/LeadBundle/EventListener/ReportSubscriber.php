@@ -130,6 +130,11 @@ class ReportSubscriber extends CommonSubscriber
         $companyContexts = ['companies'];
 
         if ($event->checkContext($leadContexts)) {
+            $aTags     = [];
+            $aTagsList = $this->leadModel->getTagList();
+            foreach ($aTagsList as $aTemp) {
+                $aTags[$aTemp['value']] = $aTemp['label'];
+            }
             $columns = [
                 'l.id' => [
                     'label' => 'mautic.lead.report.contact_id',
@@ -161,6 +166,11 @@ class ReportSubscriber extends CommonSubscriber
                 'u.last_name' => [
                     'label' => 'mautic.lead.report.owner_lastname',
                     'type'  => 'string',
+                ],
+                'lt.tag' => [
+                    'label' => 'mautic.lead.tags',
+                    'type'  => 'multiselect',
+                    'list'  => $aTags,
                 ],
             ];
 
@@ -324,6 +334,11 @@ class ReportSubscriber extends CommonSubscriber
                 } else {
                     $event->applyDateFilters($qb, 'date_added', 'l');
                 }
+                if ($event->hasFilter('lt.tag') || $event->hasColumn('lt.tag')) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx', 'ltx.lead_id = l.id')
+                            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_tags', 'lt', 'ltx.tag_id = lt.id')
+                            ->groupBy('l.id');
+                }
                 break;
 
             case 'lead.pointlog':
@@ -340,6 +355,11 @@ class ReportSubscriber extends CommonSubscriber
                     $event->addIpAddressLeftJoin($qb, 'lp');
                 }
 
+                if ($event->hasFilter('lt.tag') || $event->hasColumn('lt.tag')) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx', 'ltx.lead_id = l.id')
+                            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_tags', 'lt', 'ltx.tag_id = lt.id')
+                            ->groupBy('l.id');
+                }
                 break;
 
             case 'contact.attribution.multi':
@@ -374,6 +394,11 @@ class ReportSubscriber extends CommonSubscriber
                     $event->addCategoryLeftJoin($qb, 'c', 'cat');
                 }
 
+                if ($event->hasFilter('lt.tag') || $event->hasColumn('lt.tag')) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx', 'ltx.lead_id = l.id')
+                            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_tags', 'lt', 'ltx.tag_id = lt.id')
+                            ->groupBy('l.id');
+                }
                 $subQ = clone $qb;
                 $subQ->resetQueryParts();
 

@@ -39,7 +39,6 @@ class ReportFilterDataTransformer implements DataTransformerInterface
         if (!is_array($filters)) {
             return [];
         }
-
         foreach ($filters as &$f) {
             if (!isset($this->columns[$f['column']])) {
                 // Likely being called by form.pre_set_data after post
@@ -47,8 +46,12 @@ class ReportFilterDataTransformer implements DataTransformerInterface
             }
             $type = $this->columns[$f['column']]['type'];
             if (in_array($type, ['datetime', 'date', 'time'])) {
-                $dt         = new DateTimeHelper($f['value'], '', 'utc');
+                $dt = new DateTimeHelper($f['value'], '', 'utc');
                 $f['value'] = $dt->toLocalString();
+            }
+            if (in_array($type, ['multiselect'])) {
+                $tmpVal = ($f['value'] && !is_array($f['value'])) ? [$f['value']] : $f['value'];
+                $f['value'] = ($tmpVal) ? implode(',', $tmpVal) : '';
             }
         }
 
@@ -73,7 +76,7 @@ class ReportFilterDataTransformer implements DataTransformerInterface
             }
             $type = $this->columns[$f['column']]['type'];
             if (in_array($type, ['datetime', 'date', 'time'])) {
-                $dt         = new DateTimeHelper($f['value'], '', 'local');
+                $dt = new DateTimeHelper($f['value'], '', 'local');
                 $f['value'] = $dt->toUtcString();
             }
         }
