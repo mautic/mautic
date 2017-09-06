@@ -602,6 +602,13 @@ class EmailController extends FormController
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
+        $routeParams = [
+            'objectAction' => 'new',
+        ];
+        if ($updateSelect) {
+            $routeParams['updateSelect'] = $updateSelect;
+            $routeParams['contentOnly']  = 1;
+        }
 
         return $this->delegateView(
             [
@@ -618,15 +625,10 @@ class EmailController extends FormController
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_email_index',
-                    'mauticContent' => 'email',
-                    'updateSelect'  => $updateSelect,
-                    'route'         => $this->generateUrl(
-                        'mautic_email_action',
-                        [
-                            'objectAction' => 'new',
-                        ]
-                    ),
+                    'activeLink'      => '#mautic_email_index',
+                    'mauticContent'   => 'email',
+                    'updateSelect'    => $updateSelect,
+                    'route'           => $this->generateUrl('mautic_email_action', $routeParams),
                     'validationError' => $this->getFormErrorForBuilder($form),
                 ],
             ]
@@ -805,6 +807,14 @@ class EmailController extends FormController
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
+        $routeParams = [
+            'objectAction' => 'edit',
+            'objectId'     => $entity->getId(),
+        ];
+        if ($updateSelect) {
+            $routeParams['updateSelect'] = $updateSelect;
+            $routeParams['contentOnly']  = 1;
+        }
 
         return $this->delegateView(
             [
@@ -822,16 +832,10 @@ class EmailController extends FormController
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_email_index',
-                    'mauticContent' => 'email',
-                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
-                    'route'         => $this->generateUrl(
-                        'mautic_email_action',
-                        [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]
-                    ),
+                    'activeLink'      => '#mautic_email_index',
+                    'mauticContent'   => 'email',
+                    'updateSelect'    => InputHelper::clean($this->request->query->get('updateSelect')),
+                    'route'           => $this->generateUrl('mautic_email_action', $routeParams),
                     'validationError' => $this->getFormErrorForBuilder($form),
                 ],
             ]
