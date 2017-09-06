@@ -194,6 +194,9 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $shouldUpdateClient = $this->mapCompanyUpdatesToInesClient($config, $company, $inesClient);
                 $shouldUpdateContact = $this->mapLeadUpdatesToInesContact($config, $lead, $inesContact);
 
+                $inesClientCustomFields = $apiHelper->getClientCustomFields($inesClientRef);
+                $inesContactCustomFields = $apiHelper->getContactCustomFields($inesContactRef);
+
                 if ($shouldUpdateClient) {
                     $apiHelper->updateClient($inesClient);
                 }
@@ -201,6 +204,42 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 // TODO: Figure out how to transfer a contact from a client to another
                 if ($shouldUpdateContact) {
                     $apiHelper->updateContact($inesContact);
+                }
+
+                // TODO: push the client custom fields
+
+                // Push contact fields
+
+                $mappedCustomFields = array_filter($config['leadFields'], function ($mauticField, $integrationField) {
+                    return strpos($integrationField, self::INES_CUSTOM_FIELD_PREFIX) === 0;
+                }, ARRAY_FILTER_USE_BOTH);
+
+                foreach ($mappedCustomFields as $integrationField => $mauticField) {
+                    $customFieldDefinitionRef = (int) substr($integrationField, strlen(self::INES_CUSTOM_FIELD_PREFIX));
+
+                    $customFieldToUpdate = null;
+
+                    foreach ($inesContactCustomFields->GetContactCFResult->Values->CustomField as $inesCustomField) {
+                        if ($inesCustomField->DefinitionRef === $customFieldDefinitionRef) {
+                            $customFieldToUpdate = $inesCustomField;
+                            break;
+                        }
+                    }
+
+                    if (is_null($customFieldToUpdate)) {
+                        // Gotta create the field
+                    } else {
+                        $method = 'get' . ucfirst($mauticField);
+
+                        $mappedData = (object) [
+                            'ctRef' => $inesContactRef,
+                            'chdefRef' => $customFieldDefinitionRef,
+                            'chpRef' => $customFieldToUpdate->Ref,
+                            'chpValue' => $lead->$method(),
+                        ];
+
+                        $apiHelper->updateContactCustomField($mappedData);
+                    }
                 }
             }
         }
