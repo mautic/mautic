@@ -718,6 +718,80 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param \Mautic\LeadBundle\Entity\Company $company
+     * @param array                             $config
+     *
+     * @return array|bool
+     */
+    public function pushCompany($company,  $config = [])
+    {
+        $config = $this->mergeConfigToFeatureSettings($config);
+
+        if (empty($config['companyFields'])) {
+            return [];
+        }
+        $object     = 'company';
+        $mappedData = $this->mapContactDataForPush($company, $config);
+
+        // No fields are mapped so bail
+        if (empty($mappedData)) {
+            return false;
+        }
+
+        try {
+            if ($this->isAuthorized()) {
+                $existingCompanies = $this->getApiHelper()->getCompany(
+                    [
+                        $object => $mappedData[$object]['create'],
+                    ]
+                );
+
+                $companyFound = false;
+                $companies    = [];
+
+                if (!empty($existingCompanies[$object])) {
+                    $fieldsToUpdate = $mappedData[$object]['update'];
+                    $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingCompanies[$object], $mappedData, $config);
+                    $companyFound   = true;
+                    if (!empty($fieldsToUpdate)) {
+                        foreach ($existingCompanies[$object] as $sfCompany) {
+                            $companyData                          = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $sfCompany['Id']);
+                            $companies[$object][$sfCompany['Id']] = $sfCompany['Id'];
+                        }
+                    }
+                }
+
+                if (!$companyFound) {
+                    $companyData                            = $this->getApiHelper()->createObject($mappedData[$object]['create'], 'Account');
+                    $companies[$object][$companyData['Id']] = $companyData['Id'];
+                    $companyFound                           = true;
+                }
+
+                if (isset($companyData['Id'])) {
+                    /** @var IntegrationEntityRepository $integrationEntityRepo */
+                    $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                    $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'company', $company->getId());
+
+                    $integrationEntity = (empty($integrationId))
+                        ? $this->createIntegrationEntity($object, $companyData['Id'], 'lead', $company->getId(), [], false)
+                        :
+                        $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
+
+                    $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                    $integrationEntityRepo->saveEntity($integrationEntity);
+                }
+
+                // Return success if any company was updated or created
+                return ($companyFound) ? $companies : false;
+            }
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return false;
+    }
+
+    /**
      * @param array  $params
      * @param null   $query
      * @param null   $executed
@@ -2522,6 +2596,53 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 // Set the update fields
                 $mappedData[$object]['update'] = array_intersect_key($mappedData[$object]['create'], $fieldMapping[$object]['update']);
             }
+        }
+
+        return $mappedData;
+    }
+    /**
+     * @param Lead $lead
+     * @param      $config
+     *
+     * @return array
+     */
+    protected function mapCompanyDataForPush(Company $company, $config)
+    {
+        $object     = 'company';
+        $mappedData = [
+            $object => [],
+        ];
+
+        if (isset($config['objects']) && false !== array_search($object, $config['objects'])) {
+            $fieldKeys          = array_keys($config['companyFields']);
+            $fieldsToCreate     = $this->prepareFieldsForSync($config['companyFields'], $fieldKeys, 'Account');
+            $fieldsToUpdateInSf = $this->getPriorityFieldsForIntegration($config, 'Account', 'mautic_company');
+
+            $fieldMapping[$object] = [
+                'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
+                'create' => $fieldsToCreate,
+            ];
+
+            // Create an update and
+            $mappedData[$object]['create'] = $this->populateCompanyData(
+                $company,
+                [
+                    'companyFields'    => $fieldMapping[$object]['create'], // map with all fields available
+                    'object'           => $object,
+                    'feature_settings' => [
+                        'objects' => $config['objects'],
+                    ],
+                ]
+            );
+
+            if (isset($mappedData[$object]['create']['Id'])) {
+                unset($mappedData[$object]['create']['Id']);
+            }
+
+            $this->amendLeadDataBeforePush($mappedData[$object]['create']);
+
+            // Set the update fields
+            $mappedData[$object]['update'] = array_intersect_key($mappedData[$object]['create'], $fieldMapping[$object]['update']);
         }
 
         return $mappedData;
