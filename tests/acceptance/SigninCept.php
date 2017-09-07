@@ -1,7 +1,12 @@
 <?php
 
+use Page\Acceptance\Dashboard as DashboardPage;
+use Page\Acceptance\Login as LoginPage;
+
 $I = new AcceptanceTester($scenario);
-$I->wantTo('Login to the website');
-$I->amOnPage('/s/login');
-$I->submitForm('.login-form', ['_username' => 'admin', '_password' => 'mautic']);
-$I->seeCurrentUrlEquals('/s/dashboard');
+$I->wantTo('Login to Mautic');
+$I->amOnPage(LoginPage::$URL);
+$I->fillField(LoginPage::$username, 'admin');
+$I->fillField(LoginPage::$password, 'mautic');
+$I->click(LoginPage::$login);
+$I->seeCurrentUrlEquals(DashboardPage::$URL);

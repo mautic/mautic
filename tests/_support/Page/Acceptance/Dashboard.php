@@ -2,19 +2,16 @@
 
 namespace Page\Acceptance;
 
-class Login
+class Dashboard
 {
     // include url of current page
-    public static $URL = '/s/login';
+    public static $URL = '/s/dashboard';
 
     /**
      * Declare UI map for this page here. CSS or XPath allowed.
      * public static $usernameField = '#username';
      * public static $formSubmitButton = "#mainForm input[type=submit]";.
      */
-    public static $username = ".//*[@id='username']";
-    public static $password = ".//*[@id='password']";
-    public static $login    = ".//*[@id='main']/div/div[1]/div/div/div/form/button";
 
     /**
      * Basic route example for your current URL
