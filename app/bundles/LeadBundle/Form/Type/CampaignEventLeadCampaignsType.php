@@ -71,7 +71,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
                             'lt',
                         ],
                     ]),
-                'required'   => true,
+                'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
