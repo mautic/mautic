@@ -3,5 +3,5 @@ modules:
     enabled:
         - WebDriver:
             url: http://mautic.loc
-            browser: firefox
+            browser: chrome
         - \Helper\Acceptance
