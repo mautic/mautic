@@ -215,3 +215,7 @@
 .stat-boxes .pie-legend li {
     display: inline;
 }
+
+.preview .builder-content {
+    position: relative;
+}

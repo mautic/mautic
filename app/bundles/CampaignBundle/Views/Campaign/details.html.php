@@ -33,13 +33,20 @@ $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $campaign])
 );
+
+$session = $this->get('session');
+
+$campaignId = $campaign->getId();
+
 $preview = trim($view->render('MauticCampaignBundle:Campaign:preview.html.php', [
-    'campaignId'      => $campaign->getId(),
-    'campaignEvents'  => $campaign->getEvents(),
-    'campaignSources' => $campaign->getSources(),
-    'eventSettings'   => $campaign->getSettings(),
-    'canvasSettings'  => $entity->getCanvasSettings(),
+    'campaignId'      => $campaignId,
+    'campaignEvents'  => $campaignEvents,
+    'campaignSources' => $campaignSources,
+    'eventSettings'   => $eventSettings,
+    'canvasSettings'  => $campaign->getCanvasSettings(),
 ]));
+
+
 $decisions  = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['decision']]));
 $actions    = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['action']]));
 $conditions = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['condition']]));

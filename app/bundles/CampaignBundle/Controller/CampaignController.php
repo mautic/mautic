@@ -682,12 +682,15 @@ class CampaignController extends AbstractStandardFormController
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'campaign'      => $entity,
-                        'stats'         => $stats,
-                        'events'        => $sortedEvents,
-                        'sources'       => $this->getCampaignModel()->getLeadSources($entity),
-                        'dateRangeForm' => $dateRangeForm->createView(),
-                        'campaignLeads' => $this->forward(
+                        'campaign'          => $entity,
+                        'stats'             => $stats,
+                        'events'            => $sortedEvents,
+                        'eventSettings'     => $this->getCampaignModel()->getEvents(),
+                        'sources'           => $this->getCampaignModel()->getLeadSources($entity),
+                        'dateRangeForm'     => $dateRangeForm->createView(),
+                        'campaignEvents'    => $this->campaignEvents,
+                        'campaignSources'   => $this->campaignSources,
+                        'campaignLeads'     => $this->forward(
                             'MauticCampaignBundle:Campaign:contacts',
                             [
                                 'objectId'   => $entity->getId(),
