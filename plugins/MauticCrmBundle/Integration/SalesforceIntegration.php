@@ -416,15 +416,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         case 'Contact':
                             //get company from account id and assign company name
                             if ($dataObject['AccountId__'.$object]) {
-                                $companyQuery   = 'Select Name from Account where Id = \''.$dataObject['AccountId__'.$object].'\' and IsDeleted = false';
-                                $contactCompany = $this->getApiHelper()->getLeads($companyQuery, 'Account');
-                                if (!empty($contactCompany['records'])) {
-                                    foreach ($contactCompany['records'] as $company) {
-                                        if (!empty($company['Name'])) {
-                                            $dataObject['AccountId__'.$object] = $company['Name'];
-                                            break;
-                                        }
-                                    }
+                                $companyName = $this->getCompanyName($dataObject['AccountId__'.$object], 'Name');
+
+                                if ($companyName) {
+                                    $dataObject['AccountId__'.$object] = $companyName;
                                 } else {
                                     unset($dataObject['AccountId__'.$object]); //no company was found in Salesforce
                                 }
@@ -676,6 +671,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $personFound    = true;
                         if (!empty($fieldsToUpdate)) {
                             foreach ($existingPersons[$object] as $person) {
+                                if (isset($fieldsToUpdate['AccountId'])) {
+                                    $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id');
+                                    if (!$accountId) {
+                                        //company was not found so create a new company in Salesforce
+                                    }
+                                }
+
                                 $personData                     = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
                                 $people[$object][$person['Id']] = $person['Id'];
                             }
@@ -2559,5 +2561,24 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $fields;
+    }
+
+    public function getCompanyName($accountId, $field)
+    {
+        $companyField = null;
+
+        $companyQuery   = 'Select Name from Account where Id = \''.$accountId.'\' and IsDeleted = false';
+        $contactCompany = $this->getApiHelper()->getLeads($companyQuery, 'Account');
+
+        if (!empty($contactCompany['records'])) {
+            foreach ($contactCompany['records'] as $company) {
+                if (!empty($company[$field])) {
+                    $companyField = $company[$field];
+                    break;
+                }
+            }
+        }
+
+        return $companyField;
     }
 }
