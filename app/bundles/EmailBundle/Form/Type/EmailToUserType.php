@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\Form\Type;
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class EmailToUserType.
@@ -35,7 +35,7 @@ class EmailToUserType extends AbstractType
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.email.choose.emails_descr',
             ],
-            'update_select' => 'formaction_properties_useremail_email',
+            'update_select' => empty($options['update_select']) ? 'formaction_properties_useremail_email' : $options['update_select'],
         ]);
 
         $builder->add('user_id', 'user_list', [
@@ -60,11 +60,16 @@ class EmailToUserType extends AbstractType
         $this->addToBcBccFields($builder);
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    /**
+     * @param OptionsResolver $resolver
+     */
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'label' => false,
         ]);
+
+        $resolver->setDefined(['update_select']);
     }
 
     /**
