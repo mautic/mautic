@@ -221,6 +221,7 @@ class CampaignSubscriber extends CommonSubscriber
             'label'       => 'mautic.lead.lead.events.campaigns',
             'description' => 'mautic.lead.lead.events.campaigns_descr',
             'formType'    => 'campaignevent_lead_campaigns',
+            'formTheme'   => 'MauticLeadBundle:FormTheme\ContactCampaignsCondition',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
 

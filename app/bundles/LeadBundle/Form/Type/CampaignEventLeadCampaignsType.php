@@ -53,7 +53,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
             'dataAddedLimit',
             'yesno_button_group',
             [
-                'label' => 'mautic.lead.lead.events.campaigns.date.added.limit',
+                'label' => 'mautic.lead.lead.events.campaigns.date.added.filter',
                 'data'  => (isset($options['data']['dataAddedLimit'])) ? $options['data']['dataAddedLimit'] : false,
             ]
         );
@@ -68,9 +68,7 @@ class CampaignEventLeadCampaignsType extends AbstractType
                     [
                         'include' => [
                             'gt',
-                            'gte',
                             'lt',
-                            'lte',
                         ],
                     ]),
                 'required'   => true,
