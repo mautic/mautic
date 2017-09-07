@@ -67,8 +67,6 @@ class CampaignEventLeadCampaignsType extends AbstractType
                 'choices'  => $this->listModel->getOperatorsForFieldType(
                     [
                         'include' => [
-                            '=',
-                            '!=',
                             'gt',
                             'gte',
                             'lt',
