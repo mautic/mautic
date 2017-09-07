@@ -106,7 +106,8 @@
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
         "symfony/expression-language": "~2.8",
-        "egeloen/ordered-form-bundle": "^3.0"
+        "egeloen/ordered-form-bundle": "^3.0",
+        "symfony/dotenv": "^3.3"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
@@ -120,7 +121,8 @@
         "phpunit/phpunit-mock-objects": "~3.4.4",
         "friendsofphp/php-cs-fixer": "^1.12",
         "symfony/var-dumper": "^3.2",
-        "phpunit/phpunit-selenium": "^3.0"
+        "phpunit/phpunit-selenium": "^3.0",
+        "codeception/codeception": "^2.3"
     },
     "repositories": [
         {
