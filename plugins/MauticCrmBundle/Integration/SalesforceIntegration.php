@@ -672,8 +672,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 foreach (['Contact', 'Lead'] as $object) {
                     if (!empty($existingPersons[$object])) {
                         $fieldsToUpdate = $mappedData[$object]['update'];
-                        print_r($fieldsToUpdate);
-                        die();
                         $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPersons[$object], $mappedData, $config);
                         $personFound    = true;
                         if (!empty($fieldsToUpdate)) {
