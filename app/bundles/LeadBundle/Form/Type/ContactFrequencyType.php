@@ -90,7 +90,7 @@ class ContactFrequencyType extends AbstractType
 
                     $builder->add(
                         'frequency_number_'.$channel,
-                        'number',
+                        'integer',
                         [
                             'precision'  => 0,
                             'label'      => 'mautic.lead.list.frequency.number',
