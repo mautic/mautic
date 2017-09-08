@@ -1763,7 +1763,7 @@ class LeadListRepository extends CommonRepository
                 $event = new LeadListFilteringEvent($details, $leadId, $alias, $func, $q, $this->getEntityManager());
                 $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
                 if ($event->isFilteringDone()) {
-                    $groupExpr = $q->expr()->andX($event->getSubQuery());
+                    $groupExpr->add($event->getSubQuery());
                 }
             }
         }
