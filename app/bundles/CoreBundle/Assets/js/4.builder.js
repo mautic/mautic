@@ -139,6 +139,30 @@ Mautic.launchBuilder = function (formName, actionName) {
     // Turn Dynamic Content Tokens into builder slots
     themeHtml = Mautic.prepareDynamicContentBlocksForBuilder(themeHtml);
 
+    // hide preference center slots
+    var isPrefCenterEnabled = eval(parent.mQuery('input[name="page[isPreferenceCenter]"]:checked').val());
+    if (!isPrefCenterEnabled) {
+        var slots = [
+            'segmentlist',
+            'categorylist',
+            'preferredchannel',
+            'channelfrequency',
+            'pauseprefs'
+        ];
+        mQuery.each(slots, function (i, s) {
+            // delete existing tokens
+            themeHtml = themeHtml.replace('{' + s + '}', '');
+        });
+        var parser = new DOMParser();
+        var el = parser.parseFromString(themeHtml, "text/html");
+        var $b = mQuery(el);
+        mQuery.each(slots, function (i, s) {
+            // delete existing slots
+            $b.find('[data-slot=' + s + ']').remove();
+        });
+        themeHtml = Mautic.domToString($b);
+    }
+
     Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
         mQuery('#builder-overlay').addClass('hide');
         btnCloseBuilder.prop('disabled', false);

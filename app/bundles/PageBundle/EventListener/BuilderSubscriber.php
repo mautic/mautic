@@ -371,7 +371,8 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='segment-list'>\n";
+            $content = "<div class='pref-segmentlist'>\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php');
             $content .= "</div>\n";
         }
 
@@ -383,7 +384,8 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='category-list'>\n";
+            $content = "<div class='pref-categorylist'>\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php');
             $content .= "</div>\n";
         }
 
@@ -395,7 +397,8 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='preferred-channel'>\n";
+            $content = "<div class='pref-preferredchannel'>\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:preferredchannel.html.php');
             $content .= "</div>\n";
         }
 
@@ -407,7 +410,8 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='channel-frequency'>\n";
+            $content = "<div class='pref-channelfrequency'>\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:channelfrequency.html.php');
             $content .= "</div>\n";
         }
 
@@ -419,7 +423,8 @@ class BuilderSubscriber extends CommonSubscriber
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pause-prefs'>\n";
+            $content = "<div class='pref-pauseprefs'>\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:pauseprefs.html.php');
             $content .= "</div>\n";
         }
 
