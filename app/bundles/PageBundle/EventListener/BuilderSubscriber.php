@@ -181,46 +181,48 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_socialfollow',
                 600
             );
-            $event->addSlotType(
-                'segmentlist',
-                'Segment List',
-                'list-alt',
-                'MauticCoreBundle:Slots:segmentlist.html.php',
-                'slot_segmentlist',
-                590
-            );
-            $event->addSlotType(
-                'categorylist',
-                'Category List',
-                'bookmark-o',
-                'MauticCoreBundle:Slots:categorylist.html.php',
-                'slot_categorylist',
-                580
-            );
-            $event->addSlotType(
-                'preferredchannel',
-                'Preferred Channel',
-                'envelope-o',
-                'MauticCoreBundle:Slots:preferredchannel.html.php',
-                'slot_preferredchannel',
-                570
-            );
-            $event->addSlotType(
-                'channelfrequency',
-                'Channel Frequency',
-                'calendar',
-                'MauticCoreBundle:Slots:channelfrequency.html.php',
-                'slot_channelfrequency',
-                560
-            );
-            $event->addSlotType(
-                'pauseprefs',
-                'Pause Preferences',
-                'clock-o',
-                'MauticCoreBundle:Slots:pauseprefs.html.php',
-                'slot_pauseprefs',
-                550
-            );
+            if ($this->security->isGranted(['page:preference_center:manage'])) {
+                $event->addSlotType(
+                    'segmentlist',
+                    'Segment List',
+                    'list-alt',
+                    'MauticCoreBundle:Slots:segmentlist.html.php',
+                    'slot_segmentlist',
+                    590
+                );
+                $event->addSlotType(
+                    'categorylist',
+                    'Category List',
+                    'bookmark-o',
+                    'MauticCoreBundle:Slots:categorylist.html.php',
+                    'slot_categorylist',
+                    580
+                );
+                $event->addSlotType(
+                    'preferredchannel',
+                    'Preferred Channel',
+                    'envelope-o',
+                    'MauticCoreBundle:Slots:preferredchannel.html.php',
+                    'slot_preferredchannel',
+                    570
+                );
+                $event->addSlotType(
+                    'channelfrequency',
+                    'Channel Frequency',
+                    'calendar',
+                    'MauticCoreBundle:Slots:channelfrequency.html.php',
+                    'slot_channelfrequency',
+                    560
+                );
+                $event->addSlotType(
+                    'pauseprefs',
+                    'Pause Preferences',
+                    'clock-o',
+                    'MauticCoreBundle:Slots:pauseprefs.html.php',
+                    'slot_pauseprefs',
+                    550
+                );
+            }
             $event->addSlotType(
                 'codemode',
                 'Code Mode',

@@ -75,6 +75,23 @@ Mautic.launchBuilder = function (formName, actionName) {
         });
 
         Mautic.keepPreviewAlive('builder-template-content');
+    } else {
+        // hide preference center slots
+        var isPrefCenterEnabled = eval(parent.mQuery('input[name="page[isPreferenceCenter]"]:checked').val());
+        var slots = [
+            'segmentlist',
+            'categorylist',
+            'preferredchannel',
+            'channelfrequency',
+            'pauseprefs'
+        ];
+        mQuery.each(slots, function(i, s){
+            if (isPrefCenterEnabled) {
+                mQuery('[data-slot-type=' + s + ']').show();
+            } else {
+                mQuery('[data-slot-type=' + s + ']').hide();
+            }
+        });
     }
 
     var builderPanel = mQuery('.builder-panel');
