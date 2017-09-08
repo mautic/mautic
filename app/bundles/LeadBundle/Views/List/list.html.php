@@ -92,7 +92,7 @@ $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list')
                                             ),
                                         ],
                                         'icon'  => 'fa-users',
-                                        'label' => 'mautic.lead.list.view_leads',
+                                        'label' => 'mautic.lead.list.view_contacts',
                                     ],
                                 ],
                             ]

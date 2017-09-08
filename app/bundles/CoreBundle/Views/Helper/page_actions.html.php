@@ -14,6 +14,11 @@ use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 if (!isset($item)) {
     $item = null;
 }
+
+if (!isset($tooltip)) {
+    $tooltip = null;
+}
+
 $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_PAGE_ACTIONS, ButtonHelper::TYPE_BUTTON_DROPDOWN, $item);
 include 'action_button_helper.php';
 
@@ -41,10 +46,11 @@ foreach ($templateButtons as $action => $enabled) {
             $path = $view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
             break;
         case 'close':
-            $icon     = 'remove';
-            $path     = $view['router']->path($indexRoute);
-            $primary  = true;
-            $priority = 200;
+            $closeParameters = isset($routeVars['close']) ? $routeVars['close'] : [];
+            $icon            = 'remove';
+            $path            = $view['router']->path($indexRoute, $closeParameters);
+            $primary         = true;
+            $priority        = 200;
             break;
         case 'new':
         case'edit':
@@ -90,6 +96,7 @@ foreach ($templateButtons as $action => $enabled) {
                 'btnText'   => $view['translator']->trans('mautic.core.form.'.$action),
                 'priority'  => $priority,
                 'primary'   => $primary,
+                'tooltip'   => $tooltip,
             ]
         );
     }

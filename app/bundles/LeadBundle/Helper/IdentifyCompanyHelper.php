@@ -61,22 +61,27 @@ class IdentifyCompanyHelper
     }
 
     /**
-     * @param              $parameters
+     * @param array        $parameters
      * @param CompanyModel $companyModel
      *
      * @return array
      */
-    public static function findCompany($parameters, CompanyModel $companyModel)
+    public static function findCompany(array $parameters, CompanyModel $companyModel)
     {
-        $companyName   = $companyDomain   = null;
+        $companyName   = null;
+        $companyDomain = null;
         $companyEntity = null;
 
         if (isset($parameters['company'])) {
             $companyName = filter_var($parameters['company']);
-        } elseif (isset($parameters['email'])) {
-            $companyName = $companyDomain = self::domainExists($parameters['email']);
+        } elseif (isset($parameters['email']) || isset($parameters['companyemail'])) {
+            $companyName = isset($parameters['email']) ? self::domainExists($parameters['email']) : self::domainExists($parameters['companyemail']);
         } elseif (isset($parameters['companyname'])) {
             $companyName = filter_var($parameters['companyname']);
+        }
+
+        if (empty($parameters['companywebsite']) && !empty($parameters['companyemail'])) {
+            $companyDomain = self::domainExists($parameters['companyemail']);
         }
 
         if ($companyName) {
@@ -98,13 +103,10 @@ class IdentifyCompanyHelper
                 ]
             );
 
-            $company = [
+            $company = array_merge([
                 'companyname'    => $companyName,
                 'companywebsite' => $companyDomain,
-                'companycity'    => $parameters['companycity'],
-                'companystate'   => $parameters['companystate'],
-                'companycountry' => $parameters['companycountry'],
-            ];
+            ], $parameters);
 
             if (1 === count($companyEntities)) {
                 end($companyEntities);
@@ -119,25 +121,30 @@ class IdentifyCompanyHelper
     }
 
     /**
-     * @param $email
+     * Checks if email address' domain has a DNS MX record. Returns the domain if found.
      *
-     * @return mixed
+     * @param string $email
+     *
+     * @return string|false
      */
-    private static function domainExists($email)
+    protected static function domainExists($email)
     {
         list($user, $domain) = explode('@', $email);
         $arr                 = dns_get_record($domain, DNS_MX);
-        if ($arr[0]['host'] == $domain && !empty($arr[0]['target'])) {
-            return $arr[0]['target'];
+
+        if ($arr && $arr[0]['host'] === $domain) {
+            return $domain;
         }
+
+        return false;
     }
 
     /**
-     * @param $field
-     * @param $parameters
-     * @param $filter
+     * @param string $field
+     * @param array  $parameters
+     * @param array  $filter
      */
-    private static function setCompanyFilter($field, &$parameters, &$filter)
+    private static function setCompanyFilter($field, array &$parameters, array &$filter)
     {
         if (isset($parameters[$field]) || isset($parameters['company'.$field])) {
             if (!isset($parameters['company'.$field])) {

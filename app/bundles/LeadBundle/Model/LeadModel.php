@@ -1697,9 +1697,31 @@ class LeadModel extends FormModel
      * @return bool|null
      *
      * @throws \Exception
+     *
+     * @deprecated 2.10.0 To be removed in 3.0. Use `import` instead
      */
     public function importLead($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
     {
+        return $this->import($fields, $data, $owner, $list, $tags, $persist, $eventLog);
+    }
+
+    /**
+     * @param array        $fields
+     * @param array        $data
+     * @param null         $owner
+     * @param null         $list
+     * @param null         $tags
+     * @param bool         $persist
+     * @param LeadEventLog $eventLog
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
+    public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
+    {
+        $fields = array_flip($fields);
+
         // Let's check for an existing lead by email
         $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
         if ($hasEmail) {
@@ -1712,6 +1734,24 @@ class LeadModel extends FormModel
         } else {
             $lead   = new Lead();
             $merged = false;
+        }
+
+        // Extract company data and import separately
+        // Modifies the data array
+        $company                           = null;
+        list($companyFields, $companyData) = $this->companyModel->extractCompanyDataFromImport($fields, $data);
+
+        if (!empty($companyData)) {
+            $companyFields = array_flip($companyFields);
+            $this->companyModel->import($companyFields, $companyData, $owner, $list, $tags, $persist, $eventLog);
+            $companyFields = array_flip($companyFields);
+
+            $companyName    = isset($companyFields['companyname']) ? $companyData[$companyFields['companyname']] : null;
+            $companyCity    = isset($companyFields['companycity']) ? $companyData[$companyFields['companycity']] : null;
+            $companyCountry = isset($companyFields['companycountry']) ? $companyData[$companyFields['companycountry']] : null;
+            $companyState   = isset($companyFields['companystate']) ? $companyData[$companyFields['companystate']] : null;
+
+            $company = $this->companyModel->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState);
         }
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
@@ -1926,6 +1966,10 @@ class LeadModel extends FormModel
             if ($list !== null) {
                 $this->addToLists($lead, [$list]);
             }
+
+            if ($company !== null) {
+                $this->companyModel->addLeadToCompany($company, $lead);
+            }
         }
 
         return $merged;
@@ -1940,6 +1984,7 @@ class LeadModel extends FormModel
      */
     public function setTags(Lead $lead, array $tags, $removeOrphans = false)
     {
+        /** @var Tag[] $currentTags */
         $currentTags  = $lead->getTags();
         $leadModified = $tagsDeleted = false;
 

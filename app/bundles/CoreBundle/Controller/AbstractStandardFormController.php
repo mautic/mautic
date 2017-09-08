@@ -22,6 +22,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class AbstractStandardFormController extends AbstractFormController
 {
+    use FormErrorMessagesTrait;
+
     /**
      * Get this controller's model name.
      */
@@ -508,6 +510,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         'objectId'     => $entity->getId(),
                     ]
                 ),
+                'validationError' => $this->getFormErrorForBuilder($form),
             ],
             'objectId' => $objectId,
             'entity'   => $entity,
@@ -899,7 +902,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $repo  = $model->getRepository();
 
         if (!$permissions[$this->getPermissionBase().':viewother']) {
-            $filter['force'] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+            $filter['force'][] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
         $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
@@ -1078,6 +1081,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         'objectId'     => ($entity) ? $entity->getId() : 0,
                     ]
                 ),
+                'validationError' => $this->getFormErrorForBuilder($form),
             ],
             'entity' => $entity,
             'form'   => $form,

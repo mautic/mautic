@@ -13,6 +13,7 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class PageController extends FormController
 {
     use BuilderControllerTrait;
+    use FormErrorMessagesTrait;
 
     /**
      * @param int $page
@@ -430,6 +432,7 @@ class PageController extends FormController
                 'route'         => $this->generateUrl('mautic_page_action', [
                     'objectAction' => 'new',
                 ]),
+                'validationError' => $this->getFormErrorForBuilder($form),
             ],
         ]);
     }
@@ -575,6 +578,7 @@ class PageController extends FormController
                     'objectAction' => 'edit',
                     'objectId'     => $entity->getId(),
                 ]),
+                'validationError' => $this->getFormErrorForBuilder($form),
             ],
         ]);
     }

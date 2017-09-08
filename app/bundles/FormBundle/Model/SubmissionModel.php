@@ -762,19 +762,19 @@ class SubmissionModel extends CommonFormModel
     /**
      * Create/update lead from form submit.
      *
-     * @param       $form
+     * @param Form  $form
      * @param array $leadFieldMatches
      *
      * @return Lead
      */
-    protected function createLeadFromSubmit($form, array $leadFieldMatches, $leadFields)
+    protected function createLeadFromSubmit(Form $form, array $leadFieldMatches, $leadFields)
     {
         //set the mapped data
         $inKioskMode   = $form->isInKioskMode();
         $leadId        = null;
         $lead          = new Lead();
         $currentFields = $leadFieldMatches;
-        $companyFields = $leadFields = $this->leadFieldModel->getFieldListWithProperties('company');
+        $companyFields = $this->leadFieldModel->getFieldListWithProperties('company');
 
         if (!$inKioskMode) {
             // Default to currently tracked lead
@@ -939,11 +939,6 @@ class SubmissionModel extends CommonFormModel
 
         //set the mapped fields
         $this->leadModel->setFieldValues($lead, $data, false, true, true);
-
-        if (!empty($event)) {
-            $event->setIpAddress($ipAddress);
-            $lead->addPointsChangeLog($event);
-        }
 
         // last active time
         $lead->setLastActive(new \DateTime());

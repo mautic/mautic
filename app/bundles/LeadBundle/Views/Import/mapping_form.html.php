@@ -18,13 +18,13 @@
         </div>
         <div class="panel-body">
             <div class="col-xs-4">
-                <?php echo $view['form']->row($form['owner']); ?>
+                <?php echo $view['form']->rowIfExists($form, 'owner'); ?>
             </div>
             <div class="col-xs-4">
-                <?php echo $view['form']->row($form['list']); ?>
+                <?php echo $view['form']->rowIfExists($form, 'list'); ?>
             </div>
             <div class="col-xs-4">
-                <?php echo $view['form']->row($form['tags']); ?>
+                <?php echo $view['form']->rowIfExists($form, 'tags'); ?>
             </div>
         </div>
     </div>
