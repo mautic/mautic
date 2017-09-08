@@ -84,7 +84,7 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
-            'mautic.campaign.subscriber' => [
+            'mautic.webhook.campaign.subscriber' => [
                 'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.http.connector',
