@@ -49,6 +49,11 @@ class BuilderSubscriber extends CommonSubscriber
     protected $shareButtonsRegex   = '{sharebuttons}';
     protected $titleRegex          = '{pagetitle}';
     protected $descriptionRegex    = '{pagemetadescription}';
+    protected $segmentListRegex    = '{segmentlist}';
+    protected $categoryListRegex   = '{categorylist}';
+    protected $preferredchannel    = '{preferredchannel}';
+    protected $channelfrequency    = '{channelfrequency}';
+    protected $pauseprefsRegex     = '{pauseprefs}';
     protected $emailIsInternalSend = false;
     protected $emailEntity         = null;
 
@@ -109,6 +114,11 @@ class BuilderSubscriber extends CommonSubscriber
                         $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
                         $this->titleRegex        => $this->translator->trans('mautic.core.title'),
                         $this->descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
+                        $this->segmentListRegex  => $this->translator->trans('mautic.page.form.segmentlist'),
+                        $this->categoryListRegex => $this->translator->trans('mautic.page.form.categorylist'),
+                        $this->preferredchannel  => $this->translator->trans('mautic.page.form.preferredchannel'),
+                        $this->channelfrequency  => $this->translator->trans('mautic.page.form.channelfrequency'),
+                        $this->pauseprefsRegex   => $this->translator->trans('mautic.page.form.pauseprefs'),
                     ]
                 )
             );
@@ -170,6 +180,46 @@ class BuilderSubscriber extends CommonSubscriber
                 'MauticCoreBundle:Slots:socialfollow.html.php',
                 'slot_socialfollow',
                 600
+            );
+            $event->addSlotType(
+                'segmentlist',
+                'Segment List',
+                'list-alt',
+                'MauticCoreBundle:Slots:segmentlist.html.php',
+                'slot_segmentlist',
+                590
+            );
+            $event->addSlotType(
+                'categorylist',
+                'Category List',
+                'bookmark-o',
+                'MauticCoreBundle:Slots:categorylist.html.php',
+                'slot_categorylist',
+                580
+            );
+            $event->addSlotType(
+                'preferredchannel',
+                'Preferred Channel',
+                'envelope-o',
+                'MauticCoreBundle:Slots:preferredchannel.html.php',
+                'slot_preferredchannel',
+                570
+            );
+            $event->addSlotType(
+                'channelfrequency',
+                'Channel Frequency',
+                'calendar',
+                'MauticCoreBundle:Slots:channelfrequency.html.php',
+                'slot_channelfrequency',
+                560
+            );
+            $event->addSlotType(
+                'pauseprefs',
+                'Pause Preferences',
+                'clock-o',
+                'MauticCoreBundle:Slots:pauseprefs.html.php',
+                'slot_pauseprefs',
+                550
             );
             $event->addSlotType(
                 'codemode',
@@ -251,6 +301,31 @@ class BuilderSubscriber extends CommonSubscriber
             $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
         }
 
+        if (strpos($content, $this->segmentListRegex) !== false) {
+            $segmentList = $this->renderSegmentList();
+            $content     = str_ireplace($this->segmentListRegex, $segmentList, $content);
+        }
+
+        if (strpos($content, $this->categoryListRegex) !== false) {
+            $categoryList = $this->renderCategoryList();
+            $content      = str_ireplace($this->categoryListRegex, $categoryList, $content);
+        }
+
+        if (strpos($content, $this->preferredchannel) !== false) {
+            $preferredChannel = $this->renderPreferredChannel();
+            $content          = str_ireplace($this->preferredchannel, $preferredChannel, $content);
+        }
+
+        if (strpos($content, $this->channelfrequency) !== false) {
+            $channelfrequency = $this->renderChannelFrequency();
+            $content          = str_ireplace($this->channelfrequency, $channelfrequency, $content);
+        }
+
+        if (strpos($content, $this->pauseprefsRegex) !== false) {
+            $pausePrefs = $this->renderPausePrefs();
+            $content    = str_ireplace($this->pauseprefsRegex, $pausePrefs, $content);
+        }
+
         $clickThrough = ['source' => ['page', $page->getId()]];
         $tokens       = $this->tokenHelper->findPageTokens($content, $clickThrough);
 
@@ -281,6 +356,69 @@ class BuilderSubscriber extends CommonSubscriber
 
             //load the css into the header by calling the sharebtn_css view
             $this->templating->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
+        }
+
+        return $content;
+    }
+
+    /**
+     * Renders the HTML for the segment list.
+     */
+    protected function renderSegmentList()
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class='segment-list'>\n";
+            $content .= "</div>\n";
+        }
+
+        return $content;
+    }
+
+    protected function renderCategoryList()
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class='category-list'>\n";
+            $content .= "</div>\n";
+        }
+
+        return $content;
+    }
+
+    protected function renderPreferredChannel()
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class='preferred-channel'>\n";
+            $content .= "</div>\n";
+        }
+
+        return $content;
+    }
+
+    protected function renderChannelFrequency()
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class='channel-frequency'>\n";
+            $content .= "</div>\n";
+        }
+
+        return $content;
+    }
+
+    protected function renderPausePrefs()
+    {
+        static $content = '';
+
+        if (empty($content)) {
+            $content = "<div class='pause-prefs'>\n";
+            $content .= "</div>\n";
         }
 
         return $content;

@@ -308,6 +308,26 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
                 'alias' => 'slot_socialfollow',
             ],
+            'mautic.form.type.slot.segmentlist' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
+                'alias' => 'slot_segmentlist',
+            ],
+            'mautic.form.type.slot.categorylist' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotCategoryListType',
+                'alias' => 'slot_categorylist',
+            ],
+            'mautic.form.type.slot.preferredchannel' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotPreferredChannelType',
+                'alias' => 'slot_preferredchannel',
+            ],
+            'mautic.form.type.slot.channelfrequency' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType',
+                'alias' => 'slot_channelfrequency',
+            ],
+            'mautic.form.type.slot.pauseprefs' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotPausePrefsType',
+                'alias' => 'slot_pauseprefs',
+            ],
             'mautic.form.type.slot.codemode' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotCodeModeType',
                 'alias' => 'slot_codemode',
