@@ -107,7 +107,7 @@ class VtigerIntegration extends CrmAbstractIntegration
             'username'  => $this->keys['username'],
         ];
 
-        $response = $this->makeRequest($url, $parameters);
+        $response = $this->makeRequest($url, $parameters, 'GET', ['authorize_session' => true]);
 
         if (empty($response['success'])) {
             return $this->getErrorsFromResponse($response);
@@ -119,7 +119,7 @@ class VtigerIntegration extends CrmAbstractIntegration
             'accessKey' => md5($response['result']['token'].$this->keys['accessKey']),
         ];
 
-        $response = $this->makeRequest($url, $loginParameters, 'POST');
+        $response = $this->makeRequest($url, $loginParameters, 'POST', ['authorize_session' => true]);
 
         if (empty($response['success'])) {
             if (is_array($response) && array_key_exists('error', $response)) {
