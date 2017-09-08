@@ -223,7 +223,7 @@ class VtigerIntegration extends CrmAbstractIntegration
                                 $vTigerFields[$object][$fieldInfo['name']] = [
                                     'type'     => 'string',
                                     'label'    => $fieldInfo['label'],
-                                    'required' => ('email' === $fieldInfo['name']),
+                                    'required' => (in_array($fieldInfo['name'], ['email', 'accountname'])),
                                 ];
                             }
                         }
@@ -319,15 +319,6 @@ class VtigerIntegration extends CrmAbstractIntegration
      */
     public function getFormCompanyFields($settings = [])
     {
-        $fields        = parent::getAvailableLeadFields();
-        $companyFields = ['company'];
-        $integrations  = [];
-        foreach ($companyFields as $companyField) {
-            if (isset($fields[$companyField])) {
-                $integrations[$companyField] = ['label' => $fields[$companyField]['label']];
-            }
-        }
-
-        return $integrations;
+        return parent::getAvailableLeadFields(['cache_suffix' => '.company']);
     }
 }
