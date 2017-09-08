@@ -413,6 +413,14 @@ class PageController extends FormController
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'page:preference_center:manage',
+            ],
+            'RETURN_ARRAY'
+        );
+
         return $this->delegateView([
             'viewParameters' => [
                 'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
@@ -424,6 +432,7 @@ class PageController extends FormController
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
+                'permissions'   => $permissions,
             ],
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => [
@@ -558,6 +567,14 @@ class PageController extends FormController
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'page:preference_center:manage',
+            ],
+            'RETURN_ARRAY'
+        );
+
         return $this->delegateView([
             'viewParameters' => [
                 'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
@@ -569,6 +586,7 @@ class PageController extends FormController
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
+                'permissions'   => $permissions,
             ],
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => [

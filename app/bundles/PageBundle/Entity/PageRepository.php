@@ -66,13 +66,14 @@ class PageRepository extends CommonRepository
      * @param bool   $viewOther
      * @param bool   $topLevel
      * @param array  $ignoreIds
+     * @param array  $extraColumns
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [])
     {
         $q = $this->createQueryBuilder('p');
-        $q->select('partial p.{id, title, language, alias}');
+        $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('p.title', ':search'))
@@ -135,7 +136,7 @@ class PageRepository extends CommonRepository
         $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.lang'):
+            case $this->translator->trans('mautic.core.searchcommand.lang') :
             case $this->translator->trans('mautic.core.searchcommand.lang', [], null, 'en_US'):
                 $langUnique      = $this->generateRandomParameterName();
                 $langValue       = $filter->string.'_%';

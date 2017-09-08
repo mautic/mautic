@@ -212,6 +212,9 @@ $isCodeMode = ($email->getTemplate() === 'mautic_code_mode');
             <?php endif; ?>
 
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
+            <?php if (!empty($permissions['page:preference_center:manage'])) : ?>
+                <?php echo $view['form']->row($form['preferenceCenter']); ?>
+            <?php endif; ?>
             <hr />
             <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
             <br />

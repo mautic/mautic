@@ -610,6 +610,14 @@ class EmailController extends FormController
             $routeParams['contentOnly']  = 1;
         }
 
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'page:preference_center:manage',
+            ],
+            'RETURN_ARRAY'
+        );
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -622,6 +630,7 @@ class EmailController extends FormController
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
+                    'permissions'   => $permissions,
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => [
@@ -816,6 +825,14 @@ class EmailController extends FormController
             $routeParams['contentOnly']  = 1;
         }
 
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'page:preference_center:manage',
+            ],
+            'RETURN_ARRAY'
+        );
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -829,6 +846,7 @@ class EmailController extends FormController
                     'attachmentSize'     => $attachmentSize,
                     'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'        => $sectionForm->createView(),
+                    'permissions'        => $permissions,
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => [

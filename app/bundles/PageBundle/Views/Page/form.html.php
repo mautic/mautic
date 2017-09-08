@@ -88,6 +88,9 @@ $isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
             endif;
 
             echo $view['form']->row($form['isPublished']);
+            if (!empty($permissions['page:preference_center:manage'])) {
+                echo $view['form']->row($form['isPreferenceCenter']);
+            }
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
 

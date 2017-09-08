@@ -214,6 +214,11 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'page_list',
             ],
+            'mautic.form.type.preferencecenterlist' => [
+                'class'     => 'Mautic\PageBundle\Form\Type\PreferenceCenterListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'preference_center_list',
+            ],
             'mautic.form.type.page_abtest_settings' => [
                 'class' => 'Mautic\PageBundle\Form\Type\AbTestPropertiesType',
                 'alias' => 'page_abtest_settings',
