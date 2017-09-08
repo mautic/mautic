@@ -18,7 +18,7 @@
         </td>
         <td>
             <div>
-                <?php if (in_array($item->getStatus(), [$item::QUEUED, $item::IN_PROGRESS, $item::STOPPED]) && $permissions[$permissionBase.':publish']) : ?>
+                <?php if (!in_array($item->getStatus(), [$item::FAILED, $item::IMPORTED, $item::MANUAL]) && $permissions[$permissionBase.':publish']) : ?>
                 <?php echo $view->render(
                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                     ['item' => $item, 'model' => 'lead.import']
