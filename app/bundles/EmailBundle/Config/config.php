@@ -278,12 +278,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.validator.leadlistaccess' => [
-                'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
-                'arguments' => 'mautic.factory',
-                'tag'       => 'validator.constraint_validator',
-                'alias'     => 'leadlist_access',
-            ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
                 'arguments' => [
