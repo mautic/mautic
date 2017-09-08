@@ -338,6 +338,10 @@ class ImportModel extends FormModel
 
                 $this->saveEntity($import);
 
+                // clear unit of work of already imported data to save memory
+                $this->em->clear('Mautic\LeadBundle\Entity\Lead');
+                $this->em->clear('Mautic\LeadBundle\Entity\Company');
+
                 // Stop the import loop if the import got unpublished
                 if (!$isPublished) {
                     $this->logDebug('The import has been unpublished. Stopping the import now.', $import);
