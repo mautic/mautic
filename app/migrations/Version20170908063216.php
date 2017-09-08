@@ -2,14 +2,15 @@
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
+use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 /**
  * Migration 20170908063216. Adds tables for the deal handling feature added
  * to the pipedrive integration.
  */
-class Version20170908063216 extends AbstractMigration
+class Version20170908063216 extends AbstractMauticMigration
 {
     /**
      * @param Schema $schema
