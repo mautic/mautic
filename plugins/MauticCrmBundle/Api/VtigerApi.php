@@ -50,7 +50,7 @@ class VtigerApi extends CrmApi
      */
     public function getLeadFields($object)
     {
-        if ($object == 'company') {
+        if ($object === 'company') {
             $object = 'Accounts';
         } else {
             $object = $this->element;
