@@ -1882,7 +1882,7 @@ class LeadModel extends FormModel
                 $this->addDncForLead($lead, 'email', $reason, DoNotContact::MANUAL);
             }
         }
-        unset($fields['doNotEmail']);
+        unset($fields['doNotEmailvid']);
 
         if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
             $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']]);
