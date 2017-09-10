@@ -198,7 +198,7 @@ class LeadImportFieldType extends AbstractType
             'choice',
             [
                 'choices'    => $options['import_fields'],
-                'label'      => 'mautic.lead.import.label.owner',
+                'label'      => 'mautic.lead.import.label.ownerusername',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
@@ -218,7 +218,7 @@ class LeadImportFieldType extends AbstractType
                 'owner',
                 'user_list',
                 [
-                    'label'      => 'mautic.lead.lead.field.ownerusername',
+                    'label'      => 'mautic.lead.lead.field.owner',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class' => 'form-control',
