@@ -191,19 +191,20 @@ class LeadModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         UserProvider $userProvider
     ) {
-        $this->request           = $requestStack->getCurrentRequest();
-        $this->cookieHelper      = $cookieHelper;
-        $this->ipLookupHelper    = $ipLookupHelper;
-        $this->pathsHelper       = $pathsHelper;
-        $this->integrationHelper = $integrationHelper;
-        $this->leadFieldModel    = $leadFieldModel;
-        $this->leadListModel     = $leadListModel;
-        $this->companyModel      = $companyModel;
-        $this->formFactory       = $formFactory;
-        $this->categoryModel     = $categoryModel;
-        $this->channelListHelper = $channelListHelper;
-        $this->trackByIp         = $trackByIp;
-        $this->userProvider      = $userProvider;
+        $this->request              = $requestStack->getCurrentRequest();
+        $this->cookieHelper         = $cookieHelper;
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->pathsHelper          = $pathsHelper;
+        $this->integrationHelper    = $integrationHelper;
+        $this->leadFieldModel       = $leadFieldModel;
+        $this->leadListModel        = $leadListModel;
+        $this->companyModel         = $companyModel;
+        $this->formFactory          = $formFactory;
+        $this->categoryModel        = $categoryModel;
+        $this->channelListHelper    = $channelListHelper;
+        $this->trackByIp            = $trackByIp;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->userProvider         = $userProvider;
     }
 
     /**
