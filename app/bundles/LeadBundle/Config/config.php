@@ -696,6 +696,7 @@ return [
                     'mautic.channel.helper.channel_list',
                     '%mautic.track_contact_by_ip%',
                     'mautic.helper.core_parameters',
+                    'mautic.user.provider',
                 ],
             ],
             'mautic.lead.model.field' => [

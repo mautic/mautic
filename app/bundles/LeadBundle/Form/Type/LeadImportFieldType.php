@@ -193,6 +193,19 @@ class LeadImportFieldType extends AbstractType
             ]
         );
 
+        $properties->add(
+            'ownerusername',
+            'choice',
+            [
+                'choices'    => $options['import_fields'],
+                'label'      => 'mautic.lead.import.label.owner',
+                'required'   => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
+                'data'       => $this->getDefaultValue('ownerusername', $options['import_fields']),
+            ]
+        );
+
         $builder->add($properties);
 
         $transformer = new \Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer(
@@ -205,7 +218,7 @@ class LeadImportFieldType extends AbstractType
                 'owner',
                 'user_list',
                 [
-                    'label'      => 'mautic.lead.lead.field.owner',
+                    'label'      => 'mautic.lead.lead.field.ownerusername',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class' => 'form-control',

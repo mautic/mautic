@@ -52,6 +52,8 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -142,6 +144,11 @@ class LeadModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var UserProvider
+     */
+    protected $userProvider;
+
+    /**
      * @var
      */
     protected $leadTrackingId;
@@ -167,6 +174,7 @@ class LeadModel extends FormModel
      * @param ChannelListHelper    $channelListHelper
      * @param                      $trackByIp
      * @param CoreParametersHelper $coreParametersHelper
+     * @param UserProvider         $userProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -181,21 +189,22 @@ class LeadModel extends FormModel
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
         $trackByIp,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        UserProvider $userProvider
     ) {
-        $this->request              = $requestStack->getCurrentRequest();
-        $this->cookieHelper         = $cookieHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->pathsHelper          = $pathsHelper;
-        $this->integrationHelper    = $integrationHelper;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->leadListModel        = $leadListModel;
-        $this->companyModel         = $companyModel;
-        $this->formFactory          = $formFactory;
-        $this->categoryModel        = $categoryModel;
-        $this->channelListHelper    = $channelListHelper;
-        $this->trackByIp            = $trackByIp;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->request           = $requestStack->getCurrentRequest();
+        $this->cookieHelper      = $cookieHelper;
+        $this->ipLookupHelper    = $ipLookupHelper;
+        $this->pathsHelper       = $pathsHelper;
+        $this->integrationHelper = $integrationHelper;
+        $this->leadFieldModel    = $leadFieldModel;
+        $this->leadListModel     = $leadListModel;
+        $this->companyModel      = $companyModel;
+        $this->formFactory       = $formFactory;
+        $this->categoryModel     = $categoryModel;
+        $this->channelListHelper = $channelListHelper;
+        $this->trackByIp         = $trackByIp;
+        $this->userProvider      = $userProvider;
     }
 
     /**
@@ -1873,7 +1882,15 @@ class LeadModel extends FormModel
                 $this->addDncForLead($lead, 'email', $reason, DoNotContact::MANUAL);
             }
         }
-        unset($fields['doNotEmail']);
+        if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
+            $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']]);
+            if ($newOwner) {
+                $lead->setOwner($newOwner);
+                //reset default owner if exists
+                $owner = null;
+            }
+        }
+        unset($fields['ownerusername']);
 
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
