@@ -496,6 +496,44 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $sf->pushLeadToCampaign($lead, 1, 'Active', ['Lead' => [1]]);
     }
+    public function testPushCompany()
+    {
+        $this->sfObjects     = ['Account'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $company = new Company();
+
+        $company->setName('MyCompanyNmae');
+        $company->setId(1);
+
+        $sf->expects($this->any())
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function () {
+                    $args = func_get_args();
+
+                    // Checking for campaign members should return empty array for testing purposes
+                    if (strpos($args[0], '/query') !== false && strpos($args[1]['q'], 'Account') !== false) {
+                        return [];
+                    }
+
+                    if (strpos($args[0], '/composite') !== false) {
+                        $this->assertSame(
+                            '1-Account-null-1',
+                            $args[1]['compositeRequest'][0]['referenceId'],
+                            'The composite request when pushing an account should contain the correct referenceId.'
+                        );
+
+                        return true;
+                    }
+                }
+            );
+
+        $result = $sf->pushCompany($company);
+
+        $this->asserTrue($result);
+    }
 
     public function testExportingContactActivity()
     {

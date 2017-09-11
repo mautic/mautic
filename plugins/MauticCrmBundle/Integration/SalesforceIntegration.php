@@ -416,15 +416,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         case 'Contact':
                             //get company from account id and assign company name
                             if ($dataObject['AccountId__'.$object]) {
-                                $companyQuery   = 'Select Name from Account where Id = \''.$dataObject['AccountId__'.$object].'\' and IsDeleted = false';
-                                $contactCompany = $this->getApiHelper()->getLeads($companyQuery, 'Account');
-                                if (!empty($contactCompany['records'])) {
-                                    foreach ($contactCompany['records'] as $company) {
-                                        if (!empty($company['Name'])) {
-                                            $dataObject['AccountId__'.$object] = $company['Name'];
-                                            break;
-                                        }
-                                    }
+                                $companyName = $this->getCompanyName($dataObject['AccountId__'.$object], 'Name');
+
+                                if ($companyName) {
+                                    $dataObject['AccountId__'.$object] = $companyName;
                                 } else {
                                     unset($dataObject['AccountId__'.$object]); //no company was found in Salesforce
                                 }
@@ -727,11 +722,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
-        if (empty($config['companyFields'])) {
+        if (empty($config['companyFields']) || !$company) {
             return [];
         }
         $object     = 'company';
-        $mappedData = $this->mapContactDataForPush($company, $config);
+        $mappedData = $this->mapCompanyDataForPush($company, $config);
 
         // No fields are mapped so bail
         if (empty($mappedData)) {
@@ -745,26 +740,27 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $object => $mappedData[$object]['create'],
                     ]
                 );
-
                 $companyFound = false;
                 $companies    = [];
 
                 if (!empty($existingCompanies[$object])) {
                     $fieldsToUpdate = $mappedData[$object]['update'];
+
                     $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingCompanies[$object], $mappedData, $config);
                     $companyFound   = true;
-                    if (!empty($fieldsToUpdate)) {
-                        foreach ($existingCompanies[$object] as $sfCompany) {
-                            $companyData                          = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $sfCompany['Id']);
-                            $companies[$object][$sfCompany['Id']] = $sfCompany['Id'];
+
+                    foreach ($existingCompanies[$object] as $sfCompany) {
+                        if (!empty($fieldsToUpdate)) {
+                            $companyData = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $sfCompany['Id']);
                         }
+                        $companies[$sfCompany['Id']] = $sfCompany['Id'];
                     }
                 }
 
                 if (!$companyFound) {
-                    $companyData                            = $this->getApiHelper()->createObject($mappedData[$object]['create'], 'Account');
-                    $companies[$object][$companyData['Id']] = $companyData['Id'];
-                    $companyFound                           = true;
+                    $companyData                   = $this->getApiHelper()->createObject($mappedData[$object]['create'], 'Account');
+                    $companies[$companyData['Id']] = $companyData['Id'];
+                    $companyFound                  = true;
                 }
 
                 if (isset($companyData['Id'])) {
@@ -1884,12 +1880,41 @@ class SalesforceIntegration extends CrmAbstractIntegration
     ) {
         $body         = [];
         $updateEntity = [];
+        $companies    = [];
+        $company      = null;
         $config       = $this->mergeConfigToFeatureSettings([]);
 
         if ((isset($entity['email']) && !empty($entity['email'])) || (isset($entity['companyname']) && !empty($entity['companyname']))) {
             //use a composite patch here that can update and create (one query) every 200 records
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
+
+                if (isset($entity['company']) and $entity['integration_entity'] == 'Contact') {
+                    $accountId = $this->getCompanyName($entity['company'], 'Id', 'Name');
+
+                    if (!$accountId) {
+                        //company was not found so create a new company in Salesforce
+                        $lead      = $this->leadModel->getEntity($entity['internal_entity_id']);
+                        $companies = $this->leadModel->getCompanies($lead);
+                        if (!empty($companies)) {
+                            foreach ($companies as $companyData) {
+                                if ($companyData['is_primary']) {
+                                    $company = $this->companyModel->getEntity($companyData['company_id']);
+                                }
+                            }
+                            if ($company) {
+                                $sfCompany = $this->pushCompany($company);
+                                if (!empty($sfCompany)) {
+                                    $entity['company'] = key($sfCompany);
+                                }
+                            }
+                        } else {
+                            unset($entity['company']);
+                        }
+                    } else {
+                        $entity['company'] = $accountId;
+                    }
+                }
                 $fields = $this->getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config);
             } else {
                 $fields = $objectFields;
@@ -2609,6 +2634,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     protected function mapCompanyDataForPush(Company $company, $config)
     {
         $object     = 'company';
+        $entity     = [];
         $mappedData = [
             $object => [],
         ];
@@ -2622,10 +2648,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 'update' => !empty($fieldsToUpdateInSf) ? array_intersect_key($fieldsToCreate, $fieldsToUpdateInSf) : [],
                 'create' => $fieldsToCreate,
             ];
+            $entity['primaryCompany'] = $company->getFields();
+
+            $entity['primaryCompany'] = $this->leadModel->flattenFields($entity['primaryCompany']);
 
             // Create an update and
             $mappedData[$object]['create'] = $this->populateCompanyData(
-                $company,
+                $entity,
                 [
                     'companyFields'    => $fieldMapping[$object]['create'], // map with all fields available
                     'object'           => $object,
@@ -3161,5 +3190,24 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $result = array_merge($queryByName, $queryById);
 
         return $result;
+    }
+
+    public function getCompanyName($accountId, $field, $searchBy = 'Id')
+    {
+        $companyField = null;
+
+        $companyQuery   = 'Select Id, Name from Account where '.$searchBy.' = \''.$accountId.'\' and IsDeleted = false';
+        $contactCompany = $this->getApiHelper()->getLeads($companyQuery, 'Account');
+
+        if (!empty($contactCompany['records'])) {
+            foreach ($contactCompany['records'] as $company) {
+                if (!empty($company[$field])) {
+                    $companyField = $company[$field];
+                    break;
+                }
+            }
+        }
+
+        return $companyField;
     }
 }
