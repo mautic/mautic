@@ -219,8 +219,7 @@ class FocusType extends AbstractType
                 'multiple'    => false,
                 'empty_value' => '',
                 'attr'        => [
-                    'onchange'     => 'Mautic.focusUpdatePreview()',
-                    'data-show-on' => '{"focus_html_mode_1":""}',
+                    'onchange' => 'Mautic.focusUpdatePreview()',
                 ],
             ]
         );

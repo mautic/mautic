@@ -20,7 +20,11 @@ $formName = '_'.strtolower(
 $jsFormName = ltrim($formName, '_');
 $fields     = $form->getFields();
 $required   = [];
+?>
 
+<!-- START FOCUS FORM -->
+
+<?php
 if (empty($preview)):
     echo $view->render('MauticFormBundle:Builder:script.html.php', ['form' => $form, 'formName' => $formName]); ?>
 
@@ -154,3 +158,5 @@ if (empty($preview)):
         </form>
     </div>
 <?php endif; ?>
+
+<!-- END FOCUS FORM -->

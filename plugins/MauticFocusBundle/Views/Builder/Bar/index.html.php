@@ -8,9 +8,17 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$props   = $focus['properties'];
-$color   = \MauticPlugin\MauticFocusBundle\Model\FocusModel::isLightColor($props['colors']['primary']) ? '000000' : 'ffffff';
-$animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
+$props       = $focus['properties'];
+$color       = \MauticPlugin\MauticFocusBundle\Model\FocusModel::isLightColor($props['colors']['primary']) ? '000000' : 'ffffff';
+$animate     = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
+$formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.html.php',
+    [
+        'form'    => $form,
+        'style'   => $focus['style'],
+        'focusId' => $focus['id'],
+        'preview' => $preview,
+    ]
+) : '';
 ?>
 <div class="mautic-focus mf-bar mf-bar-<?php echo $props['bar']['size']; ?> mf-bar-<?php echo $props['bar']['placement']; ?><?php if ($props['bar']['sticky']) {
     echo ' mf-bar-sticky';
@@ -18,14 +26,11 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 
     <div class="mf-content">
         <?php if (!empty($focus['htmlMode']) || !empty($focus['html_mode'])): ?>
-            <?php echo html_entity_decode($focus['html']); ?>
+            <?php echo str_replace('{focus_form}', $formContent, html_entity_decode($focus['html'])); ?>
         <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
         <?php if ($focus['type'] == 'form' && !empty($form)): ?>
-            <?php echo $view->render(
-                'MauticFocusBundle:Builder:form.html.php',
-                ['form' => $form, 'style' => $focus['style'], 'focusId' => $focus['id'], 'preview' => $preview]
-            ); ?>
+            <?php echo $formContent; ?>
         <?php elseif ($focus['type'] == 'link'): ?>
             <a href="<?php echo (empty($preview)) ? $clickUrl : '#'; ?>" class="mf-link" target="<?php echo ($props['content']['link_new_window'])
                 ? '_new' : '_parent'; ?>">

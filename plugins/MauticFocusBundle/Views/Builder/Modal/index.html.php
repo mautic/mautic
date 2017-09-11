@@ -8,10 +8,18 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$props     = $focus['properties'];
-$style     = $focus['style'];
-$placement = (isset($props[$style]['placement'])) ? str_replace('_', '-', $props[$style]['placement']) : false;
-$animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
+$props       = $focus['properties'];
+$style       = $focus['style'];
+$placement   = (isset($props[$style]['placement'])) ? str_replace('_', '-', $props[$style]['placement']) : false;
+$animate     = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
+$formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.html.php',
+    [
+        'form'    => $form,
+        'style'   => $focus['style'],
+        'focusId' => $focus['id'],
+        'preview' => $preview,
+    ]
+) : '';
 ?>
     <style scoped>
         .mf-<?php echo $style; ?> {
@@ -27,7 +35,7 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
             </div>
             <div class="mf-content">
                 <?php if ((!empty($focus['htmlMode']) && in_array($focus['htmlMode'], ['editor', 'html']) && $htmlMode = $focus['htmlMode']) || (!empty($focus['html_mode']) && in_array($focus['html_mode'], ['editor', 'html']) && $htmlMode = $focus['html_mode'])): ?>
-                    <?php echo html_entity_decode($focus[$htmlMode]); ?>
+                    <?php echo str_replace('{focus_form}', $formContent, html_entity_decode($focus[$htmlMode])); ?>
                 <?php else: ?>
                 <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
                 <?php if ($props['content']['tagline']): ?>
@@ -35,10 +43,7 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
                 <?php endif; ?>
                 <div class="mf-inner-container">
                     <?php if ($focus['type'] == 'form' && !empty($form)): ?>
-                        <?php echo $view->render(
-                            'MauticFocusBundle:Builder:form.html.php',
-                            ['form' => $form, 'style' => $focus['style'], 'focusId' => $focus['id'], 'preview' => $preview]
-                        ); ?>
+                        <?php echo $formContent; ?>
                     <?php elseif ($focus['type'] == 'link'): ?>
                         <a href="<?php echo (empty($preview)) ? $clickUrl
                             : '#'; ?>" class="mf-link" target="<?php echo ($props['content']['link_new_window']) ? '_new' : '_parent'; ?>">
