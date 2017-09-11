@@ -960,6 +960,8 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                     return [];
                                 } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Campaign') !== false) {
                                     return 'fetched campaigns';
+                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Account') !== false) {
+                                    return 'fetched accounts';
                                 } else {
                                     // Extract emails
                                     preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
