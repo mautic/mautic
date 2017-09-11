@@ -449,6 +449,25 @@ switch ($style) {
                 Focus.iframeDoc.write("<?php echo $content; ?>");
                 Focus.iframeDoc.close();
 
+                Focus.iframe.onload = function() {
+                    // Resize iframe
+                    var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
+                    if (Focus.enableIframeResizer()) {
+                        // Give iframe chance to resize
+                        setTimeout(function () {
+                            if (animate) {
+                                Focus.addClass(Focus.iframe, "mf-animate");
+                            }
+                            Focus.addClass(Focus.iframe, "mf-loaded");
+                        }, 35);
+                    } else {
+                        if (animate) {
+                            Focus.addClass(Focus.iframe, "mf-animate");
+                        }
+                        Focus.addClass(Focus.iframe, "mf-loaded");
+                    }
+                }
+
                 // Set body margin to 0
                 Focus.iframeDoc.getElementsByTagName('body')[0].style.margin = 0;
 
@@ -476,23 +495,6 @@ switch ($style) {
 
                 // Register events
                 Focus.registerClickEvents();
-
-                // Resize iframe
-                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
-                if (Focus.enableIframeResizer()) {
-                    // Give iframe chance to resize
-                    setTimeout(function () {
-                        if (animate) {
-                            Focus.addClass(Focus.iframe, "mf-animate");
-                        }
-                        Focus.addClass(Focus.iframe, "mf-loaded");
-                    }, 35);
-                } else {
-                    if (animate) {
-                        Focus.addClass(Focus.iframe, "mf-animate");
-                    }
-                    Focus.addClass(Focus.iframe, "mf-loaded");
-                }
 
                 <?php if ($props['when'] == 'leave'): ?>
                 // Ensure user can leave
@@ -534,7 +536,6 @@ switch ($style) {
 
                         useHeight += 10;
                         useHeight = useHeight + 'px';
-
 
                         if (Focus.debug) {
                             console.log('window inner height = ' + window.innerHeight);
