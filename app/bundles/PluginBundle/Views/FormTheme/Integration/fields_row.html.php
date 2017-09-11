@@ -83,7 +83,7 @@ $indexCount = 1;
                         <div class="choice-wrapper">
                             <div class="btn-group btn-block" data-toggle="buttons">
                                 <?php $checked = $child->vars['value'] === '0'; ?>
-                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
                                     <input type="radio"
                                            id="<?php echo $child->vars['id']; ?>_0"
                                            name="<?php echo $child->vars['full_name']; ?>"
@@ -95,7 +95,7 @@ $indexCount = 1;
                                     <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                                 </label>
                                 <?php $checked = $child->vars['value'] === '1'; ?>
-                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
                                     <input type="radio" id="<?php echo $child->vars['id']; ?>_1"
                                            name="<?php echo $child->vars['full_name']; ?>"
                                            title=""
