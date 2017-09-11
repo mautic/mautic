@@ -180,7 +180,12 @@ class FocusModel extends FormModel
             $this->saveEntity($focus);
         }
 
-        return $cached;
+        // Replace tokens to ensure clickthroughs, lead tokens etc are appropriate
+        $lead       = $this->leadModel->getCurrentLead();
+        $tokenEvent = new TokenReplacementEvent($cached, $lead, ['focus_id' => $focus->getId()]);
+        $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
+
+        return $tokenEvent->getContent();
     }
 
     /**
@@ -197,22 +202,7 @@ class FocusModel extends FormModel
             $focus = $focus->toArray();
         }
 
-        if (!empty($focus['form'])) {
-            $form = $this->formModel->getEntity($focus['form']);
-        } else {
-            $form = null;
-        }
-        if ($focus['id'] != 'preview') {
-            $fid = $focus['id'];
-        } elseif (isset($focus['unlockId'])) {
-            $fid = $focus['unlockId'];
-        }
-        if (isset($fid) && !empty($focus['htmlMode']) && in_array($focus['htmlMode'], ['editor', 'html'])) {
-            $lead       = $this->leadModel->getCurrentLead();
-            $tokenEvent = new TokenReplacementEvent($focus[$focus['htmlMode']], $lead, ['focus_id' => $fid]);
-            $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
-            $focus[$focus['htmlMode']] = $tokenEvent->getContent();
-        }
+        $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
 
         if ($preview) {
             $content = [
