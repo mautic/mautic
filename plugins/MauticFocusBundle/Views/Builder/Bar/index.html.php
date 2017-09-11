@@ -25,7 +25,7 @@ $formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.h
 } ?><?php echo $animate; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>;">
 
     <div class="mf-content">
-        <?php if (!empty($focus['htmlMode']) || !empty($focus['html_mode'])): ?>
+        <?php if (in_array($htmlMode, ['editor', 'html'])): ?>
             <?php echo str_replace('{focus_form}', $formContent, html_entity_decode($focus['html'])); ?>
         <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>

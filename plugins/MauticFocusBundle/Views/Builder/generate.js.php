@@ -436,6 +436,7 @@ switch ($style) {
                         'focus'    => $focus,
                         'form'     => $form,
                         'clickUrl' => $clickUrl,
+                        'htmlMode' => $htmlMode,
                     ]
                 );
 

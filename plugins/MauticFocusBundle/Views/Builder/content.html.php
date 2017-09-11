@@ -57,6 +57,7 @@ $props = $focus['properties'];
             'form'     => $form,
             'preview'  => $preview,
             'clickUrl' => $clickUrl,
+            'htmlMode' => $htmlMode,
         ]
     );
 

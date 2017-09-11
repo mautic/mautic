@@ -204,15 +204,24 @@ class FocusModel extends FormModel
 
         $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
 
+        if (isset($focus['html_mode'])) {
+            $htmlMode = $focus['html_mode'];
+        } elseif (isset($focus['htmlMode'])) {
+            $htmlMode = $focus['htmlMode'];
+        } else {
+            $htmlMode = 'basic';
+        }
+
         if ($preview) {
             $content = [
                 'style' => '',
                 'html'  => $this->templating->getTemplating()->render(
                     'MauticFocusBundle:Builder:content.html.php',
                     [
-                        'focus'   => $focus,
-                        'form'    => $form,
-                        'preview' => $preview,
+                        'focus'    => $focus,
+                        'form'     => $form,
+                        'preview'  => $preview,
+                        'htmlMode' => $htmlMode,
                     ]
                 ),
             ];
@@ -226,7 +235,12 @@ class FocusModel extends FormModel
                     $focus['id']
                 );
 
-                $url = $this->trackableModel->generateTrackableUrl($trackable, ['channel' => ['focus', $focus['id']]], false, $focusModel->getUtmTags());
+                $url = $this->trackableModel->generateTrackableUrl(
+                    $trackable,
+                    ['channel' => ['focus', $focus['id']]],
+                    false,
+                    $focusModel->getUtmTags()
+                );
             }
 
             $content = $this->templating->getTemplating()->render(
@@ -237,6 +251,7 @@ class FocusModel extends FormModel
                     'preview'      => $preview,
                     'ignoreMinify' => $ignoreMinify,
                     'clickUrl'     => $url,
+                    'htmlMode'     => $htmlMode,
                 ]
             );
 
@@ -245,7 +260,7 @@ class FocusModel extends FormModel
             }
         }
 
-        return  $content;
+        return $content;
     }
 
     /**

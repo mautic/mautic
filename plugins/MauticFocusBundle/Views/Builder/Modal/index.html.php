@@ -20,6 +20,7 @@ $formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.h
         'preview' => $preview,
     ]
 ) : '';
+
 ?>
     <style scoped>
         .mf-<?php echo $style; ?> {
@@ -34,7 +35,7 @@ $formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.h
                 <a href="javascript:void(0)"<?php if (!empty($preview)): echo ' onclick="Mautic.closeFocusModal(\''.$style.'\')"'; endif; ?>>x</a>
             </div>
             <div class="mf-content">
-                <?php if ((!empty($focus['htmlMode']) && in_array($focus['htmlMode'], ['editor', 'html']) && $htmlMode = $focus['htmlMode']) || (!empty($focus['html_mode']) && in_array($focus['html_mode'], ['editor', 'html']) && $htmlMode = $focus['html_mode'])): ?>
+                <?php if (in_array($htmlMode, ['editor', 'html'])): ?>
                     <?php echo str_replace('{focus_form}', $formContent, html_entity_decode($focus[$htmlMode])); ?>
                 <?php else: ?>
                 <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
