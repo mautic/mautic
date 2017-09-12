@@ -6,6 +6,7 @@ Mautic.matchedFields = function (index, object, integration) {
     var mauticField = mQuery('#integration_details_featureSettings_'+object+'Fields_m_' + index + ' option:selected').val();
 
     if (mQuery.inArray(mauticField, compoundMauticFields) >= 0) {
+        mQuery('.btn-arrow' + index).removeClass('active');
         mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]').prop('disabled', true).trigger("chosen:updated");
         mQuery('.btn-arrow' + index).addClass('disabled');
     } else {
