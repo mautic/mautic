@@ -1192,7 +1192,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         //no one to send to so bail or if marketing email from a campaign has been put in a queue
         if (empty($count)) {
             if ($returnErrorMessages) {
-                return $singleEmail ? $errors[$singleEmail] : $errors;
+                return $singleEmail && isset($errors[$singleEmail]) ? $errors[$singleEmail] : $errors;
             }
 
             return $singleEmail ? true : $errors;

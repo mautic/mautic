@@ -244,6 +244,8 @@ trait CustomFieldRepositoryTrait
      */
     public function saveEntity($entity, $flush = true)
     {
+        $this->preSaveEntity($entity);
+
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
@@ -264,6 +266,8 @@ trait CustomFieldRepositoryTrait
             $this->prepareDbalFieldsForSave($fields);
             $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }
+
+        $this->postSaveEntity($entity);
     }
 
     /**
@@ -385,5 +389,25 @@ trait CustomFieldRepositoryTrait
                 $fields[$field] = (int) $value;
             }
         }
+    }
+
+    /**
+     * Inherit and use in class if required to do something to the entity prior to persisting.
+     *
+     * @param $entity
+     */
+    protected function preSaveEntity($entity)
+    {
+        // Inherit and use if required
+    }
+
+    /**
+     * Inherit and use in class if required to do something with the entity after persisting.
+     *
+     * @param $entity
+     */
+    protected function postSaveEntity($entity)
+    {
+        // Inherit and use if required
     }
 }

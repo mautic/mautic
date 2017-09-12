@@ -70,9 +70,10 @@ if ($tmpl == 'index') {
             <tbody>
             <?php foreach ($items as $item): ?>
                 <?php
-                $hasVariants     = $item->isVariant();
-                $hasTranslations = $item->isTranslation();
-                $type            = $item->getEmailType();
+                $hasVariants                = $item->isVariant();
+                $hasTranslations            = $item->isTranslation();
+                $type                       = $item->getEmailType();
+                $mauticTemplateVars['item'] = $item;
                 ?>
                 <tr>
                     <td>
@@ -160,7 +161,7 @@ if ($tmpl == 'index') {
                         </span>
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="<?php echo $item->getId(); ?>">
-                        <?php  ?>
+                        <?php echo $view['content']->getCustomContent('email.stats.above', $mauticTemplateVars); ?>
                         <span class="mt-xs label label-default hide has-click-event clickable-stat"
                               id="pending-<?php echo $item->getId(); ?>"
                               data-toggle="tooltip"
@@ -216,6 +217,7 @@ if ($tmpl == 'index') {
                             </a>
                         </span>
                         <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
+                        <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
