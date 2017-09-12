@@ -2704,4 +2704,18 @@ abstract class AbstractIntegration
 
         return $lead;
     }
+
+    public function isCompoundMauticField($fieldName)
+    {
+        $compoundFields = [
+            'mauticContactTimelineLink'         => 'mauticContactTimelineLink',
+            'mauticContactIsContactableByEmail' => 'mauticContactIsContactableByEmail',
+        ];
+
+        if (isset($compoundFields[$fieldName])) {
+            return true;
+        }
+
+        return false;
+    }
 }
