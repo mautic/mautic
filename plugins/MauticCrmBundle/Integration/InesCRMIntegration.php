@@ -227,8 +227,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     }
 
                     if (is_null($customFieldToUpdate)) {
-                        // Gotta create the field
+                        $this->logger->debug('INES: Will create contact custom field', compact('customFieldDefinitionRef', 'lead', 'config'));
                     } else {
+                        $this->logger->debug('INES: Will update contact custom field', compact('customFieldDefinitionRef', 'lead', 'config'));
+
                         $method = 'get' . ucfirst($mauticField);
 
                         $mappedData = (object) [

@@ -94,7 +94,9 @@ class InesCRMApi extends CrmApi
         $this->setAuthHeaders($client);
 
         try {
-            return $client->GetContactCF(['reference' => $internalRef]);
+            $response = $client->GetContactCF(['reference' => $internalRef]);
+            self::cleanList($response->GetContactCFResult->Values->CustomField);
+            return $response;
         } catch (\Exception $e) {
             dump($e);die();
         }
@@ -192,6 +194,14 @@ class InesCRMApi extends CrmApi
             return $client->UpdateContact(['contact' => $inesContact]);
         } catch (\Exception $e) {
             dump($e);die();
+        }
+    }
+
+    private static function cleanList(&$dirtyList) {
+        if (is_null($dirtyList)) {
+            $dirtyList = [];
+        } elseif (!is_array($dirtyList)) {
+            $dirtyList = [$dirtyList];
         }
     }
 }
