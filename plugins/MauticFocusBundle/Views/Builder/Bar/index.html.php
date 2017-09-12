@@ -26,7 +26,7 @@ $formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.h
 
     <div class="mf-content">
         <?php if (in_array($htmlMode, ['editor', 'html'])): ?>
-            <?php echo str_replace('{focus_form}', $formContent, html_entity_decode($focus['html'])); ?>
+            <?php echo str_replace('{focus_form}', $formContent, html_entity_decode($focus[$htmlMode])); ?>
         <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
         <?php if ($focus['type'] == 'form' && !empty($form)): ?>
