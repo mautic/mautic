@@ -1796,6 +1796,8 @@ abstract class AbstractIntegration
 
         if ($object) {
             $availableFields = $availableFields[$config['object']];
+        } else {
+            $availableFields = (isset($availableFields[0])) ? $availableFields[0] : $availableFields;
         }
 
         $unknown = $this->translator->trans('mautic.integration.form.lead.unknown');

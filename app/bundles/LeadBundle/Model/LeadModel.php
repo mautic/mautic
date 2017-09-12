@@ -27,7 +27,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -150,6 +149,11 @@ class LeadModel extends FormModel
      * @var bool
      */
     protected $leadTrackingCookieGenerated = false;
+
+    /**
+     * @var array
+     */
+    protected $availableLeadFields = [];
 
     /**
      * LeadModel constructor.
@@ -941,42 +945,6 @@ class LeadModel extends FormModel
             $this->logger->addDebug("LEAD: Contact ID# {$leadId} tracked through tracking ID ($trackingId}.");
         }
 
-        // Search for lead by request and/or update lead fields if some data were sent in the URL query
-        $availableLeadFields = $this->leadFieldModel->getFieldList(
-            false,
-            false,
-            [
-                'isPublished'         => true,
-                'isPubliclyUpdatable' => true,
-            ]
-        );
-
-        $uniqueLeadFields    = $this->leadFieldModel->getUniqueIdentiferFields();
-        $uniqueLeadFieldData = [];
-        $inQuery             = array_intersect_key($queryFields, $availableLeadFields);
-        foreach ($inQuery as $k => $v) {
-            if (empty($queryFields[$k])) {
-                unset($inQuery[$k]);
-            }
-
-            if (array_key_exists($k, $uniqueLeadFields)) {
-                $uniqueLeadFieldData[$k] = $v;
-            }
-        }
-
-        if (count($inQuery)) {
-            // Check for leads using unique identifier
-            if (count($uniqueLeadFieldData)) {
-                $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueLeadFieldData, ($lead) ? $lead->getId() : null);
-
-                if (!empty($existingLeads)) {
-                    $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
-                    // Merge with existing lead or use the one found
-                    $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
-                }
-            }
-        }
-
         // Search for lead by fingerprint
         if (empty($lead) && !empty($queryFields['fingerprint']) && $trackByFingerprint) {
             $deviceRepo = $this->getDeviceRepository();
@@ -990,6 +958,8 @@ class LeadModel extends FormModel
             // No lead found so generate one
             $lead = $this->getCurrentLead();
         }
+
+        list($lead, $inQuery) = $this->checkForDuplicateContact($queryFields, $lead, true, true);
 
         if ($lead) {
             $leadIpAddresses = $lead->getIpAddresses();
@@ -1007,6 +977,58 @@ class LeadModel extends FormModel
         }
 
         return $lead;
+    }
+
+    /**
+     * @param array     $queryFields
+     * @param Lead|null $lead
+     * @param bool      $returnWithQueryFields
+     *
+     * @return array|Lead
+     */
+    public function checkForDuplicateContact(array $queryFields, Lead $lead = null, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
+    {
+        // Search for lead by request and/or update lead fields if some data were sent in the URL query
+        if (null == $this->availableLeadFields) {
+            $this->availableLeadFields = $this->leadFieldModel->getFieldList(
+                false,
+                false,
+                [
+                    'isPublished'         => true,
+                    'isPubliclyUpdatable' => $onlyPubliclyUpdateable,
+                ]
+            );
+        }
+
+        $uniqueLeadFields    = $this->leadFieldModel->getUniqueIdentifierFields();
+        $uniqueLeadFieldData = [];
+        $inQuery             = array_intersect_key($queryFields, $this->availableLeadFields);
+        foreach ($inQuery as $k => $v) {
+            if (empty($queryFields[$k])) {
+                unset($inQuery[$k]);
+            }
+
+            if (array_key_exists($k, $uniqueLeadFields)) {
+                $uniqueLeadFieldData[$k] = $v;
+            }
+        }
+
+        // Check for leads using unique identifier
+        if (count($uniqueLeadFieldData)) {
+            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueLeadFieldData, ($lead) ? $lead->getId() : null);
+
+            if (!empty($existingLeads)) {
+                $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
+                // Merge with existing lead or use the one found
+                $lead = ($lead) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
+            }
+        }
+
+        if (null === $lead) {
+            $lead = new Lead();
+        }
+
+        return $returnWithQueryFields ? [$lead, $inQuery] : $lead;
     }
 
     /**
@@ -1720,21 +1742,17 @@ class LeadModel extends FormModel
      */
     public function import($fields, $data, $owner = null, $list = null, $tags = null, $persist = true, LeadEventLog $eventLog = null)
     {
-        $fields = array_flip($fields);
-
-        // Let's check for an existing lead by email
-        $hasEmail = (!empty($fields['email']) && !empty($data[$fields['email']]));
-        if ($hasEmail) {
-            // Validate the email
-            MailHelper::validateEmail($data[$fields['email']]);
-
-            $leadFound = $this->getRepository()->getLeadByEmail($data[$fields['email']]);
-            $lead      = ($leadFound) ? $this->em->getReference('MauticLeadBundle:Lead', $leadFound['id']) : new Lead();
-            $merged    = $leadFound;
-        } else {
-            $lead   = new Lead();
-            $merged = false;
+        $fields    = array_flip($fields);
+        $fieldData = [];
+        foreach ($fields as $leadField => $importField) {
+            // Prevent overwriting existing data with empty data
+            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
+                $fieldData[$leadField] = InputHelper::clean($data[$importField]);
+            }
         }
+
+        $lead   = $this->checkForDuplicateContact($fieldData);
+        $merged = ($lead->getId());
 
         // Extract company data and import separately
         // Modifies the data array
@@ -1861,7 +1879,7 @@ class LeadModel extends FormModel
         unset($fields['stage']);
 
         // Set unsubscribe status
-        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && $hasEmail) {
+        if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
             $doNotEmail = filter_var($data[$fields['doNotEmail']], FILTER_VALIDATE_BOOLEAN);
             if ($doNotEmail) {
                 $reason = $this->translator->trans('mautic.lead.import.by.user', [
@@ -1881,15 +1899,6 @@ class LeadModel extends FormModel
 
         if ($tags !== null) {
             $this->modifyTags($lead, $tags, null, false);
-        }
-
-        // Set profile data using the form so that values are validated
-        $fieldData = [];
-        foreach ($fields as $leadField => $importField) {
-            // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
-                $fieldData[$leadField] = $data[$importField];
-            }
         }
 
         if (empty($this->leadFields)) {
@@ -1918,8 +1927,6 @@ class LeadModel extends FormModel
 
         foreach ($this->leadFields as $leadField) {
             if (isset($fieldData[$leadField['alias']])) {
-                $fieldData[$leadField['alias']] = InputHelper::clean($fieldData[$leadField['alias']]);
-
                 if ('NULL' === $fieldData[$leadField['alias']]) {
                     $fieldData[$leadField['alias']] = null;
 
