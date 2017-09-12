@@ -226,12 +226,22 @@ class InesCRMIntegration extends CrmAbstractIntegration
                         }
                     }
 
+                    $method = 'get' . ucfirst($mauticField);
+
                     if (is_null($customFieldToUpdate)) {
                         $this->logger->debug('INES: Will create contact custom field', compact('customFieldDefinitionRef', 'lead', 'config'));
+
+                        $mappedData = (object) [
+                            'ctRef' => $inesContactRef,
+                            'chdefRef' => $customFieldDefinitionRef,
+                            'chpValue' => $lead->$method(),
+                            'chvLies' => 0,
+                            'chvGroupeAssoc' => 0,
+                        ];
+
+                        $apiHelper->createContactCustomField($mappedData);
                     } else {
                         $this->logger->debug('INES: Will update contact custom field', compact('customFieldDefinitionRef', 'lead', 'config'));
-
-                        $method = 'get' . ucfirst($mauticField);
 
                         $mappedData = (object) [
                             'ctRef' => $inesContactRef,
