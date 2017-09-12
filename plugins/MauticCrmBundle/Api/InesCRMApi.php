@@ -102,6 +102,17 @@ class InesCRMApi extends CrmApi
         }
     }
 
+    public function createContactCustomField($mappedData) {
+        $client = $this->customFieldClient;
+        $this->setAuthHeaders($client);
+
+        try {
+            return $client->InsertContactCF($mappedData);
+        } catch (\Exception $e) {
+            dump($e);die();
+        }
+    }
+
     public function updateContactCustomField($mappedData) {
         $client = $this->customFieldClient;
         $this->setAuthHeaders($client);
