@@ -11,6 +11,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
@@ -46,6 +47,7 @@ class PageController extends FormController
             'page:pages:deleteother',
             'page:pages:publishown',
             'page:pages:publishother',
+            'page:preference_center:manage',
         ], 'RETURN_ARRAY');
 
         if (!$permissions['page:pages:viewown'] && !$permissions['page:pages:viewother']) {
@@ -70,6 +72,16 @@ class PageController extends FormController
 
         if (!$permissions['page:pages:viewother']) {
             $filter['force'][] = ['column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+        }
+
+        if (!$permissions['page:preference_center:manage']) {
+            $filter['where'][] = [
+                'expr' => 'orX',
+                'val'  => [
+                    ['column' => 'p.isPreferenceCenter', 'expr' => 'isNull'],
+                    ['column' => 'p.isPreferenceCenter', 'expr' => 'neq', 'value' => 1],
+                ],
+            ];
         }
 
         $translator = $this->get('translator');

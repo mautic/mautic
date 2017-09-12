@@ -21,6 +21,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -219,22 +220,28 @@ class PublicController extends CommonFormController
                     );
                 }
 
-                $html = $this->get('mautic.helper.templating')->getTemplating()->render(
-                    'MauticEmailBundle:Lead:preference_options.html.php',
-                    array_merge(
-                        $viewParameters,
-                        [
-                            'form'         => $form->createView(),
-                            'currentRoute' => $this->generateUrl(
-                                'mautic_contact_action',
-                                [
-                                    'objectAction' => 'contactFrequency',
-                                    'objectId'     => $lead->getId(),
-                                ]
-                            ),
-                        ]
-                    )
-                );
+                if ($email) {
+                    /** @var Page $prefCenter */
+                    $prefCenter = $email->getPreferenceCenter();
+                    $html       = $prefCenter->getCustomHtml();
+                } else {
+                    $html = $this->get('mautic.helper.templating')->getTemplating()->render(
+                        'MauticEmailBundle:Lead:preference_options.html.php',
+                        array_merge(
+                            $viewParameters,
+                            [
+                                'form'         => $form->createView(),
+                                'currentRoute' => $this->generateUrl(
+                                    'mautic_contact_action',
+                                    [
+                                        'objectAction' => 'contactFrequency',
+                                        'objectId'     => $lead->getId(),
+                                    ]
+                                ),
+                            ]
+                        )
+                    );
+                }
                 $message = $html;
             }
         } else {
