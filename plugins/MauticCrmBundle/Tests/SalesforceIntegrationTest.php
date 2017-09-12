@@ -1169,34 +1169,36 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         foreach ($emails as $email) {
             // Extact ID
-            preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
-            $object = $match[1];
+            $found = preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
+            if ($found) {
+                $object = $match[1];
 
-            if ('Lead' === $object) {
-                if ($leadCount >= $maxLeads) {
-                    continue;
+                if ('Lead' === $object) {
+                    if ($leadCount >= $maxLeads) {
+                        continue;
+                    }
+                    ++$leadCount;
+                } else {
+                    if ($contactCount >= $maxContacts) {
+                        continue;
+                    }
+                    ++$contactCount;
                 }
-                ++$leadCount;
-            } else {
-                if ($contactCount >= $maxContacts) {
-                    continue;
-                }
-                ++$contactCount;
-            }
 
-            $id        = $match[2];
-            $records[] = [
-                'attributes' => [
+                $id        = $match[2];
+                $records[] = [
+                    'attributes' => [
                         'type' => $object,
                         'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
                     ],
-                'Id'        => 'SF'.$id,
-                'FirstName' => $object.$id,
-                'LastName'  => $object.$id,
-                'Email'     => $object.$id.'@sftest.com',
-            ];
+                    'Id'        => 'SF'.$id,
+                    'FirstName' => $object.$id,
+                    'LastName'  => $object.$id,
+                    'Email'     => $object.$id.'@sftest.com',
+                ];
 
-            $this->addSpecialCases($id, $records);
+                $this->addSpecialCases($id, $records);
+            }
         }
 
         $this->returnedSfEntities = array_merge($this->returnedSfEntities, $records);

@@ -1905,22 +1905,24 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (!$accountId) {
                         //company was not found so create a new company in Salesforce
-                        $lead      = $this->leadModel->getEntity($entity['internal_entity_id']);
-                        $companies = $this->leadModel->getCompanies($lead);
-                        if (!empty($companies)) {
-                            foreach ($companies as $companyData) {
-                                if ($companyData['is_primary']) {
-                                    $company = $this->companyModel->getEntity($companyData['company_id']);
+                        $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
+                        if ($lead) {
+                            $companies = $this->leadModel->getCompanies($lead);
+                            if (!empty($companies)) {
+                                foreach ($companies as $companyData) {
+                                    if ($companyData['is_primary']) {
+                                        $company = $this->companyModel->getEntity($companyData['company_id']);
+                                    }
                                 }
-                            }
-                            if ($company) {
-                                $sfCompany = $this->pushCompany($company);
-                                if (!empty($sfCompany)) {
-                                    $entity['company'] = key($sfCompany);
+                                if ($company) {
+                                    $sfCompany = $this->pushCompany($company);
+                                    if (!empty($sfCompany)) {
+                                        $entity['company'] = key($sfCompany);
+                                    }
                                 }
+                            } else {
+                                unset($entity['company']);
                             }
-                        } else {
-                            unset($entity['company']);
                         }
                     } else {
                         $entity['company'] = $accountId;
