@@ -59,5 +59,6 @@ $view['slots']->set('headerTitle', $header);
     'eventSettings'   => $eventSettings,
     'canvasSettings'  => $entity->getCanvasSettings(),
 ]);
+
 ?>
 

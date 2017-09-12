@@ -46,7 +46,6 @@ $preview = trim($view->render('MauticCampaignBundle:Campaign:preview.html.php', 
     'canvasSettings'  => $campaign->getCanvasSettings(),
 ]));
 
-
 $decisions  = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['decision']]));
 $actions    = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['action']]));
 $conditions = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['condition']]));
@@ -199,7 +198,7 @@ switch (true) {
         <div class="tab-content pa-md">
             <!-- #events-container -->
             <div class="<?php if ('preview' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="preview-container">
-                <?php echo $preview; ?>
+               <?php echo $preview; ?>
             </div>
             <?php if ($decisions): ?>
                 <div class="<?php if ('decision' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="decisions-container">

@@ -679,6 +679,13 @@ class CampaignController extends AbstractStandardFormController
                     ['campaign_id' => $objectId]
                 );
 
+                $session = $this->get('session');
+
+                $campaignSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.current', []);
+
+                $this->prepareCampaignSourcesForEdit($objectId, $campaignSources, true);
+                $this->prepareCampaignEventsForEdit($entity, $objectId, true);
+
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
@@ -688,8 +695,8 @@ class CampaignController extends AbstractStandardFormController
                         'eventSettings'     => $this->getCampaignModel()->getEvents(),
                         'sources'           => $this->getCampaignModel()->getLeadSources($entity),
                         'dateRangeForm'     => $dateRangeForm->createView(),
-                        'campaignEvents'    => $this->campaignEvents,
                         'campaignSources'   => $this->campaignSources,
+                        'campaignEvents'    => $events,
                         'campaignLeads'     => $this->forward(
                             'MauticCampaignBundle:Campaign:contacts',
                             [
@@ -701,6 +708,7 @@ class CampaignController extends AbstractStandardFormController
                     ]
                 );
                 break;
+
             case 'new':
             case 'edit':
                 $args['viewParameters'] = array_merge(
@@ -781,7 +789,7 @@ class CampaignController extends AbstractStandardFormController
             $campaignEvents[$id] = $event;
         }
 
-        $this->modifiedEvents = $this->campaignEvents = $campaignEvents;
+        $this->modifiedEvents = $this->campaignEvents = $campaignEvents; 
 
         $this->get('session')->set('mautic.campaign.'.$objectId.'.events.modified', $campaignEvents);
     }
@@ -811,6 +819,7 @@ class CampaignController extends AbstractStandardFormController
             $session->set('mautic.campaign.'.$objectId.'.leadsources.current', $campaignSources);
             $session->set('mautic.campaign.'.$objectId.'.leadsources.modified', $campaignSources);
         }
+
     }
 
     /**

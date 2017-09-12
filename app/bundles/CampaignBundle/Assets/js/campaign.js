@@ -380,7 +380,9 @@ Mautic.campaignBuilderUpdateLabel = function (domEventId) {
  */
 Mautic.launchCampaignEditor = function() {
     Mautic.stopIconSpinPostEvent();
-    mQuery('body').css('overflow-y', 'hidden');
+    if (!(mQuery('.preview').length)) {
+        mQuery('body').css('overflow-y', 'hidden');
+    }
 
     mQuery('.builder').addClass('builder-active').removeClass('hide');
 
@@ -734,6 +736,10 @@ Mautic.prepareCampaignCanvas = function() {
             document.querySelectorAll("#CampaignCanvas .draggable"),
             Mautic.campaignDragOptions
         );
+
+        if (mQuery('.preview').length) {
+            Mautic.launchCampaignEditor();
+        }
     }
 };
 
@@ -1218,6 +1224,7 @@ Mautic.campaignBuilderRegisterEndpoint = function (name, params) {
  */
 Mautic.campaignBuilderRegisterAnchors = function(names, el) {
     var id = mQuery(el).attr('id');
+    console.log(id);
 
     mQuery(names).each(function(key, anchorName) {
         var theAnchor = Mautic.campaignEndpointDefinitions[anchorName]['anchors'];

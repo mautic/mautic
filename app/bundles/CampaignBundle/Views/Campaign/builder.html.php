@@ -67,8 +67,6 @@
     ]
 );
 
-print_r($campaignSources);
-
 ?>
 <script>
     <?php if (!empty($canvasSettings)): ?>
