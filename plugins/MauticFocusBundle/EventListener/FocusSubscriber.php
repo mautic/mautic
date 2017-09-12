@@ -197,10 +197,13 @@ class FocusSubscriber extends CommonSubscriber
 
         if ($content) {
             $tokens = array_merge(
-                ($lead) ? TokenHelper::findLeadTokens($content, $lead->getProfileFields()) : [],
                 $this->pageTokenHelper->findPageTokens($content, $clickthrough),
                 $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
             );
+
+            if ($lead && $lead->getId()) {
+                $tokens = array_merge($tokens, TokenHelper::findLeadTokens($content, $lead->getProfileFields()));
+            }
 
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
                 $content,
