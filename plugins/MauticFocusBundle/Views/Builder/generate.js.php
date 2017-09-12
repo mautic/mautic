@@ -450,9 +450,10 @@ switch ($style) {
                 Focus.iframeDoc.write("<?php echo $content; ?>");
                 Focus.iframeDoc.close();
 
+                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
+
                 Focus.iframe.onload = function() {
                     // Resize iframe
-                    var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
                     if (Focus.enableIframeResizer()) {
                         // Give iframe chance to resize
                         setTimeout(function () {
