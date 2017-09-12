@@ -504,8 +504,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $company = new Company();
 
-        $company->setName('MyCompanyNmae');
-        $company->setId(1);
+        $company->setName('MyCompanyName');
 
         $sf->expects($this->any())
             ->method('makeRequest')
@@ -532,7 +531,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $result = $sf->pushCompany($company);
 
-        $this->asserTrue($result);
+        $this->assertTrue($result);
     }
 
     public function testExportingContactActivity()
