@@ -248,10 +248,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
             $method = 'get' . ucfirst($mauticField);
 
             if (is_null($customFieldToUpdate)) {
+                $this->logger->debug('INES: Will create custom field', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
+
                 switch ($objectType) {
                     case self::COMPANY:
-                        $this->logger->debug('INES: Will create client custom field', compact('customFieldDefinitionRef', 'mauticObject', 'config'));
-
                         $mappedData = (object) [
                             'clRef' => $inesRef,
                             'chdefRef' => $customFieldDefinitionRef,
@@ -264,8 +264,6 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     break;
 
                     case self::LEAD:
-                        $this->logger->debug('INES: Will create contact custom field', compact('customFieldDefinitionRef', 'mauticObject', 'config'));
-
                         $mappedData = (object) [
                             'ctRef' => $inesRef,
                             'chdefRef' => $customFieldDefinitionRef,
@@ -280,34 +278,38 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     default: throw new TypeError('Invalid object type');
                 }
             } else {
-                switch ($objectType) {
-                    case self::COMPANY:
-                        $this->logger->debug('INES: Will update client custom field', compact('customFieldDefinitionRef', 'mauticObject', 'config'));
+                $this->logger->debug('INES: Will update custom field', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
 
-                        $mappedData = (object) [
-                            'clRef' => $inesRef,
-                            'chdefRef' => $customFieldDefinitionRef,
-                            'chpRef' => $customFieldToUpdate->Ref,
-                            'chpValue' => $mauticObject->$method(),
-                        ];
+                if ((string) $mauticObject->$method() === (string) $customFieldToUpdate->Value) {
+                    $this->logger->debug('INES: No need to request update since values already equal', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
+                } else {
+                    $this->logger->debug('INES: Requesting update since values differ', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
 
-                        $apiHelper->updateClientCustomField($mappedData);
-                    break;
+                    switch ($objectType) {
+                        case self::COMPANY:
+                            $mappedData = (object) [
+                                'clRef' => $inesRef,
+                                'chdefRef' => $customFieldDefinitionRef,
+                                'chpRef' => $customFieldToUpdate->Ref,
+                                'chpValue' => $mauticObject->$method(),
+                            ];
 
-                    case self::LEAD:
-                        $this->logger->debug('INES: Will update contact custom field', compact('customFieldDefinitionRef', 'mauticObject', 'config'));
+                            $apiHelper->updateClientCustomField($mappedData);
+                        break;
 
-                        $mappedData = (object) [
-                            'ctRef' => $inesRef,
-                            'chdefRef' => $customFieldDefinitionRef,
-                            'chpRef' => $customFieldToUpdate->Ref,
-                            'chpValue' => $mauticObject->$method(),
-                        ];
+                        case self::LEAD:
+                            $mappedData = (object) [
+                                'ctRef' => $inesRef,
+                                'chdefRef' => $customFieldDefinitionRef,
+                                'chpRef' => $customFieldToUpdate->Ref,
+                                'chpValue' => $mauticObject->$method(),
+                            ];
 
-                        $apiHelper->updateContactCustomField($mappedData);
-                    break;
+                            $apiHelper->updateContactCustomField($mappedData);
+                        break;
 
-                    default: throw new TypeError('Invalid object type');
+                        default: throw new TypeError('Invalid object type');
+                    }
                 }
             }
         }
