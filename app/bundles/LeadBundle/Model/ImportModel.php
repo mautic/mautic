@@ -109,20 +109,14 @@ class ImportModel extends FormModel
     /**
      * Compares current number of imports in progress with the limit from the configuration.
      *
-     * @param Import $import
-     *
      * @return bool
      */
-    public function checkParallelImportLimit(Import $import)
+    public function checkParallelImportLimit()
     {
         $parallelImportLimit = $this->getParallelImportLimit();
-        $importsInProgress   = $this->getRepository()->countImportsWithStatuses([Import::IN_PROGRESS]);
+        $importsInProgress   = $this->getRepository()->countImportsInProgress();
 
-        if ($importsInProgress >= $parallelImportLimit) {
-            return false;
-        }
-
-        return true;
+        return !($importsInProgress >= $parallelImportLimit);
     }
 
     /**

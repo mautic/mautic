@@ -85,6 +85,14 @@ class ImportRepository extends CommonRepository
         return 0;
     }
 
+    /**
+     * @return int
+     */
+    public function countImportsInProgress()
+    {
+        return $this->countImportsWithStatuses([Import::IN_PROGRESS]);
+    }
+
     public function getQueryForStatuses($statuses)
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
