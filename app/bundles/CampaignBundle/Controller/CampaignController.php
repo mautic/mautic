@@ -681,7 +681,7 @@ class CampaignController extends AbstractStandardFormController
 
                 $session = $this->get('session');
 
-                $campaignSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.current', []);
+                $campaignSources = $this->getCampaignModel()->getSourceLists();
 
                 $this->prepareCampaignSourcesForEdit($objectId, $campaignSources, true);
                 $this->prepareCampaignEventsForEdit($entity, $objectId, true);
