@@ -34,8 +34,6 @@ $view['slots']->set(
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $campaign])
 );
 
-$session = $this->get('session');
-
 $campaignId = $campaign->getId();
 
 $preview = trim($view->render('MauticCampaignBundle:Campaign:preview.html.php', [
@@ -197,9 +195,11 @@ switch (true) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #events-container -->
-            <div class="<?php if ('preview' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="preview-container">
-               <?php echo $preview; ?>
-            </div>
+            <?php if ($preview): ?>
+                <div class="<?php if ('preview' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="preview-container">
+                   <?php echo $preview; ?>
+                </div>
+            <?php endif; ?>
             <?php if ($decisions): ?>
                 <div class="<?php if ('decision' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="decisions-container">
                     <?php echo $decisions; ?>
