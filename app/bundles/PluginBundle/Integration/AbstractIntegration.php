@@ -2681,6 +2681,12 @@ abstract class AbstractIntegration
         return $fields;
     }
 
+    /**
+     * @param $leadId
+     * @param string $channel
+     *
+     * @return int
+     */
     public function getLeadDonotContact($leadId, $channel = 'email')
     {
         $isContactable = 0;
@@ -2695,6 +2701,11 @@ abstract class AbstractIntegration
         return $isContactable;
     }
 
+    /**
+     * @param $lead
+     *
+     * @return mixed
+     */
     public function getCompoundMauticFields($lead)
     {
         if ($lead['internal_entity_id']) {
@@ -2705,6 +2716,11 @@ abstract class AbstractIntegration
         return $lead;
     }
 
+    /**
+     * @param $fieldName
+     *
+     * @return bool
+     */
     public function isCompoundMauticField($fieldName)
     {
         $compoundFields = [
@@ -2712,10 +2728,6 @@ abstract class AbstractIntegration
             'mauticContactIsContactableByEmail' => 'mauticContactIsContactableByEmail',
         ];
 
-        if (isset($compoundFields[$fieldName])) {
-            return true;
-        }
-
-        return false;
+        return isset($compoundFields[$fieldName]);
     }
 }
