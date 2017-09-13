@@ -205,11 +205,11 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 if ($shouldUpdateContact) {
                     $apiHelper->updateContact($inesContact);
                 }
-
-                $this->pushClientCustomFields($config, $inesClientRef, $company);
-                $this->pushContactCustomFields($config, $inesContactRef, $lead);
             }
         }
+
+        $this->pushClientCustomFields($config, $inesClientRef, $company);
+        $this->pushContactCustomFields($config, $inesContactRef, $lead);
     }
 
     private function pushCustomFields($objectType, $config, $inesRef, $mauticObject) {
