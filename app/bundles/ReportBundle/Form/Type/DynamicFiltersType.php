@@ -68,7 +68,7 @@ class DynamicFiltersType extends AbstractType
                         $type           = 'datetime';
                         $args['input']  = 'string';
                         $args['widget'] = 'single_text';
-                        $args['format'] = 'y-M-d H:i:s';
+                        $args['format'] = 'y-MM-dd H:m:s';
                         $args['attr']['class'] .= ' datetimepicker';
                         break;
                     case 'multiselect':
