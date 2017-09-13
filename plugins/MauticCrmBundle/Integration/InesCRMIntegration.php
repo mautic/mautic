@@ -112,8 +112,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $mappedData->client->AutomationRef = $company->getId();
                 $mappedData->client->Contacts->ContactInfoAuto[0]->AutomationRef = $lead->getId();
 
-                $this->mapCompanyToInesClient($config, $company, $mappedData->client);
-                $this->mapLeadToInesContact($config, $lead, $mappedData->client->Contacts->ContactInfoAuto[0]);
+                self::mapCompanyToInesClient($config, $company, $mappedData->client);
+                self::mapLeadToInesContact($config, $lead, $mappedData->client->Contacts->ContactInfoAuto[0]);
 
                 $mappedData->client->InternalRef = 0;
                 $mappedData->client->Contacts->ContactInfoAuto[0]->InternalRef = 0;
@@ -136,7 +136,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     'client' => $this->getClientTemplate(),
                 ];
 
-                $this->mapCompanyToInesClient($config, $company, $mappedData->client);
+                self::mapCompanyToInesClient($config, $company, $mappedData->client);
                 $mappedData->client->InternalRef = 0;
 
                 $response = $apiHelper->createClient($mappedData);
@@ -148,7 +148,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $inesContact = $apiHelper->getContact($inesContactRef)->GetContactResult;
 
                 // TODO: Figure out how to transfer a contact from a client to another
-                $shouldUpdateContact = $this->mapLeadUpdatesToInesContact($config, $lead, $inesContact);
+                $shouldUpdateContact = self::mapLeadUpdatesToInesContact($config, $lead, $inesContact);
 
                 if ($shouldUpdateContact) {
                     $response = $apiHelper->updateContact($inesContact);
@@ -168,7 +168,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     // TODO: add unsubscribe status
                 ];
 
-                $this->mapLeadToInesContact($config, $lead, $mappedData->contact);
+                self::mapLeadToInesContact($config, $lead, $mappedData->contact);
 
                 $mappedData->contact->InternalRef = 0;
 
@@ -180,7 +180,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
 
-                $shouldUpdateClient = $this->mapCompanyUpdatesToInesClient($config, $company, $inesClient);
+                $shouldUpdateClient = self::mapCompanyUpdatesToInesClient($config, $company, $inesClient);
 
                 if ($shouldUpdateClient) {
                     $response = $apiHelper->updateClient($inesClient);
@@ -191,8 +191,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
                 $inesContact = $apiHelper->getContact($inesContactRef)->GetContactResult;
 
-                $shouldUpdateClient = $this->mapCompanyUpdatesToInesClient($config, $company, $inesClient);
-                $shouldUpdateContact = $this->mapLeadUpdatesToInesContact($config, $lead, $inesContact);
+                $shouldUpdateClient = self::mapCompanyUpdatesToInesClient($config, $company, $inesClient);
+                $shouldUpdateContact = self::mapLeadUpdatesToInesContact($config, $lead, $inesContact);
 
                 if ($shouldUpdateClient) {
                     $apiHelper->updateClient($inesClient);
@@ -434,7 +434,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function mapFieldsFromMauticToInes($fields, $mauticObject, $inesObject) {
+    private static function mapFieldsFromMauticToInes($fields, $mauticObject, $inesObject) {
         foreach ($fields as $inesField => $mauticField) {
             if (substr($inesField, 0, 12) !== self::INES_CUSTOM_FIELD_PREFIX) { // FIXME: There's probably a better way to do this...
                 $method = 'get' . ucfirst($mauticField);
@@ -443,7 +443,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function mapFieldUpdatesFromMauticToInes($fields, $mauticObject, $inesObject) {
+    private static function mapFieldUpdatesFromMauticToInes($fields, $mauticObject, $inesObject) {
         $shouldUpdate = false;
 
         foreach ($fields as $inesField => $mauticField) {
@@ -459,28 +459,28 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $shouldUpdate;
     }
 
-    private function mapCompanyToInesClient($config, $company, $inesClient) {
+    private static function mapCompanyToInesClient($config, $company, $inesClient) {
         $companyFields = $config['companyFields'];
 
-        $this->mapFieldsFromMauticToInes($companyFields, $company, $inesClient);
+        self::mapFieldsFromMauticToInes($companyFields, $company, $inesClient);
     }
 
-    private function mapLeadToInesContact($config, $lead, $inesContact) {
+    private static function mapLeadToInesContact($config, $lead, $inesContact) {
         $leadFields = $config['leadFields'];
 
-        $this->mapFieldsFromMauticToInes($leadFields, $lead, $inesContact);
+        self::mapFieldsFromMauticToInes($leadFields, $lead, $inesContact);
     }
 
-    private function mapCompanyUpdatesToInesClient($config, $company, $inesClient) {
+    private static function mapCompanyUpdatesToInesClient($config, $company, $inesClient) {
         $companyFields = $config['companyFields'];
 
-        return $this->mapFieldUpdatesFromMauticToInes($companyFields, $company, $inesClient);
+        return self::mapFieldUpdatesFromMauticToInes($companyFields, $company, $inesClient);
     }
 
-    private function mapLeadUpdatesToInesContact($config, $lead, $inesContact) {
+    private static function mapLeadUpdatesToInesContact($config, $lead, $inesContact) {
         $leadFields = $config['leadFields'];
 
-        return $this->mapFieldUpdatesFromMauticToInes($leadFields, $lead, $inesContact);
+        return self::mapFieldUpdatesFromMauticToInes($leadFields, $lead, $inesContact);
     }
 
     private function getClientTemplate()
