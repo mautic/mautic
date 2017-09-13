@@ -190,7 +190,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('checkParallelImportLimit')
             ->will($this->returnValue(true));
 
-        $model->expects($this->once())
+        $model->expects($this->exactly(2))
             ->method('logDebug');
 
         $model->expects($this->once())
