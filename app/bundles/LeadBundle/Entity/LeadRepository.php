@@ -903,7 +903,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $variantIds = $email->getRelatedEntityIds();
                 $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
                 if ($nq instanceof QueryBuilder) {
-                    $expr = $nq->getQueryPart('where');
+                    $nq->select('l.id'); // select only id
+                    $nsql = $nq->getSQL();
+                    foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
+                        $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+                    }
+                    $expr = $q->expr()->$inExpr('l.id', sprintf('(%s)', $nsql));
                 } else {
                     $this->applySearchQueryRelationship(
                         $q,
@@ -923,7 +928,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $filter->strict  = 1;
                 $returnParameter = true;
                 break;
-            default:
+            default :
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
                 }
