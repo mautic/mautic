@@ -2702,6 +2702,8 @@ abstract class AbstractIntegration
     }
 
     /**
+     * Get pseudo fields from mautic, these are lead properties we want to map to integration fields.
+     *
      * @param $lead
      *
      * @return mixed
