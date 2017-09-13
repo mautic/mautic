@@ -235,12 +235,15 @@ class ImportModel extends FormModel
                 return false;
             }
         } catch (ORMException $e) {
-            // The EntityManager is probably closed. Let's delay for re-trial.
+            // The EntityManager is probably closed. The entity cannot be saved.
             $info = $this->translator->trans(
                 'mautic.lead.import.database.exception',
                 ['%message%' => $e->getMessage()]
             );
+
             $import->setStatus($import::DELAYED)->setStatusInfo($info);
+
+            $this->logDebug('Database had been overloaded', $import);
 
             return false;
         }
