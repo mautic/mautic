@@ -790,7 +790,6 @@ class CampaignController extends AbstractStandardFormController
         }
 
         $this->modifiedEvents = $this->campaignEvents = $campaignEvents; 
-
         $this->get('session')->set('mautic.campaign.'.$objectId.'.events.modified', $campaignEvents);
     }
 
