@@ -52,6 +52,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -2812,6 +2813,14 @@ class LeadModel extends FormModel
         }
 
         return $success;
+    }
+
+    public function updateLeadOwner(Lead $lead, $ownerId)
+    {
+        $owner = $this->em->getReference(User::class, $ownerId);
+        $lead->setOwner($owner);
+
+        parent::saveEntity($lead);
     }
 
     /**
