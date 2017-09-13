@@ -62,6 +62,8 @@ class FocusModel extends FormModel
      * @param \Mautic\FormBundle\Model\FormModel $formModel
      * @param TrackableModel                     $trackableModel
      * @param TemplatingHelper                   $templating
+     * @param EventDispatcherInterface           $dispatcher
+     * @param LeadModel                          $leadModel
      */
     public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel)
     {
@@ -165,43 +167,76 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Obtains the cached JS of a form and generates it if missing.
-     *
      * @param Focus $focus
+     * @param bool  $preview
      *
      * @return string
      */
-    public function getContent(Focus $focus)
+    public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
     {
-        $cached = $focus->getCache();
-        if (empty($cached)) {
-            $cached = $this->generateJavascript($focus);
-            $focus->setCache($cached);
-            $this->saveEntity($focus);
+        // If cached is not an array, rebuild to support the new format
+        $cached = json_decode($focus->getCache(), true);
+        if ($isPreview || $byPassCache || empty($cached)) {
+            $focusArray = $focus->toArray();
+
+            $url = '';
+            if ($focusArray['type'] == 'link') {
+                $trackable = $this->trackableModel->getTrackableByUrl(
+                    $focusArray['properties']['content']['link_url'],
+                    'focus',
+                    $focusArray['id']
+                );
+
+                $url = $this->trackableModel->generateTrackableUrl(
+                    $trackable,
+                    ['channel' => ['focus', $focusArray['id']]],
+                    false,
+                    $focus->getUtmTags()
+                );
+            }
+
+            $javascript = $this->templating->getTemplating()->render(
+                'MauticFocusBundle:Builder:generate.js.php',
+                [
+                    'focus'    => $focusArray,
+                    'preview'  => $isPreview,
+                    'clickUrl' => $url,
+                ]
+            );
+
+            $content = $this->getContent($focusArray, $isPreview);
+            $cached  = [
+                'js'    => \Minify_HTML::minify($javascript),
+                'focus' => \Minify_HTML::minify($content['focus']),
+                'form'  => \Minify_HTML::minify($content['form']),
+            ];
+
+            if (!$byPassCache) {
+                $focus->setCache(json_encode($cached));
+                $this->saveEntity($focus);
+            }
         }
 
         // Replace tokens to ensure clickthroughs, lead tokens etc are appropriate
         $lead       = $this->leadModel->getCurrentLead();
-        $tokenEvent = new TokenReplacementEvent($cached, $lead, ['focus_id' => $focus->getId()]);
+        $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
         $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
+        $focusContent = $tokenEvent->getContent();
+        $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent);
+        $focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.php')->escape($focusContent, 'js');
 
-        return $tokenEvent->getContent();
+        return str_replace('{focus_content}', $focusContent, $cached['js']);
     }
 
     /**
-     * @param      $focus
-     * @param bool $preview
-     * @param bool $ignoreMinify
+     * @param array $focus
+     * @param bool  $byPassCache
+     * @param bool  $isPreview
      *
-     * @return string
+     * @return array
      */
-    public function generateJavascript($focus, $preview = false, $ignoreMinify = false)
+    public function getContent(array $focus, $isPreview = false)
     {
-        $focusModel = $focus;
-        if ($focus instanceof Focus) {
-            $focus = $focus->toArray();
-        }
-
         $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
 
         if (isset($focus['html_mode'])) {
@@ -212,55 +247,34 @@ class FocusModel extends FormModel
             $htmlMode = 'basic';
         }
 
-        if ($preview) {
-            $content = [
-                'style' => '',
-                'html'  => $this->templating->getTemplating()->render(
-                    'MauticFocusBundle:Builder:content.html.php',
-                    [
-                        'focus'    => $focus,
-                        'form'     => $form,
-                        'preview'  => $preview,
-                        'htmlMode' => $htmlMode,
-                    ]
-                ),
+        $content = $this->templating->getTemplating()->render(
+            'MauticFocusBundle:Builder:content.html.php',
+            [
+                'focus'    => $focus,
+                'preview'  => $isPreview,
+                'htmlMode' => $htmlMode,
+            ]
+        );
+
+        // Form has to be generated outside of the content or else the form src will be converted to clickables
+        $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
+            'MauticFocusBundle:Builder:form.html.php',
+            [
+                'form'    => $form,
+                'style'   => $focus['style'],
+                'focusId' => $focus['id'],
+                'preview' => $isPreview,
+            ]
+        ) : '';
+
+        return ($isPreview)
+            ?
+            str_replace('{focus_form}', $formContent, $content)
+            :
+            [
+                'focus' => $content,
+                'form'  => $formContent,
             ];
-        } else {
-            // Generate link if applicable
-            $url = '';
-            if ($focus['type'] == 'link') {
-                $trackable = $this->trackableModel->getTrackableByUrl(
-                    $focus['properties']['content']['link_url'],
-                    'focus',
-                    $focus['id']
-                );
-
-                $url = $this->trackableModel->generateTrackableUrl(
-                    $trackable,
-                    ['channel' => ['focus', $focus['id']]],
-                    false,
-                    $focusModel->getUtmTags()
-                );
-            }
-
-            $content = $this->templating->getTemplating()->render(
-                'MauticFocusBundle:Builder:generate.js.php',
-                [
-                    'focus'        => $focus,
-                    'form'         => $form,
-                    'preview'      => $preview,
-                    'ignoreMinify' => $ignoreMinify,
-                    'clickUrl'     => $url,
-                    'htmlMode'     => $htmlMode,
-                ]
-            );
-
-            if (!$ignoreMinify) {
-                $content = \JSMin::minify($content);
-            }
-        }
-
-        return $content;
     }
 
     /**

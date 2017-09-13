@@ -8,19 +8,10 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$props       = $focus['properties'];
-$style       = $focus['style'];
-$placement   = (isset($props[$style]['placement'])) ? str_replace('_', '-', $props[$style]['placement']) : false;
-$animate     = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
-$formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.html.php',
-    [
-        'form'    => $form,
-        'style'   => $focus['style'],
-        'focusId' => $focus['id'],
-        'preview' => $preview,
-    ]
-) : '';
-
+$props     = $focus['properties'];
+$style     = $focus['style'];
+$placement = (isset($props[$style]['placement'])) ? str_replace('_', '-', $props[$style]['placement']) : false;
+$animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 ?>
     <style scoped>
         .mf-<?php echo $style; ?> {
@@ -36,7 +27,7 @@ $formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.h
             </div>
             <div class="mf-content">
                 <?php if (in_array($htmlMode, ['editor', 'html'])): ?>
-                    <?php echo str_replace('{focus_form}', $formContent, html_entity_decode($focus[$htmlMode])); ?>
+                    <?php echo html_entity_decode($focus[$htmlMode]); ?>
                 <?php else: ?>
                 <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
                 <?php if ($props['content']['tagline']): ?>
@@ -44,7 +35,7 @@ $formContent = (!empty($form)) ? $view->render('MauticFocusBundle:Builder:form.h
                 <?php endif; ?>
                 <div class="mf-inner-container">
                     <?php if ($focus['type'] == 'form' && !empty($form)): ?>
-                        <?php echo $formContent; ?>
+                        {focus_form}
                     <?php elseif ($focus['type'] == 'link'): ?>
                         <a href="<?php echo (empty($preview)) ? $clickUrl
                             : '#'; ?>" class="mf-link" target="<?php echo ($props['content']['link_new_window']) ? '_new' : '_parent'; ?>">

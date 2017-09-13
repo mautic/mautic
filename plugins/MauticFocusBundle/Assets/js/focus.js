@@ -450,7 +450,6 @@ Mautic.focusUpdatePreview = function () {
                 e.stopPropagation();
             });
         }
-
     });
 };
 

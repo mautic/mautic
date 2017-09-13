@@ -429,25 +429,7 @@ switch ($style) {
 
                 // Inject content into iframe
                 Focus.iframeDoc.open();
-                <?php
-                $content = $view->render(
-                    'MauticFocusBundle:Builder:content.html.php',
-                    [
-                        'focus'    => $focus,
-                        'form'     => $form,
-                        'clickUrl' => $clickUrl,
-                        'htmlMode' => $htmlMode,
-                    ]
-                );
-
-                if (empty($ignoreMinify)) {
-                    $content = \Minify_HTML::minify($content);
-                }
-
-                $content = $view->escape($content, 'js');
-                ?>
-
-                Focus.iframeDoc.write("<?php echo $content; ?>");
+                Focus.iframeDoc.write("{focus_content}");
                 Focus.iframeDoc.close();
 
                 var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
