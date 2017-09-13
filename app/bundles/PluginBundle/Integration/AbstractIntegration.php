@@ -2700,7 +2700,7 @@ abstract class AbstractIntegration
      *
      * @return int
      */
-    public function getLeadDonotContact($leadId, $channel = 'email')
+    public function getLeadDonotContact($leadId, $channel = 'email',  $sfObject = 'Lead', $sfIds = [])
     {
         $isContactable = 1;
         $lead          = $this->leadModel->getEntity($leadId);
@@ -2721,7 +2721,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function getCompoundMauticFields($lead)
+    public function getCompoundMauticFields($lead, $sfObject = 'Lead')
     {
         if ($lead['internal_entity_id']) {
             $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);

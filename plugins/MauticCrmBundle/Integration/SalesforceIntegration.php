@@ -1663,7 +1663,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($toUpdate as $lead) {
             if (!empty($lead['email'])) {
-                $lead                                               = $this->getCompoundMauticFields($lead);
+                $lead                                               = $this->getCompoundMauticFields($lead, $sfObject);
                 $key                                                = $this->getSyncKey($lead['email']);
                 $trackedContacts[$lead['integration_entity']][$key] = $lead['id'];
 
@@ -1727,7 +1727,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $error = false;
 
         foreach ($leadsToCreate as $lead) {
-            $lead = $this->getCompoundMauticFields($lead);
+            $lead = $this->getCompoundMauticFields($lead, 'Lead');
 
             if (isset($lead['email'])) {
                 $this->setContactToSync($checkEmailsInSF, $lead);
@@ -3128,19 +3128,42 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $companyField;
     }
 
-    public function getLeadDonotContact($leadId, $channel = 'email')
+    public function getLeadDonotContact($leadId, $channel = 'email', $sfObject = 'Lead', $sfIds = [])
     {
         $isContactable = 0;
 
+        if (!empty($sfIds)) {
+            $fieldString = "'".implode("','", $sfIds)."'";
+        }
         //get last modified date for donot contact
+        $historySelect = 'Select Field, LeadId, CreatedDate, isDeleted from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$fieldString.')';
+
+        $queryUrl  = $this->getQueryUrl();
+        $historySF = $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
+
         $lead = $this->leadModel->getEntity($leadId);
         if ($lead) {
-            $isContactableReason = $this->leadModel->isContactable($lead, $channel);
-            if ($isContactableReason === 0) {
-                $isContactable = 1;
-            }
+            /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+            $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+
+            /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
+            $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
         }
 
         return $isContactable;
+    }
+
+    public function getCompoundMauticFields($lead, $sfObject = 'Lead')
+    {
+        $sfId = [];
+        if ($lead['internal_entity_id']) {
+            $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
+            if ($lead['integration_entity_id']) {
+                $sfId = [$lead['integration_entity_id']];
+            }
+            $lead['mauticContactIsContactableByEmail'] = $this->getLeadDonotContact($lead['internal_entity_id'], 'email', $sfObject, $sfId);
+        }
+
+        return $lead;
     }
 }
