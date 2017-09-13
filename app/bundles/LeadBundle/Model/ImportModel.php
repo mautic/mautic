@@ -209,7 +209,7 @@ class ImportModel extends FormModel
             return false;
         }
 
-        if (!$this->checkParallelImportLimit($import)) {
+        if (!$this->checkParallelImportLimit()) {
             $info = $this->translator->trans(
                 'mautic.lead.import.parallel.limit.hit',
                 ['%limit%' => $this->getParallelImportLimit()]
