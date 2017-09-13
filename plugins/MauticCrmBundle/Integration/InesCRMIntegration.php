@@ -7,6 +7,9 @@ use Mautic\LeadBundle\Entity\Company;
 
 class InesCRMIntegration extends CrmAbstractIntegration
 {
+    const COMPANY = 'company';
+    const LEAD = 'lead';
+
     const INES_CUSTOM_FIELD_PREFIX = 'ines_custom_';
 
     private $defaultContactFields;
@@ -209,20 +212,33 @@ class InesCRMIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function pushClientCustomFields($config, $inesClientRef, $company) {
+    private function pushCustomFields($objectType, $config, $inesRef, $mauticObject) {
         $apiHelper = $this->getApiHelper();
-        $inesClientCustomFields = $apiHelper->getClientCustomFields($inesClientRef);
 
-        $mappedClientCustomFields = array_filter($config['companyFields'], function ($mauticField, $integrationField) {
+        switch ($objectType) {
+            case self::COMPANY:
+                $inesCustomFields = $apiHelper->getClientCustomFields($inesRef)->GetCompanyCFResult->Values->CustomField;
+                $fieldMappings = $config['companyFields'];
+            break;
+
+            case self::LEAD:
+                $inesCustomFields = $apiHelper->getContactCustomFields($inesRef)->GetContactCFResult->Values->CustomField;
+                $fieldMappings = $config['leadFields'];
+            break;
+
+            default: throw new TypeError('Invalid object type');
+        }
+
+        $customFieldMappings = array_filter($fieldMappings, function ($mauticField, $integrationField) {
             return strpos($integrationField, self::INES_CUSTOM_FIELD_PREFIX) === 0;
         }, ARRAY_FILTER_USE_BOTH);
 
-        foreach ($mappedClientCustomFields as $integrationField => $mauticField) {
+        foreach ($customFieldMappings as $integrationField => $mauticField) {
             $customFieldDefinitionRef = (int) substr($integrationField, strlen(self::INES_CUSTOM_FIELD_PREFIX));
 
             $customFieldToUpdate = null;
 
-            foreach ($inesClientCustomFields->GetCompanyCFResult->Values->CustomField as $inesCustomField) {
+            foreach ($inesCustomFields as $inesCustomField) {
                 if ($inesCustomField->DefinitionRef === $customFieldDefinitionRef) {
                     $customFieldToUpdate = $inesCustomField;
                     break;
@@ -232,79 +248,77 @@ class InesCRMIntegration extends CrmAbstractIntegration
             $method = 'get' . ucfirst($mauticField);
 
             if (is_null($customFieldToUpdate)) {
-                $this->logger->debug('INES: Will create client custom field', compact('customFieldDefinitionRef', 'company', 'config'));
+                switch ($objectType) {
+                    case self::COMPANY:
+                        $this->logger->debug('INES: Will create client custom field', compact('customFieldDefinitionRef', 'mauticObject', 'config'));
 
-                $mappedData = (object) [
-                    'clRef' => $inesClientRef,
-                    'chdefRef' => $customFieldDefinitionRef,
-                    'chpValue' => $company->$method(),
-                    'chvLies' => 0,
-                    'chvGroupeAssoc' => 0,
-                ];
+                        $mappedData = (object) [
+                            'clRef' => $inesRef,
+                            'chdefRef' => $customFieldDefinitionRef,
+                            'chpValue' => $mauticObject->$method(),
+                            'chvLies' => 0,
+                            'chvGroupeAssoc' => 0,
+                        ];
 
-                $apiHelper->createClientCustomField($mappedData);
+                        $apiHelper->createClientCustomField($mappedData);
+                    break;
+
+                    case self::LEAD:
+                        $this->logger->debug('INES: Will create contact custom field', compact('customFieldDefinitionRef', 'mauticObject', 'config'));
+
+                        $mappedData = (object) [
+                            'ctRef' => $inesRef,
+                            'chdefRef' => $customFieldDefinitionRef,
+                            'chpValue' => $mauticObject->$method(),
+                            'chvLies' => 0,
+                            'chvGroupeAssoc' => 0,
+                        ];
+
+                        $apiHelper->createContactCustomField($mappedData);
+                    break;
+
+                    default: throw new TypeError('Invalid object type');
+                }
             } else {
-                $this->logger->debug('INES: Will update client custom field', compact('customFieldDefinitionRef', 'company', 'config'));
+                switch ($objectType) {
+                    case self::COMPANY:
+                        $this->logger->debug('INES: Will update client custom field', compact('customFieldDefinitionRef', 'mauticObject', 'config'));
 
-                $mappedData = (object) [
-                    'clRef' => $inesClientRef,
-                    'chdefRef' => $customFieldDefinitionRef,
-                    'chpRef' => $customFieldToUpdate->Ref,
-                    'chpValue' => $company->$method(),
-                ];
+                        $mappedData = (object) [
+                            'clRef' => $inesRef,
+                            'chdefRef' => $customFieldDefinitionRef,
+                            'chpRef' => $customFieldToUpdate->Ref,
+                            'chpValue' => $mauticObject->$method(),
+                        ];
 
-                $apiHelper->updateClientCustomField($mappedData);
+                        $apiHelper->updateClientCustomField($mappedData);
+                    break;
+
+                    case self::LEAD:
+                        $this->logger->debug('INES: Will update contact custom field', compact('customFieldDefinitionRef', 'mauticObject', 'config'));
+
+                        $mappedData = (object) [
+                            'ctRef' => $inesRef,
+                            'chdefRef' => $customFieldDefinitionRef,
+                            'chpRef' => $customFieldToUpdate->Ref,
+                            'chpValue' => $mauticObject->$method(),
+                        ];
+
+                        $apiHelper->updateContactCustomField($mappedData);
+                    break;
+
+                    default: throw new TypeError('Invalid object type');
+                }
             }
         }
     }
 
+    private function pushClientCustomFields($config, $inesClientRef, $company) {
+        $this->pushCustomFields(self::COMPANY, $config, $inesClientRef, $company);
+    }
+
     private function pushContactCustomFields($config, $inesContactRef, $lead) {
-        $apiHelper = $this->getApiHelper();
-        $inesContactCustomFields = $apiHelper->getContactCustomFields($inesContactRef);
-
-        $mappedContactCustomFields = array_filter($config['leadFields'], function ($mauticField, $integrationField) {
-            return strpos($integrationField, self::INES_CUSTOM_FIELD_PREFIX) === 0;
-        }, ARRAY_FILTER_USE_BOTH);
-
-        foreach ($mappedContactCustomFields as $integrationField => $mauticField) {
-            $customFieldDefinitionRef = (int) substr($integrationField, strlen(self::INES_CUSTOM_FIELD_PREFIX));
-
-            $customFieldToUpdate = null;
-
-            foreach ($inesContactCustomFields->GetContactCFResult->Values->CustomField as $inesCustomField) {
-                if ($inesCustomField->DefinitionRef === $customFieldDefinitionRef) {
-                    $customFieldToUpdate = $inesCustomField;
-                    break;
-                }
-            }
-
-            $method = 'get' . ucfirst($mauticField);
-
-            if (is_null($customFieldToUpdate)) {
-                $this->logger->debug('INES: Will create contact custom field', compact('customFieldDefinitionRef', 'lead', 'config'));
-
-                $mappedData = (object) [
-                    'ctRef' => $inesContactRef,
-                    'chdefRef' => $customFieldDefinitionRef,
-                    'chpValue' => $lead->$method(),
-                    'chvLies' => 0,
-                    'chvGroupeAssoc' => 0,
-                ];
-
-                $apiHelper->createContactCustomField($mappedData);
-            } else {
-                $this->logger->debug('INES: Will update contact custom field', compact('customFieldDefinitionRef', 'lead', 'config'));
-
-                $mappedData = (object) [
-                    'ctRef' => $inesContactRef,
-                    'chdefRef' => $customFieldDefinitionRef,
-                    'chpRef' => $customFieldToUpdate->Ref,
-                    'chpValue' => $lead->$method(),
-                ];
-
-                $apiHelper->updateContactCustomField($mappedData);
-            }
-        }
+        $this->pushCustomFields(self::LEAD, $config, $inesContactRef, $lead);
     }
 
     public function pushCompany($company, $config = []) {
