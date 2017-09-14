@@ -221,4 +221,11 @@ function getTotal($a, $f, $t, $allrows, $ac)
             validateOnBlur: false
         });
     });
+    mQuery(document).ready(function() {
+        mQuery('.datepicker').datetimepicker({
+            format:'Y-m-d',
+            closeOnDateSelect: true,
+            validateOnBlur: false
+        });
+    });
 </script>

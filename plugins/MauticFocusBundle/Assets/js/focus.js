@@ -203,7 +203,14 @@ Mautic.focusOnLoad = function () {
         });
 
         mQuery('#focus_editor').on('froalaEditor.contentChanged', function (e, editor) {
-            mQuery('.mf-content').html(editor.html.get());
+            var content = editor.html.get();
+
+            if (content.indexOf('{focus_form}') !== -1) {
+                Mautic.focusUpdatePreview();
+            } else {
+                mQuery('.mf-content').html(content);
+            }
+
         });
     } else {
         Mautic.initDateRangePicker();
@@ -443,7 +450,6 @@ Mautic.focusUpdatePreview = function () {
                 e.stopPropagation();
             });
         }
-
     });
 };
 

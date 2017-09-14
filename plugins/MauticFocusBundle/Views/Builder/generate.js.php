@@ -33,22 +33,23 @@ if (!isset($preview)) {
 if (!isset($clickUrl)) {
     $clickUrl = $props['content']['link_url'];
 }
-    $cssContent = $view->render(
-        'MauticFocusBundle:Builder:style.less.php',
-        [
-            'preview' => $preview,
-            'focus'   => $focus,
-        ]
-    );
-    $cssContent = $view->escape($cssContent, 'js');
 
-    $parentCssContent = $view->render(
-        'MauticFocusBundle:Builder:parent.less.php',
-        [
-            'preview' => $preview,
-        ]
-    );
-    $parentCssContent = $view->escape($parentCssContent, 'js');
+$cssContent = $view->render(
+    'MauticFocusBundle:Builder:style.less.php',
+    [
+        'preview' => $preview,
+        'focus'   => $focus,
+    ]
+);
+$cssContent = $view->escape($cssContent, 'js');
+
+$parentCssContent = $view->render(
+    'MauticFocusBundle:Builder:parent.less.php',
+    [
+        'preview' => $preview,
+    ]
+);
+$parentCssContent = $view->escape($parentCssContent, 'js');
 
 switch ($style) {
     case 'bar':
@@ -429,25 +430,31 @@ switch ($style) {
 
                 // Inject content into iframe
                 Focus.iframeDoc.open();
-                <?php
-                $content = $view->render(
-                    'MauticFocusBundle:Builder:content.html.php',
-                    [
-                        'focus'    => $focus,
-                        'form'     => $form,
-                        'clickUrl' => $clickUrl,
-                    ]
-                );
-
-                if (empty($ignoreMinify)) {
-                    $content = \Minify_HTML::minify($content);
-                }
-
-                $content = $view->escape($content, 'js');
-                ?>
-
-                Focus.iframeDoc.write("<?php echo $content; ?>");
+                Focus.iframeDoc.write("{focus_content}");
                 Focus.iframeDoc.close();
+
+                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
+
+                Focus.iframe.onload = function() {
+                    if (Focus.debug)
+                        console.log('iframe loaded for '+Focus.iframe.getAttribute('src'));
+
+                    // Resize iframe
+                    if (Focus.enableIframeResizer()) {
+                        // Give iframe chance to resize
+                        setTimeout(function () {
+                            if (animate) {
+                                Focus.addClass(Focus.iframe, "mf-animate");
+                            }
+                            Focus.addClass(Focus.iframe, "mf-loaded");
+                        }, 35);
+                    } else {
+                        if (animate) {
+                            Focus.addClass(Focus.iframe, "mf-animate");
+                        }
+                        Focus.addClass(Focus.iframe, "mf-loaded");
+                    }
+                }
 
                 // Set body margin to 0
                 Focus.iframeDoc.getElementsByTagName('body')[0].style.margin = 0;
@@ -456,6 +463,7 @@ switch ($style) {
                 var move = Focus.iframeDoc.getElementsByClassName('mf-move-to-parent');
                 for (var i = 0; i < move.length; i++) {
                     var bodyFirstChild = document.body.firstChild;
+                    Focus.addClass(move[i], 'mf-moved-<?php echo $focus['id']; ?>');
                     bodyFirstChild.parentNode.insertBefore(move[i], Focus.iframe);
                 }
 
@@ -464,6 +472,7 @@ switch ($style) {
                 for (var i = 0; i < copy.length; i++) {
                     var bodyFirstChild = document.body.firstChild;
                     var clone = copy[i].cloneNode(true);
+                    Focus.addClass(clone, 'mf-moved-<?php echo $focus['id']; ?>');
                     bodyFirstChild.parentNode.insertBefore(clone, Focus.iframe);
                 }
 
@@ -476,23 +485,6 @@ switch ($style) {
 
                 // Register events
                 Focus.registerClickEvents();
-
-                // Resize iframe
-                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
-                if (Focus.enableIframeResizer()) {
-                    // Give iframe chance to resize
-                    setTimeout(function () {
-                        if (animate) {
-                            Focus.addClass(Focus.iframe, "mf-animate");
-                        }
-                        Focus.addClass(Focus.iframe, "mf-loaded");
-                    }, 35);
-                } else {
-                    if (animate) {
-                        Focus.addClass(Focus.iframe, "mf-animate");
-                    }
-                    Focus.addClass(Focus.iframe, "mf-loaded");
-                }
 
                 <?php if ($props['when'] == 'leave'): ?>
                 // Ensure user can leave
@@ -524,36 +516,51 @@ switch ($style) {
 
             // Enable iframe resizer
             enableIframeResizer: function () {
+                if (typeof Focus.iframeResizerEnabled !== 'undefined') {
+                    return true;
+                }
+
                 <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>
                 Focus.iframeHeight = 0;
                 Focus.iframeWidth = 0;
                 Focus.iframeResizeInterval = setInterval(function () {
                     if (Focus.iframeHeight !== Focus.iframe.style.height) {
-                        var useHeight = ((window.innerHeight < Focus.iframeFocus.offsetHeight) ?
-                            window.innerHeight : Focus.iframeFocus.offsetHeight);
+                        var trueHeight = Math.max(
+                            Math.max(Focus.iframeDoc.body.scrollHeight, Focus.iframeDoc.documentElement.scrollHeight),
+                            Math.max(Focus.iframeDoc.body.offsetHeight, Focus.iframeDoc.documentElement.offsetHeight),
+                            Math.max(Focus.iframeDoc.body.clientHeight, Focus.iframeDoc.documentElement.clientHeight)
+                        );
+
+                        var useHeight = ((window.innerHeight < trueHeight || trueHeight === 0) ?
+                            window.innerHeight : trueHeight);
 
                         useHeight += 10;
                         useHeight = useHeight + 'px';
 
-
                         if (Focus.debug) {
                             console.log('window inner height = ' + window.innerHeight);
-                            console.log('iframe offset height = ' + Focus.iframeFocus.offsetHeight);
+                            console.log('iframe offset height = ' + trueHeight);
                             console.log('iframe height set to ' + useHeight)
                         }
-                        ;
+
                         Focus.iframe.style.height = useHeight;
                         Focus.iframeHeight = useHeight;
                     }
 
                     <?php if (in_array($style, ['modal', 'notification'])): ?>
                     if (Focus.iframeWidth !== Focus.iframe.style.width) {
+                        var trueWidth = Math.max(
+                            Math.max(Focus.iframeDoc.body.scrollWidth, Focus.iframeDoc.documentElement.scrollWidth),
+                            Math.max(Focus.iframeDoc.body.offsetWidth, Focus.iframeDoc.documentElement.offsetWidth),
+                            Math.max(Focus.iframeDoc.body.clientWidth, Focus.iframeDoc.documentElement.clientWidth)
+                        );
+
                         if (Focus.debug) {
                             console.log('window inner width = ' + window.innerWidth);
-                            console.log('iframe offset width = ' + Focus.iframeFocus.offsetWidth);
+                            console.log('iframe offset width = ' + trueWidth);
                         }
 
-                        if (window.innerWidth < Focus.iframeFocus.offsetWidth) {
+                        if (window.innerWidth < trueWidth || trueWidth === 0) {
                             // Responsive iframe
                             Focus.addClass(Focus.iframeFocus, 'mf-responsive');
                             Focus.addClass(Focus.iframe, 'mf-responsive');
@@ -563,8 +570,8 @@ switch ($style) {
                                 console.log('iframe set to responsive width: ');
 
                         } else {
-                            Focus.iframe.style.width = Focus.iframeFocus.offsetWidth + 'px';
-                            Focus.iframe.width = Focus.iframeFocus.offsetWidth + 'px';
+                            Focus.iframe.style.width = trueWidth + 'px';
+                            Focus.iframe.width = trueWidth + 'px';
                             Focus.removeClass(Focus.iframeFocus, 'mf-responsive');
                             Focus.removeClass(Focus.iframe, 'mf-responsive');
 
@@ -577,6 +584,8 @@ switch ($style) {
                     <?php endif; ?>
                 }, 35);
 
+                Focus.iframeResizerEnabled = true;
+
                 return true;
                 <?php endif; ?>
 
@@ -585,6 +594,10 @@ switch ($style) {
 
             // Disable iframe resizer
             disableIFrameResizer: function () {
+                if (typeof Focus.iframeResizerEnabled !== 'undefined') {
+                    delete(Focus.iframeResizerEnabled);
+                }
+
                 <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>
                 clearInterval(Focus.iframeResizeInterval);
                 <?php endif; ?>

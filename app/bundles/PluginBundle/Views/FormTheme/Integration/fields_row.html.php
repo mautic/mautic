@@ -83,7 +83,7 @@ $indexCount = 1;
                         <div class="choice-wrapper">
                             <div class="btn-group btn-block" data-toggle="buttons">
                                 <?php $checked = $child->vars['value'] === '0'; ?>
-                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?> <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>">
                                     <input type="radio"
                                            id="<?php echo $child->vars['id']; ?>_0"
                                            name="<?php echo $child->vars['full_name']; ?>"
@@ -91,18 +91,20 @@ $indexCount = 1;
                                            autocomplete="false"
                                            value="0"
                                            onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php echo $object; ?>', '<?php echo $integration; ?>')"
-                                           <?php if ($checked): ?>checked="checked"<?php endif; ?>>
+                                           <?php if ($checked): ?>checked="checked"<?php endif; ?>
+                                           <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                                 </label>
                                 <?php $checked = $child->vars['value'] === '1'; ?>
-                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?> <?php if ($child->vars['attr']['disabled']) :echo 'disabled'; endif; ?>">
                                     <input type="radio" id="<?php echo $child->vars['id']; ?>_1"
                                            name="<?php echo $child->vars['full_name']; ?>"
                                            title=""
                                            autocomplete="false"
                                            value="1"
                                            onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php echo $object; ?>', '<?php echo $integration; ?>')"
-                                           <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>>
+                                           <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>
+                                           <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
                                 </label>
                             </div>

@@ -287,6 +287,7 @@ class FormModel extends AbstractCommonModel
         $id    = $entity->getId();
         $event = $this->dispatchEvent('pre_delete', $entity);
         $this->getRepository()->deleteEntity($entity);
+
         //set the id for use in events
         $entity->deletedId = $id;
         $this->dispatchEvent('post_delete', $entity, false, $event);
