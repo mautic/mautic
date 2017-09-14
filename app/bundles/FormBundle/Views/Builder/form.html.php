@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$formName = '_'.$form->generateFormName();
+$formName = '_'.$form->generateFormName().(isset($suffix) ? $suffix : '');
 if (!isset($fields)) {
     $fields = $form->getFields();
 }
@@ -34,12 +34,15 @@ if (!isset($style)) {
     $style = '';
 }
 
+if (!isset($isAjax)) {
+    $isAjax = true;
+}
 ?>
 
 <?php echo $style; ?>
 
 <div id="mauticform_wrapper<?php echo $formName ?>" class="mauticform_wrapper">
-    <form autocomplete="false" role="form" method="post" action="<?php echo  $action; ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo ltrim($formName, '_') ?>">
+    <form autocomplete="false" role="form" method="post" action="<?php echo  $action; ?>" id="mauticform<?php echo $formName ?>" <?php if ($isAjax): ?> data-mautic-form="<?php echo ltrim($formName, '_') ?>"<?php endif; ?>>
         <div class="mauticform-error" id="mauticform<?php echo $formName ?>_error"></div>
         <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
         <div class="mauticform-innerform">

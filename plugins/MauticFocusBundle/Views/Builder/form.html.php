@@ -105,6 +105,8 @@ if (empty($preview)):
 
                     return true;
                 }
+
+                return false;
             }
         }
     </script>
@@ -112,13 +114,14 @@ if (empty($preview)):
 
 <?php
 $formExtra = <<<EXTRA
-<input type="hidden" name="mauticform[focusId]" id="mauticform<?php echo $formName ?>_focus_id" value="<?php echo $focusId; ?>"/>
+<input type="hidden" name="mauticform[focusId]" id="mauticform<?php echo $formName ?>_focus_id" value="$focusId"/>
 EXTRA;
 
 echo $view->render('MauticFormBundle:Builder:form.html.php', [
         'form'      => $form,
         'formExtra' => $formExtra,
-        'action'    => '#',
+        'action'    => ($preview) ? '#' : null,
+        'suffix'    => '_focus',
     ]
 );
 ?>
