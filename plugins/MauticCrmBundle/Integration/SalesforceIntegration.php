@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -1189,6 +1190,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     );
                 }
             }
+
+            $this->getLeadDoNotContactByDate('email', $checkEmailsInSF);
 
             // We're done
             if (!$checkEmailsInSF) {
@@ -3128,42 +3131,78 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $companyField;
     }
 
-    public function getLeadDonotContact($leadId, $channel = 'email', $sfObject = 'Lead', $sfIds = [])
+    /**
+     * Update the record in each system taking the last modified record.
+     *
+     * @param $leadId
+     * @param string $channel
+     * @param string $sfObject
+     * @param array  $sfIds
+     *
+     * @return int
+     *
+     * @throws ApiErrorException
+     */
+    public function getLeadDoNotContactByDate($channel = 'email',  &$sfRecords = [])
     {
-        $isContactable = 0;
+        $filters = [];
+        $leadIds = [];
 
-        if (!empty($sfIds)) {
-            $fieldString = "'".implode("','", $sfIds)."'";
+        if (empty($sfRecords)) {
+            return;
         }
-        //get last modified date for donot contact
-        $historySelect = 'Select Field, LeadId, CreatedDate, isDeleted from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$fieldString.')';
-
-        $queryUrl  = $this->getQueryUrl();
-        $historySF = $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
-
-        $lead = $this->leadModel->getEntity($leadId);
-        if ($lead) {
-            /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-            $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
-
-            /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
-            $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
-        }
-
-        return $isContactable;
-    }
-
-    public function getCompoundMauticFields($lead, $sfObject = 'Lead')
-    {
-        $sfId = [];
-        if ($lead['internal_entity_id']) {
-            $lead['mauticContactTimelineLink'] = $this->getContactTimelineLink($lead['internal_entity_id']);
-            if ($lead['integration_entity_id']) {
-                $sfId = [$lead['integration_entity_id']];
+        foreach ($sfRecords as $record) {
+            $sfObject = isset($record['integration_entity']) ? $record['integration_entity'] : 'Lead';
+            if (isset($record['integration_entity_id'])) {
+                $sfIdsToFind[$sfObject][$record['integration_entity_id']] = $record['internal_entity_id'];
             }
-            $lead['mauticContactIsContactableByEmail'] = $this->getLeadDonotContact($lead['internal_entity_id'], 'email', $sfObject, $sfId);
+        }
+        foreach ($sfIdsToFind as $object) {
+            $sfIds = [];
+            foreach ($object as $sfId => $lead) {
+                $sfIds[]        = $sfId;
+                $leadIds[$sfId] = $lead;
+            }
+            if (!empty($sfIds)) {
+                $fieldString = "'".implode("','", $sfIds)."'";
+                //get last modified date for donot contact
+                $historySelect = 'Select Field, '.$sfObject.'Id, CreatedDate, isDeleted, NewValue from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$fieldString.') ORDER BY CreatedDate DESC';
+                $queryUrl      = $this->getQueryUrl();
+                $historySF     = $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
+            }
         }
 
-        return $lead;
+        foreach ($leadIds as $sfKey => $leadId) {
+            $lead = $this->leadModel->getEntity($leadId);
+            if ($lead) {
+                $autidLogRepo      = $this->em->getRepository('MauticCoreBundle:AuditLog');
+                $filters['search'] = 'dnc_channel_status%'.$channel;
+                $orderBy           = [
+                    'dateAdded',
+                    'DESC',
+                ];
+                $lastModifiedDNCDate = $autidLogRepo->getAuditLogs($lead, $filters, $orderBy);
+                $mauticLastDNCDate   = (isset($lastModifiedDNCDate[0]['dateAdded'])) ? $lastModifiedDNCDate[0]['dateAdded'] : null;
+            }
+            if (!empty($historySF['records'])) {
+                foreach ($historySF['records'] as $sfModifiedDNC) {
+                    if (((isset($sfModifiedDNC['LeadId']) && $sfModifiedDNC['LeadId'] == $sfKey)
+                        || (isset($sfModifiedDNC['ContactId']) && $sfModifiedDNC['ContactId'] == $sfKey))
+                        && ($mauticLastDNCDate
+                        && (strtotime($sfModifiedDNC['CreatedDate']) > strtotime($mauticLastDNCDate->format('c'))))) {
+                        print_r([$lead->getId()]);
+                        print_r([$mauticLastDNCDate->format('c')]);
+                        print_r([$sfModifiedDNC['CreatedDate']]);
+                        unset($sfRecords['mauticContactIsContactableByEmail']); //donot update in SF
+                        if ($sfModifiedDNC['NewValue'] === true) {
+                            $this->leadModel->addDncForLead($lead, 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
+                        } elseif ($sfModifiedDNC['NewValue'] === false) {
+                            $this->leadModel->removeDncForLead($lead, 'email', true);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
