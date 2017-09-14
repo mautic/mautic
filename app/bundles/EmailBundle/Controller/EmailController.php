@@ -613,7 +613,8 @@ class EmailController extends FormController
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
             [
-                'page:preference_center:manage',
+                'page:preference_center:viewown',
+                'page:preference_center:viewother',
             ],
             'RETURN_ARRAY'
         );
@@ -828,7 +829,8 @@ class EmailController extends FormController
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
             [
-                'page:preference_center:manage',
+                'page:preference_center:viewown',
+                'page:preference_center:viewother',
             ],
             'RETURN_ARRAY'
         );

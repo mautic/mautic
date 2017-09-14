@@ -47,7 +47,8 @@ class PageController extends FormController
             'page:pages:deleteother',
             'page:pages:publishown',
             'page:pages:publishother',
-            'page:preference_center:manage',
+            'page:preference_center:viewown',
+            'page:preference_center:viewother',
         ], 'RETURN_ARRAY');
 
         if (!$permissions['page:pages:viewown'] && !$permissions['page:pages:viewother']) {
@@ -74,14 +75,34 @@ class PageController extends FormController
             $filter['force'][] = ['column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        if (!$permissions['page:preference_center:manage']) {
+        if (!$permissions['page:preference_center:viewown'] && !$permissions['page:preference_center:viewother']) {
             $filter['where'][] = [
                 'expr' => 'orX',
                 'val'  => [
                     ['column' => 'p.isPreferenceCenter', 'expr' => 'isNull'],
-                    ['column' => 'p.isPreferenceCenter', 'expr' => 'neq', 'value' => 1],
+                    ['column' => 'p.isPreferenceCenter', 'expr' => 'eq', 'value' => 0],
                 ],
             ];
+        } elseif (!$permissions['page:preference_center:viewother']) {
+            $filter['where'][] = [
+                'expr' => 'orX',
+                'val'  => [
+                        [
+                            'expr' => 'orX',
+                            'val'  => [
+                                ['column' => 'p.isPreferenceCenter', 'expr' => 'isNull'],
+                                ['column' => 'p.isPreferenceCenter', 'expr' => 'eq', 'value' => 0],
+                            ],
+                        ],
+                        [
+                            'expr' => 'andX',
+                            'val'  => [
+                                ['column' => 'p.isPreferenceCenter', 'expr' => 'eq', 'value' => 1],
+                                ['column' => 'p.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()],
+                            ],
+                        ],
+                    ],
+                ];
         }
 
         $translator = $this->get('translator');
@@ -163,7 +184,8 @@ class PageController extends FormController
     public function viewAction($objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model      = $this->getModel('page.page');
+        $model = $this->getModel('page.page');
+        //set some permissions
         $security   = $this->get('mautic.security');
         $activePage = $model->getEntity($objectId);
         //set the page we came from
@@ -189,10 +211,13 @@ class PageController extends FormController
                     ],
                 ],
             ]);
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
-            'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
-        )
-        ) {
+        } elseif (!$security->hasEntityAccess(
+                'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
+            ) ||
+            ($activePage->getIsPreferenceCenter() &&
+                !$security->hasEntityAccess(
+                    'page:preference_center:viewown', 'page:preference_center:viewother', $activePage->getCreatedBy()
+                ))) {
             return $this->accessDenied();
         }
 
@@ -315,6 +340,8 @@ class PageController extends FormController
                     'page:pages:deleteother',
                     'page:pages:publishown',
                     'page:pages:publishother',
+                    'page:preference_center:viewown',
+                    'page:preference_center:viewother',
                 ], 'RETURN_ARRAY'),
                 'stats' => [
                     'pageviews' => $pageviews,
@@ -428,7 +455,8 @@ class PageController extends FormController
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
             [
-                'page:preference_center:manage',
+                'page:preference_center:editown',
+                'page:preference_center:editother',
             ],
             'RETURN_ARRAY'
         );
@@ -469,10 +497,11 @@ class PageController extends FormController
     public function editAction($objectId, $ignorePost = false)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
-        $model   = $this->getModel('page.page');
-        $entity  = $model->getEntity($objectId);
-        $session = $this->get('session');
-        $page    = $this->get('session')->get('mautic.page.page', 1);
+        $model    = $this->getModel('page.page');
+        $security = $this->get('mautic.security');
+        $entity   = $model->getEntity($objectId);
+        $session  = $this->get('session');
+        $page     = $this->get('session')->get('mautic.page.page', 1);
 
         //set the return URL
         $returnUrl = $this->generateUrl('mautic_page_index', ['page' => $page]);
@@ -500,9 +529,12 @@ class PageController extends FormController
                     ],
                 ])
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+        } elseif (!$security->hasEntityAccess(
             'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
-        )) {
+        ) ||
+            ($entity->getIsPreferenceCenter() && !$security->hasEntityAccess(
+                    'page:preference_center:viewown', 'page:preference_center:viewother', $entity->getCreatedBy()
+                ))) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -579,14 +611,6 @@ class PageController extends FormController
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
-        //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(
-            [
-                'page:preference_center:manage',
-            ],
-            'RETURN_ARRAY'
-        );
-
         return $this->delegateView([
             'viewParameters' => [
                 'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
@@ -598,7 +622,14 @@ class PageController extends FormController
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
-                'permissions'   => $permissions,
+                'permissions'   => $security->isGranted(
+                    [
+                        'page:preference_center:editown',
+                        'page:preference_center:editother',
+                    ],
+                    'RETURN_ARRAY'
+                ),
+                'security' => $security,
             ],
             'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
             'passthroughVars' => [

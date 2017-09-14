@@ -181,7 +181,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'slot_socialfollow',
                 600
             );
-            if ($this->security->isGranted(['page:preference_center:manage'])) {
+            if ($this->security->isGranted(['page:preference_center:editown', 'page:preference_center:editother'], 'MATCH_ONE')) {
                 $event->addSlotType(
                     'segmentlist',
                     'Segment List',
