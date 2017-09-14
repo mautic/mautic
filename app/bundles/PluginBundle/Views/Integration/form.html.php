@@ -69,7 +69,7 @@ $hasFeatureErrors =
             </a>
         </li>
     <?php endif; ?>
-    <?php if ($hasFields): ?>
+    <!--<?php if ($hasFields): ?>-->
         <li class="<?php echo $fieldTabClass; ?> <?php if (isset($activeTab) && $activeTab == 'leadFieldsContainer'): echo 'active'; endif; ?> " id="fields-tab">
             <a href="#fields-container" role="tab" data-toggle="tab">
                 <?php echo $view['translator']->trans('mautic.plugin.integration.tab.fieldmapping'); ?>
@@ -78,7 +78,7 @@ $hasFeatureErrors =
                 <?php endif; ?>
             </a>
         </li>
-    <?php endif; ?>
+    <!--<?php endif; ?>-->
     <?php if (!empty($companyFieldHtml)) : ?>
         <li class="<?php echo $fieldTabClass; ?> <?php if (isset($activeTab) && $activeTab == 'companyFieldsContainer'): echo 'active'; endif; ?> " id="company-fields-tab">
             <a href="#company-fields-container" role="tab" data-toggle="tab">
