@@ -928,7 +928,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $filter->strict  = 1;
                 $returnParameter = true;
                 break;
-            default :
+            default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
                 }
