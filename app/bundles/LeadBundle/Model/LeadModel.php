@@ -1774,9 +1774,6 @@ class LeadModel extends FormModel
         $fields    = array_flip($fields);
         $fieldData = [];
 
-        $lead   = $this->checkForDuplicateContact($fieldData);
-        $merged = ($lead->getId());
-
         // Extract company data and import separately
         // Modifies the data array
         $company                           = null;
@@ -1801,6 +1798,9 @@ class LeadModel extends FormModel
                 $fieldData[$leadField] = InputHelper::clean($data[$importField]);
             }
         }
+
+        $lead   = $this->checkForDuplicateContact($fieldData);
+        $merged = ($lead->getId());
 
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
