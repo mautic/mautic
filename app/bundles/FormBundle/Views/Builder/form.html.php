@@ -66,6 +66,9 @@ if (!isset($isAjax)) {
 
                         $template = $params['template'];
                     else:
+                        if (!$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill() && $lead && !empty($lead->getFieldValue($f->getLeadField()))) {
+                            $f->setType('hidden');
+                        }
                         $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
                     endif;
 

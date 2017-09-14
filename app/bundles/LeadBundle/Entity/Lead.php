@@ -295,7 +295,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addIndex(['date_added'], 'lead_date_added');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 

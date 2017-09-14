@@ -1796,6 +1796,8 @@ abstract class AbstractIntegration
 
         if ($object) {
             $availableFields = $availableFields[$config['object']];
+        } else {
+            $availableFields = (isset($availableFields[0])) ? $availableFields[0] : $availableFields;
         }
 
         $unknown = $this->translator->trans('mautic.integration.form.lead.unknown');
@@ -2679,6 +2681,12 @@ abstract class AbstractIntegration
         return $fields;
     }
 
+    /**
+     * @param $leadId
+     * @param string $channel
+     *
+     * @return int
+     */
     public function getLeadDonotContact($leadId, $channel = 'email')
     {
         $isContactable = 0;
@@ -2693,6 +2701,13 @@ abstract class AbstractIntegration
         return $isContactable;
     }
 
+    /**
+     * Get pseudo fields from mautic, these are lead properties we want to map to integration fields.
+     *
+     * @param $lead
+     *
+     * @return mixed
+     */
     public function getCompoundMauticFields($lead)
     {
         if ($lead['internal_entity_id']) {
@@ -2701,5 +2716,20 @@ abstract class AbstractIntegration
         }
 
         return $lead;
+    }
+
+    /**
+     * @param $fieldName
+     *
+     * @return bool
+     */
+    public function isCompoundMauticField($fieldName)
+    {
+        $compoundFields = [
+            'mauticContactTimelineLink'         => 'mauticContactTimelineLink',
+            'mauticContactIsContactableByEmail' => 'mauticContactIsContactableByEmail',
+        ];
+
+        return isset($compoundFields[$fieldName]);
     }
 }

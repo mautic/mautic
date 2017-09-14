@@ -249,6 +249,17 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             $content['text'] = $message['text'];
         }
 
+        $encoder = new \Swift_Mime_ContentEncoder_Base64ContentEncoder();
+        foreach ($this->message->getChildren() as $child) {
+            if ($child instanceof \Swift_Image) {
+                $content['inline_images'][] = [
+                    'type' => $child->getContentType(),
+                    'name' => $child->getId(),
+                    'data' => $encoder->encodeString($child->getBody()),
+                ];
+            }
+        }
+
         $sparkPostMessage = [
             'content'    => $content,
             'recipients' => $recipients,
