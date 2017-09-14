@@ -3190,9 +3190,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         || (isset($sfModifiedDNC['ContactId']) && $sfModifiedDNC['ContactId'] == $sfKey))
                         && ($mauticLastDNCDate
                         && (strtotime($sfModifiedDNC['CreatedDate']) > strtotime($mauticLastDNCDate->format('c'))))) {
-                        print_r([$lead->getId()]);
-                        print_r([$mauticLastDNCDate->format('c')]);
-                        print_r([$sfModifiedDNC['CreatedDate']]);
                         unset($sfRecords['mauticContactIsContactableByEmail']); //donot update in SF
                         if ($sfModifiedDNC['NewValue'] === true) {
                             $this->leadModel->addDncForLead($lead, 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
