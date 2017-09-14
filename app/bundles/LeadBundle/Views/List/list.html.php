@@ -14,7 +14,6 @@ if ($tmpl == 'index'):
 endif;
 $listCommand = $view['translator']->trans('mautic.lead.lead.searchcommand.list');
 ?>
-<?php $tooltip = ''; ?>
 
 <?php if (count($items)): ?>
     <div class="table-responsive">
