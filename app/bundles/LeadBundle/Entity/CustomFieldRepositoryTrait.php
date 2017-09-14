@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 /**
  * Class CustomFieldRepositoryTrait.
@@ -307,6 +308,8 @@ trait CustomFieldRepositoryTrait
 
         //loop over results to put fields in something that can be assigned to the entities
         foreach ($values as $k => $r) {
+            $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
+
             if (isset($fields[$k])) {
                 if (!is_null($r)) {
                     switch ($fields[$k]['type']) {
