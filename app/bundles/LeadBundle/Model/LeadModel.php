@@ -1805,25 +1805,25 @@ class LeadModel extends FormModel
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
             $lead->setDateAdded($dateAdded->getUtcDateTime());
         }
-        unset($fields['dateAdded']);
+        unset($fieldData['dateAdded']);
 
         if (!empty($fields['dateModified']) && !empty($data[$fields['dateModified']])) {
             $dateModified = new DateTimeHelper($data[$fields['dateModified']]);
             $lead->setDateModified($dateModified->getUtcDateTime());
         }
-        unset($fields['dateModified']);
+        unset($fieldData['dateModified']);
 
         if (!empty($fields['lastActive']) && !empty($data[$fields['lastActive']])) {
             $lastActive = new DateTimeHelper($data[$fields['lastActive']]);
             $lead->setLastActive($lastActive->getUtcDateTime());
         }
-        unset($fields['lastActive']);
+        unset($fieldData['lastActive']);
 
         if (!empty($fields['dateIdentified']) && !empty($data[$fields['dateIdentified']])) {
             $dateIdentified = new DateTimeHelper($data[$fields['dateIdentified']]);
             $lead->setDateIdentified($dateIdentified->getUtcDateTime());
         }
-        unset($fields['dateIdentified']);
+        unset($fieldData['dateIdentified']);
 
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
             $userRepo      = $this->em->getRepository('MauticUserBundle:User');
@@ -1832,7 +1832,7 @@ class LeadModel extends FormModel
                 $lead->setCreatedBy($createdByUser);
             }
         }
-        unset($fields['createdByUser']);
+        unset($fieldData['createdByUser']);
 
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
             $userRepo       = $this->em->getRepository('MauticUserBundle:User');
@@ -1841,7 +1841,7 @@ class LeadModel extends FormModel
                 $lead->setModifiedBy($modifiedByUser);
             }
         }
-        unset($fields['modifiedByUser']);
+        unset($fieldData['modifiedByUser']);
 
         if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
             $addresses = explode(',', $data[$fields['ip']]);
@@ -1851,7 +1851,7 @@ class LeadModel extends FormModel
                 $lead->addIpAddress($ipAddress);
             }
         }
-        unset($fields['ip']);
+        unset($fieldData['ip']);
 
         if (!empty($fields['points']) && !empty($data[$fields['points']]) && $lead->getId() === null) {
             // Add points only for new leads
@@ -1905,7 +1905,7 @@ class LeadModel extends FormModel
             $log->setDateAdded(new \DateTime());
             $lead->stageChangeLog($log);
         }
-        unset($fields['stage']);
+        unset($fieldData['stage']);
 
         // Set unsubscribe status
         if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
@@ -1920,7 +1920,7 @@ class LeadModel extends FormModel
                 $this->addDncForLead($lead, 'email', $reason, DoNotContact::MANUAL);
             }
         }
-        unset($fields['doNotEmail']);
+        unset($fieldData['doNotEmail']);
 
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
