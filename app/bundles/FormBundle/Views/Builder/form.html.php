@@ -24,7 +24,8 @@ if (!isset($inBuilder)) {
 <div id="mauticform_wrapper<?php echo $formName ?>" class="mauticform_wrapper">
     <form autocomplete="false" role="form" method="post" action="<?php echo $view['router']->url(
         'mautic_form_postresults',
-        ['formId' => $form->getId()]
+        ['formId' => $form->getId()],
+        self:ABSOLUTE_PATH
     ); ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo ltrim($formName, '_') ?>">
         <div class="mauticform-error" id="mauticform<?php echo $formName ?>_error"></div>
         <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
