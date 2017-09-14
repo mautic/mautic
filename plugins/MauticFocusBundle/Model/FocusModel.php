@@ -180,7 +180,7 @@ class FocusModel extends FormModel
             $focusArray = $focus->toArray();
 
             $url = '';
-            if ($focusArray['type'] == 'link') {
+            if ($focusArray['type'] == 'link' && !empty($focusArray['properties']['content']['link_url'])) {
                 $trackable = $this->trackableModel->getTrackableByUrl(
                     $focusArray['properties']['content']['link_url'],
                     'focus',
