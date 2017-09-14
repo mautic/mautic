@@ -91,7 +91,11 @@ class TokenReplacementEvent extends CommonEvent
     public function getClickthrough()
     {
         if (!in_array('lead', $this->clickthrough)) {
-            $this->clickthrough['lead'] = is_array($this->lead) ? $this->lead['id'] : $this->lead->getId();
+            if (is_array($this->lead) && !empty($this->lead['id'])) {
+                $this->clickthrough['lead'] = $this->lead['id'];
+            } elseif ($this->lead instanceof Lead && $this->lead->getId()) {
+                $this->clickthrough['lead'] = $this->lead->getId();
+            }
         }
 
         return $this->clickthrough;
