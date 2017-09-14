@@ -75,6 +75,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 Url::class => ['message' => 'mautic.form.submission.url.invalid'],
             ],
         ],
+        'file' => [],
     ];
 
     /**

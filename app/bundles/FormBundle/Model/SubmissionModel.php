@@ -27,6 +27,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
 use Mautic\FormBundle\Exception\ValidationException;
+use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Entity\Company;
@@ -37,9 +38,12 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Validation;
 
 /**
  * Class SubmissionModel.
@@ -215,6 +219,59 @@ class SubmissionModel extends CommonFormModel
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
+            }
+
+            if ($type == 'file') {
+                $files = $request->files->get('mauticform');
+
+                if (!$files) {
+                    continue;
+                }
+
+                if (!array_key_exists($f->getAlias(), $files)) {
+                    continue;
+                }
+
+                $file = $files[$f->getAlias()];
+
+                if (!$file instanceof UploadedFile) {
+                    continue;
+                }
+
+                // TODO This validation should be done in a listener (see https://developer.mautic.org/#form-validations)
+                $properties = $f->getProperties();
+
+                $fileConstraints = [];
+                if (array_key_exists(FormFieldFileType::PROPERTY_ALLOWED_MIME_TYPES, $properties)) {
+                    $fileConstraints['mimeTypes'] = explode(PHP_EOL, $properties[FormFieldFileType::PROPERTY_ALLOWED_MIME_TYPES]);
+                }
+                if (array_key_exists(FormFieldFileType::PROPERTY_ALLOWED_FILE_SIZE, $properties)) {
+                    $fileConstraints['maxSize'] = $properties[FormFieldFileType::PROPERTY_ALLOWED_FILE_SIZE];
+                }
+
+                if ($fileConstraints) {
+                    $validator = Validation::createValidator();
+                    $errors    = $validator->validate($file, new File($fileConstraints));
+
+                    $errorMessages = [];
+                    foreach ($errors as $error) {
+                        $errorMessages[] = $error->getMessage();
+                    }
+                    if ($errorMessages) {
+                        $validationErrors[$alias] = implode('<br />', $errorMessages);
+                    }
+                }
+
+                $value = $file->move(
+                    '/dev/null', // TODO Pick a location
+                    sprintf(
+                        '%s.%s.%s.%s',
+                        $form->getId(),
+                        $id,
+                        bin2hex(random_bytes(16)),
+                        $file->guessExtension()
+                    )
+                );
             }
 
             if ($f->isRequired() && empty($value)) {
