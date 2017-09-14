@@ -2689,12 +2689,12 @@ abstract class AbstractIntegration
      */
     public function getLeadDonotContact($leadId, $channel = 'email')
     {
-        $isContactable = 0;
+        $isContactable = 1;
         $lead          = $this->leadModel->getEntity($leadId);
         if ($lead) {
             $isContactableReason = $this->leadModel->isContactable($lead, $channel);
             if ($isContactableReason === 0) {
-                $isContactable = 1;
+                $isContactable = 0;
             }
         }
 
