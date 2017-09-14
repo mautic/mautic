@@ -639,7 +639,7 @@ class ReportController extends FormController
                 foreach ($dynamicFilters as $dfcol => $dfval) {
                     if (1 === $filter['dynamic'] && $filter['column'] === $dfcol) {
                         $dynamicFilters[$dfcol]['expr'] = $filter['condition'];
-                        break 2;
+                        break;
                     }
                 }
             }
