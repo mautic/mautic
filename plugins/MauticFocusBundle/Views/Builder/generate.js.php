@@ -33,22 +33,23 @@ if (!isset($preview)) {
 if (!isset($clickUrl)) {
     $clickUrl = $props['content']['link_url'];
 }
-    $cssContent = $view->render(
-        'MauticFocusBundle:Builder:style.less.php',
-        [
-            'preview' => $preview,
-            'focus'   => $focus,
-        ]
-    );
-    $cssContent = $view->escape($cssContent, 'js');
 
-    $parentCssContent = $view->render(
-        'MauticFocusBundle:Builder:parent.less.php',
-        [
-            'preview' => $preview,
-        ]
-    );
-    $parentCssContent = $view->escape($parentCssContent, 'js');
+$cssContent = $view->render(
+    'MauticFocusBundle:Builder:style.less.php',
+    [
+        'preview' => $preview,
+        'focus'   => $focus,
+    ]
+);
+$cssContent = $view->escape($cssContent, 'js');
+
+$parentCssContent = $view->render(
+    'MauticFocusBundle:Builder:parent.less.php',
+    [
+        'preview' => $preview,
+    ]
+);
+$parentCssContent = $view->escape($parentCssContent, 'js');
 
 switch ($style) {
     case 'bar':

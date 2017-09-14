@@ -204,7 +204,7 @@ class FocusModel extends FormModel
                 ]
             );
 
-            $content = $this->getContent($focusArray, $isPreview);
+            $content = $this->getContent($focusArray, $isPreview, $url);
             $cached  = [
                 'js'    => \Minify_HTML::minify($javascript),
                 'focus' => \Minify_HTML::minify($content['focus']),
@@ -229,13 +229,13 @@ class FocusModel extends FormModel
     }
 
     /**
-     * @param array $focus
-     * @param bool  $byPassCache
-     * @param bool  $isPreview
+     * @param array  $focus
+     * @param bool   $isPreview
+     * @param string $url
      *
      * @return array
      */
-    public function getContent(array $focus, $isPreview = false)
+    public function getContent(array $focus, $isPreview = false, $url = '#')
     {
         $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
 
@@ -253,6 +253,7 @@ class FocusModel extends FormModel
                 'focus'    => $focus,
                 'preview'  => $isPreview,
                 'htmlMode' => $htmlMode,
+                'clickUrl' => $url,
             ]
         );
 
