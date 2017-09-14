@@ -19,7 +19,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class ChangeOwnerType extends AbstractType
 {
-
     /** @var UserModel */
     private $userModel;
 
@@ -47,7 +46,5 @@ class ChangeOwnerType extends AbstractType
           'buttons',
           FormButtonsType::class
         );
-
     }
-
 }

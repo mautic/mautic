@@ -203,7 +203,7 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * Return list of Users for formType Choice
+     * Return list of Users for formType Choice.
      *
      * @return array
      */

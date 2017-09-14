@@ -11,7 +11,6 @@
 
 namespace Mautic\UserBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\User;
@@ -340,7 +339,7 @@ class UserModel extends FormModel
     }
 
     /**
-     * Return list of Users for formType Choice
+     * Return list of Users for formType Choice.
      *
      * @return array
      */
@@ -348,5 +347,4 @@ class UserModel extends FormModel
     {
         return $this->getRepository()->getOwnerListChoices();
     }
-
 }

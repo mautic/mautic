@@ -29,7 +29,6 @@ use Mautic\LeadBundle\Model\ListModel;
  */
 class CampaignSubscriber extends CommonSubscriber
 {
-
     const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
     /**
