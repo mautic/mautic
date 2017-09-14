@@ -4301,18 +4301,18 @@ lesshat-selector { -lh-property: 0 ;
   top: 0;
   bottom: 0;
   right: 0;
-  width: 525px;
+  width: 30%;
   height: 100%;
   padding: 15px;
   background-color: #d5d4d4;
   overflow-y: auto;
 }
-.builder-content {
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: 525px;
-  height: 100%;
+.builder-content{
+  position:fixed; 
+  left:0; 
+  top:0; 
+  width :70%; 
+  height:100%
 }
 .code-mode .builder-panel {
   width: 50%;
