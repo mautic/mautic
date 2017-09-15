@@ -362,7 +362,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $date = $dateHelper->toUtcString('Y-m-d H:i:s');
 
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->select('l.email, h.*')
+        $q->select('l.*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->leftJoin('l', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 'l.id = h.lead_id')
             ->where('h.date_hit > :date')
