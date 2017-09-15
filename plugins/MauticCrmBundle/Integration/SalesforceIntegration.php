@@ -11,8 +11,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
@@ -841,7 +839,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $start,
                         $limit
                     );
-
                     while (!empty($salesForceIds)) {
                         $executed += count($salesForceIds);
 
@@ -917,122 +914,29 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array
      */
-    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
+    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId, $filters = [])
     {
         $leadIds = (!is_array($leadId)) ? [$leadId] : $leadId;
 
         $leadActivity = [];
-        $options      = [
-            'leadIds'      => $leadIds,
-            'basic_select' => true,
-            'fromDate'     => $startDate,
-            'toDate'       => $endDate,
-        ];
 
-        /** @var LeadModel $leadModel */
-        $leadModel      = $this->leadModel;
-        $pointsRepo     = $leadModel->getPointLogRepository();
-        $results        = $pointsRepo->getLeadTimelineEvents(null, $options);
-        $pointChangeLog = [];
-        foreach ($results as $result) {
-            if (!isset($pointChangeLog[$result['lead_id']])) {
-                $pointChangeLog[$result['lead_id']] = [];
-            }
-            $pointChangeLog[$result['lead_id']][] = $result;
-        }
-        unset($results);
-
-        /** @var EmailModel $emailModel */
-        $emailModel            = $this->factory->getModel('email');
-        $emailRepo             = $emailModel->getStatRepository();
-        $emailOptions          = $options;
-        $emailOptions['state'] = 'read';
-        $results               = $emailRepo->getLeadStats(null, $emailOptions);
-        $emailStats            = [];
-        foreach ($results as $result) {
-            if (!isset($emailStats[$result['lead_id']])) {
-                $emailStats[$result['lead_id']] = [];
-            }
-            $emailStats[$result['lead_id']][] = $result;
-        }
-        unset($results);
-
-        /** @var SubmissionModel $formSubmissionModel */
-        $formSubmissionModel = $this->factory->getModel('form.submission');
-        $submissionRepo      = $formSubmissionModel->getRepository();
-        $results             = $submissionRepo->getSubmissions($options);
-        $formSubmissions     = [];
-        foreach ($results as $result) {
-            if (!isset($formSubmissions[$result['lead_id']])) {
-                $formSubmissions[$result['lead_id']] = [];
-            }
-            $formSubmissions[$result['lead_id']][] = $result;
-        }
-        unset($results);
-
-        $translator = $this->getTranslator();
         foreach ($leadIds as $leadId) {
-            $i        = 0;
-            $activity = [];
+            $i           = 0;
+            $activity    = [];
+            $lead        = $this->leadModel->getEntity($leadId);
+            $engagements = $this->leadModel->getEngagements($lead, [], null, 1, 100, true);
+            $events      = $engagements['events'];
 
-            if (isset($pointChangeLog[$leadId])) {
-                foreach ($pointChangeLog[$leadId] as $row) {
-                    $typeString = "mautic.{$row['type']}.{$row['type']}";
-                    $typeString = ($translator->hasId($typeString)) ? $translator->trans($typeString) : ucfirst($row['type']);
-                    if ((int) $row['delta'] > 0) {
-                        $subject = 'added';
-                    } else {
-                        $subject = 'subtracted';
-                        $row['delta'] *= -1;
-                    }
-                    $pointsString = $translator->transChoice(
-                        "mautic.salesforce.activity.points_{$subject}",
-                        $row['delta'],
-                        ['%points%' => $row['delta']]
-                    );
-                    $activity[$i]['eventType']   = 'point';
-                    $activity[$i]['name']        = $translator->trans('mautic.salesforce.activity.point')." ($pointsString)";
-                    $activity[$i]['description'] = "$typeString: {$row['eventName']} / {$row['actionName']}";
-                    $activity[$i]['dateAdded']   = $row['dateAdded'];
-                    $activity[$i]['id']          = 'pointChange'.$row['id'];
-                    ++$i;
-                }
-            }
-
-            if (isset($emailStats[$leadId])) {
-                foreach ($emailStats[$leadId] as $row) {
-                    switch (true) {
-                        case !empty($row['storedSubject']):
-                            $name = $row['storedSubject'];
-                            break;
-                        case !empty($row['subject']):
-                            $name = $row['subject'];
-                            break;
-                        case !empty($row['email_name']):
-                            $name = $row['email_name'];
-                            break;
-                        default:
-                            $name = $translator->trans('mautic.email.timeline.event.custom_email');
-                    }
-
-                    $activity[$i]['eventType']   = 'email';
-                    $activity[$i]['name']        = $translator->trans('mautic.salesforce.activity.email').": $name";
-                    $activity[$i]['description'] = $translator->trans('mautic.email.sent').": $name";
-                    $activity[$i]['dateAdded']   = $row['dateSent'];
-                    $activity[$i]['id']          = 'emailStat'.$row['id'];
-                    ++$i;
-                }
-            }
-
-            if (isset($formSubmissions[$leadId])) {
-                foreach ($formSubmissions[$leadId] as $row) {
-                    $activity[$i]['eventType']   = 'form';
-                    $activity[$i]['name']        = $this->getTranslator()->trans('mautic.salesforce.activity.form').': '.$row['name'];
-                    $activity[$i]['description'] = $translator->trans('mautic.form.event.submitted').': '.$row['name'];
-                    $activity[$i]['dateAdded']   = $row['dateSubmitted'];
-                    $activity[$i]['id']          = 'formSubmission'.$row['id'];
-                    ++$i;
-                }
+            // inject lead into events
+            foreach ($events as $event) {
+                $link                        = isset($event['eventLabel']['href']) ? $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL).$event['eventLabel']['href'] : '';
+                $label                       = isset($event['eventLabel']['label']) ? $event['eventLabel']['label'] : '';
+                $activity[$i]['eventType']   = $event['eventType'];
+                $activity[$i]['name']        = isset($event['eventType']) ? $event['eventType'] : '';
+                $activity[$i]['description'] = isset($event['name']) ? $event['name'].' - '.$link.' - '.$label : $link.' - '.$label;
+                $activity[$i]['dateAdded']   = $event['timestamp'];
+                $activity[$i]['id']          = str_replace('.', '-', $event['eventId']);
+                ++$i;
             }
 
             $leadActivity[$leadId] = [
@@ -1041,8 +945,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
             unset($activity);
         }
-
-        unset($pointChangeLog, $emailStats, $formSubmissions);
 
         return $leadActivity;
     }
@@ -2060,10 +1962,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } else {
                     $error = 'http status code '.$item['httpStatusCode'];
                     switch (true) {
-                        case !empty($item['body'][0]['message']['message']):
+                        case !empty($item['body'][0]['message']['message']) :
                             $error = $item['body'][0]['message']['message'];
                             break;
-                        case !empty($item['body']['message']):
+                        case !empty($item['body']['message']) :
                             $error = $item['body']['message'];
                             break;
                     }
