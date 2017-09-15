@@ -2775,4 +2775,20 @@ class LeadModel extends FormModel
 
         return $lead;
     }
+
+    /**
+     * Get the list of contact with webactivity last $minutes.
+     *
+     * @param int $minutes
+     *
+     * @return null|object
+     */
+    public function getContactsRecentWebActivity($minutes = 0)
+    {
+        if (!is_null($minutes)) {
+            return $this->getRepository()->getContactsRecentWebActivity($minutes);
+        }
+
+        return null;
+    }
 }

@@ -339,6 +339,39 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
+     * Get the list of contact with webactivity last $minutes.
+     *
+     * @param int $minutes
+     *
+     * @return mixed|null
+     */
+    public function getContactsRecentWebActivity($minutes = 0)
+    {
+        $dateHelper = new DateTimeHelper('', null, 'local');
+
+        $dateHelper->sub('PT'.$minutes.'M', false);
+
+        $date = $dateHelper->toUtcString('Y-m-d H:i:s');
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.email, h.*')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'page_hits', 'h', 'l.id = h.lead_id')
+            ->where('h.date_hit > :date')
+            ->andWhere($q->expr()->isNotNull('l.email'))
+            ->groupBy('l.email')
+            ->setParameter(':date', $date);
+
+        $result = $q->execute()->fetchAll();
+
+        if (count($result) > 0) {
+            return $result;
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Get a contact entity with the primary company data populated.
      *
      * The primary company data will be a flat array on the entity
