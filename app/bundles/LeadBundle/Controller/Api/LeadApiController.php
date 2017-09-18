@@ -602,6 +602,28 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Get the list of contact active last $minutes.
+     *
+     * @param int $minutes
+     *
+     * @return Response
+     */
+    public function getContactsRecentWebActivityAction($minutes)
+    {
+        $entity = $this->model->getContactsRecentWebActivity($minutes);
+
+        $this->preSerializeEntity($entity);
+        $view = $this->view(
+            [
+                $this->entityNameOne => $entity,
+            ],
+            Codes::HTTP_OK
+        );
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
+    }
+    /**
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity
