@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 
 trait CustomFieldEntityTrait
@@ -113,8 +114,9 @@ trait CustomFieldEntityTrait
     public function addUpdatedField($alias, $value, $oldValue = null)
     {
         $property = (defined('self::FIELD_ALIAS')) ? str_replace(self::FIELD_ALIAS, '', $alias) : $alias;
+        $field    = $this->getField($alias);
+        $setter   = 'set'.ucfirst($property);
 
-        $setter = 'set'.ucfirst($property);
         if (property_exists($this, $property) && method_exists($this, $setter)) {
             // Fixed custom field so use the setter but don't get caught in a loop such as a custom field called "notes"
             $this->$setter($value);
@@ -122,6 +124,8 @@ trait CustomFieldEntityTrait
 
         if (null == $oldValue) {
             $oldValue = $this->getFieldValue($alias);
+        } elseif ($field) {
+            $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
         }
 
         if (is_string($value)) {
@@ -137,6 +141,10 @@ trait CustomFieldEntityTrait
         } elseif (is_array($value)) {
             // Flatten the array
             $value = implode('|', $value);
+        }
+
+        if ($field) {
+            $value = CustomFieldHelper::fixValueType($field['type'], $value);
         }
 
         if ($oldValue !== $value && !(('' === $oldValue && null === $value) || (null === $oldValue && '' === $value))) {
@@ -158,12 +166,12 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * Get company field value.
+     * Get field value.
      *
-     * @param      $field
-     * @param null $group
+     * @param string $field
+     * @param string $group
      *
-     * @return bool
+     * @return array|false
      */
     public function getFieldValue($field, $group = null)
     {
@@ -171,14 +179,31 @@ trait CustomFieldEntityTrait
             return $this->updatedFields[$field];
         }
 
-        if (!empty($group) && isset($this->fields[$group][$field])) {
-            return $this->fields[$group][$field]['value'];
+        if ($field = $this->getField($field, $group)) {
+            return CustomFieldHelper::fixValueType($field['type'], $field['value']);
+        }
+
+        return false;
+    }
+
+    /**
+     * Get field details.
+     *
+     * @param string $key
+     * @param string $group
+     *
+     * @return array|false
+     */
+    public function getField($key, $group = null)
+    {
+        if ($group && isset($this->fields[$group][$key])) {
+            return $this->fields[$group][$key];
         }
 
         foreach ($this->fields as $group => $groupFields) {
             foreach ($groupFields as $name => $details) {
-                if ($name == $field) {
-                    return $details['value'];
+                if ($name == $key) {
+                    return $details;
                 }
             }
         }

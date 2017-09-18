@@ -1,7 +1,19 @@
 /* PluginBundle */
 Mautic.matchedFields = function (index, object, integration) {
+    var compoundMauticFields = ['mauticContactTimelineLink', 'mauticContactIsContactableByEmail'];
+
     var integrationField = mQuery('#integration_details_featureSettings_'+object+'Fields_i_' + index).attr('data-value');
     var mauticField = mQuery('#integration_details_featureSettings_'+object+'Fields_m_' + index + ' option:selected').val();
+
+    if (mQuery.inArray(mauticField, compoundMauticFields) >= 0) {
+        mQuery('.btn-arrow' + index).removeClass('active');
+        mQuery('#integration_details_featureSettings_'+object+'Fields_update_mautic'+ index +'_0').attr('checked', 'checked');
+        mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]').prop('disabled', true).trigger("chosen:updated");
+        mQuery('.btn-arrow' + index).addClass('disabled');
+    } else {
+        mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]').prop('disabled', false).trigger("chosen:updated");
+        mQuery('.btn-arrow' + index).removeClass('disabled');
+    }
     if (object == 'lead') {
         var updateMauticField = mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]:checked').val();
     } else {
