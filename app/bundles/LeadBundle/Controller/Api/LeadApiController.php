@@ -606,7 +606,7 @@ class LeadApiController extends CommonApiController
      *
      * @param int $minutes
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getContactsRecentWebActivityAction($minutes)
     {
