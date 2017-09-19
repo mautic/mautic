@@ -19,6 +19,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     private $defaultContactFields = null;
 
+    private $autoMappingConfig = null;
+
     public function __construct(MauticFactory $factory = null) {
         parent::__construct($factory);
 
@@ -146,6 +148,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     public function pushLead($lead, $config = []) {
         $config = $this->mergeConfigToFeatureSettings($config);
+        $config = array_merge_recursive($config, $this->getAutoMappingConfig());
 
         $companyFields = $config['companyFields'];
         $leadFields = $config['leadFields'];
@@ -154,6 +157,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
         $companyRepo = $this->em->getRepository(Company::class);
         $leadRepo = $this->em->getRepository(Lead::class);
+
+        // TODO: Maybe ensure the existence of the field around here???
 
         $company = null;
         $companies = $companyRepo->getCompaniesByLeadId($lead->getId());
@@ -350,9 +355,18 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $this->defaultContactFields;
     }
 
+    private function getAutoMappingConfig() {
+        if (is_null($this->autoMappingConfig)) {
+            $this->partitionDefaultInesFields();
+        }
+
+        return $this->autoMappingConfig;
+    }
+
     private function partitionDefaultInesFields() {
         $defaultContactFields = [];
         $defaultClientFields = [];
+        $autoMappingConfig = [];
 
         foreach ($this->defaultInesFields as $f) {
             if ($f->autoMapping === false) {
@@ -361,16 +375,25 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     'required' => $f->isMappingRequired,
                 ];
 
-                if ($f->concept === 'contact') {
-                    $defaultContactFields[$f->inesKey] = $fieldValue;
-                } elseif ($f->concept === 'client') {
+                if ($f->concept === 'client') {
                     $defaultClientFields[$f->inesKey] = $fieldValue;
+                } elseif ($f->concept === 'contact') {
+                    $defaultContactFields[$f->inesKey] = $fieldValue;
+                }
+            } else {
+                // TODO: Maybe ensure the existence of the field around here???
+
+                if ($f->concept === 'client') {
+                    $autoMappingConfig['companyFields'][$f->inesKey] = $f->autoMapping;
+                } elseif ($f->concept === 'contact') {
+                    $autoMappingConfig['leadFields'][$f->inesKey] = $f->autoMapping;
                 }
             }
         }
 
         $this->defaultClientFields = $defaultClientFields;
         $this->defaultContactFields = $defaultContactFields;
+        $this->autoMappingConfig = $autoMappingConfig;
     }
 
     private function pushContactCustomFields($config, $inesContactRef, $lead) {
