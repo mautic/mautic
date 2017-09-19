@@ -12,32 +12,16 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     const INES_CUSTOM_FIELD_PREFIX = 'ines_custom_';
 
-    private $defaultContactFields;
+    private $defaultInesFields = null;
 
-    private $defaultCompanyFields;
+    private $defaultClientFields = null;
+
+    private $defaultContactFields = null;
 
     public function __construct(MauticFactory $factory = null) {
         parent::__construct($factory);
 
-        $defaultFields = json_decode(self::INES_DEFAULT_FIELDS_JSON);
-        $defaultContactFields = [];
-        $defaultCompanyFields = [];
-
-        foreach ($defaultFields as $f) {
-            $fieldValue = [
-                'label' => $f->inesLabel,
-                'required' => $f->isMappingRequired,
-            ];
-
-            if ($f->concept === 'contact') {
-                $defaultContactFields[$f->inesKey] = $fieldValue;
-            } else if ($f->concept === 'client') {
-                $defaultCompanyFields[$f->inesKey] = $fieldValue;
-            }
-        }
-
-        $this->defaultContactFields = $defaultContactFields;
-        $this->defaultCompanyFields = $defaultCompanyFields;
+        $this->defaultInesFields = json_decode(self::INES_DEFAULT_FIELDS_JSON);
     }
 
     public function getName()
@@ -69,6 +53,45 @@ class InesCRMIntegration extends CrmAbstractIntegration
     public function getSupportedFeatures()
     {
         return ['push_lead', 'push_leads'];
+    }
+
+    private function partitionDefaultInesFields() {
+        $defaultContactFields = [];
+        $defaultClientFields = [];
+
+        foreach ($this->defaultInesFields as $f) {
+            if ($f->autoMapping === false) {
+                $fieldValue = [
+                    'label' => $f->inesLabel,
+                    'required' => $f->isMappingRequired,
+                ];
+
+                if ($f->concept === 'contact') {
+                    $defaultContactFields[$f->inesKey] = $fieldValue;
+                } elseif ($f->concept === 'client') {
+                    $defaultClientFields[$f->inesKey] = $fieldValue;
+                }
+            }
+        }
+
+        $this->defaultClientFields = $defaultClientFields;
+        $this->defaultContactFields = $defaultContactFields;
+    }
+
+    private function getDefaultClientFields() {
+        if (is_null($this->defaultClientFields)) {
+            $this->partitionDefaultInesFields();
+        }
+
+        return $this->defaultClientFields;
+    }
+
+    private function getDefaultContactFields() {
+        if (is_null($this->defaultContactFields)) {
+            $this->partitionDefaultInesFields();
+        }
+
+        return $this->defaultContactFields;
     }
 
     public function pushLead($lead, $config = []) {
@@ -397,7 +420,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function getFormLeadFields($settings = []) {
-        $leadFields = $this->defaultContactFields;
+        $leadFields = $this->getDefaultContactFields();
 
         $customFields = $this->getApiHelper()->getSyncInfo()
                              ->GetSyncInfoResult
@@ -415,7 +438,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function getFormCompanyFields($settings = []) {
-        $companyFields = $this->defaultCompanyFields;
+        $companyFields = $this->getDefaultClientFields();
 
         $customFields = $this->getApiHelper()->getSyncInfo()
                              ->GetSyncInfoResult
@@ -617,8 +640,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 "autoMapping": "ines_contact_ref",
                 "excludeFromEcrasableConfig": true,
                 "mauticCustomFieldToCreate": {
+                    "label": "Ines Contact Ref",
                     "alias": "ines_contact_ref",
-                    "type": "number"
+                    "type": "number",
+                    "object": "lead"
                 }
             },
             {
@@ -630,8 +655,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 "autoMapping": "ines_client_ref",
                 "excludeFromEcrasableConfig": true,
                 "mauticCustomFieldToCreate": {
+                    "label": "Ines Client Ref",
                     "alias": "ines_client_ref",
-                    "type": "number"
+                    "type": "number",
+                    "object": "company"
                 }
             },
             {
@@ -662,7 +689,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 "inesLabel": "Last name (contact)",
                 "isCustomField": false,
                 "isMappingRequired": false,
-                "autoMapping": "lastname",
+                "autoMapping": false,
                 "excludeFromEcrasableConfig": false,
                 "mauticCustomFieldToCreate": false
             },
@@ -672,7 +699,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 "inesLabel": "First name (contact)",
                 "isCustomField": false,
                 "isMappingRequired": false,
-                "autoMapping": "firstname",
+                "autoMapping": false,
                 "excludeFromEcrasableConfig": false,
                 "mauticCustomFieldToCreate": false
             },
@@ -944,7 +971,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 "inesLabel": "NPAI (contact)",
                 "isCustomField": false,
                 "isMappingRequired": false,
-                "autoMapping": "ines_contact_npai",
+                "autoMapping": false,
                 "excludeFromEcrasableConfig": true,
                 "mauticCustomFieldToCreate": {
                     "alias": "ines_contact_npai",
@@ -957,7 +984,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 "inesLabel": "Company name",
                 "isCustomField": false,
                 "isMappingRequired": true,
-                "autoMapping": "company",
+                "autoMapping": false,
                 "excludeFromEcrasableConfig": true,
                 "mauticCustomFieldToCreate": false
             },
