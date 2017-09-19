@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\LeadField;
 
 class InesCRMIntegration extends CrmAbstractIntegration
 {
@@ -157,8 +158,6 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
         $companyRepo = $this->em->getRepository(Company::class);
         $leadRepo = $this->em->getRepository(Lead::class);
-
-        // TODO: Maybe ensure the existence of the field around here???
 
         $company = null;
         $companies = $companyRepo->getCompaniesByLeadId($lead->getId());
@@ -381,7 +380,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     $defaultContactFields[$f->inesKey] = $fieldValue;
                 }
             } else {
-                // TODO: Maybe ensure the existence of the field around here???
+                $this->ensureFieldExists($f->mauticCustomFieldToCreate);
 
                 if ($f->concept === 'client') {
                     $autoMappingConfig['companyFields'][$f->inesKey] = $f->autoMapping;
@@ -394,6 +393,33 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $this->defaultClientFields = $defaultClientFields;
         $this->defaultContactFields = $defaultContactFields;
         $this->autoMappingConfig = $autoMappingConfig;
+    }
+
+    private function ensureFieldExists($fieldSpec) {
+        $fieldModel = $this->fieldModel;
+        $requestedField = null;
+
+        foreach ($fieldModel->getEntities() as $field) {
+            if ($field->getAlias() === $fieldSpec->alias && $field->getObject() === $fieldSpec->object) {
+                if ($field->getType() !== $fieldSpec->type) {
+                    $fieldModel->deleteEntity($field);
+                    break;
+                } else {
+                    $requestedField = $field;
+                    break;
+                }
+            }
+        }
+
+        if (is_null($requestedField)) {
+            $requestedField = new LeadField();
+            $requestedField->setLabel($fieldSpec->label);
+            $requestedField->setAlias($fieldSpec->alias);
+            $requestedField->setType($fieldSpec->type);
+            $requestedField->setObject($fieldSpec->object);
+
+            $fieldModel->saveEntity($requestedField);
+        }
     }
 
     private function pushContactCustomFields($config, $inesContactRef, $lead) {
