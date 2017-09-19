@@ -614,6 +614,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
                     $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
                 }
+                if (isset($config['campaign_task'])) {
+                    $this->createActivity($config['campaign_task'], $id);
+                }
 
                 return true;
             } else {
@@ -752,7 +755,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $params       = [];
         $activities   = [];
         $cwActivities = $this->getApiHelper()->getActivityTypes($params);
-        $this->logger->addError(print_r($cwActivities, true));
         foreach ($cwActivities as $cwActivity) {
             $activities[$cwActivity['id']] = $cwActivity['name'];
         }
@@ -760,7 +762,19 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $activities;
     }
 
-    public function createActivity()
+    /**
+     * @param $config
+     * @param $contactId
+     */
+    public function createActivity($config, $contactId)
     {
+        $activity = [
+            'name'    => $config['activity_name'],
+            'type'    => $config['campaign_activity_type'],
+            'contact' => $contactId,
+        ];
+        $activities = $this->getApiHelper()->postActivity($activity);
+
+        //finish by writing the activities created to our intergration entity table
     }
 }
