@@ -344,6 +344,13 @@ class BuilderSubscriber extends CommonSubscriber
                     $content         = $dom->saveHTML();
                 }
 
+                $divContent = $xpath->query('//*[@data-slot="saveprefsbutton"]');
+                for ($i = 0; $i < $divContent->length; ++$i) {
+                    $slot            = $divContent->item($i);
+                    $slot->nodeValue = $this->saveprefsRegex;
+                    $content         = $dom->saveHTML();
+                }
+
                 unset($slot, $xpath, $dom);
             }
             // replace tokens

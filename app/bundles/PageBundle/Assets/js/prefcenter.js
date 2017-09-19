@@ -47,4 +47,9 @@ if (typeof MauticPrefCenterLoaded == 'undefined') {
             document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = true;
         }
     }
+
+    function saveUnsubscribePreferences(formId) {
+        var form = jQuery('form[name=' + formId + ']');
+        form.submit();
+    }
 }

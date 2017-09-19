@@ -48,7 +48,6 @@ class SlotSavePrefsButtonType extends SlotType
             'attr'       => [
                 'class'           => 'form-control',
                 'data-slot-param' => 'link-text',
-                'onclick'         => 'Mautic.saveUnsubscribePreferences()',
             ],
             'data' => $this->translator->trans('mautic.page.form.saveprefs'),
         ]);

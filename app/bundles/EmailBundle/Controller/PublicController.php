@@ -227,8 +227,13 @@ class PublicController extends CommonFormController
                 // Replace tokens in preference center page
                 /** @var Page $prefCenter */
                 if ($email && ($prefCenter = $email->getPreferenceCenter())) {
-                    $html  = $prefCenter->getCustomHtml();
-                    $event = new PageDisplayEvent($html, $prefCenter, array_merge($viewParameters, ['form' => $formView]));
+                    $html = $prefCenter->getCustomHtml();
+                    // set custom tag to inject end form
+                    $params = array_merge($viewParameters, [
+                        'form'       => $formView,
+                        'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
+                    ]);
+                    $event = new PageDisplayEvent($html, $prefCenter, $params);
                     $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
                     $html = $event->getContent();
                     $html = preg_replace('/'.BuilderSubscriber::identifierToken.'/', $lead->getPrimaryIdentifier(), $html);
