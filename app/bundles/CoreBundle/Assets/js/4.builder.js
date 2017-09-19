@@ -83,7 +83,7 @@ Mautic.launchBuilder = function (formName, actionName) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'pauseprefs'
+            'saveprefsbutton'
         ];
         mQuery.each(slots, function(i, s){
             if (isPrefCenterEnabled) {
@@ -147,7 +147,7 @@ Mautic.launchBuilder = function (formName, actionName) {
             'categorylist',
             'preferredchannel',
             'channelfrequency',
-            'pauseprefs'
+            'saveprefsbutton'
         ];
         mQuery.each(slots, function (i, s) {
             // delete existing tokens
@@ -1274,7 +1274,7 @@ Mautic.initSlotListeners = function() {
             });
 
             // initialize code mode slots
-            $codeModeSlotTypes = ['codemode', 'segmentlist', 'categorylist', 'preferredchannel', 'pauseprefs', 'channelfrequency'];
+            $codeModeSlotTypes = ['codemode'];
             for (var i = 0; i < $codeModeSlotTypes.length; i++) {
                 if ($codeModeSlotTypes[i] === type) {
                     Mautic.codeMode = true;

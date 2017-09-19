@@ -343,13 +343,6 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.form.type.slot.pauseprefs' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotPausePrefsType',
-                'alias'     => 'slot_pauseprefs',
-                'arguments' => [
-                    'translator',
-                ],
-            ],
             'mautic.form.type.slot.codemode' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotCodeModeType',
                 'alias' => 'slot_codemode',
