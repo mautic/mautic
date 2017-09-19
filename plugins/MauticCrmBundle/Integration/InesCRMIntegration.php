@@ -2,8 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\LeadField;
 
 class InesCRMIntegration extends CrmAbstractIntegration
@@ -125,7 +123,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $limit                   = $params['limit'];
 
         if (in_array('lead', $config['objects'])) {
-            $leadRepo = $this->em->getRepository(Lead::class);
+            $leadRepo = $this->leadModel->getRepository();
             $qb = $leadRepo->createQueryBuilder('l');
             $qb->where('l.email is not null')->andWhere('l.email != \'\'');
 
@@ -156,15 +154,15 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
         $apiHelper = $this->getApiHelper();
 
-        $companyRepo = $this->em->getRepository(Company::class);
-        $leadRepo = $this->em->getRepository(Lead::class);
+        $companyModel = $this->companyModel;
+        $leadModel = $this->leadModel;
 
+        $companies = $leadModel->getCompanies($lead);
         $company = null;
-        $companies = $companyRepo->getCompaniesByLeadId($lead->getId());
 
         foreach ($companies as $c) {
             if ($c['is_primary']) {
-                $company = $companyRepo->getEntity($c['id']);
+                $company = $companyModel->getEntity($c['company_id']);
                 break;
             }
         }
@@ -207,8 +205,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $company->$companyInternalRefSetter($inesClientRef);
                 $lead->$leadInternalRefSetter($inesContactRef);
 
-                $companyRepo->saveEntity($company);
-                $leadRepo->saveEntity($lead);
+                $companyModel->saveEntity($company);
+                $leadModel->saveEntity($lead);
             } else {
                 $this->logger->debug('INES: Will create Client and update Contact', compact('lead', 'company', 'config'));
 
@@ -223,7 +221,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $inesClientRef = $response->AddClientResult->InternalRef;
 
                 $company->$companyInternalRefSetter($inesClientRef);
-                $companyRepo->saveEntity($company);
+                $companyModel->saveEntity($company);
 
                 $inesContact = $apiHelper->getContact($inesContactRef)->GetContactResult;
 
@@ -256,7 +254,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $inesContactRef = $response->AddContactResult->InternalRef;
 
                 $lead->$leadInternalRefSetter($inesContactRef);
-                $leadRepo->saveEntity($lead);
+                $leadModel->saveEntity($lead);
 
                 $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
 
