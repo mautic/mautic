@@ -106,7 +106,7 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
                 $this->getUsername(),
                 $this->getPassword()
             ),
-            'region' => $this->getRegion(),
+            'region'  => $this->getRegion(),
             'version' => 'latest',
         ]);
 
@@ -146,22 +146,22 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
 
     /**
      * @param \Swift_Mime_Message $message
-     * @param null $failedRecipients
+     * @param null                $failedRecipients
      *
      * @return array
      */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
         try {
-            $client = $this->start();
+            $client     = $this->start();
             $commands[] = $client->getCommand('sendRawEmail', $this->getAmazonMessage($message));
-            $pool = new CommandPool($client, $commands, [
+            $pool       = new CommandPool($client, $commands, [
                 'concurrency' => $this->concurrency,
                 'before'      => function (CommandInterface $cmd, $iteratorId) {
                 },
-                'fulfilled'   => function (ResultInterface $result, $iteratorId) use ($commands) {
+                'fulfilled' => function (ResultInterface $result, $iteratorId) use ($commands) {
                 },
-                'rejected'    => function (AwsException $reason, $iteratorId) use ($commands) {
+                'rejected' => function (AwsException $reason, $iteratorId) use ($commands) {
                 },
             ]);
             $promise = $pool->promise();
