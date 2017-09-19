@@ -805,6 +805,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function pushLeadActivity($params = [])
     {
         $executed = null;
+        $filters  = [];
 
         $query  = $this->getFetchQuery($params);
         $config = $this->mergeConfigToFeatureSettings([]);
@@ -815,6 +816,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $salesForceObjects[] = 'Lead';
         if (isset($config['objects']) && !empty($config['objects'])) {
             $salesForceObjects = $config['objects'];
+        }
+
+        if (isset($params['filters'])) {
+            $filters = $params['filters'];
         }
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
@@ -854,7 +859,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $leadActivity = $this->getLeadData(
                             $startDate,
                             $endDate,
-                            $leadIds
+                            $leadIds,
+                            $filters
                         );
 
                         $this->logger->debug('SALESFORCE: Syncing activity for '.count($leadActivity).' contacts ('.implode(', ', array_keys($leadActivity)).')');
@@ -921,10 +927,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $leadActivity = [];
 
         foreach ($leadIds as $leadId) {
-            $i           = 0;
-            $activity    = [];
-            $lead        = $this->leadModel->getEntity($leadId);
-            $engagements = $this->leadModel->getEngagements($lead, [], null, 1, 100, true);
+            $i        = 0;
+            $activity = [];
+            $lead     = $this->leadModel->getEntity($leadId);
+
+            $engagements = $this->leadModel->getEngagements($lead, $filters, null, 1, 100, true);
             $events      = $engagements['events'];
 
             // inject lead into events
@@ -1962,10 +1969,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } else {
                     $error = 'http status code '.$item['httpStatusCode'];
                     switch (true) {
-                        case !empty($item['body'][0]['message']['message']) :
+                        case !empty($item['body'][0]['message']['message']):
                             $error = $item['body'][0]['message']['message'];
                             break;
-                        case !empty($item['body']['message']) :
+                        case !empty($item['body']['message']):
                             $error = $item['body']['message'];
                             break;
                     }

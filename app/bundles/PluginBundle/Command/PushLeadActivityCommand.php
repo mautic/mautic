@@ -54,6 +54,22 @@ class PushLeadActivityCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'Send time interval to check updates on Salesforce, it should be a correct php formatted time interval in the past eg:(-10 minutes)'
             )
+            ->addOption(
+                '--include-events',
+                '-g',
+                InputOption::VALUE_OPTIONAL,
+                'Send events in the form of "lead.ipadded", "asset.download", "campaign.event", "lead.create", 
+                "lead.identified", "lead.donotcontact", "email.read", "email.sent", "email.failed", "form.submitted", "page.hit", "point.gained", 
+                "stage.changed", "lead.utmtagsadded", "page.videohit"'
+            )
+            ->addOption(
+                '--exclude-events',
+                '-k',
+                InputOption::VALUE_OPTIONAL,
+                'Send events in the form of "lead.ipadded", "asset.download", "campaign.event", "lead.create", 
+                "lead.identified", "lead.donotcontact", "email.read", "email.sent", "email.failed", "form.submitted", "page.hit", "point.gained", 
+                "stage.changed", "lead.utmtagsadded", "page.videohit"'
+            )
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
 
         parent::configure();
@@ -69,11 +85,18 @@ class PushLeadActivityCommand extends ContainerAwareCommand
         /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
         $factory = $container->get('mautic.factory');
 
-        $translator  = $factory->getTranslator();
-        $integration = $input->getOption('integration');
-        $startDate   = $input->getOption('start-date');
-        $endDate     = $input->getOption('end-date');
-        $interval    = $input->getOption('time-interval');
+        $translator    = $factory->getTranslator();
+        $integration   = $input->getOption('integration');
+        $startDate     = $input->getOption('start-date');
+        $endDate       = $input->getOption('end-date');
+        $interval      = $input->getOption('time-interval');
+        $includeEvents = $input->getOption('include-events');
+        $excludeEvents = $input->getOption('exclude-events');
+        $filters       = [
+            'search'        => '',
+            'includeEvents' => [],
+            'excludeEvents' => [],
+        ];
 
         if (!$interval) {
             $interval = '15 minutes';
@@ -85,6 +108,13 @@ class PushLeadActivityCommand extends ContainerAwareCommand
         if (!$endDate) {
             $endDate = date('c');
         }
+        if ($includeEvents) {
+            $filters['includeEvents'] = explode(',', $includeEvents);
+        }
+
+        if ($excludeEvents) {
+            $filters['excludeEvents'] = explode(',', $excludeEvents);
+        }
 
         if ($integration && $startDate && $endDate) {
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
@@ -95,8 +125,9 @@ class PushLeadActivityCommand extends ContainerAwareCommand
             if ($integrationObject !== null && method_exists($integrationObject, 'pushLeadActivity')) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.push.leads.activity', ['%integration%' => $integration]).'</info>');
 
-                $params['start'] = $startDate;
-                $params['end']   = $endDate;
+                $params['start']   = $startDate;
+                $params['end']     = $endDate;
+                $params['filters'] = $filters;
 
                 $processed = intval($integrationObject->pushLeadActivity($params));
 
