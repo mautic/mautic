@@ -55,7 +55,7 @@ class UserModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticUserBundle:User');
+        return $this->em->getRepository(User::class);
     }
 
     /**
@@ -336,5 +336,15 @@ class UserModel extends FormModel
                 }
             }
         }
+    }
+
+    /**
+     * Return list of Users for formType Choice.
+     *
+     * @return array
+     */
+    public function getOwnerListChoices()
+    {
+        return $this->getRepository()->getOwnerListChoices();
     }
 }
