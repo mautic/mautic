@@ -8,8 +8,31 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+$view['assets']->addScript('app/bundles/PageBundle/Assets/js/prefcenter.js');
 ?>
-<div class="codemodeHtmlContainer">
+<?php if (isset($form)) : ?>
+    <?php if ($showContactCategories && count($form['global_categories'])):?>
+<div class="global-categories text-left">
+    <div>
+        <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.form.categories'); ?></label>
+    </div>
+        <?php $categoryNumber = count($form['global_categories']->vars['choices']);
+        for ($i = ($categoryNumber - 1); $i >= 0; --$i): ?>
+            <div id="category-<?php echo $i; ?>" class="text-left">
+                <?php echo $view['form']->widget($form['global_categories'][$i]); ?>
+                <?php echo $view['form']->label($form['global_categories'][$i]); ?>
+            </div>
+            <?php
+        endfor;
+        unset($form['global_categories']);
+?>
+    </div>
+    <?php else:
+        unset($form['global_categories']);
+    endif;
+else :
+?>
     <div class="global-categories text-left">
         <div>
             <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.form.categories'); ?></label>
@@ -19,4 +42,4 @@
             <label for="lead_contact_frequency_rules_global_categories_1"><?php echo  $view['translator']->trans('mautic.core.category'); ?></label>
         </div>
     </div>
-</div>
+<?php endif; ?>

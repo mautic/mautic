@@ -227,6 +227,7 @@ $view['slots']->set(
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- preview URL -->
+        <?php if (!$activePage->getIsPreferenceCenter()) : ?>
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.url'); ?></div>
@@ -244,6 +245,7 @@ $view['slots']->set(
                 </div>
             </div>
         </div>
+        <?php endif; ?>
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title"><?php echo $view['translator']->trans('mautic.page.preview.url'); ?></div>

@@ -1418,6 +1418,16 @@ Mautic.initSlotListeners = function() {
 
         if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
+        } else if ('label-text' === fieldParam) {
+            params.slot.find('label.control-label').text(params.field.val());
+        } else if ('label-text1' === fieldParam) {
+            params.slot.find('label.label1').text(params.field.val());
+        } else if ('label-text2' === fieldParam) {
+            params.slot.find('label.label2').text(params.field.val());
+        } else if ('label-text3' === fieldParam) {
+            params.slot.find('label.label3').text(params.field.val());
+        } else if ('label-text4' === fieldParam) {
+            params.slot.find('label.label4').text(params.field.val());
         } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
         } else if (fieldParam === 'href') {

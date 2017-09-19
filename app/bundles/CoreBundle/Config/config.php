@@ -284,6 +284,10 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
                 'alias' => 'slot_button',
             ],
+            'mautic.form.type.slot.saveprefsbutton' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
+                'alias' => 'slot_saveprefsbutton',
+            ],
             'mautic.form.type.slot.image' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
                 'alias' => 'slot_image',
@@ -309,24 +313,39 @@ return [
                 'alias' => 'slot_socialfollow',
             ],
             'mautic.form.type.slot.segmentlist' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
-                'alias' => 'slot_segmentlist',
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
+                'alias'     => 'slot_segmentlist',
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.slot.categorylist' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotCategoryListType',
-                'alias' => 'slot_categorylist',
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotCategoryListType',
+                'alias'     => 'slot_categorylist',
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.slot.preferredchannel' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotPreferredChannelType',
-                'alias' => 'slot_preferredchannel',
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotPreferredChannelType',
+                'alias'     => 'slot_preferredchannel',
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.slot.channelfrequency' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType',
-                'alias' => 'slot_channelfrequency',
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType',
+                'alias'     => 'slot_channelfrequency',
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.slot.pauseprefs' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotPausePrefsType',
-                'alias' => 'slot_pauseprefs',
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotPausePrefsType',
+                'alias'     => 'slot_pauseprefs',
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.slot.codemode' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotCodeModeType',

@@ -11,26 +11,40 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SlotSegmentListType extends SlotType
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * ConfigType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'content',
-            TextareaType::class,
-            [
-                'label'      => false,
-                'label_attr' => ['class' => 'control-label'],
-                'required'   => false,
-                'attr'       => [
-                    'class'           => 'form-control',
-                    'data-slot-param' => 'content',
-                ],
-            ]
-        );
+        $builder->add('label-text', 'text', [
+            'label'      => 'mautic.lead.field.label',
+            'label_attr' => ['class' => 'control-label'],
+            'required'   => false,
+            'attr'       => [
+                'class'           => 'form-control',
+                'data-slot-param' => 'label-text',
+            ],
+            'data' => $this->translator->trans('mautic.lead.form.list'),
+        ]);
+
+        parent::buildForm($builder, $options);
     }
 
     /**

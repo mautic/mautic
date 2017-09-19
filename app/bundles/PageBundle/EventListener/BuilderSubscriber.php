@@ -11,6 +11,8 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use DOMDocument;
+use DOMXPath;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
@@ -53,9 +55,11 @@ class BuilderSubscriber extends CommonSubscriber
     protected $categoryListRegex   = '{categorylist}';
     protected $preferredchannel    = '{preferredchannel}';
     protected $channelfrequency    = '{channelfrequency}';
-    protected $pauseprefsRegex     = '{pauseprefs}';
+    protected $saveprefsRegex      = '{saveprefsbutton}';
     protected $emailIsInternalSend = false;
     protected $emailEntity         = null;
+
+    const identifierToken = '{leadidentifier}';
 
     public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
     {
@@ -118,7 +122,8 @@ class BuilderSubscriber extends CommonSubscriber
                         $this->categoryListRegex => $this->translator->trans('mautic.page.form.categorylist'),
                         $this->preferredchannel  => $this->translator->trans('mautic.page.form.preferredchannel'),
                         $this->channelfrequency  => $this->translator->trans('mautic.page.form.channelfrequency'),
-                        $this->pauseprefsRegex   => $this->translator->trans('mautic.page.form.pauseprefs'),
+                        $this->saveprefsRegex    => $this->translator->trans('mautic.page.form.saveprefs'),
+                        self::identifierToken    => $this->translator->trans('mautic.page.form.leadidentifier'),
                     ]
                 )
             );
@@ -215,12 +220,12 @@ class BuilderSubscriber extends CommonSubscriber
                     560
                 );
                 $event->addSlotType(
-                    'pauseprefs',
-                    'Pause Preferences',
-                    'clock-o',
-                    'MauticCoreBundle:Slots:pauseprefs.html.php',
-                    'slot_pauseprefs',
-                    550
+                    'saveprefsbutton',
+                    'Save Preferences',
+                    'floppy-o',
+                    'MauticCoreBundle:Slots:saveprefsbutton.html.php',
+                    'slot_saveprefsbutton',
+                    540
                 );
             }
             $event->addSlotType(
@@ -284,6 +289,7 @@ class BuilderSubscriber extends CommonSubscriber
     {
         $content = $event->getContent();
         $page    = $event->getPage();
+        $params  = $event->getParams();
 
         if (strpos($content, $this->langBarRegex) !== false) {
             $langbar = $this->renderLanguageBar($page);
@@ -303,29 +309,68 @@ class BuilderSubscriber extends CommonSubscriber
             $content = str_ireplace($this->descriptionRegex, $page->getMetaDescription(), $content);
         }
 
-        if (strpos($content, $this->segmentListRegex) !== false) {
-            $segmentList = $this->renderSegmentList();
-            $content     = str_ireplace($this->segmentListRegex, $segmentList, $content);
-        }
+        if ($page->getIsPreferenceCenter()) {
+            // replace slots
+            if (count($params)) {
+                $dom = new DOMDocument('1.0', 'utf-8');
+                $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+                $xpath = new DOMXPath($dom);
 
-        if (strpos($content, $this->categoryListRegex) !== false) {
-            $categoryList = $this->renderCategoryList();
-            $content      = str_ireplace($this->categoryListRegex, $categoryList, $content);
-        }
+                $divContent = $xpath->query('//*[@data-slot="segmentlist"]');
+                for ($i = 0; $i < $divContent->length; ++$i) {
+                    $slot            = $divContent->item($i);
+                    $slot->nodeValue = $this->segmentListRegex;
+                    $content         = $dom->saveHTML();
+                }
 
-        if (strpos($content, $this->preferredchannel) !== false) {
-            $preferredChannel = $this->renderPreferredChannel();
-            $content          = str_ireplace($this->preferredchannel, $preferredChannel, $content);
-        }
+                $divContent = $xpath->query('//*[@data-slot="categorylist"]');
+                for ($i = 0; $i < $divContent->length; ++$i) {
+                    $slot            = $divContent->item($i);
+                    $slot->nodeValue = $this->categoryListRegex;
+                    $content         = $dom->saveHTML();
+                }
 
-        if (strpos($content, $this->channelfrequency) !== false) {
-            $channelfrequency = $this->renderChannelFrequency();
-            $content          = str_ireplace($this->channelfrequency, $channelfrequency, $content);
-        }
+                $divContent = $xpath->query('//*[@data-slot="preferredchannel"]');
+                for ($i = 0; $i < $divContent->length; ++$i) {
+                    $slot            = $divContent->item($i);
+                    $slot->nodeValue = $this->preferredchannel;
+                    $content         = $dom->saveHTML();
+                }
 
-        if (strpos($content, $this->pauseprefsRegex) !== false) {
-            $pausePrefs = $this->renderPausePrefs();
-            $content    = str_ireplace($this->pauseprefsRegex, $pausePrefs, $content);
+                $divContent = $xpath->query('//*[@data-slot="channelfrequency"]');
+                for ($i = 0; $i < $divContent->length; ++$i) {
+                    $slot            = $divContent->item($i);
+                    $slot->nodeValue = $this->channelfrequency;
+                    $content         = $dom->saveHTML();
+                }
+
+                unset($slot, $xpath, $dom);
+            }
+            // replace tokens
+            if (strpos($content, $this->segmentListRegex) !== false) {
+                $segmentList = $this->renderSegmentList($params);
+                $content     = str_ireplace($this->segmentListRegex, $segmentList, $content);
+            }
+
+            if (strpos($content, $this->categoryListRegex) !== false) {
+                $categoryList = $this->renderCategoryList($params);
+                $content      = str_ireplace($this->categoryListRegex, $categoryList, $content);
+            }
+
+            if (strpos($content, $this->preferredchannel) !== false) {
+                $preferredChannel = $this->renderPreferredChannel($params);
+                $content          = str_ireplace($this->preferredchannel, $preferredChannel, $content);
+            }
+
+            if (strpos($content, $this->channelfrequency) !== false) {
+                $channelfrequency = $this->renderChannelFrequency($params);
+                $content          = str_ireplace($this->channelfrequency, $channelfrequency, $content);
+            }
+
+            if (strpos($content, $this->saveprefsRegex) !== false) {
+                $savePrefs = $this->renderSavePrefs($params);
+                $content   = str_ireplace($this->saveprefsRegex, $savePrefs, $content);
+            }
         }
 
         $clickThrough = ['source' => ['page', $page->getId()]];
@@ -365,66 +410,90 @@ class BuilderSubscriber extends CommonSubscriber
 
     /**
      * Renders the HTML for the segment list.
+     *
+     * @param array $params
+     *
+     * @return string
      */
-    protected function renderSegmentList()
+    protected function renderSegmentList(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-segmentlist'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php');
+            $content .= $this->templating->render('MauticCoreBundle:Slots:segmentlist.html.php', $params);
             $content .= "</div>\n";
         }
 
         return $content;
     }
 
-    protected function renderCategoryList()
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function renderCategoryList(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-categorylist'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php');
+            $content .= $this->templating->render('MauticCoreBundle:Slots:categorylist.html.php', $params);
             $content .= "</div>\n";
         }
 
         return $content;
     }
 
-    protected function renderPreferredChannel()
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function renderPreferredChannel(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-preferredchannel'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:preferredchannel.html.php');
+            $content .= $this->templating->render('MauticCoreBundle:Slots:preferredchannel.html.php', $params);
             $content .= "</div>\n";
         }
 
         return $content;
     }
 
-    protected function renderChannelFrequency()
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function renderChannelFrequency(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
             $content = "<div class='pref-channelfrequency'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:channelfrequency.html.php');
+            $content .= $this->templating->render('MauticCoreBundle:Slots:channelfrequency.html.php', $params);
             $content .= "</div>\n";
         }
 
         return $content;
     }
 
-    protected function renderPausePrefs()
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
+    protected function renderSavePrefs(array $params = [])
     {
         static $content = '';
 
         if (empty($content)) {
-            $content = "<div class='pref-pauseprefs'>\n";
-            $content .= $this->templating->render('MauticCoreBundle:Slots:pauseprefs.html.php');
+            $content = "<div class='pref-saveprefs'>\n";
+            $content .= $this->templating->render('MauticCoreBundle:Slots:saveprefsbutton.html.php', $params);
             $content .= "</div>\n";
         }
 

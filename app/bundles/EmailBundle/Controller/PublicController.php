@@ -22,6 +22,9 @@ use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\EventListener\BuilderSubscriber;
+use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -220,17 +223,24 @@ class PublicController extends CommonFormController
                     );
                 }
 
-                if ($email) {
-                    /** @var Page $prefCenter */
-                    $prefCenter = $email->getPreferenceCenter();
-                    $html       = $prefCenter->getCustomHtml();
-                } else {
+                $formView = $form->createView();
+                // Replace tokens in preference center page
+                /** @var Page $prefCenter */
+                if ($email && ($prefCenter = $email->getPreferenceCenter())) {
+                    $html  = $prefCenter->getCustomHtml();
+                    $event = new PageDisplayEvent($html, $prefCenter, array_merge($viewParameters, ['form' => $formView]));
+                    $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                    $html = $event->getContent();
+                    $html = preg_replace('/'.BuilderSubscriber::identifierToken.'/', $lead->getPrimaryIdentifier(), $html);
+                }
+
+                if (empty($html)) {
                     $html = $this->get('mautic.helper.templating')->getTemplating()->render(
                         'MauticEmailBundle:Lead:preference_options.html.php',
                         array_merge(
                             $viewParameters,
                             [
-                                'form'         => $form->createView(),
+                                'form'         => $formView,
                                 'currentRoute' => $this->generateUrl(
                                     'mautic_contact_action',
                                     [
