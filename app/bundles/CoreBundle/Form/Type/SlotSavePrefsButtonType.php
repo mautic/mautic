@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class SlotButtonType.
@@ -20,13 +21,28 @@ use Symfony\Component\Form\FormBuilderInterface;
 class SlotSavePrefsButtonType extends SlotType
 {
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * ConfigType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('link-text', 'text', [
-            'label'      => 'mautic.core.button.text',
+            'label'      => 'mautic.lead.field.label',
             'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
@@ -34,6 +50,7 @@ class SlotSavePrefsButtonType extends SlotType
                 'data-slot-param' => 'link-text',
                 'onclick'         => 'Mautic.saveUnsubscribePreferences()',
             ],
+            'data' => $this->translator->trans('mautic.page.form.saveprefs'),
         ]);
 
         parent::buildForm($builder, $options);

@@ -285,8 +285,11 @@ return [
                 'alias' => 'slot_button',
             ],
             'mautic.form.type.slot.saveprefsbutton' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
-                'alias' => 'slot_saveprefsbutton',
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
+                'alias'     => 'slot_saveprefsbutton',
+                'arguments' => [
+                    'translator',
+                ],
             ],
             'mautic.form.type.slot.image' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
