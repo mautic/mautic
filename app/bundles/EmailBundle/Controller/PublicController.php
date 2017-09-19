@@ -226,7 +226,7 @@ class PublicController extends CommonFormController
                 $formView = $form->createView();
                 // Replace tokens in preference center page
                 /** @var Page $prefCenter */
-                if ($email && ($prefCenter = $email->getPreferenceCenter())) {
+                if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
                     $html = $prefCenter->getCustomHtml();
                     // set custom tag to inject end form
                     $params = array_merge($viewParameters, [
