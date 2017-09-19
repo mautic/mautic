@@ -122,7 +122,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getApiUrl()
     {
-        return sprintf('%s/v4_6_release/apis/3.0/', $this->keys['site']);
+        return sprintf('%s/v4_6_release/apis/3.0', $this->keys['site']);
     }
 
     /**
@@ -263,22 +263,22 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        $builder->add(
-            'updateBlanks',
-            'choice',
-            [
-                'choices' => [
-                    'updateBlanks' => 'mautic.integrations.blanks',
-                ],
-                'expanded'    => true,
-                'multiple'    => true,
-                'label'       => 'mautic.integrations.form.blanks',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
-            ]
-        );
         if ($formArea == 'features') {
+            $builder->add(
+                'updateBlanks',
+                'choice',
+                [
+                    'choices' => [
+                        'updateBlanks' => 'mautic.integrations.blanks',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
             $builder->add(
                 'objects',
                 'choice',
@@ -295,6 +295,18 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     'required'    => false,
                 ]
             );
+        }
+
+        if ($formArea == 'integration') {
+            if ($this->isAuthorized()) {
+                if ($this->factory->serviceExists('mautic.form.type.connectwise.campaignaction')) {
+                    $builder->add('campaign_task', 'integration_campaign_task', [
+                        'label'  => false,
+                        'helper' => $this->factory->getHelper('integration'),
+                        'data'   => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
+                    ]);
+                }
+            }
         }
     }
 
@@ -731,4 +743,24 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
          return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
      }
+
+    /**
+     * @return array
+     */
+    public function getActivityTypes()
+    {
+        $params       = [];
+        $activities   = [];
+        $cwActivities = $this->getApiHelper()->getActivityTypes($params);
+        $this->logger->addError(print_r($cwActivities, true));
+        foreach ($cwActivities as $cwActivity) {
+            $activities[$cwActivity['id']] = $cwActivity['name'];
+        }
+
+        return $activities;
+    }
+
+    public function createActivity()
+    {
+    }
 }

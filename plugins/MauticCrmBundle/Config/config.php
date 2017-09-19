@@ -144,5 +144,11 @@ return [
                 ],
             ],
         ],
+        'forms' => [
+            'mautic.form.type.connectwise.campaignaction' => [
+                'class' => 'MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType',
+                'alias' => 'integration_campaign_task',
+            ],
+        ],
     ],
 ];
