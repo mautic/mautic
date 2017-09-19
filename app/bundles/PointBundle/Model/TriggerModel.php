@@ -348,45 +348,56 @@ class TriggerModel extends CommonFormModel
         }
 
         $settings = $availableEvents[$eventType];
-        $args     = [
-            'event'   => $event,
-            'lead'    => $lead,
-            'factory' => $this->factory, // WHAT??
-            'config'  => $event['properties'],
-        ];
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
-            if (is_array($settings['callback'])) {
-                $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
-            } elseif (strpos($settings['callback'], '::') !== false) {
-                $parts      = explode('::', $settings['callback']);
-                $reflection = new \ReflectionMethod($parts[0], $parts[1]);
-            } else {
-                $reflection = new \ReflectionMethod(null, $settings['callback']);
-            }
-
-            $pass = [];
-            foreach ($reflection->getParameters() as $param) {
-                if (isset($args[$param->getName()])) {
-                    $pass[] = $args[$param->getName()];
-                } else {
-                    $pass[] = null;
-                }
-            }
-
-            return $reflection->invokeArgs($this, $pass);
+            return $this->invokeCallback($event, $lead, $settings);
         }
         else {
-            /** @var TriggerEvent $trigger */
+            /** @var TriggerEvent $triggerEvent */
             $triggerEvent = $this->getEventRepository()->find($event['id']);
 
-            $event = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-            $this->dispatcher->dispatch(EmailToUserSubscriber::class, $event);
+            $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
+            $event = $this->dispatcher->dispatch(EmailToUserSubscriber::class, $triggerExecutedEvent);
 
-            return true;
+            return $event->getResult();
+        }
+    }
+
+    /**
+     * @param           $event
+     * @param Lead      $lead
+     * @param array     $settings
+     *
+     * @return bool
+     */
+    private function invokeCallback($event, Lead $lead, array $settings)
+    {
+        $args = [
+          'event'   => $event,
+          'lead'    => $lead,
+          'factory' => $this->factory, // WHAT??
+          'config'  => $event['properties'],
+        ];
+
+        if (is_array($settings['callback'])) {
+            $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
+        } elseif (strpos($settings['callback'], '::') !== false) {
+            $parts = explode('::', $settings['callback']);
+            $reflection = new \ReflectionMethod($parts[0], $parts[1]);
+        } else {
+            $reflection = new \ReflectionMethod(null, $settings['callback']);
         }
 
-        return false;
+        $pass = [];
+        foreach ($reflection->getParameters() as $param) {
+            if (isset($args[$param->getName()])) {
+                $pass[] = $args[$param->getName()];
+            } else {
+                $pass[] = null;
+            }
+        }
+
+        return $reflection->invokeArgs($this, $pass);
     }
 
     /**
