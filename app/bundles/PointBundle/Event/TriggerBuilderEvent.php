@@ -65,7 +65,7 @@ class TriggerBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['group', 'label', 'callback'],
+            ['group', 'label'],
             ['callback'],
             $event
         );

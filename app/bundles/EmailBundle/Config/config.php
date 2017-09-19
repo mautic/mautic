@@ -148,6 +148,12 @@ return [
                     'mautic.point.model.point',
                 ],
             ],
+            'mautic.email.touser.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\EmailToUserSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
+            ],
             'mautic.email.calendarbundle.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\CalendarSubscriber',
             ],

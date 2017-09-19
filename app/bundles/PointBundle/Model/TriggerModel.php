@@ -14,6 +14,7 @@ namespace Mautic\PointBundle\Model;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\EmailBundle\EventListener\EmailToUserSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
@@ -317,7 +318,7 @@ class TriggerModel extends CommonFormModel
      *
      * @return bool Was event triggered
      */
-    public function triggerEvent($event, Lead $lead = null,  $force = false)
+    public function triggerEvent($event, Lead $lead = null, $force = false)
     {
         //only trigger events for anonymous users
         if (!$force && !$this->security->isAnonymous()) {
@@ -354,7 +355,7 @@ class TriggerModel extends CommonFormModel
             'config'  => $event['properties'],
         ];
 
-        if (is_callable($settings['callback'])) {
+        if (isset($settings['callback']) && is_callable($settings['callback'])) {
             if (is_array($settings['callback'])) {
                 $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
             } elseif (strpos($settings['callback'], '::') !== false) {
@@ -374,6 +375,15 @@ class TriggerModel extends CommonFormModel
             }
 
             return $reflection->invokeArgs($this, $pass);
+        }
+        else {
+            /** @var TriggerEvent $trigger */
+            $triggerEvent = $this->getEventRepository()->find($event['id']);
+
+            $event = new Events\TriggerExecutedEvent($triggerEvent, $lead);
+            $this->dispatcher->dispatch(EmailToUserSubscriber::class, $event);
+
+            return true;
         }
 
         return false;

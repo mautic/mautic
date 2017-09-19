@@ -23,6 +23,7 @@ use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Hash\UserHash;
 
 /**
  * Class CampaignSubscriber.
@@ -302,13 +303,13 @@ class CampaignSubscriber extends CommonSubscriber
         $transformer     = new ArrayStringTransformer();
         $leadCredentials = $event->getLeadFields();
         $toOwner         = empty($config['to_owner']) ? false : $config['to_owner'];
-        $ownerId         = empty($leadCredentials['owner_id']) ? null : $leadCredentials['owner_id'];
+        $ownerId         = (empty($leadCredentials['owner_id']) || !$toOwner) ? null : $leadCredentials['owner_id'];
         $userIds         = empty($config['user_id']) ? [] : $config['user_id'];
         $to              = empty($config['to']) ? [] : $transformer->reverseTransform($config['to']);
         $cc              = empty($config['cc']) ? [] : $transformer->reverseTransform($config['cc']);
         $bcc             = empty($config['bcc']) ? [] : $transformer->reverseTransform($config['bcc']);
         $users           = $this->transformToUserIds($userIds, $ownerId);
-        $idHash          = 'xxxxxxxxxxxxxx'; // bogus ID since it goes to users, not contacts
+        $idHash          = UserHash::getFakeUserHash();
         $tokens          = $this->emailModel->dispatchEmailSendEvent($email, $leadCredentials, $idHash)->getTokens();
         $errors          = $this->emailModel->sendEmailToUser($email, $users, $leadCredentials, $tokens, [], false, $to, $cc, $bcc);
 
