@@ -14,8 +14,11 @@ use Symfony\Component\Dotenv\Dotenv;
 $loader->import('config.php');
 
 // Load environment variables from .env.test file
-$env = new Dotenv();
-$env->load(__DIR__.'/../../.env.test');
+$env     = new Dotenv();
+$root    = __DIR__.'/../../';
+$envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
+
+$env->load($envFile);
 
 // Define some constants from .env
 defined('MAUTIC_DB_PREFIX') || define('MAUTIC_DB_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
