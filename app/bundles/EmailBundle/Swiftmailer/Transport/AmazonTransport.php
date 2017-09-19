@@ -11,15 +11,15 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
+use Aws\CommandInterface;
+use Aws\CommandPool;
+use Aws\Credentials\Credentials;
+use Aws\Exception\AwsException;
+use Aws\ResultInterface;
 use Aws\Ses\SesClient;
-use bandwidthThrottle\tokenBucket\BlockingConsumer;
-use bandwidthThrottle\tokenBucket\Rate;
-use bandwidthThrottle\tokenBucket\storage\FileStorage;
-use bandwidthThrottle\tokenBucket\TokenBucket;
 use Joomla\Http\Exception\UnexpectedResponseException;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -27,21 +27,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Class AmazonTransport.
  */
-class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCallbackTransport
+class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport, InterfaceCallbackTransport
 {
     private $httpClient;
-
-    /* The amazon region on where your current host stays */
     private $region;
-
-    /* Email quota of remaining messages that can be sent */
-    private $emailQuoteRemaining = 0;
-
-    /* Max emails per second according to your account quota */
-    private $maxSendRate = 0;
-
-    /* @var $_consumer BlockingConsumer */
-    private $consumer;
+    private $username;
+    private $password;
+    private $concurrency;
 
     /**
      * {@inheritdoc}
@@ -68,6 +60,38 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
     }
 
     /**
+     * @return mixed
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param $username
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
      * SES authorization and choice of region
      * Initializing of TokenBucket.
      *
@@ -75,119 +99,80 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
      *
      * @throws \Exception
      */
-    public function getApiEndpoint()
+    public function start()
     {
-        $client = SesClient::factory([
+        $client = new SesClient([
+            'credentials' => new Credentials(
+                $this->getUsername(),
+                $this->getPassword()
+            ),
             'region' => $this->getRegion(),
-            'key'    => $this->getUsername(),
-            'secret' => $this->getPassword(),
+            'version' => 'latest',
         ]);
 
         /**
          * AWS SES has a limit of how many messages can be sent in a 24h time slot. The remaining messages are calculated
          * from the api. The transport will fail when the quota is exceeded.
          */
-        $quota                     = $client->getSendQuota();
-        $this->emailQuoteRemaining = $quota->get('Max24HourSend') - $quota->get('SentLast24Hours');
-        if ($this->emailQuoteRemaining > 0) {
+        $quota               = $client->getSendQuota();
+        $this->concurrency   = floor($quota->get('MaxSendRate'));
+        $emailQuoteRemaining = $quota->get('Max24HourSend') - $quota->get('SentLast24Hours');
+        if ($emailQuoteRemaining > 0) {
             $this->started = true;
         } else {
             throw new \Exception('Your AWS SES quota is exceeded');
         }
 
-        /*
-         * AWS SES limits the amount of messages that can be sent in parallel. This limit is bound to an account and can vary.
-         * The AmazonTransport reads that value from the API  and uses a TokenBucket to limit the requests to that rate
-         */
-        $this->maxSendRate = floor($quota->get('MaxSendRate'));
-        // Initialize a token bucket to track the sending limit
-        $storage        = new FileStorage(tempnam(sys_get_temp_dir(), 'MauticBucket'));
-        $rate           = new Rate($this->maxSendRate, Rate::SECOND);
-        $bucket         = new TokenBucket($this->maxSendRate, $rate, $storage);
-        $this->consumer = new BlockingConsumer($bucket);
-        $bucket->bootstrap($this->maxSendRate);
-
         return $client;
     }
 
     /**
-     * Returns the to AWS SES formatted Email.
+     * @param \Swift_Mime_Message $message
      *
-     * @return array $payload
+     * @return array
      */
-    public function getPayload()
+    public function getAmazonMessage(\Swift_Mime_Message $message)
     {
-        /*Email formatting for the amazon SES API*/
         $payload = [
-            'Source'      => current(array_keys($this->message->getFrom())),
-            'Destination' => [],
-            'Message'     => [
-                'Subject' => [
-                    'Data'    => empty($this->message->getSubject()) ? '' : $this->message->getSubject(),
-                    'Charset' => 'UTF-8',
+            'Source'       => current(array_keys($message->getFrom())),
+            'Destinations' => [current(array_keys($message->getTo()))],
+            'RawMessage'   => [
+                'Data' => $message->toString(),
                 ],
-                'Body' => [
-                    'Text' => [
-                        'Data'    => MailHelper::getPlainTextFromMessage($this->message),
-                        'Charset' => 'UTF-8',
-                    ],
-                    'Html' => [
-                        'Data'    => $this->message->getBody(),
-                        'Charset' => 'UTF-8',
-                    ],
-                ],
-            ],
-            'ReturnPath' => current(array_keys($this->message->getFrom())),
-        ];
-
-        $to = $this->message->getTo();
-        foreach ($to as $email => $name) {
-            $payload['Destination']['ToAddresses'][] = $email;
-        }
-        $cc = $this->message->getCc();
-        if (!empty($cc)) {
-            foreach ($cc as $email => $name) {
-                $payload['Destination']['CcAddresses'][] = $email;
-            }
-        }
-        $bcc = $this->message->getBcc();
-        if (!empty($bcc)) {
-            foreach ($bcc as $email => $name) {
-                $payload['Destination']['BccAddresses'][] = $email;
-            }
-        }
+            ];
 
         return $payload;
     }
 
     /**
-     * Try sending the Email with TokenBucket and through AWS SES.
-     *
-     * @param array $settings
+     * @param \Swift_Mime_Message $message
+     * @param null $failedRecipients
      *
      * @return array
-     *
-     * @throws \Exception
      */
-    public function post($settings = [])
+    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        $payload = empty($settings['payload']) ? $this->getPayload() : $settings['payload'];
-        $client  = empty($settings['client']) ? $this->getApiEndpoint() : $settings['client'];
-
         try {
-            $this->consumer->consume(1);
-            $client->sendEmail($payload);
-            --$this->emailQuoteRemaining;
+            $client = $this->start();
+            $commands[] = $client->getCommand('sendRawEmail', $this->getAmazonMessage($message));
+            $pool = new CommandPool($client, $commands, [
+                'concurrency' => $this->concurrency,
+                'before'      => function (CommandInterface $cmd, $iteratorId) {
+                },
+                'fulfilled'   => function (ResultInterface $result, $iteratorId) use ($commands) {
+                },
+                'rejected'    => function (AwsException $reason, $iteratorId) use ($commands) {
+                },
+            ]);
+            $promise = $pool->promise();
+            $promise->wait();
         } catch (\Exception $e) {
-            throw new \Exception('The Email was not send! '.$e->getMessage());
+            $this->throwException($e->getMessage());
+
+            return 0;
         }
 
-        return [];
-    }
-
-    public function getHeaders()
-    {
-        // Not used in Amazon SES.
+        return 1;
     }
 
     /**
@@ -195,12 +180,7 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
      */
     public function getMaxBatchLimit()
     {
-        return 50;
-    }
-
-    public function handlePostResponse($response, $curlInfo)
-    {
-        // Implemented with function post().
+        return 5000;
     }
 
     /**
@@ -222,7 +202,7 @@ class AmazonTransport extends AbstractTokenHttpTransport implements InterfaceCal
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        return 0;
+        return count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded;
     }
 
     /**
