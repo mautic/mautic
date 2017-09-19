@@ -56,7 +56,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <?php endif; ?>
                         </a>
                     </li>
-                    <li>
+                    <li data-toggle="tooltip" title="" data-placement="top" data-original-title="<?php echo $view['translator']->trans('mautic.lead.lead.segment.add.help'); ?>">
                         <a href="#filters" role="tab" data-toggle="tab"<?php echo $filterErrors; ?>>
                             <?php echo $view['translator']->trans('mautic.core.filters'); ?>
                             <?php if ($filterErrors): ?>
