@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Api;
 
-use GuzzleHttp; // FIXME: to remove along with mock requests
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
@@ -20,9 +19,6 @@ class InesCRMApi extends CrmApi
 
     private $translator;
 
-    // FIXME: to remove along with mock requests
-    private $client;
-
     private $loginClient;
 
     private $contactManagerClient;
@@ -34,9 +30,6 @@ class InesCRMApi extends CrmApi
     public function __construct(CrmAbstractIntegration $integration) {
         parent::__construct($integration);
         $this->translator = $integration->getTranslator();
-
-        // FIXME: to remove along with mock requests
-        $this->client = new GuzzleHttp\Client();
 
         $this->loginClient = $this->makeClient(self::LOGIN_WS_PATH);
         $this->contactManagerClient = $this->makeClient(self::CONTACT_MANAGER_WS_PATH);
@@ -201,13 +194,6 @@ class InesCRMApi extends CrmApi
         } catch (\Exception $e) {
             dump($e);die();
         }
-    }
-
-    // FIXME: To be removed or changed to `createClient`
-    public function createCompany($mappedData) {
-        $this->client->request('POST', 'http://localhost:4567/push_company', [
-            'form_params' => $mappedData
-        ]);
     }
 
     public function updateClient($inesClient) {
