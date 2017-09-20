@@ -120,7 +120,9 @@ switch ($style) {
                     Focus.modalsDismissed["<?php echo $focus['id']; ?>"] = true;
 
                     // Remove iframe
-                    Focus.iframe.parentNode.removeChild(Focus.iframe);
+                    if (Focus.iframe.parentNode) {
+                        Focus.iframe.parentNode.removeChild(Focus.iframe);
+                    }
 
                     var overlays = document.getElementsByClassName('mf-modal-overlay-<?php echo $focus['id']; ?>');
                     if (overlays.length) {
@@ -525,12 +527,6 @@ switch ($style) {
                 Focus.iframeWidth = 0;
                 Focus.iframeResizeInterval = setInterval(function () {
                     if (Focus.iframeHeight !== Focus.iframe.style.height) {
-                        var trueHeight = Math.max(
-                            Math.max(Focus.iframeDoc.body.scrollHeight, Focus.iframeDoc.documentElement.scrollHeight),
-                            Math.max(Focus.iframeDoc.body.offsetHeight, Focus.iframeDoc.documentElement.offsetHeight),
-                            Math.max(Focus.iframeDoc.body.clientHeight, Focus.iframeDoc.documentElement.clientHeight)
-                        );
-
                         var useHeight = ((window.innerHeight < Focus.iframeFocus.offsetHeight) ?
                             window.innerHeight : Focus.iframeFocus.offsetHeight);
 
@@ -549,12 +545,6 @@ switch ($style) {
 
                     <?php if (in_array($style, ['modal', 'notification'])): ?>
                     if (Focus.iframeWidth !== Focus.iframe.style.width) {
-                        var trueWidth = Math.max(
-                            Math.max(Focus.iframeDoc.body.scrollWidth, Focus.iframeDoc.documentElement.scrollWidth),
-                            Math.max(Focus.iframeDoc.body.offsetWidth, Focus.iframeDoc.documentElement.offsetWidth),
-                            Math.max(Focus.iframeDoc.body.clientWidth, Focus.iframeDoc.documentElement.clientWidth)
-                        );
-
                         if (Focus.debug) {
                             console.log('window inner width = ' + window.innerWidth);
                             console.log('iframe offset width = ' +  Focus.iframeFocus.offsetWidth);
