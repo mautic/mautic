@@ -50,147 +50,95 @@ class InesCRMApi extends CrmApi
         $client = $this->customFieldClient;
         $this->includeAuthHeader($client);
 
-        try {
-            $response = $client->GetCompanyCF(['reference' => $internalRef]);
-            self::cleanList($response->GetCompanyCFResult->Values->CustomField);
-            return $response;
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        $response = $client->GetCompanyCF(['reference' => $internalRef]);
+        self::cleanList($response->GetCompanyCFResult->Values->CustomField);
+        return $response;
     }
 
     public function getContactCustomFields($internalRef) {
         $client = $this->customFieldClient;
         $this->includeAuthHeader($client);
 
-        try {
-            $response = $client->GetContactCF(['reference' => $internalRef]);
-            self::cleanList($response->GetContactCFResult->Values->CustomField);
-            return $response;
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        $response = $client->GetContactCF(['reference' => $internalRef]);
+        self::cleanList($response->GetContactCFResult->Values->CustomField);
+        return $response;
     }
 
     public function createClientCustomField($mappedData) {
         $client = $this->customFieldClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->InsertCompanyCF($mappedData);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->InsertCompanyCF($mappedData);
     }
 
     public function updateClientCustomField($mappedData) {
         $client = $this->customFieldClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->UpdateCompanyCF($mappedData);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->UpdateCompanyCF($mappedData);
     }
 
     public function createContactCustomField($mappedData) {
         $client = $this->customFieldClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->InsertContactCF($mappedData);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->InsertContactCF($mappedData);
     }
 
     public function updateContactCustomField($mappedData) {
         $client = $this->customFieldClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->UpdateContactCF($mappedData);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->UpdateContactCF($mappedData);
     }
 
     public function getClient($internalRef) {
         $client = $this->contactManagerClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->GetClient(['reference' => $internalRef]);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->GetClient(['reference' => $internalRef]);
     }
 
     public function getContact($internalRef) {
         $client = $this->contactManagerClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->GetContact(['reference' => $internalRef]);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->GetContact(['reference' => $internalRef]);
     }
 
     public function createClientWithContacts($mappedData) {
         $client = $this->automationSyncClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->AddClientWithContacts($mappedData);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->AddClientWithContacts($mappedData);
     }
 
     public function createClient($mappedData) {
         $client = $this->contactManagerClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->AddClient($mappedData);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->AddClient($mappedData);
     }
 
     public function createContact($mappedData) {
         $client = $this->automationSyncClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->AddContact($mappedData);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->AddContact($mappedData);
     }
 
     public function updateClient($inesClient) {
         $client = $this->contactManagerClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->UpdateClient(['client' => $inesClient]);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->UpdateClient(['client' => $inesClient]);
     }
 
     public function updateContact($inesContact) {
         $client = $this->contactManagerClient;
         $this->includeAuthHeader($client);
 
-        try {
-            return $client->UpdateContact(['contact' => $inesContact]);
-        } catch (\Exception $e) {
-            dump($e);die();
-        }
+        return $client->UpdateContact(['contact' => $inesContact]);
     }
 
     private function makeClient($path) {
