@@ -1754,6 +1754,13 @@ class LeadModel extends FormModel
             $company = $this->companyModel->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState);
         }
 
+        foreach ($fields as $leadField => $importField) {
+            // Prevent overwriting existing data with empty data
+            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
+                $fieldData[$leadField] = InputHelper::clean($data[$importField]);
+            }
+        }
+
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
             $lead->setDateAdded($dateAdded->getUtcDateTime());

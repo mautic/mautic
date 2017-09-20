@@ -685,7 +685,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @return array
      */
-    public function extractCompanyDataFromImport(array $mappedFields, array &$data)
+    public function extractCompanyDataFromImport(array &$mappedFields, array &$data)
     {
         $companyData    = [];
         $companyFields  = [];
