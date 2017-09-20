@@ -156,12 +156,21 @@ class InesCRMApi extends CrmApi
 
     private function getSessionId() {
         $keys = $this->integration->getDecryptedApiKeys();
+        $failed = false;
 
         try {
             $response = $this->loginClient->authenticationWs([
                 'request' => $keys,
             ]);
+
+            if ($response->authenticationWsResult->codeReturn === 'failed') {
+                $failed = true;
+            }
         } catch (\SoapFault $e) {
+            $failed = true;
+        }
+
+        if ($failed) {
             throw new ApiErrorException($this->translator->trans('mautic.ines_crm.form.invalid_identifiers'));
         }
 

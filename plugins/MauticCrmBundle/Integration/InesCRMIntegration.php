@@ -81,6 +81,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function getFormCompanyFields($settings = []) {
+        if (!$this->isConfigured()) return;
+
         $companyFields = $this->getDefaultClientFields();
 
         $customFields = $this->getApiHelper()->getSyncInfo()
@@ -99,6 +101,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     public function getFormLeadFields($settings = []) {
+        if (!$this->isConfigured()) return;
+
         $leadFields = $this->getDefaultContactFields();
 
         $customFields = $this->getApiHelper()->getSyncInfo()
