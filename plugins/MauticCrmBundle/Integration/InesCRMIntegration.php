@@ -432,12 +432,11 @@ class InesCRMIntegration extends CrmAbstractIntegration
         foreach ($fieldModel->getEntities() as $field) {
             if ($field->getAlias() === $fieldSpec->alias && $field->getObject() === $fieldSpec->object) {
                 if ($field->getType() !== $fieldSpec->type) {
-                    $fieldModel->deleteEntity($field);
-                    break;
-                } else {
-                    $requestedField = $field;
-                    break;
+                    $this->logger->warning("INES: Invalid field type", compact('field', 'fieldSpec'));
                 }
+
+                $requestedField = $field;
+                break;
             }
         }
 
