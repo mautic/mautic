@@ -301,14 +301,16 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     private static function mapCompanyUpdatesToInesClient($config, $company, $inesClient) {
         $companyFields = $config['companyFields'];
+        $overwritableCompanyFields = self::updateToOverwritable($config['update_mautic_company']);
 
-        return self::mapFieldUpdatesFromMauticToInes($companyFields, $company, $inesClient);
+        return self::mapFieldUpdatesFromMauticToInes($companyFields, $overwritableCompanyFields, $company, $inesClient);
     }
 
     private static function mapLeadUpdatesToInesContact($config, $lead, $inesContact) {
         $leadFields = $config['leadFields'];
+        $overwritableLeadFields = self::updateToOverwritable($config['update_mautic']);
 
-        return self::mapFieldUpdatesFromMauticToInes($leadFields, $lead, $inesContact);
+        return self::mapFieldUpdatesFromMauticToInes($leadFields, $overwritableLeadFields, $lead, $inesContact);
     }
 
     private static function mapFieldsFromMauticToInes($fields, $mauticObject, $inesObject) {
@@ -320,20 +322,50 @@ class InesCRMIntegration extends CrmAbstractIntegration
         }
     }
 
-    private static function mapFieldUpdatesFromMauticToInes($fields, $mauticObject, $inesObject) {
+    private static function mapFieldUpdatesFromMauticToInes($fields, $overwritableFields, $mauticObject, $inesObject) {
         $shouldUpdate = false;
 
         foreach ($fields as $inesField => $mauticField) {
             if (substr($inesField, 0, 12) !== self::INES_CUSTOM_FIELD_PREFIX) { // FIXME: There's probably a better way to do this...
                 $method = 'get' . ucfirst($mauticField);
                 if ((string) $inesObject->$inesField !== (string) $mauticObject->$method($mauticField)) {
-                    $shouldUpdate = true;
-                    $inesObject->$inesField = $mauticObject->$method($mauticField);
+                    // The field should be overwritten if its value is "empty" in the PHP sense or if its
+                    // overwritability is unspecified or specified as true
+                    $shouldOverwrite = empty($inesObject->$inesField)
+                                    || !array_key_exists($inesField, $overwritableFields)
+                                    || $overwritableFields[$inesField];
+
+                    if ($shouldOverwrite) {
+                        $shouldUpdate = true;
+                        $inesObject->$inesField = $mauticObject->$method($mauticField);
+                    }
                 }
             }
         }
 
         return $shouldUpdate;
+    }
+
+    private static function updateToOverwritable($update) {
+        $overwritable = [];
+
+        foreach ($update as $inesField => $shouldUpdateMautic) {
+            switch ($shouldUpdateMautic) {
+                case '0':
+                    $overwritable[$inesField] = true;
+                break;
+
+                case '1':
+                    $overwritable[$inesField] = false;
+                break;
+
+                default:
+                    $this->logger->warning("INES: Invalid update flag", compact('inesField', 'shouldUpdateMautic'));
+                break;
+            }
+        }
+
+        return $overwritable;
     }
 
     private function getDefaultClientFields() {
