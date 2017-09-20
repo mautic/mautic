@@ -219,13 +219,14 @@
                     var nextButton = pageBreak.querySelector('[data-mautic-form-pagebreak-button="next"]');
 
                     // Add button handlers
-                    prevButton.onclick = function(theForm, showPageNumber) {
+                    prevButton.onclick = function(formId, theForm, showPageNumber) {
                         return function() {
+                            Form.customCallbackHandler(formId, 'onShowPreviousPage', {'page': showPageNumber});
                             Form.switchPage(theForm, showPageNumber);
                         }
-                    } (theForm, prevPageNumber);
+                    } (formId, theForm, prevPageNumber);
 
-                    nextButton.onclick = function(theForm, hidePageNumber, showPageNumber) {
+                    nextButton.onclick = function(formId, theForm, hidePageNumber, showPageNumber) {
                         return function () {
                             // Validate fields first
                             var validations = theForm.querySelector('[data-mautic-form-page="' + hidePageNumber + '"]').querySelectorAll('[data-validate]');
@@ -240,9 +241,10 @@
                                 return;
                             }
 
+                            Form.customCallbackHandler(formId, 'onShowNextPage', {'page': showPageNumber});
                             Form.switchPage(theForm, showPageNumber);
                         }
-                    } (theForm, pageNumber, nextPageNumber);
+                    } (formId, theForm, pageNumber, nextPageNumber);
 
                     if (1 === pageNumber) {
                         prevButton.setAttribute('disabled', 'disabled');
