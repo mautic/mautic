@@ -614,12 +614,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if (!isset($personData['errors'])) {
                 $id                    = (isset($personData['id'])) ? $personData['id'] : null;
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
+
+                if (isset($config['campaign_task'])) {
+                    $integrationEntities[] = $this->createActivity($config['campaign_task'], $id, $lead->getId());
+                }
+
                 if ($integrationEntities) {
                     $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
                     $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
-                }
-                if (isset($config['campaign_task'])) {
-                    $this->createActivity($config['campaign_task'], $id);
                 }
 
                 return true;
@@ -788,16 +790,30 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param $config
      * @param $contactId
      */
-    public function createActivity($config, $contactId)
+    public function createActivity($config, $cwContactId, $leadId)
     {
-        $activity = [
-            'name'     => $config['activity_name'],
-            'type'     => ['id' => $config['campaign_activity_type']],
-            'assignTo' => ['id' => $config['campaign_members']],
-            'contact'  => ['id' => $contactId],
-        ];
-        $activities = $this->getApiHelper()->postActivity($activity);
+        if ($cwContactId) {
+            $activity = [
+                'name'     => $config['activity_name'],
+                'type'     => ['id' => $config['campaign_activity_type']],
+                'assignTo' => ['id' => $config['campaign_members']],
+                'contact'  => ['id' => $cwContactId],
+            ];
+            $activities = $this->getApiHelper()->postActivity($activity);
 
-        //finish by writing the activities created to our intergration entity table
+            if (isset($activities['id'])) {
+                $integrationEntity = new IntegrationEntity();
+                $integrationEntity->setDateAdded(new \DateTime());
+                $integrationEntity->setIntegration($this->getName());
+                $integrationEntity->setIntegrationEntity('Activities');
+                $integrationEntity->setIntegrationEntityId($activities['id']);
+                $integrationEntity->setInternalEntity('lead');
+                $integrationEntity->setInternalEntityId($leadId);
+
+                return $integrationEntity;
+            }
+        }
+
+        return null;
     }
 }
