@@ -76,9 +76,9 @@ class EmailToUserAccessor
      */
     public function getToFormatted()
     {
-        $property = $this->config['to'];
+        $property = 'to';
 
-        return $this->getAddressProperty($property);
+        return empty($this->config[$property]) ? [] : $this->transformer->reverseTransform($this->config[$property]);
     }
 
     /**
@@ -86,9 +86,9 @@ class EmailToUserAccessor
      */
     public function getCcFormatted()
     {
-        $property = $this->config['cc'];
+        $property = 'cc';
 
-        return $this->getAddressProperty($property);
+        return empty($this->config[$property]) ? [] : $this->transformer->reverseTransform($this->config[$property]);
     }
 
     /**
@@ -96,18 +96,8 @@ class EmailToUserAccessor
      */
     public function getBccFormatted()
     {
-        $property = $this->config['bcc'];
+        $property = 'bcc';
 
-        return $this->getAddressProperty($property);
-    }
-
-    /**
-     * @param string $property
-     *
-     * @return array
-     */
-    private function getAddressProperty($property): array
-    {
-        return empty($property) ? [] : $this->transformer->reverseTransform($property);
+        return empty($this->config[$property]) ? [] : $this->transformer->reverseTransform($this->config[$property]);
     }
 }

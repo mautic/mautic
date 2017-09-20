@@ -47,5 +47,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
         catch (EmailCouldNotBeSentException $e) {
             $event->setFailed();
         }
+
+        return $event;
     }
 }

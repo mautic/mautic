@@ -128,6 +128,7 @@ return [
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
                     'mautic.channel.model.queue',
+                    'mautic.email.model.send_email_to_user',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [

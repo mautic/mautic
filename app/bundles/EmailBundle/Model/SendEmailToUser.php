@@ -31,7 +31,6 @@ class SendEmailToUser
      * @param Lead      $lead
      *
      * @throws EmailCouldNotBeSentException
-     * @throws \Doctrine\ORM\ORMException
      */
     public function sendEmailToUsers(array $config, Lead $lead)
     {
