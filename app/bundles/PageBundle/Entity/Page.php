@@ -290,6 +290,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     'translationParent',
                     'translationChildren',
                     'template',
+                    'customHtml',
                 ]
             )
             ->setMaxDepth(1, 'variantParent')
