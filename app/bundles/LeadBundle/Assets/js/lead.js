@@ -308,7 +308,66 @@ Mautic.leadlistOnLoad = function(container) {
                 }
             });
         });
+
+        var bodyOverflow = {};
+        mQuery('#leadlist_filters').sortable({
+            items: '.panel',
+            helper: function(e, ui) {
+                ui.children().each(function() {
+                    if (mQuery(this).is(":visible")) {
+                        mQuery(this).width(mQuery(this).width());
+                    }
+                });
+
+                // Fix body overflow that messes sortable up
+                bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+                bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+                mQuery('body').css({
+                    overflowX: 'visible',
+                    overflowY: 'visible'
+                });
+
+                return ui;
+            },
+            scroll: true,
+            axis: 'y',
+            stop: function(e, ui) {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
+
+                // First in the list should be an "and"
+                ui.item.find('select.glue-select').first().val('and');
+
+                Mautic.reorderSegmentFilters();
+            }
+        });
+
     }
+};
+
+Mautic.reorderSegmentFilters = function() {
+    // Update the filter numbers sot that they are ordered correctly when processed and grouped server side
+    var counter = 0;
+    mQuery('#leadlist_filters .panel').each(function() {
+        Mautic.updateFilterPositioning(mQuery(this).find('select.glue-select').first());
+        mQuery(this).find('[id^="leadlist_filters_"]').each(function() {
+            var id = mQuery(this).attr('id');
+            if ('leadlist_filters___name___filter' === id) {
+                return true;
+            }
+''
+            var suffix = id.split(/[_]+/).pop();
+
+            mQuery(this).attr('id', 'leadlist_filters_'+counter+'_'+suffix);
+            mQuery(this).attr('name', 'leadlist[filters]['+counter+']['+suffix+']');
+        });
+
+        ++counter;
+    });
+
+    mQuery('#leadlist_filters .panel-heading').removeClass('hide');
+    mQuery('#leadlist_filters .panel-heading').first().addClass('hide');
+    mQuery('#leadlist_filters .panel').first().removeClass('in-group');
 };
 
 Mautic.convertLeadFilterInput = function(el) {
@@ -547,6 +606,9 @@ Mautic.addLeadListFilter = function (elId) {
 
     // Convert based on first option in list
     Mautic.convertLeadFilterInput('#' + filterIdBase + 'operator');
+
+    // Reposition if applicable
+    Mautic.updateFilterPositioning(mQuery('#' + filterIdBase + 'glue'));
 };
 
 Mautic.leadfieldOnLoad = function (container) {

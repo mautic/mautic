@@ -624,6 +624,10 @@ return [
                 'arguments' => ['router'],
                 'alias'     => 'addtocompany_action',
             ],
+            'mautic.lead.events.changeowner.type.form' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ChangeOwnerType',
+                'arguments' => ['mautic.user.model.user'],
+            ],
             'mautic.company.list.type.form' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
                 'arguments' => [
