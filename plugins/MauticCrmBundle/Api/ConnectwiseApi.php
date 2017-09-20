@@ -116,4 +116,9 @@ class ConnectwiseApi extends CrmApi
     {
         return $this->request('sales/activities', $params, 'POST');
     }
+
+    public function getMembers($params = [])
+    {
+        return $this->request('system/members');
+    }
 }

@@ -50,6 +50,18 @@ class IntegrationCampaignsTaskType extends AbstractType
                 'required' => false,
             ]
         );
+        $members = $integrationObject->getMembers();
+        $builder->add(
+            'campaign_members',
+            'choice',
+            [
+                'choices' => $members,
+                'attr'    => [
+                    'class' => 'form-control', ],
+                'label'    => 'mautic.plugin.integration.campaigns.connectwise.members',
+                'required' => false,
+            ]
+        );
     }
 
     /**

@@ -511,6 +511,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
             }
         }
+        if (isset($data['id'])) {
+            $fieldsValues['id'] = $data['id'];
+        }
 
         return $fieldsValues;
     }
@@ -580,15 +583,17 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
         $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
-
-        $cwContactExists = $this->amendLeadDataBeforeMauticPopulate($cwContactExists[0], $object);
+        $communicationItems = $cwContactExists[0]['communicationItems'];
+        $cwContactExists    = $this->amendLeadDataBeforeMauticPopulate($cwContactExists[0], $object);
 
         $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
         $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
         //check for blank fields to update here
         $mappedData = $this->populateLeadData(
             $lead,
-            ['leadFields' => $leadFields, 'object' => 'Contact', 'feature_settings' => ['objects' => $config['objects']], 'update' => $personFound]
+            ['leadFields' => $leadFields, 'object' => 'Contact', 'feature_settings' => [
+                'objects' => $config['objects'], ], 'update' => $personFound, 'communicationItems' => $communicationItems,
+            ]
         );
 
         if (empty($mappedData)) {
@@ -596,13 +601,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         $personData = [];
+
         try {
             if ($personFound) {
                 $personFound = true;
                 if (!empty($mappedData)) {
-                    foreach ($cwContactExists as $person) {
-                        $personData = $this->getApiHelper()->updateContact($mappedData, $person['id']);
-                    }
+                    $personData = $this->getApiHelper()->updateContact($mappedData, $cwContactExists['id']);
                 }
             } else {
                 $personData = $this->getApiHelper()->createContact($mappedData);
@@ -675,6 +679,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         }
                     }
                 }
+                if ($config['update']) {
+                    $communicationItems = array_merge($communicationItems, $config['communicationItems']);
+                }
                 if (!empty($communicationItems)) {
                     $matched[$integrationKey] = $communicationItems;
                 }
@@ -696,7 +703,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $updateFields = [];
             foreach ($matched as $key => $field) {
                 $updateFields[] = [
-                    'op'    => $key == 'communicationItems' ? 'add' : 'replace',
+                    'op'    => 'replace',
                     'path'  => $key,
                     'value' => $field,
                 ];
@@ -763,15 +770,31 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getMembers()
+    {
+        $params    = [];
+        $members   = [];
+        $cwMembers = $this->getApiHelper()->getMembers($params);
+        foreach ($cwMembers as $cwMember) {
+            $members[$cwMember['id']] = $cwMember['identifier'];
+        }
+
+        return $members;
+    }
+
+    /**
      * @param $config
      * @param $contactId
      */
     public function createActivity($config, $contactId)
     {
         $activity = [
-            'name'    => $config['activity_name'],
-            'type'    => $config['campaign_activity_type'],
-            'contact' => $contactId,
+            'name'     => $config['activity_name'],
+            'type'     => ['id' => $config['campaign_activity_type']],
+            'assignTo' => ['id' => $config['campaign_members']],
+            'contact'  => ['id' => $contactId],
         ];
         $activities = $this->getApiHelper()->postActivity($activity);
 
