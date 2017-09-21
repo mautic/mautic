@@ -12,8 +12,11 @@
 namespace MauticPlugin\MauticCrmBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class IntegrationCampaignsTaskType.
@@ -29,19 +32,25 @@ class IntegrationCampaignsTaskType extends AbstractType
         $integrationObject = $options['helper']->getIntegrationObject('Connectwise');
         $builder->add(
             'activity_name',
-            'text',
+            TextType::class,
             [
-                'label'      => 'mautic.connectwise.activity.name',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-                'required'   => false,
+                'label'       => 'mautic.connectwise.activity.name',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => ['class' => 'form-control'],
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
             ]
         );
 
         $activityTypes = $integrationObject->getActivityTypes();
         $builder->add(
             'campaign_activity_type',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => $activityTypes,
                 'attr'    => [
@@ -53,13 +62,19 @@ class IntegrationCampaignsTaskType extends AbstractType
         $members = $integrationObject->getMembers();
         $builder->add(
             'campaign_members',
-            'choice',
+            ChoiceType::class,
             [
                 'choices' => $members,
                 'attr'    => [
                     'class' => 'form-control', ],
-                'label'    => 'mautic.plugin.integration.campaigns.connectwise.members',
-                'required' => false,
+                'label'       => 'mautic.plugin.integration.campaigns.connectwise.members',
+                'constraints' => [
+                    new NotBlank(
+                        [
+                            'message' => 'mautic.core.value.required',
+                        ]
+                    ),
+                ],
             ]
         );
     }
