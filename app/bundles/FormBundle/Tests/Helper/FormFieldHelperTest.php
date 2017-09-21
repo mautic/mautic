@@ -4,11 +4,10 @@ namespace Mautic\FormBundle\Tests\Helper;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FormFieldHelperTest extends TestCase
+class FormFieldHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var FormFieldHelper
