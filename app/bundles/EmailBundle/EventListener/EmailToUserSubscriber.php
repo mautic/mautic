@@ -31,7 +31,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return [EmailToUserSubscriber::class => ['onEmailToUser', 0]];
+        return [self::class => ['onEmailToUser', 0]];
     }
 
     public function onEmailToUser(TriggerExecutedEvent $event)
@@ -43,8 +43,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
         try {
             $this->sendEmailToUser->sendEmailToUsers($config, $lead);
             $event->setSucceded();
-        }
-        catch (EmailCouldNotBeSentException $e) {
+        } catch (EmailCouldNotBeSentException $e) {
             $event->setFailed();
         }
 

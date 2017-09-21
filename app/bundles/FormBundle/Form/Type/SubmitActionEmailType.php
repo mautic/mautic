@@ -106,7 +106,7 @@ class SubmitActionEmailType extends AbstractType
           YesNoButtonGroupType::class,
           [
             'label' => 'mautic.form.action.sendemail.emailtoowner',
-            'data' => $default,
+            'data'  => $default,
           ]
         );
 

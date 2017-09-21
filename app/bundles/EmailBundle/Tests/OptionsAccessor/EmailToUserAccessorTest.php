@@ -18,12 +18,12 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testTransformToUserIds()
     {
-        $config = [];
+        $config            = [];
         $config['user_id'] = [4, 6];
 
         $emailToUserAccessor = new EmailToUserAccessor($config);
 
-        $expected   = [
+        $expected = [
             ['id' => 4],
             ['id' => 6],
         ];
@@ -33,12 +33,12 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testTransformToUserIdsWithOwnerEntityButNoOwnerSetting()
     {
-        $config = [];
+        $config            = [];
         $config['user_id'] = [4, 6];
 
         $emailToUserAccessor = new EmailToUserAccessor($config);
 
-        $expected   = [
+        $expected = [
             ['id' => 4],
             ['id' => 6],
         ];
@@ -55,13 +55,13 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testTransformToUserIdsWithDifferentOwnerId()
     {
-        $config = [];
-        $config['user_id'] = [4, 6];
+        $config             = [];
+        $config['user_id']  = [4, 6];
         $config['to_owner'] = true;
 
         $emailToUserAccessor = new EmailToUserAccessor($config);
 
-        $expected   = [
+        $expected = [
             ['id' => 4],
             ['id' => 6],
             ['id' => 5],
@@ -79,13 +79,13 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testTransformToUserIdsWithSameOwnerId()
     {
-        $config = [];
-        $config['user_id'] = [4, 6];
+        $config             = [];
+        $config['user_id']  = [4, 6];
         $config['to_owner'] = true;
 
         $emailToUserAccessor = new EmailToUserAccessor($config);
 
-        $expected   = [
+        $expected = [
             ['id' => 4],
             ['id' => 6],
         ];
@@ -102,7 +102,7 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatToAddressOneEmail()
     {
-        $config = [];
+        $config       = [];
         $config['to'] = 'john@doe.com';
 
         $emailToUserAccessor = new EmailToUserAccessor($config);
@@ -114,7 +114,7 @@ class EmailToUserAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatToAddressMoreEmails()
     {
-        $config = [];
+        $config       = [];
         $config['to'] = 'john@doe.com, peter@doe.com,doe@mark.com';
 
         $emailToUserAccessor = new EmailToUserAccessor($config);

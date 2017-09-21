@@ -28,10 +28,10 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         'useremail' => [
             'email' => 33,
         ],
-        'user_id' => [6, 7],
+        'user_id'  => [6, 7],
         'to_owner' => true,
-        'to' => 'hello@there.com, bob@bobek.cz',
-        'bcc' => 'hidden@translation.in',
+        'to'       => 'hello@there.com, bob@bobek.cz',
+        'bcc'      => 'hidden@translation.in',
     ];
 
     public function testOnCampaignTriggerActionSendEmailToUserWithWrongEventType()
@@ -61,8 +61,8 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $args = [
             'lead'  => 64,
             'event' => [
-                'type'        => 'email.send',
-                'properties'  => $this->config,
+                'type'       => 'email.send',
+                'properties' => $this->config,
             ],
             'eventDetails'    => [],
             'systemTriggered' => true,
@@ -172,7 +172,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $expected = [
             'failed' => 1,
-            'reason' => 'Something happenned'
+            'reason' => 'Something happenned',
         ];
 
         $this->assertSame($expected, $event->getResult());

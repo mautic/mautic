@@ -25,10 +25,10 @@ class EmailToUserSubscriberTest extends \PHPUnit_Framework_TestCase
         'useremail' => [
             'email' => 33,
         ],
-        'user_id' => [6, 7],
+        'user_id'  => [6, 7],
         'to_owner' => true,
-        'to' => 'hello@there.com, bob@bobek.cz',
-        'bcc' => 'hidden@translation.in',
+        'to'       => 'hello@there.com, bob@bobek.cz',
+        'bcc'      => 'hidden@translation.in',
     ];
 
     public function testOnCampaignTriggerActionSendEmailToUserWithSendingTheEmail()

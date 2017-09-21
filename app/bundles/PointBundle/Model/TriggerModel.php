@@ -351,22 +351,21 @@ class TriggerModel extends CommonFormModel
 
         if (isset($settings['callback']) && is_callable($settings['callback'])) {
             return $this->invokeCallback($event, $lead, $settings);
-        }
-        else {
+        } else {
             /** @var TriggerEvent $triggerEvent */
             $triggerEvent = $this->getEventRepository()->find($event['id']);
 
             $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-            $event = $this->dispatcher->dispatch(EmailToUserSubscriber::class, $triggerExecutedEvent);
+            $event                = $this->dispatcher->dispatch(EmailToUserSubscriber::class, $triggerExecutedEvent);
 
             return $event->getResult();
         }
     }
 
     /**
-     * @param           $event
-     * @param Lead      $lead
-     * @param array     $settings
+     * @param       $event
+     * @param Lead  $lead
+     * @param array $settings
      *
      * @return bool
      */
@@ -382,7 +381,7 @@ class TriggerModel extends CommonFormModel
         if (is_array($settings['callback'])) {
             $reflection = new \ReflectionMethod($settings['callback'][0], $settings['callback'][1]);
         } elseif (strpos($settings['callback'], '::') !== false) {
-            $parts = explode('::', $settings['callback']);
+            $parts      = explode('::', $settings['callback']);
             $reflection = new \ReflectionMethod($parts[0], $parts[1]);
         } else {
             $reflection = new \ReflectionMethod(null, $settings['callback']);

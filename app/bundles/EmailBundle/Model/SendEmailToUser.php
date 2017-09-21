@@ -27,8 +27,8 @@ class SendEmailToUser
     }
 
     /**
-     * @param array     $config
-     * @param Lead      $lead
+     * @param array $config
+     * @param Lead  $lead
      *
      * @throws EmailCouldNotBeSentException
      */
@@ -44,8 +44,8 @@ class SendEmailToUser
 
         $leadCredentials = $lead->getProfileFields();
 
-        $to = $emailToUserAccessor->getToFormatted();
-        $cc = $emailToUserAccessor->getCcFormatted();
+        $to  = $emailToUserAccessor->getToFormatted();
+        $cc  = $emailToUserAccessor->getCcFormatted();
         $bcc = $emailToUserAccessor->getBccFormatted();
 
         $owner = $lead->getOwner();

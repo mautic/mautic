@@ -49,10 +49,10 @@ class CampaignSubscriber extends CommonSubscriber
      */
     protected $campaignEventModel;
 
-	/**
+    /**
      * @var SendEmailToUser
      */
-	private $sendEmailToUser;
+    private $sendEmailToUser;
 
     /**
      * @param LeadModel         $leadModel
@@ -66,14 +66,13 @@ class CampaignSubscriber extends CommonSubscriber
         EmailModel $emailModel,
         EventModel $eventModel,
         MessageQueueModel $messageQueueModel,
-		SendEmailToUser $sendEmailToUser
-    )
-	{
+        SendEmailToUser $sendEmailToUser
+    ) {
         $this->leadModel          = $leadModel;
         $this->emailModel         = $emailModel;
         $this->campaignEventModel = $eventModel;
         $this->messageQueueModel  = $messageQueueModel;
-        $this->sendEmailToUser = $sendEmailToUser;
+        $this->sendEmailToUser    = $sendEmailToUser;
     }
 
     /**
@@ -297,16 +296,15 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         $config = $event->getConfig();
-        $lead 	= $event->getLead();
+        $lead   = $event->getLead();
 
-	  	try {
-			$this->sendEmailToUser->sendEmailToUsers($config, $lead);
-		  	$event->setResult(true);
-	  	}
-	  	catch (EmailCouldNotBeSentException $e) {
-		  	$event->setFailed($e->getMessage());
-	  	}
+        try {
+            $this->sendEmailToUser->sendEmailToUsers($config, $lead);
+            $event->setResult(true);
+        } catch (EmailCouldNotBeSentException $e) {
+            $event->setFailed($e->getMessage());
+        }
 
-	  	return $event;
+        return $event;
     }
 }

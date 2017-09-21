@@ -29,7 +29,7 @@ class TriggerExecutedEvent extends Event
     public function __construct(TriggerEventEntity $triggerEvent, Lead $lead)
     {
         $this->triggerEvent = $triggerEvent;
-        $this->lead = $lead;
+        $this->lead         = $lead;
     }
 
     /**

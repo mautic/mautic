@@ -34,7 +34,7 @@ class ModelPass implements CompilerPassInterface
             if ($reflected->hasMethod('setEntityManager')) {
                 $definition->addMethodCall('setEntityManager', [new Reference('doctrine.orm.entity_manager')]);
             }
-            
+
             if ($reflected->hasMethod('setSecurity')) {
                 $definition->addMethodCall('setSecurity', [new Reference('mautic.security')]);
             }

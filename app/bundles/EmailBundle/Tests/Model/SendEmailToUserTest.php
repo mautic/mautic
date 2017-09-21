@@ -36,7 +36,7 @@ class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
 
         $sendEmailToUser = new SendEmailToUser($mockEmailModel);
 
-        $config = [];
+        $config                       = [];
         $config['useremail']['email'] = 100;
 
         $this->setExpectedException(EmailCouldNotBeSentException::class);
@@ -62,7 +62,7 @@ class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
 
         $sendEmailToUser = new SendEmailToUser($mockEmailModel);
 
-        $config = [];
+        $config                       = [];
         $config['useremail']['email'] = 100;
 
         $this->setExpectedException(EmailCouldNotBeSentException::class);
@@ -82,7 +82,6 @@ class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(10));
 
         $lead->setOwner($mockOwner);
-
 
         $email = new Email();
         $email->setIsPublished(true);
@@ -127,7 +126,6 @@ class SendEmailToUserTest extends \PHPUnit_Framework_TestCase
                 \PHPUnit_Framework_Assert::assertEquals([], $cc);
                 \PHPUnit_Framework_Assert::assertEquals(['hidden@translation.in'], $bcc);
             }));
-
 
         $sendEmailToUser = new SendEmailToUser($mockEmailModel);
 

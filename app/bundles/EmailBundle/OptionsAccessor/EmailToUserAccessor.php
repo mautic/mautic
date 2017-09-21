@@ -26,7 +26,7 @@ class EmailToUserAccessor
 
     public function __construct(array $config)
     {
-        $this->config = $config;
+        $this->config      = $config;
         $this->transformer = new ArrayStringTransformer();
     }
 
@@ -35,7 +35,7 @@ class EmailToUserAccessor
      */
     public function getEmailID()
     {
-        return (int)$this->config['useremail']['email'];
+        return (int) $this->config['useremail']['email'];
     }
 
     /**
@@ -47,9 +47,9 @@ class EmailToUserAccessor
     }
 
     /**
-     * Gets array of User ids formated for EmailModel
+     * Gets array of User ids formated for EmailModel.
      *
-     * @param User|null $owner  If Owner is passed in and config is setted for it, adds owner to returned array
+     * @param User|null $owner If Owner is passed in and config is setted for it, adds owner to returned array
      *
      * @return array
      */
