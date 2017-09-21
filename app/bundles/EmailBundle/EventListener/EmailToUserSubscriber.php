@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
@@ -31,7 +32,7 @@ class EmailToUserSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return [self::class => ['onEmailToUser', 0]];
+        return [EmailEvents::ON_SENT_EMAIL_TO_USER => ['onEmailToUser', 0]];
     }
 
     public function onEmailToUser(TriggerExecutedEvent $event)

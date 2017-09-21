@@ -100,6 +100,7 @@ class PointSubscriber extends CommonSubscriber
           'formType'        => EmailToUserType::class,
           'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
           'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+          'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
         ];
 
         $event->addEvent('email.send_to_user', $sendToOwnerEvent);

@@ -14,7 +14,6 @@ namespace Mautic\PointBundle\Model;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\EmailBundle\EventListener\EmailToUserSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
@@ -356,7 +355,7 @@ class TriggerModel extends CommonFormModel
             $triggerEvent = $this->getEventRepository()->find($event['id']);
 
             $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
-            $event                = $this->dispatcher->dispatch(EmailToUserSubscriber::class, $triggerExecutedEvent);
+            $event                = $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
 
             return $event->getResult();
         }
