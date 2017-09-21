@@ -567,13 +567,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
+        $object      = 'Contact';
+
         if (empty($config['leadFields']) || !$lead->getEmail()) {
             return false;
         }
 
-        $object = 'Contact';
-
-        $leadFields = $config['leadFields'];
         //findLead first
         $cwContactExists = $this->getApiHelper()->getContacts(['Email' => $lead->getEmail()]);
 
@@ -581,34 +580,18 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $personFound = true;
         }
 
-        $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
-        $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
-        $communicationItems = $cwContactExists[0]['communicationItems'];
-        $cwContactExists    = $this->amendLeadDataBeforeMauticPopulate($cwContactExists[0], $object);
-
-        $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
-        $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
-        //check for blank fields to update here
-        $mappedData = $this->populateLeadData(
-            $lead,
-            ['leadFields' => $leadFields, 'object' => 'Contact', 'feature_settings' => [
-                'objects' => $config['objects'], ], 'update' => $personFound, 'communicationItems' => $communicationItems,
-            ]
-        );
-
-        if (empty($mappedData)) {
-            return false;
-        }
-
         $personData = [];
 
         try {
             if ($personFound) {
-                $personFound = true;
-                if (!empty($mappedData)) {
-                    $personData = $this->getApiHelper()->updateContact($mappedData, $cwContactExists['id']);
+                foreach ($cwContactExists as $cwContact) { // go through array of contacts found since Connectwise lets you duplicate records with same email address
+                    $mappedData = $this->getMappedFields($object, $lead, $personFound, $config, $cwContact);
+                    if (!empty($mappedData)) {
+                        $personData = $this->getApiHelper()->updateContact($mappedData, $cwContact['id']);
+                    }
                 }
             } else {
+                $mappedData = $this->getMappedFields($object, $lead, $personFound, $config);
                 $personData = $this->getApiHelper()->createContact($mappedData);
             }
             if (!isset($personData['errors'])) {
@@ -636,6 +619,37 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         }
 
         return false;
+    }
+
+    /**
+     * @param $cwContactData
+     * @param $object
+     * @param $lead
+     * @param $personFound
+     * @param $config
+     *
+     * @return array
+     */
+    public function getMappedFields($object, $lead, $personFound, $config, $cwContactData = [])
+    {
+        $fieldsToUpdateInCW = isset($config['update_mautic']) && $personFound ? array_keys($config['update_mautic'], 1) : [];
+        $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
+        $leadFields         = $config['leadFields'];
+
+        $cwContactExists    = $this->amendLeadDataBeforeMauticPopulate($cwContactData, $object);
+        $communicationItems = isset($cwContact['communicationItems']) ? $cwContactData['communicationItems'] : [];
+
+        $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
+        $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
+        //check for blank fields to update here
+        $mappedData = $this->populateLeadData(
+            $lead,
+            ['leadFields' => $leadFields, 'object' => 'Contact', 'feature_settings' => [
+                'objects' => $config['objects'], ], 'update' => $personFound, 'communicationItems' => $communicationItems,
+            ]
+        );
+
+        return $mappedData;
     }
 
     /**
@@ -788,7 +802,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param $config
-     * @param $contactId
+     * @param $cwContactId
+     * @param $leadId
+     *
+     * @return IntegrationEntity|null
      */
     public function createActivity($config, $cwContactId, $leadId)
     {
