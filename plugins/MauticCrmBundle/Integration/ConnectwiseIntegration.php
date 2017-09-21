@@ -567,10 +567,11 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
+        $leadPushed  = false;
         $object      = 'Contact';
 
         if (empty($config['leadFields']) || !$lead->getEmail()) {
-            return false;
+            return $leadPushed;
         }
 
         //findLead first
@@ -607,9 +608,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
                 }
 
-                return true;
-            } else {
-                return false;
+                $leadPushed = true;
             }
         } catch (\Exception $e) {
             if ($e instanceof ApiErrorException) {
@@ -618,7 +617,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $this->logIntegrationError($e);
         }
 
-        return false;
+        return $leadPushed;
     }
 
     /**
