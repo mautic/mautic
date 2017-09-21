@@ -731,4 +731,31 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
          return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
      }
+
+    /**
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function getCampaigns()
+    {
+        $campaigns = [];
+        try {
+            $campaigns = $this->getApiHelper()->getCampaigns();
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
+
+        return $campaigns;
+    }
+
+    /**
+     * @param $campaignId
+     * @param $settings
+     *
+     * @throws \Exception
+     */
+    public function getCampaignMembers($campaignId, $settings)
+    {
+    }
 }
