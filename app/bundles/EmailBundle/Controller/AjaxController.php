@@ -219,7 +219,7 @@ class AjaxController extends CommonAjaxController
                         $mailer = $this->container->get($transport);
 
                         if ('mautic.transport.amazon' == $transport) {
-                            $mailer->setHost($settings['amazon_region']);
+                            $mailer->setRegion($settings['amazon_region']);
                         }
                     }
             }
@@ -288,6 +288,8 @@ class AjaxController extends CommonAjaxController
 
     /**
      * @param Request $request
+     *
+     * @return JsonResponse
      */
     protected function getEmailCountStatsAction(Request $request)
     {

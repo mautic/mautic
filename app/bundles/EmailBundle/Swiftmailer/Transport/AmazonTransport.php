@@ -11,6 +11,12 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
+use Aws\CommandInterface;
+use Aws\CommandPool;
+use Aws\Credentials\Credentials;
+use Aws\Exception\AwsException;
+use Aws\ResultInterface;
+use Aws\Ses\SesClient;
 use Joomla\Http\Exception\UnexpectedResponseException;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -21,18 +27,160 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Class AmazonTransport.
  */
-class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
+class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport, InterfaceCallbackTransport
 {
     private $httpClient;
+    private $region;
+    private $username;
+    private $password;
+    private $concurrency;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct($host, Http $httpClient)
+    public function __construct(Http $httpClient)
     {
-        parent::__construct($host, 2587, 'tls');
-        $this->setAuthMode('login');
         $this->httpClient = $httpClient;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRegion()
+    {
+        return $this->region;
+    }
+
+    /**
+     * @param string $region
+     */
+    public function setRegion($region)
+    {
+        $this->region = $region;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param $username
+     */
+    public function setUsername($username)
+    {
+        $this->username = $username;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @param $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * SES authorization and choice of region
+     * Initializing of TokenBucket.
+     *
+     * @return SesClient
+     *
+     * @throws \Exception
+     */
+    public function start()
+    {
+        $client = new SesClient([
+            'credentials' => new Credentials(
+                $this->getUsername(),
+                $this->getPassword()
+            ),
+            'region'  => $this->getRegion(),
+            'version' => 'latest',
+        ]);
+
+        /**
+         * AWS SES has a limit of how many messages can be sent in a 24h time slot. The remaining messages are calculated
+         * from the api. The transport will fail when the quota is exceeded.
+         */
+        $quota               = $client->getSendQuota();
+        $this->concurrency   = floor($quota->get('MaxSendRate'));
+        $emailQuoteRemaining = $quota->get('Max24HourSend') - $quota->get('SentLast24Hours');
+        if ($emailQuoteRemaining > 0) {
+            $this->started = true;
+        } else {
+            throw new \Exception('Your AWS SES quota is exceeded');
+        }
+
+        return $client;
+    }
+
+    /**
+     * @param \Swift_Mime_Message $message
+     *
+     * @return array
+     */
+    public function getAmazonMessage(\Swift_Mime_Message $message)
+    {
+        $payload = [
+            'Source'       => current(array_keys($message->getFrom())),
+            'Destinations' => [current(array_keys($message->getTo()))],
+            'RawMessage'   => [
+                'Data' => $message->toString(),
+                ],
+            ];
+
+        return $payload;
+    }
+
+    /**
+     * @param \Swift_Mime_Message $message
+     * @param null                $failedRecipients
+     *
+     * @return array
+     */
+    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    {
+        try {
+            $client     = $this->start();
+            $commands[] = $client->getCommand('sendRawEmail', $this->getAmazonMessage($message));
+            $pool       = new CommandPool($client, $commands, [
+                'concurrency' => $this->concurrency,
+                'before'      => function (CommandInterface $cmd, $iteratorId) {
+                },
+                'fulfilled' => function (ResultInterface $result, $iteratorId) use ($commands) {
+                },
+                'rejected' => function (AwsException $reason, $iteratorId) use ($commands) {
+                },
+            ]);
+            $promise = $pool->promise();
+            $promise->wait();
+        } catch (\Exception $e) {
+            $this->throwException($e->getMessage());
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxBatchLimit()
+    {
+        return 5000;
     }
 
     /**
@@ -43,6 +191,18 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
     public function getCallbackPath()
     {
         return 'amazon';
+    }
+
+    /**
+     * @param \Swift_Message $message
+     * @param int            $toBeAdded
+     * @param string         $type
+     *
+     * @return int
+     */
+    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
+    {
+        return count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded;
     }
 
     /**
@@ -57,7 +217,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
     {
         $translator = $factory->getTranslator();
         $logger     = $factory->getLogger();
-        $logger->debug('Receiving webhook from Amazon');
+        $logger->debug('Receiving webHook from Amazon');
 
         $payload = json_decode($request->getContent(), true);
 
@@ -77,7 +237,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
      */
     public function processJsonPayload(array $payload, $logger, $translator)
     {
-
         // Data structure that Mautic expects to be returned from this callback
         $rows = [
             DoNotContact::BOUNCED => [

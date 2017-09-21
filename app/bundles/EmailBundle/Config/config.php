@@ -301,12 +301,12 @@ return [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
-                    '%mautic.mailer_amazon_region%',
                     'mautic.http.connector',
                 ],
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
                     'setPassword' => ['%mautic.mailer_password%'],
+                    'setRegion'   => ['%mautic.mailer_amazon_region%'],
                 ],
             ],
             'mautic.transport.mandrill' => [
@@ -400,7 +400,7 @@ return [
         'mailer_password'                     => null,
         'mailer_encryption'                   => null, //tls or ssl,
         'mailer_auth_mode'                    => null, //plain, login or cram-md5
-        'mailer_amazon_region'                => 'email-smtp.us-east-1.amazonaws.com',
+        'mailer_amazon_region'                => 'us-east-1',
         'mailer_spool_type'                   => 'memory', //memory = immediate; file = queue
         'mailer_spool_path'                   => '%kernel.root_dir%/spool',
         'mailer_spool_msg_limit'              => null,
