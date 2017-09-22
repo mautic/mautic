@@ -30,7 +30,7 @@ class FilemanagerRSC extends Filemanager {
 	public function getinfo() {
 		$object = $this->get_object();
 		if (isset($object->name)) {
-			$object = $this->get_file_info(&$object);
+			$object = $this->get_file_info($object);
 			return array(
 				'Path' => $object->path,
 				'Filename' => $object->name,
@@ -105,7 +105,7 @@ class FilemanagerRSC extends Filemanager {
 			foreach ( $objects as $object ) {
 				if(!isset($this->params['type']) || (isset($this->params['type']) && strtolower($this->params['type'])=='images' && in_array(strtolower($object->content_type),$this->config['images']))) {
 					if($this->config['upload']['imagesonly']== false || ($this->config['upload']['imagesonly']== true && in_array(strtolower($object->content_type),$this->config['images']))) {
-						$object = $this->get_file_info(&$object);
+						$object = $this->get_file_info($object);
 						$array[$object->url] = array(
 							'Path'=> $object->path,
 							'Filename' => $object->name,
