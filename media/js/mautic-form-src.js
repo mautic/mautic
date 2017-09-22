@@ -221,7 +221,7 @@
                     // Add button handlers
                     prevButton.onclick = function(formId, theForm, showPageNumber) {
                         return function() {
-                            Form.customCallbackHandler(formId, 'onShowPreviousPage', {'page': showPageNumber});
+                            Form.customCallbackHandler(formId, 'onShowPreviousPage', showPageNumber);
                             Form.switchPage(theForm, showPageNumber);
                         }
                     } (formId, theForm, prevPageNumber);
@@ -241,7 +241,7 @@
                                 return;
                             }
 
-                            Form.customCallbackHandler(formId, 'onShowNextPage', {'page': showPageNumber});
+                            Form.customCallbackHandler(formId, 'onShowNextPage', showPageNumber);
                             Form.switchPage(theForm, showPageNumber);
                         }
                     } (formId, theForm, pageNumber, nextPageNumber);
