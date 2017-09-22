@@ -74,7 +74,6 @@ CONTENT
                             [
                                 'content' => null,
                                 'filters' => [
-
                                 ],
                             ],
                         ],
@@ -83,7 +82,6 @@ CONTENT
                         'tokenName' => 'Dynamic Content 2',
                         'content'   => 'DEC {test}',
                         'filters'   => [
-
                         ],
                     ],
                 ]

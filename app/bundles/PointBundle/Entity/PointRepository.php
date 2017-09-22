@@ -96,6 +96,7 @@ class PointRepository extends CommonRepository
 
         return $return;
     }
+
     /**
      * @param int $leadId
      *
@@ -125,6 +126,7 @@ class PointRepository extends CommonRepository
 
         return $return;
     }
+
     /**
      * {@inheritdoc}
      */

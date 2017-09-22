@@ -143,7 +143,6 @@ class AssetModel extends FormModel
 
         // Download triggered by lead
         if (empty($systemEntry)) {
-
             //check for any clickthrough info
             $clickthrough = $request->get('ct', false);
             if (!empty($clickthrough)) {

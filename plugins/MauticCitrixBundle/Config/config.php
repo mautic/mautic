@@ -108,25 +108,21 @@ return [
             'mautic.integration.gotoassist' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotoassistIntegration::class,
                 'arguments' => [
-
                 ],
             ],
             'mautic.integration.gotomeeting' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotomeetingIntegration::class,
                 'arguments' => [
-
                 ],
             ],
             'mautic.integration.gototraining' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GototrainingIntegration::class,
                 'arguments' => [
-
                 ],
             ],
             'mautic.integration.gotowebinar' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotowebinarIntegration::class,
                 'arguments' => [
-
                 ],
             ],
         ],

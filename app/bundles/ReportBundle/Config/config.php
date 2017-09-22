@@ -86,7 +86,6 @@ return [
                     'mautic.report.model.report',
                     'mautic.security',
                 ],
-
             ],
         ],
         'forms' => [

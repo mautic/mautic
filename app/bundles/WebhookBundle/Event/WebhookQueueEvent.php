@@ -30,7 +30,7 @@ class WebhookQueueEvent extends CommonEvent
      * @param Webhook      $webhook
      * @param bool         $isNew
      */
-    public function __construct(WebhookQueue $webhookQueue, Webhook $webhook,  $isNew = false)
+    public function __construct(WebhookQueue $webhookQueue, Webhook $webhook, $isNew = false)
     {
         $this->entity  = $webhookQueue;
         $this->webhook = $webhook;

@@ -9,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren()) {
-
     /* Top menu level start */
     if ($item->isRoot()) {
         echo '<ul class="nav mt-10" data-toggle="menu">'."\n";

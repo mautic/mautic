@@ -60,6 +60,7 @@ class StageActionType extends AbstractType
     {
         return 'choice';
     }
+
     /**
      * @return string
      */

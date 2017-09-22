@@ -332,7 +332,7 @@ class ReportModel extends FormModel
         foreach ($filters as $filter => $data) {
             if (isset($data['label'])) {
                 $return->definitions[$filter] = $data;
-                $return->choices [$filter]    = $data['label'];
+                $return->choices[$filter]     = $data['label'];
                 $return->choiceHtml .= "<option value=\"$filter\">{$data['label']}</option>\n";
 
                 $return->operatorChoices[$filter] = $this->getOperatorOptions($data);
@@ -478,7 +478,6 @@ class ReportModel extends FormModel
                     return $response;
                 }
                 throw new \Exception('PHPExcel is required to export to Excel spreadsheets');
-
             default:
                 return new Response();
         }

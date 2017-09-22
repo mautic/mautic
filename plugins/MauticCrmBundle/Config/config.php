@@ -71,25 +71,21 @@ return [
             'mautic.integration.salesforce' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration::class,
                 'arguments' => [
-
                 ],
             ],
             'mautic.integration.sugarcrm' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration::class,
                 'arguments' => [
-
                 ],
             ],
             'mautic.integration.vtiger' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration::class,
                 'arguments' => [
-
                 ],
             ],
             'mautic.integration.zoho' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration::class,
                 'arguments' => [
-
                 ],
             ],
             'mautic.integration.dynamics' => [

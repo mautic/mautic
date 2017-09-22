@@ -90,6 +90,7 @@ class FullContact_Name extends FullContact_Base
 
         return $this->response_obj;
     }
+
     public function parser($name, $casing = 'titlecase')
     {
         $this->_resourceUri = '/name/parser.json';

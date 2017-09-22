@@ -38,6 +38,7 @@ class CampaignEventSendWebhookType extends AbstractType
     {
         $this->translator = $translator;
     }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options

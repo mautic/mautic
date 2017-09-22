@@ -320,8 +320,8 @@ class ResultController extends CommonFormController
         if ($this->request->getMethod() == 'POST') {
             $model = $this->getModel('form.submission');
 
-                // Find the result
-                $entity = $model->getEntity($objectId);
+            // Find the result
+            $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
                 $flashes[] = [

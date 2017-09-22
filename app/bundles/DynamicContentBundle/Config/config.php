@@ -138,7 +138,6 @@ return [
             'mautic.dynamicContent.model.dynamicContent' => [
                 'class'     => 'Mautic\DynamicContentBundle\Model\DynamicContentModel',
                 'arguments' => [
-
                 ],
             ],
         ],

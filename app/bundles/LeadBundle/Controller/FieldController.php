@@ -295,7 +295,7 @@ class FieldController extends FormController
                         //form is valid so process the data
                         $model->saveEntity($field, $form->get('buttons')->get('save')->isClicked());
 
-                        $this->addFlash('mautic.core.notice.updated',  [
+                        $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $field->getLabel(),
                             '%menu_link%' => 'mautic_contactfield_index',
                             '%url%'       => $this->generateUrl('mautic_contactfield_action', [

@@ -106,7 +106,7 @@ class FilemanagerRSC extends Filemanager
             }
             $container = $this->conn->get_container($container);
             //$list = $container->list_objects($limit, $marker,  $prefix, $path);
-            $objects = $container->get_objects($limit, $marker,  $prefix, $path);
+            $objects = $container->get_objects($limit, $marker, $prefix, $path);
             foreach ($objects as $object) {
                 if (!isset($this->params['type']) || (isset($this->params['type']) && strtolower($this->params['type']) == 'images' && in_array(strtolower($object->content_type), $this->config['images']))) {
                     if ($this->config['upload']['imagesonly'] == false || ($this->config['upload']['imagesonly'] == true && in_array(strtolower($object->content_type), $this->config['images']))) {
@@ -333,6 +333,7 @@ class FilemanagerRSC extends Filemanager
 
         return false;
     }
+
     private function get_object($path = null, $showError = false)
     {
         if (empty($path)) {
@@ -359,6 +360,7 @@ class FilemanagerRSC extends Filemanager
 
         return false;
     }
+
     private function get_file_info($object = null)
     {
         if (empty($object) || !is_object($object)) {

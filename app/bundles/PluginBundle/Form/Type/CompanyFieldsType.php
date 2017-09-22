@@ -65,6 +65,6 @@ class CompanyFieldsType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $this->buildFieldView($view,  $options, 'company');
+        $this->buildFieldView($view, $options, 'company');
     }
 }

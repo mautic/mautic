@@ -33,6 +33,7 @@ class Version20160506000000 extends AbstractMauticMigration
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
+
     /**
      * @param Schema $schema
      */

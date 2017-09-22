@@ -1363,7 +1363,6 @@ class CommonRepository extends EntityRepository
     {
         $isOrm = $q instanceof QueryBuilder;
         if (isset($args['select'])) {
-
             // Build a custom select
             if (is_string($args['select'])) {
                 $args['select'] = explode(',', $args['select']);

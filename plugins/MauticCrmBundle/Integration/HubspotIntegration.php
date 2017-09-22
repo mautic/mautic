@@ -105,6 +105,7 @@ class HubspotIntegration extends CrmAbstractIntegration
             'enable_data_priority'   => $enableDataPriority,
         ];
     }
+
     /**
      * {@inheritdoc}
      *

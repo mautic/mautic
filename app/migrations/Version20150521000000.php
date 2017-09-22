@@ -319,7 +319,6 @@ class Version20150521000000 extends AbstractMauticMigration
 
             // Clone since the ID may be in a bunch of serialized properties then convert new to a list based email
             while (($row = $emails->next()) !== false) {
-
                 /** @var \Mautic\EmailBundle\Entity\Email $templateEmail */
                 $templateEmail = reset($row);
                 $id            = $templateEmail->getId();

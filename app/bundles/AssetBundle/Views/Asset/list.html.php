@@ -28,7 +28,6 @@ if ($tmpl == 'index') {
                         'templateButtons' => [
                             'delete' => $permissions['asset:assets:deleteown'] || $permissions['asset:assets:deleteother'],
                         ],
-
                     ]
                 );
 

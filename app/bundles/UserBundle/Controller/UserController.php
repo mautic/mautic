@@ -183,7 +183,7 @@ class UserController extends FormController
                         }
                     }
 
-                    $this->addFlash('mautic.core.notice.created',  [
+                    $this->addFlash('mautic.core.notice.created', [
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', [
@@ -315,7 +315,7 @@ class UserController extends FormController
                         }
                     }
 
-                    $this->addFlash('mautic.core.notice.updated',  [
+                    $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', [
