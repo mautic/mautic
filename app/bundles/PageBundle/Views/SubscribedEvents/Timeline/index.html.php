@@ -92,6 +92,7 @@ $query = $event['extra']['hit']['query'];
 
     <?php
     if (!empty($query)) {
+        $counter = 0;
         foreach ($query as $k => $v) {
             if (in_array($v, ['', null, []])) {
                 continue;
