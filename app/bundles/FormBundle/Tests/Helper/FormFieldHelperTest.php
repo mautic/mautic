@@ -87,7 +87,7 @@ class FormFieldHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function getField($name, $type)
     {
-        $field = new Field;
+        $field = new Field();
 
         $field->setLabel($name);
         $field->setAlias(strtolower(str_replace(' ', '', $name)));
