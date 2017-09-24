@@ -85,8 +85,6 @@ class PublicController extends CommonController
         return $response;
     }
 
-    // indexAction
-
     /**
      * This action will receive a POST when the session status changes.
      * A POST will also be made when a customer joins the session and when the session ends
@@ -128,6 +126,4 @@ class PublicController extends CommonController
 
         return new Response('OK');
     }
-
-    // sessionChangedAction
-} // class
+}
