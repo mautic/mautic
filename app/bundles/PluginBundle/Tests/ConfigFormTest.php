@@ -130,53 +130,6 @@ class ConfigFormTest extends KernelTestCase
                     )
                 );
 
-        $apiKeys = ['client_id' => 'clientid',
-            'client_secret'     => 'clientsecret',
-            'access_token'      => 'abc',
-            'oath_token_secret' => 'oauth_secret',
-            'refresh_token'     => 'refresh_token',
-            'signature'         => 'signature',
-            'scope'             => 'scope',
-            'token_type'        => 'today',
-            'instance_url'      => 'https://test.com', ];
-        $featureSettings = [
-            'updateOwner' => [
-                ],
-            'objects' => [
-                    0 => 'Lead',
-                ],
-            'leadFields' => [
-                    'Company'   => 'company',
-                    'FirstName' => 'firstname',
-                    'LastName'  => 'lastname',
-                    'Email'     => 'email',
-                ],
-            'update_mautic' => [
-                    'Company'   => '0',
-                    'FirstName' => '0',
-                    'LastName'  => '0',
-                    'Email'     => '0',
-                ],
-            'companyFields' => [
-                    'Name' => 'companyname',
-                ],
-            'update_mautic_company' => [
-                    'Name' => '0',
-                ],
-        ];
-
-        $entityManager->expects($this
-            ->any())->method('getIntegrationSettings')->willReturn(
-                $this->returnValue(
-                    [
-                        [
-                            'plugin_id'       => 1,
-                            'name'            => 'TestIntegration',
-                            'api_keys'        => $apiKeys,
-                            'is_published'    => true,
-                            'feature_sttings' => $featureSettings,
-
-        ], ]));
         $integrationHelper = new IntegrationHelper(
             self::$kernel,
             $entityManager,
