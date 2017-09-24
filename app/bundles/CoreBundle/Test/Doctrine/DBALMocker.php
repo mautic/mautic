@@ -20,9 +20,9 @@ class DBALMocker
     protected $connectionInserted;
 
     protected $queryParts = [
-        'select' => [],
-        'from' => [],
-        'where' => [],
+        'select'     => [],
+        'from'       => [],
+        'where'      => [],
         'parameters' => [],
     ];
 
@@ -57,9 +57,9 @@ class DBALMocker
     public function resetQueryParts()
     {
         $this->queryParts = [
-            'select' => [],
-            'from' => [],
-            'where' => [],
+            'select'     => [],
+            'from'       => [],
+            'where'      => [],
             'parameters' => [],
         ];
     }
