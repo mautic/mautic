@@ -44,6 +44,7 @@ class StageModel extends CommonFormModel
      * @var LeadModel
      */
     protected $leadModel;
+
     /**
      * PointModel constructor.
      *
@@ -55,6 +56,7 @@ class StageModel extends CommonFormModel
         $this->session   = $session;
         $this->leadModel = $leadModel;
     }
+
     /**
      * {@inheritdoc}
      *

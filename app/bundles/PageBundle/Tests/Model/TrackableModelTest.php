@@ -455,6 +455,7 @@ class TrackableModelTest extends WebTestCase
 
         $this->assertEmpty($trackables);
     }
+
     /**
      * @param       $urls
      * @param null  $tokenUrls

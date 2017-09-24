@@ -115,6 +115,7 @@ class AbstractFormFieldHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $actual);
     }
+
     /**
      * @testdox The string is parsed correctly into a choice array
      *
@@ -160,7 +161,6 @@ class AbstractFormFieldHelperTest extends \PHPUnit_Framework_TestCase
                 'value1' => 'label1',
                 'value2' => 'label2',
                 'value3' => 'label3',
-
             ],
         ];
         $actual = AbstractFormFieldHelper::parseList($array);

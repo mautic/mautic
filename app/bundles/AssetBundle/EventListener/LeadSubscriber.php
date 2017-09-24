@@ -76,7 +76,6 @@ class LeadSubscriber extends CommonSubscriber
         $event->addToCounter($eventTypeKey, $downloads);
 
         if (!$event->isEngagementCount()) {
-
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
                 $asset = $this->assetModel->getEntity($download['asset_id']);

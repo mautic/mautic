@@ -77,7 +77,6 @@ class MonitoringType extends AbstractType
 
         // if we have a network type value add in the form
         if (!empty($options['networkType']) && array_key_exists($options['networkType'], $options['networkTypes'])) {
-
             // get the values from the entity function
             $properties = $options['data']->getProperties();
 
