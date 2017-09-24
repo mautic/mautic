@@ -1,18 +1,22 @@
 <?php
 
-$finder = Symfony\CS\Finder\DefaultFinder::create()
+$finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/bundles')
     ->in(__DIR__.'/app/config')
     ->in(__DIR__.'/app/middlewares')
     ->in(__DIR__.'/app/migrations')
     ->in(__DIR__.'/plugins');
 
-return Symfony\CS\Config\Config::create()
-    ->level(Symfony\CS\FixerInterface::SYMFONY_LEVEL)
-    ->finder($finder)
-    ->fixers([
-        'align_double_arrow',
-        'align_equals',
-        'ordered_use',
-        'short_array_syntax',
-    ]);
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@Symfony' => true,
+        'binary_operator_spaces' => [
+            'align_double_arrow' => true,
+            'align_equals' => true
+        ],
+        'ordered_imports' => true,
+        'array_syntax' => [
+            'syntax' => 'short'
+        ],
+    ])
+    ->setFinder($finder);
