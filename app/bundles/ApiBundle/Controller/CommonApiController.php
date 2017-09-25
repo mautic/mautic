@@ -401,13 +401,7 @@ class CommonApiController extends FOSRestController implements MauticController
             $this->customSelectRequested = true;
         }
 
-        if ($where = InputHelper::cleanArray($this->request->get('where', []))) {
-            // Ensure internal flag is not spoofed
-            foreach ($where as $key => $statement) {
-                if (isset($statement['internal'])) {
-                    unset($where[$key]);
-                }
-            }
+        if ($where = $this->getWhereFromResponse()) {
             $args['filter']['where'] = $where;
         }
 
@@ -425,6 +419,20 @@ class CommonApiController extends FOSRestController implements MauticController
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
+    }
+
+    /**
+     * Sanitizes and returns an array of where statements from the request.
+     *
+     * @return array
+     */
+    protected function getWhereFromResponse()
+    {
+        $where = InputHelper::cleanArray($this->request->get('where', []));
+
+        $this->sanitizeWhereClauseArrayFromRequest($where);
+
+        return $where;
     }
 
     /**
