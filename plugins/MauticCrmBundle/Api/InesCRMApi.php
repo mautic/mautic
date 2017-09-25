@@ -37,7 +37,10 @@ class InesCRMApi extends CrmApi
     public function getSyncInfo() {
         $client = $this->getAutomationSyncClient();
 
-        return $client->GetSyncInfo();
+        $response = $client->GetSyncInfo();
+        self::cleanList($response->GetSyncInfoResult->CompanyCustomFields->CustomFieldToAuto);
+        self::cleanList($response->GetSyncInfoResult->ContactCustomFields->CustomFieldToAuto);
+        return $response;
     }
 
     public function getClientCustomFields($internalRef) {
@@ -45,6 +48,8 @@ class InesCRMApi extends CrmApi
 
         $response = $client->GetCompanyCF(['reference' => $internalRef]);
         self::cleanList($response->GetCompanyCFResult->Values->CustomField);
+        self::cleanList($response->GetCompanyCFResult->Definitions->CustomFieldDefinition);
+        self::cleanList($response->GetCompanyCFResult->Groups->CustomFieldGroup);
         return $response;
     }
 
@@ -53,6 +58,8 @@ class InesCRMApi extends CrmApi
 
         $response = $client->GetContactCF(['reference' => $internalRef]);
         self::cleanList($response->GetContactCFResult->Values->CustomField);
+        self::cleanList($response->GetContactCFResult->Definitions->CustomFieldDefinition);
+        self::cleanList($response->GetContactCFResult->Groups->CustomFieldGroup);
         return $response;
     }
 
@@ -194,7 +201,7 @@ class InesCRMApi extends CrmApi
     }
 
     private static function cleanList(&$dirtyList) {
-        if (is_null($dirtyList)) {
+        if (!isset($dirtyList)) {
             $dirtyList = [];
         } elseif (!is_array($dirtyList)) {
             $dirtyList = [$dirtyList];
