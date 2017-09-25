@@ -1,0 +1,5 @@
+{
+    "require": {
+        "recombee/php-api-client": "^1.5"
+    }
+}
