@@ -193,6 +193,7 @@ if (!$isEmbedded) {
                                     <td><?php echo $bccAddress; ?></td>
                                 </tr>
                             <?php endif; ?>
+
                             <?php if ($headers = $email->getHeaders()): ?>
                                 <tr>
                                     <td width="20%">
@@ -201,6 +202,28 @@ if (!$isEmbedded) {
                                     <td><?php echo $view['formatter']->simpleArrayToHtml($headers); ?></td>
                                 </tr>
                             <?php endif; ?>
+
+                            <?php if (!empty($pending)): ?>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b"><?php echo $view['translator']->trans('Pending'); ?></span>
+                                    </td>
+                                    <td><?php echo $pending; ?></td>
+                                </tr>
+                            <?php endif; ?>
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('Sent'); ?></span>
+                                </td>
+                                <td><?php echo $email->getSentCount(); ?></td>
+                            </tr>
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('Read'); ?></span>
+                                </td>
+                                <td><?php echo $email->getReadCount(); ?></td>
+                            </tr>
+
                             </tbody>
                         </table>
                     </div>
