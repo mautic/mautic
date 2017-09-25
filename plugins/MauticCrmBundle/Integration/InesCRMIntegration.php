@@ -199,6 +199,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $mappedData->client->InternalRef = 0;
                 $mappedData->client->Contacts->ContactInfoAuto[0]->InternalRef = 0;
+                $mappedData->client->Contacts->ContactInfoAuto[0]->Scoring = $lead->getPoints();
+                $mappedData->client->Contacts->ContactInfoAuto[0]->Desabo = !$lead->getDoNotContact()->isEmpty();
 
                 $response = $apiHelper->createClientWithContacts($mappedData);
                 $result = $response->AddClientWithContactsResult;
@@ -233,6 +235,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $shouldUpdateContact = self::mapLeadUpdatesToInesContact($config, $lead, $inesContact);
 
                 if ($shouldUpdateContact) {
+                    $inesContact->Scoring = $lead->getPoints();
+                    $inesContact->Desabo = !$lead->getDoNotContact()->isEmpty();
                     $response = $apiHelper->updateContact($inesContact);
                 }
             }
@@ -247,7 +251,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     'AutomationRef' => $lead->getId(),
                     'clientRef' => $inesClientRef,
                     'scoring' => $lead->getPoints(),
-                    // TODO: add unsubscribe status
+                    // FIXME: Can't figure out how to unsub the contact...
+                    'desabo' => !$lead->getDoNotContact()->isEmpty(),
                 ];
 
                 self::mapLeadToInesContact($config, $lead, $mappedData->contact);
@@ -282,6 +287,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 // TODO: Figure out how to transfer a contact from a client to another
                 if ($shouldUpdateContact) {
+                    $inesContact->IsNew = false;
+                    $inesContact->AutomationRef = $lead->getId();
+                    $inesContact->Scoring = $lead->getPoints();
+                    $inesContact->Desabo = !$lead->getDoNotContact()->isEmpty();
                     $apiHelper->updateContact($inesContact);
                 }
             }
@@ -332,7 +341,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
         foreach ($fields as $inesField => $mauticField) {
             if (substr($inesField, 0, 12) !== self::INES_CUSTOM_FIELD_PREFIX) { // FIXME: There's probably a better way to do this...
                 $method = 'get' . ucfirst($mauticField);
-                if ((string) $inesObject->$inesField !== (string) $mauticObject->$method($mauticField)) {
+                if ((string) $inesObject->$inesField !== (string) $mauticObject->$method()) {
                     // The field should be overwritten if its value is "empty" in the PHP sense or if its
                     // overwritability is unspecified or specified as true
                     $shouldOverwrite = empty($inesObject->$inesField)
