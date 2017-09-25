@@ -514,7 +514,7 @@ class FieldType extends AbstractType
                 case 'file':
                     $builder->add(
                         'properties',
-                        'formfield_file',
+                        FormFieldFileType::class,
                         [
                             'label' => false,
                             'data'  => $propertiesData,
