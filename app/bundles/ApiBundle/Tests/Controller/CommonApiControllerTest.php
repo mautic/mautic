@@ -9,10 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CampaignBundle\Tests\Model;
+namespace Mautic\ApiBundle\Tests\Controller;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
+use Symfony\Component\HttpFoundation\Request;
 
 class CommonApiControllerTest extends CampaignTestAbstract
 {
@@ -44,9 +45,48 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals('f.dateAdded,f.dateModified', $result);
     }
 
-    protected function getResultFromProtectedMethod($method, array $args)
+    public function testGetWhereFromResponseWithNoWhere()
     {
-        $controller           = new CommonApiController();
+        $request = $this->getMockBuilder(Request::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $result = $this->getResultFromProtectedMethod('getWhereFromResponse', [], $request);
+
+        $this->assertEquals([], $result);
+    }
+
+    public function testGetWhereFromResponseWithSomeWhere()
+    {
+        $where = [
+            [
+                'col'  => 'id',
+                'expr' => 'eq',
+                'val'  => 5,
+            ],
+        ];
+
+        $request = $this->getMockBuilder(Request::class)
+            ->setMethods(['get'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $request->method('get')
+            ->willReturn($where);
+
+        $result = $this->getResultFromProtectedMethod('getWhereFromResponse', [], $request);
+
+        $this->assertEquals($where, $result);
+    }
+
+    protected function getResultFromProtectedMethod($method, array $args, Request $request = null)
+    {
+        $controller = new CommonApiController();
+
+        if ($request) {
+            $controller->setRequest($request);
+        }
+
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
         $method               = $controllerReflection->getMethod($method);
         $method->setAccessible(true);
