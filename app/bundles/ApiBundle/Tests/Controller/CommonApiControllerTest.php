@@ -45,18 +45,18 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $this->assertEquals('f.dateAdded,f.dateModified', $result);
     }
 
-    public function testGetWhereFromResponseWithNoWhere()
+    public function testgetWhereFromRequestWithNoWhere()
     {
         $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $result = $this->getResultFromProtectedMethod('getWhereFromResponse', [], $request);
+        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [], $request);
 
         $this->assertEquals([], $result);
     }
 
-    public function testGetWhereFromResponseWithSomeWhere()
+    public function testgetWhereFromRequestWithSomeWhere()
     {
         $where = [
             [
@@ -74,7 +74,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $request->method('get')
             ->willReturn($where);
 
-        $result = $this->getResultFromProtectedMethod('getWhereFromResponse', [], $request);
+        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [], $request);
 
         $this->assertEquals($where, $result);
     }

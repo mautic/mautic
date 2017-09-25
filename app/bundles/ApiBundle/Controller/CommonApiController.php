@@ -401,7 +401,7 @@ class CommonApiController extends FOSRestController implements MauticController
             $this->customSelectRequested = true;
         }
 
-        if ($where = $this->getWhereFromResponse()) {
+        if ($where = $this->getWhereFromRequest()) {
             $args['filter']['where'] = $where;
         }
 
@@ -426,7 +426,7 @@ class CommonApiController extends FOSRestController implements MauticController
      *
      * @return array
      */
-    protected function getWhereFromResponse()
+    protected function getWhereFromRequest()
     {
         $where = InputHelper::cleanArray($this->request->get('where', []));
 
