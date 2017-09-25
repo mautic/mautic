@@ -32,23 +32,16 @@ class InesCRMApi extends CrmApi
     public function __construct(CrmAbstractIntegration $integration) {
         parent::__construct($integration);
         $this->translator = $integration->getTranslator();
-
-        $this->loginClient = $this->makeClient(self::LOGIN_WS_PATH);
-        $this->contactManagerClient = $this->makeClient(self::CONTACT_MANAGER_WS_PATH);
-        $this->customFieldClient = $this->makeClient(self::CUSTOM_FIELD_WS_PATH);
-        $this->automationSyncClient = $this->makeClient(self::AUTOMATION_SYNC_WS_PATH);
     }
 
     public function getSyncInfo() {
-        $client = $this->automationSyncClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getAutomationSyncClient();
 
         return $client->GetSyncInfo();
     }
 
     public function getClientCustomFields($internalRef) {
-        $client = $this->customFieldClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getCustomFieldClient();
 
         $response = $client->GetCompanyCF(['reference' => $internalRef]);
         self::cleanList($response->GetCompanyCFResult->Values->CustomField);
@@ -56,8 +49,7 @@ class InesCRMApi extends CrmApi
     }
 
     public function getContactCustomFields($internalRef) {
-        $client = $this->customFieldClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getCustomFieldClient();
 
         $response = $client->GetContactCF(['reference' => $internalRef]);
         self::cleanList($response->GetContactCFResult->Values->CustomField);
@@ -65,83 +57,107 @@ class InesCRMApi extends CrmApi
     }
 
     public function createClientCustomField($mappedData) {
-        $client = $this->customFieldClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getCustomFieldClient();
 
         return $client->InsertCompanyCF($mappedData);
     }
 
     public function updateClientCustomField($mappedData) {
-        $client = $this->customFieldClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getCustomFieldClient();
 
         return $client->UpdateCompanyCF($mappedData);
     }
 
     public function createContactCustomField($mappedData) {
-        $client = $this->customFieldClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getCustomFieldClient();
 
         return $client->InsertContactCF($mappedData);
     }
 
     public function updateContactCustomField($mappedData) {
-        $client = $this->customFieldClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getCustomFieldClient();
 
         return $client->UpdateContactCF($mappedData);
     }
 
     public function getClient($internalRef) {
-        $client = $this->contactManagerClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getContactManagerClient();
 
         return $client->GetClient(['reference' => $internalRef]);
     }
 
     public function getContact($internalRef) {
-        $client = $this->contactManagerClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getContactManagerClient();
 
         return $client->GetContact(['reference' => $internalRef]);
     }
 
     public function createClientWithContacts($mappedData) {
-        $client = $this->automationSyncClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getAutomationSyncClient();
 
         return $client->AddClientWithContacts($mappedData);
     }
 
     public function createClient($mappedData) {
-        $client = $this->contactManagerClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getContactManagerClient();
 
         return $client->AddClient($mappedData);
     }
 
     public function createContact($mappedData) {
-        $client = $this->automationSyncClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getAutomationSyncClient();
 
         return $client->AddContact($mappedData);
     }
 
     public function updateClient($inesClient) {
-        $client = $this->contactManagerClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getContactManagerClient();
 
         return $client->UpdateClient(['client' => $inesClient]);
     }
 
     public function updateContact($inesContact) {
-        $client = $this->contactManagerClient;
-        $this->includeAuthHeader($client);
+        $client = $this->getAutomationSyncClient();
 
         return $client->UpdateContact(['contact' => $inesContact]);
     }
 
-    private function makeClient($path) {
+    private function getLoginClient() {
+        if (is_null($this->loginClient)) {
+            $this->loginClient = self::makeClient(self::LOGIN_WS_PATH);
+        }
+
+        return $this->loginClient;
+    }
+
+    private function getContactManagerClient() {
+        if (is_null($this->contactManagerClient)) {
+            $this->contactManagerClient = self::makeClient(self::CONTACT_MANAGER_WS_PATH);
+            $this->includeAuthHeader($this->contactManagerClient);
+        }
+
+        return $this->contactManagerClient;
+    }
+
+    private function getCustomFieldClient() {
+        if (is_null($this->customFieldClient)) {
+            $this->customFieldClient = self::makeClient(self::CUSTOM_FIELD_WS_PATH);
+            $this->includeAuthHeader($this->customFieldClient);
+        }
+
+        return $this->customFieldClient;
+    }
+
+    private function getAutomationSyncClient() {
+        if (is_null($this->automationSyncClient)) {
+            $this->automationSyncClient = self::makeClient(self::AUTOMATION_SYNC_WS_PATH);
+            $this->includeAuthHeader($this->automationSyncClient);
+        }
+
+        return $this->automationSyncClient;
+    }
+
+    private static function makeClient($path) {
         return new \SoapClient(self::ROOT_URL . $path . '?wsdl');
     }
 
@@ -159,7 +175,7 @@ class InesCRMApi extends CrmApi
         $failed = false;
 
         try {
-            $response = $this->loginClient->authenticationWs([
+            $response = $this->getLoginClient()->authenticationWs([
                 'request' => $keys,
             ]);
 
