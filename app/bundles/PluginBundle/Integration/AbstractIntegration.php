@@ -977,8 +977,8 @@ abstract class AbstractIntegration
             CURLOPT_USERAGENT      => $this->getUserAgent(),
         ];
 
-        if (isset($settings['curl_options'])) {
-            $options = array_merge($options, $settings['curl_options']);
+        if (isset($settings['curl_options']) && is_array($settings['curl_options'])) {
+            $options = $settings['curl_options'] + $options;
         }
 
         if (isset($settings['ssl_verifypeer'])) {
