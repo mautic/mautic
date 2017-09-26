@@ -143,9 +143,26 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
             $iterableLeads = $qb->getQuery()->iterate();
 
+            $results = [];
+
             foreach($iterableLeads as $lead) {
-                $this->pushLead($lead[0], $config);
+                $results[] = $this->pushLead($lead[0], $config);
             }
+
+            // The following mapping takes every result array and zips them together
+            // by summing the elements at the same indices in the following way:
+
+            //   [0, 1, 0, 1, 0, 1, 0, 1] <- $results[0]
+            // + [0, 0, 1, 1, 0, 0, 1, 1] <- $results[1]
+            // + [0, 0, 0, 0, 1, 1, 1 ,1] <- $results[2]
+            // ==========================
+            //   [0, 1, 1, 2, 1, 2, 2, 3] <- $compiledResults
+
+            $compiledResults = array_map(function (...$results) {
+                return array_sum($results);
+            }, ...$results);
+
+            return $compiledResults; // <- [$updated, $created, $errors, $ignored]
         }
     }
 
@@ -174,7 +191,12 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
         if ($company === null) {
             $this->logger->debug('INES: Will not push contact without company', compact('lead', 'config'));
-            return;
+            return [
+                /* updated: */ 0,
+                /* created: */ 0,
+                /*  errors: */ 0,
+                /* ignored: */ 1,
+            ];
         }
 
         $companyInternalRefGetter = 'get' . ucfirst($companyFields['InternalRef']);
@@ -185,6 +207,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
         $inesClientRef = $company->$companyInternalRefGetter();
         $inesContactRef = $lead->$leadInternalRefGetter();
+
+        $result = null;
 
         if (!$inesClientRef) {
             if (!$inesContactRef) {
@@ -214,6 +238,13 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $companyModel->saveEntity($company);
                 $leadModel->saveEntity($lead);
+
+                $result = [
+                    /* updated: */ 0,
+                    /* created: */ 1,
+                    /*  errors: */ 0,
+                    /* ignored: */ 0,
+                ];
             } else {
                 $this->logger->debug('INES: Will create Client and update Contact', compact('lead', 'company', 'config'));
 
@@ -239,6 +270,13 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     $inesContact->Scoring = $lead->getPoints();
                     $inesContact->Desabo = !$lead->getDoNotContact()->isEmpty();
                     $response = $apiHelper->updateContact($inesContact);
+
+                    $result = [
+                        /* updated: */ 1,
+                        /* created: */ 0,
+                        /*  errors: */ 0,
+                        /* ignored: */ 0,
+                    ];
                 }
             }
         } else {
@@ -272,6 +310,13 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 if ($shouldUpdateClient) {
                     $response = $apiHelper->updateClient($inesClient);
+
+                    $result = [
+                        /* updated: */ 1,
+                        /* created: */ 0,
+                        /*  errors: */ 0,
+                        /* ignored: */ 0,
+                    ];
                 }
             } else {
                 $this->logger->debug('INES: Will update Client and Contact', compact('lead', 'company', 'config'));
@@ -293,12 +338,39 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     $inesContact->Scoring = $lead->getPoints();
                     $inesContact->Desabo = !$lead->getDoNotContact()->isEmpty();
                     $apiHelper->updateContact($inesContact);
+
+                    $result = [
+                        /* updated: */ 1,
+                        /* created: */ 0,
+                        /*  errors: */ 0,
+                        /* ignored: */ 0,
+                    ];
                 }
             }
         }
 
-        $this->pushClientCustomFields($config, $inesClientRef, $company);
-        $this->pushContactCustomFields($config, $inesContactRef, $lead);
+        $updatedClientFields = $this->pushClientCustomFields($config, $inesClientRef, $company);
+        $updatedContactFields = $this->pushContactCustomFields($config, $inesContactRef, $lead);
+
+        if (is_null($result)) {
+            if ($updatedClientFields || $updatedContactFields) {
+                $result = [
+                    /* updated: */ 1,
+                    /* created: */ 0,
+                    /*  errors: */ 0,
+                    /* ignored: */ 0,
+                ];
+            } else {
+                $result = [
+                    /* updated: */ 0,
+                    /* created: */ 0,
+                    /*  errors: */ 0,
+                    /* ignored: */ 1,
+                ];
+            }
+        }
+
+        return $result;
     }
 
     private static function mapCompanyToInesClient($config, $company, $inesClient) {
@@ -466,11 +538,11 @@ class InesCRMIntegration extends CrmAbstractIntegration
     }
 
     private function pushContactCustomFields($config, $inesContactRef, $lead) {
-        $this->pushCustomFields(self::LEAD_OBJECT_TYPE, $config, $inesContactRef, $lead);
+        return $this->pushCustomFields(self::LEAD_OBJECT_TYPE, $config, $inesContactRef, $lead);
     }
 
     private function pushClientCustomFields($config, $inesClientRef, $company) {
-        $this->pushCustomFields(self::COMPANY_OBJECT_TYPE, $config, $inesClientRef, $company);
+        return $this->pushCustomFields(self::COMPANY_OBJECT_TYPE, $config, $inesClientRef, $company);
     }
 
     private function pushCustomFields($objectType, $config, $inesRef, $mauticObject) {
@@ -538,11 +610,14 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                     default: throw new TypeError('Invalid object type');
                 }
+
+                return true;
             } else {
                 $this->logger->debug('INES: Will update custom field', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
 
                 if ((string) $mauticObject->$method() === (string) $customFieldToUpdate->Value) {
                     $this->logger->debug('INES: No need to request update since values already equal', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
+                    return false;
                 } else {
                     $this->logger->debug('INES: Requesting update since values differ', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
 
@@ -571,9 +646,13 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                         default: throw new TypeError('Invalid object type');
                     }
+
+                    return true;
                 }
             }
         }
+
+        return false;
     }
 
     private static function getClientWithContactsTemplate($nbContacts = 1)
