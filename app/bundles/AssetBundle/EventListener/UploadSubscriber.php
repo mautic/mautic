@@ -93,11 +93,13 @@ class UploadSubscriber extends CommonSubscriber
      * Validates file before upload.
      *
      * @param ValidationEvent $event
+     *
+     * @throws ValidationException
      */
     public function onUploadValidation(ValidationEvent $event)
     {
         $file       = $event->getFile();
-        $extensions = $this->coreParametersHelper->getParameter('allowed_extensions');
+        $extensions = $this->coreParametersHelper->getAllowedExtensionsForUpload();
         $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
         if ($file !== null) {
@@ -109,7 +111,7 @@ class UploadSubscriber extends CommonSubscriber
                 throw new ValidationException($message);
             }
 
-            if (!in_array(strtolower($file->getExtension()), array_map('strtolower', $extensions))) {
+            if (!in_array(strtolower($file->getExtension()), array_map('strtolower', $extensions), true)) {
                 $message = $this->translator->trans('mautic.asset.asset.error.file.extension', [
                     '%fileExtension%' => $file->getExtension(),
                     '%extensions%'    => implode(', ', $extensions),

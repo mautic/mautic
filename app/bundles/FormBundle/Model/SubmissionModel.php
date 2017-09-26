@@ -26,10 +26,12 @@ use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
+use Mautic\FormBundle\Exception\FileUploadException;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Validator\FileUploadValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
@@ -42,7 +44,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validation;
 
 /**
@@ -103,16 +104,21 @@ class SubmissionModel extends CommonFormModel
     protected $fieldHelper;
 
     /**
-     * SubmissionModel constructor.
-     *
-     * @param IpLookupHelper   $ipLookupHelper
-     * @param TemplatingHelper $templatingHelper
-     * @param FormModel        $formModel
-     * @param PageModel        $pageModel
-     * @param LeadModel        $leadModel
-     * @param CampaignModel    $campaignModel
-     * @param LeadFieldModel   $leadFieldModel
-     * @param FormFieldHelper  $fieldHelper
+     * @var FileUploadValidator
+     */
+    private $fileUploadValidator;
+
+    /**
+     * @param IpLookupHelper      $ipLookupHelper
+     * @param TemplatingHelper    $templatingHelper
+     * @param FormModel           $formModel
+     * @param PageModel           $pageModel
+     * @param LeadModel           $leadModel
+     * @param CampaignModel       $campaignModel
+     * @param LeadFieldModel      $leadFieldModel
+     * @param CompanyModel        $companyModel
+     * @param FormFieldHelper     $fieldHelper
+     * @param FileUploadValidator $fileUploadValidator
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -123,17 +129,19 @@ class SubmissionModel extends CommonFormModel
         CampaignModel $campaignModel,
         LeadFieldModel $leadFieldModel,
         CompanyModel $companyModel,
-        FormFieldHelper $fieldHelper
+        FormFieldHelper $fieldHelper,
+        FileUploadValidator $fileUploadValidator
     ) {
-        $this->ipLookupHelper   = $ipLookupHelper;
-        $this->templatingHelper = $templatingHelper;
-        $this->formModel        = $formModel;
-        $this->pageModel        = $pageModel;
-        $this->leadModel        = $leadModel;
-        $this->campaignModel    = $campaignModel;
-        $this->leadFieldModel   = $leadFieldModel;
-        $this->companyModel     = $companyModel;
-        $this->fieldHelper      = $fieldHelper;
+        $this->ipLookupHelper      = $ipLookupHelper;
+        $this->templatingHelper    = $templatingHelper;
+        $this->formModel           = $formModel;
+        $this->pageModel           = $pageModel;
+        $this->leadModel           = $leadModel;
+        $this->campaignModel       = $campaignModel;
+        $this->leadFieldModel      = $leadFieldModel;
+        $this->companyModel        = $companyModel;
+        $this->fieldHelper         = $fieldHelper;
+        $this->fileUploadValidator = $fileUploadValidator;
     }
 
     /**
@@ -147,9 +155,11 @@ class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * @param      $post
-     * @param      $server
-     * @param Form $form
+     * @param              $post
+     * @param              $server
+     * @param Form         $form
+     * @param Request|null $request
+     * @param bool         $returnEvent
      *
      * @return bool|array
      */
@@ -211,7 +221,7 @@ class SubmissionModel extends CommonFormModel
                 'alias' => $alias,
             ];
 
-            if ($type == 'captcha') {
+            if ($f->isCaptchaType()) {
                 $captcha = $this->fieldHelper->validateFieldValue($type, $value, $f);
                 if (!empty($captcha)) {
                     $props = $f->getProperties();
@@ -219,16 +229,10 @@ class SubmissionModel extends CommonFormModel
                     $validationErrors[$alias] = (!empty($props['errorMessage'])) ? $props['errorMessage'] : implode('<br />', $captcha);
                 }
                 continue;
-            }
-
-            if ($type == 'file') {
+            } elseif ($f->isFileType()) {
                 $files = $request->files->get('mauticform');
 
-                if (!$files) {
-                    continue;
-                }
-
-                if (!array_key_exists($f->getAlias(), $files)) {
+                if (!$files || !array_key_exists($f->getAlias(), $files)) {
                     continue;
                 }
 
@@ -238,43 +242,30 @@ class SubmissionModel extends CommonFormModel
                     continue;
                 }
 
-                // TODO This validation should be done in a listener (see https://developer.mautic.org/#form-validations)
                 $properties = $f->getProperties();
 
-                $fileConstraints = [];
-                if (array_key_exists(FormFieldFileType::PROPERTY_ALLOWED_MIME_TYPES, $properties)) {
-                    $fileConstraints['mimeTypes'] = explode(PHP_EOL, $properties[FormFieldFileType::PROPERTY_ALLOWED_MIME_TYPES]);
-                }
-                if (array_key_exists(FormFieldFileType::PROPERTY_ALLOWED_FILE_SIZE, $properties)) {
-                    $fileConstraints['maxSize'] = $properties[FormFieldFileType::PROPERTY_ALLOWED_FILE_SIZE];
-                }
+                $maxUploadSize     = $properties[FormFieldFileType::PROPERTY_ALLOWED_FILE_SIZE];
+                $allowedExtensions = $properties[FormFieldFileType::PROPERTY_ALLOWED_FILE_EXTENSIONS];
 
-                if ($fileConstraints) {
-                    $validator = Validation::createValidator();
-                    $errors    = $validator->validate($file, new File($fileConstraints));
+                try {
+                    $this->fileUploadValidator->validate($file, $maxUploadSize, $allowedExtensions);
 
-                    $errorMessages = [];
-                    foreach ($errors as $error) {
-                        $errorMessages[] = $error->getMessage();
-                    }
-                    if ($errorMessages) {
-                        $validationErrors[$alias] = implode('<br />', $errorMessages);
-                    }
+                    $value = $file->move(
+                        '/dev/null', // TODO Pick a location
+                        sprintf(
+                            '%s.%s.%s.%s',
+                            $form->getId(),
+                            $id,
+                            bin2hex(random_bytes(16)),
+                            $file->guessExtension()
+                        )
+                    );
+                } catch (FileUploadException $e) {
+                    $validationErrors[$alias] = $e->getMessage();
                 }
-
-                $value = $file->move(
-                    '/dev/null', // TODO Pick a location
-                    sprintf(
-                        '%s.%s.%s.%s',
-                        $form->getId(),
-                        $id,
-                        bin2hex(random_bytes(16)),
-                        $file->guessExtension()
-                    )
-                );
             }
 
-            if ($f->isRequired() && empty($value)) {
+            if (empty($value) && $f->isRequired()) {
 
                 //field is required, but hidden from form because of 'ShowWhenValueExists'
                 if ($f->getShowWhenValueExists() === false && !isset($post[$alias])) {

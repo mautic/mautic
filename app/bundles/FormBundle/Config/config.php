@@ -36,11 +36,13 @@ use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\Form\Type\PointActionFormSubmitType;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\TokenHelper;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\FormBundle\Validator\FileUploadValidator;
 
 return [
     'routes' => [
@@ -361,7 +363,7 @@ return [
         ],
         'other' => [
             'mautic.helper.form.field_helper' => [
-                'class'     => \Mautic\FormBundle\Helper\FormFieldHelper::class,
+                'class'     => FormFieldHelper::class,
                 'arguments' => [
                     'translator',
                     'validator',
@@ -371,6 +373,14 @@ return [
                 'class'     => TokenHelper::class,
                 'arguments' => [
                     'mautic.form.model.form',
+                ],
+            ],
+        ],
+        'validator' => [
+            'mautic.form.validator.file_upload' => [
+                'class'     => FileUploadValidator::class,
+                'arguments' => [
+                    'translator',
                 ],
             ],
         ],

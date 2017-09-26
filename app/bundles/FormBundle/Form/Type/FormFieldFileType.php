@@ -40,10 +40,10 @@ class FormFieldFileType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (empty($options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS])) {
-            $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS] = $this->coreParametersHelper->getParameter('allowed_extensions');
+            $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS] = $this->coreParametersHelper->getAllowedExtensionsForUpload();
         }
         if (empty($options['data'][self::PROPERTY_ALLOWED_FILE_SIZE])) {
-            $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE] = $this->coreParametersHelper->getParameter('max_size');
+            $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE] = $this->coreParametersHelper->getMaxUploadSize();
         }
 
         $arrayStringTransformer = new ArrayStringTransformer();

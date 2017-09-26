@@ -71,4 +71,20 @@ class CoreParametersHelper
     {
         return $this->parameterBag->has('mautic.'.$name);
     }
+
+    /**
+     * @return int
+     */
+    public function getMaxUploadSize()
+    {
+        return $this->getParameter('max_size');
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedExtensionsForUpload()
+    {
+        return $this->getParameter('allowed_extensions');
+    }
 }

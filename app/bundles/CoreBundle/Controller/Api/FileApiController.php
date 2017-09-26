@@ -35,7 +35,7 @@ class FileApiController extends CommonApiController
     {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
-        $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions');
+        $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->getAllowedExtensionsForUpload();
 
         parent::initialize($event);
     }
