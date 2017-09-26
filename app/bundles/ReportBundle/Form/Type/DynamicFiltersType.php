@@ -56,7 +56,7 @@ class DynamicFiltersType extends AbstractType
                         if (isset($options['data'][$definition['alias']])) {
                             $args['data'] = ((int) $options['data'][$definition['alias']] == 1);
                         } else {
-                            $args['data'] = ((int) $filter['value'] == 1);
+                            $args['data'] = (int) $filter['value'];
                         }
                         break;
                     case 'date':
