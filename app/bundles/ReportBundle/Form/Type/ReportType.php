@@ -14,7 +14,6 @@ namespace Mautic\ReportBundle\Form\Type;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -95,6 +94,34 @@ class ReportType extends AbstractType
                     'attr'  => [
                         'tooltip' => 'mautic.report.report.form.issystem.tooltip',
                     ],
+                ]
+            );
+
+            $builder->add(
+                'createdBy',
+                'user_list',
+                [
+                    'label'      => 'mautic.report.report.form.owner',
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'required' => false,
+                    'multiple' => false,
+                ]
+            );
+            $builder->add(
+                'settings',
+                'report_settings',
+                [
+                    'label'      => false,
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.email.utm_tags.tooltip',
+                    ],
+                    'data'     => $options['data']->getSettings(),
+                    'required' => false,
                 ]
             );
 

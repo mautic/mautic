@@ -105,11 +105,25 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="pa-md">
+                                    <h4><strong><?php echo $view['translator']->trans('mautic.report.report.form.display.dynamic.filters.settings'); ?></strong></h4>
+                                </div>
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form->vars['form']->children['settings']['showDynamicFilters']); ?>
+                                </div>
+                                <div class="col-md-6">
+                                    <?php echo $view['form']->row($form->vars['form']->children['settings']['hideDateRangeFilter']); ?>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="tab-pane fade bdr-w-0<?php if (!$showGraphTab): echo 'hide'; endif; ?>" id="graphs-container">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="pa-md">
+                                    <?php echo $view['form']->row($form->vars['form']->children['settings']['showGraphsAboveTable']); ?>
                                     <?php echo $view['form']->row($form['graphs']); ?>
                                 </div>
                             </div>
@@ -124,6 +138,7 @@ $showGraphTab = count($form['graphs']->vars['choices']);
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['isPublished']); ?>
             <?php echo $view['form']->row($form['system']); ?>
+            <?php echo $view['form']->row($form['createdBy']); ?>
         </div>
     </div>
 </div>

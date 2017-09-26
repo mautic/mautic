@@ -12,14 +12,15 @@ if ($tmpl == 'index') {
     $view->extend('MauticReportBundle:Report:details.html.php');
 }
 
-$dataCount       = count($data);
-$columnOrder     = $report->getColumns();
-$graphOrder      = $report->getGraphs();
-$aggregatorOrder = $report->getAggregators();
-$aggregatorCount = count($aggregatorOrder);
-$groupBy         = $report->getGroupBy();
-$groupByCount    = count($groupBy);
-$startCount      = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
+$showGraphsAboveTable = (!empty($report->getSettings()['showGraphsAboveTable']) === true);
+$dataCount            = count($data);
+$columnOrder          = $report->getColumns();
+$graphOrder           = $report->getGraphs();
+$aggregatorOrder      = $report->getAggregators();
+$aggregatorCount      = count($aggregatorOrder);
+$groupBy              = $report->getGroupBy();
+$groupByCount         = count($groupBy);
+$startCount           = ($totalResults > $limit) ? ($reportPage * $limit) - $limit + 1 : 1;
 function getTotal($a, $f, $t, $allrows, $ac)
 {
     switch ($f) {
@@ -38,183 +39,180 @@ function getTotal($a, $f, $t, $allrows, $ac)
 }
 ?>
 
-
-<?php if (!empty($graphOrder) && !empty($graphs)): ?>
-    <div class="mt-lg pa-md">
-        <div class="row equal">
-            <?php
-            $rowCount = 0;
-            foreach ($graphOrder as $key):
-                $details = $graphs[$key];
-                if (!isset($details['data'])) {
-                    continue;
-                }
-                if ($rowCount >= 12):
-                    echo '</div><div class="row equal">';
-                    $rowCount = 0;
-                endif;
-                echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', ['graph' => $details['data'], 'options' => $details['options'], 'report' => $report]);
-                $rowCount += ($details['type'] == 'line') ? 12 : 4;
-            endforeach;
-            ?>
-        </div>
-    </div>
+<?php if (!empty($showGraphsAboveTable)): ?>
+    <?php echo $view->render(
+        'MauticReportBundle:Report:details_data_graphs.html.php',
+        [
+            'graphOrder' => $graphOrder,
+            'graphs'     => $graphs,
+        ]);
+    ?>
 <?php endif; ?>
 
 <?php if (!empty($columnOrder) || !empty($aggregatorOrder)): ?>
-<!-- table section -->
+    <!-- table section -->
     <div class="col-xs-12">
-<div class="panel panel-default bdr-t-wdh-0 mb-0">
-    <div class="page-list">
-        <div class="table-responsive table-responsive-force">
-            <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
-                <thead>
-                <tr>
-                    <th class="col-report-count"></th>
-
-                    <?php foreach ($columnOrder as $key): ?>
-                        <?php
-                        if (isset($columns[$key])):
-                            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                                'sessionVar' => 'report.'.$report->getId(),
-                                'orderBy'    => strpos($key, 'channel.') === 0 ? str_replace('.', '_', $key) : $key,
-                                'text'       => $columns[$key]['label'],
-                                'class'      => 'col-report-'.$columns[$key]['type'],
-                                'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
-                                'target'     => '.report-content',
-                            ]);
-                        else:
-                            unset($columnOrder[$key]);
-                        endif;
-                        ?>
-                    <?php endforeach; ?>
-                    <?php
-                    if ($aggregatorCount) :
-                        $index = 0;
-                        foreach ($aggregatorOrder as $aggregator): ?>
-                            <?php
-                            $columnName = isset($columns[$aggregator['column']]['alias']) ? $columns[$aggregator['column']]['label'] : '';
-                            echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                                'sessionVar' => 'report.'.$report->getId(),
-                                'orderBy'    => $aggregator['function'],
-                                'text'       => $aggregator['function'].' '.$columnName,
-                                'dataToggle' => '',
-                                'target'     => '.report-content',
-                            ]);
-                            ?>
-                            <?php
-                            $total[$index] = 0;
-                            ++$index;
-                        endforeach;
-                    endif;
-                    ?>
-                </tr>
-                </thead>
-                <tbody>
-                <?php if ($dataCount):
-                    $avgCounter = 0;
-                    ?>
-                    <?php foreach ($data as $row): ?>
+        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+            <div class="page-list">
+                <div class="table-responsive table-responsive-force">
+                    <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+                        <thead>
                         <tr>
-                            <td><?php echo $startCount; ?></td>
-                            <?php foreach ($columnOrder as $key): ?>
-                                <?php if (isset($columns[$key])): ?>
-                                    <td>
-                                        <?php $closeLink = false; ?>
-                                        <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
-                                    <?php $closeLink = true;
-                                    if (array_key_exists('comp.id', $columns)) {
-                                        $objectAction = 'edit';
-                                    } else {
-                                        $objectAction = 'view';
-                                    }
-                                    ?>
-                                        <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => $objectAction, 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
-                                            <?php endif; ?>
-                                            <?php
-                                            $cellType = $columns[$key]['type'];
-                                            $cellVal  = $row[$columns[$key]['alias']];
+                            <th class="col-report-count"></th>
 
-                                            // For grouping by datetime fields, so we don't get the timestamp on them
-                                            if ($cellType === 'datetime' && strlen($cellVal) === 10) {
-                                                $cellType = 'date';
-                                            }
-                                            ?>
-                                            <?php echo $view['formatter']->_($cellVal, $cellType); ?>
-                                            <?php if ($closeLink): ?></a><?php endif; ?>
-                                    </td>
-                                <?php endif; ?>
+                            <?php foreach ($columnOrder as $key): ?>
+                                <?php
+                                if (isset($columns[$key])):
+                                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                                        'sessionVar' => 'report.'.$report->getId(),
+                                        'orderBy'    => strpos($key, 'channel.') === 0 ? str_replace('.', '_', $key) : $key,
+                                        'text'       => $columns[$key]['label'],
+                                        'class'      => 'col-report-'.$columns[$key]['type'],
+                                        'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
+                                        'target'     => '.report-content',
+                                    ]);
+                                else:
+                                    unset($columnOrder[$key]);
+                                endif;
+                                ?>
                             <?php endforeach; ?>
                             <?php
                             if ($aggregatorCount) :
                                 $index = 0;
-                                ++$avgCounter;
                                 foreach ($aggregatorOrder as $aggregator): ?>
-                                        <td>
-                                            <?php
-                                                if (isset($row[$aggregator['function'].' '.$aggregator['column']])) {
-                                                    echo $view['formatter']->_($row[$aggregator['function'].' '.$aggregator['column']], 'text');
-                                                    $total[$index] = getTotal($row[$aggregator['function'].' '.$aggregator['column']], $aggregator['function'], (isset($total[$index])) ? $total[$index] : 0, $dataCount, $avgCounter);
-                                                }
-                                            ?>
-                                        </td>
-                            <?php
-                                ++$index;
+                                    <?php
+                                    $columnName = isset($columns[$aggregator['column']]['alias']) ? $columns[$aggregator['column']]['label'] : '';
+                                    echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                                        'sessionVar' => 'report.'.$report->getId(),
+                                        'orderBy'    => $aggregator['function'],
+                                        'text'       => $aggregator['function'].' '.$columnName,
+                                        'dataToggle' => '',
+                                        'target'     => '.report-content',
+                                    ]);
+                                    ?>
+                                    <?php
+                                    $total[$index] = 0;
+                                    ++$index;
                                 endforeach;
                             endif;
                             ?>
-
                         </tr>
-                        <?php ++$startCount; ?>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td>&nbsp;</td>
-                        <?php foreach ($columnOrder as $key): ?>
-                            <td>&nbsp;</td>
-                        <?php endforeach; ?>
-                    </tr>
-                <?php endif; ?>
-                <tr class="cm-strong">
-                <td><?php echo $view['translator']->trans('mautic.report.report.groupby.totals'); ?></td>
-                <?php
-                $index = 0;
-                foreach ($columnOrder as $key): ?>
-                    <td>&nbsp;</td>
-                <?php endforeach;
-                if ($aggregatorCount) :
-                    foreach ($aggregatorOrder as $aggregator): ?>
-                        <td>
-                            <?php
-                            if (isset($total[$index])) :
-                                echo $view['formatter']->_($total[$index], 'text');
-                            endif;
+                        </thead>
+                        <tbody>
+                        <?php if ($dataCount):
+                            $avgCounter = 0;
                             ?>
+                            <?php foreach ($data as $row): ?>
+                            <tr>
+                                <td><?php echo $startCount; ?></td>
+                                <?php foreach ($columnOrder as $key): ?>
+                                    <?php if (isset($columns[$key])): ?>
+                                        <td>
+                                            <?php $closeLink = false; ?>
+                                            <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])): ?>
+                                        <?php $closeLink = true;
+                                        if (array_key_exists('comp.id', $columns)) {
+                                            $objectAction = 'edit';
+                                        } else {
+                                            $objectAction = 'view';
+                                        }
+                                        ?>
+                                            <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => $objectAction, 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
+                                                <?php endif; ?>
+                                                <?php
+                                                $cellType = $columns[$key]['type'];
+                                                $cellVal  = $row[$columns[$key]['alias']];
 
-                        </td>
-                        <?php
-                        ++$index;
-                    endforeach;
-                endif; ?>
-                </tbody>
-            </table>
-        </div>
-        <div class="panel-footer">
-            <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
-                'totalItems' => $totalResults,
-                'page'       => $reportPage,
-                'limit'      => $limit,
-                'baseUrl'    => $view['router']->path('mautic_report_view', [
-                    'objectId' => $report->getId(),
-                ]),
-                'sessionVar' => 'report.'.$report->getId(),
-                'target'     => '.report-content',
-            ]); ?>
+                                                // For grouping by datetime fields, so we don't get the timestamp on them
+                                                if ($cellType === 'datetime' && strlen($cellVal) === 10) {
+                                                    $cellType = 'date';
+                                                }
+                                                ?>
+                                                <?php echo $view['formatter']->_($cellVal, $cellType); ?>
+                                                <?php if ($closeLink): ?></a><?php endif; ?>
+                                        </td>
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
+                                <?php
+                                if ($aggregatorCount) :
+                                    $index = 0;
+                                    ++$avgCounter;
+                                    foreach ($aggregatorOrder as $aggregator): ?>
+                                        <td>
+                                            <?php
+                                            if (isset($row[$aggregator['function'].' '.$aggregator['column']])) {
+                                                echo $view['formatter']->_($row[$aggregator['function'].' '.$aggregator['column']], 'text');
+                                                $total[$index] = getTotal($row[$aggregator['function'].' '.$aggregator['column']], $aggregator['function'], (isset($total[$index])) ? $total[$index] : 0, $dataCount, $avgCounter);
+                                            }
+                                            ?>
+                                        </td>
+                                        <?php
+                                        ++$index;
+                                    endforeach;
+                                endif;
+                                ?>
+
+                            </tr>
+                            <?php ++$startCount; ?>
+                        <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <?php foreach ($columnOrder as $key): ?>
+                                    <td>&nbsp;</td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endif; ?>
+                        <tr class="cm-strong">
+                            <td><?php echo $view['translator']->trans('mautic.report.report.groupby.totals'); ?></td>
+                            <?php
+                            $index = 0;
+                            foreach ($columnOrder as $key): ?>
+                                <td>&nbsp;</td>
+                            <?php endforeach;
+                            if ($aggregatorCount) :
+                                foreach ($aggregatorOrder as $aggregator): ?>
+                                    <td>
+                                        <?php
+                                        if (isset($total[$index])) :
+                                            echo $view['formatter']->_($total[$index], 'text');
+                                        endif;
+                                        ?>
+
+                                    </td>
+                                    <?php
+                                    ++$index;
+                                endforeach;
+                            endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    <?php echo $view->render('MauticCoreBundle:Helper:pagination.html.php', [
+                        'totalItems' => $totalResults,
+                        'page'       => $reportPage,
+                        'limit'      => $limit,
+                        'baseUrl'    => $view['router']->path('mautic_report_view', [
+                            'objectId' => $report->getId(),
+                        ]),
+                        'sessionVar' => 'report.'.$report->getId(),
+                        'target'     => '.report-content',
+                    ]); ?>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-</div>
-        <!--/ table section -->
+    <!--/ table section -->
+<?php endif; ?>
+
+<?php if (empty($showGraphsAboveTable)): ?>
+<?php echo $view->render(
+    'MauticReportBundle:Report:details_data_graphs.html.php',
+    [
+        'graphOrder' => $graphOrder,
+        'graphs'     => $graphs,
+    ]);
+?>
 <?php endif; ?>
 
 <script>
