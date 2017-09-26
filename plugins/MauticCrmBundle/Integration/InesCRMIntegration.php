@@ -161,6 +161,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $companyModel = $this->companyModel;
         $leadModel = $this->leadModel;
 
+        $lead = $leadModel->getEntity($lead->getId());
         $companies = $leadModel->getCompanies($lead);
         $company = null;
 
