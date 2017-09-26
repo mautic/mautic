@@ -255,8 +255,8 @@ class ReportType extends AbstractType
                         ],
                         'data'        => 1,
                         'choice_list' => new ChoiceList(
-                            [0, 1],
-                            ['mautic.core.form.no', 'mautic.core.form.yes']
+                            [0, 1, 2],
+                            ['mautic.core.form.no', 'mautic.core.form.yes', 'mautic.core.filter.clear']
                         ),
                     ]
                 );

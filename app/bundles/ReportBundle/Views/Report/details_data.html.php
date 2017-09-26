@@ -38,8 +38,32 @@ function getTotal($a, $f, $t, $allrows, $ac)
 }
 ?>
 
+
+<?php if (!empty($graphOrder) && !empty($graphs)): ?>
+    <div class="mt-lg pa-md">
+        <div class="row equal">
+            <?php
+            $rowCount = 0;
+            foreach ($graphOrder as $key):
+                $details = $graphs[$key];
+                if (!isset($details['data'])) {
+                    continue;
+                }
+                if ($rowCount >= 12):
+                    echo '</div><div class="row equal">';
+                    $rowCount = 0;
+                endif;
+                echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', ['graph' => $details['data'], 'options' => $details['options'], 'report' => $report]);
+                $rowCount += ($details['type'] == 'line') ? 12 : 4;
+            endforeach;
+            ?>
+        </div>
+    </div>
+<?php endif; ?>
+
 <?php if (!empty($columnOrder) || !empty($aggregatorOrder)): ?>
 <!-- table section -->
+    <div class="col-xs-12">
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <div class="page-list">
         <div class="table-responsive table-responsive-force">
@@ -189,30 +213,10 @@ function getTotal($a, $f, $t, $allrows, $ac)
         </div>
     </div>
 </div>
-<!--/ table section -->
+</div>
+        <!--/ table section -->
 <?php endif; ?>
 
-<?php if (!empty($graphOrder) && !empty($graphs)): ?>
-<div class="mt-lg pa-md">
-    <div class="row equal">
-    <?php
-    $rowCount = 0;
-    foreach ($graphOrder as $key):
-        $details = $graphs[$key];
-        if (!isset($details['data'])) {
-            continue;
-        }
-        if ($rowCount >= 12):
-            echo '</div><div class="row equal">';
-            $rowCount = 0;
-        endif;
-        echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', ['graph' => $details['data'], 'options' => $details['options'], 'report' => $report]);
-        $rowCount += ($details['type'] == 'line') ? 12 : 4;
-    endforeach;
-    ?>
-    </div>
-</div>
-<?php endif; ?>
 <script>
     mQuery(document).ready(function() {
         mQuery('.datetimepicker').datetimepicker({
