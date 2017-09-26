@@ -1,1 +1,1 @@
-2.9.2-ines.beta.1
+2.9.2-ines.beta.2
