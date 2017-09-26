@@ -146,7 +146,17 @@ class InesCRMIntegration extends CrmAbstractIntegration
             $results = [];
 
             foreach($iterableLeads as $lead) {
-                $results[] = $this->pushLead($lead[0], $config);
+                try {
+                    $results[] = $this->pushLead($lead[0], $config);
+                } catch (\Exception $e) {
+                    $this->logger->error($e->getMessage(), compact('e'));
+                    $results[] = [
+                        /* updated: */ 0,
+                        /* created: */ 0,
+                        /*  errors: */ 1,
+                        /* ignored: */ 0,
+                    ];
+                }
             }
 
             // The following mapping takes every result array and zips them together
