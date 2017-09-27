@@ -1089,7 +1089,21 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ],
                     ]
                 );
-
+            $builder->add(
+                'updateBlanks',
+                'choice',
+                [
+                    'choices' => [
+                        'updateBlanks' => 'mautic.integrations.blanks',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
             $builder->add(
                     'objects',
                     'choice',
@@ -1397,6 +1411,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getObjectDataToUpdate($checkEmailsInSugar, &$mauticData, $availableFields, $contactSugarFields, $leadSugarFields, $object = 'Leads')
     {
+        $config     = $this->mergeConfigToFeatureSettings([]);
         $queryParam = ($object == 'Leads') ? 'checkemail' : 'checkemail_contacts';
 
         $sugarLead         = $this->getApiHelper()->getLeads([$queryParam => array_keys($checkEmailsInSugar), 'offset' => 0, 'max_results' => 1000], $object);
@@ -1452,6 +1467,14 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         }
                         $ownerAssignedUserIdByEmail = $this->getApiHelper()->getIdBySugarEmail(['emails' => array_unique($leadOwnerEmails)]);
                         if (empty($sugarLeadRecord['deleted']) || $sugarLeadRecord['deleted'] == 0) {
+                            $sugarFieldMappings = $this->prepareFieldsForPush($availableFields);
+
+                            if (isset($sugarFieldMappings['Contacts']) && !empty($sugarFieldMappings['Contacts'])) {
+                                $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarFieldMappings['Contacts'], $config);
+                            }
+                            if (isset($sugarFieldMappings['Leads']) && !empty($sugarFieldMappings['Leads'])) {
+                                $leadSugarFields = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord,  $sugarFieldMappings['Leads'], $config);
+                            }
                             $this->buildCompositeBody(
                                 $mauticData,
                                 $availableFields,
@@ -1694,5 +1717,44 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         return ($object && isset($fields[$object])) ? $fields[$object] : $fields;
+    }
+
+    /**
+     * @param $fields
+     *
+     * @return array
+     */
+    protected function prepareFieldsForPush($fields)
+    {
+        $fieldMappings = [];
+        $required      = [];
+        $config        = $this->mergeConfigToFeatureSettings();
+
+        $contactFields = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Contacts');
+        $leadFields    = $this->cleanSugarData($config, array_keys($config['leadFields']), 'Leads');
+        if (!empty($contactFields)) {
+            foreach ($fields['Contacts'] as $key => $field) {
+                if ($field['required']) {
+                    $required[$key] = $field;
+                }
+            }
+            $fieldMappings['Contacts']['required'] = [
+                'fields' => $required,
+            ];
+            $fieldMappings['Contacts']['create'] = $contactFields;
+        }
+        if (!empty($leadFields)) {
+            foreach ($fields['Leads'] as $key => $field) {
+                if ($field['required']) {
+                    $required[$key] = $field;
+                }
+            }
+            $fieldMappings['Leads']['required'] = [
+                'fields' => $required,
+            ];
+            $fieldMappings['Leads']['create'] = $leadFields;
+        }
+
+        return $fieldMappings;
     }
 }

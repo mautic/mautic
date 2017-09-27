@@ -19,6 +19,7 @@ use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
+use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\RequestTrait;
@@ -41,6 +42,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class CommonApiController extends FOSRestController implements MauticController
 {
     use RequestTrait;
+    use FormErrorMessagesTrait;
 
     /**
      * @var CoreParametersHelper
@@ -387,7 +389,7 @@ class CommonApiController extends FOSRestController implements MauticController
                     'string' => $this->request->query->get('search', ''),
                     'force'  => $this->listFilters,
                 ],
-                'orderBy'        => $this->request->query->get('orderBy', ''),
+                'orderBy'        => $this->addAliasIfNotPresent($this->request->query->get('orderBy', ''), $tableAlias),
                 'orderByDir'     => $this->request->query->get('orderByDir', 'ASC'),
                 'withTotalCount' => true, //for repositories that break free of Paginator
             ],
@@ -426,6 +428,36 @@ class CommonApiController extends FOSRestController implements MauticController
     }
 
     /**
+     * Adds the repository alias to the column name if it doesn't exist.
+     *
+     * @param string $column name
+     *
+     * @return string $column name with alias prefix
+     */
+    protected function addAliasIfNotPresent($columns, $alias)
+    {
+        if (!$columns) {
+            return $columns;
+        }
+
+        $columns = explode(',', trim($columns));
+        $prefix  = $alias.'.';
+
+        array_walk(
+            $columns,
+            function (&$column, $key, $prefix) {
+                $column = trim($column);
+                if (strpos($column, $prefix) === false) {
+                    $column = $prefix.$column;
+                }
+            },
+            $prefix
+        );
+
+        return implode(',', $columns);
+    }
+
+    /**
      * Obtains a specific entity as defined by the API URL.
      *
      * @param int $id Entity ID
@@ -460,60 +492,6 @@ class CommonApiController extends FOSRestController implements MauticController
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
-    }
-
-    /**
-     * @param array $formErrors
-     *
-     * @return string
-     */
-    public function getFormErrorMessage(array $formErrors)
-    {
-        $msg = '';
-
-        if ($formErrors) {
-            foreach ($formErrors as $key => $error) {
-                if (!$error) {
-                    continue;
-                }
-
-                if ($msg) {
-                    $msg .= ', ';
-                }
-
-                if (is_string($key)) {
-                    $msg .= $key.': ';
-                }
-
-                if (is_array($error)) {
-                    $msg .= $this->getFormErrorMessage($error);
-                } else {
-                    $msg .= $error;
-                }
-            }
-        }
-
-        return $msg;
-    }
-
-    /**
-     * @param Form $form
-     *
-     * @return array
-     */
-    public function getFormErrorMessages(Form $form)
-    {
-        $errors = [];
-
-        foreach ($form->getErrors(true) as $error) {
-            if (isset($errors[$error->getOrigin()->getName()])) {
-                $errors[$error->getOrigin()->getName()] = [$error->getMessage()];
-            } else {
-                $errors[$error->getOrigin()->getName()][] = $error->getMessage();
-            }
-        }
-
-        return $errors;
     }
 
     /**
@@ -633,6 +611,18 @@ class CommonApiController extends FOSRestController implements MauticController
     public function setUser(User $user)
     {
         $this->user = $user;
+    }
+
+    /**
+     * Alias for notFound method. It's used in the LeadAccessTrait.
+     *
+     * @param array $args
+     *
+     * @return Response
+     */
+    public function postActionRedirect($args = [])
+    {
+        return $this->notFound('mautic.contact.error.notfound');
     }
 
     /**

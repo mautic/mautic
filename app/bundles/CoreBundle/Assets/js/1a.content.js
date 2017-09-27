@@ -313,6 +313,18 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateDateTimeInputs(this, 'time');
     });
 
+    // Initialize callback options
+    mQuery(container + " *[data-onload-callback]").each(function() {
+        var callback = function(el) {
+            if (typeof window["Mautic"][mQuery(el).attr('data-onload-callback')] == 'function') {
+                window["Mautic"][mQuery(el).attr('data-onload-callback')].apply('window', [el]);
+            }
+        }
+
+        mQuery(document).ready(callback(this));
+    });
+
+
     mQuery(container + " input[data-toggle='color']").each(function() {
         Mautic.activateColorPicker(this);
     });
@@ -707,6 +719,10 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeConfirmationsAlive = function(jQueryObject) {
     jQueryObject.off('click.confirmation');
     jQueryObject.on('click.confirmation', function (event) {
@@ -716,6 +732,10 @@ Mautic.makeConfirmationsAlive = function(jQueryObject) {
     });
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeModalsAlive = function(jQueryObject) {
     jQueryObject.off('click.ajaxmodal');
     jQueryObject.on('click.ajaxmodal', function (event) {
@@ -725,6 +745,10 @@ Mautic.makeModalsAlive = function(jQueryObject) {
     });
 };
 
+/**
+ *
+ * @param jQueryObject
+ */
 Mautic.makeLinksAlive = function(jQueryObject) {
     jQueryObject.off('click.ajax');
     jQueryObject.on('click.ajax', function (event) {

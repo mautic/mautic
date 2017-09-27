@@ -527,6 +527,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     ],
                 ]
             );
+            $builder->add(
+                'updateBlanks',
+                'choice',
+                [
+                    'choices' => [
+                        'updateBlanks' => 'mautic.integrations.blanks',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
 
             $builder->add(
                 'objects',
@@ -575,9 +590,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $objects = (!is_array($object)) ? [$object] : $object;
-
         if (is_string($object) && 'Account' === $object) {
-            return isset($fields['companyFields']) ? $fields['companyFields'] : [];
+            return isset($fields['companyFields']) ? $fields['companyFields'] : $fields;
         }
 
         if (isset($fields['leadFields'])) {
@@ -639,16 +653,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 foreach (['Contact', 'Lead'] as $object) {
                     if (!empty($existingPersons[$object])) {
-                        $personFound = true;
-                        foreach ($existingPersons[$object] as $person) {
-                            if (!empty($mappedData[$object]['update'])) {
-                                $personData = $this->getApiHelper()->updateObject(
-                                    $mappedData[$object]['update'],
-                                    $object,
-                                    $person['Id']
-                                );
+                        $fieldsToUpdate = $mappedData[$object]['update'];
+                        $fieldsToUpdate = $this->getBlankFieldsToUpdate($fieldsToUpdate, $existingPersons[$object], $mappedData, $config);
+                        $personFound    = true;
+                        if (!empty($fieldsToUpdate)) {
+                            foreach ($existingPersons[$object] as $person) {
+                                $personData                     = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
+                                $people[$object][$person['Id']] = $person['Id'];
                             }
-                            $people[$object][$person['Id']] = $person['Id'];
                         }
                     }
 
@@ -1183,7 +1195,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $this->cleanupFromSync($leadsToSync, $exception);
                 }
             } elseif ($checkEmailsInSF) {
-                $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, $fieldMapping[$sfObject]['required']['string']);
+                $sfEntityRecords = $this->getSalesforceObjectsByEmails($sfObject, $checkEmailsInSF, implode(',', array_keys($fieldMapping[$sfObject]['create'])));
 
                 if (!isset($sfEntityRecords['records'])) {
                     // Something is wrong so throw an exception to prevent creating a bunch of new leads
@@ -1724,7 +1736,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         // When creating, we have to check for Contacts first then Lead
         if (isset($fieldMapping['Contact'])) {
-            $sfEntityRecords = $this->getSalesforceObjectsByEmails('Contact', $checkEmailsInSF, $fieldMapping['Contact']['required']['string']);
+            $sfEntityRecords = $this->getSalesforceObjectsByEmails('Contact', $checkEmailsInSF, implode(',', array_keys($fieldMapping['Contact']['create'])));
             if (isset($sfEntityRecords['records'])) {
                 foreach ($sfEntityRecords['records'] as $sfContactRecord) {
                     if (!isset($sfContactRecord['Email'])) {
@@ -1740,7 +1752,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         // For any Mautic contacts left over, check to see if existing Leads exist
         if (isset($fieldMapping['Lead']) && $checkSfLeads = array_diff_key($checkEmailsInSF, $foundContacts)) {
-            $sfLeadRecords = $this->getSalesforceObjectsByEmails('Lead', $checkSfLeads, $fieldMapping['Lead']['required']['string']);
+            $sfLeadRecords = $this->getSalesforceObjectsByEmails('Lead', $checkSfLeads, implode(',', array_keys($fieldMapping['Lead']['create'])));
 
             if (isset($sfLeadRecords['records'])) {
                 // Merge contact records with these
@@ -1780,11 +1792,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
     ) {
         $body       = [];
         $updateLead = [];
+        $config     = $this->mergeConfigToFeatureSettings([]);
 
         if (isset($lead['email']) && !empty($lead['email'])) {
             //use a composite patch here that can update and create (one query) every 200 records
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
+                $fields = $this->getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config);
             } else {
                 $fields = $objectFields;
             }
@@ -2495,5 +2509,34 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function amendToSfFields($fields)
     {
+    }
+
+    /**
+     * @param string $object
+     *
+     * @return array
+     */
+    public function getFieldsForQuery($object)
+    {
+        $fields = $this->getIntegrationSettings()->getFeatureSettings();
+        switch ($object) {
+            case 'company':
+            case 'Account':
+                $fields = array_keys(array_filter($fields['companyFields']));
+                break;
+            default:
+                $mixedFields = array_filter($fields['leadFields']);
+                $fields      = [];
+                foreach ($mixedFields as $sfField => $mField) {
+                    if (strpos($sfField, '__'.$object) !== false) {
+                        $fields[] = str_replace('__'.$object, '', $sfField);
+                    }
+                    if (strpos($sfField, '-'.$object) !== false) {
+                        $fields[] = str_replace('-'.$object, '', $sfField);
+                    }
+                }
+        }
+
+        return $fields;
     }
 }

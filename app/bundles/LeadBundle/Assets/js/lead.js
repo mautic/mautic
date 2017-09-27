@@ -308,7 +308,66 @@ Mautic.leadlistOnLoad = function(container) {
                 }
             });
         });
+
+        var bodyOverflow = {};
+        mQuery('#leadlist_filters').sortable({
+            items: '.panel',
+            helper: function(e, ui) {
+                ui.children().each(function() {
+                    if (mQuery(this).is(":visible")) {
+                        mQuery(this).width(mQuery(this).width());
+                    }
+                });
+
+                // Fix body overflow that messes sortable up
+                bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+                bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+                mQuery('body').css({
+                    overflowX: 'visible',
+                    overflowY: 'visible'
+                });
+
+                return ui;
+            },
+            scroll: true,
+            axis: 'y',
+            stop: function(e, ui) {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
+
+                // First in the list should be an "and"
+                ui.item.find('select.glue-select').first().val('and');
+
+                Mautic.reorderSegmentFilters();
+            }
+        });
+
     }
+};
+
+Mautic.reorderSegmentFilters = function() {
+    // Update the filter numbers sot that they are ordered correctly when processed and grouped server side
+    var counter = 0;
+    mQuery('#leadlist_filters .panel').each(function() {
+        Mautic.updateFilterPositioning(mQuery(this).find('select.glue-select').first());
+        mQuery(this).find('[id^="leadlist_filters_"]').each(function() {
+            var id = mQuery(this).attr('id');
+            if ('leadlist_filters___name___filter' === id) {
+                return true;
+            }
+''
+            var suffix = id.split(/[_]+/).pop();
+
+            mQuery(this).attr('id', 'leadlist_filters_'+counter+'_'+suffix);
+            mQuery(this).attr('name', 'leadlist[filters]['+counter+']['+suffix+']');
+        });
+
+        ++counter;
+    });
+
+    mQuery('#leadlist_filters .panel-heading').removeClass('hide');
+    mQuery('#leadlist_filters .panel-heading').first().addClass('hide');
+    mQuery('#leadlist_filters .panel').first().removeClass('in-group');
 };
 
 Mautic.convertLeadFilterInput = function(el) {
@@ -547,6 +606,9 @@ Mautic.addLeadListFilter = function (elId) {
 
     // Convert based on first option in list
     Mautic.convertLeadFilterInput('#' + filterIdBase + 'operator');
+
+    // Reposition if applicable
+    Mautic.updateFilterPositioning(mQuery('#' + filterIdBase + 'glue'));
 };
 
 Mautic.leadfieldOnLoad = function (container) {
@@ -1197,7 +1259,59 @@ Mautic.leadBatchSubmit = function() {
 };
 
 Mautic.updateLeadFieldValues = function (field) {
-    Mautic.updateFieldOperatorValue(field, 'lead:updateLeadFieldValues');
+    mQuery('.condition-custom-date-row').hide();
+    Mautic.updateFieldOperatorValue(field, 'lead:updateLeadFieldValues', Mautic.updateLeadFieldValueOptions, [true]);
+};
+
+Mautic.updateLeadFieldValueOptions = function (field, updating) {
+    var fieldId = mQuery(field).attr('id');
+    var fieldPrefix = fieldId.slice(0, -5);
+
+    if ('date' === mQuery('#'+fieldPrefix + 'operator').val()) {
+        var customOption = mQuery(field).find('option[data-custom=1]');
+        var value        = mQuery(field).val();
+
+        var customSelected = mQuery(customOption).prop('selected');
+        if (customSelected) {
+            if (!updating) {
+                // -/+ P/PT number unit
+                var regex = /(\+|-)(PT?)([0-9]*)([DMHY])$/g;
+                var match = regex.exec(value);
+                if (match) {
+                    var interval = ('-' === match[1]) ? match[1] + match[3] : match[3];
+                    var unit = ('PT' === match[2] && 'M' === match[4]) ? 'i' : match[4];
+
+                    mQuery('#lead-field-custom-date-interval').val(interval);
+                    mQuery('#lead-field-custom-date-unit').val(unit.toLowerCase());
+                }
+            } else {
+                var interval = mQuery('#lead-field-custom-date-interval').val();
+                var unit = mQuery('#lead-field-custom-date-unit').val();
+
+                // Convert interval/unit into PHP a DateInterval format
+                var prefix = ("i" == unit || "h" == unit) ? "PT" : "P";
+                // DateInterval uses M for minutes instead of i
+                if ("i" === unit) {
+                    unit = "m";
+                }
+
+                unit = unit.toUpperCase();
+
+                var operator = "+";
+                if (parseInt(interval) < 0) {
+                    operator = "-";
+                    interval = -1 * parseInt(interval);
+                }
+                var newValue = operator + prefix + interval + unit;
+                customOption.attr('value', newValue);
+            }
+            mQuery('.condition-custom-date-row').show();
+        } else {
+            mQuery('.condition-custom-date-row').hide();
+        }
+    } else {
+        mQuery('.condition-custom-date-row').hide();
+    }
 };
 
 Mautic.toggleTimelineMoreVisiblity = function (el) {

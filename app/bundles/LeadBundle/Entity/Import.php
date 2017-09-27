@@ -132,12 +132,12 @@ class Import extends FormEntity
     private $status;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      */
     private $dateStarted;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      */
     private $dateEnded;
 
@@ -609,7 +609,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
     public function getDateStarted()
     {
@@ -663,7 +663,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return DateTime
+     * @return \DateTime
      */
     public function getDateEnded()
     {
@@ -673,7 +673,7 @@ class Import extends FormEntity
     /**
      * Counts how log the import run so far.
      *
-     * @return DateInterval|null
+     * @return \DateInterval|null
      */
     public function getRunTime()
     {

@@ -92,12 +92,28 @@ return [
                     'leadId' => '\d+',
                 ],
             ],
+            // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_index instead.
             'mautic_contact_import_index' => [
-                'path'       => '/contacts/import/{page}',
+                'path'       => '/{object}/import/{page}',
+                'controller' => 'MauticLeadBundle:Import:index',
+                'defaults'   => [
+                    'object' => 'contacts',
+                ],
+            ],
+            // @deprecated 2.9.1 to be removed in 3.0. Use mautic_import_action instead.
+            'mautic_contact_import_action' => [
+                'path'       => '/{object}/import/{objectAction}/{objectId}',
+                'controller' => 'MauticLeadBundle:Import:execute',
+                'defaults'   => [
+                    'object' => 'contacts',
+                ],
+            ],
+            'mautic_import_index' => [
+                'path'       => '/{object}/import/{page}',
                 'controller' => 'MauticLeadBundle:Import:index',
             ],
-            'mautic_contact_import_action' => [
-                'path'       => '/contacts/import/{objectAction}/{objectId}',
+            'mautic_import_action' => [
+                'path'       => '/{object}/import/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Import:execute',
             ],
             'mautic_contact_action' => [
@@ -560,8 +576,16 @@ return [
             ],
             'mautic.form.type.campaignevent_lead_field_value' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType',
-                'arguments' => ['mautic.factory'],
-                'alias'     => 'campaignevent_lead_field_value',
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.field',
+                ],
+                'alias' => 'campaignevent_lead_field_value',
+            ],
+            'mautic.form.type.campaignevent_lead_device' => [
+                'class' => 'Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType',
+                'alias' => 'campaignevent_lead_device',
             ],
             'mautic.form.type.campaignevent_lead_tags' => [
                 'class'     => Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType::class,
@@ -599,6 +623,10 @@ return [
                 'class'     => 'Mautic\LeadBundle\Form\Type\AddToCompanyActionType',
                 'arguments' => ['router'],
                 'alias'     => 'addtocompany_action',
+            ],
+            'mautic.lead.events.changeowner.type.form' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ChangeOwnerType',
+                'arguments' => ['mautic.user.model.user'],
             ],
             'mautic.company.list.type.form' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
@@ -706,6 +734,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.core.model.notification',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.model.company',
                 ],
             ],
         ],

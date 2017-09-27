@@ -68,21 +68,21 @@ class MessageQueueSubscriber extends CommonSubscriber
                 'email_type' => 'marketing',
             ];
 
-            /** @var MessageQueue $message */
-            foreach ($messages as $id => $message) {
-                if ($email && $message->getLead()) {
-                    $contact = $message->getLead()->getProfileFields();
-                    if (empty($contact['email'])) {
-                        // No email so just let this slide
-                        $message->setProcessed();
-                        $message->setSuccess();
-                    }
-                    $sendTo[$contact['id']]            = $contact;
-                    $messagesByContact[$contact['id']] = $message;
-                } else {
-                    $message->setFailed();
+        /** @var MessageQueue $message */
+        foreach ($messages as $id => $message) {
+            if ($email && $message->getLead() && $email->isPublished()) {
+                $contact = $message->getLead()->getProfileFields();
+                if (empty($contact['email'])) {
+                    // No email so just let this slide
+                    $message->setProcessed();
+                    $message->setSuccess();
                 }
+                $sendTo[$contact['id']]            = $contact;
+                $messagesByContact[$contact['id']] = $message;
+            } else {
+                $message->setFailed();
             }
+        }
 
         if (count($sendTo)) {
             $options['resend_message_queue'] = $messagesByContact;

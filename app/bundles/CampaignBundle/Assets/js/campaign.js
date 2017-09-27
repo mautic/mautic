@@ -4,7 +4,7 @@
  *
  * @param container
  */
-Mautic.campaignOnLoad = function (container) {
+Mautic.campaignOnLoad = function (container, response) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'campaign');
     }
@@ -98,6 +98,12 @@ Mautic.campaignOnLoad = function (container) {
         });
 
         Mautic.prepareCampaignCanvas();
+
+        // Open the builder directly when saved from the builder
+        if (response && response.inBuilder) {
+            Mautic.launchCampaignEditor();
+            Mautic.processBuilderErrors(response);
+        }
     }
 };
 
@@ -376,8 +382,7 @@ Mautic.launchCampaignEditor = function() {
     Mautic.stopIconSpinPostEvent();
     mQuery('body').css('overflow-y', 'hidden');
 
-    mQuery('.builder').addClass('builder-active');
-    mQuery('.builder').removeClass('hide');
+    mQuery('.builder').addClass('builder-active').removeClass('hide');
 
     // Center new source
     if (mQuery('#CampaignEvent_newsource').length) {
@@ -954,8 +959,40 @@ Mautic.closeCampaignBuilder = function() {
         spinnerLeft = (mQuery(window).width() - panelWidth - 60) / 2,
         spinnerTop = (mQuery(window).height() - panelHeight - 60) / 2;
 
-    var overlay     = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
-    var nodes       = [];
+    var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class=".builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
+    mQuery('.btn-close-builder').prop('disabled', true);
+
+    Mautic.removeButtonLoadingIndicator(mQuery('.btn-apply-builder'));
+    mQuery('#builder-errors').hide('fast').text('');
+
+    Mautic.updateConnections(function(err, response) {
+        mQuery('body').css('overflow-y', '');
+
+        if (!err) {
+            mQuery('#builder-overlay').remove();
+            mQuery('body').css('overflow-y', '');
+            if (response.success) {
+                mQuery('.builder').addClass('hide').removeClass('builder-active');
+            }
+            mQuery('.btn-close-builder').prop('disabled', false);
+        }
+    });
+};
+
+Mautic.saveCampaignFromBuilder = function() {
+    Mautic.activateButtonLoadingIndicator(mQuery('.btn-apply-builder'));
+    Mautic.updateConnections(function(err) {
+        if (!err) {
+            var applyBtn = mQuery('.btn-apply');
+            Mautic.inBuilderSubmissionOn(applyBtn.closest('form'));
+            applyBtn.trigger('click');
+            Mautic.inBuilderSubmissionOff();
+        }
+    });
+};
+
+Mautic.updateConnections = function(callback) {
+    var nodes = [];
 
     mQuery("#CampaignCanvas .list-campaign-event").each(function (idx, elem) {
         nodes.push({
@@ -996,23 +1033,17 @@ Mautic.closeCampaignBuilder = function() {
     var campaignId     = mQuery('#campaignId').val();
     var query          = "action=campaign:updateConnections&campaignId=" + campaignId;
 
-    mQuery('.btn-close-builder').prop('disabled', true);
     mQuery.ajax({
         url: mauticAjaxUrl + '?' + query,
         type: "POST",
         data: canvasSettings,
         dataType: "json",
         success: function (response) {
-            mQuery('#builder-overlay').remove();
-            mQuery('body').css('overflow-y', '');
-            if (response.success) {
-                mQuery('.builder').addClass('hide');
-            }
-            mQuery('.btn-close-builder').prop('disabled', false);
+            if (typeof callback === 'function') callback(false, response);
         },
-        error: function (request, textStatus, errorThrown) {
-            Mautic.processAjaxError(request, textStatus, errorThrown);
-            mQuery('body').css('overflow-y', '');
+        error: function (response, textStatus, errorThrown) {
+            Mautic.processAjaxError(response, textStatus, errorThrown);
+            if (typeof callback === 'function') callback(true, response);
         }
     });
 };

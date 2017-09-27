@@ -11,15 +11,19 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
@@ -43,6 +47,11 @@ class ImportModel extends FormModel
     protected $leadModel;
 
     /**
+     * @var CompanyModel
+     */
+    protected $companyModel;
+
+    /**
      * @var NotificationModel
      */
     protected $notificationModel;
@@ -64,18 +73,21 @@ class ImportModel extends FormModel
      * @param LeadModel            $leadModel
      * @param NotificationModel    $notificationModel
      * @param CoreParametersHelper $config
+     * @param CompanyModel         $companyModel
      */
     public function __construct(
         PathsHelper $pathsHelper,
         LeadModel $leadModel,
         NotificationModel $notificationModel,
-        CoreParametersHelper $config
+        CoreParametersHelper $config,
+        CompanyModel $companyModel
     ) {
         $this->pathsHelper       = $pathsHelper;
         $this->leadModel         = $leadModel;
         $this->notificationModel = $notificationModel;
         $this->config            = $config;
         $this->leadEventLogRepo  = $leadModel->getEventLogRepository();
+        $this->companyModel      = $companyModel;
     }
 
     /**
@@ -96,25 +108,27 @@ class ImportModel extends FormModel
 
     /**
      * Compares current number of imports in progress with the limit from the configuration.
-     * If the limit is hit, the import changes its status to delayed.
-     *
-     * @param Import $import
      *
      * @return bool
      */
-    public function checkParallelImportLimit(Import $import)
+    public function checkParallelImportLimit()
     {
-        $parallelImportLimit = $this->config->getParameter('parallel_import_limit', 1);
-        $importsInProgress   = $this->getRepository()->countImportsWithStatuses([$import::IN_PROGRESS]);
+        $parallelImportLimit = $this->getParallelImportLimit();
+        $importsInProgress   = $this->getRepository()->countImportsInProgress();
 
-        if ($importsInProgress > $parallelImportLimit) {
-            $import->setStatus($import::DELAYED)
-                ->setStatusInfo($this->translator->trans('mautic.lead.import.parallel.limit.hit', ['%limit%' => $parallelImportLimit]));
+        return !($importsInProgress >= $parallelImportLimit);
+    }
 
-            return false;
-        }
-
-        return true;
+    /**
+     * Returns parallel import limit from the configuration.
+     *
+     * @param int $default
+     *
+     * @return int
+     */
+    public function getParallelImportLimit($default = 1)
+    {
+        return $this->config->getParameter('parallel_import_limit', $default);
     }
 
     /**
@@ -190,14 +204,19 @@ class ImportModel extends FormModel
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
+            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
 
-        if (!$this->checkParallelImportLimit($import)) {
+        if (!$this->checkParallelImportLimit()) {
+            $info = $this->translator->trans(
+                'mautic.lead.import.parallel.limit.hit',
+                ['%limit%' => $this->getParallelImportLimit()]
+            );
+            $import->setStatus($import::DELAYED)->setStatusInfo($info);
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
+            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
@@ -211,7 +230,21 @@ class ImportModel extends FormModel
         $this->saveEntity($import);
         $this->logDebug('The background import is about to start', $import);
 
-        if (!$this->process($import, $progress)) {
+        try {
+            if (!$this->process($import, $progress)) {
+                return false;
+            }
+        } catch (ORMException $e) {
+            // The EntityManager is probably closed. The entity cannot be saved.
+            $info = $this->translator->trans(
+                'mautic.lead.import.database.exception',
+                ['%message%' => $e->getMessage()]
+            );
+
+            $import->setStatus($import::DELAYED)->setStatusInfo($info);
+
+            $this->logDebug('Database had been overloaded', $import);
+
             return false;
         }
 
@@ -244,6 +277,8 @@ class ImportModel extends FormModel
      *
      * @param Import   $import
      * @param Progress $progress
+     *
+     * @return bool
      */
     public function process(Import $import, Progress $progress)
     {
@@ -251,7 +286,7 @@ class ImportModel extends FormModel
             $file = new \SplFileObject($import->getFilePath());
         } catch (\Exception $e) {
             $import->setStatusInfo('SplFileObject cannot read the file');
-            $import->setStatus($import::FAILED);
+            $import->setStatus(Import::FAILED);
             $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
@@ -269,6 +304,11 @@ class ImportModel extends FormModel
         }
 
         $batchSize = $config['batchlimit'];
+
+        // Convert to field names
+        array_walk($headers, function (&$val) {
+            $val = strtolower(InputHelper::alphanum($val, false, '_'));
+        });
 
         while ($batchSize && !$file->eof()) {
             $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
@@ -300,7 +340,9 @@ class ImportModel extends FormModel
                 $data = array_combine($headers, $data);
 
                 try {
-                    $merged = $this->leadModel->importLead(
+                    $entityModel = $import->getObject() === 'company' ? $this->companyModel : $this->leadModel;
+
+                    $merged = $entityModel->import(
                         $import->getMatchedFields(),
                         $data,
                         $import->getDefault('owner'),
@@ -309,11 +351,12 @@ class ImportModel extends FormModel
                         true,
                         $eventLog
                     );
+
                     if ($merged) {
-                        $this->logDebug('Contact on line '.$lineNumber.' has been updated', $import);
+                        $this->logDebug('Entity on line '.$lineNumber.' has been updated', $import);
                         $import->increaseUpdatedCount();
                     } else {
-                        $this->logDebug('Contact on line '.$lineNumber.' has been created', $import);
+                        $this->logDebug('Entity on line '.$lineNumber.' has been created', $import);
                         $import->increaseInsertedCount();
                     }
                 } catch (\Exception $e) {
@@ -337,6 +380,12 @@ class ImportModel extends FormModel
                 }
 
                 $this->saveEntity($import);
+
+                // clear unit of work of already imported data to save memory
+                $this->em->clear('Mautic\LeadBundle\Entity\Lead');
+                $this->em->clear('Mautic\LeadBundle\Entity\Company');
+
+                $this->dispatchEvent('batch_processed', $import);
 
                 // Stop the import loop if the import got unpublished
                 if (!$isPublished) {
@@ -458,7 +507,7 @@ class ImportModel extends FormModel
     /**
      * Get line chart data of imported rows.
      *
-     * @param char      $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat
@@ -594,6 +643,9 @@ class ImportModel extends FormModel
                 break;
             case 'post_delete':
                 $name = LeadEvents::IMPORT_POST_DELETE;
+                break;
+            case 'batch_processed':
+                $name = LeadEvents::IMPORT_BATCH_PROCESSED;
                 break;
             default:
                 return null;

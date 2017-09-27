@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Asset\Packages;
 
@@ -566,6 +567,9 @@ class AssetsHelper
      */
     public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = [])
     {
+        // clear tags in text
+        $text = InputHelper::clean($text);
+
         // Link attributes
         $attr = '';
         foreach ($attributes as $key => $val) {

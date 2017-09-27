@@ -75,6 +75,21 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+        $builder->add(
+            'updateBlanks',
+            'choice',
+            [
+                'choices' => [
+                    'updateBlanks' => 'mautic.integrations.blanks',
+                ],
+                'expanded'    => true,
+                'multiple'    => true,
+                'label'       => 'mautic.integrations.form.blanks',
+                'label_attr'  => ['class' => 'control-label'],
+                'empty_value' => false,
+                'required'    => false,
+            ]
+        );
         if ($formArea === 'features') {
             $builder->add(
                 'objects',
@@ -833,6 +848,11 @@ class DynamicsIntegration extends CrmAbstractIntegration
             if (defined('IN_MAUTIC_CONSOLE') && $progress) {
                 $progress->advance();
             }
+            $existingPerson = $this->getExistingRecord('emailaddress1', $lead['email'], $object);
+
+            $objectFields            = $this->prepareFieldsForPush($availableFields[$object]);
+            $fieldsToUpdate[$object] = $this->getBlankFieldsToUpdate($fieldsToUpdate[$object], $existingPerson, $objectFields, $config);
+
             // Match that data with mapped lead fields
             foreach ($fieldsToUpdate[$object] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
@@ -917,5 +937,14 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $this->createIntegrationEntity($object, $oid, 'lead', $leadId);
             }
         }
+    }
+    private function getExistingRecord($seachColumn, $searchValue, $object = 'contacts')
+    {
+        $availableFields    = $this->getAvailableLeadFields();
+        $oparams['$select'] = implode(',', array_keys($availableFields[$object]));
+        $oparams['$filter'] = $seachColumn.' eq \''.$searchValue.'\'';
+        $data               = $this->getApiHelper()->getLeads($oparams);
+
+        return (isset($data['value'][0]) && !empty($data['value'][0])) ? $data['value'][0] : [];
     }
 }

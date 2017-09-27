@@ -751,7 +751,7 @@ class LeadListRepository extends CommonRepository
                 $relativeDateStrings = $this->getRelativeDateStrings();
                 // Check if the column type is a date/time stamp
                 $isTimestamp = ($details['type'] === 'datetime' || $columnType instanceof UTCDateTimeType);
-                $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func, $isNot) {
+                $getDate     = function (&$string) use ($isTimestamp, $relativeDateStrings, &$details, &$func) {
                     $key             = array_search($string, $relativeDateStrings);
                     $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
                     $requiresBetween = in_array($func, ['eq', 'neq']) && $isTimestamp;
@@ -760,6 +760,13 @@ class LeadListRepository extends CommonRepository
                     $isRelative      = true;
 
                     switch ($timeframe) {
+                        case 'birthday':
+                        case 'anniversary':
+                            $func                = 'like';
+                            $isRelative          = false;
+                            $details['operator'] = 'like';
+                            $details['filter']   = '%'.date('-m-d');
+                            break;
                         case 'today':
                         case 'tomorrow':
                         case 'yesterday':
@@ -894,7 +901,8 @@ class LeadListRepository extends CommonRepository
                     }
 
                     // check does this match php date params pattern?
-                    if (stristr($string[0], '-') || stristr($string[0], '+')) {
+                    if ($timeframe !== 'anniversary' &&
+                        (stristr($string[0], '-') || stristr($string[0], '+'))) {
                         $date = new \DateTime('now');
                         $date->modify($string);
 
@@ -1755,7 +1763,7 @@ class LeadListRepository extends CommonRepository
                 $event = new LeadListFilteringEvent($details, $leadId, $alias, $func, $q, $this->getEntityManager());
                 $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
                 if ($event->isFilteringDone()) {
-                    $groupExpr = $q->expr()->andX($event->getSubQuery());
+                    $groupExpr->add($event->getSubQuery());
                 }
             }
         }
@@ -2000,6 +2008,7 @@ class LeadListRepository extends CommonRepository
             'mautic.lead.list.year_last',
             'mautic.lead.list.year_next',
             'mautic.lead.list.year_this',
+            'mautic.lead.list.anniversary',
         ];
     }
 

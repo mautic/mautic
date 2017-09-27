@@ -411,6 +411,10 @@ class FormModel extends CommonFormModel
             $cachedHtml = $this->generateHtml($form, $useCache);
         }
 
+        if (!$form->getInKioskMode()) {
+            $this->populateValuesWithLead($form, $cachedHtml);
+        }
+
         if ($withScript) {
             $cachedHtml = $this->getFormScript($form)."\n\n".$cachedHtml;
         }
@@ -525,6 +529,7 @@ class FormModel extends CommonFormModel
                 'fieldSettings' => $this->getCustomComponents()['fields'],
                 'fields'        => $fields,
                 'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
                 'form'          => $entity,
                 'theme'         => $theme,
                 'submissions'   => $submissions,
@@ -535,7 +540,6 @@ class FormModel extends CommonFormModel
                 'inBuilder'     => false,
             ]
         );
-
         if (!$entity->usesProgressiveProfiling()) {
             $entity->setCachedHtml($html);
 
@@ -785,45 +789,45 @@ class FormModel extends CommonFormModel
     {
         $operatorOptions = [
             '=' => [
-                    'label'       => 'mautic.lead.list.form.operator.equals',
-                    'expr'        => 'eq',
-                    'negate_expr' => 'neq',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.equals',
+                'expr'        => 'eq',
+                'negate_expr' => 'neq',
+            ],
             '!=' => [
-                    'label'       => 'mautic.lead.list.form.operator.notequals',
-                    'expr'        => 'neq',
-                    'negate_expr' => 'eq',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.notequals',
+                'expr'        => 'neq',
+                'negate_expr' => 'eq',
+            ],
             'gt' => [
-                    'label'       => 'mautic.lead.list.form.operator.greaterthan',
-                    'expr'        => 'gt',
-                    'negate_expr' => 'lt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.greaterthan',
+                'expr'        => 'gt',
+                'negate_expr' => 'lt',
+            ],
             'gte' => [
-                    'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
-                    'expr'        => 'gte',
-                    'negate_expr' => 'lt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
+                'expr'        => 'gte',
+                'negate_expr' => 'lt',
+            ],
             'lt' => [
-                    'label'       => 'mautic.lead.list.form.operator.lessthan',
-                    'expr'        => 'lt',
-                    'negate_expr' => 'gt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.lessthan',
+                'expr'        => 'lt',
+                'negate_expr' => 'gt',
+            ],
             'lte' => [
-                    'label'       => 'mautic.lead.list.form.operator.lessthanequals',
-                    'expr'        => 'lte',
-                    'negate_expr' => 'gt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.lessthanequals',
+                'expr'        => 'lte',
+                'negate_expr' => 'gt',
+            ],
             'like' => [
-                    'label'       => 'mautic.lead.list.form.operator.islike',
-                    'expr'        => 'like',
-                    'negate_expr' => 'notLike',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.islike',
+                'expr'        => 'like',
+                'negate_expr' => 'notLike',
+            ],
             '!like' => [
-                    'label'       => 'mautic.lead.list.form.operator.isnotlike',
-                    'expr'        => 'notLike',
-                    'negate_expr' => 'like',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.isnotlike',
+                'expr'        => 'notLike',
+                'negate_expr' => 'like',
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];

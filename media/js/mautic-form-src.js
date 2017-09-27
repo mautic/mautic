@@ -120,6 +120,7 @@
                 if (typeof data == 'undefined') {
                     data = null;
                 }
+
                 return MauticFormCallback[formId][event](data);
             }
 
@@ -272,7 +273,10 @@
             });
 
             // Show the wanted page
-            theForm.querySelector('[data-mautic-form-page="' + showPageNumber + '"]').style.display = 'block';
+            var thePage = theForm.querySelector('[data-mautic-form-page="' + showPageNumber + '"]');
+            if (thePage) {
+                thePage.style.display = 'block'
+            }
             var showPageBreak = theForm.querySelector('[data-mautic-form-pagebreak="' + showPageNumber + '"]');
             if (showPageBreak) {
                 showPageBreak.style.display = 'block';
@@ -583,6 +587,7 @@
                 resetForm: function () {
 
                     this.clearErrors();
+
                     Form.switchPage(document.getElementById('mauticform_' + formId), 1);
 
                     document.getElementById('mauticform_' + formId).reset();
@@ -624,6 +629,7 @@
 
                 try {
                     var response = JSON.parse(event.data);
+
                     if (response && response.formName) {
                         Core.getValidator(response.formName).parseFormResponse(response);
                     }
