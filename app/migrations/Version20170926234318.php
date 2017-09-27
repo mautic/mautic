@@ -26,6 +26,6 @@ class Version20170926234318 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
-        $this->addSql("ALTER TABLE {$this->prefix}reports ADD settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)';");
+        $this->addSql("ALTER TABLE {$this->prefix}reports ADD settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';");
     }
 }

@@ -62,7 +62,7 @@ trait FrequencyRuleTrait
 
         //find the email
         $currentChannelId = null;
-        if ($viewParameters['idHash']) {
+        if (!empty($viewParameters['idHash'])) {
             $emailModel = $this->getModel('email');
             if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {
@@ -169,6 +169,7 @@ trait FrequencyRuleTrait
      * @param array $formData
      * @param array $allChannels
      * @param       $leadChannels
+     * @param int   $currentChannelId
      */
     protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, $leadChannels, $currentChannelId = null)
     {

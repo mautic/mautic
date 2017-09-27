@@ -124,7 +124,7 @@ return [
                 'arguments' => 'translator',
             ],
             'mautic.form.type.report.settings' => [
-                'class' => 'Mautic\ReportBundle\Form\Type\ReportSettingsType',
+                'class' => \Mautic\ReportBundle\Form\Type\ReportSettingsType::class,
                 'alias' => 'report_settings',
             ],
         ],
