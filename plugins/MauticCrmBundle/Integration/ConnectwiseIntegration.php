@@ -789,7 +789,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             }
         }
 
-        if (isset($campaignsMembersResults['errors']) || isset($campaignsMembersResults['code'])) {
+        if (empty($campaignsMembersResults)) {
             return false;
         }
 
@@ -868,7 +868,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $recordList = [];
 
         foreach ($records as $i => $record) {
-            $record              = $index ? $record[$index] : $record;
+            if ($index and isset($record[$index])) {
+                $record = $record[$index];
+            }
             $recordList[$record] = [
                 'id' => $record,
             ];

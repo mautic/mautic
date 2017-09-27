@@ -36,18 +36,27 @@ class ConnectwiseApi extends CrmApi
 
         $response = $this->integration->makeRequest($url, $parameters, $method, ['encode_parameters' => 'json', 'cw-app-id' => $this->integration->getCompanyCookieKey()]);
 
-        if (is_array($response) && !empty($response['status']) && $response['status'] == 'error') {
-            throw new ApiErrorException($response['error']);
-        } elseif (is_array($response) && !empty($response['errors'])) {
-            $errors = [];
-            foreach ($response['errors'] as $error) {
-                $errors[] = $error['message'];
+        $errors = [];
+        if (is_array($response)) {
+            foreach ($response as $key => $r) {
+                $key = preg_replace('/[\r\n]+/', '', $key);
+                switch ($key) {
+                    case '<!DOCTYPE_html_PUBLIC_"-//W3C//DTD_XHTML_1_0_Strict//EN"_"http://www_w3_org/TR/xhtml1/DTD/xhtml1-strict_dtd"><html_xmlns':
+                        $errors[] = '404 not found error';
+                        break;
+                    case 'errors':
+                        $errors[] = $r['message'];
+                    case 'code':
+                        $errors[] = $r['message'];
+                        break;
+                }
             }
-
-            throw new ApiErrorException(implode(' ', $errors));
-        } else {
-            return $response;
         }
+        if (!empty($errors)) {
+            throw new ApiErrorException(implode(' ', $errors));
+        }
+
+        return $response;
     }
 
     public function getCompanies($params)
