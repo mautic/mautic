@@ -292,7 +292,7 @@ class ReportSubscriber extends CommonSubscriber
         switch ($context) {
             case 'emails':
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
-                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
 
                 $event->addCategoryLeftJoin($qb, 'e');
 
@@ -305,9 +305,9 @@ class ReportSubscriber extends CommonSubscriber
                         'SUM(cut2.unique_hits) AS unique_hits',
                         'cut2.channel_id'
                     )
-                          ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
-                          ->where('cut2.channel = \'email\'')
-                          ->groupBy('cut2.channel_id');
+                        ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
+                        ->where('cut2.channel = \'email\'')
+                        ->groupBy('cut2.channel_id');
                     $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id');
                 }
 
@@ -323,26 +323,36 @@ class ReportSubscriber extends CommonSubscriber
                 break;
             case 'email.stats':
                 $qb->from(MAUTIC_TABLE_PREFIX.'email_stats', 'es')
-                   ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = es.email_id')
-                   ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
+                    ->leftJoin('es', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = es.email_id')
+                    ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
 
                 $event->addCategoryLeftJoin($qb, 'e')
-                      ->addLeadLeftJoin($qb, 'es')
-                      ->addIpAddressLeftJoin($qb, 'es')
-                      ->applyDateFilters($qb, 'date_sent', 'es');
+                    ->addLeadLeftJoin($qb, 'es')
+                    ->addIpAddressLeftJoin($qb, 'es')
+                    ->applyDateFilters($qb, 'date_sent', 'es');
 
                 if ($event->hasColumn($clickColumns) || $event->hasFilter($clickColumns)) {
-                    $qbcut->select('COUNT(ph.id) AS hits', 'COUNT(DISTINCT(ph.redirect_id)) AS unique_hits', 'cut2.channel_id', 'ph.lead_id')
-                          ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
-                          ->join(
-                              'cut2',
-                              MAUTIC_TABLE_PREFIX.'page_hits',
-                              'ph',
-                              'cut2.redirect_id = ph.redirect_id AND cut2.channel_id = ph.source_id'
-                          )
-                          ->where('cut2.channel = \'email\' AND ph.source = \'email\'')
-                          ->groupBy('cut2.channel_id, ph.lead_id');
-                    $qb->leftJoin('e', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'e.id = cut.channel_id AND es.lead_id = cut.lead_id');
+                    $qbcut->select(
+                        'COUNT(ph.id) AS hits',
+                        'COUNT(DISTINCT(ph.redirect_id)) AS unique_hits',
+                        'cut2.channel_id',
+                        'ph.lead_id'
+                    )
+                        ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut2')
+                        ->join(
+                            'cut2',
+                            MAUTIC_TABLE_PREFIX.'page_hits',
+                            'ph',
+                            'cut2.redirect_id = ph.redirect_id AND cut2.channel_id = ph.source_id'
+                        )
+                        ->where('cut2.channel = \'email\' AND ph.source = \'email\'')
+                        ->groupBy('cut2.channel_id, ph.lead_id');
+                    $qb->leftJoin(
+                        'e',
+                        sprintf('(%s)', $qbcut->getSQL()),
+                        'cut',
+                        'e.id = cut.channel_id AND es.lead_id = cut.lead_id'
+                    );
                 }
 
                 if ($event->hasColumn($dncColumns) || $event->hasFilter($dncColumns)) {
@@ -369,7 +379,13 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
-        $graphs   = $event->getRequestedGraphs();
+        $graphs = $event->getRequestedGraphs();
+
+        if ($event->checkContext('emails') && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)) {
+            return;
+        } elseif (!$event->checkContext('email.stats')) {
+            return;
+        }
         $qb       = $event->getQueryBuilder();
         $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
         foreach ($graphs as $g) {
@@ -412,7 +428,10 @@ class ReportSubscriber extends CommonSubscriber
                     $chart  = new PieChart();
                     $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
                     $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $counts['failed']);
-                    $chart->setDataset($options['translator']->trans('mautic.email.ignored.emails'), $counts['ignored']);
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.ignored.emails'),
+                        $counts['ignored']
+                    );
                     $event->setGraph(
                         $g,
                         [
@@ -424,13 +443,21 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced':
-                    $queryBuilder->select('SUM(DISTINCT e.sent_count) as sent_count, SUM(DISTINCT e.read_count) as read_count, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced');
+                    $queryBuilder->select(
+                        'SUM(DISTINCT e.sent_count) as sent_count, SUM(DISTINCT e.read_count) as read_count, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                    );
                     $queryBuilder->resetQueryPart('groupBy');
                     $counts = $queryBuilder->execute()->fetch();
                     $chart  = new PieChart();
                     $chart->setDataset($options['translator']->trans('mautic.email.stat.read'), $counts['read_count']);
-                    $chart->setDataset($options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'), ($counts['sent_count'] - $counts['read_count']));
-                    $chart->setDataset($options['translator']->trans('mautic.email.unsubscribed'), $counts['unsubscribed']);
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
+                        ($counts['sent_count'] - $counts['read_count'])
+                    );
+                    $chart->setDataset(
+                        $options['translator']->trans('mautic.email.unsubscribed'),
+                        $counts['unsubscribed']
+                    );
                     $chart->setDataset($options['translator']->trans('mautic.email.bounced'), $counts['bounced']);
 
                     $event->setGraph(
@@ -445,8 +472,8 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.sent':
                     $queryBuilder->select('e.id, e.subject as title, SUM(DISTINCT e. sent_count) as sent')
-                                 ->groupBy('e.id, e.subject')
-                                 ->orderBy('sent', 'DESC');
+                        ->groupBy('e.id, e.subject')
+                        ->orderBy('sent', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -460,8 +487,8 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.read':
                     $queryBuilder->select('e.id, e.subject as title, SUM(DISTINCT e. read_count) as opens')
-                                 ->groupBy('e.id, e.subject')
-                                 ->orderBy('opens', 'DESC');
+                        ->groupBy('e.id, e.subject')
+                        ->orderBy('opens', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -474,10 +501,12 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.table.most.emails.failed':
-                    $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed')
-                                 ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
-                                 ->groupBy('e.id, e.subject')
-                                 ->orderBy('failed', 'DESC');
+                    $queryBuilder->select(
+                        'e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
+                    )
+                        ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
+                        ->groupBy('e.id, e.subject')
+                        ->orderBy('failed', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -490,8 +519,12 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.table.most.emails.unsubscribed':
-                    $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed')
-                        ->having('count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) > 0')
+                    $queryBuilder->select(
+                        'e.id, e.subject as title, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed'
+                    )
+                        ->having(
+                            'count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) > 0'
+                        )
                         ->groupBy('e.id, e.subject')
                         ->orderBy('unsubscribed', 'DESC');
                     $limit                  = 10;
@@ -506,8 +539,12 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.table.most.emails.bounced':
-                    $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced')
-                        ->having('count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) > 0')
+                    $queryBuilder->select(
+                        'e.id, e.subject as title, count(CASE WHEN dnc.id  and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                    )
+                        ->having(
+                            'count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) > 0'
+                        )
                         ->groupBy('e.id, e.subject')
                         ->orderBy('bounced', 'DESC');
                     $limit                  = 10;
@@ -523,8 +560,8 @@ class ReportSubscriber extends CommonSubscriber
 
                 case 'mautic.email.table.most.emails.read.percent':
                     $queryBuilder->select('e.id, e.subject as title, round(e.read_count / e.sent_count * 100) as ratio')
-                                 ->groupBy('e.id, e.subject')
-                                 ->orderBy('ratio', 'DESC');
+                        ->groupBy('e.id, e.subject')
+                        ->orderBy('ratio', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
