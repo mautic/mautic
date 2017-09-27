@@ -146,7 +146,7 @@ class IndexSchemaHelper
         $sql = [];
         if (count($this->changedIndexes)) {
             foreach ($this->changedIndexes as $index) {
-                $sql[] = $platform->getDropIndexSQL($index);
+                $sql[] = $platform->getDropIndexSQL($index, $this->table);
                 $sql[] = $platform->getCreateIndexSQL($index, $this->table);
             }
         }
