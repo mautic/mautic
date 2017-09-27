@@ -358,6 +358,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.model.company',
                     'mautic.helper.form.field_helper',
+                    'mautic.form.validator.file_upload',
                 ],
             ],
         ],

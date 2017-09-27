@@ -11,11 +11,10 @@
 
 namespace Mautic\FormBundle\Validator;
 
+use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\FormBundle\Exception\FileUploadException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Validation;
 
 class FileUploadValidator
 {
@@ -41,7 +40,7 @@ class FileUploadValidator
         $errors = [];
 
         try {
-            $this->checkExtension($file->getExtension(), $allowedExtensions);
+            $this->checkExtension($file->getClientOriginalExtension(), $allowedExtensions);
         } catch (FileUploadException $e) {
             $errors[] = $e->getMessage();
         }
@@ -67,7 +66,7 @@ class FileUploadValidator
     public function checkExtension($extension, array $allowedExtensions)
     {
         if (!in_array(strtolower($extension), array_map('strtolower', $allowedExtensions), true)) {
-            $error = $this->translator->trans('mautic.asset.asset.error.file.extension', [
+            $error = $this->translator->trans('mautic.form.submission.error.file.extension', [
                 '%fileExtension%' => $extension,
                 '%extensions%'    => implode(', ', $allowedExtensions),
             ], 'validators');
@@ -78,27 +77,24 @@ class FileUploadValidator
 
     /**
      * @param UploadedFile $file
-     * @param string       $maxUploadSize
+     * @param string       $maxUploadSizeMB Max file size in MB
      *
      * @throws FileUploadException
      */
-    public function checkFileSize(UploadedFile $file, $maxUploadSize)
+    public function checkFileSize(UploadedFile $file, $maxUploadSizeMB)
     {
-        if (!$maxUploadSize) {
+        if (!$maxUploadSizeMB) {
             return;
         }
 
-        $fileConstraints = ['maxSize' => $maxUploadSize];
+        $maxUploadSize = FileHelper::convertMegabytesToBytes($maxUploadSizeMB);
 
-        $validator = Validation::createValidator();
-        $errors    = $validator->validate($file, new File($fileConstraints));
+        if ($file->getSize() > $maxUploadSize) {
+            $message = $this->translator->trans('mautic.form.submission.error.file.size', [
+                '%fileSize%' => FileHelper::convertBytesToMegabytes($file->getSize()),
+                '%maxSize%'  => FileHelper::convertBytesToMegabytes($maxUploadSize),
+            ], 'validators');
 
-        $errorMessages = [];
-        foreach ($errors as $error) {
-            $errorMessages[] = $error->getMessage();
-        }
-        if ($errorMessages) {
-            $message = implode('<br />', $errorMessages);
             throw new FileUploadException($message);
         }
     }

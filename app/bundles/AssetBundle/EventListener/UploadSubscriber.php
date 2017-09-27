@@ -14,6 +14,7 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\FileHelper;
 use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
@@ -102,22 +103,23 @@ class UploadSubscriber extends CommonSubscriber
         $extensions = $this->coreParametersHelper->getAllowedExtensionsForUpload();
         $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
-        if ($file !== null) {
-            if ($file->getSize() > $maxSize) {
-                $message = $this->translator->trans('mautic.asset.asset.error.file.size', [
-                    '%fileSize%' => round($file->getSize() / 1048576, 2),
-                    '%maxSize%'  => round($maxSize / 1048576, 2),
-                ], 'validators');
-                throw new ValidationException($message);
-            }
+        if ($file === null) {
+            return;
+        }
+        if ($file->getSize() > $maxSize) {
+            $message = $this->translator->trans('mautic.asset.asset.error.file.size', [
+                '%fileSize%' => FileHelper::convertBytesToMegabytes($file->getSize()),
+                '%maxSize%'  => FileHelper::convertBytesToMegabytes($maxSize),
+            ], 'validators');
+            throw new ValidationException($message);
+        }
 
-            if (!in_array(strtolower($file->getExtension()), array_map('strtolower', $extensions), true)) {
-                $message = $this->translator->trans('mautic.asset.asset.error.file.extension', [
-                    '%fileExtension%' => $file->getExtension(),
-                    '%extensions%'    => implode(', ', $extensions),
-                ], 'validators');
-                throw new ValidationException($message);
-            }
+        if (!in_array(strtolower($file->getExtension()), array_map('strtolower', $extensions), true)) {
+            $message = $this->translator->trans('mautic.asset.asset.error.file.extension', [
+                '%fileExtension%' => $file->getExtension(),
+                '%extensions%'    => implode(', ', $extensions),
+            ], 'validators');
+            throw new ValidationException($message);
         }
     }
 }
