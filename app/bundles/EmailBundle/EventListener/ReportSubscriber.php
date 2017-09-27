@@ -381,11 +381,10 @@ class ReportSubscriber extends CommonSubscriber
     {
         $graphs = $event->getRequestedGraphs();
 
-        if ($event->checkContext('emails') && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)) {
-            return;
-        } elseif (!$event->checkContext('email.stats')) {
+        if (!$event->checkContext('email.stats') || ($event->checkContext('emails') && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs))) {
             return;
         }
+
         $qb       = $event->getQueryBuilder();
         $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
         foreach ($graphs as $g) {
