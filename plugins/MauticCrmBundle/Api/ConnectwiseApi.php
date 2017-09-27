@@ -67,12 +67,17 @@ class ConnectwiseApi extends CrmApi
      */
     public function getContacts($params)
     {
-        $lastUpdated = [];
+        $conditions = [];
+
         if (isset($params['start'])) {
             $conditions = ['conditions' => 'lastUpdated > ['.$params['start'].']'];
         }
         if (isset($params['Email'])) {
             $conditions = ['childconditions' => 'communicationItems/value = "'.$params['Email'].'" AND communicationItems/communicationType="Email"'];
+        }
+
+        if (isset($params['Ids'])) {
+            $conditions = ['conditions' => 'id in ('.$params['Ids'].')'];
         }
 
         return $this->request('company/contacts', $conditions);
@@ -96,5 +101,28 @@ class ConnectwiseApi extends CrmApi
     public function updateContact($params, $id)
     {
         return $this->request('company/contacts/'.$id, $params, 'PATCH');
+    }
+
+    /**
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getCampaigns()
+    {
+        return $this->request('marketing/groups');
+    }
+
+    /**
+     * @param $campaignId
+     * @param $params
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getCampaignMembers($campaignId)
+    {
+        return $this->request('marketing/groups/'.$campaignId.'/contacts');
     }
 }

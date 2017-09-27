@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\PluginBundle\Integration\IntegrationObject;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -400,9 +401,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array $params
      * @param null  $query
      */
-    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Lead')
+    public function getLeads($params = [], $query = null, &$executed = null, $result = [], $object = 'Contact')
     {
-        return $this->getRecords($params, 'Contact');
+        return $this->getRecords($params, $object);
     }
 
     /**
@@ -748,7 +749,24 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         return $campaigns;
     }
+    /**
+     * @param $campaigns
+     *
+     * @return array
+     */
+    public function getCampaignChoices($campaigns)
+    {
+        $choices = [];
+        if (isset($campaigns) && !empty($campaigns)) {
+            foreach ($campaigns as $campaign) {
+                $choices[$this->getName()][] = [
+                    'value' => $campaign['id'],
+                    'label' => $campaign['name'], ];
+            }
+        }
 
+        return $choices;
+    }
     /**
      * @param $campaignId
      * @param $settings
@@ -757,5 +775,105 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getCampaignMembers($campaignId, $settings)
     {
+        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+
+        $campaignsMembersResults = [];
+        $allCampaignMembers      = [];
+
+        try {
+            $campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId);
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+            if (!$silenceExceptions) {
+                throw $e;
+            }
+        }
+
+        if (isset($campaignsMembersResults['errors']) || isset($campaignsMembersResults['code'])) {
+            return false;
+        }
+
+        $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
+        $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
+
+        $contacts = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $recordList);
+
+        $existingContactsIds = array_map(
+            function ($contact) {
+                return ($contact['integration_entity'] == 'Contact') ? $contact['integration_entity_id'] : [];
+            },
+            $contacts
+        );
+
+        $contactList = $this->getRecordList($campaignsMembersResults, 'id');
+
+        $contactsToFetch = array_diff_key($contactList, $existingContactsIds);
+
+        if (!empty($contactsToFetch)) {
+            $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
+            $params['Ids']         = $listOfContactsToFetch;
+
+            $this->getLeads($params);
+
+            $allCampaignMembers = array_merge($existingContactsIds, array_keys($contactsToFetch));
+        }
+
+        $this->saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId);
+    }
+
+    /**
+     * @param $allCampaignMembers
+     * @param $campaignMemberObject
+     * @param $campaignId
+     */
+    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId)
+    {
+        if (empty($allCampaignMembers)) {
+            return;
+        }
+        $persistEntities = [];
+        $recordList      = $this->getRecordList($allCampaignMembers);
+        $mauticObject    = new IntegrationObject('Contact', 'lead');
+
+        $contacts = $this->integrationEntityModel->getSyncedRecords($mauticObject, $this->getName(), $recordList);
+        //first find existing campaign members.
+        foreach ($contacts as $campaignMember) {
+            $existingCampaignMember = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $campaignMember['internal_entity_id']);
+            if (empty($existingCampaignMember)) {
+                $persistEntities[] = $this->createIntegrationEntity(
+                    $campaignMemberObject->getType(),
+                    $campaignId,
+                    $campaignMemberObject->getInternalType(),
+                    $campaignMember['internal_entity_id'],
+                    [],
+                    false
+                );
+            }
+        }
+
+        if ($persistEntities) {
+            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+            unset($persistEntities);
+            $this->em->clear(IntegrationEntity::class);
+        }
+    }
+
+    /**
+     * @param $records
+     *
+     * @return array
+     */
+    public function getRecordList($records, $index = null)
+    {
+        $recordList = [];
+
+        foreach ($records as $i => $record) {
+            $record              = $index ? $record[$index] : $record;
+            $recordList[$record] = [
+                'id' => $record,
+            ];
+        }
+
+        return $recordList;
     }
 }

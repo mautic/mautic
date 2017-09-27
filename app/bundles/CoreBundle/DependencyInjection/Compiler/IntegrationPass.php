@@ -48,6 +48,7 @@ class IntegrationPass implements CompilerPassInterface
             $definition->addMethodCall('setPathsHelper', [new Reference('mautic.helper.paths')]);
             $definition->addMethodCall('setNotificationModel', [new Reference('mautic.core.model.notification')]);
             $definition->addMethodCall('setFieldModel', [new Reference('mautic.lead.model.field')]);
+            $definition->addMethodCall('setIntegrationEntityModel', [new Reference('mautic.plugin.model.integration_entity')]);
 
             $class     = $definition->getClass();
             $reflected = new \ReflectionClass($class);
