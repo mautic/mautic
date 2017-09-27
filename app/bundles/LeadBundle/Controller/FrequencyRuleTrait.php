@@ -64,8 +64,7 @@ trait FrequencyRuleTrait
         $currentChannelId = null;
         if ($viewParameters['idHash']) {
             $emailModel = $this->getModel('email');
-            $stat       = $emailModel->getEmailStatus($viewParameters['idHash']);
-            if ($stat) {
+            if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {
                     $currentChannelId = $email->getId();
                 }
