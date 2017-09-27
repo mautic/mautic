@@ -9,9 +9,17 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Symfony\Component\Form\FormView;
+
 $view->extend('MauticCoreBundle:FormTheme:form_simple.html.php');
 $view->addGlobal('translationBase', 'mautic.dynamicContent');
 $view->addGlobal('mauticContent', 'dynamicContent');
+
+if (empty($form->children['filters']->children[0]->children['filters']->vars['prototype'])) {
+    $filterSelectPrototype = null;
+} else {
+    $filterSelectPrototype = $form->children['filters']->children[0]->children['filters']->vars['prototype'];
+}
 ?>
 
 <?php $view['slots']->start('primaryFormContent'); ?>
@@ -25,6 +33,14 @@ $view->addGlobal('mauticContent', 'dynamicContent');
             <?php echo $view['form']->row($form['content']); ?>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <?php echo $view['form']->row($form['filters']); ?>
+        </div>
+    </div>
+<?php if ($filterSelectPrototype instanceof FormView) : ?>
+    <div id="filterSelectPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterSelectPrototype)); ?>"></div>
+<?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('rightFormContent'); ?>

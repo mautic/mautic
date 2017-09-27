@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\FiltersEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\TranslationEntityTrait;
@@ -27,6 +28,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 {
     use TranslationEntityTrait;
     use VariantEntityTrait;
+    use FiltersEntityTrait;
 
     /**
      * @var int
@@ -137,6 +139,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
+        self::addFiltersMetadata($builder);
     }
 
     /**
@@ -165,6 +168,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'variantParent',
                 'variantChildren',
                 'content',
+                'filters',
             ])
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')

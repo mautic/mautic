@@ -324,6 +324,14 @@ return [
                 'class' => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
                 'alias' => 'dynamic_content_filter',
             ],
+            'mautic.form.type.dynamic_web_content_filters' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DwcFiltersType::class,
+                'alias'     => 'dynamic_web_content_filters',
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'mautic.stage.model.stage',
+                ],
+            ],
             'mautic.form.type.dynamic_content_filter_entry' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
                 'alias'     => 'dynamic_content_filter_entry',
@@ -335,6 +343,18 @@ return [
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryFiltersType::class,
                 'alias'     => 'dynamic_content_filter_entry_filters',
+                'arguments' => [
+                    'translator',
+                ],
+                'methodCalls' => [
+                    'setConnection' => [
+                        'database_connection',
+                    ],
+                ],
+            ],
+            'mautic.form.type.dynamic_web_content_entry_filters' => [
+                'class'     => \Mautic\CoreBundle\Form\Type\DwcEntryFiltersType::class,
+                'alias'     => 'dynamic_web_content_entry_filters',
                 'arguments' => [
                     'translator',
                 ],

@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\DwcFiltersTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -25,6 +26,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DynamicContentType extends AbstractType
 {
+    use DwcFiltersTrait;
+
     private $em;
 
     /**
@@ -180,6 +183,8 @@ class DynamicContentType extends AbstractType
                 'form_buttons'
             );
         }
+
+        $this->addFiltersField($builder);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
