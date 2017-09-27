@@ -133,7 +133,7 @@ class Report extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->createField('settings', ' json_array')
+        $builder->createField('settings', 'json_array')
             ->columnName('settings')
             ->nullable()
             ->build();
