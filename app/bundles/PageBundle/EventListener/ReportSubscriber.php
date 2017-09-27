@@ -246,6 +246,10 @@ class ReportSubscriber extends CommonSubscriber
         if ($event->checkContext(['video.hits'])) {
             $hitPrefix  = 'vh.';
             $hitColumns = [
+                $hitPrefix.'id' => [
+                    'label' => 'mautic.core.id',
+                    'type'  => 'int',
+                ],
                 $hitPrefix.'date_hit' => [
                     'label'          => 'mautic.page.report.hits.date_hit',
                     'type'           => 'datetime',
@@ -310,12 +314,12 @@ class ReportSubscriber extends CommonSubscriber
                 'time_watched' => [
                     'label'   => 'mautic.page.report.hits.time_watched',
                     'type'    => 'string',
-                    'formula' => 'SEC_TO_TIME('.$hitPrefix.'time_watched)',
+                    'formula' => 'if('.$hitPrefix.'duration = 0,\'-\',SEC_TO_TIME('.$hitPrefix.'time_watched))',
                 ],
                 'duration' => [
                     'label'   => 'mautic.page.report.hits.duration',
                     'type'    => 'string',
-                    'formula' => 'SEC_TO_TIME('.$hitPrefix.'duration)',
+                    'formula' => 'if('.$hitPrefix.'duration = 0,\'-\',SEC_TO_TIME('.$hitPrefix.'duration))',
                 ],
             ];
 
@@ -334,8 +338,9 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        $context = $event->getContext();
-        $qb      = $event->getQueryBuilder();
+        $context    = $event->getContext();
+        $qb         = $event->getQueryBuilder();
+        $hasGroupBy = $event->hasGroupBy();
 
         switch ($context) {
             case 'pages':
@@ -360,6 +365,9 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addCampaignByChannelJoin($qb, 'p', 'page');
                 break;
             case 'video.hits':
+                if (!$hasGroupBy) {
+                    $qb->groupBy('vh.id');
+                }
                 $event->applyDateFilters($qb, 'date_hit', 'vh');
 
                 $qb->from(MAUTIC_TABLE_PREFIX.'video_hits', 'vh');
