@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\CoreBundle\Validator\FileUploadValidator;
+
 return [
     'routes' => [
         'main' => [
@@ -804,6 +806,14 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
                     'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
+        'validator' => [
+            'mautic.core.validator.file_upload' => [
+                'class'     => FileUploadValidator::class,
+                'arguments' => [
+                    'translator',
                 ],
             ],
         ],

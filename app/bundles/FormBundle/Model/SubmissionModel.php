@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -19,19 +20,17 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Entity\Result;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
-use Mautic\FormBundle\Exception\FileUploadException;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
-use Mautic\FormBundle\Validator\FileUploadValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
@@ -44,7 +43,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Validator\Validation;
 
 /**
  * Class SubmissionModel.
@@ -248,8 +246,8 @@ class SubmissionModel extends CommonFormModel
                 $allowedExtensions = $properties[FormFieldFileType::PROPERTY_ALLOWED_FILE_EXTENSIONS];
 
                 try {
-                    $this->fileUploadValidator->validate($file, $maxUploadSize, $allowedExtensions);
-
+                    $this->fileUploadValidator->validate($file->getSize(), $file->getClientOriginalExtension(), $maxUploadSize, $allowedExtensions, 'mautic.form.submission.error.file.extension', 'mautic.form.submission.error.file.size');
+/*
                     $value = $file->move(
                         '/dev/null', // TODO Pick a location
                         sprintf(
@@ -260,6 +258,7 @@ class SubmissionModel extends CommonFormModel
                             $file->guessExtension()
                         )
                     );
+*/
                 } catch (FileUploadException $e) {
                     $validationErrors[$alias] = $e->getMessage();
                 }
@@ -377,6 +376,7 @@ class SubmissionModel extends CommonFormModel
         }
 
         // Get updated lead if applicable with tracking ID
+        /** @var Lead $lead */
         list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
 
         //set tracking ID for stats purposes to determine unique hits

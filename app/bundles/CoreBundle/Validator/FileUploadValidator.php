@@ -9,10 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Validator;
+namespace Mautic\CoreBundle\Validator;
 
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\FormBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Exception\FileUploadException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -29,24 +29,27 @@ class FileUploadValidator
     }
 
     /**
-     * @param UploadedFile $file
-     * @param int          $maxUploadSize
-     * @param array        $allowedExtensions
+     * @param int       $fileSize In bytes
+     * @param string    $fileExtension
+     * @param int       $maxUploadSize In bytes
+     * @param array     $allowedExtensions
+     * @param string    $extensionErrorMsg
+     * @param string    $sizeErrorMsg
      *
      * @throws FileUploadException
      */
-    public function validate(UploadedFile $file, $maxUploadSize, array $allowedExtensions)
+    public function validate($fileSize, $fileExtension, $maxUploadSize, array $allowedExtensions, $extensionErrorMsg, $sizeErrorMsg)
     {
         $errors = [];
 
         try {
-            $this->checkExtension($file->getClientOriginalExtension(), $allowedExtensions);
+            $this->checkExtension($fileExtension, $allowedExtensions, $extensionErrorMsg);
         } catch (FileUploadException $e) {
             $errors[] = $e->getMessage();
         }
 
         try {
-            $this->checkFileSize($file, $maxUploadSize);
+            $this->checkFileSize($fileSize, $maxUploadSize, $sizeErrorMsg);
         } catch (FileUploadException $e) {
             $errors[] = $e->getMessage();
         }
@@ -58,15 +61,16 @@ class FileUploadValidator
     }
 
     /**
-     * @param string $extension
-     * @param array  $allowedExtensions
+     * @param string    $extension
+     * @param array     $allowedExtensions
+     * @param string    $extensionErrorMsg
      *
      * @throws FileUploadException
      */
-    public function checkExtension($extension, array $allowedExtensions)
+    public function checkExtension($extension, array $allowedExtensions, $extensionErrorMsg)
     {
         if (!in_array(strtolower($extension), array_map('strtolower', $allowedExtensions), true)) {
-            $error = $this->translator->trans('mautic.form.submission.error.file.extension', [
+            $error = $this->translator->trans($extensionErrorMsg, [
                 '%fileExtension%' => $extension,
                 '%extensions%'    => implode(', ', $allowedExtensions),
             ], 'validators');
@@ -76,12 +80,13 @@ class FileUploadValidator
     }
 
     /**
-     * @param UploadedFile $file
-     * @param string       $maxUploadSizeMB Max file size in MB
+     * @param int       $fileSize
+     * @param string    $maxUploadSizeMB Max file size in MB
+     * @param string    $sizeErrorMsg
      *
      * @throws FileUploadException
      */
-    public function checkFileSize(UploadedFile $file, $maxUploadSizeMB)
+    public function checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg)
     {
         if (!$maxUploadSizeMB) {
             return;
@@ -89,9 +94,9 @@ class FileUploadValidator
 
         $maxUploadSize = FileHelper::convertMegabytesToBytes($maxUploadSizeMB);
 
-        if ($file->getSize() > $maxUploadSize) {
-            $message = $this->translator->trans('mautic.form.submission.error.file.size', [
-                '%fileSize%' => FileHelper::convertBytesToMegabytes($file->getSize()),
+        if ($fileSize > $maxUploadSize) {
+            $message = $this->translator->trans($sizeErrorMsg, [
+                '%fileSize%' => FileHelper::convertBytesToMegabytes($fileSize),
                 '%maxSize%'  => FileHelper::convertBytesToMegabytes($maxUploadSize),
             ], 'validators');
 

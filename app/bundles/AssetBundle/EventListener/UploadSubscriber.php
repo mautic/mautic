@@ -13,13 +13,13 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
 use Oneup\UploaderBundle\UploadEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class UploadSubscriber.
@@ -37,22 +37,20 @@ class UploadSubscriber extends CommonSubscriber
     protected $assetModel;
 
     /**
-     * @param TranslatorInterface $translator
+     * @var FileUploadValidator
      */
-    protected $translator;
+    private $fileUploadValidator;
 
     /**
-     * UploadSubscriber constructor.
-     *
-     * @param TranslatorInterface  $translator
      * @param CoreParametersHelper $coreParametersHelper
      * @param AssetModel           $assetModel
+     * @param FileUploadValidator  $fileUploadValidator
      */
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper, AssetModel $assetModel)
+    public function __construct(CoreParametersHelper $coreParametersHelper, AssetModel $assetModel, FileUploadValidator $fileUploadValidator)
     {
-        $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->assetModel           = $assetModel;
+        $this->fileUploadValidator  = $fileUploadValidator;
     }
 
     /**
@@ -106,20 +104,17 @@ class UploadSubscriber extends CommonSubscriber
         if ($file === null) {
             return;
         }
-        if ($file->getSize() > $maxSize) {
-            $message = $this->translator->trans('mautic.asset.asset.error.file.size', [
-                '%fileSize%' => FileHelper::convertBytesToMegabytes($file->getSize()),
-                '%maxSize%'  => FileHelper::convertBytesToMegabytes($maxSize),
-            ], 'validators');
-            throw new ValidationException($message);
+
+        try {
+            $this->fileUploadValidator->checkFileSize($file->getSize(), $maxSize, 'mautic.asset.asset.error.file.size');
+        } catch (FileUploadException $e) {
+            throw new ValidationException($e->getMessage());
         }
 
-        if (!in_array(strtolower($file->getExtension()), array_map('strtolower', $extensions), true)) {
-            $message = $this->translator->trans('mautic.asset.asset.error.file.extension', [
-                '%fileExtension%' => $file->getExtension(),
-                '%extensions%'    => implode(', ', $extensions),
-            ], 'validators');
-            throw new ValidationException($message);
+        try {
+            $this->fileUploadValidator->checkExtension($file->getExtension(), $extensions, 'mautic.asset.asset.error.file.extension');
+        } catch (FileUploadException $e) {
+            throw new ValidationException($e->getMessage());
         }
     }
 }

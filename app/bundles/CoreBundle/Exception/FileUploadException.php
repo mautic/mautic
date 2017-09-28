@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\FormBundle\Exception;
+namespace Mautic\CoreBundle\Exception;
 
 class FileUploadException extends \Exception
 {

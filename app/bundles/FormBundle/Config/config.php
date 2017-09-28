@@ -42,7 +42,6 @@ use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
-use Mautic\FormBundle\Validator\FileUploadValidator;
 
 return [
     'routes' => [
@@ -358,7 +357,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.model.company',
                     'mautic.helper.form.field_helper',
-                    'mautic.form.validator.file_upload',
+                    'mautic.core.validator.file_upload',
                 ],
             ],
         ],
@@ -374,14 +373,6 @@ return [
                 'class'     => TokenHelper::class,
                 'arguments' => [
                     'mautic.form.model.form',
-                ],
-            ],
-        ],
-        'validator' => [
-            'mautic.form.validator.file_upload' => [
-                'class'     => FileUploadValidator::class,
-                'arguments' => [
-                    'translator',
                 ],
             ],
         ],
