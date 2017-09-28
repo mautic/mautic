@@ -55,8 +55,10 @@ class LeadApiController extends CommonApiController
     public function newEntityAction()
     {
         $existingLeads = $this->getExistingLeads();
+
         if (!empty($existingLeads)) {
             $this->request->setMethod('PATCH');
+
             return parent::editEntityAction($existingLeads[0]->getId());
         }
 
