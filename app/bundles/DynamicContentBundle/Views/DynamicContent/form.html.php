@@ -21,6 +21,9 @@ if (empty($form->children['filters']->children[0]->children['filters']->vars['pr
     $filterSelectPrototype = $form->children['filters']->children[0]->children['filters']->vars['prototype'];
 }
 ?>
+<?php if ($filterSelectPrototype instanceof FormView) : ?>
+    <div id="filterSelectPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterSelectPrototype)); ?>"></div>
+<?php endif; ?>
 
 <?php $view['slots']->start('primaryFormContent'); ?>
     <div class="row">
@@ -38,9 +41,6 @@ if (empty($form->children['filters']->children[0]->children['filters']->vars['pr
             <?php echo $view['form']->row($form['filters']); ?>
         </div>
     </div>
-<?php if ($filterSelectPrototype instanceof FormView) : ?>
-    <div id="filterSelectPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($filterSelectPrototype)); ?>"></div>
-<?php endif; ?>
 <?php $view['slots']->stop(); ?>
 
 <?php $view['slots']->start('rightFormContent'); ?>
