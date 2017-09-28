@@ -12,7 +12,6 @@
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -20,17 +19,18 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Event\ValidationEvent;
+use Mautic\FormBundle\Exception\FileValidationException;
+use Mautic\FormBundle\Exception\NoFileGivenException;
 use Mautic\FormBundle\Exception\ValidationException;
-use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
@@ -39,7 +39,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -102,21 +101,21 @@ class SubmissionModel extends CommonFormModel
     protected $fieldHelper;
 
     /**
-     * @var FileUploadValidator
+     * @var UploadFieldValidator
      */
-    private $fileUploadValidator;
+    private $uploadFieldValidator;
 
     /**
-     * @param IpLookupHelper      $ipLookupHelper
-     * @param TemplatingHelper    $templatingHelper
-     * @param FormModel           $formModel
-     * @param PageModel           $pageModel
-     * @param LeadModel           $leadModel
-     * @param CampaignModel       $campaignModel
-     * @param LeadFieldModel      $leadFieldModel
-     * @param CompanyModel        $companyModel
-     * @param FormFieldHelper     $fieldHelper
-     * @param FileUploadValidator $fileUploadValidator
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param TemplatingHelper     $templatingHelper
+     * @param FormModel            $formModel
+     * @param PageModel            $pageModel
+     * @param LeadModel            $leadModel
+     * @param CampaignModel        $campaignModel
+     * @param LeadFieldModel       $leadFieldModel
+     * @param CompanyModel         $companyModel
+     * @param FormFieldHelper      $fieldHelper
+     * @param UploadFieldValidator $uploadFieldValidator
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -128,18 +127,18 @@ class SubmissionModel extends CommonFormModel
         LeadFieldModel $leadFieldModel,
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
-        FileUploadValidator $fileUploadValidator
+        UploadFieldValidator $uploadFieldValidator
     ) {
-        $this->ipLookupHelper      = $ipLookupHelper;
-        $this->templatingHelper    = $templatingHelper;
-        $this->formModel           = $formModel;
-        $this->pageModel           = $pageModel;
-        $this->leadModel           = $leadModel;
-        $this->campaignModel       = $campaignModel;
-        $this->leadFieldModel      = $leadFieldModel;
-        $this->companyModel        = $companyModel;
-        $this->fieldHelper         = $fieldHelper;
-        $this->fileUploadValidator = $fileUploadValidator;
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->templatingHelper     = $templatingHelper;
+        $this->formModel            = $formModel;
+        $this->pageModel            = $pageModel;
+        $this->leadModel            = $leadModel;
+        $this->campaignModel        = $campaignModel;
+        $this->leadFieldModel       = $leadFieldModel;
+        $this->companyModel         = $companyModel;
+        $this->fieldHelper          = $fieldHelper;
+        $this->uploadFieldValidator = $uploadFieldValidator;
     }
 
     /**
@@ -205,6 +204,7 @@ class SubmissionModel extends CommonFormModel
         $tokens           = [];
         $leadFieldMatches = [];
         $validationErrors = [];
+        $uploadedFiles    = [];
 
         /** @var Field $f */
         foreach ($fields as $f) {
@@ -228,38 +228,12 @@ class SubmissionModel extends CommonFormModel
                 }
                 continue;
             } elseif ($f->isFileType()) {
-                $files = $request->files->get('mauticform');
-
-                if (!$files || !array_key_exists($f->getAlias(), $files)) {
-                    continue;
-                }
-
-                $file = $files[$f->getAlias()];
-
-                if (!$file instanceof UploadedFile) {
-                    continue;
-                }
-
-                $properties = $f->getProperties();
-
-                $maxUploadSize     = $properties[FormFieldFileType::PROPERTY_ALLOWED_FILE_SIZE];
-                $allowedExtensions = $properties[FormFieldFileType::PROPERTY_ALLOWED_FILE_EXTENSIONS];
-
                 try {
-                    $this->fileUploadValidator->validate($file->getSize(), $file->getClientOriginalExtension(), $maxUploadSize, $allowedExtensions, 'mautic.form.submission.error.file.extension', 'mautic.form.submission.error.file.size');
-/*
-                    $value = $file->move(
-                        '/dev/null', // TODO Pick a location
-                        sprintf(
-                            '%s.%s.%s.%s',
-                            $form->getId(),
-                            $id,
-                            bin2hex(random_bytes(16)),
-                            $file->guessExtension()
-                        )
-                    );
-*/
-                } catch (FileUploadException $e) {
+                    $file                  = $this->uploadFieldValidator->processFileValidation($f, $request);
+                    $uploadedFiles[$alias] = $file;
+                    $value                 = $file->getClientOriginalName();
+                } catch (NoFileGivenException $e) { //No error here, we just move to another validation, eg. if a field is required
+                } catch (FileValidationException $e) {
                     $validationErrors[$alias] = $e->getMessage();
                 }
             }
