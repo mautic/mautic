@@ -13,7 +13,7 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Oneup\UploaderBundle\Event\PostUploadEvent;
@@ -107,13 +107,13 @@ class UploadSubscriber extends CommonSubscriber
 
         try {
             $this->fileUploadValidator->checkFileSize($file->getSize(), $maxSize, 'mautic.asset.asset.error.file.size');
-        } catch (FileUploadException $e) {
+        } catch (FileInvalidException $e) {
             throw new ValidationException($e->getMessage());
         }
 
         try {
             $this->fileUploadValidator->checkExtension($file->getExtension(), $extensions, 'mautic.asset.asset.error.file.extension');
-        } catch (FileUploadException $e) {
+        } catch (FileInvalidException $e) {
             throw new ValidationException($e->getMessage());
         }
     }

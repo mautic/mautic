@@ -11,9 +11,8 @@
 
 namespace Mautic\CoreBundle\Validator;
 
+use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\FileHelper;
-use Mautic\CoreBundle\Exception\FileUploadException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class FileUploadValidator
@@ -29,14 +28,14 @@ class FileUploadValidator
     }
 
     /**
-     * @param int       $fileSize In bytes
-     * @param string    $fileExtension
-     * @param int       $maxUploadSize In bytes
-     * @param array     $allowedExtensions
-     * @param string    $extensionErrorMsg
-     * @param string    $sizeErrorMsg
+     * @param int    $fileSize          In bytes
+     * @param string $fileExtension
+     * @param int    $maxUploadSize     In bytes
+     * @param array  $allowedExtensions
+     * @param string $extensionErrorMsg
+     * @param string $sizeErrorMsg
      *
-     * @throws FileUploadException
+     * @throws FileInvalidException
      */
     public function validate($fileSize, $fileExtension, $maxUploadSize, array $allowedExtensions, $extensionErrorMsg, $sizeErrorMsg)
     {
@@ -44,28 +43,28 @@ class FileUploadValidator
 
         try {
             $this->checkExtension($fileExtension, $allowedExtensions, $extensionErrorMsg);
-        } catch (FileUploadException $e) {
+        } catch (FileInvalidException $e) {
             $errors[] = $e->getMessage();
         }
 
         try {
             $this->checkFileSize($fileSize, $maxUploadSize, $sizeErrorMsg);
-        } catch (FileUploadException $e) {
+        } catch (FileInvalidException $e) {
             $errors[] = $e->getMessage();
         }
 
         if ($errors) {
             $message = implode('<br />', $errors);
-            throw new FileUploadException($message);
+            throw new FileInvalidException($message);
         }
     }
 
     /**
-     * @param string    $extension
-     * @param array     $allowedExtensions
-     * @param string    $extensionErrorMsg
+     * @param string $extension
+     * @param array  $allowedExtensions
+     * @param string $extensionErrorMsg
      *
-     * @throws FileUploadException
+     * @throws FileInvalidException
      */
     public function checkExtension($extension, array $allowedExtensions, $extensionErrorMsg)
     {
@@ -75,16 +74,16 @@ class FileUploadValidator
                 '%extensions%'    => implode(', ', $allowedExtensions),
             ], 'validators');
 
-            throw new FileUploadException($error);
+            throw new FileInvalidException($error);
         }
     }
 
     /**
-     * @param int       $fileSize
-     * @param string    $maxUploadSizeMB Max file size in MB
-     * @param string    $sizeErrorMsg
+     * @param int    $fileSize
+     * @param string $maxUploadSizeMB Max file size in MB
+     * @param string $sizeErrorMsg
      *
-     * @throws FileUploadException
+     * @throws FileInvalidException
      */
     public function checkFileSize($fileSize, $maxUploadSizeMB, $sizeErrorMsg)
     {
@@ -100,7 +99,7 @@ class FileUploadValidator
                 '%maxSize%'  => FileHelper::convertBytesToMegabytes($maxUploadSize),
             ], 'validators');
 
-            throw new FileUploadException($message);
+            throw new FileInvalidException($message);
         }
     }
 }

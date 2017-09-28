@@ -53,7 +53,7 @@ class FormTestAbstract extends WebTestCase
     }
 
     /**
-     * @return CampaignModel
+     * @return FormModel
      */
     protected function getFormModel()
     {

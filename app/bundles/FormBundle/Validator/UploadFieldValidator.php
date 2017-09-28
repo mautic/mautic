@@ -11,7 +11,7 @@
 
 namespace Mautic\FormBundle\Validator;
 
-use Mautic\CoreBundle\Exception\FileUploadException;
+use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Exception\FileValidationException;
@@ -77,7 +77,7 @@ class UploadFieldValidator
                     )
                 );
             */
-        } catch (FileUploadException $e) {
+        } catch (FileInvalidException $e) {
             throw new FileValidationException($e->getMessage());
         }
     }

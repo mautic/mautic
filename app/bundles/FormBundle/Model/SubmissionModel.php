@@ -12,6 +12,7 @@
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -19,6 +20,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -30,6 +32,7 @@ use Mautic\FormBundle\Exception\NoFileGivenException;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
@@ -106,6 +109,11 @@ class SubmissionModel extends CommonFormModel
     private $uploadFieldValidator;
 
     /**
+     * @var FormUploader
+     */
+    private $formUploader;
+
+    /**
      * @param IpLookupHelper       $ipLookupHelper
      * @param TemplatingHelper     $templatingHelper
      * @param FormModel            $formModel
@@ -116,6 +124,7 @@ class SubmissionModel extends CommonFormModel
      * @param CompanyModel         $companyModel
      * @param FormFieldHelper      $fieldHelper
      * @param UploadFieldValidator $uploadFieldValidator
+     * @param FormUploader         $formUploader
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -127,7 +136,8 @@ class SubmissionModel extends CommonFormModel
         LeadFieldModel $leadFieldModel,
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
-        UploadFieldValidator $uploadFieldValidator
+        UploadFieldValidator $uploadFieldValidator,
+        FormUploader $formUploader
     ) {
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->templatingHelper     = $templatingHelper;
@@ -139,6 +149,7 @@ class SubmissionModel extends CommonFormModel
         $this->companyModel         = $companyModel;
         $this->fieldHelper          = $fieldHelper;
         $this->uploadFieldValidator = $uploadFieldValidator;
+        $this->formUploader         = $formUploader;
     }
 
     /**
@@ -204,7 +215,7 @@ class SubmissionModel extends CommonFormModel
         $tokens           = [];
         $leadFieldMatches = [];
         $validationErrors = [];
-        $uploadedFiles    = [];
+        $filesToUpload    = new UploadFileCrate();
 
         /** @var Field $f */
         foreach ($fields as $f) {
@@ -229,9 +240,9 @@ class SubmissionModel extends CommonFormModel
                 continue;
             } elseif ($f->isFileType()) {
                 try {
-                    $file                  = $this->uploadFieldValidator->processFileValidation($f, $request);
-                    $uploadedFiles[$alias] = $file;
-                    $value                 = $file->getClientOriginalName();
+                    $file  = $this->uploadFieldValidator->processFileValidation($f, $request);
+                    $value = $file->getClientOriginalName();
+                    $filesToUpload->addFile($file, $alias);
                 } catch (NoFileGivenException $e) { //No error here, we just move to another validation, eg. if a field is required
                 } catch (FileValidationException $e) {
                     $validationErrors[$alias] = $e->getMessage();
@@ -370,6 +381,20 @@ class SubmissionModel extends CommonFormModel
 
         //return errors if there any
         if (!empty($validationErrors)) {
+            return ['errors' => $validationErrors];
+        }
+
+        /*
+         * Process File upload and save the result to the entity
+         * Upload is here to minimize a need for deleting file if there is a validation error
+         * The action can still be invalidated below - deleteEntity takes care for File deletion
+         */
+        try {
+            $this->formUploader->uploadFiles($filesToUpload, $submission);
+        } catch (FileUploadException $e) {
+            $msg                                = $this->translator->trans('mautic.form.submission.error.file.uploadFailed', [], 'validators');
+            $validationErrors[$e->getMessage()] = $msg;
+
             return ['errors' => $validationErrors];
         }
 

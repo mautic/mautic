@@ -19,6 +19,8 @@ use Symfony\Component\HttpKernel\Kernel;
  */
 class CoreParametersHelper
 {
+    const PARAMETERS_FORM_UPLOAD_DIR = 'form_upload_dir';
+
     /**
      * @var ParameterBagInterface
      */
@@ -86,5 +88,13 @@ class CoreParametersHelper
     public function getAllowedExtensionsForUpload()
     {
         return $this->getParameter('allowed_extensions');
+    }
+
+    /**
+     * @return string
+     */
+    public function getUploadDirForForms()
+    {
+        return $this->getParameter(self::PARAMETERS_FORM_UPLOAD_DIR);
     }
 }

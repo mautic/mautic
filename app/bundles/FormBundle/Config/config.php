@@ -9,6 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\EventListener\CalendarSubscriber;
 use Mautic\FormBundle\EventListener\CampaignSubscriber;
 use Mautic\FormBundle\EventListener\DashboardSubscriber;
@@ -37,6 +38,7 @@ use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\Form\Type\PointActionFormSubmitType;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Helper\TokenHelper;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
@@ -359,6 +361,7 @@ return [
                     'mautic.lead.model.company',
                     'mautic.helper.form.field_helper',
                     'mautic.form.validator.upload_field_validator',
+                    'mautic.form.helper.form_uploader',
                 ],
             ],
         ],
@@ -368,6 +371,13 @@ return [
                 'arguments' => [
                     'translator',
                     'validator',
+                ],
+            ],
+            'mautic.form.helper.form_uploader' => [
+                'class'     => FormUploader::class,
+                'arguments' => [
+                    'mautic.helper.file_uploader',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.helper.token' => [
@@ -385,5 +395,9 @@ return [
                 ],
             ],
         ],
+    ],
+
+    'parameters' => [
+        CoreParametersHelper::PARAMETERS_FORM_UPLOAD_DIR => '%kernel.root_dir%/../media/files/form',
     ],
 ];
