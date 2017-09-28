@@ -45,6 +45,7 @@ class BuilderSubscriber extends CommonSubscriber
     protected $pageModel;
 
     protected $pageTokenRegex      = '{pagelink=(.*?)}';
+    protected $dwcTokenRegex       = '{dwcslotname=CHANGE_ME}';
     protected $langBarRegex        = '{langbar}';
     protected $shareButtonsRegex   = '{sharebuttons}';
     protected $titleRegex          = '{pagetitle}';
@@ -52,6 +53,13 @@ class BuilderSubscriber extends CommonSubscriber
     protected $emailIsInternalSend = false;
     protected $emailEntity         = null;
 
+    /**
+     * BuilderSubscriber constructor.
+     *
+     * @param TokenHelper       $tokenHelper
+     * @param IntegrationHelper $integrationHelper
+     * @param PageModel         $pageModel
+     */
     public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
     {
         $this->tokenHelper       = $tokenHelper;
@@ -109,6 +117,7 @@ class BuilderSubscriber extends CommonSubscriber
                         $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
                         $this->titleRegex        => $this->translator->trans('mautic.core.title'),
                         $this->descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
+                        $this->dwcTokenRegex     => $this->translator->trans('mautic.dynamicContent.token.slot'),
                     ]
                 )
             );
@@ -194,6 +203,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'MauticCoreBundle:Slots:gatedvideo.html.php',
                 GatedVideoType::class,
                 600
+            );
+            $event->addSlotType(
+                'dwc',
+                'Dynamic Content',
+                'sticky-note-o',
+                'MauticCoreBundle:Slots:dwc.html.php',
+                'slot_dwc',
+                700
             );
         }
 
