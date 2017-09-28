@@ -1,8 +1,15 @@
 /** DynamicContentBundle **/
 Mautic.dynamicContentOnLoad = function (container, response) {
-    if (mQuery(container + ' #list-search').length) {
-        Mautic.activateSearchAutocomplete('list-search', 'dynamicContent');
+    if (typeof container !== 'object') {
+        if (mQuery(container + ' #list-search').length) {
+            Mautic.activateSearchAutocomplete('list-search', 'dynamicContent');
+        }
     }
+
+    var availableFilters = mQuery('div.dwc-filter').find('select[data-mautic="available_filters"]');
+    Mautic.activateChosenSelect(availableFilters, false);
+
+    Mautic.leadlistOnLoad('div.dwc-filter');
 };
 
 Mautic.standardDynamicContentUrl = function(options) {
@@ -37,21 +44,13 @@ Mautic.disabledDynamicContentAction = function(opener) {
 
 if (typeof MauticIsDwcReady === 'undefined') {
     var MauticIsDwcReady = true;
-    // Handler when the DOM is fully loaded
-    var callback = function(){
-        var availableFilters = mQuery('div.dwc-filter').find('select[data-mautic="available_filters"]');
-        Mautic.activateChosenSelect(availableFilters, false);
-
-        Mautic.leadlistOnLoad('div.dwc-filter');
-    };
 
     if (
         document.readyState === "complete" ||
         !(document.readyState === "loading" || document.documentElement.doScroll)
     ) {
-        callback();
+        Mautic.dynamicContentOnLoad();
     } else {
-        document.addEventListener("DOMContentLoaded", callback);
+        document.addEventListener("DOMContentLoaded", Mautic.dynamicContentOnLoad);
     }
-
 }
