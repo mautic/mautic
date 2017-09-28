@@ -72,9 +72,9 @@ class Version20170818084908 extends AbstractMauticMigration
   `scoringcategory_id` int(11) NOT NULL,
   `score` int(11) NOT NULL,
   PRIMARY KEY (`company_id`,`scoringcategory_id`),
-  KEY `'.$keys['scoring_company_values_company_xref'].'` (`company_id`),
+  KEY `'.$keys['scoring_company_values_scoringcategory_xref'].'` (`company_id`),
   KEY `'.$keys['scoring_company_values_company_xref'].'` (`scoringcategory_id`),
-  CONSTRAINT `'.$keys['scoring_company_values_company_xref'].'` FOREIGN KEY (`scoringcategory_id`) REFERENCES `'.$this->prefix.'scoring_categories` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `'.$keys['scoring_company_values_scoringcategory_xref'].'` FOREIGN KEY (`scoringcategory_id`) REFERENCES `'.$this->prefix.'scoring_categories` (`id`) ON DELETE CASCADE,
   CONSTRAINT `'.$keys['scoring_company_values_company_xref'].'` FOREIGN KEY (`company_id`) REFERENCES `'.$this->prefix.'companies` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
         $this->addSql('CREATE TABLE `'.$this->prefix.'scoring_values` (
