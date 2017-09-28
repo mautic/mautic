@@ -330,6 +330,12 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.stage.model.stage',
+                    'translator',
+                    'mautic.lead.model.lead',
+                    'mautic.category.model.category',
+                    'mautic.email.model.email',
+                    'mautic.security',
+                    'mautic.helper.user',
                 ],
             ],
             'mautic.form.type.dynamic_content_filter_entry' => [

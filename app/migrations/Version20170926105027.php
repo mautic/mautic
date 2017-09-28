@@ -29,6 +29,6 @@ class Version20170926105027 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE '.$this->prefix.'dynamic_content ADD filters LONGTEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE '.$this->prefix.'dynamic_content ADD filters LONGTEXT DEFAULT NULL  COMMENT \'(DC2Type:array)\'');
     }
 }

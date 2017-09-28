@@ -96,6 +96,13 @@ class DwcEntryFiltersType extends AbstractType
                 'stages',
                 'locales',
                 'fields',
+                'lists',
+                'emails',
+                'deviceTypes',
+                'deviceBrands',
+                'deviceOs',
+                'tags',
+                'globalcategory',
             ]
         );
 
