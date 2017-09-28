@@ -44,7 +44,7 @@ class FormUploader
     public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission)
     {
         $uploadedFiles = [];
-        if ($filesToUpload->hasFiles()) {
+        if (!$filesToUpload->hasFiles()) {
             return;
         }
 

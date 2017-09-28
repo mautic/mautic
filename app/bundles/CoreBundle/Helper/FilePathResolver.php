@@ -66,7 +66,7 @@ class FilePathResolver
             }
         }
 
-        return $name;
+        return $name.$ext;
     }
 
     /**
