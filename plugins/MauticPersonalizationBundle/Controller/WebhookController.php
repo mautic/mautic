@@ -24,9 +24,10 @@ class WebhookController extends CommonAjaxController
      */
     public function processAction(Request $request)
     {
+        $recombeeHelper = $this->get('mautic.personalization.helper.recombee');
         $params = $request->request->all();
-        $this->parseRequest();
-        return new Response('');
+       // $this->parseRequest();
+        return new Response('test');
     }
 
     private function log($message, $type = 'info')

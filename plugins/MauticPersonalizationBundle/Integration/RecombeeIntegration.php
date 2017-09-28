@@ -2,6 +2,9 @@
 namespace MauticPlugin\MauticPersonalizationBundle\Integration;
 
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use MauticPlugin\MauticPersonalizationBundle\Helper\RecombeeHelper;
+use Recombee\RecommApi\Requests as Reqs;
+use Recombee\RecommApi\Exceptions as Ex;
 
 class RecombeeIntegration extends AbstractIntegration
 {
