@@ -9,18 +9,22 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\CoreBundle\Form\Type;
+namespace Mautic\DynamicContentBundle\Form\Type;
 
 use Mautic\LeadBundle\Form\Type\FilterTrait;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class DynamicContentFilterEntryFiltersType.
+ * Class DwcEntryFiltersType.
  */
 class DwcEntryFiltersType extends AbstractType
 {
@@ -29,7 +33,7 @@ class DwcEntryFiltersType extends AbstractType
     private $translator;
 
     /**
-     * DynamicContentFilterEntryFiltersType constructor.
+     * DwcEntryFiltersType constructor.
      *
      * @param TranslatorInterface $translator
      */
@@ -46,14 +50,14 @@ class DwcEntryFiltersType extends AbstractType
     {
         $builder->add(
             'glue',
-            'choice',
+            ChoiceType::class,
             [
                 'label'   => false,
                 'choices' => [
                     'and' => 'mautic.lead.list.form.glue.and',
                     'or'  => 'mautic.lead.list.form.glue.or',
                 ],
-                'attr' => [
+                'attr'    => [
                     'class'    => 'form-control not-chosen glue-select',
                     'onchange' => 'Mautic.updateFilterPositioning(this)',
                 ],
@@ -78,15 +82,17 @@ class DwcEntryFiltersType extends AbstractType
             }
         );
 
-        $builder->add('field', 'hidden');
-        $builder->add('object', 'hidden');
-        $builder->add('type', 'hidden');
+        $builder->add('field', HiddenType::class);
+        $builder->add('object', HiddenType::class);
+        $builder->add('type', HiddenType::class);
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
             [
@@ -117,8 +123,16 @@ class DwcEntryFiltersType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
-        return 'dynamic_web_content_entry_filters';
+        return 'dwc_entry_filters';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['fields'] = $options['fields'];
     }
 }

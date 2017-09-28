@@ -10,22 +10,25 @@
  */
 $isPrototype = ($form->vars['name'] == '__name__');
 $filterType  = $form['field']->vars['value'];
-$filterGroup = $form['object']->vars['value'];
 $inGroup     = $form->vars['data']['glue'] === 'and';
-$objectIcon  = (isset($form->vars['data']['object']) && $form->vars['data']['object'] == 'company') ? 'fa-building' : 'fa-user';
+$object      = (isset($form->vars['data']['object'])) ? $form->vars['data']['object'] : 'lead';
+$class       = (isset($form->vars['data']['object']) && $form->vars['data']['object'] == 'company') ? 'fa-building' : 'fa-user';
+if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
+    return;
+}
 ?>
 
-<div class="panel<?php echo ($isPrototype || ($inGroup && !$first)) ? ' in-group' : ''; ?>">
-    <div class="panel-footer<?php if (!$isPrototype && $form->vars['name'] === '0') {
+<div class="panel<?php echo ($inGroup && $first === false) ? ' in-group' : ''; ?>">
+    <div class="panel-heading <?php if (!$isPrototype && $form->vars['name'] === '0') {
     echo ' hide';
 } ?>">
-        <div class="col-sm-2 pl-0">
+        <div class="panel-glue col-sm-2 pl-0 ">
             <?php echo $view['form']->widget($form['glue']); ?>
         </div>
     </div>
     <div class="panel-body">
         <div class="col-xs-6 col-sm-3 field-name">
-            <i class="object-icon fa <?php echo $objectIcon; ?>"></i> <span><?php echo ($isPrototype) ? '__label__' : $form->parent->parent->vars['fields'][$filterGroup][$filterType]['label']; ?></span>
+            <i class="object-icon fa <?php echo $class; ?>" aria-hidden="true"></i> <span><?php echo ($isPrototype) ? '__label__' : $fields[$object][$filterType]['label']; ?></span>
         </div>
 
         <div class="col-xs-6 col-sm-3 padding-none">
@@ -33,12 +36,10 @@ $objectIcon  = (isset($form->vars['data']['object']) && $form->vars['data']['obj
         </div>
 
         <?php $hasErrors = count($form['filter']->vars['errors']) || count($form['display']->vars['errors']); ?>
-        <div class="col-xs-10 col-sm-5 padding-none<?php if ($hasErrors) {
-    echo ' has-error';
-} ?>">
+        <div class="col-xs-10 col-sm-5 padding-none<?php if ($hasErrors): echo ' has-error'; endif; ?>">
             <?php echo $view['form']->widget($form['filter']); ?>
-            <?php echo $view['form']->errors($form['filter']); ?>
             <?php echo $view['form']->widget($form['display']); ?>
+            <?php echo $view['form']->errors($form['filter']); ?>
             <?php echo $view['form']->errors($form['display']); ?>
         </div>
 

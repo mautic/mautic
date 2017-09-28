@@ -13,23 +13,11 @@ namespace Mautic\CoreBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
+/**
+ * Trait FiltersEntityTrait.
+ */
 trait FiltersEntityTrait
 {
-    /**
-     * @var array
-     */
-    public static $defaultFilters = [
-        [
-            'glue'     => null,
-            'field'    => null,
-            'object'   => null,
-            'type'     => null,
-            'operator' => null,
-            'display'  => null,
-            'filter'   => null,
-        ],
-    ];
-
     /**
      * @var array
      */
@@ -41,40 +29,29 @@ trait FiltersEntityTrait
     protected static function addFiltersMetadata(ClassMetadataBuilder $builder)
     {
         $builder->createField('filters', 'array')
-            ->columnName('filters')
-            ->nullable()
-            ->build();
+                ->columnName('filters')
+                ->nullable()
+                ->build();
     }
 
     /**
      * @return array
      */
-    public function getFilters()
+    public function getFilters(): array
     {
-        return empty($this->filters) ? $this->getDefaultFilters() : $this->filters;
+        return $this->filters;
     }
 
     /**
-     * @param $filters
+     * @param array $filters
      *
      * @return $this
      */
     public function setFilters($filters)
     {
-        if (empty($filters)) {
-            $filters = $this->getDefaultFilters();
-        }
-
+        $this->isChanged('filters', $filters);
         $this->filters = $filters;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaultFilters()
-    {
-        return self::$defaultFilters;
     }
 }

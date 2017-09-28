@@ -95,8 +95,28 @@ return [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.lead.model.list',
+                    'mautic.stage.model.stage',
+                    'translator',
+                    'mautic.lead.model.lead',
+                    'mautic.category.model.category',
+                    'mautic.email.model.email',
+                    'mautic.security',
+                    'mautic.helper.user',
                 ],
                 'alias' => 'dwc',
+            ],
+            'mautic.form.type.dwc_entry_filters' => [
+                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType',
+                'alias'     => 'dwc_entry_filters',
+                'arguments' => [
+                    'translator',
+                ],
+                'methodCalls' => [
+                    'setConnection' => [
+                        'database_connection',
+                    ],
+                ],
             ],
             'mautic.form.type.dwcsend_list' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType',
