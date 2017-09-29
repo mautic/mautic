@@ -202,13 +202,15 @@ class CampaignSubscriber extends CommonSubscriber
             new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
         );
 
-        $notification->setUrl($url);
-        $notification->setMessage($sendEvent->getMessage());
-        $notification->setHeading($sendEvent->getHeading());
+        // prevent rewrite notification entity
+        $sendNotification = clone $notification;
+        $sendNotification->setUrl($url);
+        $sendNotification->setMessage($sendEvent->getMessage());
+        $sendNotification->setHeading($sendEvent->getHeading());
 
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $notification
+            $sendNotification
         );
 
         $event->setChannel('notification', $notification->getId());
