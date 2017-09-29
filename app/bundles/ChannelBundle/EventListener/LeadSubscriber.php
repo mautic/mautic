@@ -48,6 +48,7 @@ class LeadSubscriber extends CommonSubscriber
     {
         $eventTypeKey  = 'message.queue';
         $eventTypeName = $this->translator->trans('mautic.message.queue');
+
         $event->addEventType($eventTypeKey, $eventTypeName);
         $event->addSerializerGroup('messageQueueList');
 
@@ -68,11 +69,15 @@ class LeadSubscriber extends CommonSubscriber
         if (!$event->isEngagementCount()) {
             // Add the logs to the event array
             foreach ($logs['results'] as $log) {
+                $eventName = [
+                    'label' => $label.$log['channelName'].' '.$log['channelId'],
+                    'href'  => $this->router->generate('mautic_'.$log['channelName'].'_action', ['objectAction' => 'view', 'objectId' => $log['channelId']]),
+                ];
                 $event->addEvent(
                     [
                         'eventId'    => $eventTypeKey.$log['id'],
                         'event'      => $eventTypeKey,
-                        'eventLabel' => $label.$log['channelName'],
+                        'eventLabel' => $eventName,
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $log['dateAdded'],
                         'extra'      => [
