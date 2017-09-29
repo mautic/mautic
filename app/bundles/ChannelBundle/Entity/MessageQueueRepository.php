@@ -126,7 +126,9 @@ class MessageQueueRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
-            ->select('mq.lead_id, mq.channel as channelName, mq.channel_id as channelId, mq.priority as priority, mq.attempts, mq.success as status, mq.date_published as dateAdded, mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
+            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId, 
+            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded, 
+            mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
 
         if ($leadId) {
             $query->where('mq.lead_id = '.(int) $leadId);

@@ -14,3 +14,15 @@ Mautic.toggleChannelFormDisplay = function (el, channel) {
         mQuery(el).closest('.tab-pane').find('.message_channel_properties_' + channel).addClass('hide');
     }
 };
+
+Mautic.cancelQueuedMessageEvent = function (channelId) {
+    Mautic.ajaxActionRequest('channel:cancelQueuedMessageEvent',
+        {
+            channelId: channelId
+        }, function (response) {
+            if (response.success) {
+                mQuery('#queued-message-'+channelId).addClass('disabled');
+            }
+        }, false
+    );
+};

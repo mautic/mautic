@@ -70,6 +70,7 @@ class LeadSubscriber extends CommonSubscriber
             foreach ($logs['results'] as $log) {
                 $event->addEvent(
                     [
+                        'eventId'    => $eventTypeKey.$log['id'],
                         'event'      => $eventTypeKey,
                         'eventLabel' => $label.$log['channelName'],
                         'eventType'  => $eventTypeName,
@@ -77,8 +78,9 @@ class LeadSubscriber extends CommonSubscriber
                         'extra'      => [
                             'log' => $log,
                         ],
-                        'icon'      => 'fa-comments-o',
-                        'contactId' => $log['lead_id'],
+                        'contentTemplate' => 'MauticChannelBundle:SubscribedEvents\Timeline:queued_messages.html.php',
+                        'icon'            => 'fa-comments-o',
+                        'contactId'       => $log['lead_id'],
                     ]
                 );
             }
