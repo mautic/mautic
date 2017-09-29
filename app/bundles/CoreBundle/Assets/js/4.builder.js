@@ -638,6 +638,17 @@ Mautic.initSectionListeners = function() {
                 'right': {},
                 'bottom': {},
                 'left': {},
+                'clone': {
+                    classes: 'fa fa-copy',
+                    onClick: function() {
+                        var cloneBtn = mQuery(this);
+                        var clonedElem = cloneBtn.closest('[data-section-wrapper]');
+                        clonedElem.clone().insertAfter(clonedElem);
+                        Mautic.initSlotListeners();
+                        Mautic.initSections();
+                        Mautic.initSlots();
+                    }
+                },
                 'handle': {
                     classes: 'fa fa-arrows-v'
                 },
