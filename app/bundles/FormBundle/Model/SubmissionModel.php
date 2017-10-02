@@ -451,7 +451,7 @@ class SubmissionModel extends CommonFormModel
     public function deleteEntity($submission)
     {
         /*
-         * @todo Second part of file delete is at ... (Remove File field from form)
+         * @todo Second part of file delete is at FormModel::handleFilesDelete() (Remove File field from form)
          */
         $this->formUploader->deleteUploadedFiles($submission);
 

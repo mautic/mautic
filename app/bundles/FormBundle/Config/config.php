@@ -44,6 +44,7 @@ use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 
 return [
@@ -347,6 +348,7 @@ return [
                     'mautic.helper.form.field_helper',
                     'mautic.lead.model.field',
                     'mautic.form.helper.form_uploader',
+                    'mautic.form.model.submission_result_loader',
                 ],
             ],
             'mautic.form.model.submission' => [
@@ -363,6 +365,12 @@ return [
                     'mautic.helper.form.field_helper',
                     'mautic.form.validator.upload_field_validator',
                     'mautic.form.helper.form_uploader',
+                ],
+            ],
+            'mautic.form.model.submission_result_loader' => [
+                'class'     => SubmissionResultLoader::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

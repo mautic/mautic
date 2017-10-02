@@ -87,18 +87,24 @@ class FormModel extends CommonFormModel
     private $formUploader;
 
     /**
+     * @var SubmissionResultLoader
+     */
+    private $submissionResultLoader;
+
+    /**
      * FormModel constructor.
      *
-     * @param RequestStack        $requestStack
-     * @param TemplatingHelper    $templatingHelper
-     * @param ThemeHelper         $themeHelper
-     * @param SchemaHelperFactory $schemaHelperFactory
-     * @param ActionModel         $formActionModel
-     * @param FieldModel          $formFieldModel
-     * @param LeadModel           $leadModel
-     * @param FormFieldHelper     $fieldHelper
-     * @param LeadFieldModel      $leadFieldModel
-     * @param FormUploader        $formUploader
+     * @param RequestStack           $requestStack
+     * @param TemplatingHelper       $templatingHelper
+     * @param ThemeHelper            $themeHelper
+     * @param SchemaHelperFactory    $schemaHelperFactory
+     * @param ActionModel            $formActionModel
+     * @param FieldModel             $formFieldModel
+     * @param LeadModel              $leadModel
+     * @param FormFieldHelper        $fieldHelper
+     * @param LeadFieldModel         $leadFieldModel
+     * @param FormUploader           $formUploader
+     * @param SubmissionResultLoader $submissionResultLoader
      */
     public function __construct(
         RequestStack $requestStack,
@@ -110,18 +116,20 @@ class FormModel extends CommonFormModel
         LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
         LeadFieldModel $leadFieldModel,
-        FormUploader $formUploader
+        FormUploader $formUploader,
+        SubmissionResultLoader $submissionResultLoader
     ) {
-        $this->request             = $requestStack->getCurrentRequest();
-        $this->templatingHelper    = $templatingHelper;
-        $this->themeHelper         = $themeHelper;
-        $this->schemaHelperFactory = $schemaHelperFactory;
-        $this->formActionModel     = $formActionModel;
-        $this->formFieldModel      = $formFieldModel;
-        $this->leadModel           = $leadModel;
-        $this->fieldHelper         = $fieldHelper;
-        $this->leadFieldModel      = $leadFieldModel;
-        $this->formUploader        = $formUploader;
+        $this->request                = $requestStack->getCurrentRequest();
+        $this->templatingHelper       = $templatingHelper;
+        $this->themeHelper            = $themeHelper;
+        $this->schemaHelperFactory    = $schemaHelperFactory;
+        $this->formActionModel        = $formActionModel;
+        $this->formFieldModel         = $formFieldModel;
+        $this->leadModel              = $leadModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->formUploader           = $formUploader;
+        $this->submissionResultLoader = $submissionResultLoader;
     }
 
     /**
@@ -308,6 +316,12 @@ class FormModel extends CommonFormModel
         }
 
         foreach ($form->getSubmissions() as $submission) {
+            /**
+             * We need to load Entity with result field, which is not populated now.
+             *
+             * @todo Refactor code - add Doctrine post_load Listener to populate this data automatically?
+             */
+            $submission = $this->submissionResultLoader->getSubmissionWithResult($submission->getId());
             $this->formUploader->deleteFileOfFormField($submission, $field);
         }
     }
