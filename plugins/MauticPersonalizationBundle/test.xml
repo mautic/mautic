@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SHOP>
+  <SHOPITEM>
+    <ITEM_ID>AB123</ITEM_ID>
+    <URL>http://obchod.sk/mobily/nokia-5800-xpressmusic</URL>
+    <PROPERTIES>
+        <PROPERTY>
+            <NAME>tags</NAME>
+            <VALUES>
+              <VALUE>detské kočíky</VALUE>
+              <VALUE>príručné tažky</VALUE>
+            </VALUES>
+        </PROPERTY>
+      <PROPERTY>
+        <NAME>price</NAME>
+        <VALUES>
+          <VALUE>320</VALUE>
+        </VALUES>
+      </PROPERTY>
+    </PROPERTIES>
+  </SHOPITEM>
+</SHOP>
