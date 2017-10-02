@@ -23,6 +23,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -81,6 +82,11 @@ class FormModel extends CommonFormModel
     protected $leadFieldModel;
 
     /**
+     * @var FormUploader
+     */
+    private $formUploader;
+
+    /**
      * FormModel constructor.
      *
      * @param RequestStack        $requestStack
@@ -92,6 +98,7 @@ class FormModel extends CommonFormModel
      * @param LeadModel           $leadModel
      * @param FormFieldHelper     $fieldHelper
      * @param LeadFieldModel      $leadFieldModel
+     * @param FormUploader        $formUploader
      */
     public function __construct(
         RequestStack $requestStack,
@@ -102,7 +109,8 @@ class FormModel extends CommonFormModel
         FieldModel $formFieldModel,
         LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
-        LeadFieldModel $leadFieldModel
+        LeadFieldModel $leadFieldModel,
+        FormUploader $formUploader
     ) {
         $this->request             = $requestStack->getCurrentRequest();
         $this->templatingHelper    = $templatingHelper;
@@ -113,6 +121,7 @@ class FormModel extends CommonFormModel
         $this->leadModel           = $leadModel;
         $this->fieldHelper         = $fieldHelper;
         $this->leadFieldModel      = $leadFieldModel;
+        $this->formUploader        = $formUploader;
     }
 
     /**
@@ -278,15 +287,28 @@ class FormModel extends CommonFormModel
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (isset($existingFields[$fieldId])) {
-                $entity->removeField($fieldId, $existingFields[$fieldId]);
-                $deleteFields[] = $fieldId;
+            if (!isset($existingFields[$fieldId])) {
+                continue;
             }
+            $this->handleFilesDelete($entity, $existingFields[$fieldId]);
+            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $deleteFields[] = $fieldId;
         }
 
         // Delete fields from db
         if (count($deleteFields)) {
             $this->formFieldModel->deleteEntities($deleteFields);
+        }
+    }
+
+    private function handleFilesDelete(Form $form, Field $field)
+    {
+        if (!$field->isFileType()) {
+            return;
+        }
+
+        foreach ($form->getSubmissions() as $submission) {
+            $this->formUploader->deleteFileOfFormField($submission, $field);
         }
     }
 

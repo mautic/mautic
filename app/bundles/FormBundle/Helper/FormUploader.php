@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\FormBundle\Crate\UploadFileCrate;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Submission;
 
 class FormUploader
@@ -76,20 +77,34 @@ class FormUploader
      */
     public function deleteUploadedFiles(Submission $submission)
     {
-        $results   = $submission->getResults();
-        $uploadDir = $this->getUploadDir();
-
         $fields = $submission->getForm()->getFields();
         foreach ($fields as $field) {
-            $alias = $field->getAlias();
-
-            if (!$field->isFileType() || empty($results[$alias])) {
-                continue;
-            }
-
-            $filePath = $uploadDir.DIRECTORY_SEPARATOR.$results[$alias];
-            $this->fileUploader->deleteFile($filePath);
+            $this->deleteFileOfFormField($submission, $field);
         }
+    }
+
+    public function deleteFileOfFormField(Submission $submission, Field $field)
+    {
+        $alias   = $field->getAlias();
+        $results = $submission->getResults();
+
+        if (!$field->isFileType() || empty($results[$alias])) {
+            return;
+        }
+
+        $fileName = $results[$alias];
+        $this->deleteFile($fileName);
+    }
+
+    /**
+     * @param string $fileName
+     */
+    private function deleteFile($fileName)
+    {
+        $uploadDir = $this->getUploadDir();
+
+        $filePath = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+        $this->fileUploader->deleteFile($filePath);
     }
 
     /**

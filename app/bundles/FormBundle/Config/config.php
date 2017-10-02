@@ -346,6 +346,7 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.helper.form.field_helper',
                     'mautic.lead.model.field',
+                    'mautic.form.helper.form_uploader',
                 ],
             ],
             'mautic.form.model.submission' => [
