@@ -15,6 +15,7 @@ use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -121,6 +122,7 @@ class EmailApiController extends CommonApiController
      */
     public function sendLeadAction($id, $leadId)
     {
+        /** @var Email $entity */
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
             if (!$this->checkEntityAccess($entity, 'view')) {
@@ -179,8 +181,7 @@ class EmailApiController extends CommonApiController
     /**
      * Sends custom content to a specific lead.
      *
-     * @param string $content
-     * @param int    $contactId
+     * @param int $contactId
      *
      * @return \Symfony\Component\HttpFoundation\Response
      *
@@ -238,9 +239,9 @@ class EmailApiController extends CommonApiController
 
             if ($mailer->send(true, false, false)) {
                 /** @var Stat $stat */
-                $stat                = $mailer->createEmailStat();
-                $response['stat_id'] = ($stat && $stat->getId()) ? $stat->getId() : 0;
-                $response['success'] = true;
+                $stat                     = $mailer->createEmailStat();
+                $response['trackingHash'] = ($stat && $stat->getTrackingHash()) ? $stat->getTrackingHash() : 0;
+                $response['success']      = true;
             }
 
             $view = $this->view($response, Codes::HTTP_OK);
@@ -249,5 +250,55 @@ class EmailApiController extends CommonApiController
         }
 
         return $this->notFound();
+    }
+
+    /**
+     * Sends custom content to anybody.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function sendCustomAction()
+    {
+        $post      = $this->request->request->all();
+        $toEmail   = (!empty($post['toEmail'])) ? $post['toEmail'] : '';
+        $toName    = (!empty($post['toName'])) ? $post['toName'] : null;
+        $fromEmail = (!empty($post['fromEmail'])) ? $post['fromEmail'] : '';
+        $fromName  = (!empty($post['fromName'])) ? $post['fromName'] : '';
+        $subject   = (!empty($post['subject'])) ? $post['subject'] : '';
+        $content   = (!empty($post['content'])) ? $post['content'] : '';
+
+        $response = ['success' => false];
+
+        /** @var MailHelper $mailer */
+        $mailer = $this->get('mautic.helper.mailer')->getMailer();
+
+        // To email
+        $mailer->addTo(
+            $toEmail,
+            $toName
+        );
+
+        $mailer->setFrom(
+            $fromEmail,
+            $fromName
+        );
+
+        // Set Content
+        $mailer->setBody($content);
+        $mailer->parsePlainText($content);
+
+        // Ensure safe emoji for notification
+        $subject = EmojiHelper::toHtml($subject);
+        $mailer->setSubject($subject);
+
+        if ($mailer->send(true, false, false)) {
+            $response['success'] = true;
+        }
+
+        $view = $this->view($response, Codes::HTTP_OK);
+
+        return $this->handleView($view);
     }
 }

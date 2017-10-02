@@ -54,9 +54,16 @@ class StatsSubscriber extends CommonStatsSubscriber
                 'open_count',
                 'last_opened',
                 'open_details',
+                'copy_id',
             ];
         $this->permissions[$statsTable] = [
             'lead' => 'lead:leads',
+        ];
+
+        $this->repositories[]            = $repo            = $em->getRepository('MauticEmailBundle:Copy');
+        $copiesTable                     = $repo->getTableName();
+        $this->permissions[$copiesTable] = [
+            'stat.lead' => 'lead:leads',
         ];
     }
 }
