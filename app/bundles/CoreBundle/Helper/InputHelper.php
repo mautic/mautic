@@ -345,8 +345,10 @@ class InputHelper
         }
 
         $value = substr($value, 0, 254);
+        $value = filter_var($value, FILTER_SANITIZE_EMAIL);
+        $value = str_replace('..', '.', $value);
 
-        return filter_var($value, FILTER_SANITIZE_EMAIL);
+        return trim($value);
     }
 
     /**
