@@ -195,11 +195,13 @@ class EmailApiController extends CommonApiController
             return $lead;
         }
 
-        $post      = $this->request->request->all();
-        $fromEmail = (!empty($post['fromEmail'])) ? $post['fromEmail'] : '';
-        $fromName  = (!empty($post['fromName'])) ? $post['fromName'] : '';
-        $subject   = (!empty($post['subject'])) ? $post['subject'] : '';
-        $content   = (!empty($post['content'])) ? $post['content'] : '';
+        $post         = $this->request->request->all();
+        $fromEmail    = (!empty($post['fromEmail'])) ? $post['fromEmail'] : null;
+        $fromName     = (!empty($post['fromName'])) ? $post['fromName'] : null;
+        $replyToEmail = (!empty($post['replyToEmail'])) ? $post['replyToEmail'] : null;
+        $replyToName  = (!empty($post['replyToName'])) ? $post['replyToName'] : null;
+        $subject      = (!empty($post['subject'])) ? $post['subject'] : '';
+        $content      = (!empty($post['content'])) ? $post['content'] : '';
 
         $leadFields       = $lead->getProfileFields();
         $leadFields['id'] = $lead->getId();
@@ -224,6 +226,8 @@ class EmailApiController extends CommonApiController
                 $fromEmail,
                 $fromName
             );
+
+            $mailer->setReplyTo($replyToEmail, $replyToName);
 
             // Set Content
             $mailer->setBody($content);
@@ -261,13 +265,15 @@ class EmailApiController extends CommonApiController
      */
     public function sendCustomAction()
     {
-        $post      = $this->request->request->all();
-        $toEmail   = (!empty($post['toEmail'])) ? $post['toEmail'] : '';
-        $toName    = (!empty($post['toName'])) ? $post['toName'] : null;
-        $fromEmail = (!empty($post['fromEmail'])) ? $post['fromEmail'] : '';
-        $fromName  = (!empty($post['fromName'])) ? $post['fromName'] : '';
-        $subject   = (!empty($post['subject'])) ? $post['subject'] : '';
-        $content   = (!empty($post['content'])) ? $post['content'] : '';
+        $post         = $this->request->request->all();
+        $toEmail      = (!empty($post['toEmail'])) ? $post['toEmail'] : null;
+        $toName       = (!empty($post['toName'])) ? $post['toName'] : null;
+        $fromEmail    = (!empty($post['fromEmail'])) ? $post['fromEmail'] : null;
+        $fromName     = (!empty($post['fromName'])) ? $post['fromName'] : null;
+        $replyToEmail = (!empty($post['replyToEmail'])) ? $post['replyToEmail'] : null;
+        $replyToName  = (!empty($post['replyToName'])) ? $post['replyToName'] : null;
+        $subject      = (!empty($post['subject'])) ? $post['subject'] : '';
+        $content      = (!empty($post['content'])) ? $post['content'] : '';
 
         $response = ['success' => false];
 
@@ -284,6 +290,8 @@ class EmailApiController extends CommonApiController
             $fromEmail,
             $fromName
         );
+
+        $mailer->setReplyTo($replyToEmail, $replyToName);
 
         // Set Content
         $mailer->setBody($content);
