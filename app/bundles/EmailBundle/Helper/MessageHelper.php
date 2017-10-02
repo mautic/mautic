@@ -28,10 +28,15 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailReplyEvent;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Model\LeadModel;
 
 /**
  * Class MessageHelper.
@@ -54,13 +59,31 @@ class MessageHelper
     protected $logger;
 
     /**
+     * @var Mailbox
+     */
+    protected $mailbox;
+
+    /**
+     * @var Mailbox
+     */
+    protected $leadModel;
+
+    /**
+     * @var Mailbox
+     */
+    protected $dispatcher;
+
+    /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, LeadModel $leadModel, Mailbox $mailbox, EventDispatcherInterface $dispatcher)
     {
-        $this->factory = $factory;
-        $this->db      = $factory->getDatabase();
-        $this->logger  = $this->factory->getLogger();
+        $this->factory    = $factory;
+        $this->db         = $factory->getDatabase();
+        $this->logger     = $this->factory->getLogger();
+        $this->mailbox    = $mailbox;
+        $this->leadModel  = $leadModel;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -2143,5 +2166,64 @@ class MessageHelper
         }
 
         return $results;
+    }
+    
+    public function processReplyMail($mailId, $refid)
+    {
+        $this->logger->debug('Processing reply mail.');
+        $sendFolderName = '';
+        foreach($this->mailbox->getListingFolders() as $folderNames) {
+            if(strpos(strtolower($folderNames), 'sent') !== false) {
+                $sendFolderName = $folderNames;
+                break;
+            }
+        }
+        $this->mailbox->switchFolder($sendFolderName);
+        $mailIds = $this->mailbox->searchMailbox('TO '.$mailId);
+        $mails   = $this->mailbox->getMailsInfo($mailIds);
+        foreach ($mails as $mail) {
+            if ($mail->message_id == $refid) {
+                $this->checkMail($mail->uid);
+            } 
+        }
+    }
+    
+    public function checkMail($mailUid)
+    {
+        $mail = $this->mailbox->getMail($mailUid);
+        if ($mail->returnPath && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $mail->returnPath, $parts)) {
+            if (strstr($parts[2], '_')) {
+                // Has an ID hash so use it to find the lead
+                list($ignore, $hashId) = explode('_', $parts[2]);
+            }
+        }
+        if (empty($hashId) && preg_match('/email\/(.*?)\.gif/', $mail->textHtml, $parts)) {
+            $hashId = $parts[1];
+        }
+
+        if (empty($hashId)) {
+            $this->logger->debug('Could not find the email identifier(hashId).');
+            return false;
+        }
+        $em = $this->factory->getEntityManager();
+        // Search for the lead
+        $statRepository = $em->getRepository('MauticEmailBundle:Stat');
+        // Search by hashId
+        $stat = $statRepository->findOneBy(['trackingHash' => $hashId]);
+        if (!$stat) {
+            $this->logger->debug('Could not find the replied email.');
+            
+            return false;
+        }
+        $this->logger->debug('Stat found with ID# '.$stat->getId());
+        $this->leadModel->setCurrentLead($stat->getLead());
+        $stat->setIsReplyed(1);
+        $em->flush($stat);
+        if($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
+            $event   = new EmailReplyEvent($stat);
+            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
+            unset($event);
+        }
+        return true;
     }
 }
