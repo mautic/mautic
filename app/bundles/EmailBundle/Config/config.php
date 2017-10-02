@@ -47,7 +47,7 @@ return [
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendCustomLead',
                 'method'     => 'POST',
             ],
-            'mautic_api_sendcustom' => [
+            'mautic_api_sendcustomemail' => [
                 'path'       => '/emails/send/custom',
                 'controller' => 'MauticEmailBundle:Api\EmailApi:sendCustom',
                 'method'     => 'POST',
