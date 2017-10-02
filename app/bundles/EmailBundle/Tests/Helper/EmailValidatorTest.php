@@ -97,7 +97,7 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateEmailWithBadDNS()
     {
         $this->expectException(InvalidEmailException::class);
-        $this->getEmailValidator()->validate('john@doe.shouldneverexist');
+        $this->getEmailValidator()->validate('john@doe.shouldneverexist', true);
     }
 
     public function testIntegrationInvalidatesEmail()

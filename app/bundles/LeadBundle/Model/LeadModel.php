@@ -1999,7 +1999,7 @@ class LeadModel extends FormModel
 
                 if ('email' === $leadField['type'] && !empty($fieldData[$leadField['alias']])) {
                     try {
-                        $this->emailValidator->validate($fieldData[$leadField['alias']]);
+                        $this->emailValidator->validate($fieldData[$leadField['alias']], false);
                     } catch (\Exception $exception) {
                         $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                     }

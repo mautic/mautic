@@ -49,10 +49,11 @@ class EmailValidator
      * leverage integrations to validate.
      *
      * @param $address
+     * @param bool $doDnsCheck
      *
      * @throws InvalidEmailException
      */
-    public function validate($address)
+    public function validate($address, $doDnsCheck = false)
     {
         if (!$this->isValidFormat($address)) {
             throw new InvalidEmailException(
@@ -73,7 +74,7 @@ class EmailValidator
             );
         }
 
-        if (!$this->hasValidDomain($address)) {
+        if ($doDnsCheck && !$this->hasValidDomain($address)) {
             throw new InvalidEmailException(
                 $address,
                 $this->translator->trans('mautic.email.address.invalid_domain', ['%email%' => $address])

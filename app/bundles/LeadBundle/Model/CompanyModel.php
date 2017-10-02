@@ -735,7 +735,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $hasEmail = (!empty($fields['companyemail']) && !empty($data[$fields['companyemail']]));
 
         if ($hasEmail) {
-            $this->emailValidator->validate($data[$fields['companyemail']]);
+            $this->emailValidator->validate($data[$fields['companyemail']], false);
         }
 
         if ($hasName) {
