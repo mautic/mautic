@@ -131,6 +131,12 @@ return [
                     'mautic.email.model.send_email_to_user',
                 ],
             ],
+            'mautic.email.campaignbundle.condition_subscriber' => [
+                'class'     => 'Mautic\EmailBundle\EventListener\CampaignConditionSubscriber',
+                'arguments' => [
+                    'mautic.validator.email',
+                ],
+            ],
             'mautic.email.formbundle.subscriber' => [
                 'class' => 'Mautic\EmailBundle\EventListener\FormSubscriber',
             ],
@@ -373,6 +379,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setMauticFactory' => ['mautic.factory'],
+                ],
+            ],
+            'mautic.validator.email' => [
+                'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
                 ],
             ],
         ],
