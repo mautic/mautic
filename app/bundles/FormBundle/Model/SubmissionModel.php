@@ -388,6 +388,8 @@ class SubmissionModel extends CommonFormModel
          * Process File upload and save the result to the entity
          * Upload is here to minimize a need for deleting file if there is a validation error
          * The action can still be invalidated below - deleteEntity takes care for File deletion
+         *
+         * @todo Refactor form validation to execute this code only if Submission is valid
          */
         try {
             $this->formUploader->uploadFiles($filesToUpload, $submission);
@@ -441,6 +443,19 @@ class SubmissionModel extends CommonFormModel
         // made it to the end so return the submission event to give the calling method access to tokens, results, etc
         // otherwise return false that no errors were encountered (to keep BC really)
         return ($returnEvent) ? ['submission' => $submissionEvent] : false;
+    }
+
+    /**
+     * @param Submission $submission
+     */
+    public function deleteEntity($submission)
+    {
+        /*
+         * @todo Second part of file delete is at ... (Remove File field from form)
+         */
+        $this->formUploader->deleteUploadedFiles($submission);
+
+        parent::deleteEntity($submission);
     }
 
     /**
@@ -731,6 +746,8 @@ class SubmissionModel extends CommonFormModel
      * Execute a form submit action.
      *
      * @param SubmissionEvent $event
+     *
+     * @throws ValidationException
      */
     protected function executeFormActions(SubmissionEvent $event)
     {

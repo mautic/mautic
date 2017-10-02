@@ -50,7 +50,7 @@ class FormUploader
 
         $result    = $submission->getResults();
         $files     = $filesToUpload->getFiles();
-        $uploadDir = $this->coreParametersHelper->getUploadDirForForms();
+        $uploadDir = $this->getUploadDir();
 
         $alias = ''; //Only for IDE - will be overriden by foreach
 
@@ -67,5 +67,36 @@ class FormUploader
             }
             throw new FileUploadException($alias);
         }
+    }
+
+    /**
+     * @param Submission $submission
+     *
+     * @todo Refactor code that result can be accessed normally and not only as a array of values
+     */
+    public function deleteUploadedFiles(Submission $submission)
+    {
+        $results   = $submission->getResults();
+        $uploadDir = $this->getUploadDir();
+
+        $fields = $submission->getForm()->getFields();
+        foreach ($fields as $field) {
+            $alias = $field->getAlias();
+
+            if (!$field->isFileType() || empty($results[$alias])) {
+                continue;
+            }
+
+            $filePath = $uploadDir.DIRECTORY_SEPARATOR.$results[$alias];
+            $this->fileUploader->deleteFile($filePath);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function getUploadDir()
+    {
+        return $this->coreParametersHelper->getUploadDirForForms();
     }
 }
