@@ -128,6 +128,7 @@ return [
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
                     'mautic.channel.model.queue',
+                    'mautic.email.model.send_email_to_user',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
@@ -146,6 +147,12 @@ return [
                 'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
                 'arguments' => [
                     'mautic.point.model.point',
+                ],
+            ],
+            'mautic.email.touser.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\EmailToUserSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.send_email_to_user',
                 ],
             ],
             'mautic.email.calendarbundle.subscriber' => [
@@ -382,6 +389,12 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
+                ],
+            ],
+            'mautic.email.model.send_email_to_user' => [
+                'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
+                'arguments' => [
+                    'mautic.email.model.email',
                 ],
             ],
         ],
