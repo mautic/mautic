@@ -107,8 +107,9 @@ if ($tmpl == 'index') {
                             <?php
                             $hasVariants     = $item->isVariant();
                             $hasTranslations = $item->isTranslation();
+                            $isFilterBased   = !$item->getIsCampaignBased();
 
-                            if ($hasVariants || $hasTranslations): ?>
+                            if ($hasVariants || $hasTranslations || $isFilterBased): ?>
                                 <span>
                                 <?php if ($hasVariants): ?>
                                     <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.ab_test'); ?>">
@@ -122,6 +123,11 @@ if ($tmpl == 'index') {
                                             <i class="fa fa-fw fa-language"></i>
                                         </span>
                                     <?php endif; ?>
+                                    <?php if ($isFilterBased): ?>
+                                         <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.is_filter_based'); ?>">
+                                            <i class="fa fa-fw fa-filter"></i>
+                                         </span>
+                                     <?php endif; ?>
                                  </span>
                             <?php endif; ?>
                         </a>
