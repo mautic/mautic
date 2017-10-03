@@ -78,6 +78,9 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.channel.reportbundle.subscriber' => [
+                'class' => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
+            ],
 
         ],
         'forms' => [
