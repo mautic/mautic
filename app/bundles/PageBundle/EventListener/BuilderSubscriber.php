@@ -45,7 +45,6 @@ class BuilderSubscriber extends CommonSubscriber
     protected $pageModel;
 
     protected $pageTokenRegex      = '{pagelink=(.*?)}';
-    protected $dwcTokenRegex       = '{dwcslotname=CHANGE_ME}';
     protected $langBarRegex        = '{langbar}';
     protected $shareButtonsRegex   = '{sharebuttons}';
     protected $titleRegex          = '{pagetitle}';
@@ -117,7 +116,6 @@ class BuilderSubscriber extends CommonSubscriber
                         $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
                         $this->titleRegex        => $this->translator->trans('mautic.core.title'),
                         $this->descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
-                        $this->dwcTokenRegex     => $this->translator->trans('mautic.dynamicContent.token.slot'),
                     ]
                 )
             );

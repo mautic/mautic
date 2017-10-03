@@ -177,6 +177,19 @@ class DynamicContentType extends AbstractType
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
+            'isCampaignBased',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.dwc.form.is_campaign_based',
+                'data'  => (bool) $options['data']->isCampaignBased(),
+                'attr'  => [
+                    'tooltip'  => 'mautic.dwc.form.is_campaign_based.tooltip',
+                    'onchange' => 'mQuery("#dwcFiltersTab").toggleClass("hide")',
+                ],
+            ]
+        );
+
+        $builder->add(
             'language',
             LocaleType::class,
             [
@@ -228,9 +241,11 @@ class DynamicContentType extends AbstractType
                 'label'      => 'mautic.dynamicContent.form.content',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'tooltip' => 'mautic.dynamicContent.form.content.help',
-                    'class'   => 'form-control editor editor-advanced editor-builder-tokens',
-                    'rows'    => '15',
+                    'tooltip'              => 'mautic.dynamicContent.form.content.help',
+                    'class'                => 'form-control editor editor-advanced editor-builder-tokens',
+                    'data-token-callback'  => 'email:getBuilderTokens',
+                    'data-token-activator' => '{',
+                    'rows'                 => '15',
                 ],
                 'required' => false,
             ]
