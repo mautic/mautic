@@ -591,15 +591,6 @@ class EmailController extends FormController
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
-        $pluginsAssets = [];
-        $plugins       = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
-
-        if ($plugins) {
-            foreach ($plugins as $name => $config) {
-                $pluginsAssets[] = '<script src="/plugins/'.$name.'/Assets/js/index.js"></script>';
-            }
-        }
-
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -610,7 +601,6 @@ class EmailController extends FormController
                     'sections'      => $this->buildSlotForms($sections),
                     'themes'        => $this->get('mautic.helper.theme')->getInstalledThemes('email', true),
                     'plugins'       => $this->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
-                    'pluginsAssets' => $pluginsAssets,
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
@@ -804,15 +794,6 @@ class EmailController extends FormController
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
 
-        $pluginsAssets = [];
-        $plugins       = $this->get('mautic.helper.plugin.builder')->getBuilderPlugins();
-
-        if ($plugins) {
-            foreach ($plugins as $name => $config) {
-                $pluginsAssets[] = '<script src="/plugins/'.$name.'/Assets/js/index.js"></script>';
-            }
-        }
-
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -822,7 +803,6 @@ class EmailController extends FormController
                     'sections'           => $this->buildSlotForms($sections),
                     'themes'             => $this->get('mautic.helper.theme')->getInstalledThemes('email', true),
                     'plugins'            => $this->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
-                    'pluginsAssets'      => $pluginsAssets,
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
