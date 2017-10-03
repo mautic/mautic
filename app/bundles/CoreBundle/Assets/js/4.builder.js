@@ -364,12 +364,18 @@ Mautic.initSelectTheme = function(themeField) {
  * @param slot
  */
 Mautic.updateIframeContent = function(iframeId, content, slot) {
+    // remove empty lines
+    content = content.replace(/^\s*[\r\n]/gm, '');
     if (iframeId) {
         var iframe = document.getElementById(iframeId);
         var doc = iframe.contentDocument || iframe.contentWindow.document;
         doc.open();
         doc.write(content);
         doc.close();
+        // remove html classes because they are duplicated with each save
+        if ('HTML' === doc.all[0].tagName) {
+            mQuery(doc.all[0]).removeClass();
+        }
     } else if (slot) {
         slot.html(content);
     }
