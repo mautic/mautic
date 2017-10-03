@@ -53,7 +53,8 @@ class EmailSubscriber extends CommonSubscriber
     public function onEmailBuild(EmailBuilderEvent $event)
     {
         $tokenHelper = new BuilderTokenHelper($this->factory, 'lead.field', 'lead:fields', 'MauticLeadBundle');
-        $tokenHelper->setPermissionSet(['lead:fields:full']);
+        // the permissions are for viewing contact data, not for managing contact fields
+        $tokenHelper->setPermissionSet(['lead:leads:viewown', 'lead:leads:viewother']);
 
         if ($event->tokensRequested(self::$leadFieldRegex)) {
             $event->addTokensFromHelper($tokenHelper, self::$leadFieldRegex, 'label', 'alias', true);

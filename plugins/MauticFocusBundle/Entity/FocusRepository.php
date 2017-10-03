@@ -36,7 +36,7 @@ class FocusRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
 
@@ -55,23 +55,23 @@ class FocusRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, ['f.name', 'f.website']);
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
@@ -102,5 +102,16 @@ class FocusRepository extends CommonRepository
     public function getTableAlias()
     {
         return 'f';
+    }
+
+    /**
+     * @return array
+     */
+    public function getFocusList($currentId)
+    {
+        $q = $this->createQueryBuilder('f');
+        $q->select('partial f.{id, name, description}')->orderBy('f.name');
+
+        return $q->getQuery()->getArrayResult();
     }
 }

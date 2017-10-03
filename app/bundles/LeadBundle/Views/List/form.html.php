@@ -28,6 +28,9 @@ $templates = [
     'timezones'      => 'timezone-template',
     'select'         => 'select-template',
     'lists'          => 'leadlist-template',
+    'deviceTypes'    => 'device_type-template',
+    'deviceBrands'   => 'device_brand-template',
+    'deviceOs'       => 'device_os-template',
     'emails'         => 'lead_email_received-template',
     'tags'           => 'tags-template',
     'stage'          => 'stage-template',
@@ -82,7 +85,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="filters">
                         <div class="form-group">
-                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->row($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
+                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
                                 <select class="chosen form-control" id="available_filters">
                                     <option value=""></option>
                                     <?php

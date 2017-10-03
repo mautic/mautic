@@ -160,6 +160,20 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
+            'utmTags',
+            'utm_tags',
+            [
+                'label'      => 'mautic.email.utm_tags',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.utm_tags.tooltip',
+                ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'template',
             'theme_list',
             [
@@ -200,6 +214,7 @@ class EmailType extends AbstractType
                 'attr'       => [
                     'class'       => 'form-control',
                     'data-toggle' => 'datetime',
+                    'tooltip'     => 'mautic.email.form.publishdown.help',
                 ],
                 'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
@@ -465,29 +480,21 @@ class EmailType extends AbstractType
             ],
         ];
 
+        $builder->add(
+            'buttons',
+            'form_buttons',
+            [
+                'pre_extra_buttons' => $customButtons,
+            ]
+        );
+
         if (!empty($options['update_select'])) {
-            $builder->add(
-                'buttons',
-                'form_buttons',
-                [
-                    'apply_text'        => false,
-                    'pre_extra_buttons' => $customButtons,
-                ]
-            );
             $builder->add(
                 'updateSelect',
                 'hidden',
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
-                ]
-            );
-        } else {
-            $builder->add(
-                'buttons',
-                'form_buttons',
-                [
-                    'pre_extra_buttons' => $customButtons,
                 ]
             );
         }

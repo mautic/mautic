@@ -79,6 +79,18 @@ class ContentHelper extends Helper
     }
 
     /**
+     * Replaces HTML script tags with non HTML tags so the JS inside them won't execute and will be readable.
+     *
+     * @param string $html
+     *
+     * @return string
+     */
+    public function showScriptTags($html)
+    {
+        return str_replace(['<script>', '</script>'], ['[script]', '[/script]'], $html);
+    }
+
+    /**
      * @return string
      */
     public function getName()

@@ -469,7 +469,7 @@ class PageModel extends FormModel
             $lead = $this->leadModel->getContactFromRequest($query, $this->trackByFingerprint);
         }
 
-        if ($lead && !$lead->getId()) {
+        if (!$lead || !$lead->getId()) {
             // Lead came from a non-trackable IP so ignore
             return;
         }
@@ -503,17 +503,16 @@ class PageModel extends FormModel
         $hit->setTrackingId($trackingId);
         $hit->setLead($lead);
 
-        $isUnique = $trackingNewlyGenerated;
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
             if (!empty($lastHit)) {
                 //this is not a new session so update the last hit if applicable with the date/time the user left
                 $this->getHitRepository()->updateHitDateLeft($lastHit);
             }
-
-            // Check if this is a unique page hit
-            $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId);
         }
+
+        // Check if this is a unique page hit
+        $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
         if (!empty($page)) {
             if ($page instanceof Page) {
@@ -604,7 +603,7 @@ class PageModel extends FormModel
                     $utmTags->setUtmTerm($query['utm_term']);
                 }
                 if (key_exists('utm_content', $query)) {
-                    $utmTags->setUtmConent($query['utm_content']);
+                    $utmTags->setUtmContent($query['utm_content']);
                 }
                 if (key_exists('utm_medium', $query)) {
                     $utmTags->setUtmMedium($query['utm_medium']);
@@ -871,7 +870,6 @@ class PageModel extends FormModel
 
         if ($flag == 'unique' || $flag == 'total_and_unique') {
             $q = $query->prepareTimeDataQuery('page_hits', 'date_hit', $filter, 'distinct(t.lead_id)');
-            $q->groupBy('DATE_FORMAT(t.date_hit, \'%Y-%m-%d\')');
 
             if (!$canViewOthers) {
                 $this->limitQueryToCreator($q);

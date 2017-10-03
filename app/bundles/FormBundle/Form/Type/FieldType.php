@@ -119,9 +119,6 @@ class FieldType extends AbstractType
                 case 'pagebreak':
                     $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
-                case 'email':
-                    $addBehaviorFields = false;
-                    break;
                 case 'select':
                     $cleanMasks['properties']['list']['list']['label'] = 'strict_html';
                     break;
@@ -368,8 +365,14 @@ class FieldType extends AbstractType
                 [
                     'choices'     => $options['leadFields'],
                     'choice_attr' => function ($val, $key, $index) use ($options) {
-                        if (!empty($options['leadFieldProperties'][$val]) && (in_array($options['leadFieldProperties'][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$val]['properties']['optionlist']))) {
-                            return ['data-list-type' => 1];
+                        $objects = ['lead', 'company'];
+                        foreach ($objects as $object) {
+                            if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
+                                return ['data-list-type' => 1];
+                            }
+                            if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
+                                return ['data-list-type' => 1];
+                            }
                         }
 
                         return [];

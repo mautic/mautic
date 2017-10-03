@@ -69,6 +69,7 @@ class LeadListSubscriber extends CommonSubscriber
                 $choices[$campaign['Id']] = $campaign['Name'];
             }
         }
+
         if (!empty($campaigns)) {
             $config = [
                 'label'      => $this->translator->trans('mautic.plugin.integration.campaign_members'),

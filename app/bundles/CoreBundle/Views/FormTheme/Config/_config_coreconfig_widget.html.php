@@ -125,6 +125,13 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'link_shortener_url', $template); ?>
         </div>
         <?php endif; ?>
+        
+        <?php if (isset($fields['max_entity_lock_time'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'max_entity_lock_time', $template); ?>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php endif; ?>

@@ -210,14 +210,18 @@ class EventModel extends CommonFormModel
                 unset($deletedEvents[$k]);
             }
 
-            $deletedKeys[] = $deleteMe;
+            if (isset($deletedEvents[$k])) {
+                $deletedKeys[] = $deleteMe;
+            }
         }
 
-        // wipe out any references to these events to prevent restraint violations
-        $this->getRepository()->nullEventRelationships($deletedKeys);
+        if (count($deletedEvents)) {
+            // wipe out any references to these events to prevent restraint violations
+            $this->getRepository()->nullEventRelationships($deletedKeys);
 
-        // delete the events
-        $this->deleteEntities($deletedEvents);
+            // delete the events
+            $this->deleteEntities($deletedEvents);
+        }
     }
 
     /**
@@ -250,8 +254,15 @@ class EventModel extends CommonFormModel
             return false;
         }*/
 
-        //get the current lead
-        $lead   = $this->leadModel->getCurrentLead();
+        // get the current lead
+        $lead = $this->leadModel->getCurrentLead();
+
+        if (!$lead instanceof Lead) {
+            $this->logger->debug('CAMPAIGN: unidentifiable contact; abort');
+
+            return false;
+        }
+
         $leadId = $lead->getId();
         $this->logger->debug('CAMPAIGN: Current Lead ID# '.$leadId);
 
@@ -458,7 +469,7 @@ class EventModel extends CommonFormModel
      * @return int
      */
     public function triggerStartingEvents(
-        $campaign,
+        Campaign $campaign,
         &$totalEventCount,
         $limit = 100,
         $max = false,
@@ -633,60 +644,62 @@ class EventModel extends CommonFormModel
                             'createdBy' => $campaign->getCreatedBy(),
                         ];
 
-                        $decisionEvent = [
-                            $campaignId => [
-                                array_merge(
-                                    $event,
-                                    ['children' => $decisionChildren[$event['id']]]
-                                ),
-                            ],
-                        ];
-                        $decisionTriggerEvent = new CampaignDecisionEvent($lead, $event['type'], null, $decisionEvent, $eventSettings, true);
-                        $this->dispatcher->dispatch(
-                            CampaignEvents::ON_EVENT_DECISION_TRIGGER,
-                            $decisionTriggerEvent
-                        );
-                        if ($decisionTriggerEvent->wasDecisionTriggered()) {
-                            ++$executedEventCount;
-                            ++$rootExecutedCount;
-
-                            $this->logger->debug(
-                                'CAMPAIGN: Decision ID# '.$event['id'].' for contact ID# '.$lead->getId()
-                                .' noted as completed by event listener thus executing children.'
+                        if (isset($decisionChildren[$event['id']])) {
+                            $decisionEvent = [
+                                $campaignId => [
+                                    array_merge(
+                                        $event,
+                                        ['children' => $decisionChildren[$event['id']]]
+                                    ),
+                                ],
+                            ];
+                            $decisionTriggerEvent = new CampaignDecisionEvent($lead, $event['type'], null, $decisionEvent, $eventSettings, true);
+                            $this->dispatcher->dispatch(
+                                CampaignEvents::ON_EVENT_DECISION_TRIGGER,
+                                $decisionTriggerEvent
                             );
+                            if ($decisionTriggerEvent->wasDecisionTriggered()) {
+                                ++$executedEventCount;
+                                ++$rootExecutedCount;
 
-                            // Decision has already been triggered by the lead so process the associated events
-                            $decisionLogged = false;
-                            foreach ($decisionEvent['children'] as $childEvent) {
-                                if ($this->executeEvent(
-                                        $childEvent,
-                                        $campaign,
-                                        $lead,
-                                        $eventSettings,
-                                        false,
-                                        null,
-                                        null,
-                                        false,
-                                        $evaluatedEventCount,
-                                        $executedEventCount,
-                                        $totalEventCount
-                                    )
-                                    && !$decisionLogged
-                                ) {
-                                    // Log the decision
-                                    $log = $this->getLogEntity($decisionEvent['id'], $campaign, $lead, null, true);
-                                    $log->setDateTriggered(new \DateTime());
-                                    $log->setNonActionPathTaken(true);
-                                    $logRepo->saveEntity($log);
-                                    $this->em->detach($log);
-                                    unset($log);
+                                $this->logger->debug(
+                                    'CAMPAIGN: Decision ID# '.$event['id'].' for contact ID# '.$lead->getId()
+                                    .' noted as completed by event listener thus executing children.'
+                                );
 
-                                    $decisionLogged = true;
+                                // Decision has already been triggered by the lead so process the associated events
+                                $decisionLogged = false;
+                                foreach ($decisionEvent['children'] as $childEvent) {
+                                    if ($this->executeEvent(
+                                            $childEvent,
+                                            $campaign,
+                                            $lead,
+                                            $eventSettings,
+                                            false,
+                                            null,
+                                            null,
+                                            false,
+                                            $evaluatedEventCount,
+                                            $executedEventCount,
+                                            $totalEventCount
+                                        )
+                                        && !$decisionLogged
+                                    ) {
+                                        // Log the decision
+                                        $log = $this->getLogEntity($decisionEvent['id'], $campaign, $lead, null, true);
+                                        $log->setDateTriggered(new \DateTime());
+                                        $log->setNonActionPathTaken(true);
+                                        $logRepo->saveEntity($log);
+                                        $this->em->detach($log);
+                                        unset($log);
+
+                                        $decisionLogged = true;
+                                    }
                                 }
                             }
-                        }
 
-                        unset($decisionEvent);
+                            unset($decisionEvent);
+                        }
                     } else {
                         if ($this->executeEvent(
                             $event,
@@ -708,7 +721,7 @@ class EventModel extends CommonFormModel
 
                     unset($event);
 
-                    if ($output && $rootEvaluatedCount < $maxCount) {
+                    if ($output && isset($progress) && $rootEvaluatedCount < $maxCount) {
                         $progress->setProgress($rootEvaluatedCount);
                     }
                 }
@@ -733,7 +746,7 @@ class EventModel extends CommonFormModel
             ++$batchDebugCounter;
         }
 
-        if ($output) {
+        if ($output && isset($progress)) {
             $progress->finish();
             $output->writeln('');
         }
@@ -931,7 +944,7 @@ class EventModel extends CommonFormModel
                     if ($max && $totalEventCount >= $max) {
                         unset($campaignEvents, $event, $leads, $eventSettings);
 
-                        if ($output) {
+                        if ($output && isset($progress)) {
                             $progress->finish();
                             $output->writeln('');
                         }
@@ -950,7 +963,7 @@ class EventModel extends CommonFormModel
                         $this->logger->debug('CAMPAIGN: Counts - '.var_export($counts, true));
 
                         return ($returnCounts) ? $counts : $executedEventCount;
-                    } elseif ($output) {
+                    } elseif ($output && isset($progress)) {
                         $currentCount = ($max) ? $totalEventCount : $evaluatedEventCount;
                         $progress->setProgress($currentCount);
                     }
@@ -972,7 +985,7 @@ class EventModel extends CommonFormModel
             $this->triggerConditions($campaign, $evaluatedEventCount, $executedEventCount, $totalEventCount);
         }
 
-        if ($output) {
+        if ($output && isset($progress)) {
             $progress->finish();
             $output->writeln('');
         }
@@ -1232,7 +1245,7 @@ class EventModel extends CommonFormModel
                             if ($max && ($totalEventCount + count($nonActionEvents)) >= $max) {
 
                                 // Hit the max or will hit the max while mid-process for the lead
-                                if ($output) {
+                                if ($output && isset($progress)) {
                                     $progress->finish();
                                     $output->writeln('');
                                 }
@@ -1307,7 +1320,7 @@ class EventModel extends CommonFormModel
                         }
 
                         $currentCount = ($max) ? $totalEventCount : $negativeEvaluatedCount;
-                        if ($output && $currentCount < $maxCount) {
+                        if ($output && isset($progress) && $currentCount < $maxCount) {
                             $progress->setProgress($currentCount);
                         }
 
@@ -1329,7 +1342,7 @@ class EventModel extends CommonFormModel
                 unset($leads, $campaignLeadIds, $leadLog);
 
                 $currentCount = ($max) ? $totalEventCount : $negativeEvaluatedCount;
-                if ($output && $currentCount < $maxCount) {
+                if ($output && isset($progress) && $currentCount < $maxCount) {
                     $progress->setProgress($currentCount);
                 }
 
@@ -1339,7 +1352,7 @@ class EventModel extends CommonFormModel
                 ++$batchDebugCounter;
             }
 
-            if ($output) {
+            if ($output && isset($progress)) {
                 $progress->finish();
                 $output->writeln('');
             }
@@ -1941,27 +1954,11 @@ class EventModel extends CommonFormModel
                 }
 
                 $interval = $action['triggerInterval'];
-                $unit     = strtoupper($action['triggerIntervalUnit']);
+                $unit     = $action['triggerIntervalUnit'];
 
                 $this->logger->debug('CAMPAIGN: Adding interval of '.$interval.$unit.' to '.$triggerOn->format('Y-m-d H:i:s T'));
 
-                switch ($unit) {
-                    case 'Y':
-                    case 'M':
-                    case 'D':
-                        $dt = "P{$interval}{$unit}";
-                        break;
-                    case 'I':
-                        $dt = "PT{$interval}M";
-                        break;
-                    case 'H':
-                    case 'S':
-                        $dt = "PT{$interval}{$unit}";
-                        break;
-                }
-
-                $dv = new \DateInterval($dt);
-                $triggerOn->add($dv);
+                $triggerOn->add((new DateTimeHelper())->buildInterval($interval, $unit));
 
                 if ($triggerOn > $now) {
                     $this->logger->debug(
@@ -2096,7 +2093,7 @@ class EventModel extends CommonFormModel
     /**
      * Get line chart data of campaign events.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string    $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
      * @param string    $dateFormat

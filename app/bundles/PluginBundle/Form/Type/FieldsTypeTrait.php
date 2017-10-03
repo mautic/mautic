@@ -121,8 +121,12 @@ trait FieldsTypeTrait
                 if ($fieldObject) {
                     $fieldsName = $fieldObject.'Fields';
                 }
+                if (isset($fieldData[$fieldsName])) {
+                    $fieldData[$fieldsName] = $options['integration_object']->formatMatchedFields($fieldData[$fieldsName]);
+                }
+
                 foreach ($paginatedFields as $field => $details) {
-                    $matched = isset($fieldData['leadFields'][$field]);
+                    $matched = isset($fieldData[$fieldsName][$field]);
                     $required = (int) (!empty($integrationFields[$field]['required']) || $choices[$field] == 'Email');
                     ++$index;
                     $form->add(
@@ -162,13 +166,15 @@ trait FieldsTypeTrait
                                 'attr'        => [
                                     'data-toggle' => 'tooltip',
                                     'title'       => 'mautic.plugin.direction.data.update',
+                                    'disabled'    => (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false,
                                 ],
                             ]
                         );
                     }
                     if (!$fieldObject) {
                         $contactLink['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
-                        $mauticFields = array_merge($mauticFields, $contactLink);
+                        $isContactable['mauticContactIsContactableByEmail'] = $this->translator->trans('mautic.plugin.integration.contact.donotcontact.email');
+                        $mauticFields = array_merge($mauticFields, $contactLink, $isContactable);
                     }
 
                     $form->add(
@@ -195,6 +201,7 @@ trait FieldsTypeTrait
                             'data' => $field,
                             'attr' => [
                                 'data-required' => $required,
+                                'data-value'    => $field,
                             ],
                         ]
                     );
@@ -205,6 +212,7 @@ trait FieldsTypeTrait
                             'data' => $index,
                             'attr' => [
                                 'data-required' => $required,
+                                'data-value'    => $index,
                             ],
                         ]
                     );

@@ -22,6 +22,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class AbstractStandardFormController extends AbstractFormController
 {
+    use FormErrorMessagesTrait;
+
     /**
      * Get this controller's model name.
      */
@@ -508,6 +510,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         'objectId'     => $entity->getId(),
                     ]
                 ),
+                'validationError' => $this->getFormErrorForBuilder($form),
             ],
             'objectId' => $objectId,
             'entity'   => $entity,
@@ -673,6 +676,26 @@ abstract class AbstractStandardFormController extends AbstractFormController
     protected function getRouteBase()
     {
         return $this->getModelName();
+    }
+
+    /**
+     * Provide the name of the column which is used for default ordering.
+     *
+     * @return string
+     */
+    protected function getDefaultOrderColumn()
+    {
+        return 'name';
+    }
+
+    /**
+     * Provide the direction for default ordering.
+     *
+     * @return string
+     */
+    protected function getDefaultOrderDirection()
+    {
+        return 'ASC';
     }
 
     /**
@@ -879,11 +902,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $repo  = $model->getRepository();
 
         if (!$permissions[$this->getPermissionBase().':viewother']) {
-            $filter['force'] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
+            $filter['force'][] = ['column' => $repo->getTableAlias().'.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.name');
-        $orderByDir = $session->get('mautic.'.$this->getSessionBase().'.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
+        $orderByDir = $session->get('mautic.'.$this->getSessionBase().'.orderbydir', $this->getDefaultOrderDirection());
 
         list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
@@ -1058,6 +1081,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                         'objectId'     => ($entity) ? $entity->getId() : 0,
                     ]
                 ),
+                'validationError' => $this->getFormErrorForBuilder($form),
             ],
             'entity' => $entity,
             'form'   => $form,

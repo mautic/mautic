@@ -19,11 +19,14 @@ use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
 use JMS\Serializer\SerializationContext;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
+use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Security\Exception\PermissionException;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
@@ -39,6 +42,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class CommonApiController extends FOSRestController implements MauticController
 {
     use RequestTrait;
+    use FormErrorMessagesTrait;
 
     /**
      * @var CoreParametersHelper
@@ -345,8 +349,12 @@ class CommonApiController extends FOSRestController implements MauticController
         $publishedOnly = $this->request->get('published', 0);
         $minimal       = $this->request->get('minimal', 0);
 
-        if (!$this->security->isGranted($this->permissionBase.':view')) {
-            return $this->accessDenied();
+        try {
+            if (!$this->security->isGranted($this->permissionBase.':view')) {
+                return $this->accessDenied();
+            }
+        } catch (PermissionException $e) {
+            return $this->accessDenied($e->getMessage());
         }
 
         if ($this->security->checkPermissionExists($this->permissionBase.':viewother')
@@ -381,7 +389,7 @@ class CommonApiController extends FOSRestController implements MauticController
                     'string' => $this->request->query->get('search', ''),
                     'force'  => $this->listFilters,
                 ],
-                'orderBy'        => $this->request->query->get('orderBy', ''),
+                'orderBy'        => $this->addAliasIfNotPresent($this->request->query->get('orderBy', ''), $tableAlias),
                 'orderByDir'     => $this->request->query->get('orderByDir', 'ASC'),
                 'withTotalCount' => true, //for repositories that break free of Paginator
             ],
@@ -420,6 +428,36 @@ class CommonApiController extends FOSRestController implements MauticController
     }
 
     /**
+     * Adds the repository alias to the column name if it doesn't exist.
+     *
+     * @param string $column name
+     *
+     * @return string $column name with alias prefix
+     */
+    protected function addAliasIfNotPresent($columns, $alias)
+    {
+        if (!$columns) {
+            return $columns;
+        }
+
+        $columns = explode(',', trim($columns));
+        $prefix  = $alias.'.';
+
+        array_walk(
+            $columns,
+            function (&$column, $key, $prefix) {
+                $column = trim($column);
+                if (strpos($column, $prefix) === false) {
+                    $column = $prefix.$column;
+                }
+            },
+            $prefix
+        );
+
+        return implode(',', $columns);
+    }
+
+    /**
      * Obtains a specific entity as defined by the API URL.
      *
      * @param int $id Entity ID
@@ -454,60 +492,6 @@ class CommonApiController extends FOSRestController implements MauticController
         $this->setSerializationContext($view);
 
         return $this->handleView($view);
-    }
-
-    /**
-     * @param array $formErrors
-     *
-     * @return string
-     */
-    public function getFormErrorMessage(array $formErrors)
-    {
-        $msg = '';
-
-        if ($formErrors) {
-            foreach ($formErrors as $key => $error) {
-                if (!$error) {
-                    continue;
-                }
-
-                if ($msg) {
-                    $msg .= ', ';
-                }
-
-                if (is_string($key)) {
-                    $msg .= $key.': ';
-                }
-
-                if (is_array($error)) {
-                    $msg .= $this->getFormErrorMessage($error);
-                } else {
-                    $msg .= $error;
-                }
-            }
-        }
-
-        return $msg;
-    }
-
-    /**
-     * @param Form $form
-     *
-     * @return array
-     */
-    public function getFormErrorMessages(Form $form)
-    {
-        $errors = [];
-
-        foreach ($form->getErrors(true) as $error) {
-            if (isset($errors[$error->getOrigin()->getName()])) {
-                $errors[$error->getOrigin()->getName()] = [$error->getMessage()];
-            } else {
-                $errors[$error->getOrigin()->getName()][] = $error->getMessage();
-            }
-        }
-
-        return $errors;
     }
 
     /**
@@ -630,6 +614,18 @@ class CommonApiController extends FOSRestController implements MauticController
     }
 
     /**
+     * Alias for notFound method. It's used in the LeadAccessTrait.
+     *
+     * @param array $args
+     *
+     * @return Response
+     */
+    public function postActionRedirect($args = [])
+    {
+        return $this->notFound('mautic.contact.error.notfound');
+    }
+
+    /**
      * Returns a 403 Access Denied.
      *
      * @param string $msg
@@ -667,7 +663,7 @@ class CommonApiController extends FOSRestController implements MauticController
      * @param mixed  $entity
      * @param string $action view|create|edit|publish|delete
      *
-     * @return bool
+     * @return bool|Response
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {
@@ -680,7 +676,11 @@ class CommonApiController extends FOSRestController implements MauticController
             return $this->security->hasEntityAccess($ownPerm, $otherPerm, $owner);
         }
 
-        return $this->security->isGranted("{$this->permissionBase}:{$action}");
+        try {
+            return $this->security->isGranted("{$this->permissionBase}:{$action}");
+        } catch (PermissionException $e) {
+            return $this->accessDenied($e->getMessage());
+        }
     }
 
     /**

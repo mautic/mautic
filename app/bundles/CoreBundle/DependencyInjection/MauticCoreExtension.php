@@ -37,6 +37,9 @@ class MauticCoreExtension extends Extension
         // since KNP menus doesn't seem to support a Renderer factory
         $menus = [];
 
+        // Keep track of names used to prevent overwriting any and thus losing functionality
+        $serviceNames = [];
+
         foreach ($bundles as $bundle) {
             if (!empty($bundle['config']['services'])) {
                 $config = $bundle['config']['services'];
@@ -57,12 +60,20 @@ class MauticCoreExtension extends Extension
                         case 'models':
                             $defaultTag = 'mautic.model';
                             break;
+                        case 'integrations':
+                            $defaultTag = 'mautic.integration';
+                            break;
                         default:
                             $defaultTag = false;
                             break;
                     }
 
                     foreach ($services as $name => $details) {
+                        if (isset($serviceNames[$name])) {
+                            throw new \InvalidArgumentException("$name is already registered");
+                        }
+                        $serviceNames[$name] = true;
+
                         if (!is_array($details)) {
                             // Set parameter
                             $container->setParameter($name, $details);

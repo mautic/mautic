@@ -40,8 +40,7 @@ class TagType extends AbstractType
                 $this->factory->getEntityManager(),
                 'MauticLeadBundle:Tag',
                 'id',
-                ($options['multiple']),
-                true
+                ($options['multiple'])
             );
 
             $builder->addModelTransformer($transformer);

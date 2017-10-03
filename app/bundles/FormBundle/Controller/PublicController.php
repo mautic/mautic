@@ -26,6 +26,11 @@ use Symfony\Component\HttpFoundation\Response;
 class PublicController extends CommonFormController
 {
     /**
+     * @var array
+     */
+    private $tokens = [];
+
+    /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function submitAction()
@@ -446,14 +451,18 @@ class PublicController extends CommonFormController
      */
     private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent)
     {
-        static $tokens = [];
-        if (empty($tokens)) {
-            $tokens = array_merge(
-                $submissionEvent->getTokens(),
-                TokenHelper::findLeadTokens($string, $submissionEvent->getLead()->getProfileFields())
-            );
+        if (empty($this->tokens)) {
+            if ($lead = $submissionEvent->getLead()) {
+                $this->tokens = array_merge(
+                    $submissionEvent->getTokens(),
+                    TokenHelper::findLeadTokens(
+                        $string,
+                        $lead->getProfileFields()
+                    )
+                );
+            }
         }
 
-        return str_replace(array_keys($tokens), array_values($tokens), $string);
+        return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
     }
 }

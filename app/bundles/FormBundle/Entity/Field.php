@@ -846,14 +846,14 @@ class Field
             // Hide the field if there is the value condition and if we already know the value for this field
             if ($submissions) {
                 foreach ($submissions as $submission) {
-                    if (!empty($submission[$this->alias])) {
+                    if (!empty($submission[$this->alias]) && !$this->isAutoFill) {
                         return false;
                     }
                 }
             }
 
             // Hide the field if the value is already known from the lead profile
-            if ($lead !== null && $this->leadField && !empty($lead->getFieldValue($this->leadField))) {
+            if ($lead !== null && $this->leadField && !empty($lead->getFieldValue($this->leadField)) && !$this->isAutoFill) {
                 return false;
             }
         }

@@ -50,13 +50,17 @@ class TokenSubscriber extends CommonSubscriber
             $event->setPlainText($plainText);
         }
 
-        $lead                  = $event->getLead();
-        $email                 = $event->getEmail();
-        $tokens                = $event->getTokens();
-        $dynamicContentAsArray = $email instanceof Email ? $email->getDynamicContent() : null;
-
-        if (!empty($dynamicContentAsArray)) {
-            $tokenEvent = new TokenReplacementEvent(null, $lead, ['tokens' => $tokens, 'lead' => null, 'dynamicContent' => $dynamicContentAsArray]);
+        $email = $event->getEmail();
+        if ($dynamicContentAsArray = $email instanceof Email ? $email->getDynamicContent() : null) {
+            $lead       = $event->getLead();
+            $tokens     = $event->getTokens();
+            $tokenEvent = new TokenReplacementEvent(
+                null, $lead, [
+                    'tokens'         => $tokens,
+                    'lead'           => null,
+                    'dynamicContent' => $dynamicContentAsArray,
+                ]
+            );
             $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $event->addTokens($tokenEvent->getTokens());
         }
@@ -234,10 +238,13 @@ class TokenSubscriber extends CommonSubscriber
                     $groups[$groupNum] = !empty($leadVal);
                     break;
                 case 'like':
-                    $groups[$groupNum] = strpos($leadVal, $filterVal) !== false;
+                    $filterVal         = str_replace(['.', '*', '%'], ['\.', '\*', '.*'], $filterVal);
+                    $groups[$groupNum] = preg_match('/'.$filterVal.'/', $leadVal) === 1;
                     break;
                 case '!like':
-                    $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
+                    $filterVal         = str_replace(['.', '*'], ['\.', '\*'], $filterVal);
+                    $filterVal         = str_replace('%', '.*', $filterVal);
+                    $groups[$groupNum] = preg_match('/'.$filterVal.'/', $leadVal) !== 1;
                     break;
                 case 'in':
                     foreach ($leadVal as $k => $v) {

@@ -33,6 +33,17 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCal
         $this->setAuthMode('login');
     }
 
+    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    {
+        // IsTransactional header for all non bulk messages
+        // https://elasticemail.com/support/guides/unsubscribe/
+        if ($message->getHeaders()->get('Precedence') != 'Bulk') {
+            $message->getHeaders()->addTextHeader('IsTransactional', 'True');
+        }
+
+        parent::send($message, $failedRecipients);
+    }
+
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *

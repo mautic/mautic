@@ -35,4 +35,24 @@ class DateTimeHelperTest extends \PHPUnit_Framework_TestCase
         $timezone = $helper->guessTimezoneFromOffset(-5 * 3600);
         $this->assertEquals($timezone, 'America/New_York');
     }
+
+    public function testBuildIntervalWithBadUnit()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class);
+        $helper = new DateTimeHelper();
+        $helper->buildInterval(4, 'j');
+    }
+
+    public function testBuildIntervalWithRightUnits()
+    {
+        $helper   = new DateTimeHelper();
+        $interval = $helper->buildInterval(4, 'Y');
+        $this->assertEquals(new \DateInterval('P4Y'), $interval);
+        $interval = $helper->buildInterval(4, 'M');
+        $this->assertEquals(new \DateInterval('P4M'), $interval);
+        $interval = $helper->buildInterval(4, 'I');
+        $this->assertEquals(new \DateInterval('PT4M'), $interval);
+        $interval = $helper->buildInterval(4, 'S');
+        $this->assertEquals(new \DateInterval('PT4S'), $interval);
+    }
 }

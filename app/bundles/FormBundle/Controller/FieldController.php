@@ -154,6 +154,8 @@ class FieldController extends CommonFormController
                     'id'            => $keyId,
                     'formId'        => $formId,
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'     => true,
                 ]
             );
         }
@@ -295,6 +297,8 @@ class FieldController extends CommonFormController
                     'id'            => $objectId,
                     'formId'        => $formId,
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'     => true,
                 ]
             );
 
@@ -347,7 +351,8 @@ class FieldController extends CommonFormController
             $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
 
             // Allow to select the lead field from the delete field again
-            if (!empty($formField['leadField']) && ($unusedLeadField = array_search($formField['leadField'], $usedLeadFields)) !== false) {
+            $unusedLeadField = array_search($formField['leadField'], $usedLeadFields);
+            if (!empty($formField['leadField']) && false !== $unusedLeadField) {
                 unset($usedLeadFields[$unusedLeadField]);
                 $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
             }

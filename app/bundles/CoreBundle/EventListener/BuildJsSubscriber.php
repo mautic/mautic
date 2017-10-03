@@ -43,7 +43,7 @@ class BuildJsSubscriber extends CommonSubscriber
         --- fingerprint2.js.orig	2017-05-15 15:02:12.600335908 +0200
         +++ fingerprint2.js	2017-05-15 15:02:30.592522246 +0200
         @@ -18,10 +18,7 @@
-         
+
          (function (name, context, definition) {
            "use strict";
         -  if (typeof define === "function" && define.amd) { define(definition); }
@@ -289,17 +289,25 @@ MauticJS.onFirstEventDelivery = function(f) {
     MauticJS.postEventDeliveryQueue.push(f);
 };
 document.addEventListener('mauticPageEventDelivered', function(e) {
-    var detail = e.detail;
-    if (detail.image && !MauticJS.mtcSet) {
+    var detail   = e.detail;
+    var isImage = detail.image;
+    if (isImage && !MauticJS.mtcSet) {
         MauticJS.getTrackedContact();
     } else if (detail.response && detail.response.id) {
         MauticJS.setTrackedContact(detail.response);
     }
     
+    if (!isImage && typeof detail.event[3] === 'object' && typeof detail.event[3].onload === 'function') {
+       // Execute onload since this is ignored if not an image
+       detail.event[3].onload(detail)       
+    }
+    
     if (!MauticJS.firstDeliveryMade) {
         MauticJS.firstDeliveryMade = true;
         for (var i in MauticJS.postEventDeliveryQueue) {
-            MauticJS.postEventDeliveryQueue[i](e.detail);
+            if (typeof MauticJS.postEventDeliveryQueue[i] == 'function') {
+                MauticJS.postEventDeliveryQueue[i](detail);
+            }
             delete MauticJS.postEventDeliveryQueue[i];
         }
     }

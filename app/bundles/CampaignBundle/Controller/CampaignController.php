@@ -14,6 +14,7 @@ namespace Mautic\CampaignBundle\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\Form;
@@ -356,7 +357,9 @@ class CampaignController extends AbstractStandardFormController
 
         if ('edit' === $action && null !== $this->connections) {
             if (!empty($this->deletedEvents)) {
-                $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
+                /** @var EventModel $eventModel */
+                $eventModel = $this->getModel('campaign.event');
+                $eventModel->deleteEvents($entity->getEvents()->toArray(), $this->deletedEvents);
             }
         }
 
@@ -650,10 +653,10 @@ class CampaignController extends AbstractStandardFormController
                 ];
 
                 foreach ($events as $event) {
-                    $event['logCount'] =
-                    $event['percent'] =
+                    $event['logCount']   =
+                    $event['percent']    =
                     $event['yesPercent'] =
-                    $event['noPercent'] = 0;
+                    $event['noPercent']  = 0;
 
                     if (isset($campaignLogCounts[$event['id']])) {
                         $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);

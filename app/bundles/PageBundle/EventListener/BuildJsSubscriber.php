@@ -15,6 +15,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\PageBundle\Helper\TrackingHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -28,13 +29,20 @@ class BuildJsSubscriber extends CommonSubscriber
     protected $assetsHelper;
 
     /**
+     * @var TrackingHelper
+     */
+    protected $trackingHelper;
+
+    /**
      * BuildJsSubscriber constructor.
      *
-     * @param AssetsHelper $assetsHelper
+     * @param AssetsHelper   $assetsHelper
+     * @param TrackingHelper $trackingHelper
      */
-    public function __construct(AssetsHelper $assetsHelper)
+    public function __construct(AssetsHelper $assetsHelper, TrackingHelper $trackingHelper)
     {
-        $this->assetsHelper = $assetsHelper;
+        $this->assetsHelper   = $assetsHelper;
+        $this->trackingHelper = $trackingHelper;
     }
 
     /**
@@ -46,6 +54,7 @@ class BuildJsSubscriber extends CommonSubscriber
             CoreEvents::BUILD_MAUTIC_JS => [
                 ['onBuildJs', 255],
                 ['onBuildJsForVideo', 256],
+                ['onBuildJsForTrackingEvent', 256],
             ],
         ];
     }
@@ -233,10 +242,19 @@ JS;
      */
     public function onBuildJsForVideo(BuildJsEvent $event)
     {
-        $formSubmitUrl   = $this->router->generate('mautic_form_postresults_ajax', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        $formSubmitUrl = $this->router->generate(
+            'mautic_form_postresults_ajax',
+            [],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.css', null, null, true);
-        $jQueryUrl       = $this->assetsHelper->getUrl('app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js', null, null, true);
+        $jQueryUrl       = $this->assetsHelper->getUrl(
+            'app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js',
+            null,
+            null,
+            true
+        );
 
         $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
         $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
@@ -276,11 +294,7 @@ JS;
         $js = <<<JS
 MauticJS.initGatedVideo = function () {
     MauticJS.videoElements = MauticJS.videoElements || document.getElementsByTagName('video');
-    if (MauticJS.videoElements.length) {
-        MauticJS.videoElements = Array.prototype.filter.call(MauticJS.videoElements, function(videoElements){
-            return null !== videoElements.attributes.getNamedItem('data-form-id');
-        });
-    }
+ 
     if (! MauticJS.videoElements.length) {
         MauticJS.videoElements = null;
         return;
@@ -372,7 +386,7 @@ MauticJS.processGatedVideos = function (videoElements) {
         var playerFeatures = [];
         var source   = node.getElementsByTagName('source')[0];
         
-        if (source.type == 'video/mp4') {
+        if (source.type === 'video/mp4') {
             node.dataset.mp4 = true;
             playerFeatures = ['playpause','progress','current','duration','volume','fullscreen'];
         }
@@ -380,113 +394,120 @@ MauticJS.processGatedVideos = function (videoElements) {
         if (!node.id) {
             node.id = 'mautic-player-' + i;
         }
-       
-        var cookieName = 'mautic-player-'+i+'-'+node.dataset.formId;
+
+        mediaPlayers[i] = [];
+        
         if (node.dataset.formId) {
-            mediaPlayers[i] = [];
-            
+            var cookieName = 'mautic-player-'+i+'-'+node.dataset.formId;
             MauticJS.makeCORSRequest('GET', '{$mauticBaseUrl}form/embed/' + node.dataset.formId, {}, function (data) {
                 mediaPlayers[i].formHtml = data;
             });
+        } else {
+            mediaPlayers[i].formHtml = '';
+        }
+
+        // If we don't have a formId, and it's not explicitly set as a Mautic controlled video, return.
+        if (!node.dataset.formId && !node.dataset.mauticVideo) {
+            return;
+        }
+        
+        mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features: playerFeatures, alwaysShowControls: true, enableKeyboard: false, success: function (mediaElement, domElement) {
+            mediaPlayers[i].inPoster = false;
+            mediaPlayers[i].success  = false;
+            mediaPlayers[i].views    = [];
+            mediaPlayers[i].mediaElement = mediaElement;
             
-            mediaPlayers[i].player = new MediaElementPlayer('#' + node.id, {features: playerFeatures, alwaysShowControls: true, enableKeyboard: false, success: function (mediaElement, domElement) {
-                mediaPlayers[i].inPoster = false;
-                mediaPlayers[i].success  = false;
-                mediaPlayers[i].views    = [];
-                mediaPlayers[i].mediaElement = mediaElement;
-                
-                if (!node.dataset.mp4) {
-                    node.parentElement.parentElement.parentElement.className += ' no-controls';
-                }
-                var iframes = node.parentElement.getElementsByTagName('iframe');
-                
-                if (iframes) {
-                    MauticJS.iterateCollection(iframes)(function(node, i) {
-                        node.setAttribute('tabindex', -1);
-                    });
-                }
-
-                mediaElement.addEventListener('ended', function(e) {
-                    MauticJS.endCurrentView(i);
+            if (!node.dataset.mp4) {
+                node.parentElement.parentElement.parentElement.className += ' no-controls';
+            }
+            var iframes = node.parentElement.getElementsByTagName('iframe');
+            
+            if (iframes) {
+                MauticJS.iterateCollection(iframes)(function(node, i) {
+                    node.setAttribute('tabindex', -1);
                 });
+            }
+
+            mediaElement.addEventListener('ended', function(e) {
+                MauticJS.endCurrentView(i);
+            });
+            
+            mediaElement.addEventListener('timeupdate', function (e) {
+                var currentTime = 0;
+                if ('Event' == e.constructor.name) {
+                    currentTime = e.srcElement.currentTime;
+                } else {
+                    currentTime = e.currentTime;
+                }
                 
-                mediaElement.addEventListener('timeupdate', function (e) {
-                    var currentTime = 0;
-                    if ('Event' == e.constructor.name) {
-                        currentTime = e.srcElement.currentTime;
-                    } else {
-                        currentTime = e.currentTime;
+                MauticJS.addVideoView(i, currentTime);
+
+                if (node.dataset.formId && document.cookie.indexOf(cookieName) == -1 && currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
+                    if (document.activeElement.tagName == 'IFRAME') {
+                        window.mejs.previousActiveElement = document.activeElement;
+                        document.activeElement.blur();
                     }
+
+                    mediaPlayers[i].inPoster = true;
+                    mediaPlayers[i].player.pause();
+                    mediaPlayers[i].poster = document.getElementById(node.id).parentElement.parentElement.getElementsByClassName('mejs-poster')[0];
+                    mediaPlayers[i].poster.innerHTML = mediaPlayers[i].formHtml;
+                    mediaPlayers[i].poster.style.display = 'block';
+                    mediaPlayers[i].form = mediaPlayers[i].poster.getElementsByTagName('form')[0];
+                    mediaPlayers[i].form.className += ' mautic-gated-video-style';
                     
-                    MauticJS.addVideoView(i, currentTime);
-
-                    if (document.cookie.indexOf(cookieName) == -1 && currentTime >= node.dataset.gateTime && mediaPlayers[i].inPoster === false && mediaPlayers[i].success === false) {
-                        if (document.activeElement.tagName == 'IFRAME') {
-                            window.mejs.previousActiveElement = document.activeElement;
-                            document.activeElement.blur();
-                        }
-
-                        mediaPlayers[i].inPoster = true;
-                        mediaPlayers[i].player.pause();
-                        mediaPlayers[i].poster = document.getElementById(node.id).parentElement.parentElement.getElementsByClassName('mejs-poster')[0];
-                        mediaPlayers[i].poster.innerHTML = mediaPlayers[i].formHtml;
-                        mediaPlayers[i].poster.style.display = 'block';
-                        mediaPlayers[i].form = mediaPlayers[i].poster.getElementsByTagName('form')[0];
-                        mediaPlayers[i].form.className += ' mautic-gated-video-style';
+                    mediaPlayers[i].form.addEventListener('submit', function (e) {
+                        e.preventDefault();
                         
-                        mediaPlayers[i].form.addEventListener('submit', function (e) {
-                            e.preventDefault();
-                            
-                            MauticJS.makeCORSRequest(
-                                'POST',
-                                '{$formSubmitUrl}?formId=' + node.dataset.formId,
-                                jQuery(mediaPlayers[i].form).serialize(),
-                                function (data) {
-                                    if (data.success) {
-                                        mediaPlayers[i].success = true;
-                                        if (!data.message) {
-                                            mediaPlayers[i].poster.style.display = 'none';
-                                            mediaPlayers[i].player.play();
+                        MauticJS.makeCORSRequest(
+                            'POST',
+                            '{$formSubmitUrl}?formId=' + node.dataset.formId,
+                            jQuery(mediaPlayers[i].form).serialize(),
+                            function (data) {
+                                if (data.success) {
+                                    mediaPlayers[i].success = true;
+                                    if (!data.message) {
+                                        mediaPlayers[i].poster.style.display = 'none';
+                                        mediaPlayers[i].player.play();
+                                        window.mejs.previousActiveElement.focus();
+                                    }
+                                    
+                                    // Set a cookie to prevent showing the same form again
+                                    document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7; 
+                                } 
+                                
+                                if (data.message) {
+                                    // Place the poster position just above center
+                                    var position = parseInt(mediaPlayers[i].poster.style.height) / 1.4;
+                                    mediaPlayers[i].poster.innerHTML = '<p style="padding:20px;padding-top:' + position + 'px;" class="mautic-response">' + data.message + '</p>';
+                                    setTimeout(function(){
+                                        mediaPlayers[i].poster.style.display = 'none';
+                                        mediaPlayers[i].player.play();
+                                        if (window.mejs.previousActiveElement && window.mejs.previousActiveElement.tagName == 'IFRAME') {
                                             window.mejs.previousActiveElement.focus();
                                         }
-                                        
-                                        // Set a cookie to prevent showing the same form again
-                                        document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7; 
-                                    } 
-                                    
-                                    if (data.message) {
-                                        // Place the poster position just above center
-                                        var position = parseInt(mediaPlayers[i].poster.style.height) / 1.4;
-                                        mediaPlayers[i].poster.innerHTML = '<p style="padding:20px;padding-top:' + position + 'px;" class="mautic-response">' + data.message + '</p>';
-                                        setTimeout(function(){
-                                            mediaPlayers[i].poster.style.display = 'none';
-                                            mediaPlayers[i].player.play();
-                                            if (window.mejs.previousActiveElement && window.mejs.previousActiveElement.tagName == 'IFRAME') {
-                                                window.mejs.previousActiveElement.focus();
-                                            }
-                                        }, 3000);
-                                    } else if (data.validationErrors) {
-                                        // Reset validation errors
-                                        jQuery('#mauticform_'+data.formName+' .mauticform-errormsg').css('display', 'none');
-                                        // Display validation errors
-                                        jQuery.each(data.validationErrors, function (field, message) {
-                                            if (jQuery('#mauticform_'+data.formName+'_'+field+' .mauticform-errormsg')) {
-                                                jQuery('#mauticform_'+data.formName+'_'+field+' .mauticform-errormsg').css('display', 'block');
-                                            }
-                                        });
-                                    }
+                                    }, 3000);
+                                } else if (data.validationErrors) {
+                                    // Reset validation errors
+                                    jQuery('#mauticform_'+data.formName+' .mauticform-errormsg').css('display', 'none');
+                                    // Display validation errors
+                                    jQuery.each(data.validationErrors, function (field, message) {
+                                        if (jQuery('#mauticform_'+data.formName+'_'+field+' .mauticform-errormsg')) {
+                                            jQuery('#mauticform_'+data.formName+'_'+field+' .mauticform-errormsg').css('display', 'block');
+                                        }
+                                    });
                                 }
-                            );
-                            
-                            return false;
-                        });
-                    }
-                });
-            }});
-            
-            if (node.autoplay) {
-                mediaPlayers[i].player.play();
-            }
+                            }
+                        );
+                        
+                        return false;
+                    });
+                }
+            });
+        }});
+        
+        if (node.autoplay) {
+            mediaPlayers[i].player.play();
         }
     });
 }
@@ -494,5 +515,108 @@ MauticJS.processGatedVideos = function (videoElements) {
 MauticJS.documentReady(MauticJS.initGatedVideo);
 JS;
         $event->appendJs($js, 'Mautic Gated Videos');
+    }
+
+    /**
+     * @param BuildJsEvent $event
+     */
+    public function onBuildJsForTrackingEvent(BuildJsEvent $event)
+    {
+        $js = '';
+
+        $lead   = $this->trackingHelper->getLead();
+        $leadId = ($lead && $lead->getId()) ? $lead->getId() : '';
+        if ($id = $this->trackingHelper->displayInitCode('google_analytics')) {
+            $js .= <<<JS
+            dataLayer = window.dataLayer ? window.dataLayer : [];
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', '{$id}', 'auto');
+  ga('send', 'pageview');
+  ga('set', 'userId', {$leadId});
+JS;
+        }
+
+        if ($id = $this->trackingHelper->displayInitCode('facebook_pixel')) {
+            $customMatch = [];
+            if ($lead && $lead->getId()) {
+                $fieldsToMatch = [
+                    'fn' => 'firstname',
+                    'ln' => 'lastname',
+                    'em' => 'email',
+                    'ph' => 'phone',
+                    'ct' => 'city',
+                    'st' => 'state',
+                    'zp' => 'zipcode',
+                ];
+                foreach ($fieldsToMatch as $key => $fieldToMatch) {
+                    $par = 'get'.ucfirst($fieldToMatch);
+                    if ($value = $lead->{$par}()) {
+                        $customMatch[$key] = $value;
+                    }
+                }
+            }
+            $customMatch = json_encode($customMatch);
+
+            $js .= <<<JS
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '{$id}'); // Insert your pixel ID here.
+fbq('track', 'PageView', {$customMatch});
+JS;
+        }
+        $js .= <<<'JS'
+        MauticJS.mtcEventSet=false;
+        document.addEventListener('mauticPageEventDelivered', function(e) {
+            var detail   = e.detail;
+            if (!MauticJS.mtcEventSet && detail.response && detail.response.events) {
+                MauticJS.setTrackedEvents(detail.response.events);
+            }
+      });
+      
+      
+MauticJS.setTrackedEvents = function(events) {
+        MauticJS.mtcEventSet=true;
+       if (typeof fbq  !== 'undefined' && typeof events.facebook_pixel !== 'undefined') {
+                 var e = events.facebook_pixel; 
+                     for(var i = 0; i < e.length; i++) {
+                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
+                            fbq('trackCustom', e[i]['action'], {
+                                eventLabel: e[i]['label']
+                            });
+                     }
+                }
+                
+                if (typeof ga  !== 'undefined' && typeof events.google_analytics !== 'undefined') {
+                 var e = events.google_analytics; 
+                     for(var i = 0; i < e.length; i++) {
+                         if(typeof e[i]['action']  !== 'undefined' && typeof e[i]['label']  !== 'undefined' )
+                             	ga('send', {
+                                    hitType: 'event',
+                                    eventCategory: e[i]['category'],
+                                    eventAction: e[i]['action'],
+                                    eventLabel: e[i]['label'],
+			                     });
+                     }
+                }        
+                
+                if (typeof events.focus_item !== 'undefined') {
+                 var e = events.focus_item; 
+                    for(var i = 0; i < e.length; i++) {
+                         if(typeof e[i]['id']  !== 'undefined' && typeof e[i]['js']  !== 'undefined' ){
+                             MauticJS.insertScript(e[i]['js']);
+                     }
+                   }
+                }
+};
+
+   
+JS;
+        $event->appendJs($js, 'Mautic 3rd party tracking pixels');
     }
 }

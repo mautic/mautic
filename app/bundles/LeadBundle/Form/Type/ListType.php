@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
+use DeviceDetector\Parser\OperatingSystem;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -35,16 +37,19 @@ use Symfony\Component\Translation\TranslatorInterface;
 class ListType extends AbstractType
 {
     private $translator;
-    private $fieldChoices      = [];
-    private $timezoneChoices   = [];
-    private $countryChoices    = [];
-    private $regionChoices     = [];
-    private $listChoices       = [];
-    private $emailChoices      = [];
-    private $tagChoices        = [];
-    private $stageChoices      = [];
-    private $localeChoices     = [];
-    private $categoriesChoices = [];
+    private $fieldChoices        = [];
+    private $timezoneChoices     = [];
+    private $countryChoices      = [];
+    private $regionChoices       = [];
+    private $listChoices         = [];
+    private $emailChoices        = [];
+    private $deviceTypesChoices  = [];
+    private $deviceBrandsChoices = [];
+    private $deviceOsChoices     = [];
+    private $tagChoices          = [];
+    private $stageChoices        = [];
+    private $localeChoices       = [];
+    private $categoriesChoices   = [];
 
     /**
      * ListType constructor.
@@ -104,6 +109,9 @@ class ListType extends AbstractType
         foreach ($categories as $category) {
             $this->categoriesChoices[$category['id']] = $category['title'];
         }
+        $this->deviceTypesChoices  = array_combine((DeviceParser::getAvailableDeviceTypeNames()), (DeviceParser::getAvailableDeviceTypeNames()));
+        $this->deviceBrandsChoices = DeviceParser::$deviceBrands;
+        $this->deviceOsChoices     = array_combine((array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())), array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()));
     }
 
     /**
@@ -176,6 +184,9 @@ class ListType extends AbstractType
                         'fields'         => $this->fieldChoices,
                         'lists'          => $this->listChoices,
                         'emails'         => $this->emailChoices,
+                        'deviceTypes'    => $this->deviceTypesChoices,
+                        'deviceBrands'   => $this->deviceBrandsChoices,
+                        'deviceOs'       => $this->deviceOsChoices,
                         'tags'           => $this->tagChoices,
                         'stage'          => $this->stageChoices,
                         'locales'        => $this->localeChoices,
@@ -220,6 +231,9 @@ class ListType extends AbstractType
         $view->vars['timezones']      = $this->timezoneChoices;
         $view->vars['lists']          = $this->listChoices;
         $view->vars['emails']         = $this->emailChoices;
+        $view->vars['deviceTypes']    = $this->deviceTypesChoices;
+        $view->vars['deviceBrands']   = $this->deviceBrandsChoices;
+        $view->vars['deviceOs']       = $this->deviceOsChoices;
         $view->vars['tags']           = $this->tagChoices;
         $view->vars['stage']          = $this->stageChoices;
         $view->vars['locales']        = $this->localeChoices;

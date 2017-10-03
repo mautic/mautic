@@ -287,6 +287,22 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
+                <li class="">
+                    <a href="#integration-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="IntegrationCount">
+                        <?php echo count($integrations); ?>
+                    </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.integration'); ?>
+                    </a>
+                </li>
+                <li class="">
+                    <a href="#auditlog-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="AuditLogCount">
+                        <?php echo $auditlog['total']; ?>
+                    </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.auditlog'); ?>
+                    </a>
+                </li>
                 <?php if ($places): ?>
                     <li class="">
                         <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
@@ -297,6 +313,8 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
+                
+                <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -337,6 +355,35 @@ $view['slots']->set(
             <?php endif; ?>
             <!--/ #social-container -->
 
+            <!-- #integration-container -->
+            <div class="tab-pane fade bdr-w-0" id="integration-container">
+                <?php echo $view->render(
+                    'MauticLeadBundle:Integration:index.html.php',
+                    [
+                        'lead'         => $lead,
+                        'integrations' => $integrations,
+                    ]
+                ); ?>
+            </div>
+            <!--/ #integration-container -->
+
+            <!-- #auditlog-container -->
+            <div class="tab-pane fade bdr-w-0" id="auditlog-container">
+                <?php echo $view->render(
+                    'MauticLeadBundle:Auditlog:list.html.php',
+                    [
+                        'events' => $auditlog,
+                        'lead'   => $lead,
+                        'tmpl'   => 'index',
+                    ]
+                ); ?>
+            </div>
+            <!--/ #auditlog-container -->
+
+            <!-- custom content -->
+            <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
+            <!-- end: custom content -->
+            
             <!-- #place-container -->
             <?php if ($places): ?>
                 <div class="tab-pane fade bdr-w-0" id="place-container">

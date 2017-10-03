@@ -109,7 +109,7 @@ class FullContactIntegration extends AbstractIntegration
      *
      * @param $section
      *
-     * @return string
+     * @return string|array
      */
     public function getFormNotes($section)
     {
@@ -117,7 +117,7 @@ class FullContactIntegration extends AbstractIntegration
             return [
                 'template'   => 'MauticFullContactBundle:Integration:form.html.php',
                 'parameters' => [
-                    'mauticUrl' => $this->factory->get('router')->generate('mautic_plugin_fullcontact_index', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                    'mauticUrl' => $this->router->generate('mautic_plugin_fullcontact_index', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 ],
             ];
         }
