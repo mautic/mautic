@@ -979,12 +979,14 @@ Mautic.initSlots = function(slotContainers) {
     });
 };
 
-Mautic.getSlotToolbar = function() {
+Mautic.getSlotToolbar = function(type) {
     Mautic.builderContents.find('[data-slot-toolbar]').remove();
 
     var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
     var deleteLink  = Mautic.getSlotDeleteLink();
-
+    if (typeof type !== 'undefined') {
+        mQuery('<span style="color:#fff;margin-left:10px;font-family:sans-serif;font-size:smaller">' + type.toUpperCase() + '</span>').appendTo(slotToolbar);
+    }
     deleteLink.appendTo(slotToolbar);
 
     return slotToolbar;
@@ -1077,7 +1079,7 @@ Mautic.initSlotListeners = function() {
         var type = slot.attr('data-slot');
 
         // initialize the drag handle
-        var slotToolbar = Mautic.getSlotToolbar();
+        var slotToolbar = Mautic.getSlotToolbar(type);
         var deleteLink  = Mautic.getSlotDeleteLink();
         var focus       = Mautic.getSlotFocus();
 
@@ -1085,7 +1087,7 @@ Mautic.initSlotListeners = function() {
             e.stopPropagation();
 
             // Get new copies of the focus, toolbar
-            slotToolbar = Mautic.getSlotToolbar();
+            slotToolbar = Mautic.getSlotToolbar(type);
             focus       = Mautic.getSlotFocus();
 
             if (Mautic.sortActive) {
@@ -1269,9 +1271,6 @@ Mautic.initSlotListeners = function() {
             focusForm.find('textarea.editor').each(function () {
                 var theEditor = this;
                 var el = parent.mQuery('<div/>');
-                if (focusType === 'dwc') {
-                    el = el.append('<div class="mautic-slot" data-slot-name="' + clickedSlot.attr('data-param-slot-name') + '"/>');
-                }
                 var slotHtml = el.html(clickedSlot.html());
                 slotHtml.find('[data-slot-focus]').remove();
                 slotHtml.find('[data-slot-toolbar]').remove();
@@ -1306,11 +1305,16 @@ Mautic.initSlotListeners = function() {
                 }
 
                 parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
-                    var el = mQuery('<div/>');
+                    var html = editor.html.get();
+                    var slotHtml = mQuery('<div/>');
                     if (focusType === 'dwc') {
-                        el = el.append('<div class="mautic-slot" data-slot-name="' + clickedSlot.attr('data-param-slot-name') + '"/>');
+                        var slotName = clickedSlot.attr('data-param-slot-name');
+                        var el = mQuery(html);
+                        el.attr('data-slot-name', slotName);
+                        slotHtml.append(el);
+                    } else {
+                        slotHtml.append(html);
                     }
-                    var slotHtml = el.append(editor.html.get());
                     // replace DEC with content from the first editor
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
@@ -1397,7 +1401,10 @@ Mautic.initSlotListeners = function() {
 
         Mautic.clearSlotFormError(fieldParam);
 
-        if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
+        if (fieldParam === 'slot-name') {
+            // update slot contents
+            parent.mQuery(params.field.parents().find('#slot_dwc_content')).froalaEditor('events.trigger', 'contentChanged');
+        } else if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
         } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
@@ -1552,12 +1559,6 @@ Mautic.initSlotListeners = function() {
                 dynConTarget.find('a.remove-item:first').click();
                 // remove vertical tab in outside form
                 parent.mQuery('.dynamicContentFilterContainer').find('a[href=' + dynConId + ']').parent().remove();
-                params.slot.remove();
-            }
-        } else if (params.type === 'dwc') {
-            // remove new DWC if name is empty
-            var slotName = params.slot.attr('data-param-slot-name');
-            if (slotName === '') {
                 params.slot.remove();
             }
         }

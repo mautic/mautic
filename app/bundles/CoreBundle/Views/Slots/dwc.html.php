@@ -9,4 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<span>Default content for anonymous contacts</span>
+<div class="mautic-slot" data-slot-name="CHANGE_ME">
+    <span>Default content for unidentified contacts</span>
+</div>
