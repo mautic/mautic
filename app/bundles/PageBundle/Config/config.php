@@ -103,7 +103,7 @@ return [
                     'mautic.page.helper.token',
                     'mautic.helper.integration',
                     'mautic.page.model.page',
-                    'mautic.page.helper.tracking',
+                    'mautic.dynamicContent.model.dynamicContent',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [

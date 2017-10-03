@@ -1310,8 +1310,10 @@ Mautic.initSlotListeners = function() {
                     if (focusType === 'dwc') {
                         var slotName = clickedSlot.attr('data-param-slot-name');
                         var el = mQuery(html);
-                        el.attr('data-slot-name', slotName);
-                        slotHtml.append(el);
+                        if (el[0].tagName === 'DIV') {
+                            el.attr('data-slot-name', slotName);
+                            slotHtml.append(el);
+                        }
                     } else {
                         slotHtml.append(html);
                     }

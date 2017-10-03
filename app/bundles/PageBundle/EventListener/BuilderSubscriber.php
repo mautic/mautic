@@ -15,6 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Form\Type\GatedVideoType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -45,25 +46,32 @@ class BuilderSubscriber extends CommonSubscriber
     protected $pageModel;
 
     protected $pageTokenRegex      = '{pagelink=(.*?)}';
+    protected $dwcTokenRegex       = '{dwc=(.*?)}';
     protected $langBarRegex        = '{langbar}';
     protected $shareButtonsRegex   = '{sharebuttons}';
     protected $titleRegex          = '{pagetitle}';
     protected $descriptionRegex    = '{pagemetadescription}';
     protected $emailIsInternalSend = false;
     protected $emailEntity         = null;
+    /**
+     * @var DynamicContentModel
+     */
+    private $dynamicContentModel;
 
     /**
      * BuilderSubscriber constructor.
      *
-     * @param TokenHelper       $tokenHelper
-     * @param IntegrationHelper $integrationHelper
-     * @param PageModel         $pageModel
+     * @param TokenHelper         $tokenHelper
+     * @param IntegrationHelper   $integrationHelper
+     * @param PageModel           $pageModel
+     * @param DynamicContentModel $dynamicContentModel
      */
-    public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
+    public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel, DynamicContentModel $dynamicContentModel)
     {
-        $this->tokenHelper       = $tokenHelper;
-        $this->integrationHelper = $integrationHelper;
-        $this->pageModel         = $pageModel;
+        $this->tokenHelper         = $tokenHelper;
+        $this->integrationHelper   = $integrationHelper;
+        $this->pageModel           = $pageModel;
+        $this->dynamicContentModel = $dynamicContentModel;
     }
 
     /**
@@ -106,8 +114,10 @@ class BuilderSubscriber extends CommonSubscriber
             $event->addAbTestWinnerCriteria('page.dwelltime', $dwellTime);
         }
 
-        if ($event->tokensRequested([$this->pageTokenRegex])) {
+        if ($event->tokensRequested([$this->pageTokenRegex, $this->dwcTokenRegex])) {
             $event->addTokensFromHelper($tokenHelper, $this->pageTokenRegex, 'title', 'id', false, true);
+            $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent');
+            $event->addTokensFromHelper($dwcTokenHelper, $this->dwcTokenRegex);
 
             $event->addTokens(
                 $event->filterTokens(

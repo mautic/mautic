@@ -57,7 +57,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <?php endif; ?>
                         </a>
                     </li>
-                    <li class="<?php echo $form->vars['value']->isCampaignBased() ? 'hide' : ''; ?>" id="dwcFiltersTab">
+                    <li class="<?php echo ($form->vars['value']->isCampaignBased() || isset($form['updateSelect'])) ? 'hide' : ''; ?>" id="dwcFiltersTab">
                         <a href="#filters" role="tab" data-toggle="tab"<?php echo $filterErrors; ?>>
                             <?php echo $view['translator']->trans('mautic.core.filters'); ?>
                             <?php if ($filterErrors): ?>
@@ -154,7 +154,9 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             <div id="publishStatus">
                 <?php echo $view['form']->row($form['isPublished']); ?>
             </div>
-            <?php echo $view['form']->row($form['isCampaignBased']); ?>
+            <?php if (!isset($form['updateSelect'])) : ?>
+                <?php echo $view['form']->row($form['isCampaignBased']); ?>
+            <?php endif ?>
             <div class="hide">
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
