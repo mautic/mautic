@@ -12,7 +12,13 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionResultLoader;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -181,6 +187,49 @@ class ResultController extends CommonFormController
                 ],
             ]
         );
+    }
+
+    /**
+     * @param int    $submissionId
+     * @param string $field
+     *
+     * @return BinaryFileResponse
+     */
+    public function downloadFileAction($submissionId, $field)
+    {
+        /** @var SubmissionResultLoader $submissionResultLoader */
+        $submissionResultLoader = $this->getModel('form.submission_result_loader');
+        $submission             = $submissionResultLoader->getSubmissionWithResult($submissionId);
+
+        if (!$submission) {
+            throw $this->createNotFoundException();
+        }
+
+        $results = $submission->getResults();
+
+        if (empty($results[$field])) {
+            throw $this->createNotFoundException();
+        }
+
+        /** @var FormUploader $formUploader */
+        $formUploader = $this->get('mautic.form.helper.form_uploader');
+
+        $fileName = $results[$field];
+        $file     = $formUploader->getCompleteFilePath($fileName);
+
+        $fs = new Filesystem();
+        if (!$fs->exists($file)) {
+            throw $this->createNotFoundException();
+        }
+
+        $response = new BinaryFileResponse($file);
+        $response::trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $fileName
+        );
+
+        return $response;
     }
 
     /**

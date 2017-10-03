@@ -71,6 +71,18 @@ class FormUploader
     }
 
     /**
+     * @param string $fileName
+     *
+     * @return string
+     */
+    public function getCompleteFilePath($fileName)
+    {
+        $uploadDir = $this->getUploadDir();
+
+        return $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+    }
+
+    /**
      * @param Submission $submission
      *
      * @todo Refactor code that result can be accessed normally and not only as a array of values
@@ -101,9 +113,7 @@ class FormUploader
      */
     private function deleteFile($fileName)
     {
-        $uploadDir = $this->getUploadDir();
-
-        $filePath = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+        $filePath = $this->getCompleteFilePath($fileName);
         $this->fileUploader->deleteFile($filePath);
     }
 
