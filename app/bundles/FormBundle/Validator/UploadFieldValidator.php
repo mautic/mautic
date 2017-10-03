@@ -65,18 +65,6 @@ class UploadFieldValidator
             $this->fileUploadValidator->validate($file->getSize(), $file->getClientOriginalExtension(), $maxUploadSize, $allowedExtensions, 'mautic.form.submission.error.file.extension', 'mautic.form.submission.error.file.size');
 
             return $file;
-            /*
-                $value = $file->move(
-                    '/dev/null', // TODO Pick a location
-                    sprintf(
-                        '%s.%s.%s.%s',
-                        $form->getId(),
-                        $id,
-                        bin2hex(random_bytes(16)),
-                        $file->guessExtension()
-                    )
-                );
-            */
         } catch (FileInvalidException $e) {
             throw new FileValidationException($e->getMessage());
         }
