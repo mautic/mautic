@@ -19,7 +19,8 @@ class Version20170926105027 extends AbstractMauticMigration
      */
     public function preUp(Schema $schema)
     {
-        if ($schema->getTable($this->prefix.'dynamic_content')->hasColumn('filters')) {
+        if ($schema->getTable($this->prefix.'dynamic_content')->hasColumn('filters') ||
+            $schema->getTable($this->prefix.'dynamic_content')->hasColumn('is_campaign_based')) {
             throw new SkipMigrationException('Schema includes this migration');
         }
     }
@@ -29,6 +30,6 @@ class Version20170926105027 extends AbstractMauticMigration
      */
     public function up(Schema $schema)
     {
-        $this->addSql('ALTER TABLE '.$this->prefix.'dynamic_content ADD filters LONGTEXT DEFAULT NULL  COMMENT \'(DC2Type:array)\'');
+        $this->addSql('ALTER TABLE '.$this->prefix.'dynamic_content ADD COLUMN(filters LONGTEXT DEFAULT NULL  COMMENT \'(DC2Type:array)\', is_campaign_based TINYINT(1) DEFAULT 1 NOT NULL)');
     }
 }

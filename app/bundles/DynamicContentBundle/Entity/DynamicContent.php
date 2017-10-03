@@ -76,6 +76,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $stats;
 
     /**
+     * @var bool
+     */
+    private $isCampaignBased = true;
+
+    /**
      * DynamicContent constructor.
      */
     public function __construct()
@@ -140,6 +145,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         self::addFiltersMetadata($builder);
+
+        $builder->createField('isCampaignBased', 'boolean')
+                ->columnName('is_campaign_based')
+                ->option('default', 1)
+                ->build();
     }
 
     /**
@@ -169,6 +179,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'variantChildren',
                 'content',
                 'filters',
+                'isCampaignBased',
             ])
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')
@@ -356,5 +367,26 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     public function getStats()
     {
         return $this->stats;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsCampaignBased() : bool
+    {
+        return $this->isCampaignBased;
+    }
+
+    /**
+     * @param bool $isCampaignBased
+     *
+     * @return $this
+     */
+    public function setIsCampaignBased($isCampaignBased)
+    {
+        $this->isChanged('isCampaignBased', $isCampaignBased);
+        $this->isCampaignBased = $isCampaignBased;
+
+        return $this;
     }
 }
