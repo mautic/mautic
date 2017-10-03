@@ -174,8 +174,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     private $sessionId;
 
-    private $customData;
-
     public function __clone()
     {
         $this->id               = null;
@@ -270,10 +268,6 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->createField('emailType', 'text')
             ->columnName('email_type')
             ->nullable()
-            ->build();
-
-        $builder->createField('customData', 'text')
-            ->columnName('custom_data')
             ->build();
 
         $builder->addPublishDates();
@@ -1075,21 +1069,5 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         } else {
             return 0;
         }
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCustomData()
-    {
-        return $this->customData;
-    }
-
-    /**
-     * @param mixed $customData
-     */
-    public function setCustomData($customData)
-    {
-        $this->customData = $customData;
     }
 }
