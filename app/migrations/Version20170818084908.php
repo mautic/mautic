@@ -27,7 +27,7 @@ class Version20170818084908 extends AbstractMauticMigration
         $shouldRunMigration = !$schema->hasTable($this->prefix.'scoring_categories');
 
         if (!$shouldRunMigration) {
-            throw new SkipMigrationException('Schema includes this migration');
+            throw new SkipMigrationException('Schema includes this migration (scoring categories)');
         }
     }
 
@@ -87,9 +87,41 @@ class Version20170818084908 extends AbstractMauticMigration
   CONSTRAINT `'.$keys['scoring_values_lead_xref'].'` FOREIGN KEY (`lead_id`) REFERENCES `'.$this->prefix.'leads` (`id`) ON DELETE CASCADE,
   CONSTRAINT `'.$keys['scoring_values_scoringcategory_xref'].'` FOREIGN KEY (`scoringcategory_id`) REFERENCES `'.$this->prefix.'scoring_categories` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci');
+        
+        $this->addSql('ALTER TABLE `'.$this->prefix.'campaign_events` ADD COLUMN `scoringcategory_id` INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE `'.$this->prefix.'points` ADD COLUMN `scoringcategory_id` INT DEFAULT NULL');
+        $this->addSql('ALTER TABLE `'.$this->prefix.'point_triggers` ADD COLUMN `scoringcategory_id` INT DEFAULT NULL');
 
         $this->addSql('ALTER TABLE `'.$this->prefix.'campaign_events` ADD CONSTRAINT '.$keys['campaign_events_scoringcategory_xref'].' FOREIGN KEY (`scoringcategory_id`) REFERENCES '.$this->prefix.'scoring_categories (`id`) ON DELETE SET NULL');
         $this->addSql('ALTER TABLE `'.$this->prefix.'points` ADD CONSTRAINT '.$keys['points_scoringcategory_xref'].' FOREIGN KEY (`scoringcategory_id`) REFERENCES '.$this->prefix.'scoring_categories (`id`) ON DELETE SET NULL');
         $this->addSql('ALTER TABLE `'.$this->prefix.'point_triggers` ADD CONSTRAINT '.$keys['point_triggers_scoringcategory_xref'].' FOREIGN KEY (`scoringcategory_id`) REFERENCES '.$this->prefix.'scoring_categories (`id`) ON DELETE SET NULL');
+        
+        $sql = <<<SQL
+INSERT INTO `{$this->prefix}scoring_categories` (`id`,
+  `is_published`,
+  `date_added`,
+  `created_by`,
+  `created_by_user`,
+  `date_modified`,
+  `modified_by`,
+  `modified_by_user`,
+  `checked_out`,
+  `checked_out_by`,
+  `checked_out_by_user`,
+  `name`,
+  `description`,
+  `publish_up`,
+  `publish_down`,
+  `order_index`,
+  `update_global_score`,
+  `global_score_modifier`,
+  `is_global_score`) 
+VALUES (1, 1, now(), 1, 'Admin', now(), 1, 'Admin', null, null, null, 'Global Scoring', '', null, null, 0, 1, 100, 1);
+SQL;
+        $this->addSql($sql);
+        
+        $this->addSql('UPDATE `'.$this->prefix.'points` set `scoringcategory_id`=1 where `scoringcategory_id` is null');
+        $this->addSql('UPDATE `'.$this->prefix.'campaign_events` set `scoringcategory_id`=1 where `scoringcategory_id` is null');
+        $this->addSql('UPDATE `'.$this->prefix.'point_triggers` set `scoringcategory_id`=1 where `scoringcategory_id` is null');
     }
 }
