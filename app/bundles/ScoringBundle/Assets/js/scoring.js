@@ -21,3 +21,17 @@ Mautic.getScoringActionPropertiesForm = function(actionType) {
         }
     });
 };
+
+Mautic.onChangeUpdateGlobalScore = function(e) {
+    var v = !!(1*e.value);
+    if(v) {
+        mQuery('#scoring_category_globalScoreModifier').removeClass('hide');
+        mQuery('label[for="scoring_category_globalScoreModifier"]').removeClass('hide');
+    } else {
+        mQuery('#scoring_category_globalScoreModifier').addClass('hide');
+        mQuery('label[for="scoring_category_globalScoreModifier"]').addClass('hide');
+        mQuery('#scoring_category_globalScoreModifier').val('0.00');
+    }
+    return true;
+};
+

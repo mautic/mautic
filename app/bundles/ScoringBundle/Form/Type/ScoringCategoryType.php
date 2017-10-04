@@ -66,13 +66,22 @@ class ScoringCategoryType extends AbstractFormStandardType
         $builder->add('updateGlobalScore', 'yesno_button_group', [
             'label'      => 'mautic.scoring.scoringCategory.action.updateGlobalScore',
             'label_attr' => ['class' => 'control-label'],
+            'attr'       => [
+                    'onchange'  => 'Mautic.onChangeUpdateGlobalScore(this)',
+                    'tooltip' => 'mautic.scoring.scoringCategory.action.updateGlobalScore.tooltip',
+                ],
         ]);
-
+        
+        $isHidden = true;
+        if (!empty($options['data']) && $options['data'] instanceof ScoringCategory) {
+            $isHidden = !($options['data']->getUpdateGlobalScore());
+        }
         $builder->add('globalScoreModifier', 'number', [
             'label'      => 'mautic.scoring.scoringCategory.action.globalScoreModifier',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'control-label'.($isHidden? ' hide':'')],
             'attr'       => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control'.($isHidden? ' hide':''),
+                    'tooltip' => 'mautic.scoring.scoringCategory.action.globalScoreModifier.tooltip',
                 ],
             'precision' => 2,
         ]);
