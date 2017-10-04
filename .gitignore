@@ -35,6 +35,7 @@
 /bin/*
 /bundles
 /node_modules
+/build/coverage
 /build/packaging
 /build/packages/*
 !/build/packages/.placeholder
