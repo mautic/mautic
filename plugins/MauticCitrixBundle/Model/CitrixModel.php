@@ -225,29 +225,22 @@ class CitrixModel extends FormModel
         if (!CitrixProducts::isValidValue($product) || !CitrixEventTypes::isValidValue($eventType)) {
             return 0; // is not a valid citrix product
         }
-        $dql = sprintf(
-            "SELECT COUNT(c.id) as cant FROM MauticCitrixBundle:CitrixEvent c WHERE c.product='%s' and c.email='%s' AND c.eventType='%s' ",
-            $product,
-            $email,
-            $eventType
-        );
+        $dql = 'SELECT COUNT(c.id) as cant FROM MauticCitrixBundle:CitrixEvent c '.
+                  ' WHERE c.product=:product and c.email=:email AND c.eventType=:eventType ';
 
         if (0 !== count($eventNames)) {
-            $dql .= sprintf(
-                'AND c.eventName IN (%s)',
-                implode(
-                    ',',
-                    array_map(
-                        function ($name) {
-                            return "'".$name."'";
-                        },
-                        $eventNames
-                    )
-                )
-            );
+            $dql .= 'AND c.eventName IN (:eventNames)';
         }
 
         $query = $this->em->createQuery($dql);
+        $query->setParameters([
+            ':product'   => $product,
+            ':email'     => $email,
+            ':eventType' => $eventType,
+        ]);
+        if (0 !== count($eventNames)) {
+            $query->setParameter(':eventNames', $eventNames);
+        }
 
         return (int) $query->getResult()[0]['cant'];
     }

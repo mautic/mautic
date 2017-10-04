@@ -2,6 +2,7 @@
 !.gitignore
 !.htaccess
 !.gitkeep
+/.env
 /composer.phar
 
 /app/bootstrap*
