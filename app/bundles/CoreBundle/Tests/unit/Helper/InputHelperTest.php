@@ -56,4 +56,22 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($expected, $actual);
         }
     }
+
+    public function testCleanArrayWithEmptyValue()
+    {
+        $this->assertEquals([], InputHelper::cleanArray(null));
+    }
+
+    public function testCleanArrayWithStringValue()
+    {
+        $this->assertEquals(['kuk'], InputHelper::cleanArray('kuk'));
+    }
+
+    public function testCleanArrayWithJS()
+    {
+        $this->assertEquals(
+            ['&#60;script&#62;console.log(&#34;log me&#34;);&#60;/script&#62;'],
+            InputHelper::cleanArray(['<script>console.log("log me");</script>'])
+        );
+    }
 }
