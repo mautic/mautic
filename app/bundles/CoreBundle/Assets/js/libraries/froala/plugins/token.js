@@ -59,6 +59,11 @@
                         nv = v.replace('a:', '');
                         k = '<a title=\'Page Link\' href=\'' + k + '\'>' + nv + '</a>';
                         tokens[k] = nv;
+                    } else if (k.match(/dwc=/i) && v.match(/a:/)){
+                        delete tokens[k];
+                        nv = v.replace('a:', '');
+                        k = '<a title=\'DYnamic Web Content\' href=\'' + k + '\'>' + nv + '</a>';
+                        tokens[k] = nv;
                     } else if (k.match(/contactfield=company/i) && !v.match(/company/i)){
                         tokens[k] = 'Company ' + v;
                     }
@@ -74,7 +79,18 @@
                 for (var i = 0; i < keys.length; i++) {
                     var val = keys[i];
                     var str = ' <div class=\'badge-wrapper\'><span class=\'badge\'>_BADGE_</span></div>';
-                    var badge = (val.match(/page link/i))? str.replace(/_BADGE_/, 'page') : (val.match(/asset link/i))? str.replace(/_BADGE_/, 'asset') : (val.match(/form=/i))? str.replace(/_BADGE_/,'form') : (val.match(/focus=/i))? str.replace(/_BADGE_/,'focus') : (val.match(/dynamiccontent=/i))? str.replace(/_BADGE_/,'dynamic') : '';
+                    var badge = (val.match(/page link/i))?
+                        str.replace(/_BADGE_/, 'page') :
+                            (val.match(/asset link/i))?
+                                str.replace(/_BADGE_/, 'asset') :
+                                    (val.match(/form=/i))?
+                                        str.replace(/_BADGE_/,'form') :
+                                            (val.match(/focus=/i))?
+                                                str.replace(/_BADGE_/,'focus') :
+                                                    (val.match(/dynamiccontent=/i))?
+                                                        str.replace(/_BADGE_/,'dynamic') :
+                                                            (val.match(/dwc=/i))?
+                                                                str.replace(/_BADGE_/,'dwc') : '';
                     var title = tokens[val];
                     if (title.length>24) title = title.substr(0, 24) + '...';
                     var newOption = '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="token" data-param1="' + val + '" title="' + title + '">' + title + badge + '</a></li>';

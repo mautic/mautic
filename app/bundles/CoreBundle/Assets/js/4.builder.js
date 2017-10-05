@@ -1403,10 +1403,7 @@ Mautic.initSlotListeners = function() {
 
         Mautic.clearSlotFormError(fieldParam);
 
-        if (fieldParam === 'slot-name') {
-            // update slot contents
-            parent.mQuery(params.field.parents().find('#slot_dwc_content')).froalaEditor('events.trigger', 'contentChanged');
-        } else if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
+        if (fieldParam === 'padding-top' || fieldParam === 'padding-bottom') {
             params.slot.css(fieldParam, params.field.val() + 'px');
         } else if ('glink' === fieldParam || 'flink' === fieldParam || 'tlink' === fieldParam) {
             params.slot.find('#'+fieldParam).attr('href', params.field.val());
