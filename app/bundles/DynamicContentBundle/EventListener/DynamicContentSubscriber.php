@@ -17,12 +17,17 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event as Events;
+use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
+use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 
 /**
@@ -30,6 +35,8 @@ use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
  */
 class DynamicContentSubscriber extends CommonSubscriber
 {
+    use MatchFilterForLeadTrait;
+
     /**
      * @var TrackableModel
      */
@@ -61,13 +68,26 @@ class DynamicContentSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    /**
+     * @var DynamicContentHelper
+     */
+    private $dynamicContentHelper;
+
+    /**
      * DynamicContentSubscriber constructor.
      *
-     * @param TrackableModel   $trackableModel
-     * @param PageTokenHelper  $pageTokenHelper
-     * @param AssetTokenHelper $assetTokenHelper
-     * @param FormTokenHelper  $formTokenHelper
-     * @param AuditLogModel    $auditLogModel
+     * @param TrackableModel       $trackableModel
+     * @param PageTokenHelper      $pageTokenHelper
+     * @param AssetTokenHelper     $assetTokenHelper
+     * @param FormTokenHelper      $formTokenHelper
+     * @param FocusTokenHelper     $focusTokenHelper
+     * @param AuditLogModel        $auditLogModel
+     * @param LeadModel            $leadModel
+     * @param DynamicContentHelper $dynamicContentHelper
      */
     public function __construct(
         TrackableModel $trackableModel,
@@ -75,14 +95,18 @@ class DynamicContentSubscriber extends CommonSubscriber
         AssetTokenHelper $assetTokenHelper,
         FormTokenHelper $formTokenHelper,
         FocusTokenHelper $focusTokenHelper,
-        AuditLogModel $auditLogModel
+        AuditLogModel $auditLogModel,
+        LeadModel $leadModel,
+        DynamicContentHelper $dynamicContentHelper
     ) {
-        $this->trackableModel   = $trackableModel;
-        $this->pageTokenHelper  = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->formTokenHelper  = $formTokenHelper;
-        $this->focusTokenHelper = $focusTokenHelper;
-        $this->auditLogModel    = $auditLogModel;
+        $this->trackableModel       = $trackableModel;
+        $this->pageTokenHelper      = $pageTokenHelper;
+        $this->assetTokenHelper     = $assetTokenHelper;
+        $this->formTokenHelper      = $formTokenHelper;
+        $this->focusTokenHelper     = $focusTokenHelper;
+        $this->auditLogModel        = $auditLogModel;
+        $this->leadModel            = $leadModel;
+        $this->dynamicContentHelper = $dynamicContentHelper;
     }
 
     /**
@@ -94,6 +118,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
             DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
             DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
+            PageEvents::PAGE_ON_DISPLAY             => ['decodeTokens', 254],
         ];
     }
 
@@ -173,5 +198,28 @@ class DynamicContentSubscriber extends CommonSubscriber
 
             $event->setContent($content);
         }
+    }
+
+    /**
+     * @param PageDisplayEvent $event
+     */
+    public function decodeTokens(PageDisplayEvent $event)
+    {
+        $content = $event->getContent();
+        $lead    = $this->security->isAnonymous() ? $this->leadModel->getCurrentLead() : null;
+        $tokens  = $this->dynamicContentHelper->findDwcTokens($content, $lead);
+        if ($lead instanceof Lead) {
+            $lead = $lead->getProfileFields();
+        }
+        $result = [];
+        foreach ($tokens as $token => $dwc) {
+            if ($this->matchFilterForLead($dwc['filters'], $lead)) {
+                $result[$token] = $dwc['content'];
+            } else {
+                $result[$token] = '';
+            }
+        }
+        $content = str_replace(array_keys($result), array_values($result), $content);
+        $event->setContent($content);
     }
 }

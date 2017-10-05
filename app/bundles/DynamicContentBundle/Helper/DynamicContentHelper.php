@@ -71,20 +71,7 @@ class DynamicContentHelper
                 $content = $data['content'];
                 $dwc     = $this->dynamicContentModel->getEntity($data['id']);
                 if ($dwc instanceof DynamicContent) {
-                    // Determine a translation based on contact's preferred locale
-                    /** @var DynamicContent $translation */
-                    list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
-                    if ($translation !== $dwc) {
-                        // Use translated version of content
-                        $dwc     = $translation;
-                        $content = $dwc->getContent();
-                    }
-                    $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
-
-                    $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-                    $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
-
-                    $content = $tokenEvent->getContent();
+                    $content = $this->getRealDynamicContent($slot, $lead, $dwc);
                 }
             }
         }
@@ -117,5 +104,67 @@ class DynamicContentHelper
         }
 
         return $content;
+    }
+
+    /**
+     * @param string $content
+     * @param Lead   $lead
+     *
+     * @return array
+     */
+    public function findDwcTokens(string $content, Lead $lead) : array
+    {
+        preg_match_all('/{dwc=(.*?)}/', $content, $matches);
+
+        $tokens = [];
+        if (!empty($matches[1])) {
+            foreach ($matches[1] as $key => $dwcId) {
+                $token = $matches[0][$key];
+                if (!empty($tokens[$token])) {
+                    continue;
+                }
+
+                $dwc = $this->dynamicContentModel->getEntity($dwcId);
+
+                if (!$dwc || $dwc->getIsCampaignBased()) {
+                    continue;
+                }
+
+                $content = $this->getRealDynamicContent($dwc->getName(), $lead, $dwc);
+
+                $tokens[$token]['content'] = $content;
+                $tokens[$token]['filters'] = $dwc->getFilters();
+            }
+
+            unset($matches);
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * @param $slot
+     * @param $lead
+     * @param $dwc
+     *
+     * @return string
+     */
+    public function getRealDynamicContent($slot, $lead, DynamicContent $dwc): string
+    {
+        $content = $dwc->getContent();
+        // Determine a translation based on contact's preferred locale
+        /** @var DynamicContent $translation */
+        list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
+        if ($translation !== $dwc) {
+            // Use translated version of content
+            $dwc     = $translation;
+            $content = $dwc->getContent();
+        }
+        $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
+
+        $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+        $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
+
+        return $tokenEvent->getContent();
     }
 }

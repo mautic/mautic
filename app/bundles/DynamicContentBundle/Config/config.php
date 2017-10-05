@@ -78,6 +78,8 @@ return [
                     'mautic.form.helper.token',
                     'mautic.focus.helper.token',
                     'mautic.core.model.auditlog',
+                    'mautic.lead.model.lead',
+                    'mautic.helper.dynamicContent',
                 ],
             ],
             'mautic.dynamicContent.subscriber.channel' => [
