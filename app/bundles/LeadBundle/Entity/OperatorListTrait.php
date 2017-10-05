@@ -295,7 +295,7 @@ trait OperatorListTrait
      *
      * @throws \InvalidArgumentException
      */
-    public function getChoiceFields(): array
+    public function getChoiceFields()
     {
         /** @var TranslatorInterface $translator */
         $translator = $this->translator;

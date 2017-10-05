@@ -57,7 +57,7 @@ class DwcEntryFiltersType extends AbstractType
                     'and' => 'mautic.lead.list.form.glue.and',
                     'or'  => 'mautic.lead.list.form.glue.or',
                 ],
-                'attr'    => [
+                'attr' => [
                     'class'    => 'form-control not-chosen glue-select',
                     'onchange' => 'Mautic.updateFilterPositioning(this)',
                 ],
@@ -123,7 +123,7 @@ class DwcEntryFiltersType extends AbstractType
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return 'dwc_entry_filters';
     }

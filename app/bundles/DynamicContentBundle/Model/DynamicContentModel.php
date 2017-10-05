@@ -317,9 +317,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                     $limit,
                     $start,
                     $this->security->isGranted($this->getPermissionBase().':viewother'),
-                    $options['top_level'] ?? false,
-                    $options['ignore_ids'] ?? [],
-                    $options['where'] ?? ''
+                    isset($options['top_level']) ? $options['top_level'] : false,
+                    isset($options['ignore_ids']) ? $options['ignore_ids'] : [],
+                    isset($options['where']) ? $options['where'] : ''
                 );
 
                 foreach ($entities as $entity) {

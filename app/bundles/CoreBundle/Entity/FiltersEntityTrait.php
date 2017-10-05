@@ -37,9 +37,9 @@ trait FiltersEntityTrait
     /**
      * @return array
      */
-    public function getFilters(): array
+    public function getFilters()
     {
-        return $this->filters ?? [];
+        return $this->filters ?: [];
     }
 
     /**

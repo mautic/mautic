@@ -127,7 +127,7 @@ class BuilderSubscriber extends CommonSubscriber
                 'id',
                 $expr
             );
-            $event->addTokens($tokens ?? []);
+            $event->addTokens(is_array($tokens) ? $tokens : []);
 
             $event->addTokens(
                 $event->filterTokens(

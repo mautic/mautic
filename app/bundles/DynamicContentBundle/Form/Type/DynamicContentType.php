@@ -364,7 +364,7 @@ class DynamicContentType extends AbstractType
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName()
     {
         return 'dwc';
     }
