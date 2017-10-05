@@ -31,7 +31,6 @@ class EmailSendEvent extends CommonEvent
      */
     private $email;
 
-
     /**
      * @var string
      */
