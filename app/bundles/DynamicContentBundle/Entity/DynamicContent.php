@@ -372,7 +372,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     /**
      * @return bool
      */
-    public function getIsCampaignBased() : bool
+    public function getIsCampaignBased()
     {
         return $this->isCampaignBased;
     }

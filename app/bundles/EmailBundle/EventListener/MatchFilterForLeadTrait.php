@@ -11,7 +11,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 /**
- * Trait MatchFilterForLeadTrait
+ * Trait MatchFilterForLeadTrait.
  */
 trait MatchFilterForLeadTrait
 {
@@ -21,7 +21,7 @@ trait MatchFilterForLeadTrait
      *
      * @return bool
      */
-    protected function matchFilterForLead(array $filter, array $lead) : bool
+    protected function matchFilterForLead(array $filter, array $lead)
     {
         $groups   = [];
         $groupNum = 0;
