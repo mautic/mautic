@@ -27,15 +27,33 @@ class ModelPass implements CompilerPassInterface
     {
         foreach ($container->findTaggedServiceIds('mautic.model') as $id => $tags) {
             $definition = $container->findDefinition($id);
-            $definition->addMethodCall('setEntityManager', [new Reference('doctrine.orm.entity_manager')]);
-            $definition->addMethodCall('setSecurity', [new Reference('mautic.security')]);
-            $definition->addMethodCall('setDispatcher', [new Reference('event_dispatcher')]);
-            $definition->addMethodCall('setTranslator', [new Reference('translator')]);
-            $definition->addMethodCall('setUserHelper', [new Reference('mautic.helper.user')]);
-            $definition->addMethodCall('setCoreParametersHelper', [new Reference('mautic.helper.core_parameters')]);
 
             $modelClass = $definition->getClass();
             $reflected  = new \ReflectionClass($modelClass);
+
+            if ($reflected->hasMethod('setEntityManager')) {
+                $definition->addMethodCall('setEntityManager', [new Reference('doctrine.orm.entity_manager')]);
+            }
+
+            if ($reflected->hasMethod('setSecurity')) {
+                $definition->addMethodCall('setSecurity', [new Reference('mautic.security')]);
+            }
+
+            if ($reflected->hasMethod('setDispatcher')) {
+                $definition->addMethodCall('setDispatcher', [new Reference('event_dispatcher')]);
+            }
+
+            if ($reflected->hasMethod('setTranslator')) {
+                $definition->addMethodCall('setTranslator', [new Reference('translator')]);
+            }
+
+            if ($reflected->hasMethod('setUserHelper')) {
+                $definition->addMethodCall('setUserHelper', [new Reference('mautic.helper.user')]);
+            }
+
+            if ($reflected->hasMethod('setCoreParametersHelper')) {
+                $definition->addMethodCall('setCoreParametersHelper', [new Reference('mautic.helper.core_parameters')]);
+            }
 
             if ($reflected->hasMethod('setRouter')) {
                 $definition->addMethodCall('setRouter', [new Reference('router')]);
