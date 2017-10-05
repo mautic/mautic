@@ -269,7 +269,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         foreach ($content as &$text) {
-            if (preg_match('/<[^<]+>/', $text) != 0) {
+            if (preg_match('/<[^<]+>/', $text) !== 0) {
                 // Parse as HTML
                 $trackableUrls = array_merge(
                     $trackableUrls,
