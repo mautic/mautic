@@ -128,6 +128,7 @@ return [
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
                     'mautic.channel.model.queue',
+                    'mautic.email.model.send_email_to_user',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
@@ -146,6 +147,12 @@ return [
                 'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
                 'arguments' => [
                     'mautic.point.model.point',
+                ],
+            ],
+            'mautic.email.touser.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\EmailToUserSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.send_email_to_user',
                 ],
             ],
             'mautic.email.calendarbundle.subscriber' => [
@@ -174,6 +181,7 @@ return [
                 'class'     => 'Mautic\EmailBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'mautic.email.model.email',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.email.dashboard.subscriber' => [
@@ -227,6 +235,10 @@ return [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailListType',
                 'alias' => 'email_list',
             ],
+            'mautic.form.type.email_click_decision' => [
+                'class' => 'Mautic\EmailBundle\Form\Type\EmailClickDecisionType',
+                'alias' => 'email_click_decision',
+            ],
             'mautic.form.type.emailopen_list' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailOpenType',
                 'alias' => 'emailopen_list',
@@ -273,12 +285,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.validator.leadlistaccess' => [
-                'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
-                'arguments' => 'mautic.factory',
-                'tag'       => 'validator.constraint_validator',
-                'alias'     => 'leadlist_access',
-            ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
                 'arguments' => [
@@ -383,6 +389,12 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
+                ],
+            ],
+            'mautic.email.model.send_email_to_user' => [
+                'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
+                'arguments' => [
+                    'mautic.email.model.email',
                 ],
             ],
         ],

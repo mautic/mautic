@@ -81,13 +81,13 @@ class LeadSubscriber extends CommonSubscriber
         $lead = $event->getLead();
 
         if ($details = $event->getChanges()) {
-            // Unset dateLastActive to prevent un-necessary audit log entries
-            unset($details['dateLastActive']);
+            // Unset dateLastActive and dateModified to prevent un-necessary audit log entries
+            unset($details['dateLastActive'], $details['dateModified']);
             if (empty($details)) {
                 return;
             }
 
-            $check = base64_encode($lead->getId().serialize($details));
+            $check = base64_encode($lead->getId().md5(json_encode($details)));
             if (!in_array($check, $preventLoop)) {
                 $preventLoop[] = $check;
 

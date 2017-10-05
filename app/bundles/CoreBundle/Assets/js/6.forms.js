@@ -109,9 +109,10 @@ Mautic.ajaxifyForm = function (formName) {
     mQuery(form + ' :submit').each(function () {
         mQuery(this).off('click.ajaxform');
         mQuery(this).on('click.ajaxform', function () {
-            if (mQuery(this).attr('name') && !mQuery("input[name='" + mQuery(this).attr('name') + "']").length) {
+            if (mQuery(this).attr('name') && !mQuery('input[name="' + mQuery(this).attr('name') + '"]').length) {
+                mQuery('input.button-clicked').remove(); // ensure the previously clicked buttons are gone
                 mQuery('form[name="' + formName + '"]').append(
-                    mQuery("<input type='hidden'>").attr({
+                    mQuery('<input type="hidden" class="button-clicked">').attr({
                         name: mQuery(this).attr('name'),
                         value: mQuery(this).attr('value')
                     })

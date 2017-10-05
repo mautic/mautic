@@ -586,6 +586,14 @@ class ListModel extends FormModel
                 ),
                 'object' => 'lead',
             ],
+            'source_id' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.source.id'),
+                'properties' => [
+                    'type' => 'number',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object'    => 'lead',
+            ],
             'notification' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.notification'),
                 'properties' => [

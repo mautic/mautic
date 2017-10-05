@@ -20,7 +20,7 @@ $view['slots']->set(
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
-            'routeBase'       => 'contact_import',
+            'routeBase'       => 'import',
             'langVar'         => 'lead.import',
             'templateButtons' => [
                 'close' => $view['security']->hasEntityAccess(
@@ -28,6 +28,11 @@ $view['slots']->set(
                     $permissions['lead:imports:viewother'],
                     $item->getCreatedBy()
                 ),
+            ],
+            'routeVars' => [
+                'close' => [
+                    'object' => $app->getRequest()->get('object', 'contacts'),
+                ],
             ],
         ]
     )

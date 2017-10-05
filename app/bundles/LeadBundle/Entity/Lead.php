@@ -29,6 +29,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
+    const FIELD_ALIAS     = '';
+    const POINTS_ADD      = 'plus';
+    const POINTS_SUBTRACT = 'minus';
+    const POINTS_MULTIPLY = 'times';
+    const POINTS_DIVIDE   = 'divide';
+
     /**
      * Used to determine social identity.
      *
@@ -127,9 +133,24 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     private $points = 0;
 
     /**
+     * @var array
+     */
+    private $pointChanges = [];
+
+    /**
+     * @var int|null
+     */
+    private $updatedPoints = null;
+
+    /**
      * @var ArrayCollection
      */
     private $pointsChangeLog;
+
+    /**
+     * @var null
+     */
+    private $actualPoints = null;
 
     /**
      * @var ArrayCollection
@@ -274,7 +295,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addIndex(['date_added'], 'lead_date_added');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -329,12 +350,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->build();
 
         $builder->createOneToMany('eventLog', LeadEventLog::class)
-                ->mappedBy('lead')
-                ->cascadePersist()
-                ->cascadeMerge()
-                ->cascadeDetach()
-                ->fetchExtraLazy()
-                ->build();
+            ->mappedBy('lead')
+            ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
+            ->fetchExtraLazy()
+            ->build();
 
         $builder->createField('lastActive', 'datetime')
             ->columnName('last_active')
@@ -778,34 +799,66 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
+     * Point changes are tracked and will be persisted as a direct DB query to avoid PHP memory overwrites with concurrent requests
+     * The risk in this is that the $changes['points'] may not be accurate but at least no points are lost.
+     *
      * @param int    $points
      * @param string $operator
      *
      * @return Lead
      */
-    public function adjustPoints($points, $operator = 'plus')
+    public function adjustPoints($points, $operator = self::POINTS_ADD)
     {
-        $oldPoints = $this->points;
+        if (!$points = (int) $points) {
+            return $this;
+        }
+
+        // Use $updatedPoints in an attempt to keep track in the $changes log although this may not be accurate if the DB updates the points rather
+        // than PHP memory
+        if (null == $this->updatedPoints) {
+            $this->updatedPoints = $this->points;
+        }
+        $oldPoints = $this->updatedPoints;
+
         switch ($operator) {
-            case 'plus':
-                $this->points += $points;
+            case self::POINTS_ADD:
+                $this->updatedPoints += $points;
+                $operator = '+';
                 break;
-            case 'minus':
-                $this->points -= $points;
+            case self::POINTS_SUBTRACT:
+                $this->updatedPoints -= $points;
+                $operator = '-';
                 break;
-            case 'times':
-                $this->points *= $points;
+            case self::POINTS_MULTIPLY:
+                $this->updatedPoints *= $points;
+                $operator = '*';
                 break;
-            case 'divide':
-                $this->points /= $points;
+            case self::POINTS_DIVIDE:
+                $this->updatedPoints /= $points;
+                $operator = '/';
                 break;
             default:
                 throw new \UnexpectedValueException('Invalid operator');
         }
 
-        $this->isChanged('points', (int) $this->points, (int) $oldPoints);
+        // Keep track of point changes to make a direct DB query
+        // Ignoring Aunt Sally here (PEMDAS)
+        if (!isset($this->pointChanges[$operator])) {
+            $this->pointChanges[$operator] = 0;
+        }
+        $this->pointChanges[$operator] += $points;
+
+        $this->isChanged('points', (int) $this->updatedPoints, (int) $oldPoints);
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPointChanges()
+    {
+        return $this->pointChanges;
     }
 
     /**
@@ -818,7 +871,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function setPoints($points)
     {
         $this->isChanged('points', $points);
-        $this->points = $points;
+        $this->points = (int) $points;
+
+        // Something is setting points directly so reset points updated by database
+        $this->resetPointChanges();
 
         return $this;
     }
@@ -830,7 +886,37 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getPoints()
     {
+        if (null !== $this->actualPoints) {
+            return $this->actualPoints;
+        } elseif (null !== $this->updatedPoints) {
+            return $this->updatedPoints;
+        }
+
         return $this->points;
+    }
+
+    /**
+     * Set by the repository method when points are updated and requeried directly on the DB side.
+     *
+     * @param $points
+     */
+    public function setActualPoints($points)
+    {
+        $this->actualPoints = (int) $points;
+    }
+
+    /**
+     * Reset point changes.
+     *
+     * @return $this
+     */
+    public function resetPointChanges()
+    {
+        $this->actualPoints  = null;
+        $this->pointChanges  = [];
+        $this->updatedPoints = null;
+
+        return $this;
     }
 
     /**
@@ -839,12 +925,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      * @param           $type
      * @param           $name
      * @param           $action
-     * @param           $pointsDelta
+     * @param           $pointChanges
      * @param IpAddress $ip
      */
-    public function addPointsChangeLogEntry($type, $name, $action, $pointsDelta, IpAddress $ip)
+    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip)
     {
-        if ($pointsDelta === 0) {
+        if ($pointChanges === 0) {
             // No need to record no change
             return;
         }
@@ -855,7 +941,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
         $event->setEventName($name);
         $event->setActionName($action);
         $event->setDateAdded(new \DateTime());
-        $event->setDelta($pointsDelta);
+        $event->setDelta($pointChanges);
         $event->setIpAddress($ip);
         $event->setLead($this);
         $this->addPointsChangeLog($event);

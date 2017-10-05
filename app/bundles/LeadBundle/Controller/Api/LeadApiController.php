@@ -21,6 +21,7 @@ use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -55,6 +56,8 @@ class LeadApiController extends CommonApiController
     {
         $existingLeads = $this->getExistingLeads();
         if (!empty($existingLeads)) {
+            $this->request->setMethod('PATCH');
+
             return parent::editEntityAction($existingLeads[0]->getId());
         }
 
@@ -680,5 +683,32 @@ class LeadApiController extends CommonApiController
         }
 
         $this->setCustomFieldValues($entity, $form, $parameters);
+    }
+
+    /**
+     * Helper method to be used in FrequencyRuleTrait.
+     *
+     * @param Form $form
+     *
+     * @return bool
+     */
+    protected function isFormCancelled($form = null)
+    {
+        return false;
+    }
+
+    /**
+     * Helper method to be used in FrequencyRuleTrait.
+     *
+     * @param Form  $form
+     * @param array $data
+     *
+     * @return bool
+     */
+    protected function isFormValid(Form $form, array $data = null)
+    {
+        $form->submit($data, 'PATCH' !== $this->request->getMethod());
+
+        return $form->isValid();
     }
 }

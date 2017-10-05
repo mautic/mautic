@@ -91,6 +91,15 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
+            'mautic.focus.campaignbundle.subscriber' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber',
+                'arguments' => [
+                    'mautic.campaign.model.event',
+                    'mautic.focus.model.focus',
+                    'mautic.page.helper.tracking',
+                    'router',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.focus.form.type.color' => [
@@ -113,6 +122,16 @@ return [
             'mautic.focus.form.type.properties' => [
                 'class' => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusPropertiesType',
                 'alias' => 'focus_properties',
+            ],
+            'mautic.focus.form.type.focusshow_list' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType',
+                'arguments' => 'router',
+                'alias'     => 'focusshow_list',
+            ],
+            'mautic.focus.form.type.focus_list' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusListType',
+                'arguments' => 'mautic.focus.model.focus',
+                'alias'     => 'focus_list',
             ],
         ],
         'models' => [

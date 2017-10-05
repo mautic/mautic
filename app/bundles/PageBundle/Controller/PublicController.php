@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -390,11 +391,16 @@ class PublicController extends CommonFormController
 
         list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
 
+        /** @var TrackingHelper $trackingHelper */
+        $trackingHelper = $this->get('mautic.page.helper.tracking');
+        $sessionValue   = $trackingHelper->getSession(true);
+
         return new JsonResponse(
             [
                 'success' => 1,
                 'id'      => ($lead) ? $lead->getId() : null,
                 'sid'     => $trackingId,
+                'events'  => $sessionValue,
             ]
         );
     }

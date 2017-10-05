@@ -14,7 +14,9 @@ namespace Mautic\CoreBundle\Tests;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 
 abstract class CommonMocks extends \PHPUnit_Framework_TestCase
@@ -81,5 +83,25 @@ abstract class CommonMocks extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         return $bundleHelper;
+    }
+
+    /**
+     * @return IpLookupHelper
+     */
+    protected function getIpLookupHelperMock()
+    {
+        return $this->getMockBuilder(IpLookupHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
+     * @return AuditLogModel
+     */
+    protected function getAuditLogModelMock()
+    {
+        return $this->getMockBuilder(AuditLogModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

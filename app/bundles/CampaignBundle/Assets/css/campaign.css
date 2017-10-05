@@ -9,8 +9,22 @@
     z-index: 1040;
 }
 
+.campaign-builder .btn-apply-builder {
+    position: fixed;
+    top: 15px;
+    right: 142px;
+    z-index: 1040;
+}
+
 .campaign-builder .builder-content {
     right: 0;
+}
+
+.campaign-builder #builder-errors {
+    position: fixed;
+    top: 52px;
+    right: 30px;
+    z-index: 1040;
 }
 
 #CampaignCanvas {
