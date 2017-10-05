@@ -37,6 +37,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class ListModel extends FormModel
 {
     use OperatorListTrait;
+    use ChoiceFieldsTrait;
 
     /**
      * @var CoreParametersHelper
