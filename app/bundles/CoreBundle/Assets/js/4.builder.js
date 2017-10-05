@@ -843,11 +843,8 @@ Mautic.sectionBackgroundChanged = function(element, color) {
     // Change the color of the editor for selected slots
     mQuery(element).find('[data-slot-focus]').each(function() {
         var focusedSlot = mQuery(this).closest('[data-slot]');
-        var slotTypes = ['text', 'dwc'];
-        for (var i = 0; i < slotTypes.length; i++) {
-            if (slotTypes[i] === focusedSlot.attr('data-slot')) {
-                Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_' + slotTypes[i] + '_content'), focusedSlot);
-            }
+        if (focusedSlot.attr('data-slot') == 'text') {
+            Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_text_content'), focusedSlot);
         }
     });
 };
@@ -1270,8 +1267,7 @@ Mautic.initSlotListeners = function() {
 
             focusForm.find('textarea.editor').each(function () {
                 var theEditor = this;
-                var el = parent.mQuery('<div/>');
-                var slotHtml = el.html(clickedSlot.html());
+                var slotHtml = parent.mQuery('<div/>').html(clickedSlot.html());
                 slotHtml.find('[data-slot-focus]').remove();
                 slotHtml.find('[data-slot-toolbar]').remove();
 
@@ -1305,18 +1301,7 @@ Mautic.initSlotListeners = function() {
                 }
 
                 parent.mQuery(this).on('froalaEditor.contentChanged', function (e, editor) {
-                    var html = editor.html.get();
-                    var slotHtml = mQuery('<div/>');
-                    if (focusType === 'dwc') {
-                        var slotName = clickedSlot.attr('data-param-slot-name');
-                        var el = mQuery(html);
-                        if (el[0].tagName === 'DIV') {
-                            el.attr('data-slot-name', slotName);
-                            slotHtml.append(el);
-                        }
-                    } else {
-                        slotHtml.append(html);
-                    }
+                    var slotHtml = mQuery('<div/>').append(editor.html.get());
                     // replace DEC with content from the first editor
                     if (!(focusType == 'dynamicContent' && mQuery(this).attr('id').match(/filters/))) {
                         clickedSlot.html(slotHtml.html());
@@ -1514,11 +1499,8 @@ Mautic.initSlotListeners = function() {
             params.slot.find('hr').css('border', params.field.val() + 'px solid #'+ sep_color);
         }
 
-        var slotTypes = ['text', 'dwc'];
-        for (var i = 0; i < slotTypes.length; i++) {
-            if (params.type == slotTypes[i]) {
-                Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_' + slotTypes[i] + '_content'), params.slot);
-            }
+        if (params.type == 'text') {
+            Mautic.setTextSlotEditorStyle(parent.mQuery('#slot_text_content'), params.slot);
         }
     });
 
@@ -1529,10 +1511,10 @@ Mautic.initSlotListeners = function() {
             Mautic.activeDECParent.append(element);
         }
 
-        if (params.type === 'text' || params.type === 'dwc') {
-            if (parent.mQuery('#slot_' + params.type  + '_content').length) {
-                parent.mQuery('#slot_' + params.type  + '_content').froalaEditor('destroy');
-                parent.mQuery('#slot_' + params.type  + '_content').find('.atwho-inserted').atwho('destroy');
+        if (params.type === 'text') {
+            if (parent.mQuery('#slot_text_content').length) {
+                parent.mQuery('#slot_text_content').froalaEditor('destroy');
+                parent.mQuery('#slot_text_content').find('.atwho-inserted').atwho('destroy');
             }
         } else if (params.type === 'image') {
             Mautic.deleteCodeModeSlot();

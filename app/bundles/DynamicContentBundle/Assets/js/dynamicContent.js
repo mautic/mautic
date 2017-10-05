@@ -31,7 +31,7 @@ Mautic.standardDynamicContentUrl = function(options) {
 };
 
 Mautic.disabledDynamicContentAction = function(opener) {
-    if (typeof opener === 'undefined') {
+    if (typeof opener == 'undefined') {
         opener = window;
     }
 

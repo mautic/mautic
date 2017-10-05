@@ -312,7 +312,6 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotCodeModeType',
                 'alias' => 'slot_codemode',
             ],
-
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
                 'alias' => 'theme_upload',

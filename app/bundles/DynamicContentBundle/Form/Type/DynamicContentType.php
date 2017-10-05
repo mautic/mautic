@@ -14,14 +14,11 @@ namespace Mautic\DynamicContentBundle\Form\Type;
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
-use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -32,12 +29,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\LocaleType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -152,7 +143,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'name',
-            TextType::class,
+            'text',
             [
                 'label'      => 'mautic.dynamicContent.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
@@ -164,7 +155,7 @@ class DynamicContentType extends AbstractType
         $builder->add(
             $builder->create(
                 'description',
-                TextareaType::class,
+                'textarea',
                 [
                     'label'      => 'mautic.dynamicContent.description',
                     'label_attr' => ['class' => 'control-label'],
@@ -174,11 +165,11 @@ class DynamicContentType extends AbstractType
             )->addModelTransformer($emojiTransformer)
         );
 
-        $builder->add('isPublished', YesNoButtonGroupType::class);
+        $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add(
             'isCampaignBased',
-            YesNoButtonGroupType::class,
+            'yesno_button_group',
             [
                 'label' => 'mautic.dwc.form.is_campaign_based',
                 'data'  => (bool) $options['data']->isCampaignBased(),
@@ -191,7 +182,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'language',
-            LocaleType::class,
+            'locale',
             [
                 'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
@@ -204,7 +195,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'publishUp',
-            DateTimeType::class,
+            'datetime',
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishup',
@@ -220,7 +211,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'publishDown',
-            DateTimeType::class,
+            'datetime',
             [
                 'widget'     => 'single_text',
                 'label'      => 'mautic.core.form.publishdown',
@@ -236,7 +227,7 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'content',
-            TextareaType::class,
+            'textarea',
             [
                 'label'      => 'mautic.dynamicContent.form.content',
                 'label_attr' => ['class' => 'control-label'],
@@ -255,7 +246,7 @@ class DynamicContentType extends AbstractType
         $builder->add(
             $builder->create(
                 'translationParent',
-                DynamicContentListType::class,
+                'dwc_list',
                 [
                     'label'      => 'mautic.core.form.translation_parent',
                     'label_attr' => ['class' => 'control-label'],
@@ -274,20 +265,20 @@ class DynamicContentType extends AbstractType
 
         $builder->add(
             'category',
-            CategoryListType::class,
+            'category',
             ['bundle' => 'dynamicContent']
         );
 
         if (!empty($options['update_select'])) {
             $builder->add(
                 'buttons',
-                FormButtonsType::class,
+                'form_buttons',
                 ['apply_text' => false]
             );
 
             $builder->add(
                 'updateSelect',
-                HiddenType::class,
+                'hidden',
                 [
                     'data'   => $options['update_select'],
                     'mapped' => false,
@@ -296,7 +287,7 @@ class DynamicContentType extends AbstractType
         } else {
             $builder->add(
                 'buttons',
-                FormButtonsType::class
+                'form_buttons'
             );
         }
 
@@ -304,7 +295,7 @@ class DynamicContentType extends AbstractType
         $builder->add(
             $builder->create(
                 'filters',
-                CollectionType::class,
+                'collection',
                 [
                     'type'    => DwcEntryFiltersType::class,
                     'options' => [

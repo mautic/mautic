@@ -275,7 +275,7 @@ Mautic.leadEmailOnLoad = function(container, response) {
         // Rewrites value of the body textarea.
         textarea.val(emailHtml.find('html').get(0).outerHTML);
     });
-};
+}
 
 Mautic.leadlistOnLoad = function(container) {
     if (mQuery(container + ' #list-search').length) {
