@@ -39,8 +39,8 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->once())
-            ->method('getUploadDirForForms')
-            ->with()
+            ->method('getParameter')
+            ->with('form_upload_dir')
             ->willReturn($uploadDir);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
@@ -98,8 +98,8 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->once())
-            ->method('getUploadDirForForms')
-            ->with()
+            ->method('getParameter')
+            ->with('form_upload_dir')
             ->willReturn($uploadDir);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
@@ -193,8 +193,8 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->once())
-            ->method('getUploadDirForForms')
-            ->with()
+            ->method('getParameter')
+            ->with('form_upload_dir')
             ->willReturn($uploadDir);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
@@ -225,8 +225,8 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $coreParametersHelperMock->expects($this->once())
-            ->method('getUploadDirForForms')
-            ->with()
+            ->method('getParameter')
+            ->with('form_upload_dir')
             ->willReturn($uploadDir);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);

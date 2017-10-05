@@ -289,7 +289,7 @@ class AssetController extends FormController
         if (null == $entity) {
             $entity = $model->getEntity();
         }
-        $entity->setMaxSize(Asset::convertSizeToBytes($this->get('mautic.helper.core_parameters')->getMaxUploadSize().'M')); // convert from MB to B
+        $entity->setMaxSize(Asset::convertSizeToBytes($this->get('mautic.helper.core_parameters')->getParameter('max_size').'M')); // convert from MB to B
         $method  = $this->request->getMethod();
         $session = $this->get('session');
 
@@ -298,7 +298,7 @@ class AssetController extends FormController
         }
 
         $maxSize    = $model->getMaxUploadSize();
-        $extensions = '.'.implode(', .', $this->get('mautic.helper.core_parameters')->getAllowedExtensionsForUpload());
+        $extensions = '.'.implode(', .', $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions'));
 
         $maxSizeError = $this->get('translator')->trans('mautic.asset.asset.error.file.size', [
             '%fileSize%' => '{{filesize}}',
@@ -422,12 +422,12 @@ class AssetController extends FormController
         /** @var \Mautic\AssetBundle\Model\AssetModel $model */
         $model  = $this->getModel('asset');
         $entity = $model->getEntity($objectId);
-        $entity->setMaxSize(Asset::convertSizeToBytes($this->get('mautic.helper.core_parameters')->getMaxUploadSize().'M')); // convert from MB to B
+        $entity->setMaxSize(Asset::convertSizeToBytes($this->get('mautic.helper.core_parameters')->getParameter('max_size').'M')); // convert from MB to B
         $session    = $this->get('session');
         $page       = $session->get('mautic.asset.page', 1);
         $method     = $this->request->getMethod();
         $maxSize    = $model->getMaxUploadSize();
-        $extensions = '.'.implode(', .', $this->get('mautic.helper.core_parameters')->getAllowedExtensionsForUpload());
+        $extensions = '.'.implode(', .', $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions'));
 
         $maxSizeError = $this->get('translator')->trans('mautic.asset.asset.error.file.size', [
             '%fileSize%' => '{{filesize}}',

@@ -9,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\EventListener\CalendarSubscriber;
 use Mautic\FormBundle\EventListener\CampaignSubscriber;
 use Mautic\FormBundle\EventListener\DashboardSubscriber;
@@ -411,6 +410,6 @@ return [
     ],
 
     'parameters' => [
-        CoreParametersHelper::PARAMETERS_FORM_UPLOAD_DIR => '%kernel.root_dir%/../media/files/form',
+        'form_upload_dir' => '%kernel.root_dir%/../media/files/form',
     ],
 ];

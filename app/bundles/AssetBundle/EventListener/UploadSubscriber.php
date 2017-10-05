@@ -98,7 +98,7 @@ class UploadSubscriber extends CommonSubscriber
     public function onUploadValidation(ValidationEvent $event)
     {
         $file       = $event->getFile();
-        $extensions = $this->coreParametersHelper->getAllowedExtensionsForUpload();
+        $extensions = $this->coreParametersHelper->getParameter('allowed_extensions');
         $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
         if ($file === null) {

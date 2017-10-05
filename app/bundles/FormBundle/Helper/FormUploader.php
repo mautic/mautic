@@ -122,6 +122,6 @@ class FormUploader
      */
     private function getUploadDir()
     {
-        return $this->coreParametersHelper->getUploadDirForForms();
+        return $this->coreParametersHelper->getParameter('form_upload_dir');
     }
 }

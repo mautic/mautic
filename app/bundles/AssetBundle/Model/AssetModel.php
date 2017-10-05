@@ -76,7 +76,7 @@ class AssetModel extends FormModel
         $this->categoryModel  = $categoryModel;
         $this->request        = $requestStack->getCurrentRequest();
         $this->ipLookupHelper = $ipLookupHelper;
-        $this->maxAssetSize   = $coreParametersHelper->getMaxUploadSize();
+        $this->maxAssetSize   = $coreParametersHelper->getParameter('mautic.max_size');
     }
 
     /**
