@@ -34,7 +34,7 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
                     <div class="mf-tagline"><?php echo $props['content']['tagline']; ?></div>
                 <?php endif; ?>
                 <div class="mf-inner-container">
-                    <?php if ($focus['type'] == 'form' && !empty($form)): ?>
+                    <?php if ($focus['type'] == 'form'): ?>
                         {focus_form}
                     <?php elseif ($focus['type'] == 'link'): ?>
                         <a href="<?php echo (empty($preview)) ? $clickUrl

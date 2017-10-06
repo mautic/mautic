@@ -174,4 +174,14 @@ final class EmailEvents
      * @var string
      */
     const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.email.on_campaign_trigger_decision';
+
+    /**
+     * The mautic.email.on_sent_email_to_user event is dispatched when email is sent to user.
+     *
+     * The event listener receives a
+     * Mautic\PointBundle\Events\TriggerExecutedEvent
+     *
+     * @var string
+     */
+    const ON_SENT_EMAIL_TO_USER = 'mautic.email.on_sent_email_to_user';
 }

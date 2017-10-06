@@ -242,6 +242,8 @@ class ReportBuilderEvent extends AbstractReportEvent
      */
     public function getLeadColumns($prefix = 'l.')
     {
+        $fields = [];
+
         foreach ($this->leadFields as $fieldArray) {
             $fields[$prefix.$fieldArray['alias']] = [
                 'label' => $this->translator->trans('mautic.report.field.lead.label', ['%field%' => $fieldArray['label']]),
