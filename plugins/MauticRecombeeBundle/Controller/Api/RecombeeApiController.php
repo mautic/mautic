@@ -38,7 +38,7 @@ class RecombeeApiController extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         $this->leadModel      = $this->getModel('lead.lead');
-        $this->recombeeHelper = $this->container->get('mautic.personalization.helper.recombee');
+        $this->recombeeHelper = $this->container->get('mautic.recombee.helper');
         parent::initialize($event);
     }
 
@@ -56,7 +56,7 @@ class RecombeeApiController extends CommonApiController
 
         if (!in_array($component, $this->components) || !in_array($action, $this->actions)) {
             return $this->returnError(
-                $this->translator->trans('mautic.plugin.personalization.api.wrong.component.action', [], 'validators'),
+                $this->translator->trans('mautic.plugin.recombee.api.wrong.component.action', [], 'validators'),
                 Response::HTTP_BAD_REQUEST
             );
         }
@@ -64,7 +64,7 @@ class RecombeeApiController extends CommonApiController
         $lead = $this->leadModel->getEntity($user);
         if (!$lead instanceof Lead || !$lead->getId()) {
             return $this->returnError(
-                $this->translator->trans('mautic.plugin.personalization.contact.doesnt.exist', [], 'validators'),
+                $this->translator->trans('mautic.plugin.recombee.contact.doesnt.exist', [], 'validators'),
                 Response::HTTP_BAD_REQUEST
             );
         }

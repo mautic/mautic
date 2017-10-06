@@ -42,8 +42,8 @@ class RecombeeIntegration extends AbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'database'   => 'mautic.plugin.personalization.integration.database',
-            'secret_key' => 'mautic.plugin.personalization.integration.secret_key',
+            'database'   => 'mautic.plugin.recombee.integration.database',
+            'secret_key' => 'mautic.plugin.recombee.integration.secret_key',
         ];
     }
 
