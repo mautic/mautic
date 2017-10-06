@@ -53,6 +53,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -143,6 +144,11 @@ class LeadModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var UserProvider
+     */
+    protected $userProvider;
+
+    /**
      * @var
      */
     protected $leadTrackingId;
@@ -173,6 +179,7 @@ class LeadModel extends FormModel
      * @param ChannelListHelper    $channelListHelper
      * @param                      $trackByIp
      * @param CoreParametersHelper $coreParametersHelper
+     * @param UserProvider         $userProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -187,7 +194,8 @@ class LeadModel extends FormModel
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
         $trackByIp,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        UserProvider $userProvider
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -202,6 +210,7 @@ class LeadModel extends FormModel
         $this->channelListHelper    = $channelListHelper;
         $this->trackByIp            = $trackByIp;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->userProvider         = $userProvider;
     }
 
     /**
@@ -1924,6 +1933,16 @@ class LeadModel extends FormModel
         }
         unset($fieldData['doNotEmail']);
 
+        if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
+            $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']], $data[$fields['ownerusername']]);
+            if ($newOwner) {
+                $lead->setOwner($newOwner);
+                //reset default import owner if exists owner for contact
+                $owner = null;
+            }
+        }
+        unset($fieldData['ownerusername']);
+
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
@@ -2087,8 +2106,8 @@ class LeadModel extends FormModel
     public function addUTMTags(Lead $lead, $params)
     {
         // known "synonym" fields expected
-        $synonyms = ['useragent'  => 'user_agent',
-                     'remotehost' => 'remote_host', ];
+        $synonyms = ['useragent' => 'user_agent',
+                    'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
