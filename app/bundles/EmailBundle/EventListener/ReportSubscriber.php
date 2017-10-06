@@ -170,16 +170,7 @@ class ReportSubscriber extends CommonSubscriber
                 unset($columns[$prefix.'read_count'], $columns[$prefix.'variant_sent_count'], $columns[$prefix.'variant_read_count']);
 
                 // Prevent null DNC records from filtering the results
-                $columns['unsubscribed']['type']    = 'bool';
-                $columns['unsubscribed']['formula'] = 'IF(dnc.id IS NULL, 0, 1)';
-
-                // is clicked for individual stats
-                $columns['is_hit'] = [
-                    'alias'   => 'is_hit',
-                    'label'   => 'mautic.email.report.is_hit',
-                    'type'    => 'bool',
-                    'formula' => 'IF('.$channelUrlTrackables.'hits is NULL, 0, 1)',
-                ];
+                $columns['unsubscribed']['formula'] = 'dnc.reason';
 
                 $statPrefix  = 'es.';
                 $statColumns = [
@@ -241,7 +232,6 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addGraph($context, 'table', 'mautic.email.table.most.emails.sent');
                 $event->addGraph($context, 'table', 'mautic.email.table.most.emails.read');
                 $event->addGraph($context, 'table', 'mautic.email.table.most.emails.failed');
-                $event->addGraph($context, 'table', 'mautic.email.table.most.emails.unsubscribed');
                 $event->addGraph($context, 'table', 'mautic.email.table.most.emails.read.percent');
             }
         }
@@ -260,7 +250,7 @@ class ReportSubscriber extends CommonSubscriber
 
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
-        $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio', 'is_hit'];
+        $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio'];
         $dncColumns   = ['unsubscribed', 'unsubscribed_ratio'];
 
         switch ($context) {
@@ -315,7 +305,7 @@ class ReportSubscriber extends CommonSubscriber
                         'e',
                         MAUTIC_TABLE_PREFIX.'lead_donotcontact',
                         'dnc',
-                        'e.id = dnc.channel_id AND dnc.channel=\'email\' AND dnc.reason in ('.DoNotContact::UNSUBSCRIBED.', '.DoNotContact::BOUNCED.') AND es.lead_id = dnc.lead_id'
+                        'e.id = dnc.channel_id AND dnc.channel=\'email\' AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' AND es.lead_id = dnc.lead_id'
                     );
                 }
 
@@ -406,9 +396,9 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.email.table.most.emails.read':
-                    $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN es.is_read THEN 1 ELSE null END) as opens')
+                    $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read"')
                                  ->groupBy('e.id, e.subject')
-                                 ->orderBy('opens', 'DESC');
+                                 ->orderBy('"read"', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -425,22 +415,6 @@ class ReportSubscriber extends CommonSubscriber
                                  ->having('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0')
                                  ->groupBy('e.id, e.subject')
                                  ->orderBy('failed', 'DESC');
-                    $limit                  = 10;
-                    $offset                 = 0;
-                    $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
-                    $graphData              = [];
-                    $graphData['data']      = $items;
-                    $graphData['name']      = $g;
-                    $graphData['iconClass'] = 'fa-exclamation-triangle';
-                    $graphData['link']      = 'mautic_email_action';
-                    $event->setGraph($g, $graphData);
-                    break;
-
-                case 'mautic.email.table.most.emails.unsubscribed':
-                    $queryBuilder->select('e.id, e.subject as title, count(CASE WHEN dnc.id THEN 1 ELSE null END) as unsubscribers')
-                                 ->having('count(CASE WHEN dnc.id THEN 1 ELSE null END) > 0')
-                                 ->groupBy('e.id, e.subject')
-                                 ->orderBy('unsubscribers', 'DESC');
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
