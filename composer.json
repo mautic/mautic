@@ -75,6 +75,7 @@
         "knplabs/gaufrette": "0.2",
         "aws/aws-sdk-php": "~2.8",
         "rackspace/php-opencloud": "1.12.*",
+        "recombee/php-api-client": "^1.5",
 
         "knplabs/knp-menu": "^2.0",
         "knplabs/knp-menu-bundle":"^2.0",

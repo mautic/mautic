@@ -1,6 +1,0 @@
-# Ignore coverage report
-tests/coverage/*
-
-# Ignore composer related files
-/composer.lock
-/vendor
