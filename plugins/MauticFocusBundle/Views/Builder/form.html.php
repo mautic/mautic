@@ -122,6 +122,7 @@ echo $view->render('MauticFormBundle:Builder:form.html.php', [
         'formExtra' => $formExtra,
         'action'    => ($preview) ? '#' : null,
         'suffix'    => '_focus',
+        'formPages' => $formPages,
     ]
 );
 ?>
