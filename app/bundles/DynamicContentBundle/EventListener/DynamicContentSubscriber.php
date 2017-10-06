@@ -207,9 +207,11 @@ class DynamicContentSubscriber extends CommonSubscriber
     {
         $content = $event->getContent();
         $lead    = $this->security->isAnonymous() ? $this->leadModel->getCurrentLead() : null;
-        $tokens  = $this->dynamicContentHelper->findDwcTokens($content, $lead);
         if ($lead instanceof Lead) {
-            $lead = $lead->getProfileFields();
+            $tokens = $this->dynamicContentHelper->findDwcTokens($content, $lead);
+            $lead   = $lead->getProfileFields();
+        } else {
+            $tokens = [];
         }
         $result = [];
         foreach ($tokens as $token => $dwc) {
