@@ -8,12 +8,12 @@ return [
     'services'    => [
         'events' => [
             'plugin.skeleton.whyMe.subscriber' => [
-                'class' => 'MauticPlugin\MauticPersonalizationBundle\EventListener\WhyMeSubscriber',
+                'class' => 'MauticPlugin\MauticRecombeeBundle\EventListener\WhyMeSubscriber',
             ],
         ],
         'other' => [
             'mautic.personalization.helper.recombee' => [
-                'class'     => 'MauticPlugin\MauticPersonalizationBundle\Helper\RecombeeHelper',
+                'class'     => 'MauticPlugin\MauticRecombeeBundle\Helper\RecombeeHelper',
                 'arguments' => [
                     'mautic.helper.integration',
                 ],
