@@ -7,15 +7,20 @@ return [
     'version'     => '1.0.0',
     'services'    => [
         'events' => [
-            'plugin.skeleton.whyMe.subscriber' => [
-                'class' => 'MauticPlugin\MauticRecombeeBundle\EventListener\WhyMeSubscriber',
+            'mautic.plugin.recombee.webhook.subscriber' => [
+                'class'       => MauticPlugin\MauticRecombeeBundle\EventListener\WebhookSubscriber::class,
+                'methodCalls' => [
+                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
+                ],
             ],
         ],
         'other' => [
             'mautic.recombee.helper' => [
-                'class'     => 'MauticPlugin\MauticRecombeeBundle\Helper\RecombeeHelper',
+                'class'     => MauticPlugin\MauticRecombeeBundle\Helper\RecombeeHelper::class,
                 'arguments' => [
                     'mautic.helper.integration',
+                    'request_stack',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],

@@ -43,7 +43,7 @@ class RecombeeApiController extends CommonApiController
     }
 
     /**
-     * @param $compnent
+     * @param $component
      * @param $user
      * @param $action
      * @param $item
