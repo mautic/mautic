@@ -24,15 +24,20 @@
         </thead>
         <tbody>
         <tr>
-            <th scope="row"><?php echo $item['channelName']; ?></th>
+            <th scope="row"><?php echo $view['channel']->getChannelLabel($item['channelName']); ?></th>
             <td><?php echo $item['attempts']; ?></td>
-            <td><?php if ($item['dateAdded']) : echo $item['dateAdded']->format('Y-m-d H:i:s'); endif; ?></td>
-            <td><?php  if ($item['scheduledDate']) : echo $item['scheduledDate']; endif; ?></td>
-            <td id="queued-status-<?php echo $item['id']; ?>"><?php echo $item['status']; ?></td>
-            <td><?php if ($item['status'] == 'pending') : ?>
-                    <button type="button" id="queued-message-<?php echo $item['id']; ?>" class="btn btn-default btn-nospin"  onclick="Mautic.cancelQueuedMessageEvent(<?php echo $item['id']; ?>)" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.queued.message.event.cancel'); ?>">
+            <td><?php if ($item['dateAdded']) : echo $view['date']->toFullConcat($item['dateAdded']); endif; ?></td>
+            <td><?php  if ($item['scheduledDate']) : echo $view['date']->toFullConcat($item['scheduledDate']); endif; ?></td>
+            <td id="queued-status-<?php echo $item['id']; ?>">
+                <?php echo $view['translator']->trans('mautic.message.queue.status.'.$item['status'], [], 'javascript'); ?>
+            </td>
+            <td>
+                <?php if ($item['status'] == 'pending') : ?>
+                <button type="button" id="queued-message-<?php echo $item['id']; ?>" class="btn btn-default btn-nospin"  onclick="Mautic.cancelQueuedMessageEvent(<?php echo $item['id']; ?>)" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.queued.message.event.cancel'); ?>">
                     <i class="fa fa-times text-danger"></i>
-                </button>  <?php endif; ?></td>
+                </button>
+                <?php endif; ?>
+            </td>
         </tr>
         </tbody>
     </table>
