@@ -589,9 +589,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $lists     = $email->getLists();
         $listCount = count($lists);
-        $combined  = [0, 0, 0, 0, 0, 0];
-
-        $chart = new BarChart(
+        $chart     = new BarChart(
             [
                 $this->translator->trans('mautic.email.sent'),
                 $this->translator->trans('mautic.email.read'),
@@ -615,31 +613,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
             $key   = ($listCount > 1) ? 1 : 0;
 
-            $sentCounts         = $statRepo->getSentCount($emailIds, true, $query);
-            $readCounts         = $statRepo->getReadCount($emailIds, true, $query);
-            $failedCounts       = $statRepo->getFailedCount($emailIds, true, $query);
+            $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
+            $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
+            $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
             $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query);
             $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
             $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
 
             foreach ($lists as $l) {
-                $sentCount = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
-                $combined[0] += $sentCount;
-
-                $readCount = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
-                $combined[1] += $readCount;
-
-                $failedCount = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
-                $combined[2] += $failedCount;
-
-                $clickCount = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
-                $combined[3] += $clickCount;
-
+                $sentCount         = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
+                $readCount         = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
+                $failedCount       = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
+                $clickCount        = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
                 $unsubscribedCount = isset($unsubscribedCounts[$l->getId()]) ? $unsubscribedCounts[$l->getId()] : 0;
-                $combined[4] += $unsubscribedCount;
-
-                $bouncedCount = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
-                $combined[5] += $bouncedCount;
+                $bouncedCount      = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
 
                 $chart->setDataset(
                     $l->getName(),
@@ -656,14 +643,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                 ++$key;
             }
-        }
 
-        if ($listCount > 1) {
-            $chart->setDataset(
-                $this->translator->trans('mautic.email.lists.combined'),
-                $combined,
-                0
-            );
+            $combined = [
+                $statRepo->getSentCount($emailIds, $lists->getKeys(), $query, true),
+                $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, true),
+                $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query, true),
+                $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true),
+                $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query, true),
+                $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query, true),
+            ];
+
+            if ($listCount > 1) {
+                $chart->setDataset(
+                    $this->translator->trans('mautic.email.lists.combined'),
+                    $combined,
+                    0
+                );
+            }
         }
 
         return $chart->render();
