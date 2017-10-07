@@ -206,8 +206,8 @@ class PublicController extends CommonFormController
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
-                    $tokensPresent = preg_match('/'.BuilderSubscriber::saveprefsRegex.'/g', $html) &&
-                                        preg_match('/'.BuilderSubscriber::channelfrequency.'/g', $html);
+                    $tokensPresent = strpos($html, BuilderSubscriber::saveprefsRegex) >= 0 &&
+                                        strpos($html, BuilderSubscriber::channelfrequency) >= 0;
                     if ($tokensPresent) {
                         // set custom tag to inject end form
                         $params = array_merge(
