@@ -78,6 +78,15 @@ class UserType extends AbstractType
 
         $langChoices = array_merge($langChoices, $parametersHelper->getParameter('supported_languages'));
 
+        foreach ($langChoices as $code => $name) {
+            $langLookupKey = 'mautic.core.language.'.$code;
+            $langText      = $this->translator->trans($langLookup);
+
+            if ($langText !== $langLookupKey) {
+                $langChoices[$code] = $langText;
+            }
+        }
+
         // Alpha sort the languages by name
         asort($langChoices);
 
