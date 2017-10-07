@@ -51,15 +51,15 @@ class BuilderSubscriber extends CommonSubscriber
     protected $shareButtonsRegex   = '{sharebuttons}';
     protected $titleRegex          = '{pagetitle}';
     protected $descriptionRegex    = '{pagemetadescription}';
-    protected $segmentListRegex    = '{segmentlist}';
-    protected $categoryListRegex   = '{categorylist}';
-    protected $preferredchannel    = '{preferredchannel}';
-    protected $channelfrequency    = '{channelfrequency}';
-    protected $saveprefsRegex      = '{saveprefsbutton}';
     protected $emailIsInternalSend = false;
     protected $emailEntity         = null;
 
-    const identifierToken = '{leadidentifier}';
+    const segmentListRegex  = '{segmentlist}';
+    const categoryListRegex = '{categorylist}';
+    const channelfrequency  = '{channelfrequency}';
+    const preferredchannel  = '{preferredchannel}';
+    const saveprefsRegex    = '{saveprefsbutton}';
+    const identifierToken   = '{leadidentifier}';
 
     public function __construct(TokenHelper $tokenHelper, IntegrationHelper $integrationHelper, PageModel $pageModel)
     {
@@ -118,11 +118,11 @@ class BuilderSubscriber extends CommonSubscriber
                         $this->shareButtonsRegex => $this->translator->trans('mautic.page.token.share'),
                         $this->titleRegex        => $this->translator->trans('mautic.core.title'),
                         $this->descriptionRegex  => $this->translator->trans('mautic.page.form.metadescription'),
-                        $this->segmentListRegex  => $this->translator->trans('mautic.page.form.segmentlist'),
-                        $this->categoryListRegex => $this->translator->trans('mautic.page.form.categorylist'),
-                        $this->preferredchannel  => $this->translator->trans('mautic.page.form.preferredchannel'),
-                        $this->channelfrequency  => $this->translator->trans('mautic.page.form.channelfrequency'),
-                        $this->saveprefsRegex    => $this->translator->trans('mautic.page.form.saveprefs'),
+                        self::segmentListRegex   => $this->translator->trans('mautic.page.form.segmentlist'),
+                        self::categoryListRegex  => $this->translator->trans('mautic.page.form.categorylist'),
+                        self::preferredchannel   => $this->translator->trans('mautic.page.form.preferredchannel'),
+                        self::channelfrequency   => $this->translator->trans('mautic.page.form.channelfrequency'),
+                        self::saveprefsRegex     => $this->translator->trans('mautic.page.form.saveprefs'),
                         self::identifierToken    => $this->translator->trans('mautic.page.form.leadidentifier'),
                     ]
                 )
@@ -319,64 +319,64 @@ class BuilderSubscriber extends CommonSubscriber
                 $divContent = $xpath->query('//*[@data-slot="segmentlist"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
-                    $slot->nodeValue = $this->segmentListRegex;
+                    $slot->nodeValue = self::segmentListRegex;
                     $content         = $dom->saveHTML();
                 }
 
                 $divContent = $xpath->query('//*[@data-slot="categorylist"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
-                    $slot->nodeValue = $this->categoryListRegex;
+                    $slot->nodeValue = self::categoryListRegex;
                     $content         = $dom->saveHTML();
                 }
 
                 $divContent = $xpath->query('//*[@data-slot="preferredchannel"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
-                    $slot->nodeValue = $this->preferredchannel;
+                    $slot->nodeValue = self::preferredchannel;
                     $content         = $dom->saveHTML();
                 }
 
                 $divContent = $xpath->query('//*[@data-slot="channelfrequency"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
-                    $slot->nodeValue = $this->channelfrequency;
+                    $slot->nodeValue = self::channelfrequency;
                     $content         = $dom->saveHTML();
                 }
 
                 $divContent = $xpath->query('//*[@data-slot="saveprefsbutton"]');
                 for ($i = 0; $i < $divContent->length; ++$i) {
                     $slot            = $divContent->item($i);
-                    $slot->nodeValue = $this->saveprefsRegex;
+                    $slot->nodeValue = self::saveprefsRegex;
                     $content         = $dom->saveHTML();
                 }
 
                 unset($slot, $xpath, $dom);
             }
             // replace tokens
-            if (strpos($content, $this->segmentListRegex) !== false) {
+            if (strpos($content, self::segmentListRegex) !== false) {
                 $segmentList = $this->renderSegmentList($params);
-                $content     = str_ireplace($this->segmentListRegex, $segmentList, $content);
+                $content     = str_ireplace(self::segmentListRegex, $segmentList, $content);
             }
 
-            if (strpos($content, $this->categoryListRegex) !== false) {
+            if (strpos($content, self::categoryListRegex) !== false) {
                 $categoryList = $this->renderCategoryList($params);
-                $content      = str_ireplace($this->categoryListRegex, $categoryList, $content);
+                $content      = str_ireplace(self::categoryListRegex, $categoryList, $content);
             }
 
-            if (strpos($content, $this->preferredchannel) !== false) {
+            if (strpos($content, self::preferredchannel) !== false) {
                 $preferredChannel = $this->renderPreferredChannel($params);
-                $content          = str_ireplace($this->preferredchannel, $preferredChannel, $content);
+                $content          = str_ireplace(self::preferredchannel, $preferredChannel, $content);
             }
 
-            if (strpos($content, $this->channelfrequency) !== false) {
+            if (strpos($content, self::channelfrequency) !== false) {
                 $channelfrequency = $this->renderChannelFrequency($params);
-                $content          = str_ireplace($this->channelfrequency, $channelfrequency, $content);
+                $content          = str_ireplace(self::channelfrequency, $channelfrequency, $content);
             }
 
-            if (strpos($content, $this->saveprefsRegex) !== false) {
+            if (strpos($content, self::saveprefsRegex) !== false) {
                 $savePrefs = $this->renderSavePrefs($params);
-                $content   = str_ireplace($this->saveprefsRegex, $savePrefs, $content);
+                $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
         }
 

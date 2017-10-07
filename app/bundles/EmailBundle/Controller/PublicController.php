@@ -176,29 +176,7 @@ class PublicController extends CommonFormController
             }
 
             if (!$this->get('mautic.helper.core_parameters')->getParameter('show_contact_preferences')) {
-                $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
-
-                $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
-                if (!$message) {
-                    $message = $translator->trans(
-                        'mautic.email.unsubscribed.success',
-                        [
-                            '%resubscribeUrl%' => '|URL|',
-                            '%email%'          => '|EMAIL|',
-                        ]
-                    );
-                }
-                $message = str_replace(
-                    [
-                        '|URL|',
-                        '|EMAIL|',
-                    ],
-                    [
-                        $this->generateUrl('mautic_email_resubscribe', ['idHash' => $idHash]),
-                        $stat->getEmailAddress(),
-                    ],
-                    $message
-                );
+                $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $translator);
             } elseif ($lead) {
                 $action = $this->generateUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
 
@@ -224,19 +202,30 @@ class PublicController extends CommonFormController
                 }
 
                 $formView = $form->createView();
-                // Replace tokens in preference center page
                 /** @var Page $prefCenter */
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
                     $html = $prefCenter->getCustomHtml();
-                    // set custom tag to inject end form
-                    $params = array_merge($viewParameters, [
-                        'form'       => $formView,
-                        'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
-                    ]);
-                    $event = new PageDisplayEvent($html, $prefCenter, $params);
-                    $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
-                    $html = $event->getContent();
-                    $html = preg_replace('/'.BuilderSubscriber::identifierToken.'/', $lead->getPrimaryIdentifier(), $html);
+                    // check if tokens are present
+                    $tokensPresent = preg_match('/'.BuilderSubscriber::saveprefsRegex.'/g', $html) &&
+                                        preg_match('/'.BuilderSubscriber::channelfrequency.'/g', $html);
+                    if ($tokensPresent) {
+                        // set custom tag to inject end form
+                        $params = array_merge(
+                            $viewParameters,
+                            [
+                                'form'       => $formView,
+                                'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
+                            ]
+                        );
+                        // Replace tokens in preference center page
+                        $event = new PageDisplayEvent($html, $prefCenter, $params);
+                        $this->get('event_dispatcher')
+                             ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                        $html = $event->getContent();
+                        $html = preg_replace('/'.BuilderSubscriber::identifierToken.'/', $lead->getPrimaryIdentifier(), $html);
+                    } else {
+                        unset($html);
+                    }
                 }
 
                 if (empty($html)) {
@@ -705,5 +694,42 @@ class PublicController extends CommonFormController
 
         // return entity
         return $repo->getLeadByEmail($email);
+    }
+
+    /**
+     * @param $idHash
+     * @param $model
+     * @param $stat
+     * @param $translator
+     *
+     * @return mixed
+     */
+    public function getUnsubscribeMessage($idHash, $model, $stat, $translator)
+    {
+        $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
+
+        $message = $this->coreParametersHelper->getParameter('unsubscribe_message');
+        if (!$message) {
+            $message = $translator->trans(
+                'mautic.email.unsubscribed.success',
+                [
+                    '%resubscribeUrl%' => '|URL|',
+                    '%email%'          => '|EMAIL|',
+                ]
+            );
+        }
+        $message = str_replace(
+            [
+                '|URL|',
+                '|EMAIL|',
+            ],
+            [
+                $this->generateUrl('mautic_email_resubscribe', ['idHash' => $idHash]),
+                $stat->getEmailAddress(),
+            ],
+            $message
+        );
+
+        return $message;
     }
 }
