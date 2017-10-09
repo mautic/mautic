@@ -9,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view['assets']->addScript('app/bundles/PageBundle/Assets/js/prefcenter.js');
 ?>
 <?php if (isset($form)) : ?>
     <?php if ($showContactPreferredChannels):?>

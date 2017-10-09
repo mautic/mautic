@@ -8,12 +8,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view['assets']->addScript('app/bundles/PageBundle/Assets/js/prefcenter.js');
 if (isset($form)) {
     // add form tag
     $view['assets']->addCustomDeclaration($view['form']->start($form), 'bodyOpen');
 }
 ?>
+<script src="<?php echo $view['assets']->getUrl('app/bundles/PageBundle/Assets/js/prefcenter.js'); ?>"></script>
     <a href="javascript:void(null)"
        class="button btn btn-default btn-save"
        <?php if (isset($form)) : ?>onclick="saveUnsubscribePreferences('<?php echo $form->vars['id']; ?>')"<?php endif; ?>
