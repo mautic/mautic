@@ -206,15 +206,19 @@ class PublicController extends CommonFormController
                 if ($email && ($prefCenter = $email->getPreferenceCenter()) && ($prefCenter->getIsPreferenceCenter())) {
                     $html = $prefCenter->getCustomHtml();
                     // check if tokens are present
-                    $tokensPresent = strpos($html, BuilderSubscriber::saveprefsRegex) >= 0 &&
-                                        strpos($html, BuilderSubscriber::channelfrequency) >= 0;
+                    $tokensPresent = false !== strpos($html, 'data-slot="channelfrequency"') &&
+                                        false !== strpos($html, 'data-slot="saveprefsbutton"');
                     if ($tokensPresent) {
                         // set custom tag to inject end form
+                        // update show pref center slots by looking for their presence in the html
                         $params = array_merge(
                             $viewParameters,
                             [
-                                'form'       => $formView,
-                                'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
+                                'form'                         => $formView,
+                                'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
+                                'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"'),
+                                'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"'),
+                                'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"'),
                             ]
                         );
                         // Replace tokens in preference center page
