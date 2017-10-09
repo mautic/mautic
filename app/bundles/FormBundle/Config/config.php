@@ -288,6 +288,7 @@ return [
                 'class'     => FormFieldFileType::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'translator',
                 ],
             ],
             'mautic.form.type.field_propertygroup' => [

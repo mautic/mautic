@@ -19,6 +19,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 
 /**
@@ -32,9 +33,15 @@ class FormFieldFileType extends AbstractType
     /** @var CoreParametersHelper */
     private $coreParametersHelper;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -59,7 +66,8 @@ class FormFieldFileType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
-                        'class' => 'form-control',
+                        'class'   => 'form-control',
+                        'tooltip' => 'mautic.form.field.file.tooltip.allowed_extensions',
                     ],
                     'data'        => $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS],
                     'constraints' => [new FileExtensionConstraint()],
@@ -67,6 +75,7 @@ class FormFieldFileType extends AbstractType
             )->addViewTransformer($arrayStringTransformer)
         );
 
+        $maxUploadSize = FileHelper::getMaxUploadSizeInMegabytes();
         $builder->add(
             self::PROPERTY_ALLOWED_FILE_SIZE,
             TextType::class,
@@ -75,10 +84,11 @@ class FormFieldFileType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => $this->translator->trans('mautic.form.field.file.tooltip.allowed_size', ['%uploadSize%' => $maxUploadSize]),
                 ],
                 'data'        => $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE],
-                'constraints' => [new LessThanOrEqual(['value' => FileHelper::getMaxUploadSizeInMegabytes()])],
+                'constraints' => [new LessThanOrEqual(['value' => $maxUploadSize])],
             ]
         );
     }
