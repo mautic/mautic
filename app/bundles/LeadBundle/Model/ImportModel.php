@@ -20,14 +20,15 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -189,10 +190,11 @@ class ImportModel extends FormModel
      *
      * @param Import   $import
      * @param Progress $progress
+     * @param int      $limit    Number of records to import before delaying the import. 0 will import all
      *
      * @return bool
      */
-    public function startImport(Import $import, Progress $progress)
+    public function startImport(Import $import, Progress $progress, $limit = 0)
     {
         $this->setGhostImportsAsFailed();
 
@@ -221,8 +223,17 @@ class ImportModel extends FormModel
             return false;
         }
 
-        $progress->setTotal($import->getLineCount());
-        $progress->setDone($import->getProcessedRows());
+        $processed = $import->getProcessedRows();
+        $total     = $import->getLineCount();
+        $pending   = $total - $processed;
+
+        if ($limit && $limit < $pending) {
+            $processed = 0;
+            $total     = $limit;
+        }
+
+        $progress->setTotal($total);
+        $progress->setDone($processed);
 
         $import->start();
 
@@ -231,7 +242,7 @@ class ImportModel extends FormModel
         $this->logDebug('The background import is about to start', $import);
 
         try {
-            if (!$this->process($import, $progress)) {
+            if (!$this->process($import, $progress, $limit)) {
                 return false;
             }
         } catch (ORMException $e) {
@@ -277,10 +288,11 @@ class ImportModel extends FormModel
      *
      * @param Import   $import
      * @param Progress $progress
+     * @param int      $limit    Number of records to import before delaying the import
      *
      * @return bool
      */
-    public function process(Import $import, Progress $progress)
+    public function process(Import $import, Progress $progress, $limit = 0)
     {
         try {
             $file = new \SplFileObject($import->getFilePath());
@@ -296,6 +308,7 @@ class ImportModel extends FormModel
         $headers     = $import->getHeaders();
         $headerCount = count($headers);
         $config      = $import->getParserConfig();
+        $counter     = 0;
 
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
 
@@ -371,6 +384,13 @@ class ImportModel extends FormModel
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
             }
 
+            // Release entities in Doctrine's memory to prevent memory leak
+            $this->em->detach($eventLog);
+            $eventLog = null;
+            $data     = null;
+            $this->em->clear(Lead::class);
+            $this->em->clear(Company::class);
+
             // Save Import entity once per batch so the user could see the progress
             if ($batchSize === 0 && $import->isBackgroundProcess()) {
                 $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
@@ -380,11 +400,6 @@ class ImportModel extends FormModel
                 }
 
                 $this->saveEntity($import);
-
-                // clear unit of work of already imported data to save memory
-                $this->em->clear('Mautic\LeadBundle\Entity\Lead');
-                $this->em->clear('Mautic\LeadBundle\Entity\Company');
-
                 $this->dispatchEvent('batch_processed', $import);
 
                 // Stop the import loop if the import got unpublished
@@ -394,6 +409,14 @@ class ImportModel extends FormModel
                 }
 
                 $batchSize = $config['batchlimit'];
+            }
+
+            ++$counter;
+            if ($limit && $counter >= $limit) {
+                $import->setStatus($import::DELAYED);
+                $this->saveEntity($import);
+
+                break;
             }
         }
 
