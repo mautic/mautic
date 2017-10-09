@@ -104,8 +104,6 @@ class EmailValidatorTest extends \PHPUnit_Framework_TestCase
     {
         try {
             $this->getEmailValidator()->doPluginValidation('bad@gmail.com');
-
-            return;
         } catch (InvalidEmailException $exception) {
             if ('bad email' === $exception->getMessage()) {
                 return;
