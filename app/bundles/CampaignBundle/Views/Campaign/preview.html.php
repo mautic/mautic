@@ -25,9 +25,42 @@
             </div>
 
             <?php
-            foreach ($campaignSources as $source):
-                echo $view->render('MauticCampaignBundle:Source:index.html.php', $source);
-            endforeach;
+            /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
+            if (count($campaign->getForms())) {
+                $sources = [
+                    'sourceType' => 'forms',
+                    'campaignId' => $campaignId,
+                    'names'      => implode(
+                        ', ',
+                        array_map(
+                            function (\Mautic\FormBundle\Entity\Form $f) {
+                                return $f->getName();
+                            },
+                            $campaign->getForms()
+                                     ->toArray()
+                        )
+                    ),
+                ];
+                echo $view->render('MauticCampaignBundle:Source:index.html.php', $sources);
+            }
+
+            if (count($campaign->getLists())) {
+                $sources = [
+                    'sourceType' => 'lists',
+                    'campaignId' => $campaignId,
+                    'names'      => implode(
+                        ', ',
+                        array_map(
+                            function (\Mautic\LeadBundle\Entity\LeadList $f) {
+                                return $f->getName();
+                            },
+                            $campaign->getLists()
+                                     ->toArray()
+                        )
+                    ),
+                ];
+                echo $view->render('MauticCampaignBundle:Source:index.html.php', $sources);
+            }
 
             foreach ($campaignEvents as $event):
                 echo $view->render('MauticCampaignBundle:Event:preview.html.php', ['event' => $event, 'campaignId' => $campaignId]);

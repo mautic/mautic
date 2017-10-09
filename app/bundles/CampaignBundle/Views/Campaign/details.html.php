@@ -38,6 +38,7 @@ $campaignId = $campaign->getId();
 
 $preview = trim($view->render('MauticCampaignBundle:Campaign:preview.html.php', [
     'campaignId'      => $campaignId,
+    'campaign'        => $campaign,
     'campaignEvents'  => $campaignEvents,
     'campaignSources' => $campaignSources,
     'eventSettings'   => $eventSettings,
