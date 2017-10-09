@@ -14,7 +14,6 @@ if (empty($route)) {
 
 $eventType  = $event['eventType'];
 $eventLogic = '';
-$translator = $this->get('translator');
 
 ?>
 <?php if (empty($update)): ?>
