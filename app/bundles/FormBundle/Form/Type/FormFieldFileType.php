@@ -13,11 +13,13 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraint;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 
 /**
  * Class FormFieldFileType.
@@ -75,7 +77,8 @@ class FormFieldFileType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'data' => $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE],
+                'data'        => $options['data'][self::PROPERTY_ALLOWED_FILE_SIZE],
+                'constraints' => [new LessThanOrEqual(['value' => FileHelper::getMaxUploadSizeInMegabytes()])],
             ]
         );
     }
