@@ -44,8 +44,8 @@ if (empty($preview)):
             var headline = document.getElementsByClassName('mf-headline');
             if (headline.length) {
                 headline[0].style.display = "none";
-            }
 
+            }
             var tagline = document.getElementsByClassName('mf-tagline');
             if (tagline.length) {
                 tagline[0].style.display = "none";
@@ -118,11 +118,21 @@ $formExtra = <<<EXTRA
 EXTRA;
 
 echo $view->render('MauticFormBundle:Builder:form.html.php', [
-        'form'      => $form,
-        'formExtra' => $formExtra,
-        'action'    => ($preview) ? '#' : null,
-        'suffix'    => '_focus',
-        'formPages' => $formPages,
+        'form'          => $form,
+        'formExtra'     => $formExtra,
+        'action'        => ($preview) ? '#' : null,
+        'suffix'        => '_focus',
+        'fieldSettings' => $fieldSettings,
+        'fields'        => $fields,
+        'contactFields' => $contactFields,
+        'companyFields' => $companyFields,
+        'theme'         => $theme,
+        'submissions'   => $submissions,
+        'lead'          => $lead,
+        'formPages'     => $formPages,
+        'lastFormPage'  => $lastFormPage,
+        'style'         => $styleForm,
+        'inBuilder'     => $inBuilder,
     ]
 );
 ?>

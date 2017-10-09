@@ -16,7 +16,9 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
@@ -27,6 +29,7 @@ use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class FocusModel extends FormModel
@@ -52,9 +55,19 @@ class FocusModel extends FormModel
     protected $templating;
 
     /**
+     * @var ThemeHelper
+     */
+    protected $themeHelper;
+
+    /**
      * @var
      */
     protected $leadModel;
+
+    /**
+     * @var
+     */
+    protected $leadFieldModel;
 
     /**
      * FocusModel constructor.
@@ -64,14 +77,20 @@ class FocusModel extends FormModel
      * @param TemplatingHelper                   $templating
      * @param EventDispatcherInterface           $dispatcher
      * @param LeadModel                          $leadModel
+     * @param ThemeHelper                        $themeHelper
+     * @param LeadFieldModel                     $leadFieldModel
+     * @param RequestStack                       $requestStack
      */
-    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel)
+    public function __construct(\Mautic\FormBundle\Model\FormModel $formModel, TrackableModel $trackableModel, TemplatingHelper $templating, EventDispatcherInterface $dispatcher, LeadModel $leadModel, ThemeHelper $themeHelper, LeadFieldModel $leadFieldModel, RequestStack $requestStack)
     {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
         $this->templating     = $templating;
         $this->dispatcher     = $dispatcher;
         $this->leadModel      = $leadModel;
+        $this->themeHelper    = $themeHelper;
+        $this->leadFieldModel = $leadFieldModel;
+        $this->request        = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -264,6 +283,26 @@ class FocusModel extends FormModel
 
         // Form has to be generated outside of the content or else the form src will be converted to clickables
 
+        //generate cached HTML
+        $theme       = $form->getTemplate();
+        $submissions = null;
+        $lead        = ($this->request) ? $this->leadModel->getCurrentLead() : null;
+        $style       = '';
+
+        if (!empty($theme)) {
+            $theme .= '|';
+        }
+
+        if ($lead && $form->usesProgressiveProfiling()) {
+            $submissions = $form->getLeadSubmissions($form, $lead->getId());
+        }
+
+        if ($form->getRenderStyle()) {
+            $templating = $this->templating->getTemplating();
+            $styleTheme = $theme.'MauticFormBundle:Builder:style.html.php';
+            $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+        }
+
         // Determine pages
         $fields = $form->getFields()->toArray();
 
@@ -316,15 +355,36 @@ class FocusModel extends FormModel
         }
 
         $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
+            $theme.'MauticFocusBundle:Builder:form.html.php',
+            [
+                'form'          => $form,
+                'style'         => $focus['style'],
+                'focusId'       => $focus['id'],
+                'preview'       => $isPreview,
+                'fieldSettings' => $this->formModel->getCustomComponents()['fields'],
+                'fields'        => $fields,
+                'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'theme'         => $theme,
+                'submissions'   => $submissions,
+                'lead'          => $lead,
+                'formPages'     => $pages,
+                'lastFormPage'  => $lastPage,
+                'styleForm'     => $style,
+                'inBuilder'     => false,
+            ]
+        ) : '';
+
+        /*$formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:form.html.php',
             [
                 'form'      => $form,
                 'style'     => $focus['style'],
                 'focusId'   => $focus['id'],
                 'preview'   => $isPreview,
-                'formPages' => $pages,
+                'renderedForm' => $renderedForm,
             ]
-        ) : '';
+        ) : '';*/
 
         if ($isPreview) {
             $content = str_replace('{focus_form}', $formContent, $content, $formReplaced);
