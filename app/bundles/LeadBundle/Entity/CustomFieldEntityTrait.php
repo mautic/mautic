@@ -171,7 +171,7 @@ trait CustomFieldEntityTrait
      * @param string $field
      * @param string $group
      *
-     * @return array|false
+     * @return mixed
      */
     public function getFieldValue($field, $group = null)
     {
@@ -183,7 +183,7 @@ trait CustomFieldEntityTrait
             return CustomFieldHelper::fixValueType($field['type'], $field['value']);
         }
 
-        return false;
+        return null;
     }
 
     /**
