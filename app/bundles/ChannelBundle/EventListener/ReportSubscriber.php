@@ -101,6 +101,7 @@ class ReportSubscriber extends CommonSubscriber
                     'display_name' => 'mautic.message.queue',
                     'columns'      => array_merge(
                         $columns,
+                        $event->getStandardColumns('l.', [], 'mautic_contact_action'),
                         $event->getLeadColumns()
                     ),
                 ]
