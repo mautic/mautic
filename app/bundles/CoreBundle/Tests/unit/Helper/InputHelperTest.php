@@ -70,6 +70,18 @@ class InputHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @testdox The email returns value without surrounding white spaces
+     *
+     * @covers \Mautic\CoreBundle\Helper\InputHelper::email
+     */
+    public function testEmailFilterRemovesWhitespace()
+    {
+        $clean = InputHelper::email('    john.doe@email.com  ');
+
+        $this->assertEquals('john.doe@email.com', $clean);
+    }
+
+    /**
      * @testdox The array is cleaned
      *
      * @covers \Mautic\CoreBundle\Helper\InputHelper::cleanArray
