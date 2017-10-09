@@ -44,6 +44,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
+use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 
 return [
@@ -406,10 +407,21 @@ return [
                     'mautic.core.validator.file_upload',
                 ],
             ],
+            'mautic.form.validator.constraint.file_extension_constraint_validator' => [
+                'class'     => FileExtensionConstraintValidator::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+                'tags' => [
+                    'name'  => 'validator.constraint_validator',
+                    'alias' => 'file_extension_constraint_validator',
+                ],
+            ],
         ],
     ],
 
     'parameters' => [
-        'form_upload_dir' => '%kernel.root_dir%/../media/files/form',
+        'form_upload_dir'        => '%kernel.root_dir%/../media/files/form',
+        'blacklisted_extensions' => ['php', 'sh'],
     ],
 ];

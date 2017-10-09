@@ -13,6 +13,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraint;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -58,7 +59,8 @@ class FormFieldFileType extends AbstractType
                     'attr'       => [
                         'class' => 'form-control',
                     ],
-                    'data' => $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS],
+                    'data'        => $options['data'][self::PROPERTY_ALLOWED_FILE_EXTENSIONS],
+                    'constraints' => [new FileExtensionConstraint()],
                 ]
             )->addViewTransformer($arrayStringTransformer)
         );
