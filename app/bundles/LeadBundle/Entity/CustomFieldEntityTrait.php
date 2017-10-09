@@ -175,7 +175,7 @@ trait CustomFieldEntityTrait
      */
     public function getFieldValue($field, $group = null)
     {
-        if (isset($this->updatedFields[$field])) {
+        if (array_key_exists($field, $this->updatedFields)) {
             return $this->updatedFields[$field];
         }
 
