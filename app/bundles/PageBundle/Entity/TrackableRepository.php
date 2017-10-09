@@ -202,7 +202,7 @@ class TrackableRepository extends CommonRepository
 
         $results = $q->execute()->fetchAll();
 
-        if ((true === $listId || is_array($listId)) && !$combined ) {
+        if ((true === $listId || is_array($listId)) && !$combined) {
             // Return array of results
             $byList = [];
             foreach ($results as $result) {
