@@ -56,6 +56,7 @@ Mautic.leadOnLoad = function (container, response) {
         };
 
         Mautic.leadTimelineOnLoad(container, response);
+        Mautic.leadAuditlogOnLoad(container, response);
     }
 
     // Auditlog filters
@@ -179,7 +180,12 @@ Mautic.leadTimelineOnLoad = function (container, response) {
         }
     });
 
-    // auditlog
+    if (response && typeof response.timelineCount != 'undefined') {
+        mQuery('#TimelineCount').html(response.timelineCount);
+    }
+};
+
+Mautic.leadAuditlogOnLoad = function (container, response) {
     mQuery("#contact-auditlog a[data-activate-details='all']").on('click', function() {
         if (mQuery(this).find('span').first().hasClass('fa-level-down')) {
             mQuery("#contact-auditlog a[data-activate-details!='all']").each(function () {
@@ -215,10 +221,6 @@ Mautic.leadTimelineOnLoad = function (container, response) {
             }
         }
     });
-
-    if (response && typeof response.timelineCount != 'undefined') {
-        mQuery('#TimelineCount').html(response.timelineCount);
-    }
 };
 
 Mautic.leadOnUnload = function(id) {
