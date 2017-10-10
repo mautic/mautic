@@ -14,20 +14,15 @@ namespace Mautic\DynamicContentBundle\Form\Type;
 use DeviceDetector\Parser\Device\DeviceParserAbstract as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
-use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\DataTransformer\EmojiToShortTransformer;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
-use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -43,85 +38,40 @@ use Symfony\Component\Translation\TranslatorInterface;
 class DynamicContentType extends AbstractType
 {
     private $em;
-
+    private $translator;
     private $fieldChoices;
     private $countryChoices;
     private $regionChoices;
     private $timezoneChoices;
-    private $stageChoices = [];
     private $localeChoices;
-
-    private $translator;
-    private $listChoices  = [];
-    private $emailChoices = [];
     private $deviceTypesChoices;
     private $deviceBrandsChoices;
     private $deviceOsChoices;
-    private $tagChoices        = [];
-    private $categoriesChoices = [];
+    private $tagChoices = [];
 
     /**
      * DynamicContentType constructor.
      *
      * @param EntityManager       $entityManager
      * @param ListModel           $listModel
-     * @param StageModel          $stageModel
      * @param TranslatorInterface $translator
      * @param LeadModel           $leadModel
-     * @param CategoryModel       $categoryModel
-     * @param EmailModel          $emailModel
-     * @param CorePermissions     $security
-     * @param UserHelper          $userHelper
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(EntityManager $entityManager, ListModel $listModel, StageModel $stageModel, TranslatorInterface $translator, LeadModel $leadModel, CategoryModel $categoryModel, EmailModel $emailModel, CorePermissions $security, UserHelper $userHelper)
+    public function __construct(EntityManager $entityManager, ListModel $listModel, TranslatorInterface $translator, LeadModel $leadModel)
     {
-        $this->em = $entityManager;
-
-        $this->fieldChoices = $listModel->getChoiceFields();
-
+        $this->em              = $entityManager;
+        $this->translator      = $translator;
+        $this->fieldChoices    = $listModel->getChoiceFields();
+        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
-        $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
-
-        $stages = $stageModel->getRepository()->getSimpleList();
-        foreach ($stages as $stage) {
-            $this->stageChoices[$stage['value']] = $stage['label'];
-        }
-
-        $this->translator = $translator;
-
-        // emails
-        $viewOther   = $security->isGranted('email:emails:viewother');
-        $currentUser = $userHelper->getUser();
-        $emailRepo   = $emailModel->getRepository();
-
-        $emailRepo->setCurrentUser($currentUser);
-
-        $emails = $emailRepo->getEmailList('', 0, 0, $viewOther, true);
-
-        foreach ($emails as $email) {
-            $this->emailChoices[$email['language']][$email['id']] = $email['name'];
-        }
-        ksort($this->emailChoices);
 
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
             $this->tagChoices[$tag['value']] = $tag['label'];
-        }
-
-        $categories = $categoryModel->getLookupResults('global');
-        foreach ($categories as $category) {
-            $this->categoriesChoices[$category['id']] = $category['title'];
-        }
-
-        // Segments
-        /** @var array $lists */
-        $lists = $listModel->getUserLists();
-        foreach ($lists as $list) {
-            $this->listChoices[$list['id']] = $list['name'];
         }
 
         $this->deviceTypesChoices  = array_combine(DeviceParser::getAvailableDeviceTypeNames(), DeviceParser::getAvailableDeviceTypeNames());
@@ -299,19 +249,15 @@ class DynamicContentType extends AbstractType
                 [
                     'type'    => DwcEntryFiltersType::class,
                     'options' => [
-                        'countries'      => $this->countryChoices,
-                        'regions'        => $this->regionChoices,
-                        'timezones'      => $this->timezoneChoices,
-                        'stages'         => $this->stageChoices,
-                        'locales'        => $this->localeChoices,
-                        'fields'         => $this->fieldChoices,
-                        'emails'         => $this->emailChoices,
-                        'lists'          => $this->listChoices,
-                        'deviceTypes'    => $this->deviceTypesChoices,
-                        'deviceBrands'   => $this->deviceBrandsChoices,
-                        'deviceOs'       => $this->deviceOsChoices,
-                        'tags'           => $this->tagChoices,
-                        'globalcategory' => $this->categoriesChoices,
+                        'countries'    => $this->countryChoices,
+                        'regions'      => $this->regionChoices,
+                        'timezones'    => $this->timezoneChoices,
+                        'locales'      => $this->localeChoices,
+                        'fields'       => $this->fieldChoices,
+                        'deviceTypes'  => $this->deviceTypesChoices,
+                        'deviceBrands' => $this->deviceBrandsChoices,
+                        'deviceOs'     => $this->deviceOsChoices,
+                        'tags'         => $this->tagChoices,
                     ],
                     'error_bubbling' => false,
                     'mapped'         => true,
@@ -353,30 +299,26 @@ class DynamicContentType extends AbstractType
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['fields']       = $this->fieldChoices;
+        $view->vars['countries']    = $this->countryChoices;
+        $view->vars['regions']      = $this->regionChoices;
+        $view->vars['timezones']    = $this->timezoneChoices;
+        $view->vars['deviceTypes']  = $this->deviceTypesChoices;
+        $view->vars['deviceBrands'] = $this->deviceBrandsChoices;
+        $view->vars['deviceOs']     = $this->deviceOsChoices;
+        $view->vars['tags']         = $this->tagChoices;
+        $view->vars['locales']      = $this->localeChoices;
+    }
+
+    /**
      * @return string
      */
     public function getName()
     {
         return 'dwc';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(FormView $view, FormInterface $form, array $options)
-    {
-        $view->vars['fields']         = $this->fieldChoices;
-        $view->vars['countries']      = $this->countryChoices;
-        $view->vars['regions']        = $this->regionChoices;
-        $view->vars['timezones']      = $this->timezoneChoices;
-        $view->vars['emails']         = $this->emailChoices;
-        $view->vars['lists']          = $this->listChoices;
-        $view->vars['deviceTypes']    = $this->deviceTypesChoices;
-        $view->vars['deviceBrands']   = $this->deviceBrandsChoices;
-        $view->vars['deviceOs']       = $this->deviceOsChoices;
-        $view->vars['tags']           = $this->tagChoices;
-        $view->vars['stage']          = $this->stageChoices;
-        $view->vars['locales']        = $this->localeChoices;
-        $view->vars['globalcategory'] = $this->categoriesChoices;
     }
 }

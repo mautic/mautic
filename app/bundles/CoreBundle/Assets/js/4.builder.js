@@ -521,8 +521,10 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
     // Remove the slot focus highlight
     htmlContent.find('[data-slot-focus], [data-section-focus]').remove();
 
+    customHtml = Mautic.domToString(htmlContent);
+
     // Convert dynamic slot definitions into tokens
-    var customHtml = Mautic.convertDynamicContentSlotsToTokens(htmlContent);
+    customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
 
     return customHtml;
 };

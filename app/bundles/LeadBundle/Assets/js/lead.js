@@ -356,7 +356,7 @@ Mautic.reorderSegmentFilters = function() {
     var counter = 0;
 
     var prefix = 'leadlist';
-    var parent = mQuery(el).parents('.dynamic-content-filter, .dwc-filter');
+    var parent = mQuery('.dynamic-content-filter, .dwc-filter');
     if (parent.length) {
         prefix = parent.attr('id');
     }

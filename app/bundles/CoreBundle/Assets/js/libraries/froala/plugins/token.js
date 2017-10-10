@@ -62,7 +62,7 @@
                     } else if (k.match(/dwc=/i) && v.match(/a:/)){
                         delete tokens[k];
                         nv = v.replace('a:', '');
-                        k = '<a title=\'DYnamic Web Content\' href=\'' + k + '\'>' + nv + '</a>';
+                        k = '<a title=\'Dynamic Web Content\' href=\'' + k + '\'>' + nv + '</a>';
                         tokens[k] = nv;
                     } else if (k.match(/contactfield=company/i) && !v.match(/company/i)){
                         tokens[k] = 'Company ' + v;

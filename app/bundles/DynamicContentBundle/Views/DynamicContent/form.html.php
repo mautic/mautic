@@ -8,7 +8,6 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view->addGlobal('translationBase', 'mautic.dynamicContent');
 $view->addGlobal('mauticContent', 'dynamicContent');
@@ -40,9 +39,11 @@ $templates = [
     'locales'        => 'locale-template',
     'globalcategory' => 'globalcategory-template',
 ];
+
 $mainErrors   = ($view['form']->containsErrors($form, ['filters'])) ? 'class="text-danger"' : '';
 $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text-danger"' : '';
 ?>
+
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
     <div class="col-md-9 bg-white height-auto">
@@ -76,7 +77,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-xs-12">
                                 <?php echo $view['form']->row($form['content']); ?>
                             </div>
                         </div>
@@ -166,6 +167,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
     </div>
 </div>
 <?php echo $view['form']->end($form); ?>
+
 <div class="hide" id="templates">
     <?php foreach ($templates as $dataKey => $template): ?>
         <?php $attr = ($dataKey == 'tags') ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create')

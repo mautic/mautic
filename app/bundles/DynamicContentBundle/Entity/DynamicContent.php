@@ -81,6 +81,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $isCampaignBased = true;
 
     /**
+     * @var string
+     */
+    private $slotName;
+
+    /**
      * DynamicContent constructor.
      */
     public function __construct()
@@ -150,6 +155,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 ->columnName('is_campaign_based')
                 ->option('default', 1)
                 ->build();
+
+        $builder->createField('slotName', 'string')
+                ->columnName('slot_name')
+                ->nullable()
+                ->build();
     }
 
     /**
@@ -180,6 +190,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'content',
                 'filters',
                 'isCampaignBased',
+                'slotName',
             ])
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')
@@ -386,6 +397,27 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     {
         $this->isChanged('isCampaignBased', $isCampaignBased);
         $this->isCampaignBased = $isCampaignBased;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlotName()
+    {
+        return $this->slotName;
+    }
+
+    /**
+     * @param string $slotName
+     *
+     * @return $this
+     */
+    public function setSlotName($slotName)
+    {
+        $this->isChanged('slotName', $slotName);
+        $this->slotName = $slotName;
 
         return $this;
     }
