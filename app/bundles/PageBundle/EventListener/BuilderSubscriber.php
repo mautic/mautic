@@ -119,12 +119,12 @@ class BuilderSubscriber extends CommonSubscriber
 
             // add only filter based dwc tokens
             $dwcTokenHelper = new BuilderTokenHelper($this->factory, 'dynamicContent');
-            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX('e.is_campaign_based<>1');
+            $expr           = $this->factory->getDatabase()->getExpressionBuilder()->andX('e.is_campaign_based <> 1 and e.slot_name is not null');
             $tokens         = $dwcTokenHelper->getTokens(
                 $this->dwcTokenRegex,
                 '',
                 'name',
-                'id',
+                'slot_name',
                 $expr
             );
             $event->addTokens(is_array($tokens) ? $tokens : []);
@@ -221,6 +221,14 @@ class BuilderSubscriber extends CommonSubscriber
                 'MauticCoreBundle:Slots:gatedvideo.html.php',
                 GatedVideoType::class,
                 600
+            );
+            $event->addSlotType(
+                'dwc',
+                'Dynamic Content',
+                'sticky-note-o',
+                'MauticCoreBundle:Slots:dwc.html.php',
+                'slot_dwc',
+                700
             );
         }
 

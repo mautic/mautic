@@ -99,16 +99,12 @@ class DwcEntryFiltersType extends AbstractType
                 'countries',
                 'regions',
                 'timezones',
-                'stages',
                 'locales',
                 'fields',
-                'lists',
-                'emails',
                 'deviceTypes',
                 'deviceBrands',
                 'deviceOs',
                 'tags',
-                'globalcategory',
             ]
         );
 

@@ -158,6 +158,9 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             <?php if (!isset($form['updateSelect'])) : ?>
                 <?php echo $view['form']->row($form['isCampaignBased']); ?>
             <?php endif ?>
+            <div id="slotNameDiv" class="<?php echo $form->vars['value']->isCampaignBased() ? 'hide' : ''; ?>">
+                <?php echo $view['form']->row($form['slotName']); ?>
+            </div>
             <div class="hide">
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>

@@ -69,6 +69,8 @@ class DynamicContentType extends AbstractType
         $this->regionChoices   = FormFieldHelper::getRegionChoices();
         $this->localeChoices   = FormFieldHelper::getLocaleChoices();
 
+        $this->filterFieldChoices();
+
         $tags = $leadModel->getTagList();
         foreach ($tags as $tag) {
             $this->tagChoices[$tag['value']] = $tag['label'];
@@ -101,6 +103,19 @@ class DynamicContentType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'slotName',
+            'text',
+            [
+                'label'      => 'mautic.dynamicContent.send.slot_name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
+                ],
+            ]
+        );
+
         $emojiTransformer = new EmojiToShortTransformer();
         $builder->add(
             $builder->create(
@@ -125,7 +140,7 @@ class DynamicContentType extends AbstractType
                 'data'  => (bool) $options['data']->isCampaignBased(),
                 'attr'  => [
                     'tooltip'  => 'mautic.dwc.form.is_campaign_based.tooltip',
-                    'onchange' => 'mQuery("#dwcFiltersTab").toggleClass("hide")',
+                    'onchange' => 'mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide")',
                 ],
             ]
         );
@@ -312,6 +327,17 @@ class DynamicContentType extends AbstractType
         $view->vars['deviceOs']     = $this->deviceOsChoices;
         $view->vars['tags']         = $this->tagChoices;
         $view->vars['locales']      = $this->localeChoices;
+    }
+
+    private function filterFieldChoices()
+    {
+        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], function ($key) {
+            return !in_array($key, ['company', 'lead_email_read_count', 'lead_email_read_date', 'lead_email_sent',
+                'leadlist', 'globalcategory', 'lead_email_received', 'stage', 'dnc_bounced',
+                'redirect_id', 'email_id', 'page_id', 'hit_url_count', 'hit_url_date',
+                'dnc_unsubscribed', 'dnc_bounced_sms', 'dnc_unsubscribed_sms', 'hit_url', ], true) &&
+                !preg_match('/(-registration|-attendance)/', $key);
+        }, ARRAY_FILTER_USE_KEY);
     }
 
     /**
