@@ -502,6 +502,25 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         if ($formArea == 'features') {
             $builder->add(
+                'sandbox',
+                'choice',
+                [
+                    'choices' => [
+                        'sandbox' => 'mautic.salesforce.sandbox',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.salesforce.form.sandbox',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
+                    ],
+                ]
+            );
+
+            $builder->add(
                 'updateOwner',
                 'choice',
                 [
