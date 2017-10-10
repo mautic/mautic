@@ -20,7 +20,7 @@ class FileUploadValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Check that extension is valid
      *
-     * @covers \FileUploadValidator::checkExtension
+     * @covers \Mautic\CoreBundle\Validator\FileUploadValidator::checkExtension
      */
     public function testValidExtension()
     {
@@ -46,7 +46,7 @@ class FileUploadValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Check that extension is not valid
      *
-     * @covers \FileUploadValidator::checkExtension
+     * @covers \Mautic\CoreBundle\Validator\FileUploadValidator::checkExtension
      */
     public function testInvalidExtension()
     {
@@ -76,7 +76,7 @@ class FileUploadValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Check file size is ok
      *
-     * @covers \FileUploadValidator::checkFileSize
+     * @covers \Mautic\CoreBundle\Validator\FileUploadValidator::checkFileSize
      */
     public function testFileSizeIsOk()
     {
@@ -99,7 +99,7 @@ class FileUploadValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Check file size bigger than allowed one
      *
-     * @covers \FileUploadValidator::checkFileSize
+     * @covers \Mautic\CoreBundle\Validator\FileUploadValidator::checkFileSize
      */
     public function testFileSizeIsBiggerThanAllowed()
     {
@@ -126,7 +126,7 @@ class FileUploadValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test concat message from validators
      *
-     * @covers \FileUploadValidator::validate
+     * @covers \Mautic\CoreBundle\Validator\FileUploadValidator::validate
      */
     public function testBadExtensionAndBadSize()
     {

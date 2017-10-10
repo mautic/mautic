@@ -26,7 +26,7 @@ class UploadFieldValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox No Files given
      *
-     * @covers \UploadFieldValidator::processFileValidation
+     * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
     public function testNoFilesGiven()
     {
@@ -61,7 +61,7 @@ class UploadFieldValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Exception should be thrown when validation fails
      *
-     * @covers \UploadFieldValidator::processFileValidation
+     * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
     public function testValidationFailed()
     {
@@ -111,7 +111,7 @@ class UploadFieldValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox No validation error
      *
-     * @covers \UploadFieldValidator::processFileValidation
+     * @covers \Mautic\FormBundle\Validator\UploadFieldValidator::processFileValidation
      */
     public function testFileIsValid()
     {

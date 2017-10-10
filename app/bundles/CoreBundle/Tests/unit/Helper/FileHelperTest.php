@@ -18,7 +18,7 @@ class FileHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Conversion of Bytes to Megebytes
      *
-     * @covers       \FileHelper::convertBytesToMegabytes
+     * @covers       \Mautic\CoreBundle\Helper\FileHelper::convertBytesToMegabytes
      *
      * @dataProvider bytesToMegabytesProvider
      *
@@ -45,7 +45,7 @@ class FileHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Conversion of Megebytes to Bytes
      *
-     * @covers       \FileHelper::convertMegabytesToBytes
+     * @covers       \Mautic\CoreBundle\Helper\FileHelper::convertMegabytesToBytes
      *
      * @dataProvider megabytesToBytesProvider
      *

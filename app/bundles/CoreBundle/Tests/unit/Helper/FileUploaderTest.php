@@ -23,7 +23,7 @@ class FileUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Uploader uploads files correctly
      *
-     * @covers \FileUploader::upload
+     * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
     public function testSuccessfulUpload()
     {
@@ -59,7 +59,7 @@ class FileUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Throw an Exception if Uploader could not create directory
      *
-     * @covers \FileUploader::upload
+     * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
     public function testCouldNotCreateDirectory()
     {
@@ -98,7 +98,7 @@ class FileUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Throw an Exception if Uploader could not move file to givven directory
      *
-     * @covers \FileUploader::upload
+     * @covers \Mautic\CoreBundle\Helper\FileUploader::upload
      */
     public function testCouldNotMoveFile()
     {
@@ -138,7 +138,7 @@ class FileUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test for file delete
      *
-     * @covers \FileUploader::deleteFile
+     * @covers \Mautic\CoreBundle\Helper\FileUploader::deleteFile
      */
     public function testDeleteFile()
     {

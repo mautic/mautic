@@ -26,7 +26,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Uploader uploads files correctly
      *
-     * @covers \FormUploader::uploadFiles
+     * @covers \Mautic\FormBundle\Helper\FormUploader::uploadFiles
      */
     public function testSuccessfulUploadFiles()
     {
@@ -144,7 +144,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Uploader delete uploaded file if anz error occures
      *
-     * @covers \FormUploader::uploadFiles
+     * @covers \Mautic\FormBundle\Helper\FormUploader::uploadFiles
      */
     public function testUploadFilesWithError()
     {
@@ -269,7 +269,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Uploader do nothing if no files for upload provided
      *
-     * @covers \FormUploader::uploadFiles
+     * @covers \Mautic\FormBundle\Helper\FormUploader::uploadFiles
      */
     public function testNoFilesUploadFiles()
     {
@@ -298,7 +298,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Uploader returs correct path for file
      *
-     * @covers \FormUploader::getCompleteFilePath
+     * @covers \Mautic\FormBundle\Helper\FormUploader::getCompleteFilePath
      */
     public function testGetCompleteFilePath()
     {
@@ -349,7 +349,7 @@ class FormUploaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Uploader delete files correctly
      *
-     * @covers \FormUploader::deleteAllFilesOfFormField
+     * @covers \Mautic\FormBundle\Helper\FormUploader::deleteAllFilesOfFormField
      */
     public function testDeleteAllFilesOfFormField()
     {

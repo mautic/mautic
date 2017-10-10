@@ -23,7 +23,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Get correct name if few previous names are taken
      *
-     * @covers \FilePathResolver::getUniqueFileName
+     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::getUniqueFileName
      */
     public function testGetUniqueName()
     {
@@ -76,7 +76,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Throws an Exception if name cannot be generated
      *
-     * @covers \FilePathResolver::getUniqueFileName
+     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::getUniqueFileName
      */
     public function testCouldNotGetUniqueName()
     {
@@ -119,7 +119,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox No action is taken when directory already exists
      *
-     * @covers \FilePathResolver::createDirectory
+     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::createDirectory
      */
     public function testNoActionIfDirectoryExists()
     {
@@ -144,7 +144,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Create new directory
      *
-     * @covers \FilePathResolver::createDirectory
+     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::createDirectory
      */
     public function testCreateNewDirectory()
     {
@@ -173,7 +173,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Directory could not be created
      *
-     * @covers \FilePathResolver::createDirectory
+     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::createDirectory
      */
     public function testDirectoryCouldNotBeCreated()
     {
@@ -206,7 +206,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Successfuly detete file
      *
-     * @covers \FilePathResolver::delete
+     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::delete
      */
     public function testDeleteFile()
     {
@@ -235,7 +235,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox File could not be deleted
      *
-     * @covers \FilePathResolver::delete
+     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::delete
      */
     public function testCouldNotDeleteFile()
     {
@@ -265,7 +265,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox File could not be deleted
      *
-     * @covers \FilePathResolver::delete
+     * @covers \Mautic\CoreBundle\Helper\FilePathResolver::delete
      */
     public function testDeleteFileWhichNotExists()
     {
