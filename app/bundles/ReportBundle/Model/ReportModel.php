@@ -638,9 +638,9 @@ class ReportModel extends FormModel
                 }
 
                 $query->select($select);
-                $query->add('orderBy', $order);
             }
 
+            $query->add('orderBy', $order);
             $queryTime = microtime(true);
             $data      = $query->execute()->fetchAll();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
