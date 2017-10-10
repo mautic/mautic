@@ -9,6 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\CoreBundle\Helper\FilePathResolver;
+use Mautic\CoreBundle\Helper\FileUploader;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Validator\FileUploadValidator;
+use Symfony\Component\Filesystem\Filesystem;
+
 return [
     'routes' => [
         'main' => [
@@ -471,6 +477,22 @@ return [
             'mautic.helper.phone_number' => [
                 'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
             ],
+            'mautic.helper.input_helper' => [
+                'class' => InputHelper::class,
+            ],
+            'mautic.helper.file_uploader' => [
+                'class'     => FileUploader::class,
+                'arguments' => [
+                    'mautic.helper.file_path_resolver',
+                ],
+            ],
+            'mautic.helper.file_path_resolver' => [
+                'class'     => FilePathResolver::class,
+                'arguments' => [
+                    'symfony.filesystem',
+                    'mautic.helper.input_helper',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -496,6 +518,10 @@ return [
             ],
         ],
         'other' => [
+            'symfony.filesystem' => [
+                'class' => Filesystem::class,
+            ],
+
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
@@ -804,6 +830,14 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
                     'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
+        'validator' => [
+            'mautic.core.validator.file_upload' => [
+                'class'     => FileUploadValidator::class,
+                'arguments' => [
+                    'translator',
                 ],
             ],
         ],
