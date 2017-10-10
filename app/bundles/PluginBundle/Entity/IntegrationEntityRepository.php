@@ -189,13 +189,13 @@ class IntegrationEntityRepository extends CommonRepository
             ->join('i', MAUTIC_TABLE_PREFIX.$joinTable, 'l', 'l.id = i.internal_entity_id');
 
         if (false === $limit) {
-            $q->select('count(i.integration_entity_id) as total, i.integration_entity');
+            $q->select('count(i.integration_entity_id) as total');
 
             if ($integrationEntity) {
                 $q->addSelect('i.integration_entity');
             }
         } else {
-            $q->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id,'.$leadFields);
+            $q->select('DISTINCT i.integration_entity_id, i.integration_entity, i.internal_entity_id,'.$leadFields);
         }
 
         $q->where('i.integration = :integration');
@@ -277,12 +277,12 @@ class IntegrationEntityRepository extends CommonRepository
 
         // Group by email to prevent duplicates from affecting this
 
-        $q->groupBy('i.integration_entity', 'i.integration_entity_id');
-
+        if (false === $limit and $integrationEntity) {
+            $q->groupBy('i.integration_entity')->having('total');
+        }
         if ($limit) {
             $q->setMaxResults($limit);
         }
-
         $results = $q->execute()->fetchAll();
         $leads   = [];
 

@@ -1762,7 +1762,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (!empty($lead['email'])) {
                 $lead                                               = $this->getCompoundMauticFields($lead);
                 $key                                                = $this->getSyncKey($lead['email']);
-                $trackedContacts[$lead['integration_entity']][$key] = $lead['id'];
+                $trackedContacts[$lead['integration_entity']][$key] = $lead['internal_entity_id'];
 
                 if ('Contact' == $sfObject) {
                     $this->setContactToSync($checkEmailsInSF, $lead);
