@@ -572,18 +572,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'required'    => false,
                 ]
             );
+
             $builder->add('includeEvents',
                 'textarea',
                 [
-                    'label'      => 'mautic.salesforce.form.activityIncludeEvents',
+                    'label'      => 'mautic.salesforce.form.activity_included_events',
                     'label_attr' => ['class' => 'control-label', 'data-toggle' => 'tooltip', 'title' => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip')],
-                ]
-            );
-            $builder->add('excludeEvents',
-                'textarea',
-                [
-                    'label'      => 'mautic.salesforce.form.activityExcludeEvents',
-                    'label_attr' => ['class' => 'control-label', 'data-toggle' => 'tooltip', 'title' => $this->translator->trans('mautic.salesforce.form.activity.exclude.events.tooltip')],
                 ]
             );
 
@@ -1032,20 +1026,24 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $i        = 0;
             $activity = [];
             $lead     = $this->leadModel->getEntity($leadId);
+            $page     = 1;
 
-            $engagements = $this->leadModel->getEngagements($lead, $filters, null, 1, 100, true);
-            $events      = $engagements['events'];
+            while ($engagements = $this->leadModel->getEngagements($lead, $filters, null, $page, 100, false)) {
+                $events = $engagements[0]['events'];
 
-            // inject lead into events
-            foreach ($events as $event) {
-                $link                        = isset($event['eventLabel']['href']) ? $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL).$event['eventLabel']['href'] : '';
-                $label                       = isset($event['eventLabel']['label']) ? $event['eventLabel']['label'] : '';
-                $activity[$i]['eventType']   = $event['eventType'];
-                $activity[$i]['name']        = isset($event['eventType']) ? $event['eventType'] : '';
-                $activity[$i]['description'] = isset($event['name']) ? $event['name'].' - '.$link.' - '.$label : $link.' - '.$label;
-                $activity[$i]['dateAdded']   = $event['timestamp'];
-                $activity[$i]['id']          = str_replace('.', '-', $event['eventId']);
-                ++$i;
+                // inject lead into events
+                foreach ($events as $event) {
+                    $link                        = isset($event['eventLabel']['href']) ? $event['eventLabel']['href'] : '';
+                    $label                       = isset($event['eventLabel']['label']) ? $event['eventLabel']['label'] : '';
+                    $activity[$i]['eventType']   = $event['eventType'];
+                    $activity[$i]['name']        = isset($event['eventType']) ? $event['eventType'] : '';
+                    $activity[$i]['description'] = isset($event['name']) ? $event['name'].' - '.$link.' - '.$label : $link.' - '.$label;
+                    $activity[$i]['dateAdded']   = $event['timestamp'];
+                    $activity[$i]['id']          = str_replace('.', '-', $event['eventId']);
+                    ++$i;
+                }
+
+                ++$page;
             }
 
             $leadActivity[$leadId] = [
