@@ -206,7 +206,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Successfuly detete file
      *
-     * @covers \FilePathResolver::deleteFile
+     * @covers \FilePathResolver::delete
      */
     public function testDeleteFile()
     {
@@ -217,6 +217,11 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
         $filesystemMock = $this->getMockBuilder(Filesystem::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $filesystemMock->expects($this->once())
+            ->method('exists')
+            ->with($file)
+            ->willReturn(true);
 
         $filesystemMock->expects($this->once())
             ->method('remove')
@@ -230,7 +235,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox File could not be deleted
      *
-     * @covers \FilePathResolver::deleteFile
+     * @covers \FilePathResolver::delete
      */
     public function testCouldNotDeleteFile()
     {
@@ -243,9 +248,42 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $filesystemMock->expects($this->once())
+            ->method('exists')
+            ->with($file)
+            ->willReturn(true);
+
+        $filesystemMock->expects($this->once())
             ->method('remove')
             ->with($file)
             ->willThrowException(new IOException(''));
+
+        $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
+
+        $filePathResolver->delete($file);
+    }
+
+    /**
+     * @testdox File could not be deleted
+     *
+     * @covers \FilePathResolver::delete
+     */
+    public function testDeleteFileWhichNotExists()
+    {
+        $file = 'my/file';
+
+        $inputHelper = new InputHelper();
+
+        $filesystemMock = $this->getMockBuilder(Filesystem::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $filesystemMock->expects($this->once())
+            ->method('exists')
+            ->with($file)
+            ->willReturn(false);
+
+        $filesystemMock->expects($this->never())
+            ->method('remove');
 
         $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
 

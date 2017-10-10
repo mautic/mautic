@@ -110,6 +110,9 @@ class FilePathResolver
      */
     public function delete($path)
     {
+        if (!$this->filesystem->exists($path)) {
+            return;
+        }
         try {
             $this->filesystem->remove($path);
         } catch (IOException $e) {
