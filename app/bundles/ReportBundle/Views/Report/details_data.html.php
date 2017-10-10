@@ -37,17 +37,18 @@ function getTotal($a, $f, $t, $allrows, $ac)
             return (int) $t;
     }
 }
+
+$graphContent = $view->render(
+    'MauticReportBundle:Report:details_data_graphs.html.php',
+    [
+        'graphOrder' => $graphOrder,
+        'graphs'     => $graphs,
+        'report'     => $report,
+    ]
+);
 ?>
 
-<?php if (!empty($showGraphsAboveTable)): ?>
-    <?php echo $view->render(
-        'MauticReportBundle:Report:details_data_graphs.html.php',
-        [
-            'graphOrder' => $graphOrder,
-            'graphs'     => $graphs,
-        ]);
-    ?>
-<?php endif; ?>
+<?php if (!empty($showGraphsAboveTable)): echo $graphContent; endif; ?>
 
 <?php if (!empty($columnOrder) || !empty($aggregatorOrder)): ?>
     <!-- table section -->
@@ -205,15 +206,7 @@ function getTotal($a, $f, $t, $allrows, $ac)
     <!--/ table section -->
 <?php endif; ?>
 
-<?php if (empty($showGraphsAboveTable)): ?>
-<?php echo $view->render(
-    'MauticReportBundle:Report:details_data_graphs.html.php',
-    [
-        'graphOrder' => $graphOrder,
-        'graphs'     => $graphs,
-    ]);
-?>
-<?php endif; ?>
+<?php if (empty($showGraphsAboveTable)): echo $graphContent; endif; ?>
 
 <script>
     mQuery(document).ready(function() {
