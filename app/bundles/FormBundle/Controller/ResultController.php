@@ -205,6 +205,14 @@ class ResultController extends CommonFormController
             throw $this->createNotFoundException();
         }
 
+        if (!$this->get('mautic.security')->hasEntityAccess(
+            'form:forms:viewown',
+            'form:forms:viewother',
+            $submission->getForm()->getCreatedBy())
+        ) {
+            return $this->accessDenied();
+        }
+
         $results = $submission->getResults();
 
         if (empty($results[$field])) {
