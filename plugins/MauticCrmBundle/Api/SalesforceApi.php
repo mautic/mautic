@@ -133,7 +133,7 @@ class SalesforceApi extends CrmApi
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
             $findLead = 'select '.$fields.' from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
-            $response = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            $response = $this->request('queryAll', ['q' => $findLead], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
                 $sfRecords['Lead'] = $response['records'];
@@ -350,9 +350,9 @@ class SalesforceApi extends CrmApi
             }
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'].$ignoreConvertedLeads;
-            $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
+            $result        = $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         } else {
-            $result = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
+            $result = $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
         }
 
         return $result;
