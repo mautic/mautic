@@ -2645,6 +2645,19 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return array
+     */
+    public function getEngagementTypes()
+    {
+        $event = new LeadTimelineEvent();
+        $event->fetchTypesOnly();
+
+        $this->dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+
+        return $event->getEventTypes();
+    }
+
+    /**
      * Get engagement counts by time unit.
      *
      * @param Lead            $lead
@@ -2664,6 +2677,7 @@ class LeadModel extends FormModel
 
         return $event->getEventCounter();
     }
+
     /**
      * @param Lead $lead
      * @param      $company

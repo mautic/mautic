@@ -21,6 +21,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -573,11 +574,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 ]
             );
 
-            $builder->add('includeEvents',
-                'textarea',
+            $builder->add(
+                'activityEvents',
+                ChoiceType::class,
                 [
+                    'choices'    => $this->leadModel->getEngagementTypes(),
                     'label'      => 'mautic.salesforce.form.activity_included_events',
-                    'label_attr' => ['class' => 'control-label', 'data-toggle' => 'tooltip', 'title' => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip')],
+                    'label_attr' => [
+                        'class'       => 'control-label',
+                        'data-toggle' => 'tooltip',
+                        'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
+                    ],
+                    'multiple'   => true,
+                    'empty_data' => ['point.gained', 'form.submitted', 'email.read'], // BC with pre 2.11.0
+                    'required'   => false,
                 ]
             );
 

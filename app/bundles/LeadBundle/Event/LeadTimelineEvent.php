@@ -115,6 +115,11 @@ class LeadTimelineEvent extends Event
     protected $siteDomain;
 
     /**
+     * @var bool
+     */
+    protected $fetchTypesOnly = false;
+
+    /**
      * @var array
      */
     protected $serializerGroups = [
@@ -421,6 +426,10 @@ class LeadTimelineEvent extends Event
      */
     public function isApplicable($eventType, $inclusive = false)
     {
+        if ($this->fetchTypesOnly) {
+            return false;
+        }
+
         if (in_array($eventType, $this->filters['excludeEvents'])) {
             return false;
         }
@@ -591,6 +600,14 @@ class LeadTimelineEvent extends Event
     public function getSerializerGroups()
     {
         return $this->serializerGroups;
+    }
+
+    /**
+     * Will cause isApplicable to return false for all in order to just compile a list of event types.
+     */
+    public function fetchTypesOnly()
+    {
+        $this->fetchTypesOnly = true;
     }
 
     /**
