@@ -405,7 +405,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function hitEmail($stat, $request, $viaBrowser = false)
+    public function hitEmail($stat, $request, $viaBrowser = false, $activeRequest = true)
     {
         if (!$stat instanceof Stat) {
             $stat = $this->getEmailStatus($stat);
@@ -428,9 +428,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $stat->setLastOpened($readDateTime->getDateTime());
 
         $lead = $stat->getLead();
-        if ($lead !== null) {
+        if (null !== $lead) {
             // Set the lead as current lead
-            $this->leadModel->setCurrentLead($lead);
+            if ($activeRequest) {
+                $this->leadModel->setCurrentLead($lead);
+            } else {
+                $this->leadModel->setSystemCurrentLead($lead);
+            }
         }
 
         $firstTime = false;
