@@ -9,14 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="hide builder campaign-builder live">
-    <button type="button" class="btn btn-primary btn-close-campaign-builder" onclick="Mautic.closeCampaignBuilder();">
-        <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
-    </button>
-    <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">
-        <?php echo $view['translator']->trans('mautic.core.form.apply'); ?>
-    </button>
-    <div id="builder-errors" class="alert alert-danger" role="alert" style="display: none;">test</div>
+<div class="builder campaign-builder preview">
     <div class="builder-content">
         <div id="CampaignCanvas">
             <div id="CampaignEvent_newsource<?php if (!empty($campaignSources)) {
@@ -32,12 +25,45 @@
             </div>
 
             <?php
-            foreach ($campaignSources as $source):
-                echo $view->render('MauticCampaignBundle:Source:index.html.php', $source);
-            endforeach;
+            /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
+            if (count($campaign->getForms())) {
+                $sources = [
+                    'sourceType' => 'forms',
+                    'campaignId' => $campaignId,
+                    'names'      => implode(
+                        ', ',
+                        array_map(
+                            function (\Mautic\FormBundle\Entity\Form $f) {
+                                return $f->getName();
+                            },
+                            $campaign->getForms()
+                                     ->toArray()
+                        )
+                    ),
+                ];
+                echo $view->render('MauticCampaignBundle:Source:index.html.php', $sources);
+            }
+
+            if (count($campaign->getLists())) {
+                $sources = [
+                    'sourceType' => 'lists',
+                    'campaignId' => $campaignId,
+                    'names'      => implode(
+                        ', ',
+                        array_map(
+                            function (\Mautic\LeadBundle\Entity\LeadList $f) {
+                                return $f->getName();
+                            },
+                            $campaign->getLists()
+                                     ->toArray()
+                        )
+                    ),
+                ];
+                echo $view->render('MauticCampaignBundle:Source:index.html.php', $sources);
+            }
 
             foreach ($campaignEvents as $event):
-                echo $view->render('MauticCampaignBundle:Event:generic.html.php', ['event' => $event, 'campaignId' => $campaignId]);
+                echo $view->render('MauticCampaignBundle:Event:preview.html.php', ['event' => $event, 'campaignId' => $campaignId]);
             endforeach;
 
             echo $view->render('MauticCampaignBundle:Campaign\Builder:index.html.php',

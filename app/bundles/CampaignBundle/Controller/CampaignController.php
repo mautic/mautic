@@ -679,15 +679,25 @@ class CampaignController extends AbstractStandardFormController
                     ['campaign_id' => $objectId]
                 );
 
+                $session = $this->get('session');
+
+                $campaignSources = $this->getCampaignModel()->getSourceLists();
+
+                $this->prepareCampaignSourcesForEdit($objectId, $campaignSources, true);
+                $this->prepareCampaignEventsForEdit($entity, $objectId, true);
+
                 $args['viewParameters'] = array_merge(
                     $args['viewParameters'],
                     [
-                        'campaign'      => $entity,
-                        'stats'         => $stats,
-                        'events'        => $sortedEvents,
-                        'sources'       => $this->getCampaignModel()->getLeadSources($entity),
-                        'dateRangeForm' => $dateRangeForm->createView(),
-                        'campaignLeads' => $this->forward(
+                        'campaign'        => $entity,
+                        'stats'           => $stats,
+                        'events'          => $sortedEvents,
+                        'eventSettings'   => $this->getCampaignModel()->getEvents(),
+                        'sources'         => $this->getCampaignModel()->getLeadSources($entity),
+                        'dateRangeForm'   => $dateRangeForm->createView(),
+                        'campaignSources' => $this->campaignSources,
+                        'campaignEvents'  => $events,
+                        'campaignLeads'   => $this->forward(
                             'MauticCampaignBundle:Campaign:contacts',
                             [
                                 'objectId'   => $entity->getId(),
@@ -698,6 +708,7 @@ class CampaignController extends AbstractStandardFormController
                     ]
                 );
                 break;
+
             case 'new':
             case 'edit':
                 $args['viewParameters'] = array_merge(
@@ -779,7 +790,6 @@ class CampaignController extends AbstractStandardFormController
         }
 
         $this->modifiedEvents = $this->campaignEvents = $campaignEvents;
-
         $this->get('session')->set('mautic.campaign.'.$objectId.'.events.modified', $campaignEvents);
     }
 
