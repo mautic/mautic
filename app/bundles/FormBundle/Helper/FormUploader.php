@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 
 class FormUploader
@@ -45,41 +46,54 @@ class FormUploader
     public function uploadFiles(UploadFileCrate $filesToUpload, Submission $submission)
     {
         $uploadedFiles = [];
-        if (!$filesToUpload->hasFiles()) {
-            return;
-        }
-
-        $result    = $submission->getResults();
-        $files     = $filesToUpload->getFiles();
-        $uploadDir = $this->getUploadDir();
-
-        $alias = ''; //Only for IDE - will be overriden by foreach
+        $result        = $submission->getResults();
+        $alias         = ''; //Only for IDE - will be overriden by foreach
 
         try {
-            foreach ($files as $alias => $file) {
-                $fileName        = $this->fileUploader->upload($uploadDir, $file);
+            foreach ($filesToUpload as $fileFieldCrate) {
+                $field           = $fileFieldCrate->getField();
+                $alias           = $field->getAlias();
+                $uploadDir       = $this->getUploadDir($field);
+                $fileName        = $this->fileUploader->upload($uploadDir, $fileFieldCrate->getUploadedFile());
                 $result[$alias]  = $fileName;
                 $uploadedFiles[] = $uploadDir.DIRECTORY_SEPARATOR.$fileName;
             }
             $submission->setResults($result);
         } catch (FileUploadException $e) {
             foreach ($uploadedFiles as $filePath) {
-                $this->fileUploader->deleteFile($filePath);
+                $this->fileUploader->delete($filePath);
             }
             throw new FileUploadException($alias);
         }
     }
 
     /**
+     * @param Field  $field
      * @param string $fileName
      *
      * @return string
      */
-    public function getCompleteFilePath($fileName)
+    public function getCompleteFilePath(Field $field, $fileName)
     {
-        $uploadDir = $this->getUploadDir();
+        $uploadDir = $this->getUploadDir($field);
 
         return $uploadDir.DIRECTORY_SEPARATOR.$fileName;
+    }
+
+    public function deleteAllFilesOfFormField(Field $field)
+    {
+        if (!$field->isFileType()) {
+            return;
+        }
+
+        $uploadDir = $this->getUploadDir($field);
+        $this->fileUploader->delete($uploadDir);
+    }
+
+    public function deleteFilesOfForm(Form $form)
+    {
+        $formUploadDir = $this->getUploadDirOfForm($form);
+        $this->fileUploader->delete($formUploadDir);
     }
 
     /**
@@ -95,7 +109,7 @@ class FormUploader
         }
     }
 
-    public function deleteFileOfFormField(Submission $submission, Field $field)
+    private function deleteFileOfFormField(Submission $submission, Field $field)
     {
         $alias   = $field->getAlias();
         $results = $submission->getResults();
@@ -105,23 +119,28 @@ class FormUploader
         }
 
         $fileName = $results[$alias];
-        $this->deleteFile($fileName);
+        $filePath = $this->getCompleteFilePath($field, $fileName);
+        $this->fileUploader->delete($filePath);
     }
 
     /**
-     * @param string $fileName
-     */
-    private function deleteFile($fileName)
-    {
-        $filePath = $this->getCompleteFilePath($fileName);
-        $this->fileUploader->deleteFile($filePath);
-    }
-
-    /**
+     * @param Field $field
+     *
      * @return string
      */
-    private function getUploadDir()
+    private function getUploadDir(Field $field)
     {
-        return $this->coreParametersHelper->getParameter('form_upload_dir');
+        $fieldId       = $field->getId();
+        $formUploadDir = $this->getUploadDirOfForm($field->getForm());
+
+        return $formUploadDir.DIRECTORY_SEPARATOR.$fieldId;
+    }
+
+    private function getUploadDirOfForm(Form $form)
+    {
+        $formId    = $form->getId();
+        $uploadDir = $this->coreParametersHelper->getParameter('form_upload_dir');
+
+        return $uploadDir.DIRECTORY_SEPARATOR.$formId;
     }
 }

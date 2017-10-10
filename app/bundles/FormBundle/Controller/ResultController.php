@@ -213,9 +213,10 @@ class ResultController extends CommonFormController
             return $this->accessDenied();
         }
 
-        $results = $submission->getResults();
+        $results     = $submission->getResults();
+        $fieldEntity = $submission->getFieldByAlias($field);
 
-        if (empty($results[$field])) {
+        if (empty($results[$field]) || $fieldEntity === null) {
             throw $this->createNotFoundException();
         }
 
@@ -223,7 +224,7 @@ class ResultController extends CommonFormController
         $formUploader = $this->get('mautic.form.helper.form_uploader');
 
         $fileName = $results[$field];
-        $file     = $formUploader->getCompleteFilePath($fileName);
+        $file     = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
 
         $fs = new Filesystem();
         if (!$fs->exists($file)) {

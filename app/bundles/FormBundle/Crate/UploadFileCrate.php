@@ -11,38 +11,48 @@
 
 namespace Mautic\FormBundle\Crate;
 
+use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class UploadFileCrate
+class UploadFileCrate implements \Iterator
 {
     /**
-     * @var array|UploadedFile[]
+     * @var array|FileFieldCrate[]
      */
-    private $files;
-
-    public function __construct()
-    {
-        $this->files = [];
-    }
+    private $fileFieldCrate = [];
 
     /**
-     * @return array|UploadedFile[]
+     * @var int
      */
-    public function getFiles()
+    private $position = 0;
+
+    public function addFile(UploadedFile $file, Field $field)
     {
-        return $this->files;
+        $this->fileFieldCrate[] = new FileFieldCrate($file, $field);
     }
 
-    public function addFile(UploadedFile $file, $alias)
+    public function rewind()
     {
-        $this->files[$alias] = $file;
+        $this->position = 0;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasFiles()
+    public function current()
     {
-        return !empty($this->files);
+        return $this->fileFieldCrate[$this->position];
+    }
+
+    public function key()
+    {
+        return $this->position;
+    }
+
+    public function next()
+    {
+        ++$this->position;
+    }
+
+    public function valid()
+    {
+        return isset($this->fileFieldCrate[$this->position]);
     }
 }

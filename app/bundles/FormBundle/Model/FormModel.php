@@ -298,7 +298,7 @@ class FormModel extends CommonFormModel
             if (!isset($existingFields[$fieldId])) {
                 continue;
             }
-            $this->handleFilesDelete($entity, $existingFields[$fieldId]);
+            $this->handleFilesDelete($existingFields[$fieldId]);
             $entity->removeField($fieldId, $existingFields[$fieldId]);
             $deleteFields[] = $fieldId;
         }
@@ -309,21 +309,13 @@ class FormModel extends CommonFormModel
         }
     }
 
-    private function handleFilesDelete(Form $form, Field $field)
+    private function handleFilesDelete(Field $field)
     {
         if (!$field->isFileType()) {
             return;
         }
 
-        foreach ($form->getSubmissions() as $submission) {
-            /**
-             * We need to load Entity with result field, which is not populated now.
-             *
-             * @todo Refactor code - add Doctrine post_load Listener to populate this data automatically?
-             */
-            $submission = $this->submissionResultLoader->getSubmissionWithResult($submission->getId());
-            $this->formUploader->deleteFileOfFormField($submission, $field);
-        }
+        $this->formUploader->deleteAllFilesOfFormField($field);
     }
 
     /**
@@ -628,7 +620,10 @@ class FormModel extends CommonFormModel
      */
     public function deleteEntity($entity)
     {
-        parent::deleteEntity($entity);
+        /* @var Form $entity */
+        //parent::deleteEntity($entity);
+
+        $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
             //delete the associated results table
@@ -646,12 +641,19 @@ class FormModel extends CommonFormModel
         $entities     = parent::deleteEntities($ids);
         $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         foreach ($entities as $id => $entity) {
+            /* @var Form $entity */
             //delete the associated results table
             $schemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
+            $this->deleteFormFiles($entity);
         }
         $schemaHelper->executeChanges();
 
         return $entities;
+    }
+
+    private function deleteFormFiles(Form $form)
+    {
+        $this->formUploader->deleteFilesOfForm($form);
     }
 
     /**

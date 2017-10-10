@@ -224,7 +224,7 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
 
         $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
 
-        $filePathResolver->deleteFile($file);
+        $filePathResolver->delete($file);
     }
 
     /**
@@ -249,6 +249,6 @@ class FilePathResolverTest extends \PHPUnit_Framework_TestCase
 
         $filePathResolver = new FilePathResolver($filesystemMock, $inputHelper);
 
-        $filePathResolver->deleteFile($file);
+        $filePathResolver->delete($file);
     }
 }

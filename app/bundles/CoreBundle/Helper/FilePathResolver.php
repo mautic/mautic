@@ -106,12 +106,12 @@ class FilePathResolver
     }
 
     /**
-     * @param string $file
+     * @param string $path
      */
-    public function deleteFile($file)
+    public function delete($path)
     {
         try {
-            $this->filesystem->remove($file);
+            $this->filesystem->remove($path);
         } catch (IOException $e) {
         }
     }

@@ -242,7 +242,7 @@ class SubmissionModel extends CommonFormModel
                 try {
                     $file  = $this->uploadFieldValidator->processFileValidation($f, $request);
                     $value = $file->getClientOriginalName();
-                    $filesToUpload->addFile($file, $alias);
+                    $filesToUpload->addFile($file, $f);
                 } catch (NoFileGivenException $e) { //No error here, we just move to another validation, eg. if a field is required
                 } catch (FileValidationException $e) {
                     $validationErrors[$alias] = $e->getMessage();
@@ -450,9 +450,6 @@ class SubmissionModel extends CommonFormModel
      */
     public function deleteEntity($submission)
     {
-        /*
-         * @todo Second part of file delete is at FormModel::handleFilesDelete() (Remove File field from form)
-         */
         $this->formUploader->deleteUploadedFiles($submission);
 
         parent::deleteEntity($submission);

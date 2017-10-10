@@ -149,11 +149,11 @@ class FileUploaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $filePathResolverMock->expects($this->once())
-            ->method('deleteFile')
+            ->method('delete')
             ->with($file);
 
         $fileUploader = new FileUploader($filePathResolverMock);
 
-        $fileUploader->deleteFile($file);
+        $fileUploader->delete($file);
     }
 }
