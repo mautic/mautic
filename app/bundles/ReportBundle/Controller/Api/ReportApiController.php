@@ -14,6 +14,7 @@ namespace Mautic\ReportBundle\Controller\Api;
 use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
  * Class ReportApiController.
@@ -45,14 +46,30 @@ class ReportApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
+        // Get the to and from dates
+        $from       = InputHelper::clean($this->request->get('dateFrom', null));
+        $to         = InputHelper::clean($this->request->get('dateTo', null));
+        $dateFrom   = new \DateTime($from ? $from : new \DateTime('-30 days'));
+        $dateTo     = new \DateTime($to ? $to : new \DateTime());
+
+        // Include graphs
+        $includeGraphs = $this->request->get('includeGraphs', false);
+
         if (!$entity instanceof $this->entityClass) {
             return $this->notFound();
         }
 
-        $reportData = $this->model->getReportData($entity, $this->container->get('form.factory'), ['paginate' => false, 'ignoreGraphData' => true]);
+        $reportData = $this->model->getReportData($entity, $this->container->get('form.factory'), [
+            'paginate' => false,
+            'ignoreGraphData' => $includeGraphs ? false : true,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+        ]);
 
         // Unset keys that we don't need to send back
-        foreach (['graphs', 'contentTemplate', 'columns', 'limit'] as $key) {
+        $ignoreKeys = ['contentTemplate', 'columns', 'limit'];
+        if (!$includeGraphs) $ignoreKeys[] = 'graphs';
+        foreach ($ignoreKeys as $key) {
             unset($reportData[$key]);
         }
 
