@@ -275,12 +275,7 @@ class IntegrationEntityRepository extends CommonRepository
                 ->setParameter('dateTo', $toDate);
         }
 
-        // Group by email to prevent duplicates from affecting this
-        if (false === $limit and $integrationEntity and !is_array($integrationEntity)) {
-            $q->groupBy('i.integration_entity');
-        } else {
-            $q->groupBy('i.integration_entity', 'i.integration_entity_id');
-        }
+        $q->groupBy('i.integration_entity');
 
         if ($limit) {
             $q->setMaxResults($limit);
