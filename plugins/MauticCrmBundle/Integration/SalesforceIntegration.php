@@ -924,10 +924,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects = $config['objects'];
         }
 
-        if (isset($params['filters'])) {
-            $filters = $params['filters'];
-        }
-
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $startDate             = new \DateTime($query['start']);
@@ -965,8 +961,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $leadActivity = $this->getLeadData(
                             $startDate,
                             $endDate,
-                            $leadIds,
-                            $filters
+                            $leadIds
                         );
 
                         $this->logger->debug('SALESFORCE: Syncing activity for '.count($leadActivity).' contacts ('.implode(', ', array_keys($leadActivity)).')');

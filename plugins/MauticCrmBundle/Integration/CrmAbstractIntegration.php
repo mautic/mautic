@@ -197,14 +197,28 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param \DateTime|null $startDate
      * @param \DateTime|null $endDate
      * @param                $leadId
-     * @param array          $filters
      *
      * @return array
      */
-    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId, $filters = [])
+    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
     {
         $leadIds      = (!is_array($leadId)) ? [$leadId] : $leadId;
         $leadActivity = [];
+
+        $config = $this->mergeConfigToFeatureSettings();
+        if (!isset($config['activityEvents'])) {
+            // BC for pre 2.11.0
+            $config['activityEvents'] = ['point.gained', 'form.submitted', 'email.read'];
+        } elseif (empty($config['activityEvents'])) {
+            // Inclusive filter meaning we only send events if something is selected
+            return [];
+        }
+
+        $filters = [
+            'search'        => '',
+            'includeEvents' => $config['activityEvents'],
+            'excludeEvents' => [],
+        ];
 
         if ($startDate) {
             $filters['dateFrom'] = $startDate;
