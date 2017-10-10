@@ -502,25 +502,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     {
         if ($formArea == 'features') {
             $builder->add(
-                'sandbox',
-                'choice',
-                [
-                    'choices' => [
-                        'sandbox' => 'mautic.salesforce.sandbox',
-                    ],
-                    'expanded'    => true,
-                    'multiple'    => true,
-                    'label'       => 'mautic.salesforce.form.sandbox',
-                    'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
-                    'required'    => false,
-                    'attr'        => [
-                        'onclick' => 'Mautic.postForm(mQuery(\'form[name="integration_details"]\'),\'\');',
-                    ],
-                ]
-            );
-
-            $builder->add(
                 'updateOwner',
                 'choice',
                 [
@@ -570,6 +551,20 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'label_attr'  => ['class' => ''],
                     'empty_value' => false,
                     'required'    => false,
+                ]
+            );
+            $builder->add('includeEvents',
+                'textarea',
+                [
+                    'label'      => 'mautic.salesforce.form.activityIncludeEvents',
+                    'label_attr' => ['class' => 'control-label', 'data-toggle' => 'tooltip', 'title' => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip')],
+                ]
+            );
+            $builder->add('excludeEvents',
+                'textarea',
+                [
+                    'label'      => 'mautic.salesforce.form.activityExcludeEvents',
+                    'label_attr' => ['class' => 'control-label', 'data-toggle' => 'tooltip', 'title' => $this->translator->trans('mautic.salesforce.form.activity.exclude.events.tooltip')],
                 ]
             );
 
