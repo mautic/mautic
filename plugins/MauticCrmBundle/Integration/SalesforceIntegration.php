@@ -1899,8 +1899,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             //use a composite patch here that can update and create (one query) every 200 records
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
-
-                if (isset($entity['company']) and $entity['integration_entity'] == 'Contact') {
+                if (isset($entity['company']) and $object == 'Contact') {
                     $accountId = $this->getCompanyName($entity['company'], 'Id', 'Name');
 
                     if (!$accountId) {
@@ -3155,8 +3154,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function getSalesforceAccountsByName($sfObject, &$checkIdsInSF, $requiredFieldString)
     {
-        $field   = [];
-        $fieldId = [];
+        $field     = [];
+        $fieldId   = [];
+        $queryById = [];
 
         foreach ($checkIdsInSF as $items) {
             if (!isset($items['integration_entity_id'])) {
