@@ -27,6 +27,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -164,6 +165,11 @@ class LeadModel extends FormModel
     protected $availableLeadFields = [];
 
     /**
+     * @var EmailValidator
+     */
+    protected $emailValidator;
+
+    /**
      * LeadModel constructor.
      *
      * @param RequestStack         $requestStack
@@ -195,6 +201,7 @@ class LeadModel extends FormModel
         ChannelListHelper $channelListHelper,
         $trackByIp,
         CoreParametersHelper $coreParametersHelper,
+        EmailValidator $emailValidator,
         UserProvider $userProvider
     ) {
         $this->request              = $requestStack->getCurrentRequest();
@@ -210,6 +217,7 @@ class LeadModel extends FormModel
         $this->channelListHelper    = $channelListHelper;
         $this->trackByIp            = $trackByIp;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->emailValidator       = $emailValidator;
         $this->userProvider         = $userProvider;
     }
 
@@ -1987,6 +1995,14 @@ class LeadModel extends FormModel
                     $this->cleanFields($fieldData, $leadField);
                 } catch (\Exception $exception) {
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
+                }
+
+                if ('email' === $leadField['type'] && !empty($fieldData[$leadField['alias']])) {
+                    try {
+                        $this->emailValidator->validate($fieldData[$leadField['alias']], false);
+                    } catch (\Exception $exception) {
+                        $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
+                    }
                 }
 
                 // Skip if the value is in the CSV row

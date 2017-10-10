@@ -18,6 +18,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceCallbackTransport;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -25,6 +26,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
+use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\Response;
 
 class PublicController extends CommonFormController
@@ -105,9 +107,18 @@ class PublicController extends CommonFormController
      */
     public function trackingImageAction($idHash)
     {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->getModel('email');
-        $model->hitEmail($idHash, $this->request);
+        $queueService = $this->get('mautic.queue.service');
+        if ($queueService->isQueueEnabled()) {
+            $msg = [
+                'request' => $this->request,
+                'idHash'  => $idHash,
+            ];
+            $queueService->publishToQueue(QueueName::EMAIL_HIT, $msg);
+        } else {
+            /** @var EmailModel $model */
+            $model = $this->getModel('email');
+            $model->hitEmail($idHash, $this->request);
+        }
 
         return TrackingPixelHelper::getResponse($this->request);
     }

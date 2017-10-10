@@ -95,6 +95,7 @@ return [
                     'templating.helper.assets',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.page.model.page',
                 ],
             ],
             'mautic.pagebuilder.subscriber' => [
@@ -270,6 +271,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
+                    'mautic.queue.service',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [

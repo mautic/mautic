@@ -350,6 +350,10 @@ class ImportModel extends FormModel
 
             if (!$errorMessage) {
                 $data = $this->trimArrayValues($data);
+                if (!array_filter($data)) {
+                    continue;
+                }
+
                 $data = array_combine($headers, $data);
 
                 try {

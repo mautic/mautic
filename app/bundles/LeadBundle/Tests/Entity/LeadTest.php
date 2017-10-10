@@ -211,6 +211,61 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $data['number']);
     }
 
+    public function testAttributionDateIsAdded()
+    {
+        $lead = new Lead();
+        $lead->addUpdatedField('attribution', 100);
+        $lead->checkAttributionDate();
+        $this->assertEquals((new \Datetime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
+        $this->assertNotEmpty($lead->getChanges());
+    }
+
+    public function testAttributionDateIsRemoved()
+    {
+        $lead = new Lead();
+        $lead->setFields(
+            [
+                'core' => [
+                    'attribution_date' => [
+                        'type'  => 'date',
+                        'value' => '2017-09-09',
+                    ],
+                    'attribution' => [
+                        'type'  => 'int',
+                        'value' => 100,
+                    ],
+                ],
+            ]
+        );
+
+        $lead->addUpdatedField('attribution', 0);
+        $lead->checkAttributionDate();
+        $this->assertNull($lead->getFieldValue('attribution_date'));
+        $this->assertNotEmpty($lead->getChanges());
+    }
+
+    public function testAttributionDateIsNotChangedWhen0ChangedToNull()
+    {
+        $lead = new Lead();
+        $lead->setFields(
+            [
+                'core' => [
+                        'attribution_date' => [
+                            'type'  => 'date',
+                            'value' => 0,
+                        ],
+                        'attribution' => [
+                            'type'  => 'int',
+                            'value' => 0,
+                        ],
+                    ],
+            ]
+        );
+
+        $lead->checkAttributionDate();
+        $this->assertEmpty($lead->getChanges());
+    }
+
     /**
      * @param      $points
      * @param      $expected

@@ -13,10 +13,11 @@ $view['slots']->set('pageTitle', $pageTitle);
 $view['slots']->set('headerTitle', $report->getName());
 $view['slots']->set('mauticContent', 'report');
 
-$dataCount   = count($data);
-$columnOrder = $report->getColumns();
-$graphOrder  = $report->getGraphs();
-$startCount  = 1;
+$showGraphsAboveTable = (!empty($report->getSettings()['showGraphsAboveTable']) === true);
+$dataCount            = count($data);
+$columnOrder          = $report->getColumns();
+$graphOrder           = $report->getGraphs();
+$startCount           = 1;
 ?>
 
 <div class="pa-md">
@@ -25,16 +26,17 @@ $startCount  = 1;
         <?php echo $view['date']->toDate($dateFrom, 'UTC').' - '.$view['date']->toDate($dateTo, 'UTC'); ?>
     </div>
 </div>
-<?php if (!empty($graphOrder) && !empty($graphs)): ?>
-    <div class="row">
-        <div class="pa-md">
-            <?php foreach ($graphOrder as $key): ?>
-                <?php $details = $graphs[$key]; ?>
-                <?php echo $view->render('MauticReportBundle:Graph:'.ucfirst($details['type']).'.html.php', ['graph' => $details['data'], 'report' => $report]); ?>
-            <?php endforeach; ?>
-        </div>
-    </div>
+
+<?php if (!empty($showGraphsAboveTable)): ?>
+    <?php echo $view->render(
+        'MauticReportBundle:Report:details_data_graphs.html.php',
+        [
+            'graphOrder' => $graphOrder,
+            'graphs'     => $graphs,
+        ]);
+    ?>
 <?php endif; ?>
+
 
 <?php if (!empty($columnOrder)):?>
 <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
@@ -67,4 +69,14 @@ $startCount  = 1;
     <?php endif; ?>
     </tbody>
 </table>
+<?php endif; ?>
+
+<?php if (empty($showGraphsAboveTable)): ?>
+    <?php echo $view->render(
+        'MauticReportBundle:Report:details_data_graphs.html.php',
+        [
+            'graphOrder' => $graphOrder,
+            'graphs'     => $graphs,
+        ]);
+    ?>
 <?php endif; ?>
