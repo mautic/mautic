@@ -46,10 +46,11 @@ foreach ($templateButtons as $action => $enabled) {
             $path = $view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
             break;
         case 'close':
-            $icon     = 'remove';
-            $path     = $view['router']->path($indexRoute);
-            $primary  = true;
-            $priority = 200;
+            $closeParameters = isset($routeVars['close']) ? $routeVars['close'] : [];
+            $icon            = 'remove';
+            $path            = $view['router']->path($indexRoute, $closeParameters);
+            $primary         = true;
+            $priority        = 200;
             break;
         case 'new':
         case'edit':

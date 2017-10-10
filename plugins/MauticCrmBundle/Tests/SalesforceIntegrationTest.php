@@ -496,6 +496,41 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $sf->pushLeadToCampaign($lead, 1, 'Active', ['Lead' => [1]]);
     }
+    public function testPushCompany()
+    {
+        $this->sfObjects     = ['Account'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $company = new Company();
+
+        $company->setName('MyCompanyName');
+
+        $sf->expects($this->any())
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function () {
+                    $args = func_get_args();
+
+                    // Checking for campaign members should return empty array for testing purposes
+                    if (strpos($args[0], '/query') !== false && strpos($args[1]['q'], 'Account') !== false) {
+                        return [];
+                    }
+
+                    if (strpos($args[0], '/composite') !== false) {
+                        $this->assertSame(
+                            '1-Account-null-1',
+                            $args[1]['compositeRequest'][0]['referenceId'],
+                            'The composite request when pushing an account should contain the correct referenceId.'
+                        );
+
+                        return true;
+                    }
+                }
+            );
+
+        $result = $sf->pushCompany($company);
+    }
 
     public function testExportingContactActivity()
     {
@@ -605,7 +640,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                         'company'                           => 'Contact1',
                         'email'                             => 'Contact1@sftest.com',
                         'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
-                        'mauticContactIsContactableByEmail' => 0,
+                        'mauticContactIsContactableByEmail' => 1,
 
                     ],
                     'contact2@sftest.com' => [
@@ -618,7 +653,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                         'company'                           => 'Contact2',
                         'email'                             => 'Contact2@sftest.com',
                         'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
-                        'mauticContactIsContactableByEmail' => 0,
+                        'mauticContactIsContactableByEmail' => 1,
                     ],
                 ],
                 'FirstName,LastName,Email'
@@ -960,12 +995,18 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                     return [];
                                 } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Campaign') !== false) {
                                     return 'fetched campaigns';
+                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Account') !== false) {
+                                    return 'fetched accounts';
                                 } else {
                                     // Extract emails
-                                    preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
-                                    $emails = explode("','", $match[1]);
+                                    $found = preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
+                                    if ($found) {
+                                        $emails = explode("','", $match[1]);
 
-                                    return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
+                                        return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
+                                    } else {
+                                        return $this->getSalesforceObjects([], $maxSfContacts, $maxSfLeads);
+                                    }
                                 }
                             case strpos($args[0], '/composite') !== false:
                                 return $this->getSalesforceCompositeResponse($args[1]);
@@ -1165,36 +1206,38 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $contactCount = 0;
         $leadCount    = 0;
 
-        foreach ($emails as $email) {
-            // Extact ID
-            preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
-            $object = $match[1];
+        if (!empty($emails)) {
+            foreach ($emails as $email) {
+                // Extact ID
+                preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
+                $object = $match[1];
 
-            if ('Lead' === $object) {
-                if ($leadCount >= $maxLeads) {
-                    continue;
+                if ('Lead' === $object) {
+                    if ($leadCount >= $maxLeads) {
+                        continue;
+                    }
+                    ++$leadCount;
+                } else {
+                    if ($contactCount >= $maxContacts) {
+                        continue;
+                    }
+                    ++$contactCount;
                 }
-                ++$leadCount;
-            } else {
-                if ($contactCount >= $maxContacts) {
-                    continue;
-                }
-                ++$contactCount;
-            }
 
-            $id        = $match[2];
-            $records[] = [
-                'attributes' => [
+                $id        = $match[2];
+                $records[] = [
+                    'attributes' => [
                         'type' => $object,
                         'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
                     ],
-                'Id'        => 'SF'.$id,
-                'FirstName' => $object.$id,
-                'LastName'  => $object.$id,
-                'Email'     => $object.$id.'@sftest.com',
-            ];
+                    'Id'        => 'SF'.$id,
+                    'FirstName' => $object.$id,
+                    'LastName'  => $object.$id,
+                    'Email'     => $object.$id.'@sftest.com',
+                ];
 
-            $this->addSpecialCases($id, $records);
+                $this->addSpecialCases($id, $records);
+            }
         }
 
         $this->returnedSfEntities = array_merge($this->returnedSfEntities, $records);

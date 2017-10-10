@@ -144,6 +144,48 @@ class SalesforceApi extends CrmApi
     }
 
     /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public function getCompany(array $data)
+    {
+        $config    = $this->integration->mergeConfigToFeatureSettings([]);
+        $queryUrl  = $this->integration->getQueryUrl();
+        $sfRecords = [
+            'Account' => [],
+        ];
+
+        $appendToQuery = '';
+
+        //try searching for lead as this has been changed before in updated done to the plugin
+        if (isset($config['objects']) && false !== array_search('company', $config['objects']) && !empty($data['company']['Name'])) {
+            $fields = $this->integration->getFieldsForQuery('Account');
+
+            if (isset($data['company']['BillingCountry']) && !empty($data['company']['BillingCountry'])) {
+                $appendToQuery .= ' and BillingCountry =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingCountry'])).'\'';
+            }
+            if (isset($data['company']['BillingCity']) && !empty($data['company']['BillingCity'])) {
+                $appendToQuery .= ' and BillingCity =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingCity'])).'\'';
+            }
+            if (isset($data['company']['BillingState']) && !empty($data['company']['BillingState'])) {
+                $appendToQuery .= ' and BillingState =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingState'])).'\'';
+            }
+
+            $fields[]    = 'Id';
+            $fields      = implode(', ', array_unique($fields));
+            $findContact = 'select '.$fields.' from Account where Name = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['Name'])).'\''.$appendToQuery;
+            $response    = $this->request('queryAll', ['q' => $findContact], 'GET', false, null, $queryUrl);
+
+            if (!empty($response['records'])) {
+                $sfRecords['company'] = $response['records'];
+            }
+        }
+
+        return $sfRecords;
+    }
+
+    /**
      * Creates Salesforce lead.
      *
      * @param array $data

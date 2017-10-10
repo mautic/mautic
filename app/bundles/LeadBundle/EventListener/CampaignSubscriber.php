@@ -18,6 +18,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -28,6 +29,8 @@ use Mautic\LeadBundle\Model\ListModel;
  */
 class CampaignSubscriber extends CommonSubscriber
 {
+    const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
+
     /**
      * @var IpLookupHelper
      */
@@ -78,6 +81,7 @@ class CampaignSubscriber extends CommonSubscriber
                 ['onCampaignTriggerActionAddToCompany', 4],
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
                 ['onCampaignTriggerActionDeleteContact', 6],
+                ['onCampaignTriggerActionChangeOwner', 7],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -131,6 +135,14 @@ class CampaignSubscriber extends CommonSubscriber
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.addtocompany', $action);
+
+        $action = [
+            'label'       => 'mautic.lead.lead.events.changeowner',
+            'description' => 'mautic.lead.lead.events.changeowner_descr',
+            'formType'    => ChangeOwnerType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+        ];
+        $event->addAction(self::ACTION_LEAD_CHANGE_OWNER, $action);
 
         $action = [
             'label'       => 'mautic.lead.lead.events.changecompanyscore',
@@ -275,6 +287,23 @@ class CampaignSubscriber extends CommonSubscriber
 
         $this->leadModel->setFieldValues($lead, $event->getConfig(), false);
         $this->leadModel->saveEntity($lead);
+
+        return $event->setResult(true);
+    }
+
+    public function onCampaignTriggerActionChangeOwner(CampaignExecutionEvent $event)
+    {
+        if (!$event->checkContext(self::ACTION_LEAD_CHANGE_OWNER)) {
+            return;
+        }
+
+        $lead = $event->getLead();
+        $data = $event->getConfig();
+        if (empty($data['owner'])) {
+            return;
+        }
+
+        $this->leadModel->updateLeadOwner($lead, $data['owner']);
 
         return $event->setResult(true);
     }

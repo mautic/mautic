@@ -11,12 +11,14 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\PointBundle\Model\TriggerModel;
 
 /**
@@ -44,6 +46,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @var TriggerModel
      */
     private $triggerModel;
+
+    /**
+     * @var
+     */
+    private $pointChanges;
 
     /**
      * Used by search functions to search social profiles.
@@ -889,20 +896,35 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.emailpending'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.emailpending', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
+                /** @var EmailRepository $emailRepo */
+                $emailRepo  = $this->getEntityManager()->getRepository('MauticEmailBundle:Email');
+                $emailId    = (int) $string;
+                $email      = $emailRepo->getEntity($emailId);
+                $variantIds = $email->getRelatedEntityIds();
+                $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
+                if ($nq instanceof QueryBuilder) {
+                    $nq->select('l.id'); // select only id
+                    $nsql = $nq->getSQL();
+                    foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
+                        $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+                    }
+                    $expr = $q->expr()->$inExpr('l.id', sprintf('(%s)', $nsql));
+                } else {
+                    $this->applySearchQueryRelationship(
+                        $q,
                         [
-                            'from_alias' => 'l',
-                            'table'      => 'message_queue',
-                            'alias'      => 'mq',
-                            'condition'  => 'l.id = mq.lead_id',
+                            [
+                                'from_alias' => 'l',
+                                'table'      => 'message_queue',
+                                'alias'      => 'mq',
+                                'condition'  => 'l.id = mq.lead_id',
+                            ],
                         ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'mq.channel_id', $eqExpr, $unique, null)
-                );
-                $q->andWhere('mq.channel = \'email\' and mq.status = \''.MessageQueue::STATUS_PENDING.'\'');
+                        $innerJoinTables,
+                        $this->generateFilterExpression($q, 'mq.channel_id', $eqExpr, $unique, null)
+                    );
+                    $q->andWhere('mq.channel = \'email\' and mq.status = \''.MessageQueue::STATUS_PENDING.'\'');
+                }
                 $filter->strict  = 1;
                 $returnParameter = true;
                 break;
@@ -1130,6 +1152,79 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $q->andHaving($having);
             }
             $q->groupBy('l.id');
+        }
+    }
+
+    /**
+     * @param array $changes
+     * @param       $id
+     * @param int   $tries
+     */
+    protected function updateContactPoints(array $changes, $id, $tries = 1)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->update(MAUTIC_TABLE_PREFIX.'leads')
+            ->where('id = '.$id);
+
+        $ph = 0;
+        // Keep operator in same order as was used in Lead::adjustPoints() in order to be congruent with what was calculated in PHP
+        // Again ignoring Aunt Sally here (PEMDAS)
+        foreach ($changes as $operator => $points) {
+            $qb->set('points', 'points '.$operator.' :points'.$ph)
+                ->setParameter('points'.$ph, $points, \PDO::PARAM_INT);
+
+            ++$ph;
+        }
+
+        try {
+            $qb->execute();
+        } catch (DriverException $exception) {
+            $message = $exception->getMessage();
+
+            if (strpos($message, 'Deadlock') !== false && $tries <= 3) {
+                ++$tries;
+
+                $this->updateContactPoints($changes, $id, $tries);
+            }
+        }
+
+        // Query new points
+        return (int) $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('l.points')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->where('l.id = '.$id)
+            ->execute()
+            ->fetchColumn();
+    }
+
+    /**
+     * @param Lead $entity
+     */
+    protected function preSaveEntity($entity)
+    {
+        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
+        $this->pointChanges = $entity->getPointChanges();
+    }
+
+    /**
+     * @param Lead $entity
+     */
+    protected function postSaveEntity($entity)
+    {
+        // Check if points need to be appended
+        if ($this->pointChanges) {
+            $newPoints = $this->updateContactPoints($this->pointChanges, $entity->getId());
+
+            // Set actual points so that code using getPoints knows the true value
+            $entity->setActualPoints($newPoints);
+
+            $changes = $entity->getChanges();
+
+            if (isset($changes['points'])) {
+                // Let's adjust the points to be more accurate in the change log
+                $changes['points'][1] = $newPoints;
+                $entity->setChanges($changes);
+            }
         }
     }
 }

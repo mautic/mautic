@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
 /**
  * Class CustomFieldRepositoryTrait.
@@ -244,6 +245,8 @@ trait CustomFieldRepositoryTrait
      */
     public function saveEntity($entity, $flush = true)
     {
+        $this->preSaveEntity($entity);
+
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
@@ -264,6 +267,8 @@ trait CustomFieldRepositoryTrait
             $this->prepareDbalFieldsForSave($fields);
             $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }
+
+        $this->postSaveEntity($entity);
     }
 
     /**
@@ -303,6 +308,8 @@ trait CustomFieldRepositoryTrait
 
         //loop over results to put fields in something that can be assigned to the entities
         foreach ($values as $k => $r) {
+            $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
+
             if (isset($fields[$k])) {
                 if (!is_null($r)) {
                     switch ($fields[$k]['type']) {
@@ -385,5 +392,25 @@ trait CustomFieldRepositoryTrait
                 $fields[$field] = (int) $value;
             }
         }
+    }
+
+    /**
+     * Inherit and use in class if required to do something to the entity prior to persisting.
+     *
+     * @param $entity
+     */
+    protected function preSaveEntity($entity)
+    {
+        // Inherit and use if required
+    }
+
+    /**
+     * Inherit and use in class if required to do something with the entity after persisting.
+     *
+     * @param $entity
+     */
+    protected function postSaveEntity($entity)
+    {
+        // Inherit and use if required
     }
 }

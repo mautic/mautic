@@ -226,7 +226,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
 
-            if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
+            if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures) && method_exists($integrationObject, 'pushLeads')) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
                 $result  = $integrationObject->pushLeads($params);
                 $ignored = 0;
@@ -242,6 +242,33 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $output->writeln(
                     '<comment>'.$translator->trans(
                         'mautic.plugin.command.fetch.pushing.leads.events_executed',
+                        [
+                            '%updated%' => $updated,
+                            '%created%' => $created,
+                            '%errored%' => $errored,
+                            '%ignored%' => $ignored,
+                        ]
+                    )
+                    .'</comment>'."\n"
+                );
+            }
+
+            if (method_exists($integrationObject, 'pushCompanies')) {
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.companies', ['%integration%' => $integration]).'</info>');
+                $result  = $integrationObject->pushCompanies($params);
+                $ignored = 0;
+
+                if (4 === count($result)) {
+                    list($updated, $created, $errored, $ignored) = $result;
+                } elseif (3 === count($result)) {
+                    list($updated, $created, $errored) = $result;
+                } else {
+                    $errored                 = '?';
+                    list($updated, $created) = $result;
+                }
+                $output->writeln(
+                    '<comment>'.$translator->trans(
+                        'mautic.plugin.command.fetch.pushing.companies.events_executed',
                         [
                             '%updated%' => $updated,
                             '%created%' => $created,
