@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
@@ -53,15 +53,22 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     protected $companyFields;
 
     /**
+     * @var EmailValidator
+     */
+    protected $emailValidator;
+
+    /**
      * CompanyModel constructor.
      *
-     * @param FieldModel $leadFieldModel
-     * @param Session    $session
+     * @param FieldModel     $leadFieldModel
+     * @param Session        $session
+     * @param EmailValidator $validator
      */
-    public function __construct(FieldModel $leadFieldModel, Session $session)
+    public function __construct(FieldModel $leadFieldModel, Session $session, EmailValidator $validator)
     {
         $this->leadFieldModel = $leadFieldModel;
         $this->session        = $session;
+        $this->emailValidator = $validator;
     }
 
     /**
@@ -728,7 +735,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $hasEmail = (!empty($fields['companyemail']) && !empty($data[$fields['companyemail']]));
 
         if ($hasEmail) {
-            MailHelper::validateEmail($data[$fields['companyemail']]);
+            $this->emailValidator->validate($data[$fields['companyemail']], false);
         }
 
         if ($hasName) {

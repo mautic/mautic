@@ -15,6 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
@@ -92,6 +93,17 @@ class PointSubscriber extends CommonSubscriber
         ];
 
         $event->addEvent('email.send', $sendEvent);
+
+        $sendToOwnerEvent = [
+          'group'           => 'mautic.email.point.trigger',
+          'label'           => 'mautic.email.point.trigger.send_email_to_user',
+          'formType'        => EmailToUserType::class,
+          'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
+          'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+          'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
+        ];
+
+        $event->addEvent('email.send_to_user', $sendToOwnerEvent);
     }
 
     /**

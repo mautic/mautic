@@ -801,6 +801,9 @@ class ReportController extends FormController
         $name    = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
         $options = ['dateFrom' => new \DateTime($fromDate), 'dateTo' => new \DateTime($toDate)];
 
+        $dynamicFilters            = $session->get('mautic.report.'.$objectId.'.filters', []);
+        $options['dynamicFilters'] = $dynamicFilters;
+
         if ($format === 'csv') {
             $response = new HttpFoundation\StreamedResponse(
                 function () use ($model, $fromDate, $toDate, $entity, $format, $name, $options) {

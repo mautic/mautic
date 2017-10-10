@@ -208,7 +208,7 @@ class FocusSubscriber extends CommonSubscriber
             list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
                 $content,
                 $tokens,
-                'focusItems',
+                'focus',
                 $clickthrough['focus_id']
             );
 

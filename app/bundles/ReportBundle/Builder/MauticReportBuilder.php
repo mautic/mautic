@@ -443,7 +443,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'boolean':
                                 if ((int) $filter['value'] > 1) {
                                     // Ignore the "reset" value of "2"
-                                    break;
+                                    continue 2;
                                 }
 
                                 $queryBuilder->setParameter($paramName, $filter['value'], 'boolean');

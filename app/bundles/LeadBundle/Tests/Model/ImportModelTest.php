@@ -34,7 +34,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->setOriginalFile($fileName);
         $log = $model->initEventLog($entity, $line);
 
-        $this->assertTrue($log instanceof LeadEventLog);
+        $this->assertInstanceOf(LeadEventLog::class, $log);
         $this->assertSame($userId, $log->getUserId());
         $this->assertSame($userName, $log->getUserName());
         $this->assertSame('lead', $log->getBundle());
@@ -81,7 +81,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        $result = $model->checkParallelImportLimit($entity);
+        $result = $model->checkParallelImportLimit();
 
         $this->assertFalse($result);
     }
@@ -111,7 +111,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        $result = $model->checkParallelImportLimit($entity);
+        $result = $model->checkParallelImportLimit();
 
         $this->assertFalse($result);
     }
@@ -141,7 +141,7 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        $result = $model->checkParallelImportLimit($entity);
+        $result = $model->checkParallelImportLimit();
 
         $this->assertTrue($result);
     }

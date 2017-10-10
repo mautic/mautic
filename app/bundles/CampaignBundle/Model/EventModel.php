@@ -1776,7 +1776,7 @@ class EventModel extends CommonFormModel
                     // Conditions will need child event processed
                     $decisionPath = ($response === true) ? 'yes' : 'no';
 
-                    if (!$response) {
+                    if (true !== $response) {
                         // Note that a condition took non action path so we can generate a visual stat
                         $log->setNonActionPathTaken(true);
                     }
