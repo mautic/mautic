@@ -1020,53 +1020,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \DateTime|null $startDate
-     * @param \DateTime|null $endDate
-     * @param                $leadId
-     *
-     * @return array
-     */
-    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId, $filters = [])
-    {
-        $leadIds = (!is_array($leadId)) ? [$leadId] : $leadId;
-
-        $leadActivity = [];
-
-        foreach ($leadIds as $leadId) {
-            $i        = 0;
-            $activity = [];
-            $lead     = $this->leadModel->getEntity($leadId);
-            $page     = 1;
-
-            while ($engagements = $this->leadModel->getEngagements($lead, $filters, null, $page, 100, false)) {
-                $events = $engagements[0]['events'];
-
-                // inject lead into events
-                foreach ($events as $event) {
-                    $link                        = isset($event['eventLabel']['href']) ? $event['eventLabel']['href'] : '';
-                    $label                       = isset($event['eventLabel']['label']) ? $event['eventLabel']['label'] : '';
-                    $activity[$i]['eventType']   = $event['eventType'];
-                    $activity[$i]['name']        = isset($event['eventType']) ? $event['eventType'] : '';
-                    $activity[$i]['description'] = isset($event['name']) ? $event['name'].' - '.$link.' - '.$label : $link.' - '.$label;
-                    $activity[$i]['dateAdded']   = $event['timestamp'];
-                    $activity[$i]['id']          = str_replace('.', '-', $event['eventId']);
-                    ++$i;
-                }
-
-                ++$page;
-            }
-
-            $leadActivity[$leadId] = [
-                'records' => $activity,
-            ];
-
-            unset($activity);
-        }
-
-        return $leadActivity;
-    }
-
-    /**
      * Return key recognized by integration.
      *
      * @param $key

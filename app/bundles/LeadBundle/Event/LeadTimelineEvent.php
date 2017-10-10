@@ -162,11 +162,11 @@ class LeadTimelineEvent extends Event
         $this->siteDomain  = $siteDomain;
 
         if (!empty($filters['dateFrom'])) {
-            $this->dateFrom = new \DateTime($filters['dateFrom']);
+            $this->dateFrom = ($filters['dateFrom'] instanceof \DateTime) ?: new \DateTime($filters['dateFrom']);
         }
 
         if (!empty($filters['dateTo'])) {
-            $this->dateTo = new \DateTime($filters['dateTo']);
+            $this->dateTo = ($filters['dateTo'] instanceof \DateTime) ?: new \DateTime($filters['dateTo']);
         }
     }
 
