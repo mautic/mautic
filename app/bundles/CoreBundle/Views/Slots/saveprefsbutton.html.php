@@ -10,10 +10,10 @@
 
 if (isset($form)) {
     // add form tag
+    echo '<script src="'.$view['assets']->getUrl('app/bundles/PageBundle/Assets/js/prefcenter.js').'"></script>';
     $view['assets']->addCustomDeclaration($view['form']->start($form), 'bodyOpen');
 }
 ?>
-<script src="<?php echo $view['assets']->getUrl('app/bundles/PageBundle/Assets/js/prefcenter.js'); ?>"></script>
     <a href="javascript:void(null)"
        class="button btn btn-default btn-save"
        <?php if (isset($form)) : ?>onclick="saveUnsubscribePreferences('<?php echo $form->vars['id']; ?>')"<?php endif; ?>
