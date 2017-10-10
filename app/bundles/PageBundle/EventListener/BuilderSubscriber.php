@@ -354,27 +354,27 @@ class BuilderSubscriber extends CommonSubscriber
                 unset($slot, $xpath, $dom);
             }
             // replace tokens
-            if (strpos($content, self::segmentListRegex) !== false) {
+            if (false !== strpos($content, self::segmentListRegex)) {
                 $segmentList = $this->renderSegmentList($params);
                 $content     = str_ireplace(self::segmentListRegex, $segmentList, $content);
             }
 
-            if (strpos($content, self::categoryListRegex) !== false) {
+            if (false !== strpos($content, self::categoryListRegex)) {
                 $categoryList = $this->renderCategoryList($params);
                 $content      = str_ireplace(self::categoryListRegex, $categoryList, $content);
             }
 
-            if (strpos($content, self::preferredchannel) !== false) {
+            if (false !== strpos($content, self::preferredchannel)) {
                 $preferredChannel = $this->renderPreferredChannel($params);
                 $content          = str_ireplace(self::preferredchannel, $preferredChannel, $content);
             }
 
-            if (strpos($content, self::channelfrequency) !== false) {
+            if (false !== strpos($content, self::channelfrequency)) {
                 $channelfrequency = $this->renderChannelFrequency($params);
                 $content          = str_ireplace(self::channelfrequency, $channelfrequency, $content);
             }
 
-            if (strpos($content, self::saveprefsRegex) !== false) {
+            if (false !== strpos($content, self::saveprefsRegex)) {
                 $savePrefs = $this->renderSavePrefs($params);
                 $content   = str_ireplace(self::saveprefsRegex, $savePrefs, $content);
             }
