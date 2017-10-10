@@ -3155,7 +3155,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function getSalesforceAccountsByName($sfObject, &$checkIdsInSF, $requiredFieldString)
     {
-        $field = [];
+        $field   = [];
+        $fieldId = [];
 
         foreach ($checkIdsInSF as $items) {
             if (!isset($items['integration_entity_id'])) {
@@ -3174,16 +3175,16 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         $fieldString = "'".implode("','", $field)."'";
-        $idString    = "'".implode("','", $fieldId)."'";
 
         $queryUrl    = $this->getQueryUrl();
         $findQuery   = 'select Id, '.$requiredFieldString.' from '.$sfObject.' where isDeleted = false and Name in ('.$fieldString.')';
         $queryByName = $this->getApiHelper()->request('query', ['q' => $findQuery], 'GET', false, null, $queryUrl);
 
-        $findQuery = 'select isDeleted, Id, '.$requiredFieldString.' from '.$sfObject.' where  Id in ('.$idString.')';
-        $queryById = $this->getApiHelper()->request('queryAll', ['q' => $findQuery], 'GET', false, null, $queryUrl);
+        if (!empty($fieldId)) {
+            $idString  = "'".implode("','", $fieldId)."'";
+            $findQuery = 'select isDeleted, Id, '.$requiredFieldString.' from '.$sfObject.' where  Id in ('.$idString.')';
+            $queryById = $this->getApiHelper()->request('queryAll', ['q' => $findQuery], 'GET', false, null, $queryUrl);
 
-        if (!empty($queryById['records'])) {
             //mark as deleleted
             foreach ($queryById['records'] as $sfId => $record) {
                 if (isset($record['IsDeleted']) && $record['IsDeleted'] == 1) {

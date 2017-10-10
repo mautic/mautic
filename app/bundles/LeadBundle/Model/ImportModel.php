@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -19,14 +20,15 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -107,25 +109,27 @@ class ImportModel extends FormModel
 
     /**
      * Compares current number of imports in progress with the limit from the configuration.
-     * If the limit is hit, the import changes its status to delayed.
-     *
-     * @param Import $import
      *
      * @return bool
      */
-    public function checkParallelImportLimit(Import $import)
+    public function checkParallelImportLimit()
     {
-        $parallelImportLimit = $this->config->getParameter('parallel_import_limit', 1);
-        $importsInProgress   = $this->getRepository()->countImportsWithStatuses([$import::IN_PROGRESS]);
+        $parallelImportLimit = $this->getParallelImportLimit();
+        $importsInProgress   = $this->getRepository()->countImportsInProgress();
 
-        if ($importsInProgress > $parallelImportLimit) {
-            $import->setStatus($import::DELAYED)
-                ->setStatusInfo($this->translator->trans('mautic.lead.import.parallel.limit.hit', ['%limit%' => $parallelImportLimit]));
+        return !($importsInProgress >= $parallelImportLimit);
+    }
 
-            return false;
-        }
-
-        return true;
+    /**
+     * Returns parallel import limit from the configuration.
+     *
+     * @param int $default
+     *
+     * @return int
+     */
+    public function getParallelImportLimit($default = 1)
+    {
+        return $this->config->getParameter('parallel_import_limit', $default);
     }
 
     /**
@@ -186,10 +190,11 @@ class ImportModel extends FormModel
      *
      * @param Import   $import
      * @param Progress $progress
+     * @param int      $limit    Number of records to import before delaying the import. 0 will import all
      *
      * @return bool
      */
-    public function startImport(Import $import, Progress $progress)
+    public function startImport(Import $import, Progress $progress, $limit = 0)
     {
         $this->setGhostImportsAsFailed();
 
@@ -201,20 +206,34 @@ class ImportModel extends FormModel
 
         if (!$import->canProceed()) {
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
+            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
 
-        if (!$this->checkParallelImportLimit($import)) {
+        if (!$this->checkParallelImportLimit()) {
+            $info = $this->translator->trans(
+                'mautic.lead.import.parallel.limit.hit',
+                ['%limit%' => $this->getParallelImportLimit()]
+            );
+            $import->setStatus($import::DELAYED)->setStatusInfo($info);
             $this->saveEntity($import);
-            $this->logDebug('import cannot be processed because'.$import->getStatusInfo(), $import);
+            $this->logDebug('import cannot be processed because '.$import->getStatusInfo(), $import);
 
             return false;
         }
 
-        $progress->setTotal($import->getLineCount());
-        $progress->setDone($import->getProcessedRows());
+        $processed = $import->getProcessedRows();
+        $total     = $import->getLineCount();
+        $pending   = $total - $processed;
+
+        if ($limit && $limit < $pending) {
+            $processed = 0;
+            $total     = $limit;
+        }
+
+        $progress->setTotal($total);
+        $progress->setDone($processed);
 
         $import->start();
 
@@ -222,7 +241,21 @@ class ImportModel extends FormModel
         $this->saveEntity($import);
         $this->logDebug('The background import is about to start', $import);
 
-        if (!$this->process($import, $progress)) {
+        try {
+            if (!$this->process($import, $progress, $limit)) {
+                return false;
+            }
+        } catch (ORMException $e) {
+            // The EntityManager is probably closed. The entity cannot be saved.
+            $info = $this->translator->trans(
+                'mautic.lead.import.database.exception',
+                ['%message%' => $e->getMessage()]
+            );
+
+            $import->setStatus($import::DELAYED)->setStatusInfo($info);
+
+            $this->logDebug('Database had been overloaded', $import);
+
             return false;
         }
 
@@ -255,10 +288,11 @@ class ImportModel extends FormModel
      *
      * @param Import   $import
      * @param Progress $progress
+     * @param int      $limit    Number of records to import before delaying the import
      *
      * @return bool
      */
-    public function process(Import $import, Progress $progress)
+    public function process(Import $import, Progress $progress, $limit = 0)
     {
         try {
             $file = new \SplFileObject($import->getFilePath());
@@ -274,6 +308,7 @@ class ImportModel extends FormModel
         $headers     = $import->getHeaders();
         $headerCount = count($headers);
         $config      = $import->getParserConfig();
+        $counter     = 0;
 
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
 
@@ -315,6 +350,10 @@ class ImportModel extends FormModel
 
             if (!$errorMessage) {
                 $data = $this->trimArrayValues($data);
+                if (!array_filter($data)) {
+                    continue;
+                }
+
                 $data = array_combine($headers, $data);
 
                 try {
@@ -349,6 +388,13 @@ class ImportModel extends FormModel
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
             }
 
+            // Release entities in Doctrine's memory to prevent memory leak
+            $this->em->detach($eventLog);
+            $eventLog = null;
+            $data     = null;
+            $this->em->clear(Lead::class);
+            $this->em->clear(Company::class);
+
             // Save Import entity once per batch so the user could see the progress
             if ($batchSize === 0 && $import->isBackgroundProcess()) {
                 $isPublished = $this->getRepository()->getValue($import->getId(), 'is_published');
@@ -358,6 +404,7 @@ class ImportModel extends FormModel
                 }
 
                 $this->saveEntity($import);
+                $this->dispatchEvent('batch_processed', $import);
 
                 // Stop the import loop if the import got unpublished
                 if (!$isPublished) {
@@ -366,6 +413,14 @@ class ImportModel extends FormModel
                 }
 
                 $batchSize = $config['batchlimit'];
+            }
+
+            ++$counter;
+            if ($limit && $counter >= $limit) {
+                $import->setStatus($import::DELAYED);
+                $this->saveEntity($import);
+
+                break;
             }
         }
 
@@ -615,6 +670,9 @@ class ImportModel extends FormModel
                 break;
             case 'post_delete':
                 $name = LeadEvents::IMPORT_POST_DELETE;
+                break;
+            case 'batch_processed':
+                $name = LeadEvents::IMPORT_BATCH_PROCESSED;
                 break;
             default:
                 return null;

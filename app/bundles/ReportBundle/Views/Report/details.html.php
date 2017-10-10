@@ -14,6 +14,9 @@ $header = $view['translator']->trans(
 );
 
 if ($tmpl == 'index') {
+    $showDynamicFilters  = (!empty($report->getSettings()['showDynamicFilters']) === true);
+    $hideDateRangeFilter = (!empty($report->getSettings()['hideDateRangeFilter']) === true);
+
     $view->extend('MauticCoreBundle:Default:content.html.php');
     $view['slots']->set('mauticContent', 'report');
 
@@ -126,11 +129,11 @@ if ($tmpl == 'index') {
             </div>
         </div>
     </div>
-    <div class="collapse" id="report-filters">
+    <div class="collapse<?php if ($showDynamicFilters): ?> in<?php endif; ?>" id="report-filters">
         <div class="pr-md pl-md pb-md">
             <div class="panel shd-none mb-0 pa-lg">
                 <div class="row">
-                    <div class="col-sm-12 mb-10">
+                    <div class="col-sm-12 mb-10<?php if ($hideDateRangeFilter):?> hide<?php endif; ?>">
                         <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm]); ?>
                     </div>
                     <?php $view['form']->start($dynamicFilterForm); ?>
@@ -155,7 +158,7 @@ if ($tmpl == 'index') {
             <a href="#report-details" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-details">
                 <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?>
             </a>
-            <a href="#report-filters" class="arrow text-muted collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
+            <a href="#report-filters" class="arrow text-muted <?php if (!$showDynamicFilters): ?>collapsed<?php endif; ?>" data-toggle="collapse" aria-expanded="false" aria-controls="report-filters">
                 <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.filters'); ?>
             </a>
         </div>

@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\CoreBundle\Helper\InputHelper;
+
 $viewTime = $duration = $percentage = $unknown = $view['translator']->trans('mautic.core.unknown');
 
 if ($event['extra']['hit']['time_watched']) {

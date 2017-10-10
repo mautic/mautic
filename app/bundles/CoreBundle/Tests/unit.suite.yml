@@ -1,0 +1,4 @@
+actor: UnitTester
+modules:
+    enabled:
+        - \Mautic\CoreBundle\Helper\Unit

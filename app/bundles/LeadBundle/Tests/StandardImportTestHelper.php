@@ -58,9 +58,12 @@ abstract class StandardImportTestHelper extends CommonMocks
         parent::tearDownAfterClass();
     }
 
-    protected function initImportEntity()
+    protected function initImportEntity(array $methods = null)
     {
-        $entity = new Import();
+        $entity = $this->getMockBuilder(Import::class)
+            ->setMethods($methods)
+            ->getMock();
+
         $entity->setFilePath(self::$csvPath)
             ->setLineCount(count(self::$initialList))
             ->setHeaders(self::$initialList[0])
@@ -122,10 +125,6 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->getMock();
 
         $companyModel->setEntityManager($entityManager);
-
-        $companyModel->expects($this->any())
-            ->method('getEventLogRepository')
-            ->willReturn($logRepository);
 
         $notificationModel = $this->getMockBuilder(NotificationModel::class)
             ->disableOriginalConstructor()

@@ -128,6 +128,13 @@ return [
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
                     'mautic.channel.model.queue',
+                    'mautic.email.model.send_email_to_user',
+                ],
+            ],
+            'mautic.email.campaignbundle.condition_subscriber' => [
+                'class'     => 'Mautic\EmailBundle\EventListener\CampaignConditionSubscriber',
+                'arguments' => [
+                    'mautic.validator.email',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
@@ -146,6 +153,12 @@ return [
                 'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
                 'arguments' => [
                     'mautic.point.model.point',
+                ],
+            ],
+            'mautic.email.touser.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\EmailToUserSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.send_email_to_user',
                 ],
             ],
             'mautic.email.calendarbundle.subscriber' => [
@@ -278,12 +291,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.validator.leadlistaccess' => [
-                'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
-                'arguments' => 'mautic.factory',
-                'tag'       => 'validator.constraint_validator',
-                'alias'     => 'leadlist_access',
-            ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
                 'arguments' => [
@@ -374,6 +381,13 @@ return [
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],
+            'mautic.validator.email' => [
+                'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -388,6 +402,12 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
+                ],
+            ],
+            'mautic.email.model.send_email_to_user' => [
+                'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
+                'arguments' => [
+                    'mautic.email.model.email',
                 ],
             ],
         ],

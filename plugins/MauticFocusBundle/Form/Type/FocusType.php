@@ -41,7 +41,7 @@ class FocusType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html']));
+        $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html', 'editor' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('focus', $options));
 
         $builder->add(
@@ -219,8 +219,7 @@ class FocusType extends AbstractType
                 'multiple'    => false,
                 'empty_value' => '',
                 'attr'        => [
-                    'onchange'     => 'Mautic.focusUpdatePreview()',
-                    'data-show-on' => '{"focus_html_mode_1":""}',
+                    'onchange' => 'Mautic.focusUpdatePreview()',
                 ],
             ]
         );

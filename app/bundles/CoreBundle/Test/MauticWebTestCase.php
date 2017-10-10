@@ -239,7 +239,7 @@ class MauticWebTestCase extends WebTestCase
     /**
      * TODO: Backup the database after creation, and store in cache dir to reimport between test.
      */
-    private function setupDatabaseOnFirstRun()
+    protected function setupDatabaseOnFirstRun()
     {
         $this->runCommand('doctrine:schema:drop', [
             '--env'   => 'test',
@@ -266,7 +266,7 @@ class MauticWebTestCase extends WebTestCase
      *
      * @return array
      */
-    private function getMauticFixtures($returnClassNames = false)
+    protected function getMauticFixtures($returnClassNames = false)
     {
         $fixtures      = [];
         $mauticBundles = $this->container->getParameter('mautic.bundles');
@@ -295,7 +295,7 @@ class MauticWebTestCase extends WebTestCase
      * @param string $classPrefix
      * @param bool   $returnClassNames
      */
-    private function populateFixturesFromDirectory($fixturesDir, array &$fixtures, $classPrefix = null, $returnClassNames = false)
+    protected function populateFixturesFromDirectory($fixturesDir, array &$fixtures, $classPrefix = null, $returnClassNames = false)
     {
         if ($returnClassNames) {
             //get files within the directory
