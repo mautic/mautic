@@ -189,7 +189,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->join('i', MAUTIC_TABLE_PREFIX.$joinTable, 'l', 'l.id = i.internal_entity_id');
 
         if (false === $limit) {
-            $q->select('count(i.integration_entity_id) as total');
+            $q->select('count(i.integration_entity_id) as total, i.integration_entity');
 
             if ($integrationEntity) {
                 $q->addSelect('i.integration_entity');
@@ -276,9 +276,8 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         // Group by email to prevent duplicates from affecting this
-        if (false === $limit and $integrationEntity and !is_array($integrationEntity)) {
-            $q->groupBy('i.integration_entity', 'i.integration_entity_id');
-        }
+
+        $q->groupBy('i.integration_entity', 'i.integration_entity_id');
 
         if ($limit) {
             $q->setMaxResults($limit);
