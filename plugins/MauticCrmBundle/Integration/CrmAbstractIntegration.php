@@ -228,25 +228,55 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         foreach ($leadIds as $leadId) {
             $i        = 0;
             $activity = [];
-            $lead     = $this->leadModel->getEntity($leadId);
+            $lead     = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
             $page     = 1;
 
-            while ($engagements = $this->leadModel->getEngagements($lead, $filters, null, $page, 100, false)) {
-                $events = $engagements[0]['events'];
+            while (true) {
+                $engagements = $this->leadModel->getEngagements($lead, $filters, null, $page, 100, false);
+                $events      = $engagements[0]['events'];
+
+                if (empty($events)) {
+                    break;
+                }
 
                 // inject lead into events
                 foreach ($events as $event) {
-                    $link                        = isset($event['eventLabel']['href']) ? $event['eventLabel']['href'] : '';
-                    $label                       = isset($event['eventLabel']['label']) ? $event['eventLabel']['label'] : '';
+                    $link  = '';
+                    $label = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
+                    if (is_array($label)) {
+                        $link  = $label['href'];
+                        $label = $label['label'];
+                    }
+
                     $activity[$i]['eventType']   = $event['eventType'];
-                    $activity[$i]['name']        = isset($event['eventType']) ? $event['eventType'] : '';
-                    $activity[$i]['description'] = isset($event['name']) ? $event['name'].' - '.$link.' - '.$label : $link.' - '.$label;
+                    $activity[$i]['name']        = $event['eventType'].' - '.$label;
+                    $activity[$i]['description'] = $link;
                     $activity[$i]['dateAdded']   = $event['timestamp'];
-                    $activity[$i]['id']          = str_replace('.', '-', $event['eventId']);
+
+                    // We must keep BC with pre 2.11.0 formatting in order to prevent duplicates
+                    switch ($event['eventType']) {
+                        case 'point.gained':
+                            $id = str_replace($event['eventType'], 'pointChange', $event['eventId']);
+                            break;
+                        case 'form.submitted':
+                            $id = str_replace($event['eventType'], 'formSubmission', $event['eventId']);
+                            break;
+                        case 'email.read':
+                            $id = str_replace($event['eventType'], 'emailStat', $event['eventId']);
+                            break;
+                        default:
+                            // Just to keep congruent formatting with the three above
+                            $id = str_replace(' ', '', ucwords(str_replace('.', ' ', $event['eventId'])));
+                    }
+
+                    $activity[$i]['id'] = $id;
                     ++$i;
                 }
 
                 ++$page;
+
+                // Lots of entities will be loaded into memory while compiling these events so let's prevent memory overload by clearing the EM
+                $this->em->clear();
             }
 
             $leadActivity[$leadId] = [

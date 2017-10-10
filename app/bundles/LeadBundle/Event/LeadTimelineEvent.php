@@ -162,11 +162,11 @@ class LeadTimelineEvent extends Event
         $this->siteDomain  = $siteDomain;
 
         if (!empty($filters['dateFrom'])) {
-            $this->dateFrom = ($filters['dateFrom'] instanceof \DateTime) ?: new \DateTime($filters['dateFrom']);
+            $this->dateFrom = ($filters['dateFrom'] instanceof \DateTime) ? $filters['dateFrom'] : new \DateTime($filters['dateFrom']);
         }
 
         if (!empty($filters['dateTo'])) {
-            $this->dateTo = ($filters['dateTo'] instanceof \DateTime) ?: new \DateTime($filters['dateTo']);
+            $this->dateTo = ($filters['dateTo'] instanceof \DateTime) ? $filters['dateTo'] : new \DateTime($filters['dateTo']);
         }
     }
 
@@ -228,11 +228,9 @@ class LeadTimelineEvent extends Event
 
                 // Ensure a full URL
                 if ($this->siteDomain && isset($data['eventLabel']) && is_array($data['eventLabel']) && isset($data['eventLabel']['href'])) {
-                    if (!empty($data['eventLabel']['isExternal'])) {
-                        // If this does not have a http, then assume a Mautic URL
-                        if (strpos($data['eventLabel']['href'], '://') === false) {
-                            $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
-                        }
+                    // If this does not have a http, then assume a Mautic URL
+                    if (strpos($data['eventLabel']['href'], '://') === false) {
+                        $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
                     }
                 }
             }
