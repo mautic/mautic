@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -182,14 +183,14 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
         $metadata->addConstraint(new Callback([
             'callback' => function (self $dwc, ExecutionContextInterface $context) {
-                if (!$dwc->getIsCampaignBased() && '' === $dwc->getSlotName()) {
+                if (!$dwc->getIsCampaignBased()) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
                         $dwc->getSlotName(),
                         [
                             new NotBlank(
                                 [
-                                    'message' => 'mautic.core.value.required',
+                                    'message' => 'mautic.dynamicContent.slot_name.notblank',
                                 ]
                             ),
                         ]
@@ -198,6 +199,24 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                         foreach ($violations as $violation) {
                             $context->buildViolation($violation->getMessage())
                                     ->atPath('slotName')
+                                    ->addViolation();
+                        }
+                    }
+                    $violations = $validator->validate(
+                        $dwc->getFilters(),
+                        [
+                            new Count(
+                                [
+                                    'minMessage' => 'mautic.dynamicContent.filter.options.empty',
+                                    'min'        => 1,
+                                ]
+                            ),
+                        ]
+                    );
+                    if (count($violations) > 0) {
+                        foreach ($violations as $violation) {
+                            $context->buildViolation($violation->getMessage())
+                                    ->atPath('filters')
                                     ->addViolation();
                         }
                     }

@@ -32,7 +32,6 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Class DynamicContentType.
@@ -119,15 +118,6 @@ class DynamicContentType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
-                ],
-                'constraints' => [
-                    new Callback(
-                        function ($validateMe, ExecutionContextInterface $context) use ($options) {
-                            if (empty($validateMe) && !$options['data']->getIsCampaignBased()) {
-                                $context->buildViolation('mautic.core.value.required')->addViolation();
-                            }
-                        }
-                    ),
                 ],
             ]
         );
