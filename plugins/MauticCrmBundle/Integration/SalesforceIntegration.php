@@ -21,6 +21,7 @@ use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -572,18 +573,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'required'    => false,
                 ]
             );
-            $builder->add('includeEvents',
-                'textarea',
+
+            $builder->add(
+                'activityEvents',
+                ChoiceType::class,
                 [
-                    'label'      => 'mautic.salesforce.form.activityIncludeEvents',
-                    'label_attr' => ['class' => 'control-label', 'data-toggle' => 'tooltip', 'title' => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip')],
-                ]
-            );
-            $builder->add('excludeEvents',
-                'textarea',
-                [
-                    'label'      => 'mautic.salesforce.form.activityExcludeEvents',
-                    'label_attr' => ['class' => 'control-label', 'data-toggle' => 'tooltip', 'title' => $this->translator->trans('mautic.salesforce.form.activity.exclude.events.tooltip')],
+                    'choices'    => $this->leadModel->getEngagementTypes(),
+                    'label'      => 'mautic.salesforce.form.activity_included_events',
+                    'label_attr' => [
+                        'class'       => 'control-label',
+                        'data-toggle' => 'tooltip',
+                        'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
+                    ],
+                    'multiple'   => true,
+                    'empty_data' => ['point.gained', 'form.submitted', 'email.read'], // BC with pre 2.11.0
+                    'required'   => false,
                 ]
             );
 
@@ -920,10 +924,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects = $config['objects'];
         }
 
-        if (isset($params['filters'])) {
-            $filters = $params['filters'];
-        }
-
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $startDate             = new \DateTime($query['start']);
@@ -961,8 +961,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $leadActivity = $this->getLeadData(
                             $startDate,
                             $endDate,
-                            $leadIds,
-                            $filters
+                            $leadIds
                         );
 
                         $this->logger->debug('SALESFORCE: Syncing activity for '.count($leadActivity).' contacts ('.implode(', ', array_keys($leadActivity)).')');
@@ -1013,49 +1012,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         return $executed;
-    }
-
-    /**
-     * @param \DateTime|null $startDate
-     * @param \DateTime|null $endDate
-     * @param                $leadId
-     *
-     * @return array
-     */
-    public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId, $filters = [])
-    {
-        $leadIds = (!is_array($leadId)) ? [$leadId] : $leadId;
-
-        $leadActivity = [];
-
-        foreach ($leadIds as $leadId) {
-            $i        = 0;
-            $activity = [];
-            $lead     = $this->leadModel->getEntity($leadId);
-
-            $engagements = $this->leadModel->getEngagements($lead, $filters, null, 1, 100, true);
-            $events      = $engagements['events'];
-
-            // inject lead into events
-            foreach ($events as $event) {
-                $link                        = isset($event['eventLabel']['href']) ? $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL).$event['eventLabel']['href'] : '';
-                $label                       = isset($event['eventLabel']['label']) ? $event['eventLabel']['label'] : '';
-                $activity[$i]['eventType']   = $event['eventType'];
-                $activity[$i]['name']        = isset($event['eventType']) ? $event['eventType'] : '';
-                $activity[$i]['description'] = isset($event['name']) ? $event['name'].' - '.$link.' - '.$label : $link.' - '.$label;
-                $activity[$i]['dateAdded']   = $event['timestamp'];
-                $activity[$i]['id']          = str_replace('.', '-', $event['eventId']);
-                ++$i;
-            }
-
-            $leadActivity[$leadId] = [
-                'records' => $activity,
-            ];
-
-            unset($activity);
-        }
-
-        return $leadActivity;
     }
 
     /**
