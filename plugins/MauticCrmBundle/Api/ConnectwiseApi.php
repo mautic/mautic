@@ -97,4 +97,28 @@ class ConnectwiseApi extends CrmApi
     {
         return $this->request('company/contacts/'.$id, $params, 'PATCH');
     }
+
+    /**
+     * https://{connectwiseSite}/v4_6_release/apis/3.0/sales/activities/types.
+     *
+     * @param array $params
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getActivityTypes($params = [])
+    {
+        return $this->request('sales/activities/types');
+    }
+
+    public function postActivity($params = [])
+    {
+        return $this->request('sales/activities', $params, 'POST');
+    }
+
+    public function getMembers($params = [])
+    {
+        return $this->request('system/members');
+    }
 }
