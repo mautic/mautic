@@ -671,6 +671,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $personFound    = true;
                         if (!empty($fieldsToUpdate)) {
                             foreach ($existingPersons[$object] as $person) {
+                                if (isset($fieldsToUpdate['AccountId'])) {
+                                    $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
+                                    if (!$accountId) {
+                                        //company was not found so create a new company in Salesforce
+                                        $company = $lead->getPrimaryCompany();
+                                        if (!empty($company)) {
+                                            $company   = $this->companyModel->getEntity($company['id']);
+                                            $sfCompany = $this->pushCompany($company);
+                                            if ($sfCompany) {
+                                                $fieldsToUpdate['AccountId'] = key($sfCompany);
+                                            }
+                                        }
+                                    } else {
+                                        $fieldsToUpdate['AccountId'] = $accountId;
+                                    }
+                                }
+
                                 $personData                     = $this->getApiHelper()->updateObject($fieldsToUpdate, $object, $person['Id']);
                                 $people[$object][$person['Id']] = $person['Id'];
                             }
@@ -1320,7 +1337,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $fieldMapping
                 );
             }
-
             // Persist pending changes
             $this->cleanupFromSync($leadsToSync);
             // Make the request
@@ -1888,8 +1904,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             //use a composite patch here that can update and create (one query) every 200 records
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
-
-                if (isset($entity['company']) and $entity['integration_entity'] == 'Contact') {
+                if (isset($entity['company']) and $object == 'Contact') {
                     $accountId = $this->getCompanyName($entity['company'], 'Id', 'Name');
 
                     if (!$accountId) {
@@ -3144,14 +3159,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     protected function getSalesforceAccountsByName($sfObject, &$checkIdsInSF, $requiredFieldString)
     {
-        $field   = [];
-        $fieldId = [];
+        $field     = [];
+        $fieldId   = [];
+        $queryById = [];
 
         foreach ($checkIdsInSF as $items) {
             if (!isset($items['integration_entity_id'])) {
                 foreach ($items as $key => $item) {
                     if ($key == 'companyname') {
-                        $field[] = $item;
+                        $field[] = str_replace("'", "\'", $this->cleanPushData($item));
                     }
                 }
             } else {
@@ -3197,8 +3213,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     public function getCompanyName($accountId, $field, $searchBy = 'Id')
     {
-        $companyField = null;
-
+        $companyField   = null;
+        $accountId      = str_replace("'", "\'", $this->cleanPushData($accountId));
         $companyQuery   = 'Select Id, Name from Account where '.$searchBy.' = \''.$accountId.'\' and IsDeleted = false';
         $contactCompany = $this->getApiHelper()->getLeads($companyQuery, 'Account');
 
