@@ -151,7 +151,7 @@ class BuilderSubscriber extends CommonSubscriber
         if ($event->slotTypesRequested()) {
             $event->addSlotType(
                 'text',
-                'Text',
+                $this->translator->trans('mautic.core.slot.label.text'),
                 'font',
                 'MauticCoreBundle:Slots:text.html.php',
                 SlotTextType::class,
@@ -159,7 +159,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'image',
-                'Image',
+                $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
                 'slot_image',
@@ -167,7 +167,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'imagecard',
-                'Image Card',
+                $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
                 'MauticCoreBundle:Slots:imagecard.html.php',
                 'slot_imagecard',
@@ -175,7 +175,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'imagecaption',
-                'Image+Caption',
+                $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
                 'MauticCoreBundle:Slots:imagecaption.html.php',
                 'slot_imagecaption',
@@ -183,7 +183,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'button',
-                'Button',
+                $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.php',
                 'slot_button',
@@ -191,7 +191,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'socialshare',
-                'Social Share',
+                $this->translator->trans('mautic.core.slot.label.socialshare'),
                 'share-alt',
                 'MauticCoreBundle:Slots:socialshare.html.php',
                 'slot_socialshare',
@@ -199,7 +199,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'socialfollow',
-                'Social Follow',
+                $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
                 'MauticCoreBundle:Slots:socialfollow.html.php',
                 'slot_socialfollow',
@@ -208,7 +208,7 @@ class BuilderSubscriber extends CommonSubscriber
             if ($this->security->isGranted(['page:preference_center:editown', 'page:preference_center:editother'], 'MATCH_ONE')) {
                 $event->addSlotType(
                     'segmentlist',
-                    'Segment List',
+                    $this->translator->trans('mautic.core.slot.label.segmentlist'),
                     'list-alt',
                     'MauticCoreBundle:Slots:segmentlist.html.php',
                     'slot_segmentlist',
@@ -216,7 +216,7 @@ class BuilderSubscriber extends CommonSubscriber
                 );
                 $event->addSlotType(
                     'categorylist',
-                    'Category List',
+                    $this->translator->trans('mautic.core.slot.label.categorylist'),
                     'bookmark-o',
                     'MauticCoreBundle:Slots:categorylist.html.php',
                     'slot_categorylist',
@@ -224,7 +224,7 @@ class BuilderSubscriber extends CommonSubscriber
                 );
                 $event->addSlotType(
                     'preferredchannel',
-                    'Preferred Channel',
+                    $this->translator->trans('mautic.core.slot.label.preferredchannel'),
                     'envelope-o',
                     'MauticCoreBundle:Slots:preferredchannel.html.php',
                     'slot_preferredchannel',
@@ -232,7 +232,7 @@ class BuilderSubscriber extends CommonSubscriber
                 );
                 $event->addSlotType(
                     'channelfrequency',
-                    'Channel Frequency',
+                    $this->translator->trans('mautic.core.slot.label.channelfrequency'),
                     'calendar',
                     'MauticCoreBundle:Slots:channelfrequency.html.php',
                     'slot_channelfrequency',
@@ -240,7 +240,7 @@ class BuilderSubscriber extends CommonSubscriber
                 );
                 $event->addSlotType(
                     'saveprefsbutton',
-                    'Save Preferences',
+                    $this->translator->trans('mautic.core.slot.label.saveprefsbutton'),
                     'floppy-o',
                     'MauticCoreBundle:Slots:saveprefsbutton.html.php',
                     'slot_saveprefsbutton',
@@ -249,7 +249,7 @@ class BuilderSubscriber extends CommonSubscriber
             }
             $event->addSlotType(
                 'codemode',
-                'Code Mode',
+                $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
                 'MauticCoreBundle:Slots:codemode.html.php',
                 'slot_codemode',
@@ -257,7 +257,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'separator',
-                'Separator',
+                $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
                 'slot_separator',
@@ -265,7 +265,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'gatedvideo',
-                'Video',
+                $this->translator->trans('mautic.core.slot.label.gatedvideo'),
                 'video-camera',
                 'MauticCoreBundle:Slots:gatedvideo.html.php',
                 GatedVideoType::class,
@@ -273,7 +273,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'dwc',
-                'Dynamic Content',
+                $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'sticky-note-o',
                 'MauticCoreBundle:Slots:dwc.html.php',
                 'slot_dwc',
@@ -284,7 +284,7 @@ class BuilderSubscriber extends CommonSubscriber
         if ($event->sectionsRequested()) {
             $event->addSection(
                 'one-column',
-                'One Column',
+                $this->translator->trans('mautic.core.slot.label.onecolumn'),
                 'file-text-o',
                 'MauticCoreBundle:Sections:one-column.html.php',
                 null,
@@ -292,7 +292,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSection(
                 'two-column',
-                'Two Columns',
+                $this->translator->trans('mautic.core.slot.label.twocolumns'),
                 'columns',
                 'MauticCoreBundle:Sections:two-column.html.php',
                 null,
@@ -300,7 +300,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSection(
                 'three-column',
-                'Three Columns',
+                $this->translator->trans('mautic.core.slot.label.threecolumns'),
                 'th',
                 'MauticCoreBundle:Sections:three-column.html.php',
                 null,

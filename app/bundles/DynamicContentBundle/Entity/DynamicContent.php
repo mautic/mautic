@@ -123,6 +123,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('dynamic_content')
+            ->addIndex(['is_campaign_based'], 'is_campaign_based_index')
+            ->addIndex(['slot_name'], 'slot_name_index')
             ->setCustomRepositoryClass('Mautic\DynamicContentBundle\Entity\DynamicContentRepository');
 
         $builder->addIdColumns();

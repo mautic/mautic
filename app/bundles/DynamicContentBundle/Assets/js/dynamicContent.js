@@ -1,4 +1,13 @@
 /** DynamicContentBundle **/
+Mautic.toggleDwcFilters = function () {
+    mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide");
+    if (mQuery("#dwcFiltersTab").hasClass('hide')) {
+        mQuery('.nav-tabs a[href="#details"]').click();
+    } else {
+        Mautic.dynamicContentOnLoad();
+    }
+};
+
 Mautic.dynamicContentOnLoad = function (container, response) {
     if (typeof container !== 'object') {
         if (mQuery(container + ' #list-search').length) {

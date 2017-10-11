@@ -140,7 +140,7 @@ class DynamicContentType extends AbstractType
                 'data'  => (bool) $options['data']->isCampaignBased(),
                 'attr'  => [
                     'tooltip'  => 'mautic.dwc.form.is_campaign_based.tooltip',
-                    'onchange' => 'mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide")',
+                    'onchange' => 'Mautic.toggleDwcFilters()',
                 ],
             ]
         );
@@ -331,12 +331,9 @@ class DynamicContentType extends AbstractType
 
     private function filterFieldChoices()
     {
+        unset($this->fieldChoices['company']);
         $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], function ($key) {
-            return !in_array($key, ['company', 'lead_email_read_count', 'lead_email_read_date', 'lead_email_sent',
-                'leadlist', 'globalcategory', 'lead_email_received', 'stage', 'dnc_bounced',
-                'redirect_id', 'email_id', 'page_id', 'hit_url_count', 'hit_url_date',
-                'dnc_unsubscribed', 'dnc_bounced_sms', 'dnc_unsubscribed_sms', 'hit_url', ], true) &&
-                !preg_match('/(-registration|-attendance)/', $key);
+            return in_array($key, ['address1', 'address2', 'attribution', 'attribution_date', 'city', 'company', 'country', 'date_added', 'date_identified', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'email', 'facebook', 'fax', 'firstname', 'foursquare', 'googleplus', 'instagram', 'last_active', 'lastname', 'linkedin', 'mobile', 'notification', 'operators', 'operators', 'operators', 'phone', 'points', 'position', 'preferred_locale', 'referer', 'sessions', 'skype', 'source', 'state', 'tags', 'title', 'twitter', 'url_title', 'website', 'zipcode'], true);
         }, ARRAY_FILTER_USE_KEY);
     }
 
