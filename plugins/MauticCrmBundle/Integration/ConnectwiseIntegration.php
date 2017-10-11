@@ -749,24 +749,27 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         return $campaigns;
     }
+
     /**
-     * @param $campaigns
-     *
      * @return array
      */
-    public function getCampaignChoices($campaigns)
+    public function getCampaignChoices()
     {
-        $choices = [];
-        if (isset($campaigns) && !empty($campaigns)) {
+        $choices   = [];
+        $campaigns = $this->getCampaigns();
+
+        if (!empty($campaigns)) {
             foreach ($campaigns as $campaign) {
-                $choices[$this->getName()][] = [
+                $choices[] = [
                     'value' => $campaign['id'],
-                    'label' => $campaign['name'], ];
+                    'label' => $campaign['name'],
+                ];
             }
         }
 
         return $choices;
     }
+
     /**
      * @param $campaignId
      * @param $settings
