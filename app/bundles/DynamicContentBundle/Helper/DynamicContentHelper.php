@@ -16,12 +16,15 @@ use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DynamicContentHelper
 {
+    use MatchFilterForLeadTrait;
+
     /**
      * @var EventModel
      */
@@ -77,6 +80,34 @@ class DynamicContentHelper
         }
 
         return $content;
+    }
+
+    /**
+     * @param string     $slotName
+     * @param Lead|array $lead
+     *
+     * @return string
+     */
+    public function getDynamicContentSlotForLead($slotName, $lead)
+    {
+        $leadArray = [];
+        if ($lead instanceof Lead) {
+            $leadArray = $lead->getProfileFields();
+        }
+        $dwcs = $this->getDwcsBySlotName($slotName);
+        /** @var DynamicContent $dwc */
+        foreach ($dwcs as $dwc) {
+            if ($dwc->getIsCampaignBased()) {
+                continue;
+            }
+            if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
+                $slotContent = $lead ? $this->getRealDynamicContent($dwc->getName(), $lead, $dwc) : '';
+
+                return $slotContent;
+            }
+        }
+
+        return '';
     }
 
     /**

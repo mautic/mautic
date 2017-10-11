@@ -231,10 +231,9 @@ class DynamicContentSubscriber extends CommonSubscriber
 
         $divContent = $xpath->query('//*[@data-slot="dwc"]');
         for ($i = 0; $i < $divContent->length; ++$i) {
-            $slot            = $divContent->item($i);
-            $slot->nodeValue = '';
-            $slotName        = $slot->getAttribute('data-param-slot-name');
-            $dwcs            = $this->dynamicContentHelper->getDwcsBySlotName($slotName);
+            $slot     = $divContent->item($i);
+            $slotName = $slot->getAttribute('data-param-slot-name');
+            $dwcs     = $this->dynamicContentHelper->getDwcsBySlotName($slotName);
             /** @var DynamicContent $dwc */
             foreach ($dwcs as $dwc) {
                 if ($dwc->getIsCampaignBased()) {
@@ -244,9 +243,9 @@ class DynamicContentSubscriber extends CommonSubscriber
                     $slotContent = $lead ? $this->dynamicContentHelper->getRealDynamicContent($dwc->getName(), $lead, $dwc) : '';
                     $newnode     = $dom->createDocumentFragment();
                     $newnode->appendXML(mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8'));
-                    // in case we want to replace the slot:
-                    // $slot->parentNode->replaceChild($newnode, $slot);
-                    $slot->appendChild($newnode);
+                    // in case we want to just change the slot contents:
+                    // $slot->appendChild($newnode);
+                    $slot->parentNode->replaceChild($newnode, $slot);
                 }
             }
         }
