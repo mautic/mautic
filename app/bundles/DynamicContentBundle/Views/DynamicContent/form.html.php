@@ -84,7 +84,8 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="filters">
                         <?php if ($filterErrors && '' !== $view['form']->errors($form['filters'])) : ?>
-                            <div class="has-error alert alert-danger" role="alert" style="padding:5px 10px 0 10px;">                                <?php echo $view['form']->errors($form['filters']); ?>
+                            <div class="has-error alert alert-danger" role="alert" style="padding:5px 10px 0 10px;">
+                                <?php echo $view['form']->errors($form['filters']); ?>
                             </div>
                         <?php endif; ?>
                         <div class="dwc-filter bdr-w-0" id="<?php echo $form->vars['id'] ?>">
