@@ -18,6 +18,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -92,7 +93,7 @@ class DynamicContentHelper
     {
         $leadArray = [];
         if ($lead instanceof Lead) {
-            $leadArray = $lead->getProfileFields();
+            $leadArray = $this->convertLeadToArray($lead);
         }
         $dwcs = $this->getDwcsBySlotName($slotName);
         /** @var DynamicContent $dwc */
@@ -101,7 +102,7 @@ class DynamicContentHelper
                 continue;
             }
             if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
-                $slotContent = $lead ? $this->getRealDynamicContent($dwc->getName(), $lead, $dwc) : '';
+                $slotContent = $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
 
                 return $slotContent;
             }
@@ -162,7 +163,7 @@ class DynamicContentHelper
                     if ($dwc->getIsCampaignBased()) {
                         continue;
                     }
-                    $content                   = $lead ? $this->getRealDynamicContent($dwc->getName(), $lead, $dwc) : '';
+                    $content                   = $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
                     $tokens[$token]['content'] = $content;
                     $tokens[$token]['filters'] = $dwc->getFilters();
                 }
@@ -219,6 +220,26 @@ class DynamicContentHelper
                     ],
                 ],
                 'ignore_paginator' => true,
+            ]
+        );
+    }
+
+    /**
+     * @param Lead $lead
+     *
+     * @return array
+     */
+    public function convertLeadToArray($lead)
+    {
+        return array_merge(
+            $lead->getProfileFields(),
+            [
+                'tags' => array_map(
+                    function (Tag $v) {
+                        return $v->getId();
+                    },
+                    $lead->getTags()->toArray()
+                ),
             ]
         );
     }

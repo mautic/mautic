@@ -213,7 +213,7 @@ class DynamicContentSubscriber extends CommonSubscriber
         $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
         $leadArray = [];
         if ($lead instanceof Lead) {
-            $leadArray = $lead->getProfileFields();
+            $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
         }
         $result = [];
         foreach ($tokens as $token => $dwc) {
@@ -240,7 +240,7 @@ class DynamicContentSubscriber extends CommonSubscriber
                     continue;
                 }
                 if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
-                    $slotContent = $lead ? $this->dynamicContentHelper->getRealDynamicContent($dwc->getName(), $lead, $dwc) : '';
+                    $slotContent = $lead ? $this->dynamicContentHelper->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
                     $newnode     = $dom->createDocumentFragment();
                     $newnode->appendXML(mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8'));
                     // in case we want to just change the slot contents:

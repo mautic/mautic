@@ -31,6 +31,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Class DynamicContentType.
@@ -48,6 +50,10 @@ class DynamicContentType extends AbstractType
     private $deviceBrandsChoices;
     private $deviceOsChoices;
     private $tagChoices = [];
+    /**
+     * @var LeadModel
+     */
+    private $leadModel;
 
     /**
      * DynamicContentType constructor.
@@ -63,6 +69,7 @@ class DynamicContentType extends AbstractType
     {
         $this->em              = $entityManager;
         $this->translator      = $translator;
+        $this->leadModel       = $leadModel;
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
         $this->countryChoices  = FormFieldHelper::getCountryChoices();
@@ -112,6 +119,15 @@ class DynamicContentType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
+                ],
+                'constraints' => [
+                    new Callback(
+                        function ($validateMe, ExecutionContextInterface $context) use ($options) {
+                            if (empty($validateMe) && !$options['data']->getIsCampaignBased()) {
+                                $context->buildViolation('mautic.core.value.required')->addViolation();
+                            }
+                        }
+                    ),
                 ],
             ]
         );
@@ -332,8 +348,9 @@ class DynamicContentType extends AbstractType
     private function filterFieldChoices()
     {
         unset($this->fieldChoices['company']);
-        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], function ($key) {
-            return in_array($key, ['address1', 'address2', 'attribution', 'attribution_date', 'city', 'company', 'country', 'date_added', 'date_identified', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'email', 'facebook', 'fax', 'firstname', 'foursquare', 'googleplus', 'instagram', 'last_active', 'lastname', 'linkedin', 'mobile', 'notification', 'operators', 'operators', 'operators', 'phone', 'points', 'position', 'preferred_locale', 'referer', 'sessions', 'skype', 'source', 'state', 'tags', 'title', 'twitter', 'url_title', 'website', 'zipcode'], true);
+        $customFields               = $this->leadModel->getRepository()->getCustomFieldList('lead');
+        $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], function ($key) use ($customFields) {
+            return in_array($key, array_merge(array_keys($customFields[0]), ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags']), true);
         }, ARRAY_FILTER_USE_KEY);
     }
 

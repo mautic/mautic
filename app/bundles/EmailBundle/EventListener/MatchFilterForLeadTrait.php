@@ -92,6 +92,7 @@ trait MatchFilterForLeadTrait
                         $filterVal .= ':00';
                     }
                     break;
+                case 'tags':
                 case 'multiselect':
                     if (!is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
@@ -149,13 +150,15 @@ trait MatchFilterForLeadTrait
                     $groups[$groupNum] = preg_match('/'.$filterVal.'/', $leadVal) !== 1;
                     break;
                 case 'in':
+                    $leadValMatched = false;
                     foreach ($leadVal as $k => $v) {
                         if (in_array($v, $filterVal)) {
-                            $groups[$groupNum] = true;
+                            $leadValMatched = true;
                             // Break once we find a match
                             break;
                         }
                     }
+                    $groups[$groupNum] = $leadValMatched;
                     break;
                 case '!in':
                     $leadValNotMatched = true;

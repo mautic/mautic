@@ -48,9 +48,19 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'dynamicContent',
+                        'orderBy'    => 'e.slotName',
+                        'text'       => 'mautic.dynamicContent.label.slot_name',
+                        'class'      => 'col-dwc-slotname visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'dynamicContent',
                         'orderBy'    => 'c.title',
                         'text'       => 'mautic.core.category',
-                        'class'      => 'visible-md visible-lg col-dwc-category',
+                        'class'      => 'col-dwc-category visible-md visible-lg',
                     ]
                 );
 
@@ -123,15 +133,11 @@ if ($tmpl == 'index') {
                                             <i class="fa fa-fw fa-language"></i>
                                         </span>
                                     <?php endif; ?>
-                                    <?php if ($isFilterBased): ?>
-                                         <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.is_filter_based'); ?>">
-                                            <i class="fa fa-fw fa-filter"></i>
-                                         </span>
-                                     <?php endif; ?>
                                  </span>
                             <?php endif; ?>
                         </a>
                     </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getSlotName(); ?></td>
                     <td class="visible-md visible-lg">
                         <?php $category = $item->getCategory(); ?>
                         <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
