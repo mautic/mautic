@@ -104,7 +104,6 @@ return [
                     'mautic.page.helper.token',
                     'mautic.helper.integration',
                     'mautic.page.model.page',
-                    'mautic.dynamicContent.model.dynamicContent',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [
@@ -214,6 +213,11 @@ return [
                 'class'     => 'Mautic\PageBundle\Form\Type\PageListType',
                 'arguments' => 'mautic.factory',
                 'alias'     => 'page_list',
+            ],
+            'mautic.form.type.preferencecenterlist' => [
+                'class'     => 'Mautic\PageBundle\Form\Type\PreferenceCenterListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'preference_center_list',
             ],
             'mautic.form.type.page_abtest_settings' => [
                 'class' => 'Mautic\PageBundle\Form\Type\AbTestPropertiesType',

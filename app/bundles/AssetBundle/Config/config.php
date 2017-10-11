@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\AssetBundle\EventListener\UploadSubscriber;
+
 return [
     'routes' => [
         'main' => [
@@ -123,11 +125,11 @@ return [
                 ],
             ],
             'oneup_uploader.pre_upload' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\UploadSubscriber',
+                'class'     => UploadSubscriber::class,
                 'arguments' => [
-                    'translator',
                     'mautic.helper.core_parameters',
                     'mautic.asset.model.asset',
+                    'mautic.core.validator.file_upload',
                 ],
             ],
             'mautic.asset.dashboard.subscriber' => [
