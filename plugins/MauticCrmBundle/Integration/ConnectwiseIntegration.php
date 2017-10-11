@@ -307,13 +307,11 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         if ($formArea == 'integration') {
             if ($this->isAuthorized()) {
-                if ($this->factory->serviceExists('mautic.form.type.connectwise.campaignaction')) {
-                    $builder->add('campaign_task', 'integration_campaign_task', [
+                $builder->add('campaign_task', 'integration_campaign_task', [
                         'label'  => false,
                         'helper' => $this->factory->getHelper('integration'),
                         'data'   => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
                     ]);
-                }
             }
         }
     }
