@@ -195,7 +195,7 @@ class IntegrationEntityRepository extends CommonRepository
                 $q->addSelect('i.integration_entity');
             }
         } else {
-            $q->select('DISTINCT i.integration_entity_id, i.integration_entity, i.internal_entity_id,'.$leadFields);
+            $q->select('i.integration_entity_id, i.integration_entity, i.id, i.internal_entity_id,'.$leadFields);
         }
 
         $q->where('i.integration = :integration');
