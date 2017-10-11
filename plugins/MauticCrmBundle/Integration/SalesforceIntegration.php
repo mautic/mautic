@@ -680,6 +680,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                         if ($sfCompany) {
                                             $fieldsToUpdate['AccountId'] = key($sfCompany);
                                         }
+                                    } else {
+                                        $fieldsToUpdate['AccountId'] = $accountId;
                                     }
                                 }
 
