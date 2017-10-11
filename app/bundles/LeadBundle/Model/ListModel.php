@@ -273,7 +273,7 @@ class ListModel extends FormModel
                     'type'     => 'lookup_id',
                     'callback' => 'activateSegmentFilterTypeahead',
                 ],
-                'operators' => $this->getOperatorsForFieldType('text'),
+                'operators' => $this->getOperatorsForFieldType('lookup_id'),
                 'object'    => 'lead',
             ],
             'points' => [
