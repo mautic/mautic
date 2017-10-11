@@ -117,13 +117,14 @@ class AuditLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getAuditLogsForLeads(array $filters = null, $listOfContacts, $dateAdded)
+    public function getAuditLogsForLeads(array $listOfContacts, array $filters = null, array $orderBy = null, $dateAdded = null)
     {
         $query = $this->createQueryBuilder('al')
             ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
             ->where('al.bundle = \'lead\'')
-            ->andWhere('al.object = \'lead\'')
-            ->andWhere('al.objectId in ('.$listOfContacts.')');
+            ->andWhere('al.object = \'lead\'');
+        $query
+            ->andWhere($query->expr()->in('al.objectId', $listOfContacts));
 
         if (is_array($filters) && !empty($filters['search'])) {
             $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
@@ -141,6 +142,22 @@ class AuditLogRepository extends CommonRepository
         if (is_array($filters) && !empty($filters['excludeEvents'])) {
             $excludeList = "'".implode("','", $filters['excludeEvents'])."'";
             $query->andWhere('al.action not in ('.$excludeList.')');
+        }
+
+        if (is_array($orderBy)) {
+            $orderdir = 'ASC';
+            $order    = 'id';
+            if (isset($orderBy[0])) {
+                $order = $orderBy[0];
+            }
+            if (isset($orderBy[1])) {
+                $orderdir = $orderBy[1];
+            }
+            if (0 !== strpos($order, 'al.')) {
+                $order = 'al.'.$order;
+            }
+
+            $query->orderBy($order, $orderdir);
         }
 
         return $query->getQuery()->getArrayResult();
