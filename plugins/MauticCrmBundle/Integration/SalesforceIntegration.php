@@ -3208,8 +3208,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     public function getCompanyName($accountId, $field, $searchBy = 'Id')
     {
-        $companyField = null;
-
+        $companyField   = null;
+        $accountId      = str_replace("'", "\'", $this->cleanPushData($accountId));
         $companyQuery   = 'Select Id, Name from Account where '.$searchBy.' = \''.$accountId.'\' and IsDeleted = false';
         $contactCompany = $this->getApiHelper()->getLeads($companyQuery, 'Account');
 
