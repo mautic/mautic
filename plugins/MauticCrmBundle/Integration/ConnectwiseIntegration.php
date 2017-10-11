@@ -778,7 +778,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $activities   = [];
         $cwActivities = $this->getApiHelper()->getActivityTypes($params);
         foreach ($cwActivities as $cwActivity) {
-            $activities[$cwActivity['id']] = $cwActivity['name'];
+            if (isset($cwActivity['id'])) {
+                $activities[$cwActivity['id']] = $cwActivity['name'];
+            }
         }
 
         return $activities;
@@ -793,7 +795,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $members   = [];
         $cwMembers = $this->getApiHelper()->getMembers($params);
         foreach ($cwMembers as $cwMember) {
-            $members[$cwMember['id']] = $cwMember['identifier'];
+            if (isset($cwMember['id'])) {
+                $members[$cwMember['id']] = $cwMember['identifier'];
+            }
         }
 
         return $members;
