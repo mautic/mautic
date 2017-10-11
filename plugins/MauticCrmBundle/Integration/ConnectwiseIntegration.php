@@ -155,12 +155,20 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $url   = $this->getApiUrl();
         $error = false;
         try {
-            $response = $this->makeRequest($url.'system/members/', $parameters, 'GET', $settings);
+            $response = $this->makeRequest($url.'/system/members/', $parameters, 'GET', $settings);
 
-            if (isset($response['message'])) {
-                $error = $response['message'];
-                $this->extractAuthKeys($response);
-            } else {
+            foreach ($response as $key => $r) {
+                $key = preg_replace('/[\r\n]+/', '', $key);
+                switch ($key) {
+                    case '<!DOCTYPE_html_PUBLIC_"-//W3C//DTD_XHTML_1_0_Strict//EN"_"http://www_w3_org/TR/xhtml1/DTD/xhtml1-strict_dtd"><html_xmlns':
+                        $error = '404 not found error';
+                        break;
+                    case 'code':
+                        $error = $response['message'].' '.$r;
+                        break;
+                }
+            }
+            if (!$error) {
                 $data = ['username' => $this->keys['username'], 'password' => $this->keys['password']];
                 $this->extractAuthKeys($data, 'username');
             }
@@ -314,8 +322,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'label'  => false,
                         'helper' => $this->factory->getHelper('integration'),
                         'data'   => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
-                    ]
-                );
+                    ]);
             }
         }
     }
@@ -807,7 +814,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $cwActivities = $this->getApiHelper()->getActivityTypes($params);
 
         foreach ($cwActivities as $cwActivity) {
-            $activities[$cwActivity['id']] = $cwActivity['name'];
+            if (isset($cwActivity['id'])) {
+                $activities[$cwActivity['id']] = $cwActivity['name'];
+            }
         }
 
         return $activities;
@@ -822,7 +831,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $members   = [];
         $cwMembers = $this->getApiHelper()->getMembers($params);
         foreach ($cwMembers as $cwMember) {
-            $members[$cwMember['id']] = $cwMember['identifier'];
+            if (isset($cwMember['id'])) {
+                $members[$cwMember['id']] = $cwMember['identifier'];
+            }
         }
 
         return $members;
