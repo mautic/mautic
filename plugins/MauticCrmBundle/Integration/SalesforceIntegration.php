@@ -1191,8 +1191,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
 
-            $this->getLeadDoNotContactByDate('email', $checkEmailsInSF);
-
+            if (isset($fieldMapping[$sfObject]['update']['HasOptedOutOfEmail']) || isset($fieldMapping[$sfObject]['create']['HasOptedOutOfEmail'])) {
+                $this->getLeadDoNotContactByDate('email', $checkEmailsInSF, $params);
+            }
             // We're done
             if (!$checkEmailsInSF) {
                 break;
@@ -3143,7 +3144,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function getLeadDoNotContactByDate($channel = 'email',  &$sfRecords = [])
+    public function getLeadDoNotContactByDate($channel = 'email',  &$sfRecords = [], $params = [])
     {
         $filters = [];
         $leadIds = [];
@@ -3172,31 +3173,30 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
         }
 
-        foreach ($leadIds as $sfKey => $leadId) {
-            $lead = $this->leadModel->getEntity($leadId);
-            if ($lead) {
-                $autidLogRepo      = $this->em->getRepository('MauticCoreBundle:AuditLog');
-                $filters['search'] = 'dnc_channel_status%'.$channel;
-                $orderBy           = [
-                    'dateAdded',
-                    'DESC',
-                ];
-                $lastModifiedDNCDate = $autidLogRepo->getAuditLogs($lead, $filters, $orderBy);
-                $mauticLastDNCDate   = (isset($lastModifiedDNCDate[0]['dateAdded'])) ? $lastModifiedDNCDate[0]['dateAdded'] : null;
-            }
-            if (!empty($historySF['records'])) {
-                foreach ($historySF['records'] as $sfModifiedDNC) {
-                    if (((isset($sfModifiedDNC['LeadId']) && $sfModifiedDNC['LeadId'] == $sfKey)
-                        || (isset($sfModifiedDNC['ContactId']) && $sfModifiedDNC['ContactId'] == $sfKey))
-                        && ($mauticLastDNCDate
-                        && (strtotime($sfModifiedDNC['CreatedDate']) > strtotime($mauticLastDNCDate->format('c'))))) {
-                        unset($sfRecords['mauticContactIsContactableByEmail']); //donot update in SF
-                        if ($sfModifiedDNC['NewValue'] === true) {
-                            $this->leadModel->addDncForLead($lead, 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
-                        } elseif ($sfModifiedDNC['NewValue'] === false) {
-                            $this->leadModel->removeDncForLead($lead, 'email', true);
+        $mauticLeadIds = "'".implode("','", $leadIds)."'";
+
+        $autidLogRepo      = $this->em->getRepository('MauticCoreBundle:AuditLog');
+        $filters['search'] = 'dnc_channel_status%'.$channel;
+
+        $lastModifiedDNCDate = $autidLogRepo->getAuditLogsForLeads($filters, $mauticLeadIds, $params['start']);
+
+        foreach ($lastModifiedDNCDate as $logs) {
+            if ($sfKey = array_search($logs['objectId'], $leadIds) !== null) {
+                $mauticLastDNCDate = $logs['dateAdded'];
+                if (!empty($historySF['records'])) {
+                    foreach ($historySF['records'] as $sfModifiedDNC) {
+                        if (((isset($sfModifiedDNC['LeadId']) && $sfModifiedDNC['LeadId'] == $sfKey)
+                                || (isset($sfModifiedDNC['ContactId']) && $sfModifiedDNC['ContactId'] == $sfKey))
+                            && ($mauticLastDNCDate
+                                && (strtotime($sfModifiedDNC['CreatedDate']) > strtotime($mauticLastDNCDate->format('c'))))) {
+                            unset($sfRecords['mauticContactIsContactableByEmail']); //donot update in SF
+                            if ($sfModifiedDNC['NewValue'] === true) {
+                                $this->leadModel->addDncForLead($lead, 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
+                            } elseif ($sfModifiedDNC['NewValue'] === false) {
+                                $this->leadModel->removeDncForLead($lead, 'email', true);
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
             }

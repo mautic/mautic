@@ -112,6 +112,40 @@ class AuditLogRepository extends CommonRepository
     }
 
     /**
+     * @param array $filters
+     * @param $listOfContacts
+     *
+     * @return array
+     */
+    public function getAuditLogsForLeads(array $filters = null, $listOfContacts, $dateAdded)
+    {
+        $query = $this->createQueryBuilder('al')
+            ->select('al.userName, al.userId, al.bundle, al.object, al.objectId, al.action, al.details, al.dateAdded, al.ipAddress')
+            ->where('al.bundle = \'lead\'')
+            ->andWhere('al.object = \'lead\'')
+            ->andWhere('al.objectId in ('.$listOfContacts.')');
+
+        if (is_array($filters) && !empty($filters['search'])) {
+            $query->andWhere('al.details like \'%'.$filters['search'].'%\'');
+        }
+
+        if (is_array($filters) && !empty($filters['includeEvents'])) {
+            $includeList = "'".implode("','", $filters['includeEvents'])."'";
+            $query->andWhere('al.action in ('.$includeList.')');
+        }
+
+        if ($dateAdded) {
+            $query->andWhere($query->expr()->gte('al.dateAdded', ':dateAdded'))->setParameter('dateAdded', $dateAdded);
+        }
+
+        if (is_array($filters) && !empty($filters['excludeEvents'])) {
+            $excludeList = "'".implode("','", $filters['excludeEvents'])."'";
+            $query->andWhere('al.action not in ('.$excludeList.')');
+        }
+
+        return $query->getQuery()->getArrayResult();
+    }
+    /**
      * Get array of objects which belongs to the object.
      *
      * @param null $object
