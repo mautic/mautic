@@ -59,11 +59,9 @@
                         nv = v.replace('a:', '');
                         k = '<a title=\'Page Link\' href=\'' + k + '\'>' + nv + '</a>';
                         tokens[k] = nv;
-                    } else if (k.match(/dwc=/i) && v.match(/a:/)){
-                        delete tokens[k];
-                        nv = v.replace('a:', '');
-                        k = '<a title=\'Dynamic Web Content\' href=\'' + k + '\'>' + nv + '</a>';
-                        tokens[k] = nv;
+                    } else if (k.match(/dwc=/i)){
+                        var tn = k.substr(5, k.length - 6);
+                        tokens[k] = v + ' (' + tn + ')';
                     } else if (k.match(/contactfield=company/i) && !v.match(/company/i)){
                         tokens[k] = 'Company ' + v;
                     }
