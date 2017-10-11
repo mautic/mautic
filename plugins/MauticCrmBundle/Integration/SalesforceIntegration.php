@@ -675,10 +675,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
                                     if (!$accountId) {
                                         //company was not found so create a new company in Salesforce
-                                        $company   = $lead->getPrimaryCompany();
-                                        $sfCompany = $this->pushCompany($company);
-                                        if ($sfCompany) {
-                                            $fieldsToUpdate['AccountId'] = key($sfCompany);
+                                        $company = $lead->getPrimaryCompany();
+                                        if (!empty($company)) {
+                                            $company   = $this->companyModel->getEntity($company['id']);
+                                            $sfCompany = $this->pushCompany($company);
+                                            if ($sfCompany) {
+                                                $fieldsToUpdate['AccountId'] = key($sfCompany);
+                                            }
                                         }
                                     } else {
                                         $fieldsToUpdate['AccountId'] = $accountId;
