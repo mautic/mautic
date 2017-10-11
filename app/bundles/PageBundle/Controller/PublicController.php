@@ -48,13 +48,10 @@ class PublicController extends CommonFormController
         /** @var Page $entity */
         $entity = $model->getEntityBySlugs($slug);
 
-        if (!empty($entity)) {
-            $userAccess = $security->hasEntityAccess(
-                'page:pages:viewown',
-                'page:pages:viewother',
-                $entity->getCreatedBy()
-            );
-            $published = $entity->isPublished();
+        // Do not hit preference center pages
+        if (!empty($entity) && !$entity->getIsPreferenceCenter()) {
+            $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
+            $published  = $entity->isPublished();
 
             // Make sure the page is published or deny access if not
             if (!$published && !$userAccess) {

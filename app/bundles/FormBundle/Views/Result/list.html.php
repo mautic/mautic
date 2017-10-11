@@ -111,11 +111,15 @@ $formId = $form->getId();
                     <?php endif; ?>
                 </td>
                 <td><?php echo $item['ipAddress']['ipAddress']; ?></td>
-                <?php foreach ($item['results'] as $r): ?>
+                <?php foreach ($item['results'] as $key => $r): ?>
                     <?php $isTextarea = $r['type'] === 'textarea'; ?>
                     <td <?php echo $isTextarea ? 'class="long-text"' : ''; ?>>
                         <?php if ($isTextarea) : ?>
                             <?php echo nl2br($r['value']); ?>
+                        <?php elseif ($r['type'] === 'file') : ?>
+                            <a href="<?php echo $view['router']->path('mautic_form_file_download', ['submissionId' => $item['id'], 'field' => $key]); ?>">
+                                <?php echo $r['value']; ?>
+                            </a>
                         <?php else : ?>
                             <?php echo $r['value']; ?>
                         <?php endif; ?>
