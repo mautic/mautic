@@ -11,11 +11,14 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use DOMDocument;
+use DOMXPath;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event as Events;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
@@ -205,23 +208,50 @@ class DynamicContentSubscriber extends CommonSubscriber
      */
     public function decodeTokens(PageDisplayEvent $event)
     {
-        $content = $event->getContent();
-        $lead    = $this->security->isAnonymous() ? $this->leadModel->getCurrentLead() : null;
+        $content   = $event->getContent();
+        $lead      = $this->security->isAnonymous() ? $this->leadModel->getCurrentLead() : null;
+        $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
+        $leadArray = [];
         if ($lead instanceof Lead) {
-            $tokens = $this->dynamicContentHelper->findDwcTokens($content, $lead);
-            $lead   = $lead->getProfileFields();
-        } else {
-            $tokens = [];
+            $leadArray = $lead->getProfileFields();
         }
         $result = [];
         foreach ($tokens as $token => $dwc) {
-            if ($this->matchFilterForLead($dwc['filters'], $lead)) {
+            $result[$token] = '';
+            if ($lead && $this->matchFilterForLead($dwc['filters'], $leadArray)) {
                 $result[$token] = $dwc['content'];
-            } else {
-                $result[$token] = '';
             }
         }
         $content = str_replace(array_keys($result), array_values($result), $content);
+
+        // replace slots
+        $dom = new DOMDocument('1.0', 'utf-8');
+        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $xpath = new DOMXPath($dom);
+
+        $divContent = $xpath->query('//*[@data-slot="dwc"]');
+        for ($i = 0; $i < $divContent->length; ++$i) {
+            $slot            = $divContent->item($i);
+            $slot->nodeValue = '';
+            $slotName        = $slot->getAttribute('data-param-slot-name');
+            $dwcs            = $this->dynamicContentHelper->getDwcsBySlotName($slotName);
+            /** @var DynamicContent $dwc */
+            foreach ($dwcs as $dwc) {
+                if ($dwc->getIsCampaignBased()) {
+                    continue;
+                }
+                if ($lead && $this->matchFilterForLead($dwc->getFilters(), $leadArray)) {
+                    $slotContent = $lead ? $this->dynamicContentHelper->getRealDynamicContent($dwc->getName(), $lead, $dwc) : '';
+                    $newnode     = $dom->createDocumentFragment();
+                    $newnode->appendXML(mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8'));
+                    // in case we want to replace the slot:
+                    // $slot->parentNode->replaceChild($newnode, $slot);
+                    $slot->appendChild($newnode);
+                }
+            }
+        }
+        $content = $dom->saveHTML();
+
         $event->setContent($content);
     }
 }

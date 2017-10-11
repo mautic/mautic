@@ -107,33 +107,34 @@ class DynamicContentHelper
     }
 
     /**
-     * @param string $content
-     * @param Lead   $lead
+     * @param string    $content
+     * @param Lead|null $lead
      *
      * @return array
      */
-    public function findDwcTokens($content, Lead $lead)
+    public function findDwcTokens($content, $lead)
     {
         preg_match_all('/{dwc=(.*?)}/', $content, $matches);
 
         $tokens = [];
         if (!empty($matches[1])) {
-            foreach ($matches[1] as $key => $dwcId) {
+            foreach ($matches[1] as $key => $slotName) {
                 $token = $matches[0][$key];
                 if (!empty($tokens[$token])) {
                     continue;
                 }
 
-                $dwc = $this->dynamicContentModel->getEntity($dwcId);
+                $dwcs = $this->getDwcsBySlotName($slotName);
 
-                if (!$dwc || $dwc->getIsCampaignBased()) {
-                    continue;
+                /** @var DynamicContent $dwc */
+                foreach ($dwcs as $dwc) {
+                    if ($dwc->getIsCampaignBased()) {
+                        continue;
+                    }
+                    $content                   = $lead ? $this->getRealDynamicContent($dwc->getName(), $lead, $dwc) : '';
+                    $tokens[$token]['content'] = $content;
+                    $tokens[$token]['filters'] = $dwc->getFilters();
                 }
-
-                $content = $this->getRealDynamicContent($dwc->getName(), $lead, $dwc);
-
-                $tokens[$token]['content'] = $content;
-                $tokens[$token]['filters'] = $dwc->getFilters();
             }
 
             unset($matches);
@@ -166,5 +167,28 @@ class DynamicContentHelper
         $this->dispatcher->dispatch(DynamicContentEvents::TOKEN_REPLACEMENT, $tokenEvent);
 
         return $tokenEvent->getContent();
+    }
+
+    /**
+     * @param string $slotName
+     *
+     * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function getDwcsBySlotName($slotName)
+    {
+        return $this->dynamicContentModel->getEntities(
+            [
+                'filter' => [
+                    'where' => [
+                        [
+                            'col'  => 'e.slotName',
+                            'expr' => 'eq',
+                            'val'  => $slotName,
+                        ],
+                    ],
+                ],
+                'ignore_paginator' => true,
+            ]
+        );
     }
 }
