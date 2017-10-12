@@ -107,6 +107,10 @@ Mautic.launchBuilder = function (formName, actionName) {
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
+            // Trigger slot:destroy event
+            document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+            // Clear the customize forms
+            mQuery('#slot-form-container, #section-form-container').html('');
             Mautic.inBuilderSubmissionOn(form);
             var bgApplyBtn = mQuery('.btn-apply');
             if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
