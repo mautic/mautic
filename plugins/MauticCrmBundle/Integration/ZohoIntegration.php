@@ -573,21 +573,23 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        $builder->add(
-            'updateBlanks',
-            'choice',
-            [
-                'choices' => [
-                    'updateBlanks' => 'mautic.integrations.blanks',
-                ],
-                'expanded'    => true,
-                'multiple'    => true,
-                'label'       => 'mautic.integrations.form.blanks',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
-            ]
-        );
+        if ($formArea == 'features') {
+            $builder->add(
+                'updateBlanks',
+                'choice',
+                [
+                    'choices' => [
+                        'updateBlanks' => 'mautic.integrations.blanks',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
+        }
         if ($formArea === 'keys') {
             $builder->add(
                 'datacenter',
