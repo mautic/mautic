@@ -1404,18 +1404,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param $campaigns
-     *
      * @return array
      */
-    public function getCampaignChoices($campaigns)
+    public function getCampaignChoices()
     {
-        $choices = [];
-        if (isset($campaigns['records']) && !empty($campaigns['records'])) {
+        $choices   = [];
+        $campaigns = $this->getCampaigns();
+
+        if (!empty($campaigns['records'])) {
             foreach ($campaigns['records'] as $campaign) {
-                $choices[$this->getName()][] = [
+                $choices[] = [
                     'value' => $campaign['Id'],
-                    'label' => $campaign['Name'], ];
+                    'label' => $campaign['Name'],
+                ];
             }
         }
 

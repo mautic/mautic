@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 
 /**
  * Class LeadListsSubscriber.
@@ -41,6 +42,7 @@ class LeadListSubscriber extends CommonSubscriber
         $this->helper    = $helper;
         $this->listModel = $listModel;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -58,17 +60,30 @@ class LeadListSubscriber extends CommonSubscriber
     public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event)
     {
         $services = $this->helper->getIntegrationObjects();
-        $success  = true;
+        $choices  = [];
 
-        $choices = [];
+        /** @var CrmAbstractIntegration $integration */
         foreach ($services as $integration) {
             if (!$integration || !$integration->getIntegrationSettings()->isPublished()) {
                 continue;
             }
-            $campaigns = [];
+
             if (method_exists($integration, 'getCampaigns')) {
-                $campaigns = $integration->getCampaigns();
-                $choices   = array_merge($choices, $integration->getCampaignChoices($campaigns));
+                $integrationChoices = $integration->getCampaignChoices();
+                if ($integrationChoices) {
+                    $integrationName = $integration->getName();
+                    // Keep BC with pre-2.11.0 that only supported SF campaigns
+                    if ('Salesforce' !== $integrationName) {
+                        array_walk(
+                            $integrationChoices,
+                            function (&$choice) use ($integrationName) {
+                                $choice['value'] = $integrationName.'::'.$choice['value'];
+                            }
+                        );
+                    }
+
+                    $choices[$integration->getDisplayName()] = $integrationChoices;
+                }
             }
         }
 
@@ -81,7 +96,8 @@ class LeadListSubscriber extends CommonSubscriber
                         'include' => [
                             '=',
                         ],
-                    ]),
+                    ]
+                ),
                 'object' => 'lead',
             ];
             $event->addChoice('lead', 'integration_campaigns', $config);
@@ -96,21 +112,28 @@ class LeadListSubscriber extends CommonSubscriber
     public function onLeadListProcessList(ListPreProcessListEvent $event)
     {
         //get Integration Campaign members
-        $integrationObjects = $this->helper->getIntegrationObjects();
-        $list               = $event->getList();
-        $success            = false;
-        $filters            = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
+        $list    = $event->getList();
+        $success = false;
+        $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
 
-        foreach ($integrationObjects as $name => $integrationObject) {
-            $settings = $integrationObject->getIntegrationSettings();
-            if (!$settings->isPublished()) {
-                continue;
-            }
+        foreach ($filters as $filter) {
+            if ($filter['field'] == 'integration_campaigns') {
+                if (strpos($filter['filter'], '::') !== false) {
+                    list($integrationName, $campaignId) = explode('::', $filter['filter']);
+                } else {
+                    // Assuming this is a Salesforce integration for BC with pre 2.11.0
+                    $integrationName = 'Salesforce';
+                    $campaignId      = $filter['filter'];
+                }
 
-            if (method_exists($integrationObject, 'getCampaignMembers')) {
-                foreach ($filters as $filter) {
-                    if ($filter['field'] == 'integration_campaigns') {
-                        if ($integrationObject->getCampaignMembers($filter['filter'], [])) {
+                /** @var CrmAbstractIntegration $integrationObject */
+                if ($integrationObject = $this->helper->getIntegrationObject($integrationName)) {
+                    if (!$integrationObject->getIntegrationSettings()->isPublished()) {
+                        continue;
+                    }
+
+                    if (method_exists($integrationObject, 'getCampaignMembers')) {
+                        if ($integrationObject->getCampaignMembers($campaignId, [])) {
                             $success = true;
                         }
                     }
