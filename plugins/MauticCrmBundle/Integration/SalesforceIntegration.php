@@ -1404,6 +1404,26 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return array
+     */
+    public function getCampaignChoices()
+    {
+        $choices   = [];
+        $campaigns = $this->getCampaigns();
+
+        if (!empty($campaigns['records'])) {
+            foreach ($campaigns['records'] as $campaign) {
+                $choices[] = [
+                    'value' => $campaign['Id'],
+                    'label' => $campaign['Name'],
+                ];
+            }
+        }
+
+        return $choices;
+    }
+
+    /**
      * @param $campaignId
      * @param $settings
      *
@@ -1411,7 +1431,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      */
     public function getCampaignMembers($campaignId, $settings)
     {
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
+        $silenceExceptions = true;
         $persistEntities   = $contactList   = $leadList   = $existingLeads   = $existingContacts   = [];
 
         try {
@@ -1422,7 +1442,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 throw $e;
             }
         }
-
         //prepare contacts to import to mautic contacts to delete from mautic
         if (isset($campaignsMembersResults['records']) && !empty($campaignsMembersResults['records'])) {
             foreach ($campaignsMembersResults['records'] as $campaignMember) {

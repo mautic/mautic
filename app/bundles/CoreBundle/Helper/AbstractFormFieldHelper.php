@@ -139,20 +139,32 @@ abstract class AbstractFormFieldHelper
 
         $choices = [];
 
-        if (is_array($list)) {
+        $valueFormatting = function ($list) use ($removeEmpty) {
+            $formattedChoices = [];
             foreach ($list as $val => $label) {
                 if (is_array($label)) {
                     $val   = $label['value'];
                     $label = $label['label'];
                 }
-
                 if ($removeEmpty && empty($val) && empty($label)) {
                     continue;
                 } elseif (empty($label)) {
                     $label = $val;
                 }
+                $formattedChoices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+            }
 
-                $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+            return $formattedChoices;
+        };
+
+        if (is_array($list)) {
+            foreach ($list as $val => $label) {
+                if (is_array($label) && !isset($label['value'])) {
+                    $choices[$val] = $val;
+                    $choices[$val] = $valueFormatting($label);
+                } elseif (is_array($label)) {
+                    $choices = $valueFormatting ($label);
+                }
             }
         }
 

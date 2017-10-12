@@ -537,9 +537,16 @@ Mautic.addLeadListFilter = function (elId) {
         if (fieldType == 'select' || fieldType == 'multiselect' || fieldType == 'boolean') {
             // Generate the options
             var fieldOptions = mQuery(filterId).data("field-list");
-
             mQuery.each(fieldOptions, function(index, val) {
-                mQuery('<option>').val(index).text(val).appendTo(filterEl);
+                if (mQuery.isPlainObject(val)) {
+                    var optGroup = index;
+                    mQuery.each(val, function(index, value) {
+                        mQuery('<option class="' + optGroup + '">').val(index).text(value).appendTo(filterEl);
+                    });
+                    mQuery('.' + index).wrapAll("<optgroup label='"+index+"' />");
+                } else {
+                    mQuery('<option>').val(index).text(val).appendTo(filterEl);
+                }
             });
         }
     } else if (fieldType == 'lookup') {
