@@ -323,13 +323,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'label'      => 'mautic.plugin.config.push.activities',
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
-                            'class'    => 'form-control',
-                            'onChange' => 'Mautic.pushConnectwiseActivities(this)',
+                            'class' => 'form-control',
                         ],
+                        'data'     => (!isset($data['push_activities'])) ? true : $data['push_activities'],
                         'required' => false,
                     ]
                 );
-                $hideClass = (isset($data['push_activities']) && !empty($data['push_activities'])) ? '' : ' hide';
+
                 $builder->add(
                         'campaign_task',
                         'integration_campaign_task',
@@ -337,7 +337,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                             'label'  => false,
                             'helper' => $this->factory->getHelper('integration'),
                             'attr'   => [
-                                'class' => $hideClass,
+                                'data-show-on' => '{"campaignevent_properties_config_push_activities_1":"checked"}',
+                                'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
+
                             ],
                             'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
                         ]);
@@ -645,7 +647,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
 
                 if (isset($config['campaign_task'])) {
-                    $integrationEntities[] = $this->createActivity($config['campaign_task'], $id, $lead->getId());
+                    $savedEntities = $this->createActivity($config['campaign_task'], $id, $lead->getId());
+                    if ($savedEntities) {
+                        $integrationEntities[] = $savedEntities;
+                    }
                 }
 
                 if (!empty($integrationEntities)) {
@@ -740,6 +745,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $communicationItems = [];
                 foreach ($field['items']['keys'] as $keyItem => $item) {
                     $defaulValue = [];
+                    $keyExists   = false;
                     if (isset($leadFields[$item])) {
                         if ($item == 'Email') {
                             $defaulValue = ['defaultFlag' => true];
@@ -748,22 +754,23 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
                             foreach ($config['communicationItems'] as $key => $ci) {
                                 if ($ci['type']['id'] == $keyItem + 1) {
-                                    unset($config['communicationItems'][$key]);
+                                    $config['communicationItems'][$key]['value'] = $fields[$mauticKey]['value'];
+                                    $keyExists                                   = true;
                                 }
                             }
-                            $type = [
-                                'type' => ['id' => $keyItem + 1, 'name' => $item], ];
-                            $values = array_merge(['value' => $this->cleanPushData($fields[$mauticKey]['value'])], $defaulValue);
+                            if (!$keyExists) {
+                                $type = [
+                                    'type' => ['id' => $keyItem + 1, 'name' => $item], ];
+                                $values = array_merge(['value' => $this->cleanPushData($fields[$mauticKey]['value'])], $defaulValue);
 
-                            $communicationItems[] = array_merge($type, $values);
+                                $communicationItems[] = array_merge($type, $values);
+                            }
                         }
                     }
                 }
-                foreach ($config['communicationItems'] as $key => $ci) {
-                    unset($config['communicationItems'][$key]['id']);
-                }
+
                 if ($config['update']) {
-                    $communicationItems = array_merge($communicationItems, $config['communicationItems']);
+                    $communicationItems = array_merge($config['communicationItems'], $communicationItems);
                 }
                 if (!empty($communicationItems)) {
                     $matched[$integrationKey] = $communicationItems;
@@ -1053,6 +1060,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             }
         }
 
-        return [];
+        return null;
     }
 }
