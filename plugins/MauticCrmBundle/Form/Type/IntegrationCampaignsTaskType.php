@@ -16,7 +16,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * Class IntegrationCampaignsTaskType.
@@ -34,16 +33,9 @@ class IntegrationCampaignsTaskType extends AbstractType
             'activity_name',
             TextType::class,
             [
-                'label'       => 'mautic.connectwise.activity.name',
-                'label_attr'  => ['class' => 'control-label'],
-                'attr'        => ['class' => 'form-control'],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
+                'label'      => 'mautic.connectwise.activity.name',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -67,14 +59,7 @@ class IntegrationCampaignsTaskType extends AbstractType
                 'choices' => $members,
                 'attr'    => [
                     'class' => 'form-control', ],
-                'label'       => 'mautic.plugin.integration.campaigns.connectwise.members',
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ],
+                'label' => 'mautic.plugin.integration.campaigns.connectwise.members',
             ]
         );
     }

@@ -317,13 +317,30 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if ($formArea == 'integration') {
             if ($this->isAuthorized()) {
                 $builder->add(
-                    'campaign_task',
-                    'integration_campaign_task',
+                    'push_activities',
+                    'yesno_button_group',
                     [
-                        'label'  => false,
-                        'helper' => $this->factory->getHelper('integration'),
-                        'data'   => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
-                    ]);
+                        'label'      => 'mautic.plugin.config.push.activities',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'    => 'form-control',
+                            'onChange' => 'Mautic.pushConnectwiseActivities(this)',
+                        ],
+                        'required' => false,
+                    ]
+                );
+                $hideClass = (isset($data['push_activities']) && !empty($data['push_activities'])) ? '' : ' hide';
+                $builder->add(
+                        'campaign_task',
+                        'integration_campaign_task',
+                        [
+                            'label'  => false,
+                            'helper' => $this->factory->getHelper('integration'),
+                            'attr'   => [
+                                'class' => $hideClass,
+                            ],
+                            'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
+                        ]);
             }
         }
     }
@@ -631,7 +648,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     $integrationEntities[] = $this->createActivity($config['campaign_task'], $id, $lead->getId());
                 }
 
-                if ($integrationEntities) {
+                if (!empty($integrationEntities)) {
                     $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
                     $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
                 }
@@ -663,8 +680,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $objectFields       = $this->prepareFieldsForPush($this->getContactFields());
         $leadFields         = $config['leadFields'];
 
-        $cwContactExists    = $this->amendLeadDataBeforeMauticPopulate($cwContactData, $object);
-        $communicationItems = isset($cwContact['communicationItems']) ? $cwContactData['communicationItems'] : [];
+        $cwContactExists = $this->amendLeadDataBeforeMauticPopulate($cwContactData, $object);
+
+        $communicationItems = isset($cwContactData['communicationItems']) ? $cwContactData['communicationItems'] : [];
 
         $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
         $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
@@ -721,16 +739,28 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if ($integrationKey == 'communicationItems') {
                 $communicationItems = [];
                 foreach ($field['items']['keys'] as $keyItem => $item) {
-                    $defaulValue = false;
+                    $defaulValue = [];
                     if (isset($leadFields[$item])) {
                         if ($item == 'Email') {
-                            $defaulValue = true;
+                            $defaulValue = ['defaultFlag' => true];
                         }
                         $mauticKey = $leadFields[$item];
                         if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                            $communicationItems[] = ['type' => ['id' => $keyItem + 1], 'value' => $this->cleanPushData($fields[$mauticKey]['value']), 'defaultFlag' => $defaulValue];
+                            foreach ($config['communicationItems'] as $key => $ci) {
+                                if ($ci['type']['id'] == $keyItem + 1) {
+                                    unset($config['communicationItems'][$key]);
+                                }
+                            }
+                            $type = [
+                                'type' => ['id' => $keyItem + 1, 'name' => $item], ];
+                            $values = array_merge(['value' => $this->cleanPushData($fields[$mauticKey]['value'])], $defaulValue);
+
+                            $communicationItems[] = array_merge($type, $values);
                         }
                     }
+                }
+                foreach ($config['communicationItems'] as $key => $ci) {
+                    unset($config['communicationItems'][$key]['id']);
                 }
                 if ($config['update']) {
                     $communicationItems = array_merge($communicationItems, $config['communicationItems']);
@@ -1001,7 +1031,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function createActivity($config, $cwContactId, $leadId)
     {
-        if ($cwContactId) {
+        if ($cwContactId and !empty($config['activity_name'])) {
             $activity = [
                 'name'     => $config['activity_name'],
                 'type'     => ['id' => $config['campaign_activity_type']],
@@ -1023,6 +1053,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             }
         }
 
-        return null;
+        return [];
     }
 }

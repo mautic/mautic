@@ -307,3 +307,23 @@ Mautic.getIntegrationCampaigns = function (el, settings) {
         }
     );
 };
+Mautic.pushConnectwiseActivities = function (el) {
+    var pushActivities = mQuery(el).val();
+
+    if (pushActivities == false) {
+        mQuery('#campaignevent_properties_config_campaign_task').addClass('hide');
+        mQuery('#campaignevent_properties_config_campaign_task_activity_name').val('');
+        mQuery('#campaignevent_properties_config_campaign_task_activity_name').prop('disabled', true).trigger("chosen:updated");
+        mQuery('#campaignevent_properties_config_campaign_task_campaign_activity_type').val('');
+        mQuery('#campaignevent_properties_config_campaign_task_campaign_activity_type').prop('disabled', true).trigger("chosen:updated");
+        mQuery('#campaignevent_properties_config_campaign_task_campaign_members').val('');
+        mQuery('#campaignevent_properties_config_campaign_task_campaign_members').prop('disabled', true).trigger("chosen:updated");
+
+    } else {
+        mQuery('#campaignevent_properties_config_campaign_task_activity_name').prop('disabled', false).trigger("chosen:updated");
+        mQuery('#campaignevent_properties_config_campaign_task').removeClass('hide');
+        mQuery('#campaignevent_properties_config_campaign_task_campaign_activity_type').prop('disabled', false).trigger("chosen:updated");
+        mQuery('#campaignevent_properties_config_campaign_task_campaign_members').prop('disabled', false).trigger("chosen:updated");
+
+    }
+};
