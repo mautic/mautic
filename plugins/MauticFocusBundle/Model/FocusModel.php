@@ -375,17 +375,6 @@ class FocusModel extends FormModel
             ]
         ) : '';
 
-        /*$formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:form.html.php',
-            [
-                'form'      => $form,
-                'style'     => $focus['style'],
-                'focusId'   => $focus['id'],
-                'preview'   => $isPreview,
-                'renderedForm' => $renderedForm,
-            ]
-        ) : '';*/
-
         if ($isPreview) {
             $content = str_replace('{focus_form}', $formContent, $content, $formReplaced);
             if (!$formReplaced && !empty($formContent)) {
