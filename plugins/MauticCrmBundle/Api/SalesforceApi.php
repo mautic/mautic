@@ -258,7 +258,7 @@ class SalesforceApi extends CrmApi
      *
      * @return array|mixed|string
      */
-    public function createLeadActivity(array $activity, $object)
+    public function createLeadActivity(array $activity, $object, $filters = [])
     {
         $config              = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
