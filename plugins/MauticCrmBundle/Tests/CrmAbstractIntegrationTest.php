@@ -29,7 +29,7 @@ class CrmAbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
         /** @var \PHPUnit_Framework_MockObject_MockBuilder $mockBuilder */
         $mockBuilder = $this->getMockBuilder(StubIntegration::class);
-        $mockBuilder->disableOriginalConstructor()->enableProxyingToOriginalMethods();
+        $mockBuilder->disableOriginalConstructor();
 
         /** @var StubIntegration $integration */
         $integration = $mockBuilder->getMock();

@@ -11,6 +11,7 @@
 
 namespace Mautic\CoreBundle\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 
@@ -23,7 +24,7 @@ trait ToBcBccFieldsTrait
     {
         $builder->add(
             'to',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.send.email.to',
                 'label_attr' => ['class' => 'control-label'],
@@ -43,7 +44,7 @@ trait ToBcBccFieldsTrait
 
         $builder->add(
             'cc',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.send.email.cc',
                 'label_attr' => ['class' => 'control-label'],
@@ -63,7 +64,7 @@ trait ToBcBccFieldsTrait
 
         $builder->add(
             'bcc',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.send.email.bcc',
                 'label_attr' => ['class' => 'control-label'],

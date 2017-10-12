@@ -948,6 +948,7 @@ class LeadListRepository extends CommonRepository
                 case 'hit_url':
                 case 'referer':
                 case 'source':
+                case 'source_id':
                 case 'url_title':
                     $operand = in_array(
                         $func,
@@ -1293,7 +1294,7 @@ class LeadListRepository extends CommonRepository
                     $select  = 'COUNT(id)';
                     if ($details['field'] == 'lead_email_read_count') {
                         $table  = 'email_stats';
-                        $select = 'SUM(open_count)';
+                        $select = 'COALESCE(SUM(open_count),0)';
                     }
                     $subqb = $this->getEntityManager()->getConnection()
                         ->createQueryBuilder()

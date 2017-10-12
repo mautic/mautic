@@ -12,12 +12,14 @@
 namespace Mautic\ChannelBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
  * MessageQueueRepository.
  */
 class MessageQueueRepository extends CommonRepository
 {
+    use TimelineTrait;
     /**
      * @param $channel
      * @param $channelId
@@ -110,5 +112,34 @@ class MessageQueueRepository extends CommonRepository
             )
             ->execute()
             ->fetchColumn();
+    }
+
+    /**
+     * Get a lead's point log.
+     *
+     * @param int|null $leadId
+     * @param array    $options
+     *
+     * @return array
+     */
+    public function getLeadTimelineEvents($leadId = null, array $options = [])
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
+            ->select('mq.id, mq.lead_id, mq.channel as channelName, mq.channel_id as channelId, 
+            mq.priority as priority, mq.attempts, mq.success, mq.status, mq.date_published as dateAdded, 
+            mq.scheduled_date as scheduledDate, mq.last_attempt as lastAttempt, mq.date_sent as dateSent');
+
+        if ($leadId) {
+            $query->where('mq.lead_id = '.(int) $leadId);
+        }
+
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere($query->expr()->orX(
+                $query->expr()->like('mq.channel', $query->expr()->literal('%'.$options['search'].'%'))
+            ));
+        }
+
+        return $this->getTimelineResults($query, $options, 'mq.channel', 'mq.date_published', [], ['dateAdded']);
     }
 }
