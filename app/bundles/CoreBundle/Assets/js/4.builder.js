@@ -1702,6 +1702,21 @@ Mautic.getBuilderTokensMethod = function() {
 };
 
 Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
+    // find DEC tokens and inject them to builderTokens
+    var decTokenRegex  = /(?:{)dynamiccontent="(.*?)(?:")}/g;
+    var match = decTokenRegex.exec(themeHtml);
+    while (match !== null) {
+        var dynConToken = match[0];
+        var dynConName = match[1];
+        // Add the dynamic content tokens
+        if (!Mautic.builderTokens.hasOwnProperty(dynConToken)) {
+            Mautic.builderTokens[dynConToken] = dynConName;
+        }
+
+        // fetch next token
+        match = decTokenRegex.exec(themeHtml);
+    }
+
     // Turn Dynamic Content Tokens into builder slots
     themeHtml = Mautic.prepareDynamicContentBlocksForBuilder(themeHtml);
 
