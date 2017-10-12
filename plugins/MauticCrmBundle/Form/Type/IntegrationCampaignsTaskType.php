@@ -16,7 +16,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 /**
  * Class IntegrationCampaignsTaskType.
@@ -38,10 +39,13 @@ class IntegrationCampaignsTaskType extends AbstractType
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                    new Callback(
+                        function ($validateMe, ExecutionContextInterface $context) {
+                            $data = $context->getRoot()->getData();
+                            if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
+                                $context->buildViolation('mautic.core.value.required')->addViolation();
+                            }
+                        }
                     ),
                 ],
             ]
@@ -69,10 +73,13 @@ class IntegrationCampaignsTaskType extends AbstractType
                     'class' => 'form-control', ],
                 'label'       => 'mautic.plugin.integration.campaigns.connectwise.members',
                 'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                    new Callback(
+                        function ($validateMe, ExecutionContextInterface $context) {
+                            $data = $context->getRoot()->getData();
+                            if (!empty($data['properties']['config']['push_activities']) && empty($validateMe)) {
+                                $context->buildViolation('mautic.core.value.required')->addViolation();
+                            }
+                        }
                     ),
                 ],
             ]

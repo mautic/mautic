@@ -37,7 +37,6 @@ Mautic.campaignOnLoad = function (container, response) {
             mQuery("#CampaignCanvas div.list-campaign-event").each(function () {
                 var thisId = mQuery(this).attr('id');
                 var option  = mQuery('#'+thisId+' option[value="' + mQuery(this).val() + '"]');
-                console.log(option);
             });
         }
 

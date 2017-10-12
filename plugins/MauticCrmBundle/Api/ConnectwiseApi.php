@@ -45,9 +45,9 @@ class ConnectwiseApi extends CrmApi
                         $errors[] = '404 not found error';
                         break;
                     case 'errors':
-                        $errors[] = $r['message'];
+                        $errors[] = $response['message'];
                     case 'code':
-                        $errors[] = $r['message'];
+                        $errors[] = $response['message'];
                         break;
                 }
             }
