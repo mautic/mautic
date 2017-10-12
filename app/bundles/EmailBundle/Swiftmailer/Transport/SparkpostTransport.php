@@ -18,7 +18,6 @@ use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use SparkPost\SparkPost;
-use SparkPost\SparkPostException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -77,18 +76,8 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     public function start()
     {
-        try {
-            $sparky   = $this->createSparkPost();
-            $response = $sparky->transmissions->get();
-            $response->wait();
-        } catch (SparkPostException $exception) {
-            $response = json_decode($exception->getMessage(), true);
-
-            if (is_array($response) && isset($response['errors'])) {
-                $this->throwException($response['errors'][0]['message']);
-            } else {
-                $this->throwException($exception->getMessage());
-            }
+        if (empty($this->apiKey)) {
+            $this->throwException($this->translator->trans('mautic.email.api_key_required', [], 'validators'));
         }
 
         $this->started = true;
@@ -101,10 +90,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      */
     protected function createSparkPost()
     {
-        if (empty($this->apiKey)) {
-            $this->throwException($this->translator->trans('mautic.email.api_key_required', [], 'validators'));
-        }
-
         $httpAdapter = new GuzzleAdapter(new Client());
         $sparky      = new SparkPost($httpAdapter, ['key' => $this->apiKey]);
 

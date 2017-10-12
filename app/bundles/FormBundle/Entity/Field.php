@@ -860,4 +860,20 @@ class Field
 
         return true;
     }
+
+    /**
+     * @return bool
+     */
+    public function isCaptchaType()
+    {
+        return $this->type === 'captcha';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFileType()
+    {
+        return $this->type === 'file';
+    }
 }

@@ -126,10 +126,6 @@ abstract class StandardImportTestHelper extends CommonMocks
 
         $companyModel->setEntityManager($entityManager);
 
-        $companyModel->expects($this->any())
-            ->method('getEventLogRepository')
-            ->willReturn($logRepository);
-
         $notificationModel = $this->getMockBuilder(NotificationModel::class)
             ->disableOriginalConstructor()
             ->getMock();

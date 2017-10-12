@@ -98,7 +98,6 @@
 
         "stack/run": "^1.0",
         "stack/builder": "^1.0",
-
         "piwik/device-detector": "~3.7.0",
         "php-http/guzzle6-adapter": "^1.1",
         "sparkpost/sparkpost": "~2.0.3",
@@ -106,7 +105,10 @@
         "sonata-project/exporter": "^1.7",
         "lightsaml/sp-bundle": "~1.0.3",
         "symfony/expression-language": "~2.8",
-        "egeloen/ordered-form-bundle": "^3.0"
+        "egeloen/ordered-form-bundle": "^3.0",
+        "symfony/dotenv": "^3.3",
+        "php-amqplib/rabbitmq-bundle": "^1.10",
+        "leezy/pheanstalk-bundle": "^3.2"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
@@ -114,10 +116,14 @@
         "sensio/generator-bundle": "~3.0",
         "babdev/transifex": "~1.0",
         "webfactory/exceptions-bundle": "~4.3",
-        "phpunit/phpunit": "4.5",
+        "phpunit/phpunit": "^5.7",
         "phpunit/dbunit": "^2.0",
+        "sebastian/exporter": "~2.0",
+        "phpunit/phpunit-mock-objects": "~3.4.4",
         "friendsofphp/php-cs-fixer": "^1.12",
-        "symfony/var-dumper": "^3.2"
+        "symfony/var-dumper": "^3.2",
+        "phpunit/phpunit-selenium": "^3.0",
+        "codeception/codeception": "^2.3"
     },
     "repositories": [
         {
