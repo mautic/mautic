@@ -337,7 +337,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                             'label'  => false,
                             'helper' => $this->factory->getHelper('integration'),
                             'attr'   => [
-                                'data-show-on' => '{"campaignevent_properties_config_push_activities_1":"checked"}',
                                 'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
 
                             ],
