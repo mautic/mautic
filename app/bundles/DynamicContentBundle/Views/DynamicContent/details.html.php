@@ -89,6 +89,11 @@ if (!$isEmbedded) {
                                 </a>
                             </div>
                         <?php endif; ?>
+                        <?php if (!$entity->getIsCampaignBased()): ?>
+                            <div class="small">
+                                <?php echo $view['translator']->trans('mautic.dynamicContent.header.is_filter_based', ['%slot%' => $entity->getSlotName()]); ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -103,6 +108,24 @@ if (!$isEmbedded) {
                                 'MauticCoreBundle:Helper:details.html.php',
                                 ['entity' => $entity]
                             ); ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b">
+                                    <?php echo $view['translator']->trans('mautic.dynamicContent.slot.campaign'); ?>
+                                </td>
+                                <td>
+                                    <?php echo $entity->getIsCampaignBased() ? 'Yes' : 'No'; ?>
+                                </td>
+                            </tr>
+                            <?php if (!$entity->getIsCampaignBased()) : ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b">
+                                    <?php echo $view['translator']->trans('mautic.dynamicContent.label.slot_name'); ?>
+                                </td>
+                                <td>
+                                    <?php echo $entity->getSlotName(); ?>
+                                </td>
+                            </tr>
+                            <?php endif ?>
                             </tbody>
                         </table>
                     </div>
