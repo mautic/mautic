@@ -88,12 +88,6 @@ Mautic.launchBuilder = function (formName, actionName) {
     var form = mQuery('form[name='+formName+']');
 
     applyBtn.off('click').on('click', function(e) {
-        // Trigger slot:destroy event
-        document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
-
-        // Clear the customize forms
-        mQuery('#slot-form-container, #section-form-container').html('');
-
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
             Mautic.inBuilderSubmissionOn(form);
@@ -125,7 +119,14 @@ Mautic.launchBuilder = function (formName, actionName) {
     var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
     themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
-    Mautic.initBuilderIframe(themeHtml, btnCloseBuilder, applyBtn);
+    // Turn Dynamic Content Tokens into builder slots
+    themeHtml = Mautic.prepareDynamicContentBlocksForBuilder(themeHtml);
+
+    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
+        mQuery('#builder-overlay').addClass('hide');
+        btnCloseBuilder.prop('disabled', false);
+        applyBtn.prop('disabled', false);
+    });
 };
 
 /**
@@ -989,7 +990,11 @@ Mautic.getSlotFocus = function() {
 };
 
 Mautic.cloneFocusForm = function(decId, removeFroala) {
-    Mautic.reattachDEC();
+    // reattach DEC
+    if (typeof Mautic.activeDEC !== 'undefined') {
+        var element = Mautic.activeDEC.detach();
+        Mautic.activeDECParent.append(element);
+    }
     var focusForm = parent.mQuery('#emailform_dynamicContent_' + decId);
     Mautic.activeDECParent = focusForm.parent();
     // show if hidden
@@ -1031,10 +1036,7 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
 Mautic.removeAddVariantButton = function() {
     // Remove the Add Variant button for dynamicContent slots
     parent.mQuery('#customize-slot-panel').find('.panel-heading button').remove();
-    Mautic.reattachDEC();
-};
-
-Mautic.reattachDEC = function() {
+    // reattach DEC
     if (typeof Mautic.activeDEC !== 'undefined') {
         var element = Mautic.activeDEC.detach();
         Mautic.activeDECParent.append(element);
@@ -1486,7 +1488,11 @@ Mautic.initSlotListeners = function() {
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {
-        Mautic.reattachDEC();
+        // reattach DEC
+        if (typeof Mautic.activeDEC !== 'undefined') {
+            var element = Mautic.activeDEC.detach();
+            Mautic.activeDECParent.append(element);
+        }
 
         if (params.type === 'text') {
             if (parent.mQuery('#slot_content').length) {
@@ -1652,32 +1658,6 @@ Mautic.getBuilderTokensMethod = function() {
         method = 'email:getBuilderTokens';
     }
     return method;
-};
-
-Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
-// Turn Dynamic Content Tokens into builder slots
-    themeHtml = Mautic.prepareDynamicContentBlocksForBuilder(themeHtml);
-
-    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
-        mQuery('#builder-overlay').addClass('hide');
-        btnCloseBuilder.prop('disabled', false);
-        applyBtn.prop('disabled', false);
-    });
-};
-
-Mautic.initBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
-    // Avoid to request the tokens if not necessary
-    if (Mautic.builderTokensRequestInProgress) {
-        // Wait till previous request finish
-        var intervalID = setInterval(function(){
-            if (!Mautic.builderTokensRequestInProgress) {
-                clearInterval(intervalID);
-                Mautic.prepareBuilderIframe(themeHtml, btnCloseBuilder, applyBtn);
-            }
-        }, 500);
-    } else {
-        Mautic.prepareBuilderIframe(themeHtml, btnCloseBuilder, applyBtn);
-    }
 };
 
 Mautic.prepareDynamicContentBlocksForBuilder = function(builderHtml) {
