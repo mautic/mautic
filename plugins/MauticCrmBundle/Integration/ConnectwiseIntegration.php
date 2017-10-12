@@ -721,10 +721,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if ($integrationKey == 'communicationItems') {
                 $communicationItems = [];
                 foreach ($field['items']['keys'] as $keyItem => $item) {
+                    $defaulValue = false;
                     if (isset($leadFields[$item])) {
+                        if ($item == 'Email') {
+                            $defaulValue = true;
+                        }
                         $mauticKey = $leadFields[$item];
                         if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
-                            $communicationItems[] = ['type' => ['id' => $keyItem + 1], 'value' => $this->cleanPushData($fields[$mauticKey]['value'])];
+                            $communicationItems[] = ['type' => ['id' => $keyItem + 1], 'value' => $this->cleanPushData($fields[$mauticKey]['value']), 'defaultFlag' => $defaulValue];
                         }
                     }
                 }
