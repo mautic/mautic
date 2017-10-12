@@ -646,7 +646,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $id                    = $personData['id'];
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
 
-                if (isset($config['campaign_task'])) {
+                if (isset($config['push_activities']) and $config['push_activities'] == true) {
                     $savedEntities = $this->createActivity($config['campaign_task'], $id, $lead->getId());
                     if ($savedEntities) {
                         $integrationEntities[] = $savedEntities;
