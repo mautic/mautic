@@ -26,14 +26,14 @@ $required   = [];
 
 <?php
 if (empty($preview)):
-    echo $view->render('MauticFormBundle:Builder:script.html.php', ['form' => $form, 'formName' => $formName]); ?>
+    echo $view->render($theme.'MauticFormBundle:Builder:script.html.php', ['form' => $form, 'formName' => $formName]); ?>
 
     <script>
         var MauticFocusHandler = function (messageType, message) {
             // Store the HTML
             var wrapper = document.getElementById('mauticform_wrapper<?php echo $formName ?>');
             var innerForm = wrapper.getElementsByClassName('mauticform-innerform');
-            innerForm[0].style.display = "none";
+            //innerForm[0].style.display = "none";
 
             <?php if ($style == 'page'): ?>
             document.getElementById('mauticform<?php echo $formName ?>_' + messageType).style.fontSize = "2em";
@@ -43,12 +43,12 @@ if (empty($preview)):
 
             var headline = document.getElementsByClassName('mf-headline');
             if (headline.length) {
-                headline[0].style.display = "none";
+                //headline[0].style.display = "none";
 
             }
             var tagline = document.getElementsByClassName('mf-tagline');
             if (tagline.length) {
-                tagline[0].style.display = "none";
+                //tagline[0].style.display = "none";
             }
 
             if (message) {
