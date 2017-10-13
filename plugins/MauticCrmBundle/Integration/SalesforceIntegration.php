@@ -1668,7 +1668,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         foreach ($toUpdate as $lead) {
             if (!empty($lead['email'])) {
-                $lead                                               = $this->getCompoundMauticFields($lead, $sfObject);
+                $lead                                               = $this->getCompoundMauticFields($lead);
                 $key                                                = $this->getSyncKey($lead['email']);
                 $trackedContacts[$lead['integration_entity']][$key] = $lead['id'];
 
@@ -1732,7 +1732,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $error = false;
 
         foreach ($leadsToCreate as $lead) {
-            $lead = $this->getCompoundMauticFields($lead, 'Lead');
+            $lead = $this->getCompoundMauticFields($lead);
 
             if (isset($lead['email'])) {
                 $this->setContactToSync($checkEmailsInSF, $lead);
