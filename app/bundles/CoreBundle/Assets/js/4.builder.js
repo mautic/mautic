@@ -1029,6 +1029,8 @@ Mautic.cloneFocusForm = function(decId, removeFroala) {
     focusForm.removeClass('fade');
     // remove delete default button
     focusForm.find('.tab-pane:first').find('.remove-item').hide();
+    // hide add variant button
+    focusForm.find('.addNewDynamicContentFilter').hide();
     var element =focusForm.detach();
     Mautic.activeDEC = element;
     return element;
