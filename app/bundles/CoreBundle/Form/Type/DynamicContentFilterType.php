@@ -34,7 +34,6 @@ class DynamicContentFilterType extends AbstractType
                 'attr'  => [
                     'class' => 'form-control dynamic-content-token-name',
                 ],
-                'read_only' => true,
             ]
         );
 
