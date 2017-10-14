@@ -456,8 +456,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')
     {
-        die(var_dump($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object));
-
         foreach ($objectFields as $integrationField => $mauticField) {
             if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $integrationData[$integrationField.'__'.$object]) {
                 $matchedFields[$mauticField] = $integrationData[$integrationField.'__'.$object];
