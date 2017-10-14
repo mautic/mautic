@@ -32,6 +32,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
@@ -2471,23 +2472,7 @@ abstract class AbstractIntegration
      */
     public function cleanPushData($value, $fieldType = self::FIELD_TYPE_STRING)
     {
-        $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
-        switch ($fieldType) {
-            case self::FIELD_TYPE_BOOL:
-                return (bool) $clean;
-            case self::FIELD_TYPE_NUMBER:
-                return (float) $clean;
-            case self::FIELD_TYPE_DATETIME:
-                $dateTimeValue = new \DateTime($value);
-
-                return (!empty($clean)) ? $dateTimeValue->format('c') : '';
-            case self::FIELD_TYPE_DATE:
-                $dateTimeValue = new \DateTime($value);
-
-                return (!empty($clean)) ? $dateTimeValue->format('Y-m-d') : '';
-            default:
-                return $clean;
-        }
+        return Cleaner::clean($value, $fieldType);
     }
 
     /**

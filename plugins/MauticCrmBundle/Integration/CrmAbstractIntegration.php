@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\UserBundle\Entity\User;
+use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 /**
  * Class CrmAbstractIntegration.
@@ -60,8 +61,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $config
+     * @param Lead|array $lead
+     * @param array      $config
      *
      * @return array|bool
      */
@@ -83,7 +84,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $LeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+                $this->getApiHelper()->createLead($mappedData, $lead);
 
                 return true;
             }
@@ -174,7 +175,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Get the API helper.
      *
-     * @return object
+     * @return CrmApi
      */
     public function getApiHelper()
     {
@@ -455,6 +456,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getBlankFieldsToUpdateInMautic($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object = 'Lead')
     {
+        die(var_dump($matchedFields, $leadFieldValues, $objectFields, $integrationData, $object));
+
         foreach ($objectFields as $integrationField => $mauticField) {
             if (isset($leadFieldValues[$mauticField]) && empty($leadFieldValues[$mauticField]['value']) && !empty($integrationData[$integrationField.'__'.$object]) && $this->translator->trans('mautic.integration.form.lead.unknown') !== $integrationData[$integrationField.'__'.$object]) {
                 $matchedFields[$mauticField] = $integrationData[$integrationField.'__'.$object];
