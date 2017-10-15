@@ -1206,7 +1206,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     private function getExistingRecord($seachColumn, $searchValue, $object = 'Leads')
     {
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
-        $selectColumns   = implode(',', $availableFields[$object]);
+        $selectColumns   = implode(',', array_keys($availableFields[$object]));
         $records         = $this->getApiHelper()->getSearchRecords($selectColumns, $seachColumn, $searchValue, $object);
         $parsedRecords   = $this->parseZohoRecord($records, $availableFields[$object]);
 
