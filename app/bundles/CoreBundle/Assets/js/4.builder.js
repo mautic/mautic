@@ -405,12 +405,18 @@ Mautic.initSelectTheme = function(themeField) {
  * @param slot
  */
 Mautic.updateIframeContent = function(iframeId, content, slot) {
+    // remove empty lines
+    content = content.replace(/^\s*[\r\n]/gm, '');
     if (iframeId) {
         var iframe = document.getElementById(iframeId);
         var doc = iframe.contentDocument || iframe.contentWindow.document;
         doc.open();
         doc.write(content);
         doc.close();
+        // remove html classes because they are duplicated with each save
+        if ('HTML' === doc.all[0].tagName) {
+            mQuery(doc.all[0]).removeClass();
+        }
     } else if (slot) {
         slot.html(content);
     }
@@ -556,12 +562,10 @@ Mautic.sanitizeHtmlBeforeSave = function(htmlContent) {
     // Remove the slot focus highlight
     htmlContent.find('[data-slot-focus], [data-section-focus]').remove();
 
-    customHtml = Mautic.domToString(htmlContent);
+    var customHtml = Mautic.domToString(htmlContent);
 
     // Convert dynamic slot definitions into tokens
-    customHtml = Mautic.convertDynamicContentSlotsToTokens(customHtml);
-
-    return customHtml;
+    return Mautic.convertDynamicContentSlotsToTokens(customHtml);
 };
 
 /**
@@ -1013,12 +1017,14 @@ Mautic.initSlots = function(slotContainers) {
     });
 };
 
-Mautic.getSlotToolbar = function() {
+Mautic.getSlotToolbar = function(type) {
     Mautic.builderContents.find('[data-slot-toolbar]').remove();
 
     var slotToolbar = mQuery('<div/>').attr('data-slot-toolbar', true);
     var deleteLink  = Mautic.getSlotDeleteLink();
-
+    if (typeof type !== 'undefined') {
+        mQuery('<span style="color:#fff;margin-left:10px;font-family:sans-serif;font-size:smaller">' + type.toUpperCase() + '</span>').appendTo(slotToolbar);
+    }
     deleteLink.appendTo(slotToolbar);
 
     return slotToolbar;
@@ -1111,7 +1117,7 @@ Mautic.initSlotListeners = function() {
         var type = slot.attr('data-slot');
 
         // initialize the drag handle
-        var slotToolbar = Mautic.getSlotToolbar();
+        var slotToolbar = Mautic.getSlotToolbar(type);
         var deleteLink  = Mautic.getSlotDeleteLink();
         var focus       = Mautic.getSlotFocus();
 
@@ -1119,7 +1125,7 @@ Mautic.initSlotListeners = function() {
             e.stopPropagation();
 
             // Get new copies of the focus, toolbar
-            slotToolbar = Mautic.getSlotToolbar();
+            slotToolbar = Mautic.getSlotToolbar(type);
             focus       = Mautic.getSlotFocus();
 
             if (Mautic.sortActive) {
@@ -1561,9 +1567,9 @@ Mautic.initSlotListeners = function() {
         }
 
         if (params.type === 'text') {
-            if (parent.mQuery('#slot_content').length) {
-                parent.mQuery('#slot_content').froalaEditor('destroy');
-                parent.mQuery('#slot_content').find('.atwho-inserted').atwho('destroy');
+            if (parent.mQuery('#slot_text_content').length) {
+                parent.mQuery('#slot_text_content').froalaEditor('destroy');
+                parent.mQuery('#slot_text_content').find('.atwho-inserted').atwho('destroy');
             }
         } else if (params.type === 'image') {
             Mautic.deleteCodeModeSlot();
