@@ -91,11 +91,11 @@ class Mapper
     /**
      * @param $id
      *
-     * @return int
+     * @return int If any single field is mapped, return 1 to count as one contact to be updated
      */
     public function map($id, $zohoId = null)
     {
-        $mapped = false;
+        $mapped = 0;
         $row    = $this->writer->row($id);
 
         if ($zohoId) {
@@ -105,7 +105,7 @@ class Mapper
         foreach ($this->mappedFields as $zohoField => $mauticField) {
             $field = $this->getField($zohoField);
             if ($field && isset($this->contact[$mauticField]) && $this->contact[$mauticField]) {
-                $mapped   = true;
+                $mapped   = 1;
                 $apiField = $field['dv'];
                 $apiValue = $this->contact[$mauticField];
 
@@ -113,7 +113,7 @@ class Mapper
             }
         }
 
-        return (int) $mapped;
+        return $mapped;
     }
 
     /**
