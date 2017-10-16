@@ -164,4 +164,12 @@ class LeadListFilteringEvent extends CommonEvent
     {
         return $this->subQuery;
     }
+
+    /**
+     * @param array $details
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+    }
 }

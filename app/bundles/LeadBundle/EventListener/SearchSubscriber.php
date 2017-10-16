@@ -11,9 +11,17 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\LeadListFilteringEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 
 /**
@@ -27,6 +35,11 @@ class SearchSubscriber extends CommonSubscriber
     protected $leadModel;
 
     /**
+     * @var LeadRepository
+     */
+    private $leadRepo;
+
+    /**
      * SearchSubscriber constructor.
      *
      * @param LeadModel $leadModel
@@ -34,6 +47,7 @@ class SearchSubscriber extends CommonSubscriber
     public function __construct(LeadModel $leadModel)
     {
         $this->leadModel = $leadModel;
+        $this->leadRepo  = $leadModel->getRepository();
     }
 
     /**
@@ -42,8 +56,9 @@ class SearchSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
-            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+            CoreEvents::GLOBAL_SEARCH              => ['onGlobalSearch', 0],
+            CoreEvents::BUILD_COMMAND_LIST         => ['onBuildCommandList', 0],
+            LeadEvents::LEAD_BUILD_SEARCH_COMMANDS => ['onBuildSearchCommands', 0],
         ];
     }
 
@@ -124,5 +139,199 @@ class SearchSubscriber extends CommonSubscriber
                 $this->leadModel->getCommandList()
             );
         }
+    }
+
+    /**
+     * @param LeadListFilteringEvent $event
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function onBuildSearchCommands(LeadListFilteringEvent $event)
+    {
+        $details       = $event->getDetails();
+        $searchCommand = $details['command'];
+
+        // add email read search command
+        $searchCommands = [
+            $this->translator->trans('mautic.lead.lead.searchcommand.emailread'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.emailread', [], null, 'en_US'),
+        ];
+        if (in_array($searchCommand, $searchCommands, true)) {
+            $event->setSubQuery($this->buildEmailReadQuery($event));
+
+            return;
+        }
+
+        // add email sent search command
+        $searchCommands = [
+            $this->translator->trans('mautic.lead.lead.searchcommand.emailsent'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.emailsent', [], null, 'en_US'),
+        ];
+        if (in_array($searchCommand, $searchCommands, true)) {
+            $event->setSubQuery($this->buildEmailSentQuery($event));
+
+            return;
+        }
+        // add email queued search command
+        $searchCommands = [
+            $this->translator->trans('mautic.lead.lead.searchcommand.emailqueued'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.emailqueued', [], null, 'en_US'),
+        ];
+        if (in_array($searchCommand, $searchCommands, true)) {
+            $event->setSubQuery($this->buildEmailQueuedQuery($event));
+
+            return;
+        }
+
+        // add email pending search command
+        $searchCommands = [
+            $this->translator->trans('mautic.lead.lead.searchcommand.emailpending'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.emailpending', [], null, 'en_US'),
+        ];
+        if (in_array($searchCommand, $searchCommands, true)) {
+            $event->setSubQuery($this->buildEmailPendingQuery($event));
+
+            return;
+        }
+    }
+
+    /**
+     * @param LeadListFilteringEvent $event
+     *
+     * @return string
+     */
+    private function buildEmailQueuedQuery(LeadListFilteringEvent $event)
+    {
+        $alias   = $event->getAlias();
+        $q       = $event->getQueryBuilder();
+        $details = $event->getDetails();
+        $expr    = $q->expr()->andX()->add(sprintf("mq.channel = 'email' and mq.status = '%s'", MessageQueue::STATUS_SENT));
+        $this->leadRepo->applySearchQueryRelationship(
+            $q,
+            [
+                [
+                    'from_alias' => 'l',
+                    'table'      => 'message_queue',
+                    'alias'      => 'mq',
+                    'condition'  => 'l.id = mq.lead_id',
+                ],
+            ],
+            1,
+            $this->leadRepo->generateFilterExpression($q, 'mq.channel_id', 'eq', $alias, null, $expr)
+        );
+        $details['returnParameter'] = true;
+        $details['strict']          = 1;
+        $event->setDetails($details);
+
+        return null;
+    }
+
+    /**
+     * @param LeadListFilteringEvent $event
+     *
+     * @return string
+     */
+    private function buildEmailPendingQuery(LeadListFilteringEvent $event)
+    {
+        $query   = '';
+        $alias   = $event->getAlias();
+        $q       = $event->getQueryBuilder();
+        $details = $event->getDetails();
+        $expr    = $q->expr()->andX()->add(sprintf("mq.channel = 'email' and mq.status = '%s'", MessageQueue::STATUS_PENDING));
+
+        /** @var EmailRepository $emailRepo */
+        $emailRepo = $event->getEntityManager()->getRepository('MauticEmailBundle:Email');
+        $emailId   = (int) $details['string'];
+        /** @var Email $email */
+        $email = $emailRepo->getEntity($emailId);
+        if (null === $email) {
+            return null;
+        }
+        $variantIds = $email->getRelatedEntityIds();
+        $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
+        if ($nq instanceof QueryBuilder) {
+            $nq->select('l.id'); // select only id
+            $nsql = $nq->getSQL();
+            foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
+                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+            }
+            $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
+        } else {
+            $this->leadRepo->applySearchQueryRelationship(
+                $q,
+                [
+                    [
+                        'from_alias' => 'l',
+                        'table'      => 'message_queue',
+                        'alias'      => 'mq',
+                        'condition'  => 'l.id = mq.lead_id',
+                    ],
+                ],
+                1,
+                $this->leadRepo->generateFilterExpression($q, 'mq.channel_id', 'eq', $alias, null, $expr)
+            );
+        }
+
+        $details['returnParameter'] = true;
+        $details['strict']          = 1;
+        $event->setDetails($details);
+
+        return $query;
+    }
+
+    /**
+     * @param LeadListFilteringEvent $event
+     *
+     * @return string
+     */
+    private function buildEmailSentQuery(LeadListFilteringEvent $event)
+    {
+        return $this->buildEmailQuery($event);
+    }
+
+    /**
+     * @param LeadListFilteringEvent $event
+     *
+     * @return string
+     */
+    private function buildEmailReadQuery(LeadListFilteringEvent $event)
+    {
+        $expr = $event->getQueryBuilder()
+                      ->expr()
+                      ->andX()
+                      ->add('es.is_read = 1');
+
+        return $this->buildEmailQuery($event, $expr);
+    }
+
+    /**
+     * @param LeadListFilteringEvent   $event
+     * @param CompositeExpression|null $expr
+     *
+     * @return string
+     */
+    private function buildEmailQuery(LeadListFilteringEvent $event, CompositeExpression $expr = null)
+    {
+        $alias   = $event->getAlias();
+        $q       = $event->getQueryBuilder();
+        $details = $event->getDetails();
+        $this->leadRepo->applySearchQueryRelationship(
+            $q,
+            [
+                [
+                    'from_alias' => 'l',
+                    'table'      => 'email_stats',
+                    'alias'      => 'es',
+                    'condition'  => 'l.id = es.lead_id',
+                ],
+            ],
+            1,
+            $this->leadRepo->generateFilterExpression($q, 'es.email_id', 'eq', $alias, null, $expr)
+        );
+        $details['returnParameter'] = true;
+        $details['strict']          = 1;
+        $event->setDetails($details);
+
+        return null;
     }
 }

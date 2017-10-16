@@ -231,6 +231,7 @@ class LeadModel extends FormModel
         static $repoSetup;
 
         $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $repo->setDispatcher($this->dispatcher);
 
         if (!$repoSetup) {
             $repoSetup = true;

@@ -13,13 +13,14 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
-use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\LeadBundle\Event\LeadListFilteringEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * LeadRepository.
@@ -29,6 +30,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     use CustomFieldRepositoryTrait;
     use ExpressionHelperTrait;
     use OperatorListTrait;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
 
     /**
      * @var array
@@ -75,6 +81,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setTriggerModel(TriggerModel $triggerModel)
     {
         $this->triggerModel = $triggerModel;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -833,102 +847,30 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailsent'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailsent', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
-                        [
-                            'from_alias' => 'l',
-                            'table'      => 'email_stats',
-                            'alias'      => 'es',
-                            'condition'  => 'l.id = es.lead_id',
-                        ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'es.email_id', $eqExpr, $unique, null)
-                );
-                $filter->strict  = 1;
-                $returnParameter = true;
-                break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailread'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailread', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
-                        [
-                            'from_alias' => 'l',
-                            'table'      => 'email_stats',
-                            'alias'      => 'es',
-                            'condition'  => 'l.id = es.lead_id',
-                        ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'es.email_id', $eqExpr, $unique, null)
-                );
-                $q->andWhere('es.is_read=1');
-                $filter->strict  = 1;
-                $returnParameter = true;
-                break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailqueued'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailqueued', [], null, 'en_US'):
-                $this->applySearchQueryRelationship(
-                    $q,
-                    [
-                        [
-                            'from_alias' => 'l',
-                            'table'      => 'message_queue',
-                            'alias'      => 'mq',
-                            'condition'  => 'l.id = mq.lead_id',
-                        ],
-                    ],
-                    $innerJoinTables,
-                    $this->generateFilterExpression($q, 'mq.channel_id', $eqExpr, $unique, null)
-                );
-                $q->andWhere('mq.channel = \'email\' and mq.status = \''.MessageQueue::STATUS_SENT.'\'');
-                $filter->strict  = 1;
-                $returnParameter = true;
-                break;
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailpending'):
-            case $this->translator->trans('mautic.lead.lead.searchcommand.emailpending', [], null, 'en_US'):
-                /** @var EmailRepository $emailRepo */
-                $emailRepo  = $this->getEntityManager()->getRepository('MauticEmailBundle:Email');
-                $emailId    = (int) $string;
-                $email      = $emailRepo->getEntity($emailId);
-                $variantIds = $email->getRelatedEntityIds();
-                $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
-                if ($nq instanceof QueryBuilder) {
-                    $nq->select('l.id'); // select only id
-                    $nsql = $nq->getSQL();
-                    foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
-                        $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
-                    }
-                    $expr = $q->expr()->$inExpr('l.id', sprintf('(%s)', $nsql));
-                } else {
-                    $this->applySearchQueryRelationship(
-                        $q,
-                        [
-                            [
-                                'from_alias' => 'l',
-                                'table'      => 'message_queue',
-                                'alias'      => 'mq',
-                                'condition'  => 'l.id = mq.lead_id',
-                            ],
-                        ],
-                        $innerJoinTables,
-                        $this->generateFilterExpression($q, 'mq.channel_id', $eqExpr, $unique, null)
-                    );
-                    $q->andWhere('mq.channel = \'email\' and mq.status = \''.MessageQueue::STATUS_PENDING.'\'');
-                }
-                $filter->strict  = 1;
-                $returnParameter = true;
-                break;
             default:
                 if (in_array($command, $this->availableSearchFields)) {
                     $expr = $q->expr()->$likeExpr("l.$command", ":$unique");
                 }
                 $returnParameter = true;
                 break;
+        }
+
+        if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS)) {
+            $event = new LeadListFilteringEvent(get_object_vars($filter), null, $unique, $exprType, $q, $this->getEntityManager());
+            $this->dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+            if ($event->isFilteringDone()) {
+                $details = $event->getDetails();
+                if (isset($details['returnParameter'])) {
+                    $returnParameter = $details['returnParameter'];
+                }
+                if (isset($details['strict'])) {
+                    $filter->strict = $details['strict'];
+                }
+                if (isset($details['parameters'])) {
+                    $parameters = array_merge($parameters, $details['parameters']);
+                }
+                $expr = $event->getSubQuery();
+            }
         }
 
         if ($returnParameter) {
@@ -1119,7 +1061,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * @param null         $whereExpression
      * @param null         $having
      */
-    protected function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
+    public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
     {
         $primaryTable = $tables[0];
         unset($tables[0]);
