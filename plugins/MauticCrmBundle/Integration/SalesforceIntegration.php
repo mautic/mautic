@@ -2070,10 +2070,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $integrationEntity = null;
                     if ($integrationEntityId && $object !== 'CampaignMember') {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
-                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        if ($integrationEntity) {
+                            $integrationEntity->setLastSyncDate(new \DateTime());
+                        }
                     } elseif (isset($campaignId) && $campaignId != null) {
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $campaignId);
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                        if ($integrationEntity) {
+                            $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                        }
                     } elseif ($contactId) {
                         $integrationEntity = $this->createIntegrationEntity(
                             $object,
@@ -2115,13 +2119,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if ($integrationEntityId) {
                         /** @var IntegrationEntity $integrationEntity */
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                        if ($integrationEntity) {
+                            $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                            if (isset($this->salesforceIdMapping[$contactId])) {
+                                $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                            }
 
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
-                        if (isset($this->salesforceIdMapping[$contactId])) {
-                            $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                            $this->persistIntegrationEntities[] = $integrationEntity;
                         }
-
-                        $this->persistIntegrationEntities[] = $integrationEntity;
                     } elseif (!empty($this->salesforceIdMapping[$contactId])) {
                         // Found in Salesforce so create a new record for it
                         $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
@@ -2156,13 +2161,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if ($integrationEntityId) {
                         /** @var IntegrationEntity $integrationEntity */
                         $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                        if ($integrationEntity) {
+                            $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                            if (isset($this->salesforceIdMapping[$contactId])) {
+                                $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                            }
 
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
-                        if (isset($this->salesforceIdMapping[$contactId])) {
-                            $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                            $this->persistIntegrationEntities[] = $integrationEntity;
                         }
-
-                        $this->persistIntegrationEntities[] = $integrationEntity;
                     } elseif (!empty($this->salesforceIdMapping[$contactId])) {
                         // Found in Salesforce so create a new record for it
                         $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
