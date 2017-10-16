@@ -43,7 +43,7 @@ class FormatterHelper extends Helper
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val)) {
+        if (empty($val) && $type !== 'bool') {
             return $val;
         }
 
@@ -91,6 +91,9 @@ class FormatterHelper extends Helper
                 break;
             case 'html':
                 $string = InputHelper::strict_html($val);
+                break;
+            case 'bool':
+                $string = $val ? 'yes' : 'no';
                 break;
             default:
                 $string = InputHelper::clean($val);
