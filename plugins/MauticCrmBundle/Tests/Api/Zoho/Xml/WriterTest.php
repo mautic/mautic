@@ -18,9 +18,9 @@ class WriterTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test that a single row is generated correctly with numerical index
      *
-     * @covers  \Writer::row()
-     * @covers  \Writer::add()
-     * @covers  \Writer::write()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:row()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:add()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:write()
      */
     public function testXmlWithSingleRow()
     {
@@ -46,9 +46,9 @@ XML;
     /**
      * @testdox Test that multiple rows are generated correctly with specified indexes
      *
-     * @covers  \Writer::row()
-     * @covers  \Writer::add()
-     * @covers  \Writer::write()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:row()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:add()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:write()
      */
     public function testXmlWithMultipleRows()
     {
@@ -92,9 +92,9 @@ XML;
     /**
      * @testdox Test that empty row is not included
      *
-     * @covers  \Writer::row()
-     * @covers  \Writer::add()
-     * @covers  \Writer::write()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:row()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:add()
+     * @covers  \MauticPlugin\MauticCrmBundle\Api\Zoho\Xml\Writer:write()
      */
     public function testXmlWithEmptyRow()
     {
