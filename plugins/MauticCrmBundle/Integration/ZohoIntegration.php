@@ -1048,10 +1048,10 @@ class ZohoIntegration extends CrmAbstractIntegration
                 $objectFields             = $this->prepareFieldsForPush($availableFields[$zObject]);
                 $fieldsToUpdate[$zObject] = $this->getBlankFieldsToUpdate($fieldsToUpdate[$zObject], $existingPerson, $objectFields, $config);
 
-                $totalUpdated += (int) $mapper
+                $totalUpdated += $mapper
                     ->setMappedFields($fieldsToUpdate[$zObject])
                     ->setContact($lead)
-                    ->map($lead['internal_entity_id']);
+                    ->map($lead['internal_entity_id'], $lead['integration_entity_id']);
                 ++$counter;
 
                 // ONLY 100 RECORDS CAN BE SENT AT A TIME
@@ -1078,7 +1078,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     $progress->advance();
                 }
 
-                $totalCreated += (int) $mapper
+                $totalCreated += $mapper
                     ->setMappedFields($config['leadFields'])
                     ->setContact($lead)
                     ->map($lead['internal_entity_id']);

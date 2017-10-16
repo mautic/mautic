@@ -91,13 +91,17 @@ class Mapper
     /**
      * @param $id
      *
-     * @return bool
+     * @return int
      */
-    public function map($id)
+    public function map($id, $zohoId = null)
     {
         $mapped = false;
+        $row    = $this->writer->row($id);
 
-        $row = $this->writer->row($id);
+        if ($zohoId) {
+            $row->add('Id', $zohoId);
+        }
+
         foreach ($this->mappedFields as $zohoField => $mauticField) {
             $field = $this->getField($zohoField);
             if ($field && isset($this->contact[$mauticField]) && $this->contact[$mauticField]) {
@@ -109,7 +113,7 @@ class Mapper
             }
         }
 
-        return $mapped;
+        return (int) $mapped;
     }
 
     /**
