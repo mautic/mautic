@@ -66,6 +66,14 @@ trait OperatorListTrait
                 '!in',
             ],
         ],
+        'lookup_id' => [
+            'include' => [
+                '=',
+                '!=',
+                'empty',
+                '!empty',
+            ],
+        ],
     ];
 
     protected $operatorOptions = [
@@ -271,7 +279,7 @@ trait OperatorListTrait
             $type = 'bool';
         } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
             $type = 'select';
-        } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
+        } elseif (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
             $type = 'text';
         } elseif ($type === 'datetime') {
             $type = 'date';

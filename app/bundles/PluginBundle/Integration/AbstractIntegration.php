@@ -34,6 +34,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
+use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -190,6 +191,11 @@ abstract class AbstractIntegration
     protected $persistIntegrationEntities = [];
 
     /**
+     * @var IntegrationEntityModel
+     */
+    protected $integrationEntityModel;
+
+    /**
      * AbstractIntegration constructor.
      */
     public function __construct(MauticFactory $factory = null)
@@ -201,21 +207,22 @@ abstract class AbstractIntegration
          *            integration pass to set all of these properties
          */
         if ($factory) {
-            $this->factory           = $factory;
-            $this->dispatcher        = $factory->getDispatcher();
-            $this->cache             = $factory->getHelper('cache_storage')->getCache($this->getName());
-            $this->em                = $factory->getEntityManager();
-            $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-            $this->request           = $factory->getRequest();
-            $this->router            = $factory->getRouter();
-            $this->translator        = $factory->getTranslator();
-            $this->logger            = $factory->getLogger();
-            $this->encryptionHelper  = $factory->getHelper('encryption');
-            $this->leadModel         = $factory->getModel('lead');
-            $this->companyModel      = $factory->getModel('lead.company');
-            $this->pathsHelper       = $factory->getHelper('paths');
-            $this->notificationModel = $factory->getModel('core.notification');
-            $this->fieldModel        = $factory->getModel('lead.field');
+            $this->factory                = $factory;
+            $this->dispatcher             = $factory->getDispatcher();
+            $this->cache                  = $factory->getHelper('cache_storage')->getCache($this->getName());
+            $this->em                     = $factory->getEntityManager();
+            $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
+            $this->request                = $factory->getRequest();
+            $this->router                 = $factory->getRouter();
+            $this->translator             = $factory->getTranslator();
+            $this->logger                 = $factory->getLogger();
+            $this->encryptionHelper       = $factory->getHelper('encryption');
+            $this->leadModel              = $factory->getModel('lead');
+            $this->companyModel           = $factory->getModel('lead.company');
+            $this->pathsHelper            = $factory->getHelper('paths');
+            $this->notificationModel      = $factory->getModel('core.notification');
+            $this->fieldModel             = $factory->getModel('lead.field');
+            $this->integrationEntityModel = $factory->getModel('plugin.integration_entity');
         }
 
         $this->init();
@@ -342,6 +349,14 @@ abstract class AbstractIntegration
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param IntegrationEntityModel $integrationModel
+     */
+    public function setIntegrationEntityModel(IntegrationEntityModel $integrationEntityModel)
+    {
+        $this->integrationEntityModel = $integrationEntityModel;
     }
 
     /**
@@ -1838,14 +1853,14 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Match lead data with integration fields.
+     * Match Company data with integration fields.
      *
-     * @param $lead
+     * @param $entity
      * @param $config
      *
      * @return array
      */
-    public function populateCompanyData($lead, $config = [])
+    public function populateCompanyData($entity, $config = [])
     {
         if (!isset($config['companyFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -1855,10 +1870,10 @@ abstract class AbstractIntegration
             }
         }
 
-        if ($lead instanceof Lead) {
-            $fields = $lead->getPrimaryCompany();
+        if ($entity instanceof Lead) {
+            $fields = $entity->getPrimaryCompany();
         } else {
-            $fields = $lead['primaryCompany'];
+            $fields = $entity['primaryCompany'];
         }
 
         $companyFields   = $config['companyFields'];

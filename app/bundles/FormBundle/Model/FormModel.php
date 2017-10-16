@@ -23,6 +23,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -81,17 +82,29 @@ class FormModel extends CommonFormModel
     protected $leadFieldModel;
 
     /**
+     * @var FormUploader
+     */
+    private $formUploader;
+
+    /**
+     * @var SubmissionResultLoader
+     */
+    private $submissionResultLoader;
+
+    /**
      * FormModel constructor.
      *
-     * @param RequestStack        $requestStack
-     * @param TemplatingHelper    $templatingHelper
-     * @param ThemeHelper         $themeHelper
-     * @param SchemaHelperFactory $schemaHelperFactory
-     * @param ActionModel         $formActionModel
-     * @param FieldModel          $formFieldModel
-     * @param LeadModel           $leadModel
-     * @param FormFieldHelper     $fieldHelper
-     * @param LeadFieldModel      $leadFieldModel
+     * @param RequestStack           $requestStack
+     * @param TemplatingHelper       $templatingHelper
+     * @param ThemeHelper            $themeHelper
+     * @param SchemaHelperFactory    $schemaHelperFactory
+     * @param ActionModel            $formActionModel
+     * @param FieldModel             $formFieldModel
+     * @param LeadModel              $leadModel
+     * @param FormFieldHelper        $fieldHelper
+     * @param LeadFieldModel         $leadFieldModel
+     * @param FormUploader           $formUploader
+     * @param SubmissionResultLoader $submissionResultLoader
      */
     public function __construct(
         RequestStack $requestStack,
@@ -102,17 +115,21 @@ class FormModel extends CommonFormModel
         FieldModel $formFieldModel,
         LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
-        LeadFieldModel $leadFieldModel
+        LeadFieldModel $leadFieldModel,
+        FormUploader $formUploader,
+        SubmissionResultLoader $submissionResultLoader
     ) {
-        $this->request             = $requestStack->getCurrentRequest();
-        $this->templatingHelper    = $templatingHelper;
-        $this->themeHelper         = $themeHelper;
-        $this->schemaHelperFactory = $schemaHelperFactory;
-        $this->formActionModel     = $formActionModel;
-        $this->formFieldModel      = $formFieldModel;
-        $this->leadModel           = $leadModel;
-        $this->fieldHelper         = $fieldHelper;
-        $this->leadFieldModel      = $leadFieldModel;
+        $this->request                = $requestStack->getCurrentRequest();
+        $this->templatingHelper       = $templatingHelper;
+        $this->themeHelper            = $themeHelper;
+        $this->schemaHelperFactory    = $schemaHelperFactory;
+        $this->formActionModel        = $formActionModel;
+        $this->formFieldModel         = $formFieldModel;
+        $this->leadModel              = $leadModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->formUploader           = $formUploader;
+        $this->submissionResultLoader = $submissionResultLoader;
     }
 
     /**
@@ -278,16 +295,27 @@ class FormModel extends CommonFormModel
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (isset($existingFields[$fieldId])) {
-                $entity->removeField($fieldId, $existingFields[$fieldId]);
-                $deleteFields[] = $fieldId;
+            if (!isset($existingFields[$fieldId])) {
+                continue;
             }
+            $this->handleFilesDelete($existingFields[$fieldId]);
+            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $deleteFields[] = $fieldId;
         }
 
         // Delete fields from db
         if (count($deleteFields)) {
             $this->formFieldModel->deleteEntities($deleteFields);
         }
+    }
+
+    private function handleFilesDelete(Field $field)
+    {
+        if (!$field->isFileType()) {
+            return;
+        }
+
+        $this->formUploader->deleteAllFilesOfFormField($field);
     }
 
     /**
@@ -592,7 +620,10 @@ class FormModel extends CommonFormModel
      */
     public function deleteEntity($entity)
     {
-        parent::deleteEntity($entity);
+        /* @var Form $entity */
+        //parent::deleteEntity($entity);
+
+        $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
             //delete the associated results table
@@ -610,12 +641,19 @@ class FormModel extends CommonFormModel
         $entities     = parent::deleteEntities($ids);
         $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         foreach ($entities as $id => $entity) {
+            /* @var Form $entity */
             //delete the associated results table
             $schemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
+            $this->deleteFormFiles($entity);
         }
         $schemaHelper->executeChanges();
 
         return $entities;
+    }
+
+    private function deleteFormFiles(Form $form)
+    {
+        $this->formUploader->deleteFilesOfForm($form);
     }
 
     /**

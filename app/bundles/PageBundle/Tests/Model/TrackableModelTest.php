@@ -439,6 +439,23 @@ class TrackableModelTest extends WebTestCase
     }
 
     /**
+     * @testdox Test that css images are not converted if there are no links
+     */
+    public function testCssUrlsAreNotConvertedIfThereAreNoLinks()
+    {
+        $url   = 'https://foo-bar.com?foo=bar';
+        $model = $this->getModel($url);
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            '<style> .mf-modal { background-image: url(\'https://www.mautic.org/wp-content/uploads/2014/08/iTunesArtwork.png\'); } </style>',
+            [],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables);
+    }
+    /**
      * @param       $urls
      * @param null  $tokenUrls
      * @param array $doNotTrack

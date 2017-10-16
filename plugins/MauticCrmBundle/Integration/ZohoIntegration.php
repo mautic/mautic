@@ -612,21 +612,23 @@ class ZohoIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        $builder->add(
-            'updateBlanks',
-            'choice',
-            [
-                'choices' => [
-                    'updateBlanks' => 'mautic.integrations.blanks',
-                ],
-                'expanded'    => true,
-                'multiple'    => true,
-                'label'       => 'mautic.integrations.form.blanks',
-                'label_attr'  => ['class' => 'control-label'],
-                'empty_value' => false,
-                'required'    => false,
-            ]
-        );
+        if ($formArea == 'features') {
+            $builder->add(
+                'updateBlanks',
+                'choice',
+                [
+                    'choices' => [
+                        'updateBlanks' => 'mautic.integrations.blanks',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
+        }
         if ($formArea === 'keys') {
             $builder->add(
                 'datacenter',
@@ -1204,7 +1206,7 @@ class ZohoIntegration extends CrmAbstractIntegration
     private function getExistingRecord($seachColumn, $searchValue, $object = 'Leads')
     {
         $availableFields = $this->getAvailableLeadFields(['feature_settings' => ['objects' => ['Leads', 'Contacts']]]);
-        $selectColumns   = implode(',', $availableFields[$object]);
+        $selectColumns   = implode(',', array_keys($availableFields[$object]));
         $records         = $this->getApiHelper()->getSearchRecords($selectColumns, $seachColumn, $searchValue, $object);
         $parsedRecords   = $this->parseZohoRecord($records, $availableFields[$object]);
 
