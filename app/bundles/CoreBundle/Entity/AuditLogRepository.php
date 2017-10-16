@@ -145,7 +145,7 @@ class AuditLogRepository extends CommonRepository
         }
 
         if (is_array($orderBy)) {
-            $orderdir = 'ASC';
+            $orderdir = 'DESC';
             $order    = 'id';
             if (isset($orderBy[0])) {
                 $order = $orderBy[0];

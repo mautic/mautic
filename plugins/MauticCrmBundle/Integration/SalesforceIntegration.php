@@ -431,7 +431,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                             } elseif (!empty($dataObject['Owner__Contact']['Email'])) {
                                 $dataObject['owner_email'] = $dataObject['Owner__Contact']['Email'];
                             }
-                            $entity                = $this->getMauticLead($dataObject, true, null, null, $object);
+                            $entity                = $this->getMauticLead($dataObject, true, null, null, $object, $params);
                             $mauticObjectReference = 'lead';
                             $detachClass           = Lead::class;
 
@@ -1192,7 +1192,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             }
 
             if (isset($fieldMapping[$sfObject]['update']['HasOptedOutOfEmail']) || isset($fieldMapping[$sfObject]['create']['HasOptedOutOfEmail'])) {
-                $this->getLeadDoNotContactByDate('email', $checkEmailsInSF, $sfObject, $params);
+                $this->pushLeadDoNotContactByDate('email', $checkEmailsInSF, $sfObject, $params);
             }
 
             // We're done
@@ -2653,7 +2653,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function getLeadDoNotContactByDate($channel,  &$sfRecords, $sfObject, $params = [])
+    public function pushLeadDoNotContactByDate($channel,  &$sfRecords, $sfObject, $params = [])
     {
         $filters = [];
         $leadIds = [];
@@ -2682,30 +2682,30 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $auditLogRepo        = $this->em->getRepository('MauticCoreBundle:AuditLog');
         $filters['search']   = 'dnc_channel_status%'.$channel;
         $lastModifiedDNCDate = $auditLogRepo->getAuditLogsForLeads(array_flip($leadIds), $filters, ['dateAdded', 'DESC'], $params['start']);
-
+        $trackedIds          = [];
         foreach ($historySF['records'] as $sfModifiedDNC) {
             // if we have no history in Mautic, then update the Mautic record
             if (empty($lastModifiedDNCDate)) {
                 unset($sfRecords['mauticContactIsContactableByEmail']);
-
                 $leads  = array_flip($leadIds);
                 $leadId = $leads[$sfModifiedDNC[$sfObject.'Id']];
                 $this->updateMauticDNC($leadId, $sfModifiedDNC['NewValue']);
-
                 continue;
             }
 
             foreach ($lastModifiedDNCDate as $logs) {
                 $leadId = $logs['objectId'];
-
+                if (strtotime($logs['dateAdded']->format('c')) > strtotime($sfModifiedDNC['CreatedDate'])) {
+                    $trackedIds[] = $leadId;
+                }
                 if (((isset($leadIds[$leadId]) && $leadIds[$leadId] == $sfModifiedDNC[$sfObject.'Id']))
-                    && ((strtotime($sfModifiedDNC['CreatedDate']) > strtotime($logs['dateAdded']->format('c'))))) {
+                    && ((strtotime($sfModifiedDNC['CreatedDate']) > strtotime($logs['dateAdded']->format('c')))) && !in_array($leadId, $trackedIds)) {
                     //SF was updated last so update Mautic record
                     unset($sfRecords['mauticContactIsContactableByEmail']);
                     $this->updateMauticDNC($leadId, $sfModifiedDNC['NewValue']);
+                    $trackedIds[] = $leadId;
+                    break;
                 }
-
-                break;
             }
         }
     }
@@ -3222,74 +3222,13 @@ class SalesforceIntegration extends CrmAbstractIntegration
         return $companyField;
     }
 
-    /**
-     * Update the record in each system taking the last modified record.
-     *
-     * @param $leadId
-     * @param string $channel
-     * @param string $sfObject
-     * @param array  $sfIds
-     *
-     * @return int
-     *
-     * @throws ApiErrorException
-     */
-    public function getLeadDoNotContactByDate($channel = 'email',  &$sfRecords = [], $params = [])
+    public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, $params = [])
     {
-        $filters = [];
-        $leadIds = [];
+        $matchedFields['internal_entity_id']    = $lead->getId();
+        $matchedFields['integration_entity_id'] = $sfData['Id__'.$object];
+        $record[$lead->getEmail()]              = $matchedFields;
+        $this->pushLeadDoNotContactByDate($channel,  $record, $object, $params);
 
-        if (empty($sfRecords)) {
-            return;
-        }
-        foreach ($sfRecords as $record) {
-            $sfObject = isset($record['integration_entity']) ? $record['integration_entity'] : 'Lead';
-            if (isset($record['integration_entity_id'])) {
-                $sfIdsToFind[$sfObject][$record['integration_entity_id']] = $record['internal_entity_id'];
-            }
-        }
-        foreach ($sfIdsToFind as $object) {
-            $sfIds = [];
-            foreach ($object as $sfId => $lead) {
-                $sfIds[]        = $sfId;
-                $leadIds[$sfId] = $lead;
-            }
-            if (!empty($sfIds)) {
-                $fieldString = "'".implode("','", $sfIds)."'";
-                //get last modified date for donot contact
-                $historySelect = 'Select Field, '.$sfObject.'Id, CreatedDate, isDeleted, NewValue from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$fieldString.') ORDER BY CreatedDate DESC';
-                $queryUrl      = $this->getQueryUrl();
-                $historySF     = $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
-            }
-        }
-
-        $mauticLeadIds = "'".implode("','", $leadIds)."'";
-
-        $autidLogRepo      = $this->em->getRepository('MauticCoreBundle:AuditLog');
-        $filters['search'] = 'dnc_channel_status%'.$channel;
-
-        $lastModifiedDNCDate = $autidLogRepo->getAuditLogsForLeads($filters, $mauticLeadIds, $params['start']);
-
-        foreach ($lastModifiedDNCDate as $logs) {
-            if ($sfKey = array_search($logs['objectId'], $leadIds) !== null) {
-                $mauticLastDNCDate = $logs['dateAdded'];
-                if (!empty($historySF['records'])) {
-                    foreach ($historySF['records'] as $sfModifiedDNC) {
-                        if (((isset($sfModifiedDNC['LeadId']) && $sfModifiedDNC['LeadId'] == $sfKey)
-                                || (isset($sfModifiedDNC['ContactId']) && $sfModifiedDNC['ContactId'] == $sfKey))
-                            && ($mauticLastDNCDate
-                                && (strtotime($sfModifiedDNC['CreatedDate']) > strtotime($mauticLastDNCDate->format('c'))))) {
-                            unset($sfRecords['mauticContactIsContactableByEmail']); //donot update in SF
-                            if ($sfModifiedDNC['NewValue'] === true) {
-                                $this->leadModel->addDncForLead($lead, 'email', 'Set by Salesforce', DoNotContact::MANUAL, true, false, true);
-                            } elseif ($sfModifiedDNC['NewValue'] === false) {
-                                $this->leadModel->removeDncForLead($lead, 'email', true);
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        return $record[$lead->getEmail()];
     }
 }

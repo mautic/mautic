@@ -1973,7 +1973,7 @@ abstract class AbstractIntegration
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $params = [])
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -2744,5 +2744,22 @@ abstract class AbstractIntegration
         ];
 
         return isset($compoundFields[$fieldName]);
+    }
+
+    /**
+     * Update the record in each system taking the last modified record.
+     *
+     * @param $leadId
+     * @param string $channel
+     * @param string $sfObject
+     * @param array  $sfIds
+     *
+     * @return int
+     *
+     * @throws ApiErrorException
+     */
+    public function getLeadDoNotContactByDate($channel,  $records, $object, $lead, $integrationData, $params = [])
+    {
+        return $records;
     }
 }
