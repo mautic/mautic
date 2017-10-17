@@ -464,9 +464,13 @@ return [
                 'alias' => 'content',
             ],
             'mautic.helper.template.formatter' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'formatter',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\FormatterHelper::class,
+                'arguments' => [
+                    'mautic.helper.app_version',
+                    'mautic.helper.template.date',
+                    'translator',
+                ],
+                'alias' => 'formatter',
             ],
             'mautic.helper.template.version' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\VersionHelper::class,
