@@ -278,7 +278,7 @@ class ReportSubscriber extends CommonSubscriber
             }
 
             if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_SEGMENT_MEMBERSHIP])) {
-                $this->injectSegmentReportData($event, $columns);
+                $this->injectSegmentReportData($event, $columns, $filters);
             }
         }
 
@@ -831,8 +831,9 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @param ReportBuilderEvent $event
      * @param array              $columns
+     * @param array              $filters
      */
-    private function injectSegmentReportData(ReportBuilderEvent $event, array $columns)
+    private function injectSegmentReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $segmentColumns = [
             'lll.manually_removed' => [
@@ -847,7 +848,8 @@ class ReportSubscriber extends CommonSubscriber
 
         $data = [
             'display_name' => 'mautic.lead.report.segment.membership',
-            'columns'      => array_merge($columns, $segmentColumns, $event->getIpColumn()),
+            'columns'      => array_merge($columns, $segmentColumns, $event->getIpColumn(), $event->getStandardColumns('ll')),
+            'filters'      => $filters,
         ];
         $event->addTable(self::CONTEXT_SEGMENT_MEMBERSHIP, $data, self::GROUP_CONTACTS);
     }
