@@ -11,18 +11,28 @@
 
 namespace Mautic\CoreBundle\Tests\Templating\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class FormatterHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testStrictHtmlFormatIsRemovingScriptTags()
     {
-        $factoryMock = $this->getMockBuilder(MauticFactory::class)
+        $appVersion = $this->getMockBuilder(AppVersion::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $helper = new FormatterHelper($factoryMock);
+        $dateHelper = $this->getMockBuilder(DateHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator = $this->getMockBuilder(TranslatorInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $helper = new FormatterHelper($appVersion, $dateHelper, $translator);
 
         $sample = '<a href="/index_dev.php/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.<script>console.log(\'script is running\');</script><SCRIPT>console.log(\'CAPITAL script is running\');</SCRIPT>';
 
