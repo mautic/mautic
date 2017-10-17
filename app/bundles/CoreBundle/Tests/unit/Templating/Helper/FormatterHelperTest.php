@@ -42,4 +42,36 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testBooleanFormat()
+    {
+        $appVersion = $this->getMockBuilder(AppVersion::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $dateHelper = $this->getMockBuilder(DateHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator = $this->getMockBuilder(TranslatorInterface::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translator->expects($this->at(0))
+            ->method('trans')
+            ->with('mautic.core.yes')
+            ->willReturn('yes');
+        $translator->expects($this->at(1))
+            ->method('trans')
+            ->with('mautic.core.no')
+            ->willReturn('no');
+
+        $helper = new FormatterHelper($appVersion, $dateHelper, $translator);
+
+        $result = $helper->_(1, 'bool');
+        $this->assertEquals('yes', $result);
+
+        $result = $helper->_(0, 'bool');
+        $this->assertEquals('no', $result);
+    }
 }
