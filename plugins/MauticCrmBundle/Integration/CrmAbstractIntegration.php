@@ -356,7 +356,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null, $params = [])
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $object = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -408,9 +408,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $leadFields = $this->cleanPriorityFields($config, $object);
         if (!$lead->isNewlyCreated()) {
-            if (isset($matchedFields['mauticContactIsContactableByEmail'])) {
-                $this->getLeadDoNotContactByDate('email', $matchedFields, $object, $lead, $data, $params);
-            }
+            $params = $this->commandParameters;
+
+            $this->getLeadDoNotContactByDate('email', $matchedFields, $object, $lead, $data, $params);
+
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
             if (empty($fieldsToUpdateInMautic)) {

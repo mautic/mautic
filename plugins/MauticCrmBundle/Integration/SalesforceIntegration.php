@@ -209,6 +209,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @return bool
+     */
+    public function updateDncByDate()
+    {
+        $featureSettings = $this->settings->getFeatureSettings();
+        if (isset($featureSettings['updateDncByDate'][0]) && $featureSettings['updateDncByDate'][0] === 'updateDncByDate') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get available company fields for choices in the config UI.
      *
      * @param array $settings
@@ -550,6 +565,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'expanded'    => true,
                     'multiple'    => true,
                     'label'       => 'mautic.integrations.form.blanks',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                ]
+            );
+            $builder->add(
+                'updateDncByDate',
+                'choice',
+                [
+                    'choices' => [
+                        'updateDncByDate' => 'mautic.integrations.update.dnc.by.date',
+                    ],
+                    'expanded'    => true,
+                    'multiple'    => true,
+                    'label'       => 'mautic.integrations.form.update.dnc.by.date.label',
                     'label_attr'  => ['class' => 'control-label'],
                     'empty_value' => false,
                     'required'    => false,
@@ -1191,9 +1221,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
             }
 
-            if (isset($fieldMapping[$sfObject]['update']['HasOptedOutOfEmail']) || isset($fieldMapping[$sfObject]['create']['HasOptedOutOfEmail'])) {
-                $this->pushLeadDoNotContactByDate('email', $checkEmailsInSF, $sfObject, $params);
-            }
+            $this->pushLeadDoNotContactByDate('email', $checkEmailsInSF, $sfObject, $params);
 
             // We're done
             if (!$checkEmailsInSF) {
@@ -2658,7 +2686,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $filters = [];
         $leadIds = [];
 
-        if (empty($sfRecords)) {
+        if (empty($sfRecords) || !isset($sfRecords['mauticContactIsContactableByEmail']) || $this->updateDncByDate() !== true) {
             return;
         }
 
@@ -3224,11 +3252,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     public function getLeadDoNotContactByDate($channel, $matchedFields, $object, $lead, $sfData, $params = [])
     {
-        $matchedFields['internal_entity_id']    = $lead->getId();
-        $matchedFields['integration_entity_id'] = $sfData['Id__'.$object];
-        $record[$lead->getEmail()]              = $matchedFields;
-        $this->pushLeadDoNotContactByDate($channel,  $record, $object, $params);
+        if (isset($matchedFields['mauticContactIsContactableByEmail']) and $this->updateDncByDate() === true) {
+            $matchedFields['internal_entity_id']    = $lead->getId();
+            $matchedFields['integration_entity_id'] = $sfData['Id__'.$object];
+            $record[$lead->getEmail()]              = $matchedFields;
+            $this->pushLeadDoNotContactByDate($channel, $record, $object, $params);
 
-        return $record[$lead->getEmail()];
+            return $record[$lead->getEmail()];
+        }
+
+        return $matchedFields;
     }
 }

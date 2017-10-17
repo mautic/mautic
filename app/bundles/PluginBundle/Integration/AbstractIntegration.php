@@ -196,6 +196,11 @@ abstract class AbstractIntegration
     protected $integrationEntityModel;
 
     /**
+     * @var array
+     */
+    protected $commandParameters = [];
+
+    /**
      * AbstractIntegration constructor.
      */
     public function __construct(MauticFactory $factory = null)
@@ -359,6 +364,11 @@ abstract class AbstractIntegration
         $this->integrationEntityModel = $integrationEntityModel;
     }
 
+    public function setCommandParameters(array $params)
+    {
+        $this->commandParameters = $params;
+    }
+
     /**
      * @return CacheStorageHelper
      */
@@ -399,6 +409,16 @@ abstract class AbstractIntegration
      * @return int
      */
     public function getPriority()
+    {
+        return 9999;
+    }
+
+    /**
+     * Determines if DNC records should be updated by date or by priority.
+     *
+     * @return int
+     */
+    public function updateDncByDate()
     {
         return 9999;
     }
@@ -1973,7 +1993,7 @@ abstract class AbstractIntegration
      *
      * @return Lead
      */
-    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null, $params = [])
+    public function getMauticLead($data, $persist = true, $socialCache = null, $identifiers = null)
     {
         if (is_object($data)) {
             // Convert to array in all levels
@@ -2739,9 +2759,12 @@ abstract class AbstractIntegration
     public function isCompoundMauticField($fieldName)
     {
         $compoundFields = [
-            'mauticContactTimelineLink'         => 'mauticContactTimelineLink',
-            'mauticContactIsContactableByEmail' => 'mauticContactIsContactableByEmail',
+            'mauticContactTimelineLink' => 'mauticContactTimelineLink',
         ];
+
+        if ($this->updateDncByDate() === true) {
+            $compoundFields['mauticContactIsContactableByEmail'] = 'mauticContactIsContactableByEmail';
+        }
 
         return isset($compoundFields[$fieldName]);
     }
