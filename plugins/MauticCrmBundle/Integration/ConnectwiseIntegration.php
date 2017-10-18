@@ -872,10 +872,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         if (!empty($campaigns)) {
             foreach ($campaigns as $campaign) {
-                $choices[] = [
-                    'value' => $campaign['id'],
-                    'label' => $campaign['name'],
-                ];
+                if (isset($campaign['id'])) {
+                    $choices[] = [
+                        'value' => $campaign['id'],
+                        'label' => $campaign['name'],
+                    ];
+                }
             }
         }
 
