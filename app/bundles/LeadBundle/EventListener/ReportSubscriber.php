@@ -451,7 +451,7 @@ class ReportSubscriber extends CommonSubscriber
             case self::CONTEXT_SEGMENT_MEMBERSHIP:
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
                     ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lll.lead_id')
-                    ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = lll.leadlist_id');
+                    ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 's', 's.id = lll.leadlist_id');
 
                 break;
             case self::CONTEXT_COMPANIES:
@@ -848,7 +848,7 @@ class ReportSubscriber extends CommonSubscriber
 
         $data = [
             'display_name' => 'mautic.lead.report.segment.membership',
-            'columns'      => array_merge($columns, $segmentColumns, $event->getIpColumn(), $event->getStandardColumns('ll')),
+            'columns'      => array_merge($columns, $segmentColumns, $event->getIpColumn(), $event->getStandardColumns('s.')),
             'filters'      => $filters,
         ];
         $event->addTable(self::CONTEXT_SEGMENT_MEMBERSHIP, $data, self::GROUP_CONTACTS);
