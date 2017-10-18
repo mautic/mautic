@@ -15,7 +15,9 @@
             <?php echo $view['form']->label($form['content']); ?>
         </div>
         <div class="col-xs-2">
-            <a href="javascript: void(0);" class="remove-item remove-filter btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
+            <?php if ('emailform_dynamicContent_0_filters_0' !== $id) : ?>
+            <a class="remove-item remove-filter btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
+            <?php endif ?>
         </div>
     </div>
     <div class="row form-group">
