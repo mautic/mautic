@@ -87,24 +87,18 @@ class FormModel extends CommonFormModel
     private $formUploader;
 
     /**
-     * @var SubmissionResultLoader
-     */
-    private $submissionResultLoader;
-
-    /**
      * FormModel constructor.
      *
-     * @param RequestStack           $requestStack
-     * @param TemplatingHelper       $templatingHelper
-     * @param ThemeHelper            $themeHelper
-     * @param SchemaHelperFactory    $schemaHelperFactory
-     * @param ActionModel            $formActionModel
-     * @param FieldModel             $formFieldModel
-     * @param LeadModel              $leadModel
-     * @param FormFieldHelper        $fieldHelper
-     * @param LeadFieldModel         $leadFieldModel
-     * @param FormUploader           $formUploader
-     * @param SubmissionResultLoader $submissionResultLoader
+     * @param RequestStack        $requestStack
+     * @param TemplatingHelper    $templatingHelper
+     * @param ThemeHelper         $themeHelper
+     * @param SchemaHelperFactory $schemaHelperFactory
+     * @param ActionModel         $formActionModel
+     * @param FieldModel          $formFieldModel
+     * @param LeadModel           $leadModel
+     * @param FormFieldHelper     $fieldHelper
+     * @param LeadFieldModel      $leadFieldModel
+     * @param FormUploader        $formUploader
      */
     public function __construct(
         RequestStack $requestStack,
@@ -116,20 +110,18 @@ class FormModel extends CommonFormModel
         LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
         LeadFieldModel $leadFieldModel,
-        FormUploader $formUploader,
-        SubmissionResultLoader $submissionResultLoader
+        FormUploader $formUploader
     ) {
-        $this->request                = $requestStack->getCurrentRequest();
-        $this->templatingHelper       = $templatingHelper;
-        $this->themeHelper            = $themeHelper;
-        $this->schemaHelperFactory    = $schemaHelperFactory;
-        $this->formActionModel        = $formActionModel;
-        $this->formFieldModel         = $formFieldModel;
-        $this->leadModel              = $leadModel;
-        $this->fieldHelper            = $fieldHelper;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->formUploader           = $formUploader;
-        $this->submissionResultLoader = $submissionResultLoader;
+        $this->request             = $requestStack->getCurrentRequest();
+        $this->templatingHelper    = $templatingHelper;
+        $this->themeHelper         = $themeHelper;
+        $this->schemaHelperFactory = $schemaHelperFactory;
+        $this->formActionModel     = $formActionModel;
+        $this->formFieldModel      = $formFieldModel;
+        $this->leadModel           = $leadModel;
+        $this->fieldHelper         = $fieldHelper;
+        $this->leadFieldModel      = $leadFieldModel;
+        $this->formUploader        = $formUploader;
     }
 
     /**
