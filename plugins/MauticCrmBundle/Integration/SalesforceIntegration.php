@@ -719,19 +719,21 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         if (!empty($fieldsToUpdate)) {
                             foreach ($existingPersons[$object] as $person) {
                                 if (isset($fieldsToUpdate['AccountId'])) {
-                                    $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
-                                    if (!$accountId) {
-                                        //company was not found so create a new company in Salesforce
-                                        $company = $lead->getPrimaryCompany();
-                                        if (!empty($company)) {
-                                            $company   = $this->companyModel->getEntity($company['id']);
-                                            $sfCompany = $this->pushCompany($company);
-                                            if ($sfCompany) {
-                                                $fieldsToUpdate['AccountId'] = key($sfCompany);
+                                    if (isset($fieldsToUpdate['AccountId'])) {
+                                        $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
+                                        if (!$accountId) {
+                                            //company was not found so create a new company in Salesforce
+                                            $company = $lead->getPrimaryCompany();
+                                            if (!empty($company)) {
+                                                $company   = $this->companyModel->getEntity($company['id']);
+                                                $sfCompany = $this->pushCompany($company);
+                                                if ($sfCompany) {
+                                                    $fieldsToUpdate['AccountId'] = key($sfCompany);
+                                                }
                                             }
+                                        } else {
+                                            $fieldsToUpdate['AccountId'] = $accountId;
                                         }
-                                    } else {
-                                        $fieldsToUpdate['AccountId'] = $accountId;
                                     }
                                 }
 
@@ -1836,31 +1838,33 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
                 if (isset($entity['company']) && isset($entity['integration_entity']) && $object == 'Contact') {
-                    $accountId = $this->getCompanyName($entity['company'], 'Id', 'Name');
+                    if (isset($entity['company'])) {
+                        $accountId = $this->getCompanyName($entity['company'], 'Id', 'Name');
 
-                    if (!$accountId) {
-                        //company was not found so create a new company in Salesforce
-                        $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
-                        if ($lead) {
-                            $companies = $this->leadModel->getCompanies($lead);
-                            if (!empty($companies)) {
-                                foreach ($companies as $companyData) {
-                                    if ($companyData['is_primary']) {
-                                        $company = $this->companyModel->getEntity($companyData['company_id']);
+                        if (!$accountId) {
+                            //company was not found so create a new company in Salesforce
+                            $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
+                            if ($lead) {
+                                $companies = $this->leadModel->getCompanies($lead);
+                                if (!empty($companies)) {
+                                    foreach ($companies as $companyData) {
+                                        if ($companyData['is_primary']) {
+                                            $company = $this->companyModel->getEntity($companyData['company_id']);
+                                        }
                                     }
-                                }
-                                if ($company) {
-                                    $sfCompany = $this->pushCompany($company);
-                                    if (!empty($sfCompany)) {
-                                        $entity['company'] = key($sfCompany);
+                                    if ($company) {
+                                        $sfCompany = $this->pushCompany($company);
+                                        if (!empty($sfCompany)) {
+                                            $entity['company'] = key($sfCompany);
+                                        }
                                     }
+                                } else {
+                                    unset($entity['company']);
                                 }
-                            } else {
-                                unset($entity['company']);
                             }
+                        } else {
+                            $entity['company'] = $accountId;
                         }
-                    } else {
-                        $entity['company'] = $accountId;
                     }
                 }
                 $fields = $this->getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config);
@@ -2670,6 +2674,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param $sfObject
+     * @param $sfFieldString
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getDncHistory($sfObject, $sfFieldString)
+    {
+        //get last modified date for donot contact in Salesforce
+        $historySelect = 'Select Field, '.$sfObject.'Id, CreatedDate, isDeleted, NewValue from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$sfFieldString.') ORDER BY CreatedDate DESC';
+        $queryUrl      = $this->getQueryUrl();
+        $historySF     = $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
+
+        return $historySF;
+    }
+    /**
      * Update the record in each system taking the last modified record.
      *
      * @param $leadId
@@ -2686,21 +2707,18 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $filters = [];
         $leadIds = [];
 
-        if (empty($sfRecords) || !isset($sfRecords['mauticContactIsContactableByEmail']) || $this->updateDncByDate() !== true) {
+        if (empty($sfRecords) || !isset($sfRecords['mauticContactIsContactableByEmail']) && !$this->updateDncByDate()) {
             return;
         }
 
         foreach ($sfRecords as $leadEmail => $record) {
-            $leadIds[$record['internal_entity_id']] = $record['integration_entity_id'];
+            $leadIds[$record['internal_entity_id']]    = $record['integration_entity_id'];
+            $leadEmails[$record['internal_entity_id']] = $record['email'];
         }
 
         $sfFieldString = "'".implode("','", $leadIds)."'";
 
-        //get last modified date for donot contact in Salesforce
-        $historySelect = 'Select Field, '.$sfObject.'Id, CreatedDate, isDeleted, NewValue from '.$sfObject.'History where Field = \'HasOptedOutOfEmail\' and '.$sfObject.'Id IN ('.$sfFieldString.') ORDER BY CreatedDate DESC';
-        $queryUrl      = $this->getQueryUrl();
-        $historySF     = $this->getApiHelper()->request('query', ['q' => $historySelect], 'GET', false, null, $queryUrl);
-
+        $historySF = $this->getDncHistory($sfObject, $sfFieldString);
         //if there is no records of when it was modified in SF then just exit
         if (empty($historySF['records'])) {
             return;
@@ -2714,10 +2732,11 @@ class SalesforceIntegration extends CrmAbstractIntegration
         foreach ($historySF['records'] as $sfModifiedDNC) {
             // if we have no history in Mautic, then update the Mautic record
             if (empty($lastModifiedDNCDate)) {
-                unset($sfRecords['mauticContactIsContactableByEmail']);
                 $leads  = array_flip($leadIds);
                 $leadId = $leads[$sfModifiedDNC[$sfObject.'Id']];
                 $this->updateMauticDNC($leadId, $sfModifiedDNC['NewValue']);
+                $key = $this->getSyncKey($leadEmails[$leadId]);
+                unset($sfRecords[$key]['mauticContactIsContactableByEmail']);
                 continue;
             }
 
@@ -2729,7 +2748,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 if (((isset($leadIds[$leadId]) && $leadIds[$leadId] == $sfModifiedDNC[$sfObject.'Id']))
                     && ((strtotime($sfModifiedDNC['CreatedDate']) > strtotime($logs['dateAdded']->format('c')))) && !in_array($leadId, $trackedIds)) {
                     //SF was updated last so update Mautic record
-                    unset($sfRecords['mauticContactIsContactableByEmail']);
+                    $key = $this->getSyncKey($leadEmails[$leadId]);
+                    unset($sfRecords[$key]['mauticContactIsContactableByEmail']);
                     $this->updateMauticDNC($leadId, $sfModifiedDNC['NewValue']);
                     $trackedIds[] = $leadId;
                     break;

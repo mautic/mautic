@@ -420,7 +420,7 @@ abstract class AbstractIntegration
      */
     public function updateDncByDate()
     {
-        return 9999;
+        return false;
     }
 
     /**
