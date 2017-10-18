@@ -719,21 +719,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         if (!empty($fieldsToUpdate)) {
                             foreach ($existingPersons[$object] as $person) {
                                 if (isset($fieldsToUpdate['AccountId'])) {
-                                    if (isset($fieldsToUpdate['AccountId'])) {
-                                        $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
-                                        if (!$accountId) {
-                                            //company was not found so create a new company in Salesforce
+                                    $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
+                                    if (!$accountId) {
+                                        //company was not found so create a new company in Salesforce
                                             $company = $lead->getPrimaryCompany();
-                                            if (!empty($company)) {
-                                                $company   = $this->companyModel->getEntity($company['id']);
-                                                $sfCompany = $this->pushCompany($company);
-                                                if ($sfCompany) {
-                                                    $fieldsToUpdate['AccountId'] = key($sfCompany);
-                                                }
+                                        if (!empty($company)) {
+                                            $company   = $this->companyModel->getEntity($company['id']);
+                                            $sfCompany = $this->pushCompany($company);
+                                            if ($sfCompany) {
+                                                $fieldsToUpdate['AccountId'] = key($sfCompany);
                                             }
-                                        } else {
-                                            $fieldsToUpdate['AccountId'] = $accountId;
                                         }
+                                    } else {
+                                        $fieldsToUpdate['AccountId'] = $accountId;
                                     }
                                 }
 
@@ -1838,33 +1836,31 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (isset($objectFields['update'])) {
                 $fields = ($objectId) ? $objectFields['update'] : $objectFields['create'];
                 if (isset($entity['company']) && isset($entity['integration_entity']) && $object == 'Contact') {
-                    if (isset($entity['company'])) {
-                        $accountId = $this->getCompanyName($entity['company'], 'Id', 'Name');
+                    $accountId = $this->getCompanyName($entity['company'], 'Id', 'Name');
 
-                        if (!$accountId) {
-                            //company was not found so create a new company in Salesforce
+                    if (!$accountId) {
+                        //company was not found so create a new company in Salesforce
                             $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
-                            if ($lead) {
-                                $companies = $this->leadModel->getCompanies($lead);
-                                if (!empty($companies)) {
-                                    foreach ($companies as $companyData) {
-                                        if ($companyData['is_primary']) {
-                                            $company = $this->companyModel->getEntity($companyData['company_id']);
-                                        }
+                        if ($lead) {
+                            $companies = $this->leadModel->getCompanies($lead);
+                            if (!empty($companies)) {
+                                foreach ($companies as $companyData) {
+                                    if ($companyData['is_primary']) {
+                                        $company = $this->companyModel->getEntity($companyData['company_id']);
                                     }
-                                    if ($company) {
-                                        $sfCompany = $this->pushCompany($company);
-                                        if (!empty($sfCompany)) {
-                                            $entity['company'] = key($sfCompany);
-                                        }
-                                    }
-                                } else {
-                                    unset($entity['company']);
                                 }
+                                if ($company) {
+                                    $sfCompany = $this->pushCompany($company);
+                                    if (!empty($sfCompany)) {
+                                        $entity['company'] = key($sfCompany);
+                                    }
+                                }
+                            } else {
+                                unset($entity['company']);
                             }
-                        } else {
-                            $entity['company'] = $accountId;
                         }
+                    } else {
+                        $entity['company'] = $accountId;
                     }
                 }
                 $fields = $this->getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config);
