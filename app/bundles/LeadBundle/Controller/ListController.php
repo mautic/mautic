@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends FormController
 {
+    use EntityContactsTrait;
     /**
      * Generate's default list view.
      *
@@ -543,6 +544,101 @@ class ListController extends FormController
             array_merge($postActionVars, [
                 'flashes' => $flashes,
             ])
+        );
+    }
+
+    /**
+     * Loads a specific form into the detailed panel.
+     *
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($objectId)
+    {
+        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        $model    = $this->getModel('lead.list');
+        $security = $this->get('mautic.security');
+
+        /** @var \Mautic\LeadBundle\Entity\LeadList $list */
+        $list = $model->getEntity($objectId);
+        //set the page we came from
+        $page = $this->get('session')->get('mautic.segment.page', 1);
+
+        if ($list === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
+
+            return $this->postActionRedirect([
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $page],
+                'contentTemplate' => 'MauticLeadBundle:List:index',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_segment_index',
+                    'mauticContent' => 'list',
+                ],
+                'flashes' => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.list.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ],
+                ],
+            ]);
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'lead:lists:viewother',
+            'lead:lists:editother',
+            'lead:lists:deleteother',
+            $list->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        return $this->delegateView([
+            'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
+            'viewParameters' => [
+                'list'        => $list,
+                'permissions' => $security->isGranted([
+                    'lead:leads:editown',
+                    'lead:lists:viewother',
+                    'lead:lists:editother',
+                    'lead:lists:deleteother',
+                ], 'RETURN_ARRAY'),
+                'security' => $security,
+                'contacts' => $this->forward(
+                    'MauticLeadBundle:List:contacts',
+                    [
+                        'objectId'   => $list->getId(),
+                        'page'       => $this->get('session')->get('mautic.segment.contact.page', 1),
+                        'ignoreAjax' => true,
+                    ]
+                )->getContent(),
+            ],
+            'contentTemplate' => 'MauticLeadBundle:List:details.html.php',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_segment_index',
+                'mauticContent' => 'list',
+            ],
+        ]);
+    }
+
+    /**
+     * @param     $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'lead:leads:view',
+            'segment',
+            'lead_lists_leads',
+            null,
+            'leadlist_id'
         );
     }
 }
