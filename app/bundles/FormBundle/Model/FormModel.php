@@ -621,7 +621,7 @@ class FormModel extends CommonFormModel
     public function deleteEntity($entity)
     {
         /* @var Form $entity */
-        //parent::deleteEntity($entity);
+        parent::deleteEntity($entity);
 
         $this->deleteFormFiles($entity);
 
