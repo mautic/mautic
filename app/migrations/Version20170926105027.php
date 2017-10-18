@@ -40,7 +40,7 @@ class Version20170926105027 extends AbstractMauticMigration
     public function up(Schema $schema)
     {
         $this->addSql('ALTER TABLE '.$this->prefix.'dynamic_content ADD COLUMN(filters LONGTEXT DEFAULT NULL  COMMENT \'(DC2Type:array)\', is_campaign_based TINYINT(1) DEFAULT 1 NOT NULL, slot_name VARCHAR(255) DEFAULT NULL)');
-        $this->addSql("CREATE INDEX {$this->prefix}is_campaign_based_index ON {$this->prefix}dynamic_content (slot_name)");
-        $this->addSql("CREATE INDEX {$this->prefix}slot_name_index ON {$this->prefix}dynamic_content (is_campaign_based)");
+        $this->addSql("CREATE INDEX {$this->prefix}is_campaign_based_index ON {$this->prefix}dynamic_content (is_campaign_based_index)");
+        $this->addSql("CREATE INDEX {$this->prefix}slot_name_index ON {$this->prefix}dynamic_content (slot_name_index)");
     }
 }
