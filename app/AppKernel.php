@@ -182,6 +182,7 @@ class AppKernel extends Kernel
             new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
+            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle()
         ];
 
         //dynamically register Mautic Plugin Bundles

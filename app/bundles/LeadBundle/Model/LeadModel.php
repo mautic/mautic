@@ -37,6 +37,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\MergeRecord;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
@@ -51,6 +52,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -311,6 +313,14 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return \Mautic\LeadBundle\Entity\MergeRecordRepository
+     */
+    public function getMergeRecordRepository()
+    {
+        return $this->em->getRepository('MauticLeadBundle:MergeRecord');
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -367,7 +377,14 @@ class LeadModel extends FormModel
             return new Lead();
         }
 
-        return parent::getEntity($id);
+        $entity = parent::getEntity($id);
+
+        if (null === $entity) {
+            // Check if this contact was merged into another and if so, return the new contact
+            $entity = $this->getMergeRecordRepository()->findMergedContact($id);
+        }
+
+        return $entity;
     }
 
     /**
@@ -422,7 +439,7 @@ class LeadModel extends FormModel
      * @param Lead $entity
      * @param bool $unlock
      */
-    public function saveEntity($entity, $unlock = true)
+    public function saveEntity($entity, $unlock = true, $dispatch = true)
     {
         $companyFieldMatches = [];
         $fields              = $entity->getFields();
@@ -465,7 +482,13 @@ class LeadModel extends FormModel
 
         $this->setEntityDefaultValues($entity);
 
-        parent::saveEntity($entity, $unlock);
+        if($dispatch){
+            parent::saveEntity($entity, $unlock);
+        } else {
+            $isNew = $this->isNewEntity($entity);
+            parent::setTimestamps($entity, $isNew, $unlock);
+            parent::getRepository()->saveEntity($entity);
+        }
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
@@ -478,7 +501,7 @@ class LeadModel extends FormModel
     /**
      * @param object $entity
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity, $dispatch = true)
     {
         // Delete custom avatar if one exists
         $imageDir = $this->pathsHelper->getSystemPath('images', true);
@@ -488,7 +511,13 @@ class LeadModel extends FormModel
             unlink($avatar);
         }
 
-        parent::deleteEntity($entity);
+        if($dispatch){
+            parent::deleteEntity($entity);
+        } else {
+            $id = $entity->getId();
+            $this->getRepository()->deleteEntity($entity);
+            $entity->deletedId = $id;
+        }
     }
 
     /**
@@ -866,6 +895,8 @@ class LeadModel extends FormModel
                 $lead = $this->getEntity($leadId);
 
                 if ($lead === null) {
+                    // Check if this contact was merged into another
+
                     $lead = $this->createNewContact($ip);
                 } else {
                     $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
@@ -1282,7 +1313,7 @@ class LeadModel extends FormModel
      *
      * @return Lead
      */
-    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
+    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true, $dispatch = true)
     {
         $this->logger->debug('LEAD: Merging leads');
 
@@ -1355,7 +1386,18 @@ class LeadModel extends FormModel
         $this->modifyTags($mergeWith, $addTags, null, false);
 
         //save the updated lead
-        $this->saveEntity($mergeWith, false);
+        $this->saveEntity($mergeWith, false, false);
+
+        // Update merge records for the lead about to be deleted
+        $this->getMergeRecordRepository()->moveMergeRecord($mergeFrom->getId(), $mergeWith->getId());
+
+        // Create an entry this contact was merged
+        $mergeRecord = new MergeRecord();
+        $mergeRecord->setContact($mergeWith)
+            ->setDateAdded()
+            ->setName($mergeFrom->getPrimaryIdentifier())
+            ->setMergedId($mergeFrom->getId());
+        $this->getMergeRecordRepository()->saveEntity($mergeRecord, true, false);
 
         //post merge events
         if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
@@ -1363,7 +1405,7 @@ class LeadModel extends FormModel
         }
 
         //delete the old
-        $this->deleteEntity($mergeFrom);
+        $this->deleteEntity($mergeFrom, $dispatch);
 
         //return the merged lead
         return $mergeWith;
@@ -1744,15 +1786,6 @@ class LeadModel extends FormModel
     {
         $fields    = array_flip($fields);
         $fieldData = [];
-        foreach ($fields as $leadField => $importField) {
-            // Prevent overwriting existing data with empty data
-            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
-                $fieldData[$leadField] = InputHelper::clean($data[$importField]);
-            }
-        }
-
-        $lead   = $this->checkForDuplicateContact($fieldData);
-        $merged = ($lead->getId());
 
         // Extract company data and import separately
         // Modifies the data array
@@ -1772,29 +1805,39 @@ class LeadModel extends FormModel
             $company = $this->companyModel->getRepository()->identifyCompany($companyName, $companyCity, $companyCountry, $companyState);
         }
 
+        foreach ($fields as $leadField => $importField) {
+            // Prevent overwriting existing data with empty data
+            if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
+                $fieldData[$leadField] = InputHelper::clean($data[$importField]);
+            }
+        }
+
+        $lead   = $this->checkForDuplicateContact($fieldData);
+        $merged = ($lead->getId());
+
         if (!empty($fields['dateAdded']) && !empty($data[$fields['dateAdded']])) {
             $dateAdded = new DateTimeHelper($data[$fields['dateAdded']]);
             $lead->setDateAdded($dateAdded->getUtcDateTime());
         }
-        unset($fields['dateAdded']);
+        unset($fieldData['dateAdded']);
 
         if (!empty($fields['dateModified']) && !empty($data[$fields['dateModified']])) {
             $dateModified = new DateTimeHelper($data[$fields['dateModified']]);
             $lead->setDateModified($dateModified->getUtcDateTime());
         }
-        unset($fields['dateModified']);
+        unset($fieldData['dateModified']);
 
         if (!empty($fields['lastActive']) && !empty($data[$fields['lastActive']])) {
             $lastActive = new DateTimeHelper($data[$fields['lastActive']]);
             $lead->setLastActive($lastActive->getUtcDateTime());
         }
-        unset($fields['lastActive']);
+        unset($fieldData['lastActive']);
 
         if (!empty($fields['dateIdentified']) && !empty($data[$fields['dateIdentified']])) {
             $dateIdentified = new DateTimeHelper($data[$fields['dateIdentified']]);
             $lead->setDateIdentified($dateIdentified->getUtcDateTime());
         }
-        unset($fields['dateIdentified']);
+        unset($fieldData['dateIdentified']);
 
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
             $userRepo      = $this->em->getRepository('MauticUserBundle:User');
@@ -1803,7 +1846,7 @@ class LeadModel extends FormModel
                 $lead->setCreatedBy($createdByUser);
             }
         }
-        unset($fields['createdByUser']);
+        unset($fieldData['createdByUser']);
 
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
             $userRepo       = $this->em->getRepository('MauticUserBundle:User');
@@ -1812,7 +1855,7 @@ class LeadModel extends FormModel
                 $lead->setModifiedBy($modifiedByUser);
             }
         }
-        unset($fields['modifiedByUser']);
+        unset($fieldData['modifiedByUser']);
 
         if (!empty($fields['ip']) && !empty($data[$fields['ip']])) {
             $addresses = explode(',', $data[$fields['ip']]);
@@ -1822,7 +1865,7 @@ class LeadModel extends FormModel
                 $lead->addIpAddress($ipAddress);
             }
         }
-        unset($fields['ip']);
+        unset($fieldData['ip']);
 
         if (!empty($fields['points']) && !empty($data[$fields['points']]) && $lead->getId() === null) {
             // Add points only for new leads
@@ -1876,7 +1919,7 @@ class LeadModel extends FormModel
             $log->setDateAdded(new \DateTime());
             $lead->stageChangeLog($log);
         }
-        unset($fields['stage']);
+        unset($fieldData['stage']);
 
         // Set unsubscribe status
         if (!empty($fields['doNotEmail']) && !empty($data[$fields['doNotEmail']]) && (!empty($fields['email']) && !empty($data[$fields['email']]))) {
@@ -1891,7 +1934,7 @@ class LeadModel extends FormModel
                 $this->addDncForLead($lead, 'email', $reason, DoNotContact::MANUAL);
             }
         }
-        unset($fields['doNotEmail']);
+        unset($fieldData['doNotEmail']);
 
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
@@ -2782,6 +2825,14 @@ class LeadModel extends FormModel
         }
 
         return $success;
+    }
+
+    public function updateLeadOwner(Lead $lead, $ownerId)
+    {
+        $owner = $this->em->getReference(User::class, $ownerId);
+        $lead->setOwner($owner);
+
+        parent::saveEntity($lead);
     }
 
     /**
