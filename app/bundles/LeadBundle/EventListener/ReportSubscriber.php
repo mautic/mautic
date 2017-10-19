@@ -846,10 +846,14 @@ class ReportSubscriber extends CommonSubscriber
             ],
         ];
 
+        $segmentFilters                    = $filters;
+        $segmentFilters['lll.leadlist_id'] = $segmentFilters['s.leadlist_id'];
+        unset($segmentFilters['s.leadlist_id']);
+
         $data = [
             'display_name' => 'mautic.lead.report.segment.membership',
             'columns'      => array_merge($columns, $segmentColumns, $event->getIpColumn(), $event->getStandardColumns('s.')),
-            'filters'      => $filters,
+            'filters'      => $segmentFilters,
         ];
         $event->addTable(self::CONTEXT_SEGMENT_MEMBERSHIP, $data, self::GROUP_CONTACTS);
     }
