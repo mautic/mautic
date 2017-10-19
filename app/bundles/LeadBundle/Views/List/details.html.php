@@ -95,6 +95,24 @@ $view['slots']->set(
             <!--/ stats -->
 
             <!-- tabs controls -->
+            <!-- search bar-->
+            <form method="post" action="<?php echo $view['router']->path('mautic_segment_contacts', ['objectId' => $list->getId()]); ?>" class="panel" id="segment-contact-filters">
+                <?php if (isset($events['types']) && is_array($events['types'])) : ?>
+                    <div class="history-search panel-footer text-muted">
+                        <div class="col-sm-5">
+                            <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="<?php echo $view['translator']->trans('mautic.lead.lead.filter.bundles.include.placeholder'); ?>">
+                                <?php foreach ($events['types'] as $typeKey => $typeName) : ?>
+                                    <option value="<?php echo $typeKey; ?>">
+                                        <?php echo $typeName; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+            </form>
+            <!--/ search bar -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
                     <a href="#contacts-container" role="tab" data-toggle="tab">
@@ -107,7 +125,7 @@ $view['slots']->set(
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-            <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
+            <div class="tab-pane active bdr-w-0 page-list" id="contacts-container">
                 <?php echo $contacts; ?>
             </div>
         </div>

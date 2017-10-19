@@ -12,11 +12,13 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends FormController
@@ -565,6 +567,15 @@ class ListController extends FormController
         //set the page we came from
         $page = $this->get('session')->get('mautic.segment.page', 1);
 
+        if ($this->request->getMethod() === 'POST' && $this->request->request->has('includeEvents')) {
+            $filters = [
+                'includeEvents' => InputHelper::clean($this->request->get('includeEvents', [])),
+            ];
+            $this->get('session')->set('mautic.segment.filters', $filters);
+        } else {
+            $filters = null;
+        }
+
         if ($list === null) {
             //set the return URL
             $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
@@ -594,6 +605,7 @@ class ListController extends FormController
         ) {
             return $this->accessDenied();
         }
+        $translator = $this->get('translator');
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
@@ -606,12 +618,21 @@ class ListController extends FormController
                     'lead:lists:deleteother',
                 ], 'RETURN_ARRAY'),
                 'security' => $security,
+                'events'   => [
+                    'filters' => $filters,
+                    'types'   => [
+                        'manually_added'   => $translator->trans('mautic.segment.contact.manually.added'),
+                        'manually_removed' => $translator->trans('mautic.segment.contact.manually.removed'),
+                        'filter_added'     => $translator->trans('mautic.segment.contact.filter.added'),
+                    ],
+                ],
                 'contacts' => $this->forward(
                     'MauticLeadBundle:List:contacts',
                     [
                         'objectId'   => $list->getId(),
                         'page'       => $this->get('session')->get('mautic.segment.contact.page', 1),
                         'ignoreAjax' => true,
+                        'filters'    => $filters,
                     ]
                 )->getContent(),
             ],
@@ -631,14 +652,39 @@ class ListController extends FormController
      */
     public function contactsAction($objectId, $page = 1)
     {
+        $manuallyRemoved = 0;
+        $listFilters     = ['manually_removed' => $manuallyRemoved];
+        if ($this->request->getMethod() === 'POST' && $this->request->request->has('includeEvents')) {
+            $filters = [
+                'includeEvents' => InputHelper::clean($this->request->get('includeEvents', [])),
+            ];
+            $this->get('session')->set('mautic.segment.filters', $filters);
+        } else {
+            $filters = null;
+        }
+
+        if ($filters) {
+            if (isset($filters['includeEvents']) && in_array('manually_added', $filters['includeEvents'])) {
+                $listFilters = array_merge($listFilters, ['manually_added' => 1]);
+            }
+            if (isset($filters['includeEvents']) && in_array('manually_removed', $filters['includeEvents'])) {
+                $listFilters = array_merge($listFilters, ['manually_removed' => 1]);
+            }
+            if (isset($filters['includeEvents']) && in_array('filter_added', $filters['includeEvents'])) {
+                $listFilters = array_merge($listFilters, ['manually_added' => 0]);
+            }
+        }
+
         return $this->generateContactsGrid(
             $objectId,
             $page,
-            'lead:leads:view',
+            'lead:lists:viewother',
             'segment',
             'lead_lists_leads',
             null,
-            'leadlist_id'
+            'leadlist_id',
+            $listFilters
+
         );
     }
 }
