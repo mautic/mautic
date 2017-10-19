@@ -18,7 +18,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -41,7 +40,6 @@ class ReportSubscriber extends CommonSubscriber
     const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
     const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
     const CONTEXT_COMPANIES                 = 'companies';
-    const CONTEXT_SEGMENT_MEMBERSHIP        = 'segment.membership';
 
     const GROUP_CONTACTS = 'contacts';
 
@@ -52,7 +50,6 @@ class ReportSubscriber extends CommonSubscriber
         self::CONTEXT_CONTACT_ATTRIBUTION_FIRST,
         self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
         self::CONTEXT_CONTACT_FREQUENCYRULES,
-        self::CONTEXT_SEGMENT_MEMBERSHIP,
     ];
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
@@ -184,10 +181,6 @@ class ReportSubscriber extends CommonSubscriber
 
             if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_CONTACT_FREQUENCYRULES])) {
                 $this->injectFrequencyReportData($event, $columns);
-            }
-
-            if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_SEGMENT_MEMBERSHIP])) {
-                $this->injectSegmentReportData($event);
             }
         }
 
@@ -358,12 +351,6 @@ class ReportSubscriber extends CommonSubscriber
                         ->groupBy("{$alias}log.lead_id");
                     $qb->addSelect(sprintf('(%s) activity_count', $subQ->getSQL()));
                 }
-
-                break;
-            case self::CONTEXT_SEGMENT_MEMBERSHIP:
-                $qb->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
-                    ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lll.lead_id')
-                    ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 's', 's.id = lll.leadlist_id');
 
                 break;
             case self::CONTEXT_COMPANIES:
@@ -738,36 +725,6 @@ class ReportSubscriber extends CommonSubscriber
             'columns'      => array_merge($columns, $frequencyColumns, $event->getIpColumn()),
         ];
         $event->addTable(self::CONTEXT_CONTACT_FREQUENCYRULES, $data, self::GROUP_CONTACTS);
-    }
-
-    /**
-     * @param ReportBuilderEvent $event
-     */
-    private function injectSegmentReportData(ReportBuilderEvent $event)
-    {
-        $columns = $this->fieldsBuilder->getLeadFieldsColumns('l.');
-
-        $filters = $this->fieldsBuilder->getLeadFilter('l.', 'lll.');
-
-        $segmentColumns = [
-            'lll.manually_removed' => [
-                'label' => 'mautic.lead.report.segment.manually_removed',
-                'type'  => 'bool',
-            ],
-            'lll.manually_added' => [
-                'label' => 'mautic.lead.report.segment.manually_added',
-                'type'  => 'bool',
-            ],
-        ];
-
-        $data = [
-            'display_name' => 'mautic.lead.report.segment.membership',
-            'columns'      => array_merge($columns, $segmentColumns, $event->getIpColumn(), $event->getStandardColumns('s.')),
-            'filters'      => $filters,
-        ];
-        $event->addTable(self::CONTEXT_SEGMENT_MEMBERSHIP, $data, self::GROUP_CONTACTS);
-
-        unset($columns, $filters, $segmentColumns, $data);
     }
 
     /**

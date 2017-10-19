@@ -387,6 +387,12 @@ return [
                     'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
+            'mautic.lead.reportbundle.segment_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\SegmentReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.reportbundle.fields_builder',
+                ],
+            ],
             'mautic.lead.calendarbundle.subscriber' => [
                 'class' => 'Mautic\LeadBundle\EventListener\CalendarSubscriber',
             ],
