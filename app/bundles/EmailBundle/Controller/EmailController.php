@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Helper\BuilderHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
@@ -107,7 +108,7 @@ class EmailController extends FormController
 
         //retrieve a list of themes
         $listFilters['filters']['groups']['mautic.core.filter.themes'] = [
-            'options' => $this->factory->getInstalledThemes('email'),
+            'options' => $this->get('mautic.helper.theme')->getInstalledThemes('email'),
             'prefix'  => 'theme',
         ];
 
@@ -618,7 +619,8 @@ class EmailController extends FormController
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
                     'sections'      => $this->buildSlotForms($sections),
-                    'themes'        => $this->factory->getInstalledThemes('email', true),
+                    'themes'        => $this->get('mautic.helper.theme')->getInstalledThemes('email', true),
+                    'plugins'       => $this->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
@@ -823,7 +825,8 @@ class EmailController extends FormController
                     'isVariant'          => $entity->isVariant(true),
                     'slots'              => $this->buildSlotForms($slotTypes),
                     'sections'           => $this->buildSlotForms($sections),
-                    'themes'             => $this->factory->getInstalledThemes('email', true),
+                    'themes'             => $this->get('mautic.helper.theme')->getInstalledThemes('email', true),
+                    'plugins'            => $this->get('mautic.helper.plugin.builder')->getBuilderPlugins(),
                     'email'              => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                     'attachmentSize'     => $attachmentSize,
@@ -980,7 +983,11 @@ class EmailController extends FormController
         }
 
         $template = InputHelper::clean($this->request->query->get('template'));
-        $slots    = $this->factory->getTheme($template)->getSlots('email');
+        if (explode(':', $template)[0] === 'plugin') {
+            return new Response(explode(':', $template)[1]);
+        }
+
+        $slots = $this->get('mautic.helper.theme')->getTheme($template)->getSlots('email');
 
         //merge any existing changes
         $newContent = $this->get('session')->get('mautic.emailbuilder.'.$objectId.'.content', []);
@@ -997,7 +1004,7 @@ class EmailController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+        $logicalName = $this->get('mautic.helper.theme')->checkForTwigTemplate(':'.$template.':email.html.php');
 
         return $this->render(
             $logicalName,

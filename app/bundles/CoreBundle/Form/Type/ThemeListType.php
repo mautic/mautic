@@ -12,6 +12,8 @@
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\PluginBundle\Model\PluginModel;
+use Mautic\PluginBundle\Helper\BuilderHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -22,13 +24,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ThemeListType extends AbstractType
 {
     private $factory;
+    private $builder;
 
     /**
      * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, BuilderHelper $builder)
     {
         $this->factory = $factory;
+        $this->builder = $builder;
     }
 
     /**
@@ -41,6 +45,12 @@ class ThemeListType extends AbstractType
             'choices' => function (Options $options) use ($factory) {
                 $themes = $factory->getInstalledThemes($options['feature']);
                 $themes['mautic_code_mode'] = 'Code Mode';
+
+                $builderPlugins = $this->builder->getBuilderPlugins();
+
+                foreach ($builderPlugins as $name => $config) {
+                    $themes[$name] = $config['name'];
+                }
 
                 return $themes;
             },

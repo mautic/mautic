@@ -368,6 +368,9 @@ return [
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],
+            'mautic.helper.plugin.builder' => [
+                'class'     => 'Mautic\PluginBundle\Helper\BuilderHelper'
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [

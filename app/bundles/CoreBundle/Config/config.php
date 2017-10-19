@@ -263,7 +263,10 @@ return [
             ],
             'mautic.form.type.theme_list' => [
                 'class'     => 'Mautic\CoreBundle\Form\Type\ThemeListType',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.factory',
+                    'mautic.helper.plugin.builder'
+                ],
                 'alias'     => 'theme_list',
             ],
             'mautic.form.type.daterange' => [
@@ -470,6 +473,9 @@ return [
             ],
             'mautic.helper.phone_number' => [
                 'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
+            ],
+            'mautic.helper.plugin.builder' => [
+                'class'     => 'Mautic\PluginBundle\Helper\BuilderHelper'
             ],
         ],
         'menus' => [
