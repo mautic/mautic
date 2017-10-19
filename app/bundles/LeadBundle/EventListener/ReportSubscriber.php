@@ -16,6 +16,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -1026,13 +1027,17 @@ class ReportSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param $fields
-     * @param $prefix
+     * @param LeadField[] $fields
+     * @param string      $prefix
      *
      * @return array
      */
     protected function getFieldColumns($fields, $prefix)
     {
+        if (strpos($prefix, '.') === false) {
+            $prefix .= '.';
+        }
+
         $columns = [];
         foreach ($fields as $f) {
             switch ($f->getType()) {

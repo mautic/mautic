@@ -163,7 +163,7 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @return array
      */
-    public function getStandardColumns($prefix, $removeColumns = [], $idLink = null)
+    public function getStandardColumns($prefix, array $removeColumns = [], $idLink = null)
     {
         $aliasPrefix = str_replace('.', '_', $prefix);
         $columns     = [
