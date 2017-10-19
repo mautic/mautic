@@ -573,7 +573,7 @@ class ListController extends FormController
             ];
             $this->get('session')->set('mautic.segment.filters', $filters);
         } else {
-            $filters = null;
+            $filters = [];
         }
 
         if ($list === null) {
@@ -605,7 +605,18 @@ class ListController extends FormController
         ) {
             return $this->accessDenied();
         }
-        $translator = $this->get('translator');
+        $translator      = $this->get('translator');
+        $dateRangeValues = $this->request->get('daterange', []);
+        $action          = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $stats           = $this->getModel('lead.list')->getSegmentContactsLineChartData(
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
+            array_merge(['leadlist_id' => ['value' => $objectId,
+                            'list_column_name'     => 't.lead_id', ], 't.leadlist_id' => $objectId])
+        );
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
@@ -617,8 +628,10 @@ class ListController extends FormController
                     'lead:lists:editother',
                     'lead:lists:deleteother',
                 ], 'RETURN_ARRAY'),
-                'security' => $security,
-                'events'   => [
+                'security'      => $security,
+                'stats'         => $stats,
+                'dateRangeForm' => $dateRangeForm->createView(),
+                'events'        => [
                     'filters' => $filters,
                     'types'   => [
                         'manually_added'   => $translator->trans('mautic.segment.contact.manually.added'),
@@ -660,10 +673,10 @@ class ListController extends FormController
             ];
             $this->get('session')->set('mautic.segment.filters', $filters);
         } else {
-            $filters = null;
+            $filters = [];
         }
 
-        if ($filters) {
+        if (!empty($filters)) {
             if (isset($filters['includeEvents']) && in_array('manually_added', $filters['includeEvents'])) {
                 $listFilters = array_merge($listFilters, ['manually_added' => 1]);
             }
