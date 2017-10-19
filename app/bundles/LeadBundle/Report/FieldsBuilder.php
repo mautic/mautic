@@ -204,8 +204,8 @@ class FieldsBuilder
         $prefix = $this->sanitizePrefix($prefix);
 
         $columns = [];
-        foreach ($fields as $f) {
-            switch ($f->getType()) {
+        foreach ($fields as $field) {
+            switch ($field->getType()) {
                 case 'boolean':
                     $type = 'bool';
                     break;
@@ -231,8 +231,8 @@ class FieldsBuilder
                     $type = 'string';
                     break;
             }
-            $columns[$prefix.$f->getAlias()] = [
-                'label' => $f->getLabel(),
+            $columns[$prefix.$field->getAlias()] = [
+                'label' => $field->getLabel(),
                 'type'  => $type,
             ];
         }
