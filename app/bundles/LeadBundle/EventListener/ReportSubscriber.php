@@ -16,12 +16,12 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -64,11 +64,6 @@ class ReportSubscriber extends CommonSubscriber
     protected $listModel;
 
     /**
-     * @var ListModel
-     */
-    protected $fieldModel;
-
-    /**
      * @var LeadModel
      */
     protected $leadModel;
@@ -94,6 +89,11 @@ class ReportSubscriber extends CommonSubscriber
     protected $userModel;
 
     /**
+     * @var FieldsBuilder
+     */
+    private $fieldsBuilder;
+
+    /**
      * @var array
      */
     protected $channels;
@@ -112,32 +112,32 @@ class ReportSubscriber extends CommonSubscriber
      * ReportSubscriber constructor.
      *
      * @param ListModel         $listModel
-     * @param FieldModel        $fieldModel
      * @param LeadModel         $leadModel
      * @param StageModel        $stageModel
      * @param CampaignModel     $campaignModel
      * @param UserModel         $userModel
      * @param CompanyModel      $companyModel
      * @param CompanyReportData $companyReportData
+     * @param FieldsBuilder     $fieldsBuilder
      */
     public function __construct(
         ListModel $listModel,
-        FieldModel $fieldModel,
         LeadModel $leadModel,
         StageModel $stageModel,
         CampaignModel $campaignModel,
         UserModel $userModel,
         CompanyModel $companyModel,
-        CompanyReportData $companyReportData
+        CompanyReportData $companyReportData,
+        FieldsBuilder $fieldsBuilder
     ) {
         $this->listModel         = $listModel;
-        $this->fieldModel        = $fieldModel;
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;
         $this->campaignModel     = $campaignModel;
         $this->userModel         = $userModel;
         $this->companyModel      = $companyModel;
         $this->companyReportData = $companyReportData;
+        $this->fieldsBuilder     = $fieldsBuilder;
     }
 
     /**
@@ -165,51 +165,9 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         if ($event->checkContext($this->leadContexts)) {
-            $columns = [
-                'l.id' => [
-                    'label' => 'mautic.lead.report.contact_id',
-                    'type'  => 'int',
-                    'link'  => 'mautic_contact_action',
-                ],
-                'i.ip_address' => [
-                    'label' => 'mautic.core.ipaddress',
-                    'type'  => 'text',
-                ],
-                'l.date_identified' => [
-                    'label'          => 'mautic.lead.report.date_identified',
-                    'type'           => 'datetime',
-                    'groupByFormula' => 'DATE(l.date_identified)',
-                ],
-                'l.points' => [
-                    'label' => 'mautic.lead.points',
-                    'type'  => 'int',
-                ],
-                'l.owner_id' => [
-                    'label' => 'mautic.lead.report.owner_id',
-                    'type'  => 'int',
-                    'link'  => 'mautic_user_action',
-                ],
-                'u.first_name' => [
-                    'label' => 'mautic.lead.report.owner_firstname',
-                    'type'  => 'string',
-                ],
-                'u.last_name' => [
-                    'label' => 'mautic.lead.report.owner_lastname',
-                    'type'  => 'string',
-                ],
-            ];
+            $columns = $this->fieldsBuilder->getLeadFieldsColumns('l.');
 
-            $leadFields = $this->fieldModel->getEntities([
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'f.object',
-                            'expr'   => 'like',
-                            'value'  => 'lead',
-                        ],
-                    ],
-                ],
-            ]);
+            $filters = $columns;
 
             $companyColumns = $this->companyReportData->getCompanyData();
 
@@ -284,11 +242,14 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         if ($event->checkContext($this->companyContexts)) {
-            $companyColumns = $this->companyReportData->getCompanyData();
+            $companyColumns = $this->fieldsBuilder->getCompanyFieldsColumns('comp.');
+
+            $companyFilters = $companyColumns;
 
             $data = [
                 'display_name' => 'mautic.lead.lead.companies',
                 'columns'      => $companyColumns,
+                'filters'      => $companyFilters,
             ];
 
             $event->addTable(self::CONTEXT_COMPANIES, $data, self::CONTEXT_COMPANIES);
@@ -1024,54 +985,5 @@ class ReportSubscriber extends CommonSubscriber
 
         $event->setData($data);
         unset($data);
-    }
-
-    /**
-     * @param LeadField[] $fields
-     * @param string      $prefix
-     *
-     * @return array
-     */
-    protected function getFieldColumns($fields, $prefix)
-    {
-        if (strpos($prefix, '.') === false) {
-            $prefix .= '.';
-        }
-
-        $columns = [];
-        foreach ($fields as $f) {
-            switch ($f->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
-            $columns[$prefix.$f->getAlias()] = [
-                'label' => $f->getLabel(),
-                'type'  => $type,
-            ];
-        }
-
-        return $columns;
     }
 }
