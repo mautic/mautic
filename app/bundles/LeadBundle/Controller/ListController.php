@@ -614,8 +614,8 @@ class ListController extends FormController
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             null,
-            array_merge(['leadlist_id' => ['value' => $objectId,
-                            'list_column_name'     => 't.lead_id', ], 't.leadlist_id' => $objectId])
+           ['leadlist_id' => ['value'          => $objectId,
+                            'list_column_name' => 't.lead_id', ], 't.leadlist_id' => $objectId]
         );
 
         return $this->delegateView([
