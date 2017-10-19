@@ -204,7 +204,9 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testReportGenerate()
     {
-        define('MAUTIC_TABLE_PREFIX', 'Mautic_');
+        if (!defined('MAUTIC_TABLE_PREFIX')) {
+            define('MAUTIC_TABLE_PREFIX', '');
+        }
 
         $channelListHelperMock = $this->getMockBuilder(ChannelListHelper::class)
             ->disableOriginalConstructor()
@@ -231,17 +233,17 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder->expects($this->at(0))
             ->method('from')
-            ->with('Mautic_lead_lists_leads', 'lll')
+            ->with('lead_lists_leads', 'lll')
             ->willReturn($queryBuilder);
 
         $queryBuilder->expects($this->at(1))
             ->method('leftJoin')
-            ->with('lll', 'Mautic_leads', 'l', 'l.id = lll.lead_id')
+            ->with('lll', 'leads', 'l', 'l.id = lll.lead_id')
             ->willReturn($queryBuilder);
 
         $queryBuilder->expects($this->at(2))
             ->method('leftJoin')
-            ->with('lll', 'Mautic_lead_lists', 's', 's.id = lll.leadlist_id')
+            ->with('lll', 'lead_lists', 's', 's.id = lll.leadlist_id')
             ->willReturn($queryBuilder);
 
         $reportGeneratorEvent = new ReportGeneratorEvent($reportMock, [], $queryBuilder, $channelListHelperMock);
