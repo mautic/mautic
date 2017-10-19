@@ -56,6 +56,7 @@ class FieldsBuilder
 
     /**
      * @param string $prefix
+     * @param string $segmentPrefix
      *
      * @return array
      */
@@ -89,7 +90,7 @@ class FieldsBuilder
         $filters[$ownerPrefix] = [
             'label' => 'mautic.lead.list.filter.owner',
             'type'  => 'select',
-            'list'  => $this->userModel->getRepository()->getUserList('', 0),
+            'list'  => $this->userModel->getUserList('', 0),
         ];
 
         return $filters;
