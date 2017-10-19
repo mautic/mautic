@@ -14,20 +14,10 @@ namespace Mautic\CoreBundle\Helper;
 class AppVersion
 {
     /**
-     * @var string
-     */
-    private $version;
-
-    public function __construct(\AppKernel $kernel)
-    {
-        $this->version = $kernel->getVersion();
-    }
-
-    /**
      * @return string
      */
     public function getVersion()
     {
-        return $this->version;
+        return MAUTIC_VERSION;
     }
 }

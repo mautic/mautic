@@ -395,10 +395,7 @@ return [
         ],
         'helpers' => [
             'mautic.helper.app_version' => [
-                'class'     => \Mautic\CoreBundle\Helper\AppVersion::class,
-                'arguments' => [
-                    'kernel',
-                ],
+                'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
             ],
             'mautic.helper.template.menu' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
