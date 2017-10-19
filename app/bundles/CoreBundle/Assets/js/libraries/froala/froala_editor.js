@@ -5145,7 +5145,7 @@
     requestWithCORS: true,
     requestWithCredentials: false,
     requestHeaders: {},
-    useClasses: true,
+    useClasses: false,
     spellcheck: true,
     iframeStyle: 'html{margin:0px;height:auto;}body{height:auto;padding:10px;background:transparent;color:#000000;position:relative;z-index: 2;-webkit-user-select:auto;margin:0px;overflow:hidden;min-height:20px;}body:after{content:"";display:block;clear:both;}',
     iframeStyleFiles: [],
