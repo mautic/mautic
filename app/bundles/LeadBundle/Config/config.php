@@ -379,11 +379,9 @@ return [
             'mautic.lead.reportbundle.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
-                    'mautic.lead.model.list',
                     'mautic.lead.model.lead',
                     'mautic.stage.model.stage',
                     'mautic.campaign.model.campaign',
-                    'mautic.user.model.user',
                     'mautic.lead.model.company',
                     'mautic.lead.model.company_report_data',
                     'mautic.lead.reportbundle.fields_builder',
@@ -777,6 +775,8 @@ return [
                 'class'     => \Mautic\LeadBundle\Report\FieldsBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.field',
+                    'mautic.lead.model.list',
+                    'mautic.user.model.user',
                 ],
             ],
             'mautic.lead.model.dnc' => [

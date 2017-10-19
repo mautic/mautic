@@ -13,6 +13,8 @@ namespace Mautic\LeadBundle\Report;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\UserBundle\Model\UserModel;
 
 class FieldsBuilder
 {
@@ -21,9 +23,21 @@ class FieldsBuilder
      */
     private $fieldModel;
 
-    public function __construct(FieldModel $fieldModel)
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    /**
+     * @var UserModel
+     */
+    private $userModel;
+
+    public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel)
     {
         $this->fieldModel = $fieldModel;
+        $this->listModel  = $listModel;
+        $this->userModel  = $userModel;
     }
 
     /**
@@ -38,6 +52,47 @@ class FieldsBuilder
         $fieldColumns = $this->getFieldColumns($leadFields, $prefix);
 
         return array_merge($baseColumns, $fieldColumns);
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return array
+     */
+    public function getLeadFilter($prefix, $segmentPrefix)
+    {
+        $filters = $this->getLeadFieldsColumns($prefix);
+
+        $segmentPrefix = $this->sanitizePrefix($segmentPrefix);
+        $prefix        = $this->sanitizePrefix($prefix);
+
+        // Append segment filters
+        $userSegments = $this->listModel->getUserLists();
+
+        $list = [];
+        foreach ($userSegments as $segment) {
+            $list[$segment['id']] = $segment['name'];
+        }
+
+        $segmentKey           = $segmentPrefix.'leadlist_id';
+        $filters[$segmentKey] = [
+            'alias'     => 'segment_id',
+            'label'     => 'mautic.core.filter.lists',
+            'type'      => 'select',
+            'list'      => $list,
+            'operators' => [
+                'eq' => 'mautic.core.operator.equals',
+            ],
+        ];
+
+        $ownerPrefix           = $prefix.'owner_id';
+        $filters[$ownerPrefix] = [
+            'label' => 'mautic.lead.list.filter.owner',
+            'type'  => 'select',
+            'list'  => $this->userModel->getRepository()->getUserList('', 0),
+        ];
+
+        return $filters;
     }
 
     /**
@@ -145,9 +200,7 @@ class FieldsBuilder
      */
     private function getFieldColumns($fields, $prefix)
     {
-        if (strpos($prefix, '.') === false) {
-            $prefix .= '.';
-        }
+        $prefix = $this->sanitizePrefix($prefix);
 
         $columns = [];
         foreach ($fields as $f) {
@@ -184,5 +237,19 @@ class FieldsBuilder
         }
 
         return $columns;
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return string
+     */
+    private function sanitizePrefix($prefix)
+    {
+        if (strpos($prefix, '.') === false) {
+            $prefix .= '.';
+        }
+
+        return $prefix;
     }
 }

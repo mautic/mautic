@@ -20,7 +20,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
@@ -28,7 +27,6 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
-use Mautic\UserBundle\Model\UserModel;
 
 /**
  * Class ReportSubscriber.
@@ -59,11 +57,6 @@ class ReportSubscriber extends CommonSubscriber
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
     /**
-     * @var ListModel
-     */
-    protected $listModel;
-
-    /**
      * @var LeadModel
      */
     protected $leadModel;
@@ -82,11 +75,6 @@ class ReportSubscriber extends CommonSubscriber
      * @var CompanyModel
      */
     protected $companyModel;
-
-    /**
-     * @var UserModel
-     */
-    protected $userModel;
 
     /**
      * @var FieldsBuilder
@@ -109,32 +97,24 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * ReportSubscriber constructor.
-     *
-     * @param ListModel         $listModel
      * @param LeadModel         $leadModel
      * @param StageModel        $stageModel
      * @param CampaignModel     $campaignModel
-     * @param UserModel         $userModel
      * @param CompanyModel      $companyModel
      * @param CompanyReportData $companyReportData
      * @param FieldsBuilder     $fieldsBuilder
      */
     public function __construct(
-        ListModel $listModel,
         LeadModel $leadModel,
         StageModel $stageModel,
         CampaignModel $campaignModel,
-        UserModel $userModel,
         CompanyModel $companyModel,
         CompanyReportData $companyReportData,
         FieldsBuilder $fieldsBuilder
     ) {
-        $this->listModel         = $listModel;
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;
         $this->campaignModel     = $campaignModel;
-        $this->userModel         = $userModel;
         $this->companyModel      = $companyModel;
         $this->companyReportData = $companyReportData;
         $this->fieldsBuilder     = $fieldsBuilder;
@@ -167,37 +147,7 @@ class ReportSubscriber extends CommonSubscriber
         if ($event->checkContext($this->leadContexts)) {
             $columns = $this->fieldsBuilder->getLeadFieldsColumns('l.');
 
-            $filters = $columns;
-
-            $companyColumns = $this->companyReportData->getCompanyData();
-
-            $filters = $columns = array_merge(
-                $columns,
-                $companyColumns,
-                $this->getFieldColumns($leadFields, 'l.')
-            );
-
-            // Append segment filters
-            $userSegments = $this->listModel->getUserLists();
-            $list         = [];
-            foreach ($userSegments as $segment) {
-                $list[$segment['id']] = $segment['name'];
-            }
-            $filters['s.leadlist_id'] = [
-                'alias'     => 'segment_id',
-                'label'     => 'mautic.core.filter.lists',
-                'type'      => 'select',
-                'list'      => $list,
-                'operators' => [
-                    'eq' => 'mautic.core.operator.equals',
-                ],
-            ];
-
-            $filters['l.owner_id'] = [
-                'label' => 'mautic.lead.list.filter.owner',
-                'type'  => 'select',
-                'list'  => $this->userModel->getRepository()->getUserList('', 0),
-            ];
+            $filters = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
             $data = [
                 'display_name' => 'mautic.lead.leads',
@@ -237,7 +187,7 @@ class ReportSubscriber extends CommonSubscriber
             }
 
             if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_SEGMENT_MEMBERSHIP])) {
-                $this->injectSegmentReportData($event, $columns, $filters);
+                $this->injectSegmentReportData($event);
             }
         }
 
@@ -792,11 +742,13 @@ class ReportSubscriber extends CommonSubscriber
 
     /**
      * @param ReportBuilderEvent $event
-     * @param array              $columns
-     * @param array              $filters
      */
-    private function injectSegmentReportData(ReportBuilderEvent $event, array $columns, array $filters)
+    private function injectSegmentReportData(ReportBuilderEvent $event)
     {
+        $columns = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+
+        $filters = $this->fieldsBuilder->getLeadFilter('l.', 'lll.');
+
         $segmentColumns = [
             'lll.manually_removed' => [
                 'label' => 'mautic.lead.report.segment.manually_removed',
@@ -808,16 +760,14 @@ class ReportSubscriber extends CommonSubscriber
             ],
         ];
 
-        $segmentFilters                    = $filters;
-        $segmentFilters['lll.leadlist_id'] = $segmentFilters['s.leadlist_id'];
-        unset($segmentFilters['s.leadlist_id']);
-
         $data = [
             'display_name' => 'mautic.lead.report.segment.membership',
             'columns'      => array_merge($columns, $segmentColumns, $event->getIpColumn(), $event->getStandardColumns('s.')),
-            'filters'      => $segmentFilters,
+            'filters'      => $filters,
         ];
         $event->addTable(self::CONTEXT_SEGMENT_MEMBERSHIP, $data, self::GROUP_CONTACTS);
+
+        unset($columns, $filters, $segmentColumns, $data);
     }
 
     /**
