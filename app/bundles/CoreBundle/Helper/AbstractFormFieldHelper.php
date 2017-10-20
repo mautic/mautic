@@ -111,7 +111,7 @@ abstract class AbstractFormFieldHelper
         if (!is_array($list)) {
 
             // Try to json decode first
-            if (strpos($list, '{') === 0 && $json = json_decode($list, true)) {
+            if ($json = json_decode($list, true)) {
                 $list = $json;
             } else {
                 if (strpos($list, '|') !== false) {
@@ -126,7 +126,8 @@ abstract class AbstractFormFieldHelper
                         $values = $labels;
                         $list   = array_combine($values, $labels);
                     }
-                } elseif (!empty($list) && !is_array($list)) {
+                }
+                if (!empty($list) && !is_array($list)) {
                     $list = [$list => $list];
                 }
             }
@@ -141,17 +142,21 @@ abstract class AbstractFormFieldHelper
 
         $valueFormatting = function ($list) use ($removeEmpty) {
             $formattedChoices = [];
-            foreach ($list as $val => $label) {
-                if (is_array($label)) {
-                    $val   = $label['value'];
-                    $label = $label['label'];
+            if (!isset($list['label']) || is_array($list['label'])) {
+                foreach ($list as $val => $label) {
+                    if (is_array($label)) {
+                        $val   = $label['value'];
+                        $label = $label['label'];
+                    }
+                    if ($removeEmpty && empty($val) && empty($label)) {
+                        continue;
+                    } elseif (empty($label)) {
+                        $label = $val;
+                    }
+                    $formattedChoices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
                 }
-                if ($removeEmpty && empty($val) && empty($label)) {
-                    continue;
-                } elseif (empty($label)) {
-                    $label = $val;
-                }
-                $formattedChoices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+            } else {
+                $formattedChoices[trim(html_entity_decode($list['value'], ENT_QUOTES))] = trim(html_entity_decode($list['label'], ENT_QUOTES));
             }
 
             return $formattedChoices;
@@ -163,12 +168,14 @@ abstract class AbstractFormFieldHelper
                     $choices[$val] = $val;
                     $choices[$val] = $valueFormatting($label);
                 } elseif (is_array($label)) {
-                    $choices = $valueFormatting ($label);
+                    $choice        = $valueFormatting($label);
+                    $key           = key($choice);
+                    $choices[$key] = $choice[$key];
                 }
             }
         }
 
-        return $choices;
+        return !empty($choices) ? $choices : $list;
     }
 
     /**
