@@ -563,9 +563,7 @@ Mautic.addLeadListFilter = function (elId) {
                         mQuery('<option class="' + optGroup + '">').val(index).text(value).appendTo(filterEl);
                     });
                     mQuery('.' + index).wrapAll("<optgroup label='"+index+"' />");
-                    console.log('object');
                 } else {
-                    console.log('simple');
                     mQuery('<option>').val(index).text(val).appendTo(filterEl);
                 }
             });
