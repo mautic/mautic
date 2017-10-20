@@ -174,6 +174,10 @@ abstract class AbstractFormFieldHelper
                     if ($key) {
                         $choices[$key] = $choice[$key];
                     }
+                } elseif (is_array($label) && !empty($label['value']) && !empty($label['label'])) {
+                    $choices[trim(html_entity_decode($label['value'], ENT_QUOTES))] = trim(html_entity_decode($label['label'], ENT_QUOTES));
+                } elseif (!is_array($label) && !empty($label) && !empty($val)) {
+                    $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
                 }
             }
         }
