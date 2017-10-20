@@ -163,12 +163,12 @@ abstract class AbstractFormFieldHelper
 
         if (is_array($list)) {
             foreach ($list as $val => $label) {
-                if (is_array($label) && !isset($label['value'])) {
-                    if (!empty($label['label'])) {
+                if (is_array($label) && !isset($label['label'])) {
+                    if (!empty($label)) {
                         $choices[$val] = $val;
                         $choices[$val] = $valueFormatting($label);
                     }
-                } elseif (is_array($label)) {
+                } elseif (is_array($label) && !empty($label['value'])) {
                     $choice = $valueFormatting($label);
                     $key    = key($choice);
                     if ($key) {
