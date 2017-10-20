@@ -111,7 +111,7 @@ abstract class AbstractFormFieldHelper
         if (!is_array($list)) {
 
             // Try to json decode first
-            if ($json = json_decode($list, true)) {
+            if (strpos($list, '{') === 0 && $json = json_decode($list, true)) {
                 $list = $json;
             } else {
                 if (strpos($list, '|') !== false) {
@@ -126,8 +126,7 @@ abstract class AbstractFormFieldHelper
                         $values = $labels;
                         $list   = array_combine($values, $labels);
                     }
-                }
-                if (!empty($list) && !is_array($list)) {
+                } elseif (!empty($list) && !is_array($list)) {
                     $list = [$list => $list];
                 }
             }
