@@ -137,48 +137,38 @@ abstract class AbstractFormFieldHelper
             $list = array_combine($list, $list);
         }
 
-        $choices = [];
-
         $valueFormatting = function ($list) use ($removeEmpty) {
-            $formattedChoices = [];
-            if (!isset($list['label']) || is_array($list['label'])) {
-                foreach ($list as $val => $label) {
-                    if (is_array($label)) {
-                        $val   = $label['value'];
-                        $label = $label['label'];
-                    }
-                    if ($removeEmpty && empty($val) && empty($label)) {
-                        continue;
-                    } elseif (empty($label)) {
-                        $label = $val;
-                    }
-                    $formattedChoices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+            $choices = [];
+            foreach ($list as $val => $label) {
+                if (is_array($label) && isset($label['value'])) {
+                    $val   = $label['value'];
+                    $label = $label['label'];
                 }
-            } elseif (!empty($list['value'])) {
-                $formattedChoices[trim(html_entity_decode($list['value'], ENT_QUOTES))] = trim(html_entity_decode($list['label'], ENT_QUOTES));
+                if ($removeEmpty && empty($val) && empty($label)) {
+                    continue;
+                } elseif (empty($label)) {
+                    $label = $val;
+                }
+                if (!is_array($label)) {
+                    $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+                }
             }
 
-            return $formattedChoices;
+            return $choices;
         };
+
+        $formatList = $list;
+        $choices    = [];
 
         if (is_array($list)) {
             foreach ($list as $val => $label) {
                 if (is_array($label) && !isset($label['label'])) {
-                    if (!empty($label)) {
-                        $choices[$val] = $val;
-                        $choices[$val] = $valueFormatting($label);
-                    }
-                } elseif (is_array($label) && !empty($label['value'])) {
-                    $choice = $valueFormatting($label);
-                    $key    = key($choice);
-                    if ($key) {
-                        $choices[$key] = $choice[$key];
-                    }
-                } elseif (is_array($label) && !empty($label['value']) && !empty($label['label'])) {
-                    $choices[trim(html_entity_decode($label['value'], ENT_QUOTES))] = trim(html_entity_decode($label['label'], ENT_QUOTES));
-                } elseif (!is_array($label) && !empty($label) && !empty($val)) {
-                    $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+                    $choices[$val] = $valueFormatting($label);
+                    unset($formatList[$val]);
                 }
+            }
+            if (!empty($formatList)) {
+                $choices = $valueFormatting($formatList);
             }
         }
 
