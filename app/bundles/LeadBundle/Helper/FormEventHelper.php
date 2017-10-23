@@ -50,6 +50,8 @@ class FormEventHelper
         $event->setDelta($newPoints - $oldPoints);
         $lead->addPointsChangeLog($event);
 
+        $lead->setPoints($newPoints);
+
         $model->saveEntity($lead, false);
     }
 
