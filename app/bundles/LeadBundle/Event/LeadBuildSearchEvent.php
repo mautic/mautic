@@ -16,11 +16,11 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 /**
- * Class LeadListFilteringEvent.
+ * Class LeadBuildSearchEvent.
  *
  * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples
  */
-class LeadListFilteringEvent extends CommonEvent
+class LeadBuildSearchEvent extends CommonEvent
 {
     /**
      * @var array

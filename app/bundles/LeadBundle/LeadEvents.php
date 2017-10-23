@@ -151,7 +151,7 @@ final class LeadEvents
      * The mautic.lead_build_search_commands event is dispatched when the search commands are built.
      *
      * The event listener receives a
-     * Mautic\LeadBundle\Event\LeadListFilteringEvent instance.
+     * Mautic\LeadBundle\Event\LeadBuildSearchEvent instance.
      *
      * @var string
      */

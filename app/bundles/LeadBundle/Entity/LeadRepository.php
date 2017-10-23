@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
-use Mautic\LeadBundle\Event\LeadListFilteringEvent;
+use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -856,7 +856,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS)) {
-            $event = new LeadListFilteringEvent(get_object_vars($filter), null, $unique, $exprType, $q, $this->getEntityManager());
+            $event = new LeadBuildSearchEvent(get_object_vars($filter), null, $unique, $exprType, $q, $this->getEntityManager());
             $this->dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
             if ($event->isFilteringDone()) {
                 $details = $event->getDetails();

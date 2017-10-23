@@ -20,7 +20,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Event\LeadListFilteringEvent;
+use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 
@@ -142,11 +142,11 @@ class SearchSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadListFilteringEvent $event
+     * @param LeadBuildSearchEvent $event
      *
      * @throws \InvalidArgumentException
      */
-    public function onBuildSearchCommands(LeadListFilteringEvent $event)
+    public function onBuildSearchCommands(LeadBuildSearchEvent $event)
     {
         $details       = $event->getDetails();
         $searchCommand = $details['command'];
@@ -196,11 +196,11 @@ class SearchSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadListFilteringEvent $event
+     * @param LeadBuildSearchEvent $event
      *
      * @return string
      */
-    private function buildEmailQueuedQuery(LeadListFilteringEvent $event)
+    private function buildEmailQueuedQuery(LeadBuildSearchEvent $event)
     {
         $alias   = $event->getAlias();
         $q       = $event->getQueryBuilder();
@@ -219,6 +219,7 @@ class SearchSubscriber extends CommonSubscriber
             1,
             $this->leadRepo->generateFilterExpression($q, 'mq.channel_id', 'eq', $alias, null, $expr)
         );
+        // return parameters so aliases are translated to values
         $details['returnParameter'] = true;
         $details['strict']          = 1;
         $event->setDetails($details);
@@ -227,11 +228,11 @@ class SearchSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadListFilteringEvent $event
+     * @param LeadBuildSearchEvent $event
      *
      * @return string
      */
-    private function buildEmailPendingQuery(LeadListFilteringEvent $event)
+    private function buildEmailPendingQuery(LeadBuildSearchEvent $event)
     {
         $query   = '';
         $alias   = $event->getAlias();
@@ -244,18 +245,18 @@ class SearchSubscriber extends CommonSubscriber
         $emailId   = (int) $details['string'];
         /** @var Email $email */
         $email = $emailRepo->getEntity($emailId);
-        if (null === $email) {
-            return null;
-        }
-        $variantIds = $email->getRelatedEntityIds();
-        $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
-        if ($nq instanceof QueryBuilder) {
-            $nq->select('l.id'); // select only id
-            $nsql = $nq->getSQL();
-            foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
-                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+        if ($email instanceof Email) {
+            $variantIds = $email->getRelatedEntityIds();
+            $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
+            if ($nq instanceof QueryBuilder) {
+                $nq->select('l.id'); // select only id
+                $nsql = $nq->getSQL();
+                foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
+                    $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+                }
+                $query = $q->expr()
+                           ->in('l.id', sprintf('(%s)', $nsql));
             }
-            $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
         } else {
             $this->leadRepo->applySearchQueryRelationship(
                 $q,
@@ -271,7 +272,7 @@ class SearchSubscriber extends CommonSubscriber
                 $this->leadRepo->generateFilterExpression($q, 'mq.channel_id', 'eq', $alias, null, $expr)
             );
         }
-
+        // return parameters so aliases are translated to values
         $details['returnParameter'] = true;
         $details['strict']          = 1;
         $event->setDetails($details);
@@ -280,21 +281,21 @@ class SearchSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadListFilteringEvent $event
+     * @param LeadBuildSearchEvent $event
      *
      * @return string
      */
-    private function buildEmailSentQuery(LeadListFilteringEvent $event)
+    private function buildEmailSentQuery(LeadBuildSearchEvent $event)
     {
         return $this->buildEmailQuery($event);
     }
 
     /**
-     * @param LeadListFilteringEvent $event
+     * @param LeadBuildSearchEvent $event
      *
      * @return string
      */
-    private function buildEmailReadQuery(LeadListFilteringEvent $event)
+    private function buildEmailReadQuery(LeadBuildSearchEvent $event)
     {
         $expr = $event->getQueryBuilder()
                       ->expr()
@@ -305,12 +306,12 @@ class SearchSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param LeadListFilteringEvent   $event
+     * @param LeadBuildSearchEvent     $event
      * @param CompositeExpression|null $expr
      *
      * @return string
      */
-    private function buildEmailQuery(LeadListFilteringEvent $event, CompositeExpression $expr = null)
+    private function buildEmailQuery(LeadBuildSearchEvent $event, CompositeExpression $expr = null)
     {
         $alias   = $event->getAlias();
         $q       = $event->getQueryBuilder();
