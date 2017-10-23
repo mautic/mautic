@@ -414,7 +414,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     switch ($object) {
                         case 'Contact':
                             //get company from account id and assign company name
-                            if ($dataObject['AccountId__'.$object]) {
+                            if (isset($dataObject['AccountId__'.$object])) {
                                 $companyName = $this->getCompanyName($dataObject['AccountId__'.$object], 'Name');
 
                                 if ($companyName) {
