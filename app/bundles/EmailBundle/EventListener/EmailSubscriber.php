@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\EmailBundle\Helper\MessageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event as Events;
@@ -44,23 +43,17 @@ class EmailSubscriber extends CommonSubscriber
     protected $emailModel;
 
     /**
-     * @var MessageHelper
-     */
-    protected $messageHelper;
-
-    /**
      * EmailSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      * @param EmailModel     $emailModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, EmailModel $emailModel, MessageHelper $messageHelper)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, EmailModel $emailModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
         $this->emailModel     = $emailModel;
-        $this->messageHelper  = $messageHelper;
     }
 
     /**
@@ -74,7 +67,6 @@ class EmailSubscriber extends CommonSubscriber
             EmailEvents::EMAIL_FAILED      => ['onEmailFailed', 0],
             EmailEvents::EMAIL_ON_SEND     => ['onEmailSend', 0],
             EmailEvents::EMAIL_RESEND      => ['onEmailResend', 0],
-            EmailEvents::EMAIL_PARSE       => ['onEmailParse', 0],
             QueueEvents::EMAIL_HIT         => ['onEmailHit', 0],
         ];
     }
@@ -186,34 +178,6 @@ class EmailSubscriber extends CommonSubscriber
 
                 $this->em->persist($stat);
                 $this->em->flush();
-            }
-        }
-    }
-
-    /**
-     * @param Events\ParseEmailEvent $event
-     */
-    public function onEmailParse(Events\ParseEmailEvent $event)
-    {
-        // Listening for bounce_folder and unsubscribe_folder
-        $isBounce      = $event->isApplicable('EmailBundle', 'bounces');
-        $isUnsubscribe = $event->isApplicable('EmailBundle', 'unsubscribes');
-        $isReply       = $event->isApplicable('EmailBundle', 'reply');
-        if ($isBounce || $isUnsubscribe) {
-            // Process the messages
-            $messages = $event->getMessages();
-            foreach ($messages as $message) {
-                $this->messageHelper->analyzeMessage($message, $isBounce, $isUnsubscribe);
-            }
-        }
-        if ($isReply) {
-            // Process the messages
-            $messages = $event->getMessages();
-            foreach ($messages as $message) {
-                if(!$message->inReplyTo) {
-                    continue;
-                }
-                $this->messageHelper->processReplyMail($message->fromAddress, $message->inReplyTo);
             }
         }
     }

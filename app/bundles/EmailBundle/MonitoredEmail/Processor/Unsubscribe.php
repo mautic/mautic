@@ -1,0 +1,143 @@
+<?php
+
+/*
+ * @copyright   2017 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace Mautic\EmailBundle\MonitoredEmail\Processor;
+
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
+use Mautic\EmailBundle\MonitoredEmail\Search\Contact;
+use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceUnsubscriptionProcessor;
+use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Model\LeadModel;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
+class Unsubscribe implements InterfaceProcessor
+{
+    use MessageTrait;
+
+    /**
+     * @var \Swift_Transport
+     */
+    protected $transport;
+
+    /**
+     * @var Contact
+     */
+    protected $contactSearchHelper;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
+     * @var string
+     */
+    protected $unsubscriptionAddress;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * Bounce constructor.
+     *
+     * @param \Swift_Transport $transport
+     * @param Contact          $contactSearchHelper
+     * @param StatRepository   $statRepository
+     * @param LeadModel        $leadModel
+     * @param LoggerInterface  $logger
+     */
+    public function __construct(
+        \Swift_Transport $transport,
+        Contact $contactSearchHelper,
+        LeadModel $leadModel,
+        TranslatorInterface $translator,
+        LoggerInterface $logger
+    ) {
+        $this->transport           = $transport;
+        $this->contactSearchHelper = $contactSearchHelper;
+        $this->leadModel           = $leadModel;
+        $this->translator          = $translator;
+        $this->logger              = $logger;
+    }
+
+    /**
+     * @return bool
+     */
+    public function process()
+    {
+        $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for an unsubscription');
+
+        $unsubscription = false;
+
+        // Does the transport have special handling like Amazon SNS
+        if ($this->transport instanceof InterfaceUnsubscriptionProcessor) {
+            try {
+                $unsubscription = $this->transport->processUnsubscription($this->message);
+            } catch (UnsubscriptionNotFound $exception) {
+                // Attempt to parse a unsubscription the standard way
+            }
+        }
+
+        if (!$unsubscription) {
+            if (!$this->isApplicable()) {
+                return false;
+            }
+
+            $unsubscription = new UnsubscribedEmail($this->message->fromAddress, $this->unsubscriptionAddress);
+        }
+
+        $searchResult = $this->contactSearchHelper->find($unsubscription->getContactEmail(), $unsubscription->getUnsubscriptionAddress());
+        if (!$contacts = $searchResult->getContacts()) {
+            // No contacts found so bail
+            return false;
+        }
+
+        $stat    = $searchResult->getStat();
+        $channel = 'email';
+        if ($stat && $email = $stat->getEmail()) {
+            // We know the email ID so set it to append to the the DNC record
+            $channel = ['email' => $email->getId()];
+        }
+
+        $comments = $this->translator->trans('mautic.email.bounce.reason.unsubscribed');
+        foreach ($contacts as $contact) {
+            $this->leadModel->addDncForLead($contact, $channel, $comments, DoNotContact::UNSUBSCRIBED);
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isApplicable()
+    {
+        foreach ($this->message->to as $to => $name) {
+            if (strpos($to, '+unsubscribe') !== false) {
+                $this->unsubscriptionAddress = $to;
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+}

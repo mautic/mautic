@@ -845,7 +845,7 @@ class Mailbox
      * @param      $mailId
      * @param bool $markAsSeen
      *
-     * @return Mail
+     * @return Message
      */
     public function getMail($mailId, $markAsSeen = true)
     {
@@ -888,13 +888,17 @@ class Mailbox
                 ) : null;
             }
         }
-        
-        if(isset($headObject->in_reply_to)) {
+
+        if (isset($headObject->in_reply_to)) {
             $mail->inReplyTo = $headObject->in_reply_to;
         }
-        
-        if(isset($headObject->return_path)) {
+
+        if (isset($headObject->return_path)) {
             $mail->returnPath = $headObject->return_path;
+        }
+
+        if (isset($headObject->references)) {
+            $mail->references = explode("\n", $headObject->references);
         }
 
         $mailStructure = imap_fetchstructure($this->getImapStream(), $mailId, FT_UID);

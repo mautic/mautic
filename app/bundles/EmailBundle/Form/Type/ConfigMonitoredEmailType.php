@@ -47,7 +47,7 @@ class ConfigMonitoredEmailType extends AbstractType
             $event->addFolder('general', '', 'mautic.email.config.monitored_email.general');
             $event->addFolder('EmailBundle', 'bounces', 'mautic.email.config.monitored_email.bounce_folder');
             $event->addFolder('EmailBundle', 'unsubscribes', 'mautic.email.config.monitored_email.unsubscribe_folder');
-            $event->addFolder('EmailBundle', 'reply', 'mautic.email.config.monitored_email.reply_folder');
+            $event->addFolder('EmailBundle', 'replies', 'mautic.email.config.monitored_email.reply_folder');
 
             if ($this->factory->getDispatcher()->hasListeners(EmailEvents::MONITORED_EMAIL_CONFIG)) {
                 $this->factory->getDispatcher()->dispatch(EmailEvents::MONITORED_EMAIL_CONFIG, $event);

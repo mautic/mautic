@@ -110,6 +110,19 @@ return [
                     'mautic.helper.message',
                 ],
             ],
+            'mautic.email.monitored.bounce.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\ProcessBounceSubscriber::class,
+                'arguments' => [
+                    'mautic.message.processor.bounce',
+                ],
+            ],
+            'mautic.email.monitored.unsubscribe.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber::class,
+                'arguments' => [
+                    'mautic.message.processor.unsubscribe',
+                    'mautic.message.processor.feedbackloop',
+                ],
+            ],
             'mautic.emailbuilder.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\BuilderSubscriber',
                 'arguments' => [
@@ -293,36 +306,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.helper.mailbox' => [
-                'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                ],
-            ],
-            'mautic.helper.message' => [
-                'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
-                'arguments' => [
-                    'mautic.factory',
-                    'mautic.lead.model.lead',
-                    'mautic.helper.mailbox',
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.helper.mailer' => [
-                'class'     => 'Mautic\EmailBundle\Helper\MailHelper',
-                'arguments' => [
-                    'mautic.factory',
-                    'mailer',
-                ],
-            ],
-            'mautic.email.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\Stat::class,
-                ],
-            ],
             // Mailers
             'mautic.transport.amazon' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
@@ -393,6 +376,74 @@ return [
                 ],
                 'methodCalls' => [
                     'setMauticFactory' => ['mautic.factory'],
+                ],
+            ],
+            'mautic.helper.mailbox' => [
+                'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
+                ],
+            ],
+            'mautic.email.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\Stat::class,
+                ],
+            ],
+            'mautic.message.search.contact' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\Contact::class,
+                'arguments' => [
+                    'mautic.email.repository.stat',
+                    'mautic.lead.repository.lead',
+                    'mautic.lead.model.lead',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.message.processor.bounce' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class,
+                'arguments' => [
+                    'swiftmailer.transport.real',
+                    'mautic.message.search.contact',
+                    'mautic.email.repository.stat',
+                    'mautic.lead.model.lead',
+                    'translator',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.message.processor.unsubscribe' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
+                'arguments' => [
+                    'swiftmailer.transport.real',
+                    'mautic.message.search.contact',
+                    'mautic.lead.model.lead',
+                    'translator',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.message.processor.feedbackloop' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop::class,
+                'arguments' => [
+                    'mautic.message.search.contact',
+                    'mautic.lead.model.lead',
+                    'translator',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.helper.message' => [
+                'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
+                'arguments' => [
+                    'mautic.message.processor.bounce',
+                    'mautic.message.processor.unsubscribe',
+                    'mautic.message.processor.feedbackloop',
+                ],
+            ],
+            'mautic.helper.mailer' => [
+                'class'     => 'Mautic\EmailBundle\Helper\MailHelper',
+                'arguments' => [
+                    'mautic.factory',
+                    'mailer',
                 ],
             ],
             'mautic.validator.email' => [

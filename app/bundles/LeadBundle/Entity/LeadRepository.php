@@ -154,6 +154,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
+     * @param $email
+     *
+     * @return Lead[]
+     */
+    public function getContactsByEmail($email)
+    {
+        $contacts = $this->getLeadsByFieldValue('email', $email);
+
+        // Attempt to search for contacts without a + suffix
+        if (empty($contacts) && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts)) {
+            $email    = $parts[1].'@'.$parts[3];
+            $contacts = $this->getLeadsByFieldValue('email', $email);
+        }
+
+        return $contacts;
+    }
+
+    /**
      * Get a list of lead entities.
      *
      * @param     $uniqueFieldsWithData
@@ -170,8 +188,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
-                ->setParameter($col, $val);
+            $q->orWhere("strtolower(l.$col) = :".$col)
+                ->setParameter($col, strtolower($val));
         }
 
         // if we have a lead ID lets use it

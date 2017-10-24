@@ -1,7 +1,7 @@
 <?php
 
 /*
- * @copyright   2014 Mautic Contributors. All rights reserved
+ * @copyright   2017 Mautic Contributors. All rights reserved
  * @author      Mautic
  *
  * @link        http://mautic.org
@@ -11,14 +11,14 @@
 
 namespace Mautic\EmailBundle\Event;
 
-use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class EmailReplyEvent.
  */
-class EmailReplyEvent extends CommonEvent
+class EmailReplyEvent extends Event
 {
     /**
      * @var Email
@@ -26,12 +26,17 @@ class EmailReplyEvent extends CommonEvent
     private $email;
 
     /**
+     * @var Stat
+     */
+    private $stat;
+
+    /**
      * @param Stat $stat
      */
     public function __construct(Stat $stat)
     {
-        $this->entity  = $stat;
-        $this->email   = $stat->getEmail();
+        $this->stat  = $stat;
+        $this->email = $stat->getEmail();
     }
 
     /**
@@ -49,7 +54,6 @@ class EmailReplyEvent extends CommonEvent
      */
     public function getStat()
     {
-        return $this->entity;
+        return $this->stat;
     }
-
 }

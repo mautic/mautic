@@ -33,6 +33,7 @@ class Message
     public $replyTo    = [];
     public $inReplyTo  = false;
     public $returnPath = false;
+    public $references = [];
 
     public $textPlain;
     public $textHtml;
