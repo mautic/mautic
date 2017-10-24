@@ -123,9 +123,9 @@ class Stat
     private $openDetails = [];
 
     /**
-     * @var bool
+     * @var EmailReply[]
      */
-    private $isReplyed = false;
+    private $replies;
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -175,7 +175,7 @@ class Stat
         $builder->createField('isFailed', 'boolean')
             ->columnName('is_failed')
             ->build();
-        
+
         $builder->createField('viewedInBrowser', 'boolean')
             ->columnName('viewed_in_browser')
             ->build();
@@ -218,8 +218,10 @@ class Stat
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
 
-        $builder->createField('isReplyed', 'boolean')
-            ->columnName('is_replyed')
+        $builder->createOneToMany('replies', EmailReply::class)
+            ->mappedBy('stat')
+            ->fetchExtraLazy()
+            ->cascadeAll()
             ->build();
     }
 
@@ -630,26 +632,10 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return EmailReply[]
      */
-    public function getIsReplyed()
+    public function getReplies()
     {
-        return $this->isReplyed;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function isReplyed()
-    {
-        return $this->getIsReplyed();
-    }
-    
-    /**
-     * @param mixed $isReplyed
-     */
-    public function setIsReplyed($isReplyed)
-    {
-        $this->isReplyed = $isReplyed;
+        return $this->replies;
     }
 }

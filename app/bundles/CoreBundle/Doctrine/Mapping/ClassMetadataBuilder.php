@@ -134,6 +134,21 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
+     * Add UUID as Id.
+     *
+     * @return $this
+     */
+    public function addUuid()
+    {
+        $this->createField('id', 'guid')
+            ->makePrimaryKey()
+            ->generatedValue('UUID')
+            ->build();
+
+        return $this;
+    }
+
+    /**
      * Add id, name, and description columns.
      *
      * @param string $nameColumn
