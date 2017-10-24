@@ -16,18 +16,9 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 interface InterfaceProcessor
 {
     /**
-     * Set the message.
-     *
-     * @param Message $message
-     *
-     * @return InterfaceProcessor
-     */
-    public function setMessage(Message $message);
-
-    /**
      * Process the message.
      *
      * @return bool
      */
-    public function process();
+    public function process(Message $message);
 }

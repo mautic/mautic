@@ -13,8 +13,9 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
+use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
-use Mautic\EmailBundle\MonitoredEmail\Search\Contact;
+use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceUnsubscriptionProcessor;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -23,17 +24,15 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class Unsubscribe implements InterfaceProcessor
 {
-    use MessageTrait;
-
     /**
      * @var \Swift_Transport
      */
     protected $transport;
 
     /**
-     * @var Contact
+     * @var ContactFinder
      */
-    protected $contactSearchHelper;
+    protected $contactFinder;
 
     /**
      * @var LeadModel
@@ -56,33 +55,39 @@ class Unsubscribe implements InterfaceProcessor
     protected $logger;
 
     /**
+     * @var Message
+     */
+    protected $message;
+
+    /**
      * Bounce constructor.
      *
      * @param \Swift_Transport $transport
-     * @param Contact          $contactSearchHelper
+     * @param ContactFinder    $contactFinder
      * @param StatRepository   $statRepository
      * @param LeadModel        $leadModel
      * @param LoggerInterface  $logger
      */
     public function __construct(
         \Swift_Transport $transport,
-        Contact $contactSearchHelper,
+        ContactFinder $contactFinder,
         LeadModel $leadModel,
         TranslatorInterface $translator,
         LoggerInterface $logger
     ) {
-        $this->transport           = $transport;
-        $this->contactSearchHelper = $contactSearchHelper;
-        $this->leadModel           = $leadModel;
-        $this->translator          = $translator;
-        $this->logger              = $logger;
+        $this->transport     = $transport;
+        $this->contactFinder = $contactFinder;
+        $this->leadModel     = $leadModel;
+        $this->translator    = $translator;
+        $this->logger        = $logger;
     }
 
     /**
      * @return bool
      */
-    public function process()
+    public function process(Message $message)
     {
+        $this->message = $message;
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for an unsubscription');
 
         $unsubscription = false;
@@ -104,7 +109,7 @@ class Unsubscribe implements InterfaceProcessor
             $unsubscription = new UnsubscribedEmail($this->message->fromAddress, $this->unsubscriptionAddress);
         }
 
-        $searchResult = $this->contactSearchHelper->find($unsubscription->getContactEmail(), $unsubscription->getUnsubscriptionAddress());
+        $searchResult = $this->contactFinder->find($unsubscription->getContactEmail(), $unsubscription->getUnsubscriptionAddress());
         if (!$contacts = $searchResult->getContacts()) {
             // No contacts found so bail
             return false;

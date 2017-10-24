@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 
-class Contact
+class ContactFinder
 {
     /**
      * @var StatRepository

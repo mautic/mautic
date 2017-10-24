@@ -15,9 +15,10 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
+use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
-use Mautic\EmailBundle\MonitoredEmail\Search\Contact;
+use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceBounceProcessor;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
@@ -25,17 +26,15 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class Bounce implements InterfaceProcessor
 {
-    use MessageTrait;
-
     /**
      * @var \Swift_Transport
      */
     protected $transport;
 
     /**
-     * @var Contact
+     * @var ContactFinder
      */
-    protected $contactSearchHelper;
+    protected $contactFinder;
 
     /**
      * @var StatRepository
@@ -63,10 +62,15 @@ class Bounce implements InterfaceProcessor
     protected $logger;
 
     /**
+     * @var Message
+     */
+    protected $message;
+
+    /**
      * Bounce constructor.
      *
      * @param \Swift_Transport    $transport
-     * @param Contact             $contactSearchHelper
+     * @param ContactFinder       $contactFinder
      * @param StatRepository      $statRepository
      * @param LeadModel           $leadModel
      * @param TranslatorInterface $translator
@@ -74,26 +78,29 @@ class Bounce implements InterfaceProcessor
      */
     public function __construct(
         \Swift_Transport $transport,
-        Contact $contactSearchHelper,
+        ContactFinder $contactFinder,
         StatRepository $statRepository,
         LeadModel $leadModel,
         TranslatorInterface $translator,
         LoggerInterface $logger
     ) {
-        $this->transport           = $transport;
-        $this->contactSearchHelper = $contactSearchHelper;
-        $this->statRepository      = $statRepository;
-        $this->leadModel           = $leadModel;
-        $this->translator          = $translator;
-        $this->logger              = $logger;
+        $this->transport      = $transport;
+        $this->contactFinder  = $contactFinder;
+        $this->statRepository = $statRepository;
+        $this->leadModel      = $leadModel;
+        $this->translator     = $translator;
+        $this->logger         = $logger;
     }
 
     /**
+     * @param Message $message
+     *
      * @return bool
      */
-    public function process()
+    public function process(Message $message)
     {
-        $bounce = false;
+        $this->message = $message;
+        $bounce        = false;
 
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for a bounce');
 
@@ -118,7 +125,7 @@ class Bounce implements InterfaceProcessor
             }
         }
 
-        $searchResult = $this->contactSearchHelper->find($bounce->getContactEmail(), $bounce->getBounceAddress());
+        $searchResult = $this->contactFinder->find($bounce->getContactEmail(), $bounce->getBounceAddress());
         if (!$contacts = $searchResult->getContacts()) {
             // No contacts found so bail
             return false;

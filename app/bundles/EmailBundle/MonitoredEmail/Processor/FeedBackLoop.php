@@ -11,8 +11,9 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
+use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop\Parser;
-use Mautic\EmailBundle\MonitoredEmail\Search\Contact;
+use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
@@ -20,12 +21,10 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class FeedBackLoop implements InterfaceProcessor
 {
-    use MessageTrait;
-
     /**
-     * @var Contact
+     * @var ContactFinder
      */
-    protected $contactSearchHelper;
+    protected $contactFinder;
 
     /**
      * @var LeadModel
@@ -43,30 +42,36 @@ class FeedBackLoop implements InterfaceProcessor
     protected $logger;
 
     /**
+     * @var Message
+     */
+    protected $message;
+
+    /**
      * FeedBackLoop constructor.
      *
-     * @param Contact             $contactSearchHelper
+     * @param ContactFinder       $contactFinder
      * @param LeadModel           $leadModel
      * @param TranslatorInterface $translator
      * @param LoggerInterface     $logger
      */
     public function __construct(
-        Contact $contactSearchHelper,
+        ContactFinder $contactFinder,
         LeadModel $leadModel,
         TranslatorInterface $translator,
         LoggerInterface $logger
     ) {
-        $this->contactSearchHelper = $contactSearchHelper;
-        $this->leadModel           = $leadModel;
-        $this->translator          = $translator;
-        $this->logger              = $logger;
+        $this->contactFinder = $contactFinder;
+        $this->leadModel     = $leadModel;
+        $this->translator    = $translator;
+        $this->logger        = $logger;
     }
 
     /**
      * @return bool
      */
-    public function process()
+    public function process(Message $message)
     {
+        $this->message = $message;
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for a feedback loop report');
 
         if (!$this->isApplicable()) {
@@ -81,7 +86,7 @@ class FeedBackLoop implements InterfaceProcessor
 
         $this->logger->debug('MONITORED EMAIL: Found '.$contactEmail.' in feedback loop report');
 
-        $searchResult = $this->contactSearchHelper->find($contactEmail);
+        $searchResult = $this->contactFinder->find($contactEmail);
         if (!$contacts = $searchResult->getContacts()) {
             return false;
         }
@@ -97,7 +102,7 @@ class FeedBackLoop implements InterfaceProcessor
     /**
      * @return int
      */
-    public function isApplicable()
+    protected function isApplicable()
     {
         return preg_match('/.*feedback-type: abuse.*/is', $this->message->fblReport);
     }

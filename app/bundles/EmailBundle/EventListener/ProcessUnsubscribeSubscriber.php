@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
@@ -19,6 +20,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 {
+    const BUNDLE     = 'EmailBundle';
+    const FOLDER_KEY = 'unsubscribes';
+
     /**
      * @var Unsubscribe
      */
@@ -35,7 +39,8 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            EmailEvents::EMAIL_PARSE => ['onEmailParse', 0],
+            EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
+            EmailEvents::EMAIL_PARSE            => ['onEmailParse', 0],
         ];
     }
 
@@ -52,16 +57,24 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @param MonitoredEmailEvent $event
+     */
+    public function onEmailConfig(MonitoredEmailEvent $event)
+    {
+        $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.unsubscribe_folder');
+    }
+
+    /**
      * @param ParseEmailEvent $event
      */
     public function onEmailParse(ParseEmailEvent $event)
     {
-        if ($event->isApplicable('EmailBundle', 'unsubscribes')) {
+        if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
             // Process the messages
             $messages = $event->getMessages();
             foreach ($messages as $message) {
-                if (!$this->unsubscriber->setMessage($message)->process()) {
-                    $this->looper->setMessage($message)->process();
+                if (!$this->unsubscriber->process($message)) {
+                    $this->looper->process($message);
                 }
             }
         }
