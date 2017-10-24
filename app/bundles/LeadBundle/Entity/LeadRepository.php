@@ -856,20 +856,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS)) {
-            $event = new LeadBuildSearchEvent(get_object_vars($filter), null, $unique, $exprType, $q, $this->getEntityManager());
+            $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q, $this->getEntityManager());
             $this->dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
-            if ($event->isFilteringDone()) {
-                $details = $event->getDetails();
-                if (isset($details['returnParameter'])) {
-                    $returnParameter = $details['returnParameter'];
-                }
-                if (isset($details['strict'])) {
-                    $filter->strict = $details['strict'];
-                }
-                if (isset($details['parameters'])) {
-                    $parameters = array_merge($parameters, $details['parameters']);
-                }
-                $expr = $event->getSubQuery();
+            if ($event->isSearchDone()) {
+                $returnParameter = $event->getReturnParameters();
+                $filter->strict  = $event->getStrict();
+                $expr            = $event->getSubQuery();
+                $parameters      = array_merge($parameters, $event->getParameters());
             }
         }
 

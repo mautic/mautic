@@ -12,7 +12,6 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
@@ -93,11 +92,12 @@ class SearchSubscriberTest extends CommonMocks
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $mockRepository = $this->getMockBuilder(LeadRepository::class)
                                ->disableOriginalConstructor()
-                               ->setMethods(['getEntityManager', 'applySearchQueryRelationship', 'generateFilterExpression', 'getEntity'])
+                               ->setMethods(['getEntityManager', 'applySearchQueryRelationship', 'getEntity'])
                                ->getMock();
         $mockRepository->method('applySearchQueryRelationship')
                        ->willReturnCallback(
                             function (QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null) {
+                                // the following code is taken from LeadRepository class
                                 $primaryTable = $tables[0];
                                 unset($tables[0]);
                                 $joinType = ($innerJoinTables) ? 'join' : 'leftJoin';
@@ -120,42 +120,6 @@ class SearchSubscriberTest extends CommonMocks
                                     }
                                     $q->groupBy('l.id');
                                 }
-                            }
-                       );
-        $mockRepository->method('generateFilterExpression')
-                       ->willReturnCallback(
-                            function ($q, $column, $operator, $parameter, $includeIsNull, CompositeExpression $appendTo = null) {
-                                if (!is_array($parameter) && 0 !== strpos($parameter, ':')) {
-                                    $parameter = ":$parameter";
-                                }
-                                if (null === $includeIsNull) {
-                                    $includeIsNull = in_array($operator, ['neq', 'notLike', 'notIn'], true);
-                                }
-                                if ($includeIsNull) {
-                                    $expr = $q->expr()
-                                             ->orX(
-                                                 $q->expr()
-                                                   ->$operator(
-                                                       $column,
-                                                       $parameter
-                                                   ),
-                                                 $q->expr()
-                                                   ->isNull($column)
-                                             );
-                                } else {
-                                    $expr = $q->expr()
-                                             ->$operator(
-                                                 $column,
-                                                 $parameter
-                                             );
-                                }
-                                if ($appendTo) {
-                                    $appendTo->add($expr);
-
-                                    return $appendTo;
-                                }
-
-                                return $expr;
                             }
                        );
 

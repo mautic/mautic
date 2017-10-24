@@ -17,30 +17,18 @@ use Mautic\CoreBundle\Event\CommonEvent;
 
 /**
  * Class LeadBuildSearchEvent.
- *
- * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples
  */
 class LeadBuildSearchEvent extends CommonEvent
 {
     /**
-     * @var array
+     * @var string
      */
-    protected $details;
-
-    /**
-     * @var int
-     */
-    protected $leadId;
+    protected $string;
 
     /**
      * @var QueryBuilder
      */
     protected $queryBuilder;
-
-    /**
-     * @var bool
-     */
-    protected $isFilteringDone;
 
     /**
      * @var string
@@ -50,47 +38,75 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @var string
      */
-    protected $subQuery;
+    protected $command;
 
     /**
      * @var string
      */
-    protected $func;
+    protected $subQuery;
 
     /**
-     * @param array         $details
-     * @param int           $leadId
+     * @var bool
+     */
+    protected $negate;
+
+    /**
+     * @var bool
+     */
+    protected $isSearchDone;
+
+    /**
+     * @var bool
+     */
+    protected $returnParameters;
+
+    /**
+     * @var bool
+     */
+    protected $strict;
+
+    /**
+     * @var array
+     */
+    protected $parameters;
+
+    /**
+     * @param string        $string
+     * @param string        $command
      * @param string        $alias
-     * @param string        $func
+     * @param string        $negate
      * @param QueryBuilder  $queryBuilder
      * @param EntityManager $entityManager
      */
-    public function __construct($details, $leadId, $alias, $func, QueryBuilder $queryBuilder, EntityManager $entityManager)
+    public function __construct($string, $command, $alias, $negate, QueryBuilder $queryBuilder, EntityManager $entityManager)
     {
-        $this->details         = $details;
-        $this->leadId          = $leadId;
-        $this->alias           = $alias;
-        $this->func            = $func;
-        $this->queryBuilder    = $queryBuilder;
-        $this->em              = $entityManager;
-        $this->isFilteringDone = false;
-        $this->subQuery        = '';
+        $this->string           = $string;
+        $this->command          = $command;
+        $this->alias            = $alias;
+        $this->negate           = $negate;
+        $this->queryBuilder     = $queryBuilder;
+        $this->em               = $entityManager;
+        $this->subQuery         = '';
+        $this->isSearchDone     = false;
+        $this->strict           = false;
+        $this->returnParameters = false;
+        $this->parameters       = [];
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getDetails()
+    public function getString()
     {
-        return $this->details;
+        return $this->string;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getLeadId()
+    public function getCommand()
     {
-        return $this->leadId;
+        return $this->command;
     }
 
     /**
@@ -102,11 +118,11 @@ class LeadBuildSearchEvent extends CommonEvent
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getFunc()
+    public function isNegation()
     {
-        return $this->func;
+        return $this->negate;
     }
 
     /**
@@ -128,9 +144,9 @@ class LeadBuildSearchEvent extends CommonEvent
     /**
      * @param bool $status
      */
-    public function setFilteringStatus($status)
+    public function setSearchStatus($status)
     {
-        $this->isFilteringDone = $status;
+        $this->isSearchDone = $status;
     }
 
     /**
@@ -140,15 +156,15 @@ class LeadBuildSearchEvent extends CommonEvent
     {
         $this->subQuery = $query;
 
-        $this->setFilteringStatus(true);
+        $this->setSearchStatus(true);
     }
 
     /**
      * @return bool
      */
-    public function isFilteringDone()
+    public function isSearchDone()
     {
-        return $this->isFilteringDone;
+        return $this->isSearchDone;
     }
 
     /**
@@ -160,10 +176,58 @@ class LeadBuildSearchEvent extends CommonEvent
     }
 
     /**
-     * @param array $details
+     * @param array $string
      */
-    public function setDetails($details)
+    public function setString($string)
     {
-        $this->details = $details;
+        $this->string = $string;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getStrict()
+    {
+        return $this->strict;
+    }
+
+    /**
+     * @param bool $val
+     */
+    public function setStrict($val)
+    {
+        $this->strict = $val;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getReturnParameters()
+    {
+        return $this->returnParameters;
+    }
+
+    /**
+     * @param bool $val
+     */
+    public function setReturnParameters($val)
+    {
+        $this->returnParameters = $val;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param array $val
+     */
+    public function setParameters($val)
+    {
+        $this->parameters = $val;
     }
 }
