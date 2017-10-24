@@ -17,7 +17,6 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
-use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Tests\CommonMocks;
@@ -50,7 +49,7 @@ class SearchSubscriberTest extends CommonMocks
         $translator->expects($this->any())
                    ->method('trans')
                    ->willReturnCallback(function ($key) {
-                       return preg_replace('/^.*\.email(.*)$/', 'email_\1', $key);
+                       return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
                    });
 
         $subscriber = new SearchSubscriber($leadModel);
@@ -227,33 +226,12 @@ class SearchSubscriberTest extends CommonMocks
         $mockRepository->method('getEntity')
                        ->willReturn(null);
 
-        $mockStatement = $this->getMockBuilder(Statement::class)
-                              ->disableOriginalConstructor()
-                              ->getMock();
-
-        $filters = [
-            [
-                'id'      => 1,
-                'filters' => serialize([]),
-            ],
-            [
-                'id'      => 2,
-                'filters' => serialize([]),
-            ],
-        ];
-        $mockStatement->method('fetchAll')
-                      ->willReturn($filters);
-
         $mockConnection->method('createQueryBuilder')
             ->willReturnCallback(
-                function () use ($mockConnection, $mockStatement) {
+                function () use ($mockConnection) {
                     $qb = $this->getMockBuilder(QueryBuilder::class)
                                ->setConstructorArgs([$mockConnection])
-                               ->setMethods(['execute'])
                                ->getMock();
-
-                    $qb->method('execute')
-                       ->willReturn($mockStatement);
 
                     return $qb;
                 }

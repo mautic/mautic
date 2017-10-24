@@ -153,8 +153,8 @@ class SearchSubscriber extends CommonSubscriber
 
         // add email read search command
         $searchCommands = [
-            $this->translator->trans('mautic.lead.lead.searchcommand.emailread'),
-            $this->translator->trans('mautic.lead.lead.searchcommand.emailread', [], null, 'en_US'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.email_read'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.email_read', [], null, 'en_US'),
         ];
         if (in_array($searchCommand, $searchCommands, true)) {
             $event->setSubQuery($this->buildEmailReadQuery($event));
@@ -164,18 +164,19 @@ class SearchSubscriber extends CommonSubscriber
 
         // add email sent search command
         $searchCommands = [
-            $this->translator->trans('mautic.lead.lead.searchcommand.emailsent'),
-            $this->translator->trans('mautic.lead.lead.searchcommand.emailsent', [], null, 'en_US'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.email_sent'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.email_sent', [], null, 'en_US'),
         ];
         if (in_array($searchCommand, $searchCommands, true)) {
             $event->setSubQuery($this->buildEmailSentQuery($event));
 
             return;
         }
+
         // add email queued search command
         $searchCommands = [
-            $this->translator->trans('mautic.lead.lead.searchcommand.emailqueued'),
-            $this->translator->trans('mautic.lead.lead.searchcommand.emailqueued', [], null, 'en_US'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.email_queued'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.email_queued', [], null, 'en_US'),
         ];
         if (in_array($searchCommand, $searchCommands, true)) {
             $event->setSubQuery($this->buildEmailQueuedQuery($event));
@@ -185,11 +186,44 @@ class SearchSubscriber extends CommonSubscriber
 
         // add email pending search command
         $searchCommands = [
-            $this->translator->trans('mautic.lead.lead.searchcommand.emailpending'),
-            $this->translator->trans('mautic.lead.lead.searchcommand.emailpending', [], null, 'en_US'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.email_pending'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.email_pending', [], null, 'en_US'),
         ];
         if (in_array($searchCommand, $searchCommands, true)) {
             $event->setSubQuery($this->buildEmailPendingQuery($event));
+
+            return;
+        }
+
+        // add sms sent search command
+        $searchCommands = [
+            $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent', [], null, 'en_US'),
+        ];
+        if (in_array($searchCommand, $searchCommands, true)) {
+            $event->setSubQuery($this->buildSmsSentQuery($event));
+
+            return;
+        }
+
+        // add web sent search command
+        $searchCommands = [
+            $this->translator->trans('mautic.lead.lead.searchcommand.web_sent'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.web_sent', [], null, 'en_US'),
+        ];
+        if (in_array($searchCommand, $searchCommands, true)) {
+            $event->setSubQuery($this->buildWebSentQuery($event));
+
+            return;
+        }
+
+        // add mobile sent search command
+        $searchCommands = [
+            $this->translator->trans('mautic.lead.lead.searchcommand.mobile_sent'),
+            $this->translator->trans('mautic.lead.lead.searchcommand.mobile_sent', [], null, 'en_US'),
+        ];
+        if (in_array($searchCommand, $searchCommands, true)) {
+            $event->setSubQuery($this->buildMobileSentQuery($event));
 
             return;
         }
@@ -328,6 +362,97 @@ class SearchSubscriber extends CommonSubscriber
             ],
             1,
             $this->leadRepo->generateFilterExpression($q, 'es.email_id', 'eq', $alias, null, $expr)
+        );
+        $details['returnParameter'] = true;
+        $details['strict']          = 1;
+        $event->setDetails($details);
+
+        return null;
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     *
+     * @return string
+     */
+    private function buildSmsSentQuery(LeadBuildSearchEvent $event)
+    {
+        $alias   = $event->getAlias();
+        $q       = $event->getQueryBuilder();
+        $details = $event->getDetails();
+        $this->leadRepo->applySearchQueryRelationship(
+            $q,
+            [
+                [
+                    'from_alias' => 'l',
+                    'table'      => 'sms_message_stats',
+                    'alias'      => 'es',
+                    'condition'  => 'l.id = es.lead_id',
+                ],
+            ],
+            1,
+            $this->leadRepo->generateFilterExpression($q, 'es.sms_id', 'eq', $alias, null)
+        );
+        $details['returnParameter'] = true;
+        $details['strict']          = 1;
+        $event->setDetails($details);
+
+        return null;
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     *
+     * @return string
+     */
+    private function buildWebSentQuery(LeadBuildSearchEvent $event)
+    {
+        return $this->buildNotificationSentQuery($event);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     *
+     * @return string
+     */
+    private function buildMobileSentQuery(LeadBuildSearchEvent $event)
+    {
+        return $this->buildNotificationSentQuery($event, 1);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     * @param int                  $isMobile
+     *
+     * @return string
+     */
+    private function buildNotificationSentQuery(LeadBuildSearchEvent $event, $isMobile = 0)
+    {
+        $alias   = $event->getAlias();
+        $q       = $event->getQueryBuilder();
+        $details = $event->getDetails();
+        $expr    = $event->getQueryBuilder()
+                      ->expr()
+                      ->andX()
+                      ->add(sprintf('pn.mobile = %d', $isMobile));
+        $this->leadRepo->applySearchQueryRelationship(
+            $q,
+            [
+                [
+                    'from_alias' => 'l',
+                    'table'      => 'push_notification_stats',
+                    'alias'      => 'es',
+                    'condition'  => 'l.id = es.lead_id',
+                ],
+                [
+                    'from_alias' => 'es',
+                    'table'      => 'push_notifications',
+                    'alias'      => 'pn',
+                    'condition'  => 'pn.id = es.notification_id',
+                ],
+            ],
+            1,
+            $this->leadRepo->generateFilterExpression($q, 'es.notification_id', 'eq', $alias, null, $expr)
         );
         $details['returnParameter'] = true;
         $details['strict']          = 1;

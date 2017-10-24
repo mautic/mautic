@@ -904,10 +904,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.tag',
             'mautic.lead.lead.searchcommand.stage',
             'mautic.lead.lead.searchcommand.duplicate',
-            'mautic.lead.lead.searchcommand.emailsent',
-            'mautic.lead.lead.searchcommand.emailread',
-            'mautic.lead.lead.searchcommand.emailqueued',
-            'mautic.lead.lead.searchcommand.emailpending',
+            'mautic.lead.lead.searchcommand.email_sent',
+            'mautic.lead.lead.searchcommand.email_read',
+            'mautic.lead.lead.searchcommand.email_queued',
+            'mautic.lead.lead.searchcommand.email_pending',
+            'mautic.lead.lead.searchcommand.sms_sent',
+            'mautic.lead.lead.searchcommand.web_sent',
+            'mautic.lead.lead.searchcommand.mobile_sent',
         ];
 
         if (!empty($this->availableSearchFields)) {
