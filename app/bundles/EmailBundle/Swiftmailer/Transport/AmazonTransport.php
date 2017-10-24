@@ -132,7 +132,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
             $message = json_decode($payload['Message'], true);
 
             // only deal with hard bounces
-            if ($message['notificationType'] == 'BouncedEmail' && $message['bounce']['bounceType'] == 'Permanent') {
+            if ($message['notificationType'] == 'Bounce' && $message['bounce']['bounceType'] == 'Permanent') {
                 // Get bounced recipients in an array
                 $bouncedRecipients = $message['bounce']['bouncedRecipients'];
                 foreach ($bouncedRecipients as $bouncedRecipient) {
@@ -184,7 +184,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
         }
 
         $message = $this->getSnsPayload($message->textPlain);
-        if ('BouncedEmail' !== $message['notificationType']) {
+        if ('Bounce' !== $message['notificationType']) {
             throw new BounceNotFound();
         }
 
