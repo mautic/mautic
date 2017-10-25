@@ -12,7 +12,10 @@
 namespace Mautic\ReportBundle\Validator;
 
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Exception\InvalidSchedulerException;
+use Mautic\ReportBundle\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Exception\ScheduleNotValidException;
+use Mautic\ReportBundle\Scheduler\SchedulerBuilder;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -31,6 +34,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
         }
         if ($report->isScheduledDaily()) {
             $report->ensureIsDailyScheduled();
+            $this->buildScheduler($report);
 
             return;
         }
@@ -57,6 +61,24 @@ class ScheduleIsValidValidator extends ConstraintValidator
     private function addViolation()
     {
         $this->context->buildViolation('mautic.report.scheduler.notValid')
+            ->atPath('isScheduled')
+            ->addViolation();
+    }
+
+    private function buildScheduler(Report $report)
+    {
+        $scheduleBuilder = new SchedulerBuilder($report);
+        try {
+            $scheduleBuilder->getNextEvent();
+
+            return;
+        } catch (InvalidSchedulerException $e) {
+            $message = 'mautic.report.scheduler.invalidScheduler';
+        } catch (NotSupportedScheduleTypeException $e) {
+            $message = 'mautic.report.scheduler.notSupportedType';
+        }
+
+        $this->context->buildViolation($message)
             ->atPath('isScheduled')
             ->addViolation();
     }

@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\ReportBundle\Enum\RecurentEnum;
 use Mautic\ReportBundle\Exception\ScheduleNotValidException;
+use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Mautic\ReportBundle\Validator as ReportAssert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -24,7 +25,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Class Report.
  */
-class Report extends FormEntity
+class Report extends FormEntity implements SchedulerInterface
 {
     /**
      * @var int
