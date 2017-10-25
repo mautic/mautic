@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\ReportBundle\Form\Type\ReportType;
+
 return [
     'routes' => [
         'main' => [
@@ -91,9 +93,11 @@ return [
         ],
         'forms' => [
             'mautic.form.type.report' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\ReportType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'report',
+                'class'     => ReportType::class,
+                'arguments' => [
+                    'mautic.report.model.report',
+                    'translator',
+                ],
             ],
             'mautic.form.type.filter_selector' => [
                 'class' => 'Mautic\ReportBundle\Form\Type\FilterSelectorType',

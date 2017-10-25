@@ -388,7 +388,13 @@ class ReportController extends FormController
                     //reset old columns
                     $entity->setColumns($oldColumns);
                     $entity->setGraphs($oldGraphs);
-                    $this->addFlash('mautic.core.error.not.valid', [], 'error');
+                    if ($this->getFormErrorMessages($form)) {
+                        foreach ($this->getFormErrorMessages($form) as $error) {
+                            $this->addFlash($error[0], [], 'error');
+                        }
+                    } else {
+                        $this->addFlash('mautic.core.error.not.valid', [], 'error');
+                    }
                 }
             } else {
                 //unlock the entity

@@ -15,6 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\ReportBundle\Enum\RecurentEnum;
+use Mautic\ReportBundle\Exception\ScheduleNotValidException;
+use Mautic\ReportBundle\Validator as ReportAssert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -83,6 +86,26 @@ class Report extends FormEntity
      */
     private $settings = [];
 
+    /**
+     * @var bool
+     */
+    private $isScheduled = false;
+
+    /**
+     * @var null|string
+     */
+    private $scheduleUnit;
+
+    /**
+     * @var null|string
+     */
+    private $scheduleDay;
+
+    /**
+     * @var null|string
+     */
+    private $scheduleMonthFrequency;
+
     public function __clone()
     {
         $this->id = null;
@@ -98,7 +121,7 @@ class Report extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('reports')
-            ->setCustomRepositoryClass('Mautic\ReportBundle\Entity\ReportRepository');
+            ->setCustomRepositoryClass(ReportRepository::class);
 
         $builder->addIdColumns();
 
@@ -137,6 +160,25 @@ class Report extends FormEntity
             ->columnName('settings')
             ->nullable()
             ->build();
+
+        $builder->createField('isScheduled', 'boolean')
+            ->columnName('is_scheduled')
+            ->build();
+
+        $builder->createField('scheduleUnit', 'string')
+            ->columnName('schedule_unit')
+            ->nullable()
+            ->build();
+
+        $builder->createField('scheduleDay', 'string')
+            ->columnName('schedule_day')
+            ->nullable()
+            ->build();
+
+        $builder->createField('scheduleMonthFrequency', 'string')
+            ->columnName('schedule_month_frequency')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -147,6 +189,8 @@ class Report extends FormEntity
         $metadata->addPropertyConstraint('name', new NotBlank([
             'message' => 'mautic.core.name.required',
         ]));
+
+        $metadata->addConstraint(new ReportAssert\ScheduleIsValid());
     }
 
     /**
@@ -408,5 +452,128 @@ class Report extends FormEntity
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isScheduled()
+    {
+        return $this->isScheduled;
+    }
+
+    /**
+     * @param bool $isScheduled
+     */
+    public function setIsScheduled($isScheduled)
+    {
+        $this->isScheduled = $isScheduled;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getScheduleUnit()
+    {
+        return $this->scheduleUnit;
+    }
+
+    /**
+     * @param null|string $scheduleUnit
+     */
+    public function setScheduleUnit($scheduleUnit)
+    {
+        $this->scheduleUnit = $scheduleUnit;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getScheduleDay()
+    {
+        return $this->scheduleDay;
+    }
+
+    /**
+     * @param null|string $scheduleDay
+     */
+    public function setScheduleDay($scheduleDay)
+    {
+        $this->scheduleDay = $scheduleDay;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getScheduleMonthFrequency()
+    {
+        return $this->scheduleMonthFrequency;
+    }
+
+    /**
+     * @param null|string $scheduleMonthFrequency
+     */
+    public function setScheduleMonthFrequency($scheduleMonthFrequency)
+    {
+        $this->scheduleMonthFrequency = $scheduleMonthFrequency;
+    }
+
+    public function setAsNotScheduled()
+    {
+        $this->setIsScheduled(false);
+        $this->setScheduleUnit(null);
+        $this->setScheduleDay(null);
+        $this->setScheduleMonthFrequency(null);
+    }
+
+    public function ensureIsDailyScheduled()
+    {
+        $this->setIsScheduled(true);
+        $this->setScheduleUnit(RecurentEnum::UNIT_DAILY);
+        $this->setScheduleDay(null);
+        $this->setScheduleMonthFrequency(null);
+    }
+
+    /**
+     * @throws ScheduleNotValidException
+     */
+    public function ensureIsMonthlyScheduled()
+    {
+        if (
+            !array_key_exists($this->getScheduleMonthFrequency(), RecurentEnum::getMonthFrequencyForSelect()) ||
+            !array_key_exists($this->getScheduleDay(), RecurentEnum::getDayEnumForSelect())
+        ) {
+            throw new ScheduleNotValidException();
+        }
+        $this->setIsScheduled(true);
+        $this->setScheduleUnit(RecurentEnum::UNIT_MONTHLY);
+    }
+
+    /**
+     * @throws ScheduleNotValidException
+     */
+    public function ensureIsWeeklyScheduled()
+    {
+        if (!array_key_exists($this->getScheduleDay(), RecurentEnum::getDayEnumForSelect())) {
+            throw new ScheduleNotValidException();
+        }
+        $this->setIsScheduled(true);
+        $this->setScheduleUnit(RecurentEnum::UNIT_WEEKLY);
+        $this->setScheduleMonthFrequency(null);
+    }
+
+    public function isScheduledDaily()
+    {
+        return $this->getScheduleUnit() === RecurentEnum::UNIT_DAILY;
+    }
+
+    public function isScheduledWeekly()
+    {
+        return $this->getScheduleUnit() === RecurentEnum::UNIT_WEEKLY;
+    }
+
+    public function isScheduledMonthly()
+    {
+        return $this->getScheduleUnit() === RecurentEnum::UNIT_MONTHLY;
     }
 }

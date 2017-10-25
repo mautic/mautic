@@ -11,16 +11,27 @@
 
 namespace Mautic\ReportBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Enum\RecurentEnum;
+use Mautic\ReportBundle\Model\ReportModel;
+use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ReportType.
@@ -28,11 +39,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ReportType extends AbstractType
 {
     /**
-     * Factory object.
-     *
-     * @var \Mautic\CoreBundle\Factory\MauticFactory
+     * @var ReportModel
      */
-    private $factory;
+    private $reportModel;
 
     /**
      * Translator object.
@@ -41,13 +50,10 @@ class ReportType extends AbstractType
      */
     private $translator;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function __construct(ReportModel $reportModel, TranslatorInterface $translator)
     {
-        $this->translator = $factory->getTranslator();
-        $this->factory    = $factory;
+        $this->reportModel = $reportModel;
+        $this->translator  = $translator;
     }
 
     /**
@@ -62,7 +68,7 @@ class ReportType extends AbstractType
         if (!$options['read_only']) {
             $builder->add(
                 'name',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.core.name',
                     'label_attr' => ['class' => 'control-label'],
@@ -73,7 +79,7 @@ class ReportType extends AbstractType
 
             $builder->add(
                 'description',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.core.description',
                     'label_attr' => ['class' => 'control-label'],
@@ -82,12 +88,12 @@ class ReportType extends AbstractType
                 ]
             );
 
-            $builder->add('isPublished', 'yesno_button_group');
+            $builder->add('isPublished', YesNoButtonGroupType::class);
 
             $data = $options['data']->getSystem();
             $builder->add(
                 'system',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.report.report.form.issystem',
                     'data'  => $data,
@@ -99,7 +105,7 @@ class ReportType extends AbstractType
 
             $builder->add(
                 'createdBy',
-                'user_list',
+                UserListType::class,
                 [
                     'label'      => 'mautic.report.report.form.owner',
                     'label_attr' => ['class' => 'control-label'],
@@ -112,7 +118,7 @@ class ReportType extends AbstractType
             );
             $builder->add(
                 'settings',
-                'report_settings',
+                ReportSettingsType::class,
                 [
                     'label'      => false,
                     'label_attr' => ['class' => 'control-label'],
@@ -131,7 +137,7 @@ class ReportType extends AbstractType
             // Build a list of data sources
             $builder->add(
                 'source',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices'     => $tables,
                     'expanded'    => false,
@@ -148,8 +154,7 @@ class ReportType extends AbstractType
                 ]
             );
 
-            /** @var \Mautic\ReportBundle\Model\ReportModel $model */
-            $model        = $this->factory->getModel('report');
+            $model        = $this->reportModel;
             $tableList    = $options['table_list'];
             $formModifier = function (FormInterface $form, $source, $currentColumns, $currentGraphs, $formData) use ($model, $tables, $tableList) {
                 if (empty($source)) {
@@ -175,7 +180,7 @@ class ReportType extends AbstractType
                 // Build the columns selector
                 $form->add(
                     'columns',
-                    'choice',
+                    ChoiceType::class,
                     [
                         'choices'    => $columns->choices,
                         'label'      => false,
@@ -194,7 +199,7 @@ class ReportType extends AbstractType
                 // Build the columns selector
                 $form->add(
                     'groupBy',
-                    'choice',
+                    ChoiceType::class,
                     [
                         'choices'    => $groupByColumns->choices,
                         'label'      => false,
@@ -213,7 +218,7 @@ class ReportType extends AbstractType
                 // Build the filter selector
                 $form->add(
                     'filters',
-                    'report_filters',
+                    ReportFiltersType::class,
                     [
                         'type'    => 'filter_selector',
                         'label'   => false,
@@ -238,7 +243,7 @@ class ReportType extends AbstractType
                 // Build the filter selector
                 $form->add(
                     'aggregators',
-                    'collection',
+                    CollectionType::class,
                     [
                         'type'    => 'aggregator',
                         'label'   => false,
@@ -255,7 +260,7 @@ class ReportType extends AbstractType
 
                 $form->add(
                     'tableOrder',
-                    'collection',
+                    CollectionType::class,
                     [
                         'type'    => 'table_order',
                         'label'   => false,
@@ -273,7 +278,7 @@ class ReportType extends AbstractType
                 // Templates for values
                 $form->add(
                     'value_template_yesno',
-                    'yesno_button_group',
+                    YesNoButtonGroupType::class,
                     [
                         'label'  => false,
                         'mapped' => false,
@@ -298,7 +303,7 @@ class ReportType extends AbstractType
 
                 $form->add(
                     'graphs',
-                    'choice',
+                    ChoiceType::class,
                     [
                         'choices'    => $graphList->choices,
                         'label'      => 'mautic.report.report.form.graphs',
@@ -314,6 +319,68 @@ class ReportType extends AbstractType
                     ]
                 );
             };
+
+            //Scheduler
+            $builder->add(
+                'isScheduled',
+                CheckboxType::class,
+                [
+                    'label'      => 'mautic.report.schedule.isScheduled',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                ]
+            );
+
+            $builder->add(
+                'scheduleUnit',
+                ChoiceType::class,
+                [
+                    'choices'     => RecurentEnum::getUnitEnumForSelect(),
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'label'       => 'mautic.report.schedule.every',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'scheduleDay',
+                ChoiceType::class,
+                [
+                    'choices'     => RecurentEnum::getDayEnumForSelect(),
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'label'       => 'mautic.report.schedule.day',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'scheduleMonthFrequency',
+                ChoiceType::class,
+                [
+                    'choices'     => RecurentEnum::getMonthFrequencyForSelect(),
+                    'expanded'    => false,
+                    'multiple'    => false,
+                    'label'       => 'mautic.report.schedule.month_frequency',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'empty_value' => false,
+                    'required'    => false,
+                    'attr'        => [
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
 
             $builder->addEventListener(
                 FormEvents::PRE_SET_DATA,
@@ -333,7 +400,7 @@ class ReportType extends AbstractType
                 }
             );
 
-            $builder->add('buttons', 'form_buttons');
+            $builder->add('buttons', FormButtonsType::class);
         }
 
         if (!empty($options['action'])) {
@@ -348,7 +415,7 @@ class ReportType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Mautic\ReportBundle\Entity\Report',
+                'data_class' => Report::class,
                 'table_list' => [],
             ]
         );

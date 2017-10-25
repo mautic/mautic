@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\ReportBundle\Enum\RecurentEnum;
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'report');
 
@@ -43,6 +46,10 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                data-toggle="tab"><?php echo $view['translator']->trans(
                                     'mautic.report.tab.graphs'
                                 ); ?></a>
+                        </li>
+                        <li>
+                            <a href="#schedule-container" role="tab"
+                               data-toggle="tab"><?php echo $view['translator']->trans('mautic.report.tab.schedule'); ?></a>
                         </li>
                     </ul>
                     <!--/ tabs controls -->
@@ -136,7 +143,73 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                 </div>
                             </div>
                         </div>
+                        <script type='text/javascript'>
+                            mQuery(document).ready(function ( ) {
+                                let $isScheduled = mQuery("#<?php echo $form['isScheduled']->vars['id'] ?>");
+                                let $unitTypeId = mQuery("#<?php echo $form['scheduleUnit']->vars['id'] ?>");
 
+                                function schedule_display() {
+                                    check_is_scheduled();
+
+                                    let unitVal = mQuery($unitTypeId).val();
+                                    mQuery('#scheduleDay, #scheduleMonthFrequency').hide();
+                                    if (unitVal === '<?php echo RecurentEnum::UNIT_WEEKLY ?>' || unitVal === '<?php echo RecurentEnum::UNIT_MONTHLY ?>') {
+                                        mQuery('#scheduleDay').show();
+                                    }
+                                    if (unitVal === '<?php echo RecurentEnum::UNIT_MONTHLY ?>') {
+                                        mQuery('#scheduleMonthFrequency').show();
+                                    }
+                                }
+                                function check_is_scheduled() {
+                                    let $scheduleForm = mQuery('#schedule_form');
+                                    if (mQuery(mQuery($isScheduled)).prop("checked")) {
+                                        $scheduleForm.show();
+                                        return;
+                                    }
+                                    $scheduleForm.hide();
+                                }
+                                mQuery($isScheduled).change(function () {
+                                    schedule_display();
+                                });
+                                mQuery($unitTypeId).change(function () {
+                                    schedule_display();
+                                });
+                                schedule_display();
+                            });
+                        </script>
+                        <div class="tab-pane fade bdr-w-0" id="schedule-container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="pa-md">
+                                        <div class="checkbox">
+                                            <label>
+                                                <?php
+                                                    echo $view['form']->widget($form['isScheduled']);
+                                                    echo $view['translator']->trans($form['isScheduled']->vars['label']);
+                                                ?>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="schedule_form">
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <?php echo $view['form']->row($form['scheduleUnit']); ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="pa-md">
+                                        <div id='scheduleMonthFrequency' style='display:none'>
+                                            <?php echo $view['form']->row($form['scheduleMonthFrequency']); ?>
+                                        </div>
+                                        <div id='scheduleDay' style='display:none'>
+                                            <?php echo $view['form']->row($form['scheduleDay']); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
