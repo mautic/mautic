@@ -21,6 +21,8 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class PublicController extends CommonController
 {
+    private $token = 'TXUhcWFbWGzjGWLAmgposiJmLwQRqJcvVtSOqNcpyCEawUSQJcKh1kccGFqZXGJF';
+
     /**
      * This action will receive a POST when the session status changes.
      * A POST will also be made when a customer joins the session and when the session ends
@@ -36,6 +38,10 @@ class PublicController extends CommonController
      */
     public function insertAction(Request $request)
     {
+        if($request->headers->get('Authorization') != "Basic ".$this->token){
+            return new Response('', 401);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         return $this->_process($data, "new");
@@ -56,6 +62,10 @@ class PublicController extends CommonController
      */
     public function updateAction(Request $request)
     {
+        if($request->headers->get('Authorization') != "Basic ".$this->token){
+            return new Response('', 401);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         return $this->_process($data, "update");
@@ -76,6 +86,10 @@ class PublicController extends CommonController
      */
     public function deleteAction(Request $request)
     {
+        if($request->headers->get('Authorization') != "Basic ".$this->token){
+            return new Response('', 401);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         return $this->_process($data, "delete");
