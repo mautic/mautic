@@ -101,6 +101,11 @@ class SFConsumerCommand extends ModeratedCommand
             return;
         }
 
+        $this->_checkToken();
+        if(isset($this->token['access_token']) && !empty($this->token['access_token'])){
+            $output->writeln("<info>Got SalesForce token.</info>");
+        }
+
 	    $connection = new AMQPStreamConnection($integrationObject->getLocation(), 5672, $integrationObject->getUser(), $integrationObject->getPassword());
 	    $channel = $connection->channel();
 
@@ -167,18 +172,50 @@ class SFConsumerCommand extends ModeratedCommand
             if ($operation == 'delete') {
                 if(!empty($id)){
                     $output->writeln("<info>Deleting lead.</info>");
-                    $this->_deleteLead($id);
+                    $response = $this->_deleteLead($id);
+                    $response = json_decode($response, true);
+                    if(is_array($response)){
+                        $response = reset($response);
+                    }
+
+                    if(isset($response['errorCode']) && !empty($response['errorCode'])) {
+                        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag']);
+                        $output->writeln("<error>[!] " . $response['errorCode'] . ": " . $response['message'] ."</error>");
+                    } else {
+                        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+                    }
                 }
             } else {
                 if(!empty($id)){
                     $output->writeln("<info>Updating lead.</info>");
-                    $this->_updateLead($id, $data);
+                    $response = $this->_updateLead($id, $data);
+                    $response = json_decode($response, true);
+                    if(is_array($response)){
+                        $response = reset($response);
+                    }
+
+                    if(isset($response['errorCode']) && !empty($response['errorCode'])) {
+                        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag']);
+                        $output->writeln("<error>[!] " . $response['errorCode'] . ": " . $response['message'] ."</error>");
+                    } else {
+                        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+                    }
                 } else {
-                    $output->writeln("<info>Pusing lead.</info>");
-                    $this->_pushLead($data);
+                    $output->writeln("<info>Pushing lead.</info>");
+                    $response = $this->_pushLead($data);
+                    $response = json_decode($response, true);
+                    if(is_array($response)){
+                        $response = reset($response);
+                    }
+
+                    if(isset($response['errorCode']) && !empty($response['errorCode'])) {
+                        $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag']);
+                        $output->writeln("<error>[!] " . $response['errorCode'] . ": " . $response['message'] ."</error>");
+                    } else {
+                        $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+                    }
                 }
             }
-            $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
 	    };
 
 	    $channel->basic_consume('salesforce', '', false, false, false, false, $callback);
@@ -239,7 +276,12 @@ class SFConsumerCommand extends ModeratedCommand
             ]);
 
             $this->token = json_decode($result, true);
-        } 
+        }
+
+        if(isset($this->token['error'])){
+            echo "Token error: " . $this->token['error'] . " (" . $this->token['error_description'] . ")\n";
+            exit;
+        }
     }
 
     private function _request ($url, $data, $authorize = false, $type = "", $request_type = "POST") {
