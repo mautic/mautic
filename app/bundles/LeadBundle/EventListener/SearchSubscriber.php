@@ -369,13 +369,13 @@ class SearchSubscriber extends CommonSubscriber
      */
     private function buildJoinQuery(LeadBuildSearchEvent $event, array $tables, array $config)
     {
-        if (0 === count($tables)) {
+        if (!isset($config['column']) || 0 === count($tables)) {
             return;
         }
 
         $alias = $event->getAlias();
         $q     = $event->getQueryBuilder();
-        $expr  = $q->expr()->andX();
+        $expr  = $q->expr()->andX(sprintf('%s = :%s', $config['column'], $alias));
 
         if (isset($config['params'])) {
             $params = (array) $config['params'];
@@ -384,10 +384,11 @@ class SearchSubscriber extends CommonSubscriber
                 $expr->add(sprintf('%s = %s', $name, $param));
             }
         }
-        $expr->add(sprintf('%s = :%s', $config['column'], $alias));
+
         $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
-        $event->setReturnParameters(true);
-        $event->setStrict(true);
-        $event->setSearchStatus(true);
+
+        $event->setReturnParameters(true); // replace search string
+        $event->setStrict(true);           // don't use like
+        $event->setSearchStatus(true);     // finish searching
     }
 }

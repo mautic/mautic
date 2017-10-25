@@ -14,9 +14,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
-use Doctrine\DBAL\Types\TextType;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -57,31 +55,56 @@ class SearchSubscriberTest extends CommonMocks
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
-        $alias = ':mytestalias';
+        $alias = 'mytestalias';
 
         // test email read
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent(['command' => 'email_read'], null, $alias, 'expr', $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'email_read', $alias, false, $qb, $em);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
-        $this->assertEquals('SELECT  WHERE (es.is_read = 1) AND (es.email_id = :mytestalias) GROUP BY l.id', $event->getQueryBuilder()->getSQL());
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (es.email_id = ?) AND (es.is_read = ?) GROUP BY l.id', $sql);
 
         // test email sent
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent(['command' => 'email_sent'], null, $alias, 'expr', $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'email_sent', $alias, false, $qb, $em);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
-        $this->assertEquals('SELECT  WHERE es.email_id = :mytestalias GROUP BY l.id', $event->getQueryBuilder()->getSQL());
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE es.email_id = ? GROUP BY l.id', $sql);
 
         // test email pending
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent(['command' => 'email_pending', 'string' => '1'], null, $alias, 'expr', $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'email_pending', $alias, false, $qb, $em);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
-        $this->assertEquals("SELECT  WHERE (mq.channel = 'email' and mq.status = 'pending') AND (mq.channel_id = :mytestalias) GROUP BY l.id", $event->getQueryBuilder()->getSQL());
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
 
         // test email queued
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent(['command' => 'email_queued'], null, $alias, 'expr', $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'email_queued', $alias, false, $qb, $em);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
-        $this->assertEquals("SELECT  WHERE (mq.channel = 'email' and mq.status = 'sent') AND (mq.channel_id = :mytestalias) GROUP BY l.id", $event->getQueryBuilder()->getSQL());
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
+
+        // test sms sent
+        $qb    = $connection->createQueryBuilder();
+        $event = new LeadBuildSearchEvent('1', 'sms_sent', $alias, false, $qb, $em);
+        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE ss.sms_id = ? GROUP BY l.id', $sql);
+
+        // test web sent
+        $qb    = $connection->createQueryBuilder();
+        $event = new LeadBuildSearchEvent('1', 'web_sent', $alias, false, $qb, $em);
+        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
+
+        // test mobile sent
+        $qb    = $connection->createQueryBuilder();
+        $event = new LeadBuildSearchEvent('1', 'mobile_sent', $alias, false, $qb, $em);
+        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
     }
 
     /**
@@ -110,7 +133,7 @@ class SearchSubscriberTest extends CommonMocks
                                         $primaryTable['condition']
                                     );
                                     foreach ($tables as $table) {
-                                        $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition ']);
+                                        $q->$joinType($table['from_alias'], MAUTIC_TABLE_PREFIX.$table['table'], $table['alias'], $table['condition']);
                                     }
                                     if ($whereExpression) {
                                         $q->andWhere($whereExpression);
@@ -142,28 +165,6 @@ class SearchSubscriberTest extends CommonMocks
         $mockSchemaManager = $this->getMockBuilder(MySqlSchemaManager::class)
                                   ->disableOriginalConstructor()
                                   ->getMock();
-        $mockSchemaManager->method('listTableColumns')
-            ->willReturnCallback(
-                function ($table) {
-                    $mockType = $this->getMockBuilder(TextType::class)
-                                     ->disableOriginalConstructor()
-                                     ->getMock();
-                    $name = '';
-                    switch ($table) {
-                        case 'leads':
-                            $name = 'email';
-                            break;
-                        case 'companies':
-                            $name = 'company_email';
-                            break;
-                    }
-                    $column = new Column($name, $mockType);
-
-                    return [
-                        $name => $column,
-                    ];
-                }
-            );
 
         $mockConnection->method('getSchemaManager')
                        ->willReturn($mockSchemaManager);
@@ -193,11 +194,7 @@ class SearchSubscriberTest extends CommonMocks
         $mockConnection->method('createQueryBuilder')
             ->willReturnCallback(
                 function () use ($mockConnection) {
-                    $qb = $this->getMockBuilder(QueryBuilder::class)
-                               ->setConstructorArgs([$mockConnection])
-                               ->getMock();
-
-                    return $qb;
+                    return new QueryBuilder($mockConnection);
                 }
             );
 
