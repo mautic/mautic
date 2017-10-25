@@ -32,7 +32,7 @@ class Version20171024153459 extends AbstractMauticMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE reports ADD is_scheduled TINYINT(1) NOT NULL, ADD schedule_unit VARCHAR(255) DEFAULT NULL, ADD schedule_day VARCHAR(255) DEFAULT NULL, ADD schedule_month_frequency VARCHAR(255) DEFAULT NULL');
+        $this->addSql("ALTER TABLE {$this->prefix}reports ADD is_scheduled TINYINT(1) NOT NULL, ADD schedule_unit VARCHAR(255) DEFAULT NULL, ADD schedule_day VARCHAR(255) DEFAULT NULL, ADD schedule_month_frequency VARCHAR(255) DEFAULT NULL");
     }
 
     /**
@@ -43,6 +43,6 @@ class Version20171024153459 extends AbstractMauticMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE reports DROP is_scheduled, DROP schedule_unit, DROP schedule_day, DROP schedule_month_frequency');
+        $this->addSql("ALTER TABLE {$this->prefix}reports DROP is_scheduled, DROP schedule_unit, DROP schedule_day, DROP schedule_month_frequency");
     }
 }
