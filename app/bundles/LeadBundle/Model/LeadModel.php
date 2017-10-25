@@ -1943,10 +1943,7 @@ class LeadModel extends FormModel
                         $this->em->getReference('MauticLeadBundle:Tag', $tag)
                     );
                 } else {
-                    // New tag
-                    $newTag = new Tag();
-                    $newTag->setTag(InputHelper::clean($tag));
-                    $lead->addTag($newTag);
+                    $lead->addTag(new Tag($tag));
                 }
             }
             $leadModified = true;
@@ -2130,8 +2127,7 @@ class LeadModel extends FormModel
                 $tagToBeAdded = null;
 
                 if (!array_key_exists($tag, $foundTags)) {
-                    $tagToBeAdded = new Tag();
-                    $tagToBeAdded->setTag($tag);
+                    $tagToBeAdded = new Tag($tag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $tagToBeAdded = $foundTags[$tag];
                 }

@@ -11,14 +11,16 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 class Tag
 {
     /**
-     * @var
+     * @var int
      */
     private $id;
 
@@ -27,6 +29,11 @@ class Tag
      */
     private $tag;
 
+    public function __construct($tag = null)
+    {
+        $this->tag = $this->validateTag($tag);
+    }
+
     /**
      * @param ClassMetadata $metadata
      */
@@ -34,11 +41,11 @@ class Tag
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('lead_tags')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\TagRepository')
+            ->setCustomRepositoryClass(TagRepository::class)
             ->addIndex(['tag'], 'lead_tag_search');
 
         $builder->addId();
-        $builder->addField('tag', 'string');
+        $builder->addField('tag', Type::STRING);
     }
 
     /**
@@ -75,11 +82,23 @@ class Tag
      * @param string $tag
      *
      * @return Tag
+     *
+     * @deprecated in 2.12.0. To be removed in 3.0.0. Use constructor instead
      */
     public function setTag($tag)
     {
-        $this->tag = $tag;
+        $this->tag = $this->validateTag($tag);
 
         return $this;
+    }
+
+    /**
+     * @param string $tag
+     *
+     * @return Tag
+     */
+    protected function validateTag($tag)
+    {
+        return InputHelper::clean($tag);
     }
 }

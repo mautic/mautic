@@ -649,10 +649,7 @@ class AjaxController extends CommonAjaxController
             $newTags = [];
             foreach ($tags as $tag) {
                 if (!is_numeric($tag)) {
-                    // New tag
-                    $tagEntity = new Tag();
-                    $tagEntity->setTag(InputHelper::clean($tag));
-                    $newTags[] = $tagEntity;
+                    $newTags[] = new Tag($tag);
                 }
             }
 
