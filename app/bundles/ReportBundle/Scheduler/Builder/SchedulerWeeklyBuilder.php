@@ -9,14 +9,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Scheduler;
+namespace Mautic\ReportBundle\Scheduler\Builder;
 
 use Mautic\ReportBundle\Exception\InvalidSchedulerException;
+use Mautic\ReportBundle\Scheduler\BuilderInterface;
+use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Recurr\Exception\InvalidArgument;
 use Recurr\Exception\InvalidRRule;
 use Recurr\Rule;
 
-class SchedulerWeeklyBuilder
+class SchedulerWeeklyBuilder implements BuilderInterface
 {
     /**
      * @param Rule               $rule

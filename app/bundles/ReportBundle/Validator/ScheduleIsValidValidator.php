@@ -15,12 +15,20 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Exception\ScheduleNotValidException;
-use Mautic\ReportBundle\Scheduler\SchedulerBuilder;
+use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class ScheduleIsValidValidator extends ConstraintValidator
 {
+    /** @var SchedulerBuilder */
+    private $schedulerBuilder;
+
+    public function __construct(SchedulerBuilder $schedulerBuilder)
+    {
+        $this->schedulerBuilder = $schedulerBuilder;
+    }
+
     /**
      * @param Report     $report
      * @param Constraint $constraint
@@ -41,6 +49,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
         if ($report->isScheduledWeekly()) {
             try {
                 $report->ensureIsWeeklyScheduled();
+                $this->buildScheduler($report);
 
                 return;
             } catch (ScheduleNotValidException $e) {
@@ -50,6 +59,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
         if ($report->isScheduledMonthly()) {
             try {
                 $report->ensureIsMonthlyScheduled();
+                $this->buildScheduler($report);
 
                 return;
             } catch (ScheduleNotValidException $e) {
@@ -67,9 +77,8 @@ class ScheduleIsValidValidator extends ConstraintValidator
 
     private function buildScheduler(Report $report)
     {
-        $scheduleBuilder = new SchedulerBuilder($report);
         try {
-            $scheduleBuilder->getNextEvent();
+            $this->schedulerBuilder->getNextEvent($report);
 
             return;
         } catch (InvalidSchedulerException $e) {

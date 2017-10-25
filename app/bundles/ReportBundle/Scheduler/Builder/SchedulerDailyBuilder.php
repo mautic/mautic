@@ -9,14 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\ReportBundle\Scheduler;
+namespace Mautic\ReportBundle\Scheduler\Builder;
 
 use Mautic\ReportBundle\Exception\InvalidSchedulerException;
+use Mautic\ReportBundle\Scheduler\BuilderInterface;
+use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Recurr\Exception\InvalidArgument;
-use Recurr\Exception\InvalidRRule;
 use Recurr\Rule;
 
-class SchedulerMonthBuilder
+class SchedulerDailyBuilder implements BuilderInterface
 {
     /**
      * @param Rule               $rule
@@ -29,15 +30,8 @@ class SchedulerMonthBuilder
     public function build(Rule $rule, SchedulerInterface $scheduler)
     {
         try {
-            $frequency   = $scheduler->getScheduleMonthFrequency();
-            $scheduleDay = $scheduler->getScheduleDay();
-            $day         = $frequency.$scheduleDay;
-
-            $rule->setFreq('MONTHLY');
-            $rule->setByDay([$day]);
+            $rule->setFreq('DAILY');
         } catch (InvalidArgument $e) {
-            throw new InvalidSchedulerException();
-        } catch (InvalidRRule $e) {
             throw new InvalidSchedulerException();
         }
 

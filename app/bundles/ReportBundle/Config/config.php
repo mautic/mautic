@@ -10,6 +10,9 @@
  */
 
 use Mautic\ReportBundle\Form\Type\ReportType;
+use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
+use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
+use Mautic\ReportBundle\Validator\ScheduleIsValidValidator;
 
 return [
     'routes' => [
@@ -149,6 +152,25 @@ return [
                     'mautic.lead.model.field',
                     'mautic.report.helper.report',
                 ],
+            ],
+            'mautic.report.model.scheduler_builder' => [
+                'class'     => SchedulerBuilder::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_template_factory',
+                ],
+            ],
+            'mautic.report.model.scheduler_template_factory' => [
+                'class'     => SchedulerTemplateFactory::class,
+                'arguments' => [],
+            ],
+        ],
+        'validator' => [
+            'mautic.report.validator.schedule_is_valid_validator' => [
+                'class'     => ScheduleIsValidValidator::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_builder',
+                ],
+                'tag' => 'validator.constraint_validator',
             ],
         ],
     ],
