@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
+use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -166,6 +167,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var \Mautic\FormBundle\Entity\Form
      */
     private $unsubscribeForm;
+
+    /**
+     * @var \Mautic\PageBundle\Entity\Page
+     */
+    private $preferenceCenter;
 
     /**
      * @var ArrayCollection
@@ -323,6 +329,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
         $builder->createManyToOne('unsubscribeForm', 'Mautic\FormBundle\Entity\Form')
             ->addJoinColumn('unsubscribeform_id', 'id', true, false, 'SET NULL')
+            ->build();
+
+        $builder->createManyToOne('preferenceCenter', 'Mautic\PageBundle\Entity\Page')
+            ->addJoinColumn('preference_center_id', 'id', true, false, 'SET NULL')
             ->build();
 
         $builder->createManyToMany('assetAttachments', 'Mautic\AssetBundle\Entity\Asset')
@@ -999,6 +1009,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function setUnsubscribeForm(Form $unsubscribeForm = null)
     {
         $this->unsubscribeForm = $unsubscribeForm;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPreferenceCenter()
+    {
+        return $this->preferenceCenter;
+    }
+
+    /**
+     * @param Page $preferenceCenter
+     *
+     * @return $this
+     */
+    public function setPreferenceCenter(Page $preferenceCenter = null)
+    {
+        $this->preferenceCenter = $preferenceCenter;
 
         return $this;
     }

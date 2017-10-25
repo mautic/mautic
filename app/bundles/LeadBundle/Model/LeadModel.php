@@ -27,6 +27,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -53,6 +54,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -143,6 +145,11 @@ class LeadModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var UserProvider
+     */
+    protected $userProvider;
+
+    /**
      * @var
      */
     protected $leadTrackingId;
@@ -156,6 +163,11 @@ class LeadModel extends FormModel
      * @var array
      */
     protected $availableLeadFields = [];
+
+    /**
+     * @var EmailValidator
+     */
+    protected $emailValidator;
 
     /**
      * LeadModel constructor.
@@ -173,6 +185,7 @@ class LeadModel extends FormModel
      * @param ChannelListHelper    $channelListHelper
      * @param                      $trackByIp
      * @param CoreParametersHelper $coreParametersHelper
+     * @param UserProvider         $userProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -187,7 +200,9 @@ class LeadModel extends FormModel
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
         $trackByIp,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        EmailValidator $emailValidator,
+        UserProvider $userProvider
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -202,6 +217,8 @@ class LeadModel extends FormModel
         $this->channelListHelper    = $channelListHelper;
         $this->trackByIp            = $trackByIp;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->emailValidator       = $emailValidator;
+        $this->userProvider         = $userProvider;
     }
 
     /**
@@ -1386,7 +1403,7 @@ class LeadModel extends FormModel
         $this->modifyTags($mergeWith, $addTags, null, false);
 
         //save the updated lead
-        $this->saveEntity($mergeWith, false, false);
+        $this->saveEntity($mergeWith, false, $dispatch);
 
         // Update merge records for the lead about to be deleted
         $this->getMergeRecordRepository()->moveMergeRecord($mergeFrom->getId(), $mergeWith->getId());
@@ -1397,7 +1414,7 @@ class LeadModel extends FormModel
             ->setDateAdded()
             ->setName($mergeFrom->getPrimaryIdentifier())
             ->setMergedId($mergeFrom->getId());
-        $this->getMergeRecordRepository()->saveEntity($mergeRecord, true, false);
+        $this->getMergeRecordRepository()->saveEntity($mergeRecord, true, $dispatch);
 
         //post merge events
         if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
@@ -1936,6 +1953,16 @@ class LeadModel extends FormModel
         }
         unset($fieldData['doNotEmail']);
 
+        if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
+            $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']], $data[$fields['ownerusername']]);
+            if ($newOwner) {
+                $lead->setOwner($newOwner);
+                //reset default import owner if exists owner for contact
+                $owner = null;
+            }
+        }
+        unset($fieldData['ownerusername']);
+
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
@@ -1980,6 +2007,14 @@ class LeadModel extends FormModel
                     $this->cleanFields($fieldData, $leadField);
                 } catch (\Exception $exception) {
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
+                }
+
+                if ('email' === $leadField['type'] && !empty($fieldData[$leadField['alias']])) {
+                    try {
+                        $this->emailValidator->validate($fieldData[$leadField['alias']], false);
+                    } catch (\Exception $exception) {
+                        $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
+                    }
                 }
 
                 // Skip if the value is in the CSV row
@@ -2099,8 +2134,8 @@ class LeadModel extends FormModel
     public function addUTMTags(Lead $lead, $params)
     {
         // known "synonym" fields expected
-        $synonyms = ['useragent'  => 'user_agent',
-                     'remotehost' => 'remote_host', ];
+        $synonyms = ['useragent' => 'user_agent',
+                    'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -2622,6 +2657,19 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return array
+     */
+    public function getEngagementTypes()
+    {
+        $event = new LeadTimelineEvent();
+        $event->fetchTypesOnly();
+
+        $this->dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+
+        return $event->getEventTypes();
+    }
+
+    /**
      * Get engagement counts by time unit.
      *
      * @param Lead            $lead
@@ -2641,6 +2689,7 @@ class LeadModel extends FormModel
 
         return $event->getEventCounter();
     }
+
     /**
      * @param Lead $lead
      * @param      $company

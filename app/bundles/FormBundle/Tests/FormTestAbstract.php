@@ -22,10 +22,12 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -53,7 +55,7 @@ class FormTestAbstract extends WebTestCase
     }
 
     /**
-     * @return CampaignModel
+     * @return FormModel
      */
     protected function getFormModel()
     {
@@ -144,6 +146,11 @@ class FormTestAbstract extends WebTestCase
                 )
             );
 
+        $formUploaderMock = $this
+            ->getMockBuilder(FormUploader::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $formModel = new FormModel(
             $requestStack,
             $templatingHelperMock,
@@ -153,7 +160,8 @@ class FormTestAbstract extends WebTestCase
             $formFieldModel,
             $leadModel,
             $fieldHelper,
-            $leadFieldModel
+            $leadFieldModel,
+            $formUploaderMock
         );
 
         $formModel->setDispatcher($dispatcher);
@@ -307,6 +315,16 @@ class FormTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $uploadFieldValidatorMock = $this
+            ->getMockBuilder(UploadFieldValidator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $formUploaderMock = $this
+            ->getMockBuilder(FormUploader::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $submissionModel = new SubmissionModel(
             $ipLookupHelper,
             $templatingHelperMock,
@@ -316,7 +334,9 @@ class FormTestAbstract extends WebTestCase
             $campaignModel,
             $leadFieldModel,
             $companyModel,
-            $fieldHelper
+            $fieldHelper,
+            $uploadFieldValidatorMock,
+            $formUploaderMock
         );
 
         $submissionModel->setDispatcher($dispatcher);

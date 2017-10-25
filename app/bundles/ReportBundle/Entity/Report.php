@@ -78,6 +78,11 @@ class Report extends FormEntity
      */
     private $aggregators = [];
 
+    /**
+     * @var array
+     */
+    private $settings = [];
+
     public function __clone()
     {
         $this->id = null;
@@ -127,6 +132,11 @@ class Report extends FormEntity
             ->columnName('aggregators')
             ->nullable()
             ->build();
+
+        $builder->createField('settings', 'json_array')
+            ->columnName('settings')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -163,6 +173,7 @@ class Report extends FormEntity
                     'tableOrder',
                     'graphs',
                     'groupBy',
+                    'settings',
                 ]
             )
             ->build();
@@ -381,5 +392,21 @@ class Report extends FormEntity
     public function setAggregators(array $aggregators)
     {
         $this->aggregators = $aggregators;
+    }
+
+    /**
+     * @param array $settings
+     */
+    public function setSettings(array $settings)
+    {
+        $this->settings = $settings;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSettings()
+    {
+        return $this->settings;
     }
 }

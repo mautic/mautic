@@ -109,8 +109,9 @@ abstract class AbstractFormFieldHelper
         // for BC purposes
         $checkNumericalKeys = true;
         if (!is_array($list)) {
+
             // Try to json decode first
-            if ($json = json_decode($list, true)) {
+            if (strpos($list, '{') === 0 && $json = json_decode($list, true)) {
                 $list = $json;
             } else {
                 if (strpos($list, '|') !== false) {
@@ -125,8 +126,7 @@ abstract class AbstractFormFieldHelper
                         $values = $labels;
                         $list   = array_combine($values, $labels);
                     }
-                }
-                if (!empty($list) && !is_array($list)) {
+                } elseif (!empty($list) && !is_array($list)) {
                     $list = [$list => $list];
                 }
             }
@@ -139,20 +139,32 @@ abstract class AbstractFormFieldHelper
 
         $choices = [];
 
-        if (is_array($list)) {
+        $valueFormatting = function ($list) use ($removeEmpty) {
+            $formattedChoices = [];
             foreach ($list as $val => $label) {
                 if (is_array($label)) {
                     $val   = $label['value'];
                     $label = $label['label'];
                 }
-
                 if ($removeEmpty && empty($val) && empty($label)) {
                     continue;
                 } elseif (empty($label)) {
                     $label = $val;
                 }
+                $formattedChoices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+            }
 
-                $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+            return $formattedChoices;
+        };
+
+        if (is_array($list)) {
+            foreach ($list as $val => $label) {
+                if (is_array($label) && !isset($label['value'])) {
+                    $choices[$val] = $val;
+                    $choices[$val] = $valueFormatting($label);
+                } elseif (is_array($label)) {
+                    $choices = $valueFormatting ($label);
+                }
             }
         }
 

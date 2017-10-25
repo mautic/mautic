@@ -49,19 +49,28 @@ class DynamicFiltersType extends AbstractType
                             [
                                 'mautic.core.form.no'      => false,
                                 'mautic.core.form.yes'     => true,
-                                'mautic.core.filter.clear' => '',
+                                'mautic.core.filter.clear' => '2',
                             ],
                         ];
 
                         if (isset($options['data'][$definition['alias']])) {
                             $args['data'] = ((int) $options['data'][$definition['alias']] == 1);
+                        } else {
+                            $args['data'] = (int) $filter['value'];
                         }
+                        break;
+                    case 'date':
+                        $type           = 'date';
+                        $args['input']  = 'string';
+                        $args['widget'] = 'single_text';
+                        $args['format'] = 'y-MM-dd';
+                        $args['attr']['class'] .= ' datepicker';
                         break;
                     case 'datetime':
                         $type           = 'datetime';
                         $args['input']  = 'string';
                         $args['widget'] = 'single_text';
-                        $args['format'] = 'Y-m-d H:i:s';
+                        $args['format'] = 'y-MM-dd HH:mm:ss';
                         $args['attr']['class'] .= ' datetimepicker';
                         break;
                     case 'multiselect':
