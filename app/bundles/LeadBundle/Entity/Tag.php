@@ -29,6 +29,9 @@ class Tag
      */
     private $tag;
 
+    /**
+     * @param string $tag
+     */
     public function __construct($tag = null)
     {
         $this->tag = $this->validateTag($tag);
@@ -56,6 +59,7 @@ class Tag
         $metadata->setGroupPrefix('tag')
             ->addListProperties(
                 [
+                    'id',
                     'tag',
                 ]
             )
