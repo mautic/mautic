@@ -539,19 +539,19 @@ return [
                 'alias'     => 'lead_quickemail',
             ],
             'mautic.form.type.lead_tags' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\TagListType',
+                'class'     => \Mautic\LeadBundle\Form\Type\TagListType::class,
                 'alias'     => 'lead_tags',
-                'arguments' => ['mautic.factory'],
+                'arguments' => ['translator'],
             ],
             'mautic.form.type.lead_tag' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\TagType',
+                'class'     => \Mautic\LeadBundle\Form\Type\TagType::class,
                 'alias'     => 'lead_tag',
-                'arguments' => ['mautic.factory'],
+                'arguments' => ['doctrine.orm.entity_manager'],
             ],
             'mautic.form.type.modify_lead_tags' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
+                'class'     => \Mautic\LeadBundle\Form\Type\ModifyLeadTagsType::class,
                 'alias'     => 'modify_lead_tags',
-                'arguments' => ['mautic.factory'],
+                'arguments' => ['translator'],
             ],
             'mautic.form.type.lead_batch' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\BatchType',
