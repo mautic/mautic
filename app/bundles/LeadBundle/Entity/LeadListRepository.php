@@ -1336,6 +1336,7 @@ class LeadListRepository extends CommonRepository
                     $groupExpr->add(sprintf('%s (%s)', $operand, $subqb->getSQL()));
                     break;
 
+                case 'dnc_manual':
                 case 'dnc_bounced':
                 case 'dnc_unsubscribed':
                 case 'dnc_bounced_sms':
@@ -1378,7 +1379,7 @@ class LeadListRepository extends CommonRepository
 
                     $ignoreAutoFilter = true;
 
-                    $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
+                    $parameters[$parameter]        = ($parts[1] === 'bounced') ? DoNotContact::BOUNCED : (($parts[1] === 'manual') ? DoNotContact::MANUAL : DoNotContact::UNSUBSCRIBED);
                     $parameters[$channelParameter] = $channel;
 
                     break;
