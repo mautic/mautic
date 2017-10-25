@@ -56,6 +56,21 @@ class MAConsumerCommand extends ModeratedCommand
             return;
         }
 
+        if (empty($integrationObject->getLocation())) {
+            $output->writeln("<error>RabbitMQ server location not set, check the plugin settings.</error>");
+            return;
+        }
+
+        if (empty($integrationObject->getUser())) {
+            $output->writeln("<error>RabbitMQ user not set, check the plugin settings.</error>");
+            return;
+        }
+
+        if (empty($integrationObject->getPassword())) {
+            $output->writeln("<error>RabbitMQ password not set, check the plugin settings.</error>");
+            return;
+        }
+
         $connection = new AMQPStreamConnection($integrationObject->getLocation(), 5672, $integrationObject->getUser(), $integrationObject->getPassword());
         $channel = $connection->channel();
 

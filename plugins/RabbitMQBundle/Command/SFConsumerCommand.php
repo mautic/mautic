@@ -66,6 +66,41 @@ class SFConsumerCommand extends ModeratedCommand
 	        return;
 	    }
 
+        if (empty($integrationObject->getLocation())) {
+            $output->writeln("<error>RabbitMQ server location not set, check the plugin settings.</error>");
+            return;
+        }
+
+        if (empty($integrationObject->getUser())) {
+            $output->writeln("<error>RabbitMQ user not set, check the plugin settings.</error>");
+            return;
+        }
+
+        if (empty($integrationObject->getPassword())) {
+            $output->writeln("<error>RabbitMQ password not set, check the plugin settings.</error>");
+            return;
+        }
+
+        if (empty($this->client_id)) {
+            $output->writeln("<error>SalesForce client id not set, check the plugin settings.</error>");
+            return;
+        }
+
+        if (empty($this->client_secret)) {
+            $output->writeln("<error>SalesForce client secret not set, check the plugin settings.</error>");
+            return;
+        }
+
+        if (empty($this->username)) {
+            $output->writeln("<error>SalesForce ussername not set, check the plugin settings.</error>");
+            return;
+        }
+
+        if (empty($this->password)) {
+            $output->writeln("<error>SalesForce password not set, check the plugin settings.</error>");
+            return;
+        }
+
 	    $connection = new AMQPStreamConnection($integrationObject->getLocation(), 5672, $integrationObject->getUser(), $integrationObject->getPassword());
 	    $channel = $connection->channel();
 
