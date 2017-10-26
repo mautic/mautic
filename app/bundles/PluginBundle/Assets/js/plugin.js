@@ -297,7 +297,6 @@ Mautic.getIntegrationCampaigns = function (el, settings) {
     Mautic.ajaxActionRequest('plugin:getIntegrationCampaigns', data,
         function (response) {
             if (response.success) {
-                console.log(response.html);
                 mQuery('.integration-campaigns').html(response.html);
                 Mautic.onPageLoad('.integration-campaigns', response);
             }

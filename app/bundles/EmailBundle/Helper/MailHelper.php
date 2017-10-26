@@ -1273,31 +1273,6 @@ class MailHelper
     }
 
     /**
-     * Validates a given address to ensure RFC 2822, 3.6.2 specs.
-     *
-     * @param $address
-     *
-     * @throws \Swift_RfcComplianceException
-     */
-    public static function validateEmail($address)
-    {
-        $invalidChar = strpbrk($address, '\'^&*%');
-
-        if ($invalidChar !== false) {
-            throw new \Swift_RfcComplianceException(
-                'Email address ['.$address.
-                '] contains this invalid character: '.substr($invalidChar, 0, 1)
-            );
-        }
-
-        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new \Swift_RfcComplianceException(
-                'Email address ['.$address.'] is invalid'
-            );
-        }
-    }
-
-    /**
      * @return string|null
      */
     public function getIdHash()
@@ -2084,5 +2059,32 @@ class MailHelper
             : EmojiHelper::toHtml(
                 str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], nl2br($owner['signature']))
             );
+    }
+
+    /**
+     * Validates a given address to ensure RFC 2822, 3.6.2 specs.
+     *
+     * @deprecated 2.11.0 to be removed in 3.0; use Mautic\EmailBundle\Helper\EmailValidator
+     *
+     * @param $address
+     *
+     * @throws \Swift_RfcComplianceException
+     */
+    public static function validateEmail($address)
+    {
+        $invalidChar = strpbrk($address, '\'^&*%');
+
+        if ($invalidChar !== false) {
+            throw new \Swift_RfcComplianceException(
+                'Email address ['.$address.
+                '] contains this invalid character: '.substr($invalidChar, 0, 1)
+            );
+        }
+
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+            throw new \Swift_RfcComplianceException(
+                'Email address ['.$address.'] is invalid'
+            );
+        }
     }
 }

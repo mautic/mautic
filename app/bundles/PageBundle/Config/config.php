@@ -95,6 +95,7 @@ return [
                     'templating.helper.assets',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.page.model.page',
                 ],
             ],
             'mautic.pagebuilder.subscriber' => [
@@ -103,7 +104,6 @@ return [
                     'mautic.page.helper.token',
                     'mautic.helper.integration',
                     'mautic.page.model.page',
-                    'mautic.page.helper.tracking',
                 ],
             ],
             'mautic.pagetoken.subscriber' => [
@@ -214,6 +214,11 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'page_list',
             ],
+            'mautic.form.type.preferencecenterlist' => [
+                'class'     => 'Mautic\PageBundle\Form\Type\PreferenceCenterListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'preference_center_list',
+            ],
             'mautic.form.type.page_abtest_settings' => [
                 'class' => 'Mautic\PageBundle\Form\Type\AbTestPropertiesType',
                 'alias' => 'page_abtest_settings',
@@ -265,6 +270,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
+                    'mautic.queue.service',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [
