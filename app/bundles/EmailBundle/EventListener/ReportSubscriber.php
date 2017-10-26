@@ -294,7 +294,8 @@ class ReportSubscriber extends CommonSubscriber
                 $qb->from(MAUTIC_TABLE_PREFIX.'emails', 'e')
                     ->leftJoin('e', MAUTIC_TABLE_PREFIX.'emails', 'vp', 'vp.id = e.variant_parent_id');
 
-                $event->addCategoryLeftJoin($qb, 'e');
+                $event->addCategoryLeftJoin($qb, 'e')
+                    ->applyDateFilters($qb, 'date_added', 'e');
 
                 if (!$hasGroupBy) {
                     $qb->groupBy('e.id');
