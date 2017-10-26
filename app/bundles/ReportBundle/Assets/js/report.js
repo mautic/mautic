@@ -32,6 +32,39 @@ Mautic.reportOnLoad = function (container) {
     Mautic.updateReportGlueTriggers();
     Mautic.checkSelectedGroupBy();
     Mautic.initDateRangePicker();
+
+    var $isScheduled = mQuery('[data-report-schedule="isScheduled"]');
+    var $unitTypeId = mQuery('[data-report-schedule="scheduleUnit"]');
+
+    mQuery($isScheduled).change(function () {
+        Mautic.schedule_display($isScheduled, $unitTypeId);
+    });
+    mQuery($unitTypeId).change(function () {
+        Mautic.schedule_display($isScheduled, $unitTypeId);
+    });
+    Mautic.schedule_display($isScheduled, $unitTypeId);
+};
+
+Mautic.schedule_display = function ($isScheduled, $unitTypeId) {
+    Mautic.check_is_scheduled($isScheduled);
+
+    var unitVal = mQuery($unitTypeId).val();
+    mQuery('#scheduleDay, #scheduleMonthFrequency').hide();
+    if (unitVal === 'WEEKLY' || unitVal === 'MONTHLY') {
+        mQuery('#scheduleDay').show();
+    }
+    if (unitVal === 'MONTHLY') {
+        mQuery('#scheduleMonthFrequency').show();
+    }
+};
+
+Mautic.check_is_scheduled = function ($isScheduled) {
+    var $scheduleForm = mQuery('#schedule_form');
+    if (mQuery(mQuery($isScheduled)).prop("checked")) {
+        $scheduleForm.hide();
+        return;
+    }
+    $scheduleForm.show();
 };
 
 /**

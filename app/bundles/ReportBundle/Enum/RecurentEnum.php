@@ -14,8 +14,8 @@ namespace Mautic\ReportBundle\Enum;
 class RecurentEnum
 {
     const UNIT_DAILY   = 'DAILY';
-    const UNIT_WEEKLY  = 'WEEKLY';
-    const UNIT_MONTHLY = 'MONTHLY';
+    const UNIT_WEEKLY  = 'WEEKLY'; //Defined in report.js too
+    const UNIT_MONTHLY = 'MONTHLY'; //Defined in report.js too
 
     const DAY_MO = 'MO';
     const DAY_TU = 'TU';

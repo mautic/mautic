@@ -21,7 +21,6 @@ use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -323,11 +322,15 @@ class ReportType extends AbstractType
             //Scheduler
             $builder->add(
                 'isScheduled',
-                CheckboxType::class,
+                YesNoButtonGroupType::class,
                 [
                     'label'      => 'mautic.report.schedule.isScheduled',
                     'label_attr' => ['class' => 'control-label'],
-                    'required'   => false,
+                    'attr'       => [
+                        'class'                => 'form-control',
+                        'data-report-schedule' => 'isScheduled',
+                    ],
+                    'required' => false,
                 ]
             );
 
@@ -343,7 +346,8 @@ class ReportType extends AbstractType
                     'empty_value' => false,
                     'required'    => false,
                     'attr'        => [
-                        'class' => 'form-control',
+                        'class'                => 'form-control',
+                        'data-report-schedule' => 'scheduleUnit',
                     ],
                 ]
             );
