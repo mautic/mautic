@@ -11,7 +11,6 @@
 
 namespace Mautic\ReportBundle\Scheduler\Date;
 
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\ReportBundle\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
@@ -24,15 +23,9 @@ class DateBuilder
      */
     private $schedulerBuilder;
 
-    /**
-     * @var DateHelper
-     */
-    private $dateHelper;
-
-    public function __construct(SchedulerBuilder $schedulerBuilder, DateHelper $dateHelper)
+    public function __construct(SchedulerBuilder $schedulerBuilder)
     {
         $this->schedulerBuilder = $schedulerBuilder;
-        $this->dateHelper       = $dateHelper;
     }
 
     public function getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
@@ -49,7 +42,7 @@ class DateBuilder
 
         $dates = [];
         foreach ($recurrences as $recurrence) {
-            $dates[] = $this->dateHelper->toShort($recurrence->getStart());
+            $dates[] = $recurrence->getStart();
         }
 
         return $dates;

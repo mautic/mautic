@@ -25,9 +25,16 @@ class ScheduleController extends CommonAjaxController
         $dateBuilder = $this->container->get('mautic.report.model.scheduler_date_builder');
         $dates       = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
 
-        return $this->sendJsonResponse(
+        $html = $this->render(
+            'MauticReportBundle:Schedule:index.html.php',
             [
                 'dates' => $dates,
+            ]
+        )->getContent();
+
+        return $this->sendJsonResponse(
+            [
+                'html' => $html,
             ]
         );
     }

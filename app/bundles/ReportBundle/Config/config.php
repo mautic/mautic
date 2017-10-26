@@ -178,7 +178,6 @@ return [
                 'class'     => DateBuilder::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_builder',
-                    'mautic.helper.template.date',
                 ],
             ],
         ],

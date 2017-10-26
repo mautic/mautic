@@ -88,16 +88,12 @@ Mautic.schedule_preview = function ($isScheduled, $unitTypeId, $scheduleDay, $sc
     mQuery.get(
         preview_url + '/' + isScheduledVal + '/' + unitVal + '/' + scheduleDayVal + '/' + scheduleMonthFrequencyVal,
         function( data ) {
-            if (!data.dates) {
+            if (!data.html) {
                 return;
             }
-            $schedule_preview_data.show();
 
-            var html = '';
-            for (i = 0; i < data.dates.length; i++) {
-                html += data.dates[i] + "<br>";
-            }
-            mQuery("#schedule_preview_data_content").html(html);
+            mQuery("#schedule_preview_data_content").html(data.html);
+            $schedule_preview_data.show();
         }
     );
 };
