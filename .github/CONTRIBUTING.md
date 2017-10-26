@@ -32,7 +32,7 @@ When creating a new Pull Request, the description template should be filled appr
 
 #### Documentation 
 
-Each new feature should include a reference to a pull request in our [End User Documentation](https://github.com/mautic/documentation) repository or []Developer Documentation](https://github.com/mautic/developer-documentation) repository if applicable.
+Each new feature should include a reference to a pull request in our [End User Documentation](https://github.com/mautic/documentation) repository or [Developer Documentation](https://github.com/mautic/developer-documentation) repository if applicable.
 
 ## Core Development Rules
 
