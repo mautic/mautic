@@ -128,51 +128,162 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
 
     /**
      * @param \Swift_Mime_Message $message
-     *
-     * @return array
-     */
-    public function getAmazonMessage(\Swift_Mime_Message $message)
-    {
-        $payload = [
-            'Source'       => current(array_keys($message->getFrom())),
-            'Destinations' => [current(array_keys($message->getTo()))],
-            'RawMessage'   => [
-                'Data' => $message->toString(),
-                ],
-            ];
-
-        return $payload;
-    }
-
-    /**
-     * @param \Swift_Mime_Message $message
      * @param null                $failedRecipients
      *
      * @return array
      */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
+        $failedRecipients = (array) $failedRecipients;
+
+        if ($evt = $this->getDispatcher()->createSendEvent($this, $message)) {
+            $this->getDispatcher()->dispatchEvent($evt, 'beforeSendPerformed');
+            if ($evt->bubbleCancelled()) {
+                return 0;
+            }
+        }     
+        $count = $this->getBatchRecipientCount($message);
+        
+        list($amazonTemplate, $amazonMessage) = $this->getAmazonSesMessage($message);
+        $amazonTemplateName = $amazonTemplate['TemplateName'];
+        
         try {
             $client     = $this->start();
-            $commands[] = $client->getCommand('sendRawEmail', $this->getAmazonMessage($message));
-            $pool       = new CommandPool($client, $commands, [
-                'concurrency' => $this->concurrency,
-                'before'      => function (CommandInterface $cmd, $iteratorId) {
-                },
-                'fulfilled' => function (ResultInterface $result, $iteratorId) use ($commands) {
-                },
-                'rejected' => function (AwsException $reason, $iteratorId) use ($commands) {
-                },
+            
+            $promise = $client->createTemplateAsync([
+                'Template' => $amazonTemplate,
             ]);
-            $promise = $pool->promise();
-            $promise->wait();
-        } catch (\Exception $e) {
+            
+            //handle email attachments  --to-do
+            
+            $promise->then(function () use ($client, $amazonMessage, $amazonTemplateName ) {
+                $emailPrimise = $client->sendBulkTemplatedEmailAsync($amazonMessage);
+                
+                $emailPrimise->then(function () use ($amazonTemplateName) {
+                    $client->deleteTemplate([
+                        'TemplateName' => $amazonTemplateName,
+                    ]);
+                });
+            });
+            
+            if ($evt) {
+                $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
+                $evt->setFailedRecipients($failedRecipients);
+                $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
+            }
+            
+            //check bulk email failed emails  --to-do
+                        
+            return $count;
+        } catch (AwsException $ex) {
+            $this->triggerSendError($evt,$failedRecipients);
+            $message->generateId();
+            
+            $this->throwException($ex->getAwsErrorMessage());
+        } catch (Exception $e) {
+            $this->triggerSendError($evt,$failedRecipients);
+            $message->generateId();
+            
             $this->throwException($e->getMessage());
+        }
+        
+        return $count;
+    }
+    
+    /**
+     * @param type $evt
+     * @param type $failedRecipients
+     * 
+     */
+    private function triggerSendError($evt,$failedRecipients)
+    {
+        $failedRecipients = array_merge(
+            $failedRecipients,
+            array_keys((array) $this->message->getTo()),
+            array_keys((array) $this->message->getCc()),
+            array_keys((array) $this->message->getBcc())
+        );
 
-            return 0;
+        if ($evt) {
+            $evt->setResult(\Swift_Events_SendEvent::RESULT_FAILED);
+            $evt->setFailedRecipients($failedRecipients);
+            $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
         }
 
-        return 1;
+        $message->generateId();
+    }
+    
+    /**
+     * @param \Swift_Mime_Message $message
+     *
+     * @return array
+     */
+    public function getAmazonSesMessage(\Swift_Mime_Message $message)
+    {
+        $this->message = $message;
+        $metadata      = $this->getMetadata();        
+        $messageArray = [];
+                
+        if (!empty($metadata)) {
+            $metadataSet  = reset($metadata);
+            $emailId = $metadataSet['emailId'];
+            $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
+            $mauticTokens = array_keys($tokens);
+            $tokenReplace = $amazonTokens = [];
+            foreach ($tokens as $search => $token) {
+                $tokenKey = preg_replace('/[^\da-z]/i', '_', trim($search, '{}'));
+                $tokenReplace[$search] = '{{'.$tokenKey.'}}';
+                $amazonTokens[$search] = $tokenKey;
+            }
+            $messageArray = $this->messageToArray($mauticTokens, $tokenReplace, true);
+        }
+        
+        $CcAddresses = [];
+        if (count($messageArray['recipients']['cc']) > 0) {
+            $CcAddresses = array_keys($messageArray['recipients']['cc']);
+        }
+        
+        $BccAddresses = [];
+        if (count($messageArray['recipients']['cc']) > 0) {
+            $BccAddresses = array_keys($messageArray['recipients']['bcc']);
+        }
+        
+        //build amazon ses template array
+        $template = [
+            "TemplateName" => "MauticTemplate".$emailId.time(),//unique template name
+            "SubjectPart" => $messageArray["subject"],
+            "TextPart" => $messageArray["text"],
+            "HtmlPart" => $messageArray["html"]
+        ];
+        
+        $destinations = [];
+        foreach ($metadata as $recipient => $mailData) {
+            
+            $ReplacementTemplateData = [];
+            foreach ( $mailData['tokens'] as $token => $tokenData) {
+                $ReplacementTemplateData[$amazonTokens[$token]] = $tokenData;
+            }
+            
+            $destinations[] = [
+                'Destination' => [
+                    'BccAddresses' => $BccAddresses,
+                    'CcAddresses' => $CcAddresses,
+                    'ToAddresses' => [$recipient],
+                ],
+                'ReplacementTemplateData' => $ReplacementTemplateData,
+            ];
+        }
+        
+        //build amazon ses message array
+        $amazonMessage = [
+            'ConfigurationSetName' => 'ConfigSet',
+            'Destinations' => $destinations,
+            'ReplyToAddresses' => $messageArray['replyTo']['email'],
+            'Source' => $messageArray['from']['email'],
+            'Template' => $template['TemplateName'],
+        ];
+        
+        return array($template, $amazonMessage);
     }
 
     /**

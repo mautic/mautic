@@ -256,7 +256,7 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport && $this->factory->getParameter('mailer_transport') !== 'mautic.transport.amazon') {
+        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
             $this->tokenizationEnabled = true;
         }
 
