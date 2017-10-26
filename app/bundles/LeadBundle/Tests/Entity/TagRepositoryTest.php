@@ -11,6 +11,7 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
