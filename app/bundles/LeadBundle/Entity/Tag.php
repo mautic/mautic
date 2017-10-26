@@ -75,6 +75,18 @@ class Tag
     }
 
     /**
+     * @param int
+     *
+     * @return Tag
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getTag()

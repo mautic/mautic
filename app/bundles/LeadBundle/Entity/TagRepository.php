@@ -48,11 +48,11 @@ class TagRepository extends CommonRepository
     /**
      * Get tag entities by name.
      *
-     * @param $tags
+     * @param array $tags
      *
      * @return array
      */
-    public function getTagsByName($tags)
+    public function getTagsByName(array $tags)
     {
         if (empty($tags)) {
             return [];
@@ -61,7 +61,7 @@ class TagRepository extends CommonRepository
         array_walk($tags, create_function('&$val', 'if (strpos($val, "-") === 0) $val = substr($val, 1);'));
         $qb = $this->_em->createQueryBuilder()
             ->select('t')
-            ->from('MauticLeadBundle:Tag', 't', 't.tag');
+            ->from(Tag::class, 't', 't.tag');
 
         if ($tags) {
             $qb->where(
@@ -70,9 +70,19 @@ class TagRepository extends CommonRepository
                 ->setParameter('tags', $tags);
         }
 
-        $results = $qb->getQuery()->getResult();
+        return $qb->getQuery()->getResult();
+    }
 
-        return $results;
+    /**
+     * Get tag entity by name.
+     *
+     * @param string $tags
+     *
+     * @return Tag
+     */
+    public function getTagByName($tag)
+    {
+        return $this->findOneByTag($tag);
     }
 
     /**
@@ -91,18 +101,38 @@ class TagRepository extends CommonRepository
 
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-        $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
-                ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
-                ->where(
-                    $q->expr()->andX(
-                        $q->expr()->in('t.tag', ':tags'),
-                        $q->expr()->eq('l.id', ':leadId')
-                    )
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
+            ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('t.tag', ':tags'),
+                    $q->expr()->eq('l.id', ':leadId')
                 )
-                ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
-                ->setParameter('leadId', $lead->getId());
+            )
+            ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+            ->setParameter('leadId', $lead->getId());
 
         return (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
+     * Save an entity through the repository.
+     *
+     * @param object $entity
+     * @param bool   $flush  true by default; use false if persisting in batches
+     *
+     * @return int
+     */
+    public function saveEntity($entity, $flush = true)
+    {
+        if (!$entity->getId() && $existingTag = $this->findOneByTag($entity->getTag())) {
+            // Do not save if the tag exists and instead add the ID of the existing tag to the entity
+            $entity->setId($existingTag->getId());
+
+            return;
+        }
+
+        parent::saveEntity($entity, $flush);
     }
 }
