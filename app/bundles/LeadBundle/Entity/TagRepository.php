@@ -74,18 +74,6 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Get tag entity by name.
-     *
-     * @param string $tags
-     *
-     * @return Tag
-     */
-    public function getTagByName($tag)
-    {
-        return $this->findOneByTag($tag);
-    }
-
-    /**
      * Check Lead tags by Ids.
      *
      * @param Lead $lead
@@ -126,7 +114,7 @@ class TagRepository extends CommonRepository
      */
     public function saveEntity($entity, $flush = true)
     {
-        if (!$entity->getId() && $existingTag = $this->findOneByTag($entity->getTag())) {
+        if (!$entity->getId() && $existingTag = $this->findOneBy(['tag' => $entity->getTag()])) {
             // Do not save if the tag exists and instead add the ID of the existing tag to the entity
             $entity->setId($existingTag->getId());
 
