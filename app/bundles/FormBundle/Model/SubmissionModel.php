@@ -1009,8 +1009,18 @@ class SubmissionModel extends CommonFormModel
             }
         }
 
+        // Also set lead as newly created if it had no email before.
+        // This is a workaround a problem where the form submission does not
+        // track the lead as newly created, because the lead exists (but has
+        // no email).
+        $hadNoEmail = null === $lead->getEmail();
+
         //set the mapped fields
         $this->leadModel->setFieldValues($lead, $data, false, true, true);
+
+        if ($hadNoEmail && null !== $lead->getEmail()) {
+            $lead->setNewlyCreated(true);
+        }
 
         // last active time
         $lead->setLastActive(new \DateTime());
