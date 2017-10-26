@@ -24,7 +24,7 @@ All code styling is handled automatically by the aforementioned git hook. In cas
 
 #### Automated Tests
 
-All code contributions should include adequate and appropriate automated tests. Pull Requests without these tests will not be merged.
+All code contributions should include adequate and appropriate unit tests using [PHPUnit](https://phpunit.de/manual/5.7/en/index.html) and/or Symfony functional tests ([https://symfony.com/doc/2.8/testing.html](https://symfony.com/doc/2.8/testing.html)). Pull Requests without these tests will not be merged. 
 
 #### Pull Request Description 
 
