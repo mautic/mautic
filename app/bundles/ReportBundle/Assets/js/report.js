@@ -35,17 +35,25 @@ Mautic.reportOnLoad = function (container) {
 
     var $isScheduled = mQuery('[data-report-schedule="isScheduled"]');
     var $unitTypeId = mQuery('[data-report-schedule="scheduleUnit"]');
+    var $scheduleDay = mQuery('[data-report-schedule="scheduleDay"]');
+    var $scheduleMonthFrequency = mQuery('[data-report-schedule="scheduleMonthFrequency"]');
 
     mQuery($isScheduled).change(function () {
-        Mautic.schedule_display($isScheduled, $unitTypeId);
+        Mautic.schedule_display($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
     });
     mQuery($unitTypeId).change(function () {
-        Mautic.schedule_display($isScheduled, $unitTypeId);
+        Mautic.schedule_display($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
     });
-    Mautic.schedule_display($isScheduled, $unitTypeId);
+    mQuery($scheduleDay).change(function () {
+        Mautic.schedule_preview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    mQuery($scheduleMonthFrequency).change(function () {
+        Mautic.schedule_preview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    Mautic.schedule_display($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
 };
 
-Mautic.schedule_display = function ($isScheduled, $unitTypeId) {
+Mautic.schedule_display = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
     Mautic.check_is_scheduled($isScheduled);
 
     var unitVal = mQuery($unitTypeId).val();
@@ -56,15 +64,51 @@ Mautic.schedule_display = function ($isScheduled, $unitTypeId) {
     if (unitVal === 'MONTHLY') {
         mQuery('#scheduleMonthFrequency').show();
     }
+    Mautic.schedule_preview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+};
+
+Mautic.schedule_preview = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
+    var preview_url = mQuery('#schedule_preview_url').data('url');
+    var $schedule_preview_data = mQuery('#schedule_preview_data');
+
+    var isScheduledVal = 0;
+    if (!mQuery($isScheduled).prop("checked")) { //$isScheduled.val() does not work
+        isScheduledVal = 1;
+    }
+
+    if (!isScheduledVal) {
+        $schedule_preview_data.hide();
+
+        return;
+    }
+    var unitVal = mQuery($unitTypeId).val();
+    var scheduleDayVal = mQuery($scheduleDay).val();
+    var scheduleMonthFrequencyVal = mQuery($scheduleMonthFrequency).val();
+
+    mQuery.get(
+        preview_url + '/' + isScheduledVal + '/' + unitVal + '/' + scheduleDayVal + '/' + scheduleMonthFrequencyVal,
+        function( data ) {
+            if (!data.dates) {
+                return;
+            }
+            $schedule_preview_data.show();
+
+            var html = '';
+            for (i = 0; i < data.dates.length; i++) {
+                html += data.dates[i] + "<br>";
+            }
+            mQuery("#schedule_preview_data_content").html(html);
+        }
+    );
 };
 
 Mautic.check_is_scheduled = function ($isScheduled) {
     var $scheduleForm = mQuery('#schedule_form');
-    if (mQuery(mQuery($isScheduled)).prop("checked")) {
-        $scheduleForm.hide();
+    if (!mQuery(mQuery($isScheduled)).prop("checked")) {
+        $scheduleForm.show();
         return;
     }
-    $scheduleForm.show();
+    $scheduleForm.hide();
 };
 
 /**

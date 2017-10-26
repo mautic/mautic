@@ -168,6 +168,17 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="pa-md">
+                                        <span id="schedule_preview_url" data-url="<?php echo $view['router']->path('mautic_report_schedule_preview'); ?>"></span>
+                                        <div id="schedule_preview_data">
+                                            <strong><?php echo $view['translator']->trans('mautic.report.schedule.preview_data'); ?></strong>
+                                            <div id="schedule_preview_data_content"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

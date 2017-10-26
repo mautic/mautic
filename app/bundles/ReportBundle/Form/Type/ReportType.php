@@ -364,7 +364,8 @@ class ReportType extends AbstractType
                     'empty_value' => false,
                     'required'    => false,
                     'attr'        => [
-                        'class' => 'form-control',
+                        'class'                => 'form-control',
+                        'data-report-schedule' => 'scheduleDay',
                     ],
                 ]
             );
@@ -381,7 +382,8 @@ class ReportType extends AbstractType
                     'empty_value' => false,
                     'required'    => false,
                     'attr'        => [
-                        'class' => 'form-control',
+                        'class'                => 'form-control',
+                        'data-report-schedule' => 'scheduleMonthFrequency',
                     ],
                 ]
             );

@@ -12,6 +12,7 @@
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -406,7 +407,7 @@ return [
                 'alias'     => 'menu',
             ],
             'mautic.helper.template.date' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\DateHelper',
+                'class'     => DateHelper::class,
                 'arguments' => [
                     '%mautic.date_format_full%',
                     '%mautic.date_format_short%',

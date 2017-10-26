@@ -11,6 +11,7 @@
 
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
+use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Mautic\ReportBundle\Validator\ScheduleIsValidValidator;
 
@@ -36,6 +37,16 @@ return [
                 ],
                 'requirements' => [
                     'reportPage' => '\d+',
+                ],
+            ],
+            'mautic_report_schedule_preview' => [
+                'path'       => '/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
+                'controller' => 'MauticReportBundle:Schedule:index',
+                'defaults'   => [
+                    'isScheduled'            => 0,
+                    'scheduleUnit'           => '',
+                    'scheduleDay'            => '',
+                    'scheduleMonthFrequency' => '',
                 ],
             ],
             'mautic_report_action' => [
@@ -162,6 +173,13 @@ return [
             'mautic.report.model.scheduler_template_factory' => [
                 'class'     => SchedulerTemplateFactory::class,
                 'arguments' => [],
+            ],
+            'mautic.report.model.scheduler_date_builder' => [
+                'class'     => DateBuilder::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_builder',
+                    'mautic.helper.template.date',
+                ],
             ],
         ],
         'validator' => [

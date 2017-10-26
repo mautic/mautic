@@ -57,7 +57,7 @@ class SchedulerBuilder
             throw new InvalidSchedulerException();
         }
 
-        $startDate = new \DateTime();
+        $startDate = (new \DateTime())->setTime(0, 0);
         $rule      = new Rule();
         $rule->setStartDate($startDate)
             ->setCount($count);
@@ -65,8 +65,8 @@ class SchedulerBuilder
         $builder = $this->schedulerTemplateFactory->getBuilder($scheduler);
 
         try {
-            $finalScheduler   = $builder->build($rule, $scheduler);
-            $transformer = new ArrayTransformer();
+            $finalScheduler = $builder->build($rule, $scheduler);
+            $transformer    = new ArrayTransformer();
 
             return $transformer->transform($finalScheduler);
         } catch (InvalidWeekday $e) {
