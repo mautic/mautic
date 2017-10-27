@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadField;
 
 class InesCRMIntegration extends CrmAbstractIntegration
@@ -20,7 +21,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
     private $autoMappingConfig = null;
 
-    public function __construct(MauticFactory $factory = null) {
+    public function __construct(MauticFactory $factory = null)
+    {
         parent::__construct($factory);
 
         $this->defaultInesFields = json_decode(self::INES_DEFAULT_FIELDS_JSON);
@@ -84,8 +86,11 @@ class InesCRMIntegration extends CrmAbstractIntegration
         }
     }
 
-    public function getFormCompanyFields($settings = []) {
-        if (!$this->isConfigured()) return;
+    public function getFormCompanyFields($settings = [])
+    {
+        if (!$this->isConfigured()) {
+            return;
+        }
 
         $companyFields = $this->getDefaultClientFields();
 
@@ -94,8 +99,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                              ->CustomFieldToAuto;
 
         foreach ($customFields as $f) {
-            $companyFields[self::INES_CUSTOM_FIELD_PREFIX . $f->InesID] = [
-                'label' => $f->InesName,
+            $companyFields[self::INES_CUSTOM_FIELD_PREFIX.$f->InesID] = [
+                'label'    => $f->InesName,
                 'required' => false,
             ];
         }
@@ -103,8 +108,11 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $companyFields;
     }
 
-    public function getFormLeadFields($settings = []) {
-        if (!$this->isConfigured()) return;
+    public function getFormLeadFields($settings = [])
+    {
+        if (!$this->isConfigured()) {
+            return;
+        }
 
         $leadFields = $this->getDefaultContactFields();
 
@@ -113,8 +121,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
                              ->CustomFieldToAuto;
 
         foreach ($customFields as $f) {
-            $leadFields[self::INES_CUSTOM_FIELD_PREFIX . $f->InesID] = [
-                'label' => $f->InesName,
+            $leadFields[self::INES_CUSTOM_FIELD_PREFIX.$f->InesID] = [
+                'label'    => $f->InesName,
                 'required' => false,
             ];
         }
@@ -122,7 +130,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $leadFields;
     }
 
-    public function pushLeads($params = []) {
+    public function pushLeads($params = [])
+    {
         $config                  = $this->mergeConfigToFeatureSettings();
         list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
         $fetchAll                = $params['fetchAll'];
@@ -130,14 +139,14 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
         if (in_array('lead', $config['objects'])) {
             $leadRepo = $this->leadModel->getRepository();
-            $qb = $leadRepo->createQueryBuilder('l');
+            $qb       = $leadRepo->createQueryBuilder('l');
             $qb->where('l.email is not null')->andWhere('l.email != \'\'');
 
             if (!$fetchAll) {
                 $qb->andWhere('l.dateAdded >= :fromDate')
                    ->andWhere('l.dateAdded <= :toDate')
                    ->setParameters(compact('fromDate', 'toDate'));
-           }
+            }
 
             if ($limit) {
                 $qb->setMaxResults($limit);
@@ -147,7 +156,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
             $results = [];
 
-            foreach($iterableLeads as $lead) {
+            foreach ($iterableLeads as $lead) {
                 try {
                     $results[] = $this->pushLead($lead[0], $config);
                 } catch (\Exception $e) {
@@ -178,21 +187,28 @@ class InesCRMIntegration extends CrmAbstractIntegration
         }
     }
 
-    public function pushLead($lead, $config = []) {
+    public function pushLead($lead, $config = [])
+    {
         $config = $this->mergeConfigToFeatureSettings($config);
         $config = array_merge_recursive($config, $this->getAutoMappingConfig());
 
         $companyFields = $config['companyFields'];
-        $leadFields = $config['leadFields'];
+        $leadFields    = $config['leadFields'];
 
         $apiHelper = $this->getApiHelper();
 
         $companyModel = $this->companyModel;
-        $leadModel = $this->leadModel;
+        $leadModel    = $this->leadModel;
 
-        $lead = $leadModel->getEntity($lead->getId());
+        $emailRepo = $this->em->getRepository(Email::class);
+        $doNotEmail = $emailRepo->checkDoNotEmail($lead->getEmail());
+
+        $leadUnsubscribed = $doNotEmail['unsubscribed'] || $doNotEmail['manual'];
+        $leadBounced = $doNotEmail['bounced'];
+
+        $lead      = $leadModel->getEntity($lead->getId());
         $companies = $leadModel->getCompanies($lead);
-        $company = null;
+        $company   = null;
 
         foreach ($companies as $c) {
             if ($c['is_primary']) {
@@ -203,6 +219,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
         if ($company === null) {
             $this->logger->debug('INES: Will not push contact without company', compact('lead', 'config'));
+
             return [
                 /* updated: */ 0,
                 /* created: */ 0,
@@ -211,13 +228,13 @@ class InesCRMIntegration extends CrmAbstractIntegration
             ];
         }
 
-        $companyInternalRefGetter = 'get' . ucfirst($companyFields['InternalRef']);
-        $leadInternalRefGetter = 'get' . ucfirst($leadFields['InternalRef']);
+        $companyInternalRefGetter = 'get'.ucfirst($companyFields['InternalRef']);
+        $leadInternalRefGetter    = 'get'.ucfirst($leadFields['InternalRef']);
 
-        $companyInternalRefSetter = 'set' . ucfirst($companyFields['InternalRef']);
-        $leadInternalRefSetter = 'set' . ucfirst($leadFields['InternalRef']);
+        $companyInternalRefSetter = 'set'.ucfirst($companyFields['InternalRef']);
+        $leadInternalRefSetter    = 'set'.ucfirst($leadFields['InternalRef']);
 
-        $inesClientRef = $company->$companyInternalRefGetter();
+        $inesClientRef  = $company->$companyInternalRefGetter();
         $inesContactRef = $lead->$leadInternalRefGetter();
 
         $result = null;
@@ -228,21 +245,22 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $mappedData = self::getClientWithContactsTemplate();
 
-                $mappedData->client->AutomationRef = $company->getId();
+                $mappedData->client->AutomationRef                               = $company->getId();
                 $mappedData->client->Contacts->ContactInfoAuto[0]->AutomationRef = $lead->getId();
 
                 self::mapCompanyToInesClient($config, $company, $mappedData->client);
                 self::mapLeadToInesContact($config, $lead, $mappedData->client->Contacts->ContactInfoAuto[0]);
 
-                $mappedData->client->InternalRef = 0;
+                $mappedData->client->InternalRef                               = 0;
                 $mappedData->client->Contacts->ContactInfoAuto[0]->InternalRef = 0;
-                $mappedData->client->Contacts->ContactInfoAuto[0]->Scoring = $lead->getPoints();
-                $mappedData->client->Contacts->ContactInfoAuto[0]->Desabo = !$lead->getDoNotContact()->isEmpty();
+                $mappedData->client->Contacts->ContactInfoAuto[0]->Scoring     = $lead->getPoints();
+                $mappedData->client->Contacts->ContactInfoAuto[0]->Desabo      = $leadUnsubscribed;
+                $mappedData->client->Contacts->ContactInfoAuto[0]->NPai        = $leadBounced;
 
                 $response = $apiHelper->createClientWithContacts($mappedData);
-                $result = $response->AddClientWithContactsResult;
+                $result   = $response->AddClientWithContactsResult;
 
-                $inesClientRef = $result->InternalRef;
+                $inesClientRef  = $result->InternalRef;
                 $inesContactRef = $result->Contacts->ContactInfoAuto->InternalRef;
 
                 $company->$companyInternalRefSetter($inesClientRef);
@@ -277,7 +295,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 self::mapCompanyToInesClient($config, $company, $mappedData->client);
                 $mappedData->client->InternalRef = 0;
 
-                $response = $apiHelper->createClient($mappedData);
+                $response      = $apiHelper->createClient($mappedData);
                 $inesClientRef = $response->AddClientResult->InternalRef;
 
                 $company->$companyInternalRefSetter($inesClientRef);
@@ -290,8 +308,9 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 if ($shouldUpdateContact) {
                     $inesContact->Scoring = $lead->getPoints();
-                    $inesContact->Desabo = !$lead->getDoNotContact()->isEmpty();
-                    $response = $apiHelper->updateContact($inesContact);
+                    $inesContact->Desabo  = $leadUnsubscribed;
+                    $inesContact->NPai    = $leadBounced;
+                    $response             = $apiHelper->updateContact($inesContact);
 
                     $result = [
                         /* updated: */ 1,
@@ -308,19 +327,19 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
 
                 $mappedData = (object) [
-                    'contact' => self::getContactTemplate(),
+                    'contact'       => self::getContactTemplate(),
                     'AutomationRef' => $lead->getId(),
-                    'clientRef' => $inesClientRef,
-                    'scoring' => $lead->getPoints(),
-                    // FIXME: Can't figure out how to unsub the contact...
-                    'desabo' => !$lead->getDoNotContact()->isEmpty(),
+                    'clientRef'     => $inesClientRef,
+                    'scoring'       => $lead->getPoints(),
+                    'desabo'        => $leadUnsubscribed,
+                    'npai'          => $leadBounced,
                 ];
 
                 self::mapLeadToInesContact($config, $lead, $mappedData->contact);
 
                 $mappedData->contact->InternalRef = 0;
 
-                $response = $apiHelper->createContact($mappedData);
+                $response       = $apiHelper->createContact($mappedData);
                 $inesContactRef = $response->AddContactResult->InternalRef;
 
                 $lead->$leadInternalRefSetter($inesContactRef);
@@ -353,10 +372,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
             } else {
                 $this->logger->debug('INES: Will update Client and Contact', compact('lead', 'company', 'config'));
 
-                $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
+                $inesClient  = $apiHelper->getClient($inesClientRef)->GetClientResult;
                 $inesContact = $apiHelper->getContact($inesContactRef)->GetContactResult;
 
-                $shouldUpdateClient = self::mapCompanyUpdatesToInesClient($config, $company, $inesClient);
+                $shouldUpdateClient  = self::mapCompanyUpdatesToInesClient($config, $company, $inesClient);
                 $shouldUpdateContact = self::mapLeadUpdatesToInesContact($config, $lead, $inesContact);
 
                 if ($shouldUpdateClient) {
@@ -365,10 +384,12 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 // TODO: Figure out how to transfer a contact from a client to another
                 if ($shouldUpdateContact) {
-                    $inesContact->IsNew = false;
+                    $inesContact->IsNew         = false;
                     $inesContact->AutomationRef = $lead->getId();
-                    $inesContact->Scoring = $lead->getPoints();
-                    $inesContact->Desabo = !$lead->getDoNotContact()->isEmpty();
+                    $inesContact->Scoring       = $lead->getPoints();
+                    $inesContact->Desabo        = $leadUnsubscribed;
+                    $inesContact->NPai          = $leadBounced;
+
                     $apiHelper->updateContact($inesContact);
 
                     $result = [
@@ -381,7 +402,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
             }
         }
 
-        $updatedClientFields = $this->pushClientCustomFields($config, $inesClientRef, $company);
+        $updatedClientFields  = $this->pushClientCustomFields($config, $inesClientRef, $company);
         $updatedContactFields = $this->pushContactCustomFields($config, $inesContactRef, $lead);
 
         if (is_null($result)) {
@@ -405,47 +426,53 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $result;
     }
 
-    private static function mapCompanyToInesClient($config, $company, $inesClient) {
+    private static function mapCompanyToInesClient($config, $company, $inesClient)
+    {
         $companyFields = $config['companyFields'];
 
         self::mapFieldsFromMauticToInes($companyFields, $company, $inesClient);
     }
 
-    private static function mapLeadToInesContact($config, $lead, $inesContact) {
+    private static function mapLeadToInesContact($config, $lead, $inesContact)
+    {
         $leadFields = $config['leadFields'];
 
         self::mapFieldsFromMauticToInes($leadFields, $lead, $inesContact);
     }
 
-    private static function mapCompanyUpdatesToInesClient($config, $company, $inesClient) {
-        $companyFields = $config['companyFields'];
+    private static function mapCompanyUpdatesToInesClient($config, $company, $inesClient)
+    {
+        $companyFields             = $config['companyFields'];
         $overwritableCompanyFields = self::updateToOverwritable($config['update_mautic_company']);
 
         return self::mapFieldUpdatesFromMauticToInes($companyFields, $overwritableCompanyFields, $company, $inesClient);
     }
 
-    private static function mapLeadUpdatesToInesContact($config, $lead, $inesContact) {
-        $leadFields = $config['leadFields'];
+    private static function mapLeadUpdatesToInesContact($config, $lead, $inesContact)
+    {
+        $leadFields             = $config['leadFields'];
         $overwritableLeadFields = self::updateToOverwritable($config['update_mautic']);
 
         return self::mapFieldUpdatesFromMauticToInes($leadFields, $overwritableLeadFields, $lead, $inesContact);
     }
 
-    private static function mapFieldsFromMauticToInes($fields, $mauticObject, $inesObject) {
+    private static function mapFieldsFromMauticToInes($fields, $mauticObject, $inesObject)
+    {
         foreach ($fields as $inesField => $mauticField) {
             if (substr($inesField, 0, 12) !== self::INES_CUSTOM_FIELD_PREFIX) { // FIXME: There's probably a better way to do this...
-                $method = 'get' . ucfirst($mauticField);
+                $method                 = 'get'.ucfirst($mauticField);
                 $inesObject->$inesField = $mauticObject->$method($mauticField);
             }
         }
     }
 
-    private static function mapFieldUpdatesFromMauticToInes($fields, $overwritableFields, $mauticObject, $inesObject) {
+    private static function mapFieldUpdatesFromMauticToInes($fields, $overwritableFields, $mauticObject, $inesObject)
+    {
         $shouldUpdate = false;
 
         foreach ($fields as $inesField => $mauticField) {
             if (substr($inesField, 0, 12) !== self::INES_CUSTOM_FIELD_PREFIX) { // FIXME: There's probably a better way to do this...
-                $method = 'get' . ucfirst($mauticField);
+                $method = 'get'.ucfirst($mauticField);
                 if ((string) $inesObject->$inesField !== (string) $mauticObject->$method()) {
                     // The field should be overwritten if its value is "empty" in the PHP sense or if its
                     // overwritability is unspecified or specified as true
@@ -454,7 +481,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                                     || $overwritableFields[$inesField];
 
                     if ($shouldOverwrite) {
-                        $shouldUpdate = true;
+                        $shouldUpdate           = true;
                         $inesObject->$inesField = $mauticObject->$method($mauticField);
                     }
                 }
@@ -464,7 +491,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $shouldUpdate;
     }
 
-    private static function updateToOverwritable($update) {
+    private static function updateToOverwritable($update)
+    {
         $overwritable = [];
 
         foreach ($update as $inesField => $shouldUpdateMautic) {
@@ -478,7 +506,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 break;
 
                 default:
-                    $this->logger->warning("INES: Invalid update flag", compact('inesField', 'shouldUpdateMautic'));
+                    $this->logger->warning('INES: Invalid update flag', compact('inesField', 'shouldUpdateMautic'));
                 break;
             }
         }
@@ -486,7 +514,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $overwritable;
     }
 
-    private function getDefaultClientFields() {
+    private function getDefaultClientFields()
+    {
         if (is_null($this->defaultClientFields)) {
             $this->partitionDefaultInesFields();
         }
@@ -494,7 +523,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $this->defaultClientFields;
     }
 
-    private function getDefaultContactFields() {
+    private function getDefaultContactFields()
+    {
         if (is_null($this->defaultContactFields)) {
             $this->partitionDefaultInesFields();
         }
@@ -502,7 +532,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $this->defaultContactFields;
     }
 
-    private function getAutoMappingConfig() {
+    private function getAutoMappingConfig()
+    {
         if (is_null($this->autoMappingConfig)) {
             $this->partitionDefaultInesFields();
         }
@@ -510,15 +541,16 @@ class InesCRMIntegration extends CrmAbstractIntegration
         return $this->autoMappingConfig;
     }
 
-    private function partitionDefaultInesFields() {
+    private function partitionDefaultInesFields()
+    {
         $defaultContactFields = [];
-        $defaultClientFields = [];
-        $autoMappingConfig = [];
+        $defaultClientFields  = [];
+        $autoMappingConfig    = [];
 
         foreach ($this->defaultInesFields as $f) {
             if ($f->autoMapping === false) {
                 $fieldValue = [
-                    'label' => $f->inesLabel,
+                    'label'    => $f->inesLabel,
                     'required' => $f->isMappingRequired,
                 ];
 
@@ -538,19 +570,20 @@ class InesCRMIntegration extends CrmAbstractIntegration
             }
         }
 
-        $this->defaultClientFields = $defaultClientFields;
+        $this->defaultClientFields  = $defaultClientFields;
         $this->defaultContactFields = $defaultContactFields;
-        $this->autoMappingConfig = $autoMappingConfig;
+        $this->autoMappingConfig    = $autoMappingConfig;
     }
 
-    private function ensureFieldExists($fieldSpec) {
-        $fieldModel = $this->fieldModel;
+    private function ensureFieldExists($fieldSpec)
+    {
+        $fieldModel     = $this->fieldModel;
         $requestedField = null;
 
         foreach ($fieldModel->getEntities() as $field) {
             if ($field->getAlias() === $fieldSpec->alias && $field->getObject() === $fieldSpec->object) {
                 if ($field->getType() !== $fieldSpec->type) {
-                    $this->logger->warning("INES: Invalid field type", compact('field', 'fieldSpec'));
+                    $this->logger->warning('INES: Invalid field type', compact('field', 'fieldSpec'));
                 }
 
                 $requestedField = $field;
@@ -569,26 +602,29 @@ class InesCRMIntegration extends CrmAbstractIntegration
         }
     }
 
-    private function pushContactCustomFields($config, $inesContactRef, $lead) {
+    private function pushContactCustomFields($config, $inesContactRef, $lead)
+    {
         return $this->pushCustomFields(self::LEAD_OBJECT_TYPE, $config, $inesContactRef, $lead);
     }
 
-    private function pushClientCustomFields($config, $inesClientRef, $company) {
+    private function pushClientCustomFields($config, $inesClientRef, $company)
+    {
         return $this->pushCustomFields(self::COMPANY_OBJECT_TYPE, $config, $inesClientRef, $company);
     }
 
-    private function pushCustomFields($objectType, $config, $inesRef, $mauticObject) {
+    private function pushCustomFields($objectType, $config, $inesRef, $mauticObject)
+    {
         $apiHelper = $this->getApiHelper();
 
         switch ($objectType) {
             case self::COMPANY_OBJECT_TYPE:
                 $inesCustomFields = $apiHelper->getClientCustomFields($inesRef)->GetCompanyCFResult->Values->CustomField;
-                $fieldMappings = $config['companyFields'];
+                $fieldMappings    = $config['companyFields'];
             break;
 
             case self::LEAD_OBJECT_TYPE:
                 $inesCustomFields = $apiHelper->getContactCustomFields($inesRef)->GetContactCFResult->Values->CustomField;
-                $fieldMappings = $config['leadFields'];
+                $fieldMappings    = $config['leadFields'];
             break;
 
             default: throw new TypeError('Invalid object type');
@@ -610,7 +646,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 }
             }
 
-            $method = 'get' . ucfirst($mauticField);
+            $method = 'get'.ucfirst($mauticField);
 
             if (is_null($customFieldToUpdate)) {
                 $this->logger->debug('INES: Will create custom field', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
@@ -618,10 +654,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 switch ($objectType) {
                     case self::COMPANY_OBJECT_TYPE:
                         $mappedData = (object) [
-                            'clRef' => $inesRef,
-                            'chdefRef' => $customFieldDefinitionRef,
-                            'chpValue' => $mauticObject->$method(),
-                            'chvLies' => 0,
+                            'clRef'          => $inesRef,
+                            'chdefRef'       => $customFieldDefinitionRef,
+                            'chpValue'       => $mauticObject->$method(),
+                            'chvLies'        => 0,
                             'chvGroupeAssoc' => 0,
                         ];
 
@@ -630,10 +666,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                     case self::LEAD_OBJECT_TYPE:
                         $mappedData = (object) [
-                            'ctRef' => $inesRef,
-                            'chdefRef' => $customFieldDefinitionRef,
-                            'chpValue' => $mauticObject->$method(),
-                            'chvLies' => 0,
+                            'ctRef'          => $inesRef,
+                            'chdefRef'       => $customFieldDefinitionRef,
+                            'chpValue'       => $mauticObject->$method(),
+                            'chvLies'        => 0,
                             'chvGroupeAssoc' => 0,
                         ];
 
@@ -649,6 +685,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 if ((string) $mauticObject->$method() === (string) $customFieldToUpdate->Value) {
                     $this->logger->debug('INES: No need to request update since values already equal', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
+
                     return false;
                 } else {
                     $this->logger->debug('INES: Requesting update since values differ', compact('objectType', 'customFieldDefinitionRef', 'mauticObject', 'config'));
@@ -656,9 +693,9 @@ class InesCRMIntegration extends CrmAbstractIntegration
                     switch ($objectType) {
                         case self::COMPANY_OBJECT_TYPE:
                             $mappedData = (object) [
-                                'clRef' => $inesRef,
+                                'clRef'    => $inesRef,
                                 'chdefRef' => $customFieldDefinitionRef,
-                                'chpRef' => $customFieldToUpdate->Ref,
+                                'chpRef'   => $customFieldToUpdate->Ref,
                                 'chpValue' => $mauticObject->$method(),
                             ];
 
@@ -667,9 +704,9 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                         case self::LEAD_OBJECT_TYPE:
                             $mappedData = (object) [
-                                'ctRef' => $inesRef,
+                                'ctRef'    => $inesRef,
                                 'chdefRef' => $customFieldDefinitionRef,
-                                'chpRef' => $customFieldToUpdate->Ref,
+                                'chpRef'   => $customFieldToUpdate->Ref,
                                 'chpValue' => $mauticObject->$method(),
                             ];
 
@@ -690,12 +727,12 @@ class InesCRMIntegration extends CrmAbstractIntegration
     private static function getClientWithContactsTemplate($nbContacts = 1)
     {
         $data = (object) [
-            'client' => self::getClientTemplate()
+            'client' => self::getClientTemplate(),
         ];
 
         $data->client->Contacts->ContactInfoAuto = [];
 
-        for($i = 0; $i < $nbContacts; $i += 1) {
+        for ($i = 0; $i < $nbContacts; $i += 1) {
             $data->client->Contacts->ContactInfoAuto[] = self::getContactTemplate();
         }
 
@@ -705,92 +742,92 @@ class InesCRMIntegration extends CrmAbstractIntegration
     private static function getClientTemplate()
     {
         return (object) [
-            'Confidentiality' => 'Undefined',
-            'CompanyName' => '',
-            'Type' => 0, /* filled from INES config : company type */
-            'Service' => '',
-            'Address1' => '',
-            'Address2' => '',
-            'ZipCode' => '',
-            'City' => '',
-            'State' => '',
-            'Country' => '',
-            'Phone' => '',
-            'Fax' => '',
-            'Website' => '',
-            'Comments' => '',
-            'Manager' => 0,
-            'SalesResponsable' => 0,
+            'Confidentiality'      => 'Undefined',
+            'CompanyName'          => '',
+            'Type'                 => 0, /* filled from INES config : company type */
+            'Service'              => '',
+            'Address1'             => '',
+            'Address2'             => '',
+            'ZipCode'              => '',
+            'City'                 => '',
+            'State'                => '',
+            'Country'              => '',
+            'Phone'                => '',
+            'Fax'                  => '',
+            'Website'              => '',
+            'Comments'             => '',
+            'Manager'              => 0,
+            'SalesResponsable'     => 0,
             'TechnicalResponsable' => 0,
-            'CreationDate' => date('Y-m-d\TH:i:s'),
-            'ModifiedDate' => date('Y-m-d\TH:i:s'),
-            'Origin' => 0,
-            'CustomerNumber' => 0,
-            'CompanyTaxCode' => '',
-            'VatTax' => 0,
-            'Bank' => '',
-            'BankAccount' => '',
-            'PaymentMethod' => '',
-            'PaymentMethodRef' => 1, /* MANDATORY AND NOT NULL, OTHERWISE ERROR */
-            'Discount' => 0,
-            'HeadQuarter' => 0,
-            'Language' => '',
-            'Activity' => '',
-            'AccountingCode' => '',
-            'Scoring' => '',
-            'Remainder' => 0,
-            'MaxRemainder' => 0,
-            'Moral' => 0,
-            'Folder' => 0,
-            'Currency' => '',
-            'BankReference' => 0,
-            'TaxType' => 0,
-            'VatTaxValue' => 0,
-            'Creator' => 0,
-            'Delivery' => 0,
-            'Billing' => 0,
-            'IsNew' => true,
-            'AutomationRef' => 0, /* don't fill because Mautic company concept isn't managed by the plugin */
-            'InternalRef' => 0
+            'CreationDate'         => date('Y-m-d\TH:i:s'),
+            'ModifiedDate'         => date('Y-m-d\TH:i:s'),
+            'Origin'               => 0,
+            'CustomerNumber'       => 0,
+            'CompanyTaxCode'       => '',
+            'VatTax'               => 0,
+            'Bank'                 => '',
+            'BankAccount'          => '',
+            'PaymentMethod'        => '',
+            'PaymentMethodRef'     => 1, /* MANDATORY AND NOT NULL, OTHERWISE ERROR */
+            'Discount'             => 0,
+            'HeadQuarter'          => 0,
+            'Language'             => '',
+            'Activity'             => '',
+            'AccountingCode'       => '',
+            'Scoring'              => '',
+            'Remainder'            => 0,
+            'MaxRemainder'         => 0,
+            'Moral'                => 0,
+            'Folder'               => 0,
+            'Currency'             => '',
+            'BankReference'        => 0,
+            'TaxType'              => 0,
+            'VatTaxValue'          => 0,
+            'Creator'              => 0,
+            'Delivery'             => 0,
+            'Billing'              => 0,
+            'IsNew'                => true,
+            'AutomationRef'        => 0, /* don't fill because Mautic company concept isn't managed by the plugin */
+            'InternalRef'          => 0,
         ];
     }
 
     private static function getContactTemplate()
     {
         return (object) [
-            'Author' => 0,
-            'BusinessAddress' => '',
-            'BussinesTelephone' => '',
-            'City' => '',
-            'Comment' => "",
-            'CompanyRef' => 0,
-            'Confidentiality' => 'Undefined',
-            'Country' => '',
-            'CreationDate' => date('Y-m-d\TH:i:s'),
-            'DateOfBirth' => date('Y-m-d\TH:i:s'),
-            'Fax' => '',
-            'FirstName' => '',
-            'Function' => '',
-            'Genre' => '',
-            'HomeAddress' => '',
-            'HomeTelephone' => '',
-            'IsNew' => true,
-            'Language' => '',
-            'LastName' => '',
-            'MobilePhone' => '',
-            'ModificationDate' => date("Y-m-d\TH:i:s"),
-            'PrimaryMailAddress' => '',
-            'Rang' => 'Principal',
+            'Author'               => 0,
+            'BusinessAddress'      => '',
+            'BussinesTelephone'    => '',
+            'City'                 => '',
+            'Comment'              => '',
+            'CompanyRef'           => 0,
+            'Confidentiality'      => 'Undefined',
+            'Country'              => '',
+            'CreationDate'         => date('Y-m-d\TH:i:s'),
+            'DateOfBirth'          => date('Y-m-d\TH:i:s'),
+            'Fax'                  => '',
+            'FirstName'            => '',
+            'Function'             => '',
+            'Genre'                => '',
+            'HomeAddress'          => '',
+            'HomeTelephone'        => '',
+            'IsNew'                => true,
+            'Language'             => '',
+            'LastName'             => '',
+            'MobilePhone'          => '',
+            'ModificationDate'     => date("Y-m-d\TH:i:s"),
+            'PrimaryMailAddress'   => '',
+            'Rang'                 => 'Principal',
             'SecondaryMailAddress' => '',
-            'Service' => '',
-            'Type' => 0,
-            'State' => '',
-            'ZipCode' => '',
-            'Desabo' => '',
-            'NPai' => '',
-            'InternalRef' => 0,
-            'AutomationRef' => 0,
-            'Scoring' => 0
+            'Service'              => '',
+            'Type'                 => 0,
+            'State'                => '',
+            'ZipCode'              => '',
+            'Desabo'               => '',
+            'NPai'                 => '',
+            'InternalRef'          => 0,
+            'AutomationRef'        => 0,
+            'Scoring'              => 0,
         ];
     }
 
