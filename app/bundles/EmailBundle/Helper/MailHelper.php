@@ -592,73 +592,66 @@ class MailHelper
      */
     public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'], $useOwnerAsMailer = true)
     {
-        if ($this->tokenizationEnabled) {
-            if (count($this->metadata) && empty($this->fatal)) {
-                $errors             = $this->errors;
-                $errors['failures'] = [];
-                $result             = true;
+        // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
+        $flushed = empty($this->fatal);
+        if ($this->tokenizationEnabled && count($this->metadata) && empty($this->fatal)) {
+            $errors             = $this->errors;
+            $errors['failures'] = [];
+            $flushed            = false;
 
-                foreach ($this->metadata as $fromKey => $metadatum) {
-                    // Whatever is in the message "to" should be ignored as we will send to the contacts grouped by from addresses
-                    // This prevents mailers such as sparkpost from sending duplicates to contacts
-                    $this->message->setTo([]);
+            foreach ($this->metadata as $fromKey => $metadatum) {
+                // Whatever is in the message "to" should be ignored as we will send to the contacts grouped by from addresses
+                // This prevents mailers such as sparkpost from sending duplicates to contacts
+                $this->message->setTo([]);
 
-                    $this->errors = [];
+                $this->errors = [];
 
-                    if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
-                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
-                    } else {
-                        $this->setFrom($this->from, null, null);
-                    }
-
-                    foreach ($metadatum['contacts'] as $email => $contact) {
-                        $this->message->addMetadata($email, $contact);
-
-                        // Add asset stats if applicable
-                        if (!empty($contact['leadId'])) {
-                            $this->queueAssetDownloadEntry($email, $contact);
-                        }
-
-                        $this->message->addTo($email, $contact['name']);
-                    }
-
-                    if (!$this->send(false, true)) {
-                        $result = false;
-                    }
-
-                    // Merge errors
-                    if (isset($this->errors['failures'])) {
-                        $errors['failures'] = array_merge($errors['failures'], $this->errors['failures']);
-                        unset($this->errors['failures']);
-                    }
-
-                    if (!empty($this->errors)) {
-                        $errors = array_merge($errors, $this->errors);
-                    }
-
-                    // Clear metadata for the previous recipients
-                    $this->message->clearMetadata();
+                if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
+                    $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
+                } else {
+                    $this->setFrom($this->from, null, null);
                 }
 
-                $this->errors = $errors;
+                foreach ($metadatum['contacts'] as $email => $contact) {
+                    $this->message->addMetadata($email, $contact);
 
-                // Clear queued to recipients
-                $this->queuedRecipients = [];
-                $this->metadata         = [];
+                    // Add asset stats if applicable
+                    if (!empty($contact['leadId'])) {
+                        $this->queueAssetDownloadEntry($email, $contact);
+                    }
 
-                foreach ($resetEmailTypes as $type) {
-                    $type = ucfirst($type);
-                    $this->message->{'set'.$type}([]);
+                    $this->message->addTo($email, $contact['name']);
                 }
 
-                return $result;
+                $flushed = $this->send(false, true);
+
+                // Merge errors
+                if (isset($this->errors['failures'])) {
+                    $errors['failures'] = array_merge($errors['failures'], $this->errors['failures']);
+                    unset($this->errors['failures']);
+                }
+
+                if (!empty($this->errors)) {
+                    $errors = array_merge($errors, $this->errors);
+                }
+
+                // Clear metadata for the previous recipients
+                $this->message->clearMetadata();
             }
 
-            return false;
+            $this->errors = $errors;
+
+            // Clear queued to recipients
+            $this->queuedRecipients = [];
+            $this->metadata         = [];
         }
 
-        // Batching was not enabled and thus sent with queue()
-        return true;
+        foreach ($resetEmailTypes as $type) {
+            $type = ucfirst($type);
+            $this->message->{'set'.$type}([]);
+        }
+
+        return $flushed;
     }
 
     /**

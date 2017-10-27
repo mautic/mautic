@@ -309,6 +309,13 @@ return [
                     'mailer',
                 ],
             ],
+            'mautic.email.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\Stat::class,
+                ],
+            ],
             // Mailers
             'mautic.transport.amazon' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
@@ -402,12 +409,22 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
+                    'mautic.email.model.send_email_to_contacts',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
                 'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
                 'arguments' => [
                     'mautic.email.model.email',
+                ],
+            ],
+            'mautic.email.model.send_email_to_contacts' => [
+                'class'     => \Mautic\EmailBundle\Model\SendEmailToContacts::class,
+                'arguments' => [
+                    'mautic.helper.mailer',
+                    'mautic.email.repository.stat',
+                    'mautic.lead.model.dnc',
+                    'translator',
                 ],
             ],
         ],
