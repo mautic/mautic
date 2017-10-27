@@ -23,7 +23,7 @@ class ReportEvent extends CommonEvent
      * @param Report $report
      * @param bool   $isNew
      */
-    public function __construct(Report &$report, $isNew = false)
+    public function __construct(Report $report, $isNew = false)
     {
         $this->entity = &$report;
         $this->isNew  = $isNew;

@@ -12,7 +12,9 @@
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
+use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
+use Mautic\ReportBundle\Scheduler\Model\SchedulerModel;
 use Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator;
 
 return [
@@ -102,7 +104,12 @@ return [
                     'mautic.report.model.report',
                     'mautic.security',
                 ],
-
+            ],
+            'mautic.report.scheduler.report_scheduler_subscriber' => [
+                'class'     => ReportSchedulerSubscriber::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_model',
+                ],
             ],
         ],
         'forms' => [
@@ -178,6 +185,13 @@ return [
                 'class'     => DateBuilder::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_builder',
+                ],
+            ],
+            'mautic.report.model.scheduler_model' => [
+                'class'     => SchedulerModel::class,
+                'arguments' => [
+                    'mautic.report.model.scheduler_date_builder',
+                    'doctrine.orm.default_entity_manager',
                 ],
             ],
         ],
