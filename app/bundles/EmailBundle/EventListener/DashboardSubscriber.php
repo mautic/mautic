@@ -175,8 +175,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.email.label.sends'),
+                        'mautic.dashboard.label.title',
+                        'mautic.email.label.sends',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $emails,
@@ -227,8 +227,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.email.label.reads'),
+                        'mautic.dashboard.label.title',
+                        'mautic.email.label.reads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $emails,
@@ -282,7 +282,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        'mautic.dashboard.label.title',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $emails,

@@ -167,8 +167,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.dashboard.label.hits'),
+                        'mautic.dashboard.label.title',
+                        'mautic.dashboard.label.hits',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $pages,
@@ -210,7 +210,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        'mautic.dashboard.label.title',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $pages,
