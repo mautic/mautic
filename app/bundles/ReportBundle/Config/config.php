@@ -13,7 +13,7 @@ use Mautic\ReportBundle\Form\Type\ReportType;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
-use Mautic\ReportBundle\Validator\ScheduleIsValidValidator;
+use Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator;
 
 return [
     'routes' => [

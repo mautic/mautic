@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-namespace Mautic\ReportBundle\Enum;
+namespace Mautic\ReportBundle\Scheduler\Enum;
 
-class RecurentEnum
+class SchedulerEnum
 {
     const UNIT_DAILY   = 'DAILY';
     const UNIT_WEEKLY  = 'WEEKLY'; //Defined in report.js too

@@ -16,8 +16,8 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\ReportBundle\Entity\Report;
-use Mautic\ReportBundle\Enum\RecurentEnum;
 use Mautic\ReportBundle\Model\ReportModel;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\UserBundle\Form\Type\UserListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\ChoiceList\ChoiceList;
@@ -338,7 +338,7 @@ class ReportType extends AbstractType
                 'scheduleUnit',
                 ChoiceType::class,
                 [
-                    'choices'     => RecurentEnum::getUnitEnumForSelect(),
+                    'choices'     => SchedulerEnum::getUnitEnumForSelect(),
                     'expanded'    => false,
                     'multiple'    => false,
                     'label'       => 'mautic.report.schedule.every',
@@ -356,7 +356,7 @@ class ReportType extends AbstractType
                 'scheduleDay',
                 ChoiceType::class,
                 [
-                    'choices'     => RecurentEnum::getDayEnumForSelect(),
+                    'choices'     => SchedulerEnum::getDayEnumForSelect(),
                     'expanded'    => false,
                     'multiple'    => false,
                     'label'       => 'mautic.report.schedule.day',
@@ -374,7 +374,7 @@ class ReportType extends AbstractType
                 'scheduleMonthFrequency',
                 ChoiceType::class,
                 [
-                    'choices'     => RecurentEnum::getMonthFrequencyForSelect(),
+                    'choices'     => SchedulerEnum::getMonthFrequencyForSelect(),
                     'expanded'    => false,
                     'multiple'    => false,
                     'label'       => 'mautic.report.schedule.month_frequency',

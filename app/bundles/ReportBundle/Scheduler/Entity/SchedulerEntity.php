@@ -11,7 +11,7 @@
 
 namespace Mautic\ReportBundle\Scheduler\Entity;
 
-use Mautic\ReportBundle\Enum\RecurentEnum;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
 class SchedulerEntity implements SchedulerInterface
@@ -78,16 +78,16 @@ class SchedulerEntity implements SchedulerInterface
 
     public function isScheduledDaily()
     {
-        return $this->getScheduleUnit() === RecurentEnum::UNIT_DAILY;
+        return $this->getScheduleUnit() === SchedulerEnum::UNIT_DAILY;
     }
 
     public function isScheduledWeekly()
     {
-        return $this->getScheduleUnit() === RecurentEnum::UNIT_WEEKLY;
+        return $this->getScheduleUnit() === SchedulerEnum::UNIT_WEEKLY;
     }
 
     public function isScheduledMonthly()
     {
-        return $this->getScheduleUnit() === RecurentEnum::UNIT_MONTHLY;
+        return $this->getScheduleUnit() === SchedulerEnum::UNIT_MONTHLY;
     }
 }

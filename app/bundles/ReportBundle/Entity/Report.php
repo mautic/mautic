@@ -15,10 +15,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\ReportBundle\Enum\RecurentEnum;
 use Mautic\ReportBundle\Exception\ScheduleNotValidException;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
-use Mautic\ReportBundle\Validator as ReportAssert;
+use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -530,7 +530,7 @@ class Report extends FormEntity implements SchedulerInterface
     public function ensureIsDailyScheduled()
     {
         $this->setIsScheduled(true);
-        $this->setScheduleUnit(RecurentEnum::UNIT_DAILY);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_DAILY);
         $this->setScheduleDay(null);
         $this->setScheduleMonthFrequency(null);
     }
@@ -541,13 +541,13 @@ class Report extends FormEntity implements SchedulerInterface
     public function ensureIsMonthlyScheduled()
     {
         if (
-            !array_key_exists($this->getScheduleMonthFrequency(), RecurentEnum::getMonthFrequencyForSelect()) ||
-            !array_key_exists($this->getScheduleDay(), RecurentEnum::getDayEnumForSelect())
+            !array_key_exists($this->getScheduleMonthFrequency(), SchedulerEnum::getMonthFrequencyForSelect()) ||
+            !array_key_exists($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())
         ) {
             throw new ScheduleNotValidException();
         }
         $this->setIsScheduled(true);
-        $this->setScheduleUnit(RecurentEnum::UNIT_MONTHLY);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_MONTHLY);
     }
 
     /**
@@ -555,26 +555,26 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function ensureIsWeeklyScheduled()
     {
-        if (!array_key_exists($this->getScheduleDay(), RecurentEnum::getDayEnumForSelect())) {
+        if (!array_key_exists($this->getScheduleDay(), SchedulerEnum::getDayEnumForSelect())) {
             throw new ScheduleNotValidException();
         }
         $this->setIsScheduled(true);
-        $this->setScheduleUnit(RecurentEnum::UNIT_WEEKLY);
+        $this->setScheduleUnit(SchedulerEnum::UNIT_WEEKLY);
         $this->setScheduleMonthFrequency(null);
     }
 
     public function isScheduledDaily()
     {
-        return $this->getScheduleUnit() === RecurentEnum::UNIT_DAILY;
+        return $this->getScheduleUnit() === SchedulerEnum::UNIT_DAILY;
     }
 
     public function isScheduledWeekly()
     {
-        return $this->getScheduleUnit() === RecurentEnum::UNIT_WEEKLY;
+        return $this->getScheduleUnit() === SchedulerEnum::UNIT_WEEKLY;
     }
 
     public function isScheduledMonthly()
     {
-        return $this->getScheduleUnit() === RecurentEnum::UNIT_MONTHLY;
+        return $this->getScheduleUnit() === SchedulerEnum::UNIT_MONTHLY;
     }
 }
