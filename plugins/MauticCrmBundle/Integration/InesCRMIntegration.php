@@ -52,6 +52,10 @@ class InesCRMIntegration extends CrmAbstractIntegration
         ];
     }
 
+    public function isAuthorized() {
+        return $this->isConfigured();
+    }
+
     public function getSupportedFeatures()
     {
         return ['push_lead', 'push_leads'];
