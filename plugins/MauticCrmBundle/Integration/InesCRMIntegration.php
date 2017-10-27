@@ -86,7 +86,6 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $companyFields = $this->getDefaultClientFields();
 
         $customFields = $this->getApiHelper()->getSyncInfo()
-                             ->GetSyncInfoResult
                              ->CompanyCustomFields
                              ->CustomFieldToAuto;
 
@@ -106,7 +105,6 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $leadFields = $this->getDefaultContactFields();
 
         $customFields = $this->getApiHelper()->getSyncInfo()
-                             ->GetSyncInfoResult
                              ->ContactCustomFields
                              ->CustomFieldToAuto;
 
@@ -249,6 +247,16 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $companyModel->saveEntity($company);
                 $leadModel->saveEntity($lead);
 
+                $mappedLeadData = self::getLeadTemplate();
+                $mappedLeadData->ClRef = $inesClientRef;
+                $mappedLeadData->CtRef = $inesContactRef;
+                $mappedLeadData->MailExpe = $lead->getEmail();
+                $mappedLeadData->AutomationScoring = $lead->getPoints();
+                $mappedLeadData->FileRef = $apiHelper->getSyncInfo()->LeadRef;
+                $mappedLeadData->DescriptionCourte = 'Mautic Lead';
+
+                $apiHelper->createLead($mappedLeadData);
+
                 $result = [
                     /* updated: */ 0,
                     /* created: */ 1,
@@ -313,6 +321,16 @@ class InesCRMIntegration extends CrmAbstractIntegration
 
                 $lead->$leadInternalRefSetter($inesContactRef);
                 $leadModel->saveEntity($lead);
+
+                $mappedLeadData = self::getLeadTemplate();
+                $mappedLeadData->ClRef = $inesClientRef;
+                $mappedLeadData->CtRef = $inesContactRef;
+                $mappedLeadData->MailExpe = $lead->getEmail();
+                $mappedLeadData->AutomationScoring = $lead->getPoints();
+                $mappedLeadData->FileRef = $apiHelper->getSyncInfo()->LeadRef;
+                $mappedLeadData->DescriptionCourte = 'Mautic Lead';
+
+                $apiHelper->createLead($mappedLeadData);
 
                 $inesClient = $apiHelper->getClient($inesClientRef)->GetClientResult;
 
@@ -769,6 +787,29 @@ class InesCRMIntegration extends CrmAbstractIntegration
             'InternalRef' => 0,
             'AutomationRef' => 0,
             'Scoring' => 0
+        ];
+    }
+
+    private static function getLeadTemplate()
+    {
+        return (object) [
+            'ClRef' => 0,
+            'CtRef' => 0,
+            'MailExpe' => '',
+            'AutomationScoring' => 0,
+            'FileRef' => 0,
+            'DescriptionCourte' => '',
+            'ReclaDescDetail' => '',
+            'CriticiteRef' => 0,
+            'TypeRef' => 0,
+            'EtatRef' => 0,
+            'OrigineRef' => 0,
+            'DossierRef' => 0,
+            'CampagneRef' => 0,
+            'ArticleRef' => 0,
+            'ReclaMere' => 0,
+            'Propietaire' => 0,
+            'Gestionnaire' => 0,
         ];
     }
 
