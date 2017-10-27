@@ -21,6 +21,8 @@ interface SchedulerInterface
 
     public function isScheduledMonthly();
 
+    public function isScheduledWeekDays();
+
     public function getScheduleDay();
 
     public function getScheduleMonthFrequency();

@@ -13,6 +13,7 @@ namespace Mautic\ReportBundle\Scheduler\Builder;
 
 use Mautic\ReportBundle\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\BuilderInterface;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Recurr\Exception\InvalidArgument;
 use Recurr\Exception\InvalidRRule;
@@ -32,7 +33,14 @@ class SchedulerWeeklyBuilder implements BuilderInterface
     {
         try {
             $rule->setFreq('WEEKLY');
-            $rule->setByDay([$scheduler->getScheduleDay()]);
+
+            if ($scheduler->isScheduledWeekDays()) {
+                $days = SchedulerEnum::getWeekDays();
+            } else {
+                $days = [$scheduler->getScheduleDay()];
+            }
+
+            $rule->setByDay($days);
         } catch (InvalidArgument $e) {
             throw new InvalidSchedulerException();
         } catch (InvalidRRule $e) {
