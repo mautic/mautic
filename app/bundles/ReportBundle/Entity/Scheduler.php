@@ -48,7 +48,6 @@ class Scheduler
 
         $builder->createManyToOne('report', Report::class)
             ->addJoinColumn('report_id', 'id', false, false, 'CASCADE')
-            ->cascadeRemove()
             ->build();
 
         $builder->createField('scheduleDate', 'datetime')
