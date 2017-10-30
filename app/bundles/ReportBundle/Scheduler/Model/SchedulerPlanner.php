@@ -18,7 +18,7 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 
-class SchedulerModel
+class SchedulerPlanner
 {
     /**
      * @var DateBuilder

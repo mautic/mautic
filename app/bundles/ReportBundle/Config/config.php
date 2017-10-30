@@ -14,7 +14,7 @@ use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
-use Mautic\ReportBundle\Scheduler\Model\SchedulerModel;
+use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator;
 
 return [
@@ -188,7 +188,7 @@ return [
                 ],
             ],
             'mautic.report.model.scheduler_model' => [
-                'class'     => SchedulerModel::class,
+                'class'     => SchedulerPlanner::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_date_builder',
                     'doctrine.orm.default_entity_manager',

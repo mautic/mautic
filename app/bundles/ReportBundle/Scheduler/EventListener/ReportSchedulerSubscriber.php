@@ -13,19 +13,19 @@ namespace Mautic\ReportBundle\Scheduler\EventListener;
 
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\ReportEvents;
-use Mautic\ReportBundle\Scheduler\Model\SchedulerModel;
+use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSchedulerSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var SchedulerModel
+     * @var SchedulerPlanner
      */
-    private $schedulerModel;
+    private $schedulerPlanner;
 
-    public function __construct(SchedulerModel $schedulerModel)
+    public function __construct(SchedulerPlanner $schedulerPlanner)
     {
-        $this->schedulerModel = $schedulerModel;
+        $this->schedulerPlanner = $schedulerPlanner;
     }
 
     /**
@@ -40,7 +40,7 @@ class ReportSchedulerSubscriber implements EventSubscriberInterface
     {
         $report = $event->getReport();
 
-        $this->schedulerModel->computeScheduler($report);
+        $this->schedulerPlanner->computeScheduler($report);
 
         return $event;
     }
