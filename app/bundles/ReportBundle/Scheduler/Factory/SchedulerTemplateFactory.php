@@ -11,11 +11,11 @@
 
 namespace Mautic\ReportBundle\Scheduler\Factory;
 
-use Mautic\ReportBundle\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerDailyBuilder;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerMonthBuilder;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerWeeklyBuilder;
 use Mautic\ReportBundle\Scheduler\BuilderInterface;
+use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
 class SchedulerTemplateFactory

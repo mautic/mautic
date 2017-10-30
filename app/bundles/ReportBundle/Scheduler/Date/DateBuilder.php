@@ -11,11 +11,11 @@
 
 namespace Mautic\ReportBundle\Scheduler\Date;
 
-use Mautic\ReportBundle\Exception\InvalidSchedulerException;
-use Mautic\ReportBundle\Exception\NoScheduleException;
-use Mautic\ReportBundle\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
+use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
+use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
+use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 
 class DateBuilder

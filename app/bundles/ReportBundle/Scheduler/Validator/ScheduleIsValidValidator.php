@@ -12,10 +12,10 @@
 namespace Mautic\ReportBundle\Scheduler\Validator;
 
 use Mautic\ReportBundle\Entity\Report;
-use Mautic\ReportBundle\Exception\InvalidSchedulerException;
-use Mautic\ReportBundle\Exception\NotSupportedScheduleTypeException;
-use Mautic\ReportBundle\Exception\ScheduleNotValidException;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
+use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
+use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
+use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 

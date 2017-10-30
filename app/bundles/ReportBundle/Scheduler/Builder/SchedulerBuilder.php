@@ -11,8 +11,8 @@
 
 namespace Mautic\ReportBundle\Scheduler\Builder;
 
-use Mautic\ReportBundle\Exception\InvalidSchedulerException;
-use Mautic\ReportBundle\Exception\NotSupportedScheduleTypeException;
+use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
+use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Recurr\Exception\InvalidWeekday;

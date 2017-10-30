@@ -11,9 +11,9 @@
 
 namespace Mautic\ReportBundle\Scheduler\Builder;
 
-use Mautic\ReportBundle\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\BuilderInterface;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
+use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Recurr\Exception\InvalidArgument;
 use Recurr\Exception\InvalidRRule;

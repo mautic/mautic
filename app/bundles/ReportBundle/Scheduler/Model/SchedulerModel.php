@@ -15,8 +15,8 @@ use Doctrine\ORM\EntityManager;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
-use Mautic\ReportBundle\Exception\NoScheduleException;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
+use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 
 class SchedulerModel
 {
