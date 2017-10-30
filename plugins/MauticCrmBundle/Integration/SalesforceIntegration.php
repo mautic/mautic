@@ -14,7 +14,6 @@ namespace MauticPlugin\MauticCrmBundle\Integration;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -751,7 +750,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushCompany($company,  $config = [])
+    public function pushCompany($company, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -2540,6 +2539,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $mappedData;
     }
+
     /**
      * @param Lead $lead
      * @param      $config
@@ -2631,6 +2631,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $fields;
     }
+
     /**
      * @param array $params
      *
@@ -3010,6 +3011,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return 0 === $toUpdateCount;
     }
+
     /**
      * @param      $checkIdsInSF
      * @param      $mauticCompanyFieldString
