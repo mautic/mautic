@@ -320,14 +320,6 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             $company = $existingCompany[2];
         }
 
-        $companyFieldTypes = $this->fieldModel->getFieldListWithProperties('company');
-
-        foreach ($matchedFields as $companyField => $value) {
-            if (isset($companyFieldTypes[$companyField]['type']) && $companyFieldTypes[$companyField]['type'] == 'text') {
-                $matchedFields[$companyField] = substr($value, 0, 255);
-            }
-        }
-
         if (!$company->isNew()) {
             $fieldsToUpdate = $this->getPriorityFieldsForMautic($config, $object, 'mautic_company');
             $fieldsToUpdate = array_intersect_key($config['companyFields'], $fieldsToUpdate);
@@ -378,14 +370,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $leadModel           = $this->leadModel;
         $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
         $uniqueLeadFieldData = [];
-        $leadFieldTypes      = $this->fieldModel->getFieldListWithProperties();
 
         foreach ($matchedFields as $leadField => $value) {
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
-            }
-            if (isset($leadFieldTypes[$leadField]['type']) && $leadFieldTypes[$leadField]['type'] == 'text') {
-                $matchedFields[$leadField] = substr($value, 0, 255);
             }
         }
 
