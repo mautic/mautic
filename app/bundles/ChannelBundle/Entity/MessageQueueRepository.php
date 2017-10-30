@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 class MessageQueueRepository extends CommonRepository
 {
     use TimelineTrait;
+
     /**
      * @param $channel
      * @param $channelId

@@ -160,7 +160,6 @@ class MonitoringController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
-
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
@@ -519,7 +518,6 @@ class MonitoringController extends FormController
         ];
 
         if ($this->request->getMethod() == 'POST') {
-
             /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
             $model  = $this->getModel('social.monitoring');
             $entity = $model->getEntity($objectId);

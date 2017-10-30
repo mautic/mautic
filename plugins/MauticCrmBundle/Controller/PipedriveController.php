@@ -92,7 +92,6 @@ class PipedriveController extends CommonController
                     $response = [
                         'status' => 'unsupported event',
                     ];
-
             }
         } catch (\Exception $e) {
             return new JsonResponse([

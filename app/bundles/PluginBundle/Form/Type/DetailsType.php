@@ -68,7 +68,6 @@ class DetailsType extends AbstractType
                     'class'   => 'btn btn-success btn-lg',
                     'onclick' => 'Mautic.initiateIntegrationAuthorization()',
                     'icon'    => 'fa fa-key',
-
                 ],
                 'label'    => 'mautic.integration.form.'.$label,
                 'disabled' => $disabled,

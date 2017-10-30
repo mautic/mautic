@@ -338,7 +338,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                             'helper' => $this->factory->getHelper('integration'),
                             'attr'   => [
                                 'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
-
                             ],
                             'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
                         ]);
@@ -995,6 +994,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         return $recordList;
     }
+
     /**
      * @return array
      */

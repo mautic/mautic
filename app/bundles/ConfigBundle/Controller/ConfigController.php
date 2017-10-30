@@ -75,7 +75,6 @@ class ConfigController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritabale && $isValid = $this->isFormValid($form)) {
-
                     // Bind request to the form
                     $post     = $this->request->request;
                     $formData = $form->getData();
@@ -279,7 +278,6 @@ class ConfigController extends FormController
         $localParams = $parameters;
 
         foreach ($forms as &$form) {
-
             // Merge the bundle params with the local params
             foreach ($form['parameters'] as $key => $value) {
                 if (in_array($key, $doNotChange)) {

@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormBuilder;
 abstract class EmailAbstractIntegration extends AbstractIntegration
 {
     protected $pushContactLink = false;
+
     /**
      * @return array
      */

@@ -128,7 +128,6 @@ abstract class ModeratedCommand extends ContainerAwareCommand
      */
     private function checkStatus($force = false, $lockMode = null)
     {
-
         // getmypid may be disabled and posix_getpgid is not available on Windows machines
         if ((is_null($lockMode) || $lockMode === 'pid') && function_exists('getmypid') && function_exists('posix_getpgid')) {
             $disabled = explode(',', ini_get('disable_functions'));

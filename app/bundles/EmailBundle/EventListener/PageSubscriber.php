@@ -65,7 +65,6 @@ class PageSubscriber extends CommonSubscriber
         $redirect = $hit->getRedirect();
 
         if ($redirect && $email = $hit->getEmail()) {
-
             //click trigger condition
             $this->campaignEventModel->triggerEvent('email.click', $hit, 'email', $email->getId());
             // Check for an email stat

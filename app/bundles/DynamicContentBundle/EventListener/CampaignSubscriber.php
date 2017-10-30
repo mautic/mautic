@@ -106,7 +106,6 @@ class CampaignSubscriber extends CommonSubscriber
                 'formTheme'       => 'MauticDynamicContentBundle:FormTheme\DynamicContentDecisionList',
                 'channel'         => 'dynamicContent',
                 'channelIdField'  => 'dynamicContent',
-
             ]
         );
     }

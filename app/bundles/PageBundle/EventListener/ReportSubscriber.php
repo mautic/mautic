@@ -222,7 +222,6 @@ class ReportSubscriber extends CommonSubscriber
                         'label' => 'mautic.lead.device_os_platform',
                         'type'  => 'string',
                     ],
-
                 ];
                 $data = [
                     'display_name' => 'mautic.page.hits',

@@ -3,6 +3,6 @@
     <?php foreach ($form->vars['choices'] as $condition) {
     ?>
     <option value="<?php echo $condition->value; ?>"<?php echo ($condition->value == $form->vars['data']) ? ' selected' : '' ?>><?php echo $condition->label; ?></option>
-    <?php 
+    <?php
 } ?>
 </select>

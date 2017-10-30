@@ -25,6 +25,7 @@ class CampaignTestAbstract extends \PHPUnit_Framework_TestCase
 {
     protected static $mockId   = 232;
     protected static $mockName = 'Mock name';
+
     /**
      * @return CampaignModel
      */

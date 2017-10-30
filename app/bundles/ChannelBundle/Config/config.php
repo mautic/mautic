@@ -34,7 +34,6 @@ return [
             ],
         ],
         'public' => [
-
         ],
     ],
 
@@ -48,13 +47,10 @@ return [
             ],
         ],
         'admin' => [
-
         ],
         'profile' => [
-
         ],
         'extra' => [
-
         ],
     ],
 
@@ -84,7 +80,6 @@ return [
             'mautic.channel.reportbundle.subscriber' => [
                 'class' => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
             ],
-
         ],
         'forms' => [
             \Mautic\ChannelBundle\Form\Type\MessageType::class => [
@@ -136,6 +131,5 @@ return [
     ],
 
     'parameters' => [
-
     ],
 ];

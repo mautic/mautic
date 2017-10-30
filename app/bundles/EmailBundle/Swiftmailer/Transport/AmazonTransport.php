@@ -77,7 +77,6 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
      */
     public function processJsonPayload(array $payload, $logger, $translator)
     {
-
         // Data structure that Mautic expects to be returned from this callback
         $rows = [
             DoNotContact::BOUNCED => [

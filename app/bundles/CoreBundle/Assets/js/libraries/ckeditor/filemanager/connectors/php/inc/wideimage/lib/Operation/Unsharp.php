@@ -26,7 +26,6 @@
          */
         public function execute($image, $amount, $radius, $threshold)
         {
-
             // Attempt to calibrate the parameters to Photoshop:
             if ($amount > 500) {
                 $amount = 500;

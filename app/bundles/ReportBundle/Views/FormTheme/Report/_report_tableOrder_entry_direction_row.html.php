@@ -4,7 +4,7 @@
         <?php foreach ($form->vars['choices'] as $direction) {
     ?>
         <option value="<?php echo $direction->value; ?>"<?php echo ($direction->value == $form->vars['data']) ? ' selected' : '' ?>><?php echo $direction->label; ?></option>
-        <?php 
+        <?php
 } ?>
     </select>
 </div>

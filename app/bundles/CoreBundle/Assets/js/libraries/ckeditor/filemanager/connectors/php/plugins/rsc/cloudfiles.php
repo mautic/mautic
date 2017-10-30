@@ -218,6 +218,7 @@ class CF_Authentication
 
         return true;
     }
+
     /**
      * Use Cached Token and Storage URL's rather then grabbing from the Auth System.
      *
@@ -252,6 +253,7 @@ class CF_Authentication
 
         return true;
     }
+
     /**
      * Grab Cloud Files info to be Cached for later use with the load_cached_credentials method.
      *
@@ -1086,6 +1088,7 @@ class CF_Container
 
         return $this->cdn_uri;
     }
+
     /**
      * Purge Containers objects from CDN Cache.
      * Example:
@@ -1119,6 +1122,7 @@ class CF_Container
 
         return true;
     }
+
     /**
      * Enable ACL restriction by User Agent for this container.
      *
@@ -2169,6 +2173,7 @@ class CF_Object
 
         return $result;
     }
+
     /**
      * Purge this Object from CDN Cache.
      * Example:

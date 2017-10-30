@@ -1189,7 +1189,6 @@ class EventModel extends CommonFormModel
 
                         // Prevent path if lead has already gone down this path
                         if (!isset($leadLog[$lead->getId()]) || !array_key_exists($parentId, $leadLog[$lead->getId()])) {
-
                             // Get date to compare against
                             $utcDateString = ($grandParentId) ? $leadLog[$lead->getId()][$grandParentId]['date_triggered']
                                 : $campaignLeadDates[$lead->getId()];
@@ -1243,7 +1242,6 @@ class EventModel extends CommonFormModel
                             }
 
                             if ($max && ($totalEventCount + count($nonActionEvents)) >= $max) {
-
                                 // Hit the max or will hit the max while mid-process for the lead
                                 if ($output && isset($progress)) {
                                     $progress->finish();

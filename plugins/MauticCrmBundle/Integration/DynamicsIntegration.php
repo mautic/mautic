@@ -214,7 +214,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
             return [
                 'template'   => 'MauticCrmBundle:Integration:dynamics.html.php',
                 'parameters' => [
-
                 ],
             ];
         }
@@ -801,7 +800,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         $leadsToUpdateInD    = [];
         $integrationEntities = [];
 
-        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'],  $object, [])[$object];
+        $toUpdate = $integrationEntityRepo->findLeadsToUpdate('Dynamics', 'lead', $fields, $totalToUpdate, $params['start'], $params['end'], $object, [])[$object];
 
         if (is_array($toUpdate)) {
             $totalUpdated += count($toUpdate);
@@ -938,6 +937,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
             }
         }
     }
+
     private function getExistingRecord($seachColumn, $searchValue, $object = 'contacts')
     {
         $availableFields    = $this->getAvailableLeadFields();
