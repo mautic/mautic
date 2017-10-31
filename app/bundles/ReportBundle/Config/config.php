@@ -9,11 +9,14 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Model\ExcelExporter;
+use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
+use Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
@@ -111,7 +114,7 @@ return [
             'mautic.report.scheduler.report_scheduler_subscriber' => [
                 'class'     => ReportSchedulerSubscriber::class,
                 'arguments' => [
-                    'mautic.report.model.scheduler_model',
+                    'mautic.report.model.scheduler_planner',
                 ],
             ],
         ],
@@ -203,11 +206,24 @@ return [
                     'mautic.report.model.scheduler_builder',
                 ],
             ],
-            'mautic.report.model.scheduler_model' => [
+            'mautic.report.model.scheduler_planner' => [
                 'class'     => SchedulerPlanner::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_date_builder',
                     'doctrine.orm.default_entity_manager',
+                ],
+            ],
+            'mautic.report.model.report_exporter' => [
+                'class'     => ReportExporter::class,
+                'arguments' => [
+                    'doctrine.orm.default_entity_manager',
+                    'mautic.report.model.report_data_adapter',
+                ],
+            ],
+            'mautic.report.model.report_data_adapter' => [
+                'class'     => ReportDataAdapter::class,
+                'arguments' => [
+                    'mautic.report.model.report',
                 ],
             ],
         ],
@@ -218,6 +234,15 @@ return [
                     'mautic.report.model.scheduler_builder',
                 ],
                 'tag' => 'validator.constraint_validator',
+            ],
+        ],
+        'command' => [
+            'mautic.report.command.export_scheduler' => [
+                'class'     => ExportSchedulerCommand::class,
+                'arguments' => [
+                    'mautic.report.model.report_exporter',
+                ],
+                'tag' => 'console.command',
             ],
         ],
     ],
