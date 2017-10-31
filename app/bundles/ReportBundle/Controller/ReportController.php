@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ExportResponse;
 use Symfony\Component\HttpFoundation;
 
 /**
@@ -812,7 +813,7 @@ class ReportController extends FormController
 
         if ($format === 'csv') {
             $response = new HttpFoundation\StreamedResponse(
-                function () use ($model, $fromDate, $toDate, $entity, $format, $name, $options) {
+                function () use ($model, $entity, $format, $options) {
                     $options['paginate'] = true;
                     $options['ignoreGraphData'] = true;
                     $options['limit'] =
@@ -828,12 +829,8 @@ class ReportController extends FormController
                 }
             );
 
-            $response->headers->set('Content-Type', 'application/force-download');
-            $response->headers->set('Content-Type', 'application/octet-stream');
-            $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.'.$format.'"');
-            $response->headers->set('Expires', 0);
-            $response->headers->set('Cache-Control', 'must-revalidate');
-            $response->headers->set('Pragma', 'public');
+            $fileName = $name.'.'.$format;
+            ExportResponse::setResponseHeaders($response, $fileName);
         } else {
             if ($format === 'xlsx') {
                 $options['ignoreGraphData'] = true;

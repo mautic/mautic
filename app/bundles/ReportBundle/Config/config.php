@@ -10,6 +10,9 @@
  */
 
 use Mautic\ReportBundle\Form\Type\ReportType;
+use Mautic\ReportBundle\Model\CsvExporter;
+use Mautic\ReportBundle\Model\ExcelExporter;
+use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
@@ -161,14 +164,27 @@ return [
         ],
         'models' => [
             'mautic.report.model.report' => [
-                'class'     => 'Mautic\ReportBundle\Model\ReportModel',
+                'class'     => ReportModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.helper.template.formatter',
                     'mautic.helper.templating',
                     'mautic.channel.helper.channel_list',
                     'mautic.lead.model.field',
                     'mautic.report.helper.report',
+                    'mautic.report.model.csv_exporter',
+                    'mautic.report.model.excel_exporter',
+                ],
+            ],
+            'mautic.report.model.csv_exporter' => [
+                'class'     => CsvExporter::class,
+                'arguments' => [
+                    'mautic.helper.template.formatter',
+                ],
+            ],
+            'mautic.report.model.excel_exporter' => [
+                'class'     => ExcelExporter::class,
+                'arguments' => [
+                    'mautic.helper.template.formatter',
                 ],
             ],
             'mautic.report.model.scheduler_builder' => [
