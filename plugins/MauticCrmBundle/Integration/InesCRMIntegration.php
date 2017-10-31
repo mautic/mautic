@@ -54,7 +54,8 @@ class InesCRMIntegration extends CrmAbstractIntegration
         ];
     }
 
-    public function isAuthorized() {
+    public function isAuthorized()
+    {
         return $this->isConfigured();
     }
 
@@ -200,11 +201,11 @@ class InesCRMIntegration extends CrmAbstractIntegration
         $companyModel = $this->companyModel;
         $leadModel    = $this->leadModel;
 
-        $emailRepo = $this->em->getRepository(Email::class);
+        $emailRepo  = $this->em->getRepository(Email::class);
         $doNotEmail = $emailRepo->checkDoNotEmail($lead->getEmail());
 
         $leadUnsubscribed = $doNotEmail['unsubscribed'] || $doNotEmail['manual'];
-        $leadBounced = $doNotEmail['bounced'];
+        $leadBounced      = $doNotEmail['bounced'];
 
         $lead      = $leadModel->getEntity($lead->getId());
         $companies = $leadModel->getCompanies($lead);
@@ -269,12 +270,12 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $companyModel->saveEntity($company);
                 $leadModel->saveEntity($lead);
 
-                $mappedLeadData = self::getLeadTemplate();
-                $mappedLeadData->ClRef = $inesClientRef;
-                $mappedLeadData->CtRef = $inesContactRef;
-                $mappedLeadData->MailExpe = $lead->getEmail();
+                $mappedLeadData                    = self::getLeadTemplate();
+                $mappedLeadData->ClRef             = $inesClientRef;
+                $mappedLeadData->CtRef             = $inesContactRef;
+                $mappedLeadData->MailExpe          = $lead->getEmail();
                 $mappedLeadData->AutomationScoring = $lead->getPoints();
-                $mappedLeadData->FileRef = $apiHelper->getSyncInfo()->LeadRef;
+                $mappedLeadData->FileRef           = $apiHelper->getSyncInfo()->LeadRef;
                 $mappedLeadData->DescriptionCourte = 'Mautic Lead';
 
                 $apiHelper->createLead($mappedLeadData);
@@ -345,12 +346,12 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 $lead->$leadInternalRefSetter($inesContactRef);
                 $leadModel->saveEntity($lead);
 
-                $mappedLeadData = self::getLeadTemplate();
-                $mappedLeadData->ClRef = $inesClientRef;
-                $mappedLeadData->CtRef = $inesContactRef;
-                $mappedLeadData->MailExpe = $lead->getEmail();
+                $mappedLeadData                    = self::getLeadTemplate();
+                $mappedLeadData->ClRef             = $inesClientRef;
+                $mappedLeadData->CtRef             = $inesContactRef;
+                $mappedLeadData->MailExpe          = $lead->getEmail();
                 $mappedLeadData->AutomationScoring = $lead->getPoints();
-                $mappedLeadData->FileRef = $apiHelper->getSyncInfo()->LeadRef;
+                $mappedLeadData->FileRef           = $apiHelper->getSyncInfo()->LeadRef;
                 $mappedLeadData->DescriptionCourte = 'Mautic Lead';
 
                 $apiHelper->createLead($mappedLeadData);
@@ -834,23 +835,23 @@ class InesCRMIntegration extends CrmAbstractIntegration
     private static function getLeadTemplate()
     {
         return (object) [
-            'ClRef' => 0,
-            'CtRef' => 0,
-            'MailExpe' => '',
+            'ClRef'             => 0,
+            'CtRef'             => 0,
+            'MailExpe'          => '',
             'AutomationScoring' => 0,
-            'FileRef' => 0,
+            'FileRef'           => 0,
             'DescriptionCourte' => '',
-            'ReclaDescDetail' => '',
-            'CriticiteRef' => 0,
-            'TypeRef' => 0,
-            'EtatRef' => 0,
-            'OrigineRef' => 0,
-            'DossierRef' => 0,
-            'CampagneRef' => 0,
-            'ArticleRef' => 0,
-            'ReclaMere' => 0,
-            'Propietaire' => 0,
-            'Gestionnaire' => 0,
+            'ReclaDescDetail'   => '',
+            'CriticiteRef'      => 0,
+            'TypeRef'           => 0,
+            'EtatRef'           => 0,
+            'OrigineRef'        => 0,
+            'DossierRef'        => 0,
+            'CampagneRef'       => 0,
+            'ArticleRef'        => 0,
+            'ReclaMere'         => 0,
+            'Propietaire'       => 0,
+            'Gestionnaire'      => 0,
         ];
     }
 
