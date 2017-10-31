@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Aws\CommandInterface;
 use Aws\CommandPool;
 use Aws\Credentials\Credentials;
 use Aws\Exception\AwsException;
@@ -141,61 +140,61 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
             if ($evt->bubbleCancelled()) {
                 return 0;
             }
-        }     
+        }
         $count = $this->getBatchRecipientCount($message);
-        
-        //If found any attachment, send mail using sendRawEmail method 
+
+        //If found any attachment, send mail using sendRawEmail method
         //current sendBulkTemplatedEmail method doesn't support attachments
-        if ( !empty($message->getAttachments()) ){
+        if (!empty($message->getAttachments())) {
             return $this->sendRawEmail($message, $evt, $failedRecipients);
         }
-        
+
         list($amazonTemplate, $amazonMessage) = $this->getAmazonSesMessage($message);
-        $amazonTemplateName = $amazonTemplate['TemplateName'];
-        
+        $amazonTemplateName                   = $amazonTemplate['TemplateName'];
         try {
-            $client     = $this->start();
-            
+            $client = $this->start();
+
             $promise = $client->createTemplateAsync([
                 'Template' => $amazonTemplate,
             ]);
-            
-            $promise->then(function () use ($client, $amazonMessage, $amazonTemplateName ) {
+
+            $promise->then(function () use ($client, $amazonMessage, $amazonTemplateName) {
                 $client->sendBulkTemplatedEmailAsync($amazonMessage)->then(
                     function () use ($amazonTemplateName) {
                         $client->deleteTemplate([
                             'TemplateName' => $amazonTemplateName,
-                        ]);
+                        ])->wait();
                     }
-                );
+                )->wait();
             });
-            
+
+            $promise->wait();
+
             if ($evt) {
                 $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
                 $evt->setFailedRecipients($failedRecipients);
                 $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
             }
-                        
+
             return $count;
         } catch (AwsException $ex) {
-            $this->triggerSendError($evt,$failedRecipients);
+            $this->triggerSendError($evt, $failedRecipients);
             $message->generateId();
-            
+
             $this->throwException($ex->getAwsErrorMessage());
         } catch (Exception $e) {
-            $this->triggerSendError($evt,$failedRecipients);
+            $this->triggerSendError($evt, $failedRecipients);
             $message->generateId();
-            
+
             $this->throwException($e->getMessage());
         }
-        
+
         return $count;
     }
-    
+
     /**
      * @param type $evt
      * @param type $failedRecipients
-     * 
      */
     private function triggerSendError($evt, $failedRecipients)
     {
@@ -212,7 +211,7 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
             $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
         }
     }
-    
+
     /**
      * @param \Swift_Mime_Message $message
      *
@@ -221,72 +220,71 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
     public function getAmazonSesMessage(\Swift_Mime_Message $message)
     {
         $this->message = $message;
-        $metadata      = $this->getMetadata();        
-        $messageArray = [];
-                
+        $metadata      = $this->getMetadata();
+        $messageArray  = [];
+
         if (!empty($metadata)) {
             $metadataSet  = reset($metadata);
-            $emailId = $metadataSet['emailId'];
+            $emailId      = $metadataSet['emailId'];
             $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
             $mauticTokens = array_keys($tokens);
             $tokenReplace = $amazonTokens = [];
             foreach ($tokens as $search => $token) {
-                $tokenKey = preg_replace('/[^\da-z]/i', '_', trim($search, '{}'));
+                $tokenKey              = preg_replace('/[^\da-z]/i', '_', trim($search, '{}'));
                 $tokenReplace[$search] = '{{'.$tokenKey.'}}';
                 $amazonTokens[$search] = $tokenKey;
             }
             $messageArray = $this->messageToArray($mauticTokens, $tokenReplace, true);
         }
-        
+
         $CcAddresses = [];
         if (count($messageArray['recipients']['cc']) > 0) {
             $CcAddresses = array_keys($messageArray['recipients']['cc']);
         }
-        
+
         $BccAddresses = [];
         if (count($messageArray['recipients']['cc']) > 0) {
             $BccAddresses = array_keys($messageArray['recipients']['bcc']);
         }
-        
+
         //build amazon ses template array
         $template = [
-            "TemplateName" => "MauticTemplate".$emailId.time(),//unique template name
-            "SubjectPart" => $messageArray["subject"],
-            "TextPart" => $messageArray["text"],
-            "HtmlPart" => $messageArray["html"]
+            'TemplateName' => 'MauticTemplate'.$emailId.time(), //unique template name
+            'SubjectPart'  => $messageArray['subject'],
+            'TextPart'     => $messageArray['text'],
+            'HtmlPart'     => $messageArray['html'],
         ];
-        
+
         $destinations = [];
         foreach ($metadata as $recipient => $mailData) {
-            
             $ReplacementTemplateData = [];
-            foreach ( $mailData['tokens'] as $token => $tokenData) {
+            foreach ($mailData['tokens'] as $token => $tokenData) {
                 $ReplacementTemplateData[$amazonTokens[$token]] = $tokenData;
             }
-            
+
             $destinations[] = [
                 'Destination' => [
                     'BccAddresses' => $BccAddresses,
-                    'CcAddresses' => $CcAddresses,
-                    'ToAddresses' => [$recipient],
+                    'CcAddresses'  => $CcAddresses,
+                    'ToAddresses'  => [$recipient],
                 ],
-                'ReplacementTemplateData' => $ReplacementTemplateData,
+                'ReplacementTemplateData' => \GuzzleHttp\json_encode($ReplacementTemplateData),
             ];
         }
-        
+
         //build amazon ses message array
+
         $amazonMessage = [
-            'ConfigurationSetName' => 'ConfigSet',
-            'Destinations' => $destinations,
-            'ReplyToAddresses' => $messageArray['replyTo']['email'],
-            'Source' => $messageArray['from']['email'],
-            'Template' => $template['TemplateName'],
+        'DefaultTemplateData'  => $destinations[0]['ReplacementTemplateData'],
+            'Destinations'     => $destinations,
+            'ReplyToAddresses' => [$messageArray['replyTo']['email']],
+            'Source'           => $messageArray['from']['email'],
+            'Template'         => $template['TemplateName'],
         ];
-        
-        return array($template, $amazonMessage);
+
+        return [$template, $amazonMessage];
     }
-    
-    
+
     /**
      * @param \Swift_Mime_Message $message
      * @param null                $failedRecipients
@@ -296,14 +294,14 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
     public function sendRawEmail(\Swift_Mime_Message $message, $evt, &$failedRecipients = null)
     {
         try {
-            $client     = $this->start();
-            $commands   = [];
-            foreach ($this->getAmazonMessage($message) as $rawEmail) {                
+            $client   = $this->start();
+            $commands = [];
+            foreach ($this->getAmazonMessage($message) as $rawEmail) {
                 $commands[] = $client->getCommand('sendRawEmail', $rawEmail);
             }
-            $pool       = new CommandPool($client, $commands, [
+            $pool = new CommandPool($client, $commands, [
                 'concurrency' => $this->concurrency,
-                'fulfilled' => function (ResultInterface $result, $iteratorId) use ($commands, $evt) {
+                'fulfilled'   => function (ResultInterface $result, $iteratorId) use ($commands, $evt) {
                     if ($evt) {
                         $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
                         $evt->setFailedRecipients($failedRecipients);
@@ -316,17 +314,17 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
             ]);
             $promise = $pool->promise();
             $promise->wait();
-            
+
             return count($commands);
         } catch (\Exception $e) {
-            $this->triggerSendError($evt,$failedRecipients);
+            $this->triggerSendError($evt, $failedRecipients);
             $message->generateId();
             $this->throwException($e->getMessage());
         }
-        
+
         return 1;
     }
-    
+
     /**
      * @param \Swift_Mime_Message $message
      *
@@ -336,51 +334,53 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
     {
         $this->message = $message;
         $metadata      = $this->getMetadata();
-                
+        $emailBody     = $this->message->getBody();
+
         if (!empty($metadata)) {
             $metadataSet  = reset($metadata);
             $tokens       = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
             $mauticTokens = array_keys($tokens);
         }
-        
+
         $CcAddresses = [];
         if (count($messageArray['recipients']['cc']) > 0) {
             $CcAddresses = array_keys($messageArray['recipients']['cc']);
         }
-        
+
         $BccAddresses = [];
         if (count($messageArray['recipients']['cc']) > 0) {
             $BccAddresses = array_keys($messageArray['recipients']['bcc']);
         }
-            
-        
-        foreach ($metadata as $recipient => $mailData) {            
-            $msg = $this->messageToArray($mauticTokens, $mailData['tokens'], true);
+
+        foreach ($metadata as $recipient => $mailData) {
+            $this->message->setBody($emailBody);
+            $msg        = $this->messageToArray($mauticTokens, $mailData['tokens'], true);
             $rawMessage = $this->buildRawMessage($msg, $recipient);
-            $payload = [
+            $payload    = [
                 'Source'       => $msg['from']['email'],
                 'Destinations' => [$recipient],
                 'RawMessage'   => [
                     'Data' => $rawMessage,
                     ],
             ];
-            
+
             yield $payload;
         }
     }
-    
+
     /**
-     * 
      * @param type $msg
      * @param type $recipient
+     *
      * @return string
      */
-    function buildRawMessage($msg, $recipient) {
-        $separator = md5(time());
-        $separator_multipart = md5($msg['subject'] . time());
-        $message = "MIME-Version: 1.0\n";
-        $message .= "Subject: ".$msg['subject']."\n";
-        $message .= "From: ".$msg['from']['name']." <".$msg['from']['email'].">\n";
+    public function buildRawMessage($msg, $recipient)
+    {
+        $separator           = md5(time());
+        $separator_multipart = md5($msg['subject'].time());
+        $message             = "MIME-Version: 1.0\n";
+        $message .= 'Subject: '.$msg['subject']."\n";
+        $message .= 'From: '.$msg['from']['name'].' <'.$msg['from']['email'].">\n";
         $message .= "To: $recipient\n";
         $message .= "Content-Type: multipart/mixed; boundary=\"$separator_multipart\"\n";
         $message .= "\n--$separator_multipart\n";
@@ -388,18 +388,18 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
         $message .= "Content-Type: multipart/alternative; boundary=\"$separator\"\n";
         $message .= "\n--$separator\n";
         $message .= "Content-Type: text/html; charset=\"UTF-8\"\n";
-        $message .= "\n".$msg["html"]."\n";
+        $message .= "\n".$msg['html']."\n";
         $message .= "\n--$separator--\n";
 
         foreach ($msg['attachments'] as $attachment) {
             $message .= "--$separator_multipart\n";
-            $message .= "Content-Type: ".$attachment['type']."; name=\"".$attachment['name']."\"\n";
-            $message .= "Content-Disposition: attachment; filename=\"".$attachment['name']."\"\n";
+            $message .= 'Content-Type: '.$attachment['type'].'; name="'.$attachment['name']."\"\n";
+            $message .= 'Content-Disposition: attachment; filename="'.$attachment['name']."\"\n";
             $message .= "Content-Transfer-Encoding: base64\n";
-            $message .= "".$attachment['content']."\n";
-            $message .= "--$separator_multipart--";                       
+            $message .= ''.$attachment['content']."\n";
+            $message .= "--$separator_multipart--";
         }
-        
+
         return $message;
     }
 
