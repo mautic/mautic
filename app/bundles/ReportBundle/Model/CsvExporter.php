@@ -12,6 +12,7 @@
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\ReportBundle\Crate\ReportDataResult;
 
 /**
  * Class CsvExporter.
@@ -28,37 +29,27 @@ class CsvExporter
         $this->formatterHelper = $formatterHelper;
     }
 
-    public function export(array $reportData, $handle, $page)
+    public function export(ReportDataResult $reportDataResult, $handle, $page = 0)
     {
-        if (!array_key_exists('data', $reportData) || !array_key_exists('columns', $reportData)) {
-            throw new \InvalidArgumentException("Keys 'data' and 'columns' have to be provided");
+        if ($page === 1) {
+            $this->putHeader($reportDataResult, $handle);
         }
 
-        foreach ($reportData['data'] as $count => $data) {
-            if ($count === 0 && $page === 1) {
-                $this->putHeader($data, $handle);
-            }
-
+        foreach ($reportDataResult->getData() as $data) {
             $row = [];
             foreach ($data as $k => $v) {
-                $type       = $reportData['columns'][$reportData['dataColumns'][$k]]['type'];
+                $type       = $reportDataResult->getType($k);
                 $typeString = $type !== 'string';
 
                 $row[] = $typeString ? $this->formatterHelper->_($v, $type, true) : $v;
             }
 
             fputcsv($handle, $row);
-            unset($row, $reportData['data'][$count]);
         }
     }
 
-    private function putHeader(array $data, $handle)
+    private function putHeader(ReportDataResult $reportDataResult, $handle)
     {
-        $header = [];
-        foreach ($data as $k => $v) {
-            $header[] = $k;
-        }
-
-        fputcsv($handle, $header);
+        fputcsv($handle, $reportDataResult->getHeaders());
     }
 }

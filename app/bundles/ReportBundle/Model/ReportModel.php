@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
+use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
@@ -29,6 +30,7 @@ use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -402,16 +404,18 @@ class ReportModel extends FormModel
         switch ($format) {
             case 'csv':
                 //build the data rows
+                $reportDataResult = new ReportDataResult($reportData);
+
                 if (!is_null($handle)) {
-                    $this->csvExporter->export($reportData, $handle, $page);
+                    $this->csvExporter->export($reportDataResult, $handle, $page);
 
                     return;
                 }
 
                 $response = new StreamedResponse(
-                    function () use ($reportData) {
+                    function () use ($reportDataResult) {
                         $handle = fopen('php://output', 'r+');
-                        $this->csvExporter->export($reportData, $handle, 0);
+                        $this->csvExporter->export($reportDataResult, $handle);
                         fclose($handle);
                     }
                 );
@@ -461,13 +465,13 @@ class ReportModel extends FormModel
     /**
      * Get report data for view rendering.
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param array $options
+     * @param Report               $entity
+     * @param FormFactoryInterface $formFactory
+     * @param array                $options
      *
      * @return array
      */
-    public function getReportData($entity, $formFactory = null, $options = [])
+    public function getReportData(Report $entity, FormFactoryInterface $formFactory = null, array $options = [])
     {
         // Clone dateFrom/dateTo because they handled separately in charts
         $chartDateFrom = isset($options['dateFrom']) ? clone $options['dateFrom'] : (new \DateTime('-30 days'));
@@ -500,7 +504,7 @@ class ReportModel extends FormModel
         }
 
         $paginate        = !empty($options['paginate']);
-        $reportPage      = (isset($options['reportPage'])) ? $options['reportPage'] : 1;
+        $reportPage      = isset($options['reportPage']) ? $options['reportPage'] : 1;
         $data            = $graphs            = [];
         $reportGenerator = new ReportGenerator($this->dispatcher, $this->em->getConnection(), $entity, $this->channelListHelper, $formFactory);
 
