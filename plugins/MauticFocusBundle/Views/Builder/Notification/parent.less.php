@@ -15,49 +15,57 @@
 .mf-notification-iframe {
     position: fixed;
     z-index: 21001;
+    margin-top: -100%;
 
-    &.mf-animate {
-        .notificationAnimate();
-    }
+    &.mf-loaded {
+        margin-top: 0;
+        margin-bottom: 0;
 
-    &.mf-notification-iframe-top-left {
-        top: 5px;
-        left: 5px;
 
         &.mf-animate {
-            .notificationName(mf-notification-slide-right);
+            .notificationAnimate();
         }
-    }
 
-    &.mf-notification-iframe-top-right {
-        top: 5px;
-        right: 5px;
+        &.mf-notification-iframe-top-left {
+            top: 5px;
+            left: 5px;
 
-        &.mf-animate {
-            .notificationName(mf-notification-slide-left);
+            &.mf-animate {
+                .notificationName(mf-notification-slide-right);
+            }
         }
-    }
 
-    &.mf-notification-iframe-bottom-left {
-        bottom: 5px;
-        left: 5px;
+        &.mf-notification-iframe-top-right {
+            top: 5px;
+            right: 5px;
 
-        &.mf-animate {
-            .notificationName(mf-notification-slide-right);
+            &.mf-animate {
+                .notificationName(mf-notification-slide-left);
+            }
         }
-    }
 
-    &.mf-notification-iframe-bottom-right {
-        bottom: 5px;
-        right: 5px;
+        &.mf-notification-iframe-bottom-left {
+            bottom: 5px;
+            left: 5px;
 
-        &.mf-animate {
-            .notificationName(mf-notification-slide-left);
+            &.mf-animate {
+                .notificationName(mf-notification-slide-right);
+            }
         }
-    }
 
-    &.mf-responsive {
-        left: 0 !important;
-        right: 0 !important;
+        &.mf-notification-iframe-bottom-right {
+            bottom: 5px;
+            right: 5px;
+
+            &.mf-animate {
+                .notificationName(mf-notification-slide-left);
+            }
+        }
+
+        &.mf-responsive {
+            left: 0 !important;
+            right: 0 !important;
+        }
     }
 }
+
