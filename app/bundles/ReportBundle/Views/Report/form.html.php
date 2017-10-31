@@ -151,19 +151,28 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                                     </div>
                                 </div>
                             </div>
-                            <div class="row" id="schedule_form">
-                                <div class="col-md-6">
-                                    <div class="pa-md">
-                                        <?php echo $view['form']->row($form['scheduleUnit']); ?>
+                            <div id="schedule_form">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="pa-md">
+                                            <?php echo $view['form']->row($form['toAddress']); ?>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="pa-md">
-                                        <div id='scheduleMonthFrequency''>
-                                            <?php echo $view['form']->row($form['scheduleMonthFrequency']); ?>
+                                <div class="row" id="schedule_form">
+                                    <div class="col-md-6">
+                                        <div class="pa-md">
+                                            <?php echo $view['form']->row($form['scheduleUnit']); ?>
                                         </div>
-                                        <div id='scheduleDay'>
-                                            <?php echo $view['form']->row($form['scheduleDay']); ?>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="pa-md">
+                                            <div id='scheduleMonthFrequency''>
+                                                <?php echo $view['form']->row($form['scheduleMonthFrequency']); ?>
+                                            </div>
+                                            <div id='scheduleDay'>
+                                                <?php echo $view['form']->row($form['scheduleDay']); ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

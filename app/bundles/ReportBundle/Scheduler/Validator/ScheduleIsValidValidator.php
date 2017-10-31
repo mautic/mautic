@@ -40,6 +40,13 @@ class ScheduleIsValidValidator extends ConstraintValidator
 
             return;
         }
+
+        if (is_null($report->getToAddress())) {
+            $this->context->buildViolation('mautic.report.schedule.to_address_required')
+                ->atPath('toAddress')
+                ->addViolation();
+        }
+
         if ($report->isScheduledDaily()) {
             $report->ensureIsDailyScheduled();
             $this->buildScheduler($report);
@@ -70,7 +77,7 @@ class ScheduleIsValidValidator extends ConstraintValidator
 
     private function addViolation()
     {
-        $this->context->buildViolation('mautic.report.scheduler.notValid')
+        $this->context->buildViolation('mautic.report.schedule.notValid')
             ->atPath('isScheduled')
             ->addViolation();
     }
@@ -82,9 +89,9 @@ class ScheduleIsValidValidator extends ConstraintValidator
 
             return;
         } catch (InvalidSchedulerException $e) {
-            $message = 'mautic.report.scheduler.invalidScheduler';
+            $message = 'mautic.report.schedule.notValid';
         } catch (NotSupportedScheduleTypeException $e) {
-            $message = 'mautic.report.scheduler.notSupportedType';
+            $message = 'mautic.report.schedule.notSupportedType';
         }
 
         $this->context->buildViolation($message)

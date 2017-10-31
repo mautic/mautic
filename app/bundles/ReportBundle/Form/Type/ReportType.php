@@ -335,6 +335,21 @@ class ReportType extends AbstractType
             );
 
             $builder->add(
+                'toAddress',
+                TextType::class,
+                [
+                    'label'      => 'mautic.report.schedule.toAddress.label',
+                    'label_attr' => ['class' => 'control-label'],
+                    'required'   => false,
+                    'attr'       => [
+                        'class'    => 'form-control',
+                        'preaddon' => 'fa fa-envelope',
+                        'tooltip'  => 'mautic.report.schedule.toAddress.tooltip',
+                    ],
+                ]
+            );
+
+            $builder->add(
                 'scheduleUnit',
                 ChoiceType::class,
                 [

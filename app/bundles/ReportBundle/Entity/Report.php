@@ -95,6 +95,11 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @var null|string
      */
+    private $toAddress;
+
+    /**
+     * @var null|string
+     */
     private $scheduleUnit;
 
     /**
@@ -168,6 +173,11 @@ class Report extends FormEntity implements SchedulerInterface
 
         $builder->createField('scheduleUnit', 'string')
             ->columnName('schedule_unit')
+            ->nullable()
+            ->build();
+
+        $builder->createField('toAddress', 'string')
+            ->columnName('to_address')
             ->nullable()
             ->build();
 
@@ -474,6 +484,22 @@ class Report extends FormEntity implements SchedulerInterface
     /**
      * @return null|string
      */
+    public function getToAddress()
+    {
+        return $this->toAddress;
+    }
+
+    /**
+     * @param null|string $toAddress
+     */
+    public function setToAddress($toAddress)
+    {
+        $this->toAddress = $toAddress;
+    }
+
+    /**
+     * @return null|string
+     */
     public function getScheduleUnit()
     {
         return $this->scheduleUnit;
@@ -522,6 +548,7 @@ class Report extends FormEntity implements SchedulerInterface
     public function setAsNotScheduled()
     {
         $this->setIsScheduled(false);
+        $this->setToAddress(null);
         $this->setScheduleUnit(null);
         $this->setScheduleDay(null);
         $this->setScheduleMonthFrequency(null);
