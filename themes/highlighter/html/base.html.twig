@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% if page is defined %}
+        <title>{pagetitle}</title>
+            <meta name="description" content="{pagemetadescription}">
+            {% endif %}
+        {% block stylesheets %}{% endblock %}
+            {{ outputHeadDeclarations() }}
+    </head>
+    <body>
+        {{ outputScripts('bodyOpen') }}
+        {% block content %}{% endblock %}
+        {{ outputScripts('bodyClose') }}
+    </body>
+</html>
