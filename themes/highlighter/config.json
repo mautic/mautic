@@ -1,10 +1,8 @@
 {
-  "name": "Blank",
-  "author": "Mautic team",
-  "authorUrl": "https://mautic.org",
+  "name": "Highlighter",
+  "author": "Innotiom",
+  "authorUrl": "https://innotiom.com",
   "features": [
-    "page",
-    "email",
-    "form"
+    "email"
   ]
 }
