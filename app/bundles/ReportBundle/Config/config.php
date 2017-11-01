@@ -13,8 +13,12 @@ use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Model\ExcelExporter;
+use Mautic\ReportBundle\Model\ExportHandler;
 use Mautic\ReportBundle\Model\ReportExporter;
+use Mautic\ReportBundle\Model\ReportExportOptions;
+use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ReportModel;
+use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
@@ -216,14 +220,43 @@ return [
             'mautic.report.model.report_exporter' => [
                 'class'     => ReportExporter::class,
                 'arguments' => [
-                    'doctrine.orm.default_entity_manager',
+                    'mautic.report.model.schedule_model',
                     'mautic.report.model.report_data_adapter',
+                    'mautic.report.model.report_export_options',
+                    'mautic.report.model.report_file_writer',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.report.model.schedule_model' => [
+                'class'     => ScheduleModel::class,
+                'arguments' => [
+                    'doctrine.orm.default_entity_manager',
                 ],
             ],
             'mautic.report.model.report_data_adapter' => [
                 'class'     => ReportDataAdapter::class,
                 'arguments' => [
                     'mautic.report.model.report',
+                ],
+            ],
+            'mautic.report.model.report_export_options' => [
+                'class'     => ReportExportOptions::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.report.model.report_file_writer' => [
+                'class'     => ReportFileWriter::class,
+                'arguments' => [
+                    'mautic.report.model.csv_exporter',
+                    'mautic.report.model.export_handler',
+                ],
+            ],
+            'mautic.report.model.export_handler' => [
+                'class'     => ExportHandler::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.file_path_resolver',
                 ],
             ],
         ],
@@ -245,5 +278,10 @@ return [
                 'tag' => 'console.command',
             ],
         ],
+    ],
+
+    'parameters' => [
+        'report_temp_dir'          => '%kernel.root_dir%/../media/files/temp',
+        'report_export_batch_size' => 1000,
     ],
 ];

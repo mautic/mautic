@@ -13,6 +13,7 @@ namespace Mautic\ReportBundle\Adapter;
 
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportDataAdapter
@@ -27,12 +28,13 @@ class ReportDataAdapter
         $this->reportModel = $reportModel;
     }
 
-    public function getRportData(Report $report)
+    public function getReportData(Report $report, ReportExportOptions $reportExportOptions)
     {
-        $options = [];
-        //$options['paginate'] = true;
-        //$options['limit'] = 10000;
+        $options                    = [];
+        $options['paginate']        = true;
+        $options['limit']           = $reportExportOptions->getBatchSize();
         $options['ignoreGraphData'] = true;
+        $options['page']            = $reportExportOptions->getPage();
 
         $data = $this->reportModel->getReportData($report, null, $options);
 

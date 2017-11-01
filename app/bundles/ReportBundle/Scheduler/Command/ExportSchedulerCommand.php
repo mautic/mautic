@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Scheduler\Command;
 
+use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\Console\Command\Command;
@@ -57,6 +58,12 @@ class ExportSchedulerCommand extends Command
             return;
         }
 
-        $this->reportExporter->processExport($exportOption);
+        try {
+            $this->reportExporter->processExport($exportOption);
+        } catch (FileIOException $e) {
+            $output->writeln('<error>'.$e->getMessage().'</error>');
+
+            return;
+        }
     }
 }
