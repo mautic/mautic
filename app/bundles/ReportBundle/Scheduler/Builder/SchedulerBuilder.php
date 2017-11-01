@@ -57,7 +57,7 @@ class SchedulerBuilder
             throw new InvalidSchedulerException();
         }
 
-        $startDate = (new \DateTime())->setTime(0, 0);
+        $startDate = (new \DateTime())->setTime(0, 0)->modify('+1 day');
         $rule      = new Rule();
         $rule->setStartDate($startDate)
             ->setCount($count);
