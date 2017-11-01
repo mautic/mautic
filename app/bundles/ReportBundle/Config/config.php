@@ -239,6 +239,7 @@ return [
                 'class'     => ScheduleModel::class,
                 'arguments' => [
                     'doctrine.orm.default_entity_manager',
+                    'mautic.report.model.scheduler_planner',
                 ],
             ],
             'mautic.report.model.report_data_adapter' => [
