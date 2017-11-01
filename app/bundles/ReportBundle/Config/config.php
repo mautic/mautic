@@ -10,6 +10,7 @@
  */
 
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
+use Mautic\ReportBundle\EventListener\SchedulerSubscriber;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Model\ExcelExporter;
@@ -119,6 +120,13 @@ return [
                 'class'     => ReportSchedulerSubscriber::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_planner',
+                ],
+            ],
+            'mautic.report.report.schedule_subscriber' => [
+                'class'     => SchedulerSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.mailer',
+                    'translator',
                 ],
             ],
         ],
