@@ -31,6 +31,7 @@ if (is_array($item)) {
         <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
             <i class="fa fa-angle-down "></i>
         </button>
+        <?php if (!empty($tooltip)): ?> <i class="fa fa-question-circle"></i><?php endif; ?>
         <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
             <?php
             if (!empty($templateButtons['edit'])):

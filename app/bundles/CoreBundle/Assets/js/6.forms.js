@@ -109,9 +109,10 @@ Mautic.ajaxifyForm = function (formName) {
     mQuery(form + ' :submit').each(function () {
         mQuery(this).off('click.ajaxform');
         mQuery(this).on('click.ajaxform', function () {
-            if (mQuery(this).attr('name') && !mQuery("input[name='" + mQuery(this).attr('name') + "']").length) {
+            if (mQuery(this).attr('name') && !mQuery('input[name="' + mQuery(this).attr('name') + '"]').length) {
+                mQuery('input.button-clicked').remove(); // ensure the previously clicked buttons are gone
                 mQuery('form[name="' + formName + '"]').append(
-                    mQuery("<input type='hidden'>").attr({
+                    mQuery('<input type="hidden" class="button-clicked">').attr({
                         name: mQuery(this).attr('name'),
                         value: mQuery(this).attr('value')
                     })
@@ -550,8 +551,9 @@ Mautic.createOption = function (value, label) {
  *
  * @param field
  * @param action
+ * @param valueOnChange
  */
-Mautic.updateFieldOperatorValue = function(field, action) {
+Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOnChangeArguments) {
     var fieldId = mQuery(field).attr('id');
     Mautic.activateLabelLoadingIndicator(fieldId);
 
@@ -594,11 +596,27 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                     if (typeof optgroup === 'object') {
                         var optgroupEl = mQuery('<optgroup/>').attr('label', value);
                         mQuery.each(optgroup, function(optVal, label) {
-                            optgroupEl.append(Mautic.createOption(optVal, label))
+                            var option = Mautic.createOption(optVal, label);
+
+                            if (response.optionsAttr && response.optionsAttr[optVal]) {
+                                mQuery.each(response.optionsAttr[optVal], function(optAttr, optVal) {
+                                    option.attr(optAttr, optVal);
+                                });
+                            }
+
+                            optgroupEl.append(option)
                         });
                         newValueField.append(optgroupEl);
                     } else {
-                        newValueField.append(Mautic.createOption(value, optgroup));
+                        var option = Mautic.createOption(value, optgroup);
+
+                        if (response.optionsAttr && response.optionsAttr[value]) {
+                            mQuery.each(response.optionsAttr[value], function(optAttr, optVal) {
+                                option.attr(optAttr, optVal);
+                            });
+                        }
+
+                        newValueField.append(option);
                     }
                 });
                 newValueField.val(valueFieldAttrs['value']);
@@ -624,6 +642,17 @@ Mautic.updateFieldOperatorValue = function(field, action) {
                 if (response.fieldType == 'date' || response.fieldType == 'datetime') {
                     Mautic.activateDateTimeInputs(newValueField, response.fieldType);
                 }
+            }
+
+            if (valueOnChange && typeof valueOnChange == 'function') {
+                mQuery('#'+fieldPrefix+'value').on('change', function () {
+                    if (typeof valueOnChangeArguments != 'object') {
+                        valueOnChangeArguments = [];
+                    }
+                    valueOnChangeArguments.unshift(mQuery('#'+fieldPrefix+'value'));
+
+                    valueOnChange.apply(null, valueOnChangeArguments);
+                });
             }
 
             if (!mQuery.isEmptyObject(response.operators)) {

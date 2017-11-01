@@ -173,7 +173,7 @@ class MailchimpIntegration extends EmailAbstractIntegration
                 unset($mappedData['EMAIL']);
 
                 $options                 = [];
-                $options['double_optin'] = $config['list_settings']['doubleOptin'];
+                $options['status']       = $config['list_settings']['doubleOptin'] ? 'pending' : 'subscribed';
                 $options['send_welcome'] = $config['list_settings']['sendWelcome'];
                 $listId                  = $config['list_settings']['list'];
 

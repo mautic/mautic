@@ -352,7 +352,7 @@ class FieldController extends FormController
      *
      * @param $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function cloneAction($objectId)
     {

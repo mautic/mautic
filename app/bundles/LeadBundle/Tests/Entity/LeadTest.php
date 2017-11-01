@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Tests;
+namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class LeadTest extends \PHPUnit_Framework_TestCase
 {
     use RequestTrait;
+
     public function testPreferredChannels()
     {
         $frequencyRules = [
@@ -124,6 +125,23 @@ class LeadTest extends \PHPUnit_Framework_TestCase
                     'type'  => 'textarea',
                     'value' => 'Test blah',
                 ],
+            ],
+        ];
+
+        $lead->setFields($fields);
+
+        // This should not killover with a segmentation fault due to a loop
+        $lead->setNotes('hello');
+
+        // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
+        $lead->setTest('hello');
+        $this->assertEquals('hello', $lead->getTest());
+    }
+
+    public function testDataIsCleanedCorrectly()
+    {
+        $fields = [
+            'core' => [
                 'boolean' => [
                     'alias' => 'boolean',
                     'label' => 'Boolean',
@@ -145,8 +163,6 @@ class LeadTest extends \PHPUnit_Framework_TestCase
             ],
         ];
         $data = [
-            'notes'     => 'hello',
-            'test'      => 'test',
             'boolean'   => 'yes',
             'dateField' => '12-12-2017 22:03:59',
             'multi'     => 'a|b',
@@ -160,23 +176,99 @@ class LeadTest extends \PHPUnit_Framework_TestCase
 
         $testDateObject = new \DateTime('12-12-2017 22:03:59');
 
-        $this->assertEquals($testDateObject->format('Y-m-d H:i'), $data['dateField']);
+        $this->assertEquals($testDateObject->format('Y-m-d H:i:s'), $data['dateField']);
         $this->assertEquals((int) true, $data['boolean']);
         $this->assertEquals(['a', 'b'], $data['multi']);
+    }
 
-        $lead->setFields($fields);
+    public function testCleanBooleanAndNumberAsNullAreNotConverted()
+    {
+        $fields = [
+            'core' => [
+                'boolean' => [
+                    'alias' => 'boolean',
+                    'label' => 'Boolean',
+                    'type'  => 'boolean',
+                    'value' => false,
+                ],
+                'number' => [
+                    'alias' => 'number',
+                    'label' => 'Number',
+                    'type'  => 'number',
+                    'value' => '1234',
+                ],
+            ],
+        ];
+        $data = [
+            'boolean' => null,
+            'number'  => null,
+        ];
 
-        // This should not killover with a segmentation fault due to a loop
-        $lead->setNotes('hello');
+        $this->cleanFields($data, $fields['core']['boolean']);
+        $this->cleanFields($data, $fields['core']['number']);
 
-        // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
-        $lead->setTest('hello');
-        $this->assertEquals('hello', $lead->getTest());
+        $this->assertEquals(null, $data['boolean']);
+        $this->assertEquals(null, $data['number']);
+    }
+
+    public function testAttributionDateIsAdded()
+    {
+        $lead = new Lead();
+        $lead->addUpdatedField('attribution', 100);
+        $lead->checkAttributionDate();
+        $this->assertEquals((new \Datetime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
+        $this->assertNotEmpty($lead->getChanges());
+    }
+
+    public function testAttributionDateIsRemoved()
+    {
+        $lead = new Lead();
+        $lead->setFields(
+            [
+                'core' => [
+                    'attribution_date' => [
+                        'type'  => 'date',
+                        'value' => '2017-09-09',
+                    ],
+                    'attribution' => [
+                        'type'  => 'int',
+                        'value' => 100,
+                    ],
+                ],
+            ]
+        );
+
+        $lead->addUpdatedField('attribution', 0);
+        $lead->checkAttributionDate();
+        $this->assertNull($lead->getFieldValue('attribution_date'));
+        $this->assertNotEmpty($lead->getChanges());
+    }
+
+    public function testAttributionDateIsNotChangedWhen0ChangedToNull()
+    {
+        $lead = new Lead();
+        $lead->setFields(
+            [
+                'core' => [
+                        'attribution_date' => [
+                            'type'  => 'date',
+                            'value' => 0,
+                        ],
+                        'attribution' => [
+                            'type'  => 'int',
+                            'value' => 0,
+                        ],
+                    ],
+            ]
+        );
+
+        $lead->checkAttributionDate();
+        $this->assertEmpty($lead->getChanges());
     }
 
     /**
-     * @param $points
-     * @param $expected
+     * @param      $points
+     * @param      $expected
      * @param Lead $lead
      * @param bool $operator
      */

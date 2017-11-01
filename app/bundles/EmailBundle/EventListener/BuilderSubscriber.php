@@ -138,7 +138,7 @@ class BuilderSubscriber extends CommonSubscriber
         if ($event->slotTypesRequested()) {
             $event->addSlotType(
                 'text',
-                'Text',
+                $this->translator->trans('mautic.core.slot.label.text'),
                 'font',
                 'MauticCoreBundle:Slots:text.html.php',
                 SlotTextType::class,
@@ -146,7 +146,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'image',
-                'Image',
+                $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
                 'slot_image',
@@ -154,7 +154,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'imagecard',
-                'Image Card',
+                $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
                 'MauticCoreBundle:Slots:imagecard.html.php',
                 'slot_imagecard',
@@ -162,7 +162,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'imagecaption',
-                'Image+Caption',
+                $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
                 'MauticCoreBundle:Slots:imagecaption.html.php',
                 'slot_imagecaption',
@@ -170,7 +170,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'button',
-                'Button',
+                $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.php',
                 'slot_button',
@@ -178,7 +178,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'socialfollow',
-                'Social Follow',
+                $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
                 'MauticCoreBundle:Slots:socialfollow.html.php',
                 'slot_socialfollow',
@@ -186,7 +186,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'codemode',
-                'Code Mode',
+                $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
                 'MauticCoreBundle:Slots:codemode.html.php',
                 'slot_codemode',
@@ -194,7 +194,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSlotType(
                 'separator',
-                'Separator',
+                $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
                 'slot_separator',
@@ -203,7 +203,7 @@ class BuilderSubscriber extends CommonSubscriber
 
             $event->addSlotType(
                 'dynamicContent',
-                'Dynamic Content',
+                $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'tag',
                 'MauticCoreBundle:Slots:dynamiccontent.html.php',
                 'slot_dynamiccontent',
@@ -214,7 +214,7 @@ class BuilderSubscriber extends CommonSubscriber
         if ($event->sectionsRequested()) {
             $event->addSection(
                 'one-column',
-                'One Column',
+                $this->translator->trans('mautic.core.slot.label.onecolumn'),
                 'file-text-o',
                 'MauticCoreBundle:Sections:one-column.html.php',
                 null,
@@ -222,7 +222,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSection(
                 'two-column',
-                'Two Columns',
+                $this->translator->trans('mautic.core.slot.label.twocolumns'),
                 'columns',
                 'MauticCoreBundle:Sections:two-column.html.php',
                 null,
@@ -230,7 +230,7 @@ class BuilderSubscriber extends CommonSubscriber
             );
             $event->addSection(
                 'three-column',
-                'Three Columns',
+                $this->translator->trans('mautic.core.slot.label.threecolumns'),
                 'th',
                 'MauticCoreBundle:Sections:three-column.html.php',
                 null,

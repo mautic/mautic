@@ -2,6 +2,7 @@
 !.gitignore
 !.htaccess
 !.gitkeep
+/.env
 /composer.phar
 
 /app/bootstrap*
@@ -34,6 +35,7 @@
 /bin/*
 /bundles
 /node_modules
+/build/coverage
 /build/packaging
 /build/packages/*
 !/build/packages/.placeholder

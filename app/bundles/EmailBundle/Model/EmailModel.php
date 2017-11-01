@@ -34,6 +34,7 @@ use Mautic\EmailBundle\Entity\StatDevice;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
@@ -404,7 +405,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \Exception
      */
-    public function hitEmail($stat, $request, $viaBrowser = false)
+    public function hitEmail($stat, $request, $viaBrowser = false, $activeRequest = true)
     {
         if (!$stat instanceof Stat) {
             $stat = $this->getEmailStatus($stat);
@@ -427,9 +428,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $stat->setLastOpened($readDateTime->getDateTime());
 
         $lead = $stat->getLead();
-        if ($lead !== null) {
+        if (null !== $lead) {
             // Set the lead as current lead
-            $this->leadModel->setCurrentLead($lead);
+            if ($activeRequest) {
+                $this->leadModel->setCurrentLead($lead);
+            } else {
+                $this->leadModel->setSystemCurrentLead($lead);
+            }
         }
 
         $firstTime = false;
@@ -588,9 +593,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         $lists     = $email->getLists();
         $listCount = count($lists);
-        $combined  = [0, 0, 0, 0, 0, 0];
-
-        $chart = new BarChart(
+        $chart     = new BarChart(
             [
                 $this->translator->trans('mautic.email.sent'),
                 $this->translator->trans('mautic.email.read'),
@@ -614,31 +617,20 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
             $key   = ($listCount > 1) ? 1 : 0;
 
-            $sentCounts         = $statRepo->getSentCount($emailIds, true, $query);
-            $readCounts         = $statRepo->getReadCount($emailIds, true, $query);
-            $failedCounts       = $statRepo->getFailedCount($emailIds, true, $query);
+            $sentCounts         = $statRepo->getSentCount($emailIds, $lists->getKeys(), $query);
+            $readCounts         = $statRepo->getReadCount($emailIds, $lists->getKeys(), $query);
+            $failedCounts       = $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query);
             $clickCounts        = $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query);
             $unsubscribedCounts = $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query);
             $bouncedCounts      = $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query);
 
             foreach ($lists as $l) {
-                $sentCount = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
-                $combined[0] += $sentCount;
-
-                $readCount = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
-                $combined[1] += $readCount;
-
-                $failedCount = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
-                $combined[2] += $failedCount;
-
-                $clickCount = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
-                $combined[3] += $clickCount;
-
+                $sentCount         = isset($sentCounts[$l->getId()]) ? $sentCounts[$l->getId()] : 0;
+                $readCount         = isset($readCounts[$l->getId()]) ? $readCounts[$l->getId()] : 0;
+                $failedCount       = isset($failedCounts[$l->getId()]) ? $failedCounts[$l->getId()] : 0;
+                $clickCount        = isset($clickCounts[$l->getId()]) ? $clickCounts[$l->getId()] : 0;
                 $unsubscribedCount = isset($unsubscribedCounts[$l->getId()]) ? $unsubscribedCounts[$l->getId()] : 0;
-                $combined[4] += $unsubscribedCount;
-
-                $bouncedCount = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
-                $combined[5] += $bouncedCount;
+                $bouncedCount      = isset($bouncedCounts[$l->getId()]) ? $bouncedCounts[$l->getId()] : 0;
 
                 $chart->setDataset(
                     $l->getName(),
@@ -655,14 +647,23 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
                 ++$key;
             }
-        }
 
-        if ($listCount > 1) {
-            $chart->setDataset(
-                $this->translator->trans('mautic.email.lists.combined'),
-                $combined,
-                0
-            );
+            $combined = [
+                $statRepo->getSentCount($emailIds, $lists->getKeys(), $query, true),
+                $statRepo->getReadCount($emailIds, $lists->getKeys(), $query, true),
+                $statRepo->getFailedCount($emailIds, $lists->getKeys(), $query, true),
+                $trackableRepo->getCount('email', $emailIds, $lists->getKeys(), $query, true),
+                $dncRepo->getCount('email', $emailIds, DoNotContact::UNSUBSCRIBED, $lists->getKeys(), $query, true),
+                $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED, $lists->getKeys(), $query, true),
+            ];
+
+            if ($listCount > 1) {
+                $chart->setDataset(
+                    $this->translator->trans('mautic.email.lists.combined'),
+                    $combined,
+                    0
+                );
+            }
         }
 
         return $chart->render();
@@ -1191,7 +1192,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         //no one to send to so bail or if marketing email from a campaign has been put in a queue
         if (empty($count)) {
             if ($returnErrorMessages) {
-                return $singleEmail ? $errors[$singleEmail] : $errors;
+                return $singleEmail && isset($errors[$singleEmail]) ? $errors[$singleEmail] : $errors;
             }
 
             return $singleEmail ? true : $errors;
@@ -1466,33 +1467,45 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Send an email to lead(s).
      *
-     * @param       $email
-     * @param       $users
-     * @param mixed $lead
-     * @param array $tokens
-     * @param array $assetAttachments
-     * @param bool  $saveStat
+     * @param Email     $email
+     * @param array|int $users
+     * @param array     $lead
+     * @param array     $tokens
+     * @param array     $assetAttachments
+     * @param bool      $saveStat
+     * @param array     $to
+     * @param array     $cc
+     * @param array     $bcc
      *
      * @return mixed
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function sendEmailToUser($email, $users, $lead = null, $tokens = [], $assetAttachments = [], $saveStat = true)
-    {
+    public function sendEmailToUser(
+        Email $email,
+        $users,
+        array $lead = null,
+        array $tokens = [],
+        array $assetAttachments = [],
+        $saveStat = true,
+        array $to = [],
+        array $cc = [],
+        array $bcc = []
+    ) {
         if (!$emailId = $email->getId()) {
             return false;
         }
 
+        // In case only user ID was provided
         if (!is_array($users)) {
-            $user  = ['id' => $users];
-            $users = [$user];
+            $users = [['id' => $users]];
         }
 
-        //get email settings
+        // Get email settings
         $emailSettings = &$this->getEmailSettings($email, false);
 
-        //noone to send to so bail
-        if (empty($users)) {
+        // No one to send to so bail
+        if (empty($users) && empty($to)) {
             return false;
         }
 
@@ -1500,8 +1513,34 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $mailer->setLead($lead, true);
         $mailer->setTokens($tokens);
         $mailer->setEmail($email, false, $emailSettings[$emailId]['slots'], $assetAttachments, (!$saveStat));
+        $mailer->setCc($cc);
+        $mailer->setBcc($bcc);
 
         $errors = [];
+
+        foreach ($to as $toAddress) {
+            $idHash = uniqid();
+            $mailer->setIdHash($idHash, $saveStat);
+
+            if (!$mailer->addTo($toAddress)) {
+                $errors[] = "{$toAddress}: ".$this->translator->trans('mautic.email.bounce.reason.bad_email');
+            } else {
+                if (!$mailer->queue(true)) {
+                    $errorArray = $mailer->getErrors();
+                    unset($errorArray['failures']);
+                    $errors[] = "{$toAddress}: ".implode('; ', $errorArray);
+                }
+
+                if ($saveStat) {
+                    $saveEntities[] = $mailer->createEmailStat(false, $toAddress);
+                }
+
+                // Clear CC and BCC to do not duplicate the send several times
+                $mailer->setCc([]);
+                $mailer->setBcc([]);
+            }
+        }
+
         foreach ($users as $user) {
             $idHash = uniqid();
             $mailer->setIdHash($idHash, $saveStat);
@@ -1532,6 +1571,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 if ($saveStat) {
                     $saveEntities[] = $mailer->createEmailStat(false, $user['email']);
                 }
+
+                // Clear CC and BCC to do not duplicate the send several times
+                $mailer->setCc([]);
+                $mailer->setBcc([]);
             }
         }
 
@@ -1550,6 +1593,35 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         unset($mailer);
 
         return $errors;
+    }
+
+    /**
+     * Dispatches EmailSendEvent so you could get tokens form it or tokenized content.
+     *
+     * @param Email  $email
+     * @param array  $leadFields
+     * @param string $idHash
+     * @param array  $tokens
+     *
+     * @return EmailSendEvent
+     */
+    public function dispatchEmailSendEvent(Email $email, array $leadFields = [], $idHash = null, array $tokens = [])
+    {
+        $event = new EmailSendEvent(
+            null,
+            [
+                'content'      => $email->getCustomHtml(),
+                'email'        => $email,
+                'idHash'       => $idHash,
+                'tokens'       => $tokens,
+                'internalSend' => true,
+                'lead'         => $leadFields,
+            ]
+        );
+
+        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+
+        return $event;
     }
 
     /**

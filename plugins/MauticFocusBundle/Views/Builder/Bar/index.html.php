@@ -17,15 +17,12 @@ $animate = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '';
 } ?><?php echo $animate; ?>" style="background-color: #<?php echo $props['colors']['primary']; ?>;">
 
     <div class="mf-content">
-        <?php if (!empty($focus['htmlMode']) || !empty($focus['html_mode'])): ?>
-            <?php echo html_entity_decode($focus['html']); ?>
+        <?php if (in_array($htmlMode, ['editor', 'html'])): ?>
+            <?php echo html_entity_decode($focus[$htmlMode]); ?>
         <?php else: ?>
         <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
-        <?php if ($focus['type'] == 'form' && !empty($form)): ?>
-            <?php echo $view->render(
-                'MauticFocusBundle:Builder:form.html.php',
-                ['form' => $form, 'style' => $focus['style'], 'focusId' => $focus['id'], 'preview' => $preview]
-            ); ?>
+        <?php if ($focus['type'] == 'form'): ?>
+            {focus_form}
         <?php elseif ($focus['type'] == 'link'): ?>
             <a href="<?php echo (empty($preview)) ? $clickUrl : '#'; ?>" class="mf-link" target="<?php echo ($props['content']['link_new_window'])
                 ? '_new' : '_parent'; ?>">

@@ -13,10 +13,12 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,7 +48,8 @@ class PublicController extends CommonFormController
         /** @var Page $entity */
         $entity = $model->getEntityBySlugs($slug);
 
-        if (!empty($entity)) {
+        // Do not hit preference center pages
+        if (!empty($entity) && !$entity->getIsPreferenceCenter()) {
             $userAccess = $security->hasEntityAccess('page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy());
             $published  = $entity->isPublished();
 
@@ -192,7 +195,11 @@ class PublicController extends CommonFormController
                             $useId = key($variants);
 
                             //set the cookie - 14 days
-                            $this->get('mautic.helper.cookie')->setCookie('mautic_page_'.$entity->getId(), $useId, 3600 * 24 * 14);
+                            $this->get('mautic.helper.cookie')->setCookie(
+                                'mautic_page_'.$entity->getId(),
+                                $useId,
+                                3600 * 24 * 14
+                            );
 
                             if ($useId != $entity->getId()) {
                                 $entity = $childrenVariants[$useId];
@@ -203,7 +210,11 @@ class PublicController extends CommonFormController
 
                 // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
                 if ($entity->isTranslation() && empty($entity->languageSlug)) {
-                    list($translationParent, $translatedEntity) = $model->getTranslatedEntity($entity, $lead, $this->request);
+                    list($translationParent, $translatedEntity) = $model->getTranslatedEntity(
+                        $entity,
+                        $lead,
+                        $this->request
+                    );
 
                     if ($translationParent && $translatedEntity !== $entity) {
                         if (!$this->request->get('ntrd', 0)) {
@@ -377,11 +388,16 @@ class PublicController extends CommonFormController
 
         list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
 
+        /** @var TrackingHelper $trackingHelper */
+        $trackingHelper = $this->get('mautic.page.helper.tracking');
+        $sessionValue   = $trackingHelper->getSession(true);
+
         return new JsonResponse(
             [
                 'success' => 1,
                 'id'      => ($lead) ? $lead->getId() : null,
                 'sid'     => $trackingId,
+                'events'  => $sessionValue,
             ]
         );
     }
@@ -402,8 +418,9 @@ class PublicController extends CommonFormController
         if (empty($redirect) || !$redirect->isPublished(false)) {
             throw $this->createNotFoundException($this->translator->trans('mautic.core.url.error.404'));
         }
-
-        $this->getModel('page')->hitPage($redirect, $this->request);
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        $pageModel = $this->getModel('page');
+        $pageModel->hitPage($redirect, $this->request);
 
         $url = $redirect->getUrl();
 

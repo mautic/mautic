@@ -58,10 +58,11 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param $data
-     * @param $object
+     * @param        $data
+     * @param null   $lead
+     * @param string $object
      *
-     * @return array
+     * @return mixed|string
      */
     public function createLead($data, $lead = null, $object = 'Leads')
     {
@@ -76,10 +77,11 @@ class ZohoApi extends CrmApi
     }
 
     /**
-     * @param $data
-     * @param $object
+     * @param        $data
+     * @param null   $lead
+     * @param string $object
      *
-     * @return array
+     * @return mixed|string
      */
     public function updateLead($data, $lead = null, $object = 'Leads')
     {
@@ -153,5 +155,25 @@ class ZohoApi extends CrmApi
         }
 
         return $data;
+    }
+
+    /**
+     * @param        $selectColumns
+     * @param        $searchColumn
+     * @param        $searchValue
+     * @param string $object
+     *
+     * @return mixed|string
+     */
+    public function getSearchRecords($selectColumns, $searchColumn, $searchValue, $object = 'Leads')
+    {
+        $parameters = [
+            'selectColumns' => 'All',
+            'searchColumn'  => $searchColumn, // search by email
+            'searchValue'   => $searchValue, // email value
+            'newFormat'     => 2,
+        ];
+
+        return $this->request('getSearchRecordsByPDC', $parameters, 'GET', $object, true);
     }
 }
