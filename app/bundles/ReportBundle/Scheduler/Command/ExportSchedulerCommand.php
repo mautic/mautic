@@ -39,7 +39,6 @@ class ExportSchedulerCommand extends Command
         $this
             ->setName('mautic:repots:scheduler')
             ->setDescription('Processes scheduler for report\'s export')
-            ->addOption('--row-limit', 'limit', InputOption::VALUE_OPTIONAL, 'Limit number of exported rows at a time. Defaults to value set in config.')
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
     }
 
@@ -48,13 +47,12 @@ class ExportSchedulerCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $rowLimit = $input->getOption('row-limit');
-        $report   = $input->getOption('report');
+        $report = $input->getOption('report');
 
         try {
-            $exportOption = new ExportOption($rowLimit, $report);
+            $exportOption = new ExportOption($report);
         } catch (\InvalidArgumentException $e) {
-            $output->writeln('<error>parameters "row-limit" and "report" have to be numbers</error>');
+            $output->writeln('<error>parameter "report" have to be number</error>');
 
             return;
         }
