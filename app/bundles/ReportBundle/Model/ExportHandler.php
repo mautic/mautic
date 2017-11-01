@@ -58,6 +58,18 @@ class ExportHandler
     }
 
     /**
+     * @param string $fileName
+     */
+    public function removeFile($fileName)
+    {
+        try {
+            $path = $this->getPath($fileName);
+            $this->filePathResolver->delete($path);
+        } catch (FileIOException $e) {
+        }
+    }
+
+    /**
      * @param $fileName
      *
      * @return string

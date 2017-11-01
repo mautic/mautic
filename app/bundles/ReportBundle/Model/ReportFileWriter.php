@@ -49,6 +49,12 @@ class ReportFileWriter
         $this->exportHandler->closeHandler($handler);
     }
 
+    public function clear(Scheduler $scheduler)
+    {
+        $fileName = $this->getFileName($scheduler);
+        $this->exportHandler->removeFile($fileName);
+    }
+
     /**
      * @param Scheduler $scheduler
      *
