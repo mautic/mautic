@@ -24,7 +24,6 @@ class ExportResponse
      */
     public static function setResponseHeaders(Response $response, $fileName)
     {
-        $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$fileName.'"');
         $response->headers->set('Expires', 0);

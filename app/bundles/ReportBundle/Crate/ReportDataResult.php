@@ -43,7 +43,7 @@ class ReportDataResult
             throw new \InvalidArgumentException("Keys 'data', 'dataColumns' and 'columns' have to be provided");
         }
 
-        $this->totalResults = $data['totalResults'];
+        $this->totalResults = (int) $data['totalResults'];
         $this->data         = $data['data'];
 
         $this->buildHeader($data);

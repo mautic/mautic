@@ -29,7 +29,7 @@ class CsvExporter
         $this->formatterHelper = $formatterHelper;
     }
 
-    public function export(ReportDataResult $reportDataResult, $handle, $page = 0)
+    public function export(ReportDataResult $reportDataResult, $handle, $page = 1)
     {
         if ($page === 1) {
             $this->putHeader($reportDataResult, $handle);
