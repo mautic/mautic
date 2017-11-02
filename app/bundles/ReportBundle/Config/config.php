@@ -26,6 +26,7 @@ use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
+use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator;
 
 return [
@@ -125,8 +126,7 @@ return [
             'mautic.report.report.schedule_subscriber' => [
                 'class'     => SchedulerSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.mailer',
-                    'translator',
+                    'mautic.report.model.send_schedule',
                 ],
             ],
         ],
@@ -223,6 +223,13 @@ return [
                 'arguments' => [
                     'mautic.report.model.scheduler_date_builder',
                     'doctrine.orm.default_entity_manager',
+                ],
+            ],
+            'mautic.report.model.send_schedule' => [
+                'class'     => SendSchedule::class,
+                'arguments' => [
+                    'mautic.helper.mailer',
+                    'translator',
                 ],
             ],
             'mautic.report.model.report_exporter' => [
