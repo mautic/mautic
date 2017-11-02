@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\EmailBundle\Validator as EmailAssert;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
@@ -200,6 +201,8 @@ class Report extends FormEntity implements SchedulerInterface
         $metadata->addPropertyConstraint('name', new NotBlank([
             'message' => 'mautic.core.name.required',
         ]));
+
+        $metadata->addPropertyConstraint('toAddress', new EmailAssert\MultipleEmailsValid());
 
         $metadata->addConstraint(new ReportAssert\ScheduleIsValid());
     }

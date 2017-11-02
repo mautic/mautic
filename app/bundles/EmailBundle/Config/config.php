@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\EmailBundle\Validator\MultipleEmailsValidValidator;
+
 return [
     'routes' => [
         'main' => [
@@ -427,6 +429,15 @@ return [
                     'mautic.lead.model.dnc',
                     'translator',
                 ],
+            ],
+        ],
+        'validator' => [
+            'mautic.email.validator.multiple_emails_valid_validator' => [
+                'class'     => MultipleEmailsValidValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                ],
+                'tag' => 'validator.constraint_validator',
             ],
         ],
     ],
