@@ -249,7 +249,7 @@ class SubmissionModel extends CommonFormModel
                 }
             }
 
-            if ($value == '' && $f->isRequired()) {
+            if ($value === '' && $f->isRequired()) {
 
                 //field is required, but hidden from form because of 'ShowWhenValueExists'
                 if ($f->getShowWhenValueExists() === false && !isset($post[$alias])) {
