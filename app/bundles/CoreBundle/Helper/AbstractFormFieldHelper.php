@@ -137,12 +137,10 @@ abstract class AbstractFormFieldHelper
             $list = array_combine($list, $list);
         }
 
-        $choices = [];
-
         $valueFormatting = function ($list) use ($removeEmpty) {
-            $formattedChoices = [];
+            $choices = [];
             foreach ($list as $val => $label) {
-                if (is_array($label)) {
+                if (is_array($label) && isset($label['value'])) {
                     $val   = $label['value'];
                     $label = $label['label'];
                 }
@@ -151,20 +149,26 @@ abstract class AbstractFormFieldHelper
                 } elseif (empty($label)) {
                     $label = $val;
                 }
-                $formattedChoices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+                if (!is_array($label)) {
+                    $choices[trim(html_entity_decode($val, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+                }
             }
 
-            return $formattedChoices;
+            return $choices;
         };
+
+        $formatList = $list;
+        $choices    = [];
 
         if (is_array($list)) {
             foreach ($list as $val => $label) {
-                if (is_array($label) && !isset($label['value'])) {
-                    $choices[$val] = $val;
+                if (is_array($label) && !isset($label['label'])) {
                     $choices[$val] = $valueFormatting($label);
-                } elseif (is_array($label)) {
-                    $choices = $valueFormatting ($label);
+                    unset($formatList[$val]);
                 }
+            }
+            if (!empty($formatList)) {
+                $choices = $valueFormatting($formatList);
             }
         }
 

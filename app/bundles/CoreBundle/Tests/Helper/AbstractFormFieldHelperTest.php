@@ -115,4 +115,56 @@ class AbstractFormFieldHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $actual);
     }
+    /**
+     * @testdox The string is parsed correctly into a choise array
+     *
+     * @covers \Mautic\CoreBundle\\Helper\AbstractFormFieldHelper::parseList
+     */
+    public function testLabelValuePairsAreFlattenedWithOptGroup()
+    {
+        $array['optGroup1'] = [
+            [
+                'label' => 'label1',
+                'value' => 'value1',
+            ],
+            [
+                'label' => 'label2',
+                'value' => 'value2',
+            ],
+            [
+                'label' => 'label3',
+                'value' => 'value3',
+            ],
+        ];
+        $array['optGroup2'] = [
+            [
+                'label' => 'label1',
+                'value' => 'value1',
+            ],
+            [
+                'label' => 'label2',
+                'value' => 'value2',
+            ],
+            [
+                'label' => 'label3',
+                'value' => 'value3',
+            ],
+        ];
+        $expected = [
+            'optGroup1' => [
+                'value1' => 'label1',
+                'value2' => 'label2',
+                'value3' => 'label3',
+                ],
+            'optGroup2' => [
+                'value1' => 'label1',
+                'value2' => 'label2',
+                'value3' => 'label3',
+
+            ],
+        ];
+        $actual = AbstractFormFieldHelper::parseList($array);
+
+        $this->assertEquals($expected, $actual);
+    }
 }
