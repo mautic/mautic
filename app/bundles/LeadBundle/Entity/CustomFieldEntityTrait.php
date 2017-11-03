@@ -120,7 +120,7 @@ trait CustomFieldEntityTrait
         if (property_exists($this, $property) && method_exists($this, $setter)) {
             // Fixed custom field so use the setter but don't get caught in a loop such as a custom field called "notes"
             // Set empty value as null
-            if (empty($value)) {
+            if ($value === '') {
                 $value = null;
             }
             $this->$setter($value);
