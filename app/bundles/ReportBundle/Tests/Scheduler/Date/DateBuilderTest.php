@@ -1,6 +1,6 @@
 <?php
 
-namespace Scheduler;
+namespace Mautic\ReportBundle\Tests\Scheduler\Date;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;

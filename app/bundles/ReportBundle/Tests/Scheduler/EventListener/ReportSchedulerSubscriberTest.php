@@ -1,6 +1,6 @@
 <?php
 
-namespace Scheduler;
+namespace Mautic\ReportBundle\Tests\Scheduler\EventListener;
 
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportEvent;
@@ -9,7 +9,7 @@ use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 
 class ReportSchedulerSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetNextEvent()
+    public function testOnReportSave()
     {
         $report = new Report();
         $event  = new ReportEvent($report);
