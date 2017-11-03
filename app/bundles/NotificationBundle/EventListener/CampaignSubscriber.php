@@ -221,6 +221,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $pushID->setEnabled(true);
             }
         }
+        $this->notificationModel->getPushIDRepository()->saveEntities($pushIDs);
 
         $event->setChannel('notification', $notification->getId());
 
