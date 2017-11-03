@@ -600,7 +600,9 @@ class ListModel extends FormModel
                     'type' => 'boolean',
                     'list' => [
                         0 => $this->translator->trans('mautic.core.form.no'),
-                        1 => $this->translator->trans('mautic.core.form.yes'),
+                        1 => $this->translator->trans('mautic.lead.list.filter.notification..subscribed.unsubscribed'),
+                        2 => $this->translator->trans('mautic.lead.list.filter.notification.subscribed'),
+                        3 => $this->translator->trans('mautic.lead.list.filter.notification.unsubscribed'),
                     ],
                 ],
                 'operators' => $this->getOperatorsForFieldType('bool'),
