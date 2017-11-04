@@ -17,17 +17,23 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
+use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
  * Class LeadApiController.
+ *
+ * @property LeadModel $model
  */
 class LeadApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use FrequencyRuleTrait;
+    use LeadDetailsTrait;
 
     /**
      * @param FilterControllerEvent $event
@@ -38,7 +44,7 @@ class LeadApiController extends CommonApiController
         $this->entityClass      = 'Mautic\LeadBundle\Entity\Lead';
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
-        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList'];
+        $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
 
         parent::initialize($event);
     }
@@ -50,6 +56,8 @@ class LeadApiController extends CommonApiController
     {
         $existingLeads = $this->getExistingLeads();
         if (!empty($existingLeads)) {
+            $this->request->setMethod('PATCH');
+
             return parent::editEntityAction($existingLeads[0]->getId());
         }
 
@@ -392,7 +400,7 @@ class LeadApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEventsAction($id)
+    public function getActivityAction($id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -404,27 +412,33 @@ class LeadApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filters = InputHelper::clean($this->request->get('filters', []));
+        return $this->getAllActivityAction($entity);
+    }
 
-        if (!isset($filters['search'])) {
-            $filters['search'] = '';
+    /**
+     * Obtains a list of contact events.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getAllActivityAction($lead = null)
+    {
+        $canViewOwn    = $this->security->isGranted('lead:leads:viewown');
+        $canViewOthers = $this->security->isGranted('lead:leads:viewother');
+
+        if (!$canViewOthers && !$canViewOwn) {
+            return $this->accessDenied();
         }
 
-        if (!isset($filters['includeEvents'])) {
-            $filters['includeEvents'] = [];
-        }
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
+        $limit   = (int) $this->request->get('limit', 25);
+        $page    = (int) $this->request->get('page', 1);
+        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
 
-        if (!isset($filters['excludeEvents'])) {
-            $filters['excludeEvents'] = [];
-        }
+        list($events, $serializerGroups) = $this->model->getEngagements($lead, $filters, $order, $page, $limit, false);
 
-        $order = InputHelper::clean($this->request->get('order', [
-            'timestamp',
-            'DESC',
-        ]));
-        $page        = (int) $this->request->get('page', 1);
-        $engagements = $this->model->getEngagements($entity, $filters, $order, $page);
-        $view        = $this->view($engagements);
+        $view    = $this->view($events);
+        $context = SerializationContext::create()->setGroups($serializerGroups);
+        $view->setSerializationContext($context);
 
         return $this->handleView($view);
     }
@@ -494,6 +508,102 @@ class LeadApiController extends CommonApiController
     }
 
     /**
+     * Add/Remove a UTM Tagset to/from the contact.
+     *
+     * @param int       $id
+     * @param string    $method
+     * @param array/int $data
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function applyUtmTagsAction($id, $method, $data)
+    {
+        $entity = $this->model->getEntity((int) $id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'edit')) {
+            return $this->accessDenied();
+        }
+
+        // calls add/remove method as appropriate
+        $result = $this->model->$method($entity, $data);
+
+        if ($result === false) {
+            return $this->badRequest();
+        }
+
+        if ('removeUtmTags' == $method) {
+            $view = $this->view(
+                [
+                    'recordFound'        => $result,
+                    $this->entityNameOne => $entity,
+                ]
+            );
+        } else {
+            $view = $this->view([$this->entityNameOne => $entity]);
+        }
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Adds a UTM Tagset to the contact.
+     *
+     * @param int $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function addUtmTagsAction($id)
+    {
+        return $this->applyUtmTagsAction($id, 'addUTMTags', $this->request->request->all());
+    }
+
+    /**
+     * Remove a UTM Tagset for the contact.
+     *
+     * @param int $id
+     * @param int $utmid
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function removeUtmTagsAction($id, $utmid)
+    {
+        return $this->applyUtmTagsAction($id, 'removeUtmTags', (int) $utmid);
+    }
+
+    /**
+     * Obtains a list of contact events.
+     *
+     * @deprecated 2.10.0 to be removed in 3.0
+     *
+     * @param $id
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getEventsAction($id)
+    {
+        $entity = $this->model->getEntity($id);
+
+        if ($entity === null) {
+            return $this->notFound();
+        }
+
+        if (!$this->checkEntityAccess($entity, 'view')) {
+            return $this->accessDenied();
+        }
+
+        $filters = $this->sanitizeEventFilter(InputHelper::clean($this->request->get('filters', [])));
+        $order   = InputHelper::clean($this->request->get('order', ['timestamp', 'DESC']));
+        $page    = (int) $this->request->get('page', 1);
+        $events  = $this->model->getEngagements($entity, $filters, $order, $page);
+
+        return $this->handleView($this->view($events));
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @param \Mautic\LeadBundle\Entity\Lead &$entity
@@ -541,7 +651,7 @@ class LeadApiController extends CommonApiController
         if (isset($originalParams['lastActive'])) {
             $lastActive = new DateTimeHelper($originalParams['lastActive']);
             $entity->setLastActive($lastActive->getDateTime());
-            unset($parameters['lastActive']);
+            unset($originalParams['lastActive']);
         }
 
         if (!empty($parameters['doNotContact']) && is_array($parameters['doNotContact'])) {
@@ -573,5 +683,32 @@ class LeadApiController extends CommonApiController
         }
 
         $this->setCustomFieldValues($entity, $form, $parameters);
+    }
+
+    /**
+     * Helper method to be used in FrequencyRuleTrait.
+     *
+     * @param Form $form
+     *
+     * @return bool
+     */
+    protected function isFormCancelled($form = null)
+    {
+        return false;
+    }
+
+    /**
+     * Helper method to be used in FrequencyRuleTrait.
+     *
+     * @param Form  $form
+     * @param array $data
+     *
+     * @return bool
+     */
+    protected function isFormValid(Form $form, array $data = null)
+    {
+        $form->submit($data, 'PATCH' !== $this->request->getMethod());
+
+        return $form->isValid();
     }
 }

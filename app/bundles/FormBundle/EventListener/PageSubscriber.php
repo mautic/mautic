@@ -106,10 +106,6 @@ class PageSubscriber extends CommonSubscriber
                     $formHtml  = preg_replace('#</form>#', $pageInput.'</form>', $formHtml);
 
                     //pouplate get parameters
-                    //priority populate value order by: query string (parameters) -> with lead
-                    if (!$form->getInKioskMode()) {
-                        $this->formModel->populateValuesWithLead($form, $formHtml);
-                    }
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
 
                     $content = preg_replace('#{form='.$id.'}#', $formHtml, $content);

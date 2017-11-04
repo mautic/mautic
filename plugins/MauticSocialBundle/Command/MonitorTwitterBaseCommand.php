@@ -74,15 +74,15 @@ EOT
         $this->maxRuns         = $this->input->getOption('max-runs');
         $this->queryCount      = $this->input->getOption('query-count');
         $this->monitoringModel = $this->getContainer()->get('mautic.social.model.monitoring');
+        $this->translator      = $this->getContainer()->get('translator');
 
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
+        $this->translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
 
         // get the twitter integration
         $this->twitter = $this->getTwitterIntegration();
 
         if (!$this->twitter->isAuthorized()) {
-            $this->output->writeln('Twitter integration not configured or authorized. Configure the integration to complete this task.');
+            $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.configured'));
 
             return 1;
         }
@@ -90,8 +90,20 @@ EOT
         // get the mid from the cli
         $mid = $input->getOption('mid');
 
+        if (!$mid) {
+            $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.mid.empty'));
+
+            return 1;
+        }
+
         // monitor record
         $monitor = $this->getMonitor($mid);
+
+        if (!$monitor || !$monitor->getId()) {
+            $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.monitor.does.not.exist', ['%id%' => $mid]));
+
+            return 1;
+        }
 
         // process the monitor
         $this->processMonitor($monitor);
@@ -113,10 +125,10 @@ EOT
     {
         $results = $this->getTweets($monitor);
 
-        if ($results === false || !array_key_exists('statuses', $results)) {
+        if ($results === false || !isset($results['statuses'])) {
             $this->output->writeln('No statuses found');
 
-            if (array_key_exists('errors', $results)) {
+            if (!empty($results['errors'])) {
                 foreach ($results['errors'] as $error) {
                     $this->output->writeln($error['code'].': '.$error['message']);
                 }
@@ -128,7 +140,7 @@ EOT
         if (count($results['statuses'])) {
             $this->createLeadsFromStatuses($results['statuses'], $monitor);
         } else {
-            $this->output->writeln('No new tweets');
+            $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.no.new.tweets'));
         }
 
         $this->setMonitorStats($monitor, $results['search_metadata']);
@@ -197,7 +209,7 @@ EOT
 
         if (!$leadField) {
             // Field has been deleted or something
-            $this->output->writeln('Twitter lead field not found.');
+            $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.filed.not.found'));
 
             return;
         }
@@ -238,7 +250,7 @@ EOT
             $twitterLeads = [];
             foreach ($leads as $leadId => $lead) {
                 $fields                       = $lead->getFields();
-                $twitterHandle                = $fields[$handleFieldGroup][$handleField]['value'];
+                $twitterHandle                = strtolower($fields[$handleFieldGroup][$handleField]['value']);
                 $twitterLeads[$twitterHandle] = $lead;
             }
 
@@ -254,7 +266,7 @@ EOT
             // tweet timestamp
             $tweetTimestamp = $status['created_at'];
             $lastActive     = new \DateTime($tweetTimestamp);
-            $handle         = $status['user']['screen_name'];
+            $handle         = strtolower($status['user']['screen_name']);
 
             /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {

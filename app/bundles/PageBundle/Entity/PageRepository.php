@@ -22,7 +22,7 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('p')
@@ -66,13 +66,14 @@ class PageRepository extends CommonRepository
      * @param bool   $viewOther
      * @param bool   $topLevel
      * @param array  $ignoreIds
+     * @param array  $extraColumns
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [])
     {
         $q = $this->createQueryBuilder('p');
-        $q->select('partial p.{id, title, language, alias}');
+        $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('p.title', ':search'))
@@ -108,7 +109,7 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -123,7 +124,7 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
@@ -148,6 +149,11 @@ class PageRepository extends CommonRepository
                     $q->expr()->like('p.language', ":$langUnique")
                 );
                 $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.page.searchcommand.isprefcenter'):
+            case $this->translator->trans('mautic.page.searchcommand.isprefcenter', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":$unique");
+                $forceParameters = [$unique => true];
                 break;
         }
 
@@ -177,6 +183,7 @@ class PageRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.page.searchcommand.isprefcenter',
         ];
 
         return array_merge($commands, parent::getSearchCommands());

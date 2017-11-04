@@ -62,7 +62,7 @@ $indexCount = 1;
             if ($child->vars['name'] == 'label_'.$indexCount):
                 if ($isRequired):
                     $name = $child->vars['full_name'];
-                    echo '<input type="hidden" value="'.$child->vars['value'].'" name="'.$name.'" />';
+                    echo '<input type="hidden" value="'.$child->vars['attr']['data-label'].'" name="'.$name.'" />';
                 endif;
                 ?>
                 <div class="pl-xs pr-xs <?php echo $class; ?><?php if ($isRequired): echo ' has-error'; endif; ?>">
@@ -71,7 +71,7 @@ $indexCount = 1;
                                id="<?php echo $child->vars['id']; ?>"
                                name="<?php echo $child->vars['full_name']; ?>"
                                class="<?php echo $child->vars['attr']['class']; ?>"
-                               value="<?php echo $child->vars['value']; ?>"
+                               value="<?php echo $child->vars['attr']['data-label']; ?>"
                                readonly />
                     </div>
                 </div>
@@ -83,28 +83,28 @@ $indexCount = 1;
                         <div class="choice-wrapper">
                             <div class="btn-group btn-block" data-toggle="buttons">
                                 <?php $checked = $child->vars['value'] === '0'; ?>
-                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?> <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>">
                                     <input type="radio"
                                            id="<?php echo $child->vars['id']; ?>_0"
                                            name="<?php echo $child->vars['full_name']; ?>"
-                                           data-toggle="tooltip"
                                            title=""
                                            autocomplete="false"
                                            value="0"
                                            onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php echo $object; ?>', '<?php echo $integration; ?>')"
-                                           <?php if ($checked): ?>checked="checked"<?php endif; ?>>
+                                           <?php if ($checked): ?>checked="checked"<?php endif; ?>
+                                           <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-left"></btn>
                                 </label>
                                 <?php $checked = $child->vars['value'] === '1'; ?>
-                                <label class="btn btn-default<?php if ($checked): echo ' active'; endif; ?>">
+                                <label class="btn-arrow<?php echo $indexCount; ?> btn btn-default<?php if ($checked): echo ' active'; endif; ?> <?php if ($child->vars['attr']['disabled']) :echo 'disabled'; endif; ?>">
                                     <input type="radio" id="<?php echo $child->vars['id']; ?>_1"
                                            name="<?php echo $child->vars['full_name']; ?>"
-                                           data-toggle="tooltip"
                                            title=""
                                            autocomplete="false"
                                            value="1"
                                            onchange="Mautic.matchedFields(<?php echo $indexCount; ?>, '<?php echo $object; ?>', '<?php echo $integration; ?>')"
-                                           <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>>
+                                           <?php if ($child->vars['value'] === '1'): ?>checked="checked"<?php endif; ?>
+                                           <?php if ($child->vars['attr']['disabled']) : echo 'disabled'; endif; ?>>
                                     <btn class="btn-nospin fa fa-arrow-circle-right"></btn>
                                 </label>
                             </div>

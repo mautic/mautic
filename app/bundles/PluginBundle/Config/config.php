@@ -72,12 +72,19 @@ return [
                 'class' => 'Mautic\PluginBundle\EventListener\PointSubscriber',
             ],
             'mautic.plugin.formbundle.subscriber' => [
-                'class' => 'Mautic\PluginBundle\EventListener\FormSubscriber',
+                'class'       => 'Mautic\PluginBundle\EventListener\FormSubscriber',
+                'methodCalls' => [
+                    'setIntegrationHelper' => [
+                        'mautic.helper.integration',
+                    ],
+                ],
             ],
             'mautic.plugin.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\PluginBundle\EventListener\CampaignSubscriber',
-                'arguments' => [
-                    'mautic.helper.integration',
+                'class'       => 'Mautic\PluginBundle\EventListener\CampaignSubscriber',
+                'methodCalls' => [
+                    'setIntegrationHelper' => [
+                        'mautic.helper.integration',
+                    ],
                 ],
             ],
             'mautic.plugin.leadbundle.subscriber' => [
@@ -85,6 +92,9 @@ return [
                 'arguments' => [
                     'mautic.plugin.model.plugin',
                 ],
+            ],
+            'mautic.plugin.integration.subscriber' => [
+                'class' => 'Mautic\PluginBundle\EventListener\IntegrationSubscriber',
             ],
         ],
         'forms' => [
@@ -97,18 +107,19 @@ return [
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',
-                    'translator',
                     'monolog.logger.mautic',
                 ],
                 'alias' => 'integration_featuresettings',
             ],
             'mautic.form.type.integration.fields' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\FieldsType',
-                'alias' => 'integration_fields',
+                'class'     => 'Mautic\PluginBundle\Form\Type\FieldsType',
+                'alias'     => 'integration_fields',
+                'arguments' => 'translator',
             ],
             'mautic.form.type.integration.company.fields' => [
-                'class' => 'Mautic\PluginBundle\Form\Type\CompanyFieldsType',
-                'alias' => 'integration_company_fields',
+                'class'     => 'Mautic\PluginBundle\Form\Type\CompanyFieldsType',
+                'alias'     => 'integration_company_fields',
+                'arguments' => 'translator',
             ],
             'mautic.form.type.integration.keys' => [
                 'class' => 'Mautic\PluginBundle\Form\Type\KeysType',
@@ -130,8 +141,16 @@ return [
         ],
         'other' => [
             'mautic.helper.integration' => [
-                'class'     => 'Mautic\PluginBundle\Helper\IntegrationHelper',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,
+                'arguments' => [
+                    'kernel',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.paths',
+                    'mautic.helper.bundle',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.templating',
+                    'mautic.plugin.model.plugin',
+                ],
             ],
         ],
         'models' => [
@@ -140,6 +159,10 @@ return [
                 'arguments' => [
                     'mautic.lead.model.field',
                 ],
+            ],
+
+            'mautic.plugin.model.integration_entity' => [
+                'class' => Mautic\PluginBundle\Model\IntegrationEntityModel::class,
             ],
         ],
     ],

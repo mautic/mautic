@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -132,7 +133,7 @@ class EmailRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this->getEntityManager()
             ->createQueryBuilder()
@@ -180,9 +181,9 @@ class EmailRepository extends CommonRepository
      * @param bool $countOnly
      * @param null $limit
      *
-     * @return array|int
+     * @return QueryBuilder|int|array
      */
-    public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
+    public function getEmailPendingQuery($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
     {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -306,6 +307,26 @@ class EmailRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
+        return $q;
+    }
+
+    /**
+     * @param      $emailId
+     * @param null $variantIds
+     * @param null $listIds
+     * @param bool $countOnly
+     * @param null $limit
+     *
+     * @return array|int
+     */
+    public function getEmailPendingLeads($emailId, $variantIds = null, $listIds = null, $countOnly = false, $limit = null)
+    {
+        $q = $this->getEmailPendingQuery($emailId, $variantIds, $listIds, $countOnly, $limit);
+
+        if (!($q instanceof QueryBuilder)) {
+            return $q;
+        }
+
         $results = $q->execute()->fetchAll();
 
         if ($countOnly) {
@@ -392,12 +413,12 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param                            $filter
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     * @param                                         $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause($q, $filter, [
             'e.name',
@@ -406,12 +427,12 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     * @param                            $filter
+     * @param \Doctrine\ORM\QueryBuilder|QueryBuilder $q
+     * @param                                         $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {

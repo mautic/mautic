@@ -97,18 +97,6 @@ class ConfigSubscriber extends CommonSubscriber
             }
         }
 
-        // Ensure that percent signs are decoded in the unsubscribe/webview settings
-        $decode = [
-            'unsubscribe_text',
-            'webview_text',
-            'unsubscribe_message',
-            'resubscribe_message',
-            'default_signature_text',
-        ];
-        foreach ($decode as $key) {
-            $data[$key] = $event->escapeString($data[$key]);
-        }
-
         $event->setConfig($data, 'emailconfig');
     }
 }

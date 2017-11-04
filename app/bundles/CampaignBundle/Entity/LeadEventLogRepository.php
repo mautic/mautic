@@ -22,7 +22,7 @@ class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
         $q     = $this
@@ -60,20 +60,21 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Get a lead's page event log.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
+     * @param array    $options
      *
      * @return array
      *
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadLogs($leadId, array $options = [])
+    public function getLeadLogs($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()
                       ->getConnection()
                       ->createQueryBuilder()
-                      ->select('ll.event_id,
+                      ->select('ll.id as log_id,
+                    ll.event_id,
                     ll.campaign_id,
                     ll.date_triggered as dateTriggered,
                     e.name AS event_name,
@@ -85,15 +86,19 @@ class LeadEventLogRepository extends CommonRepository
                     ll.is_scheduled as isScheduled,
                     ll.trigger_date as triggerDate,
                     ll.channel,
-                    ll.channel_id as channel_id
+                    ll.channel_id as channel_id,
+                    ll.lead_id
                     '
                       )
                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
                       ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
-                      ->where('ll.lead_id = '.(int) $leadId)
                       ->andWhere('e.event_type != :eventType')
                       ->setParameter('eventType', 'decision');
+
+        if ($leadId) {
+            $query->where('ll.lead_id = '.(int) $leadId);
+        }
 
         if (isset($options['scheduledState'])) {
             if ($options['scheduledState']) {
@@ -198,7 +203,7 @@ class LeadEventLogRepository extends CommonRepository
             $query->orWhere('ll.ip_address IN ('.implode(',', $ipIds).')');
         }
 
-        if (!empty($options['canViewOthers']) && isset($this->currentUser)) {
+        if (empty($options['canViewOthers']) && isset($this->currentUser)) {
             $query->andWhere('c.created_by = :userId')
                 ->setParameter('userId', $this->currentUser->getId());
         }
@@ -212,10 +217,9 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @return array
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false)
+    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
     {
         $q = $this->_em->getConnection()->createQueryBuilder()
-                       ->select('o.event_id, count(o.lead_id) as lead_count')
                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
                        ->innerJoin(
                            'o',
@@ -225,12 +229,22 @@ class LeadEventLogRepository extends CommonRepository
                        );
 
         $expr = $q->expr()->andX(
-            $q->expr()->eq('o.campaign_id', (int) $campaignId),
-            $q->expr()->orX(
-                $q->expr()->isNull('o.non_action_path_taken'),
-                $q->expr()->eq('o.non_action_path_taken', ':false')
-            )
+            $q->expr()->eq('o.campaign_id', (int) $campaignId)
         );
+
+        $groupBy = 'o.event_id';
+        if ($excludeNegative) {
+            $q->select('o.event_id, count(o.lead_id) as lead_count');
+            $expr->add(
+                $q->expr()->orX(
+                    $q->expr()->isNull('o.non_action_path_taken'),
+                    $q->expr()->eq('o.non_action_path_taken', ':false')
+                )
+            );
+        } else {
+            $q->select('o.event_id, count(o.lead_id) as lead_count, o.non_action_path_taken');
+            $groupBy .= ', o.non_action_path_taken';
+        }
 
         if ($excludeScheduled) {
             $expr->add(
@@ -238,9 +252,20 @@ class LeadEventLogRepository extends CommonRepository
             );
         }
 
+        // Exclude failed events
+        $failedSq = $this->_em->getConnection()->createQueryBuilder();
+        $failedSq->select('null')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
+            ->where(
+                $failedSq->expr()->eq('fe.log_id', 'o.id')
+            );
+        $expr->add(
+            sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
+        );
+
         $q->where($expr)
           ->setParameter('false', false, 'boolean')
-          ->groupBy('o.event_id');
+          ->groupBy($groupBy);
 
         $results = $q->execute()->fetchAll();
 
@@ -248,7 +273,19 @@ class LeadEventLogRepository extends CommonRepository
 
         //group by event id
         foreach ($results as $l) {
-            $return[$l['event_id']] = $l['lead_count'];
+            if (!$excludeNegative) {
+                if (!isset($return[$l['event_id']])) {
+                    $return[$l['event_id']] = [
+                        0 => 0,
+                        1 => 0,
+                    ];
+                }
+
+                $key                          = (int) $l['non_action_path_taken'] ? 0 : 1;
+                $return[$l['event_id']][$key] = (int) $l['lead_count'];
+            } else {
+                $return[$l['event_id']] = (int) $l['lead_count'];
+            }
         }
 
         return $return;

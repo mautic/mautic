@@ -227,8 +227,8 @@ class Campaign extends FormEntity
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 
@@ -531,7 +531,7 @@ class Campaign extends FormEntity
      *
      * @param Contact $contact
      *
-     * @return \Doctrine\Common\Collections\Collection|static|\Mautic\CampaignBundle\Entity\Contact[]
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getContactMembership(Contact $contact)
     {

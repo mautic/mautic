@@ -24,6 +24,7 @@ class MessageQueue
     const STATUS_RESCHEDULED = 'rescheduled';
     const STATUS_PENDING     = 'pending';
     const STATUS_SENT        = 'sent';
+    const STATUS_CANCELLED   = 'cancelled';
 
     const PRIORITY_NORMAL = 2;
     const PRIORITY_HIGH   = 1;
@@ -127,11 +128,6 @@ class MessageQueue
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
-        // @deprecated 2.4 to be removed in 3.0; BC support to ensure Doctrine doesn't populate metadata for Core and Channel bundle's entities
-        if (get_called_class() == \Mautic\CoreBundle\Entity\MessageQueue::class) {
-            return;
-        }
-
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('message_queue')

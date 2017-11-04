@@ -68,8 +68,9 @@ class ReportSubscriber extends CommonSubscriber
                 $pagePrefix        = 'p.';
                 $submissionColumns = [
                     $submissionPrefix.'date_submitted' => [
-                        'label' => 'mautic.form.report.submit.date_submitted',
-                        'type'  => 'datetime',
+                        'label'          => 'mautic.form.report.submit.date_submitted',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$submissionPrefix.'date_submitted)',
                     ],
                     $submissionPrefix.'referer' => [
                         'label' => 'mautic.core.referer',
@@ -114,7 +115,6 @@ class ReportSubscriber extends CommonSubscriber
             case 'forms':
                 $qb->from(MAUTIC_TABLE_PREFIX.'forms', 'f');
                 $event->addCategoryLeftJoin($qb, 'f');
-                $event->addCampaignByChannelJoin($qb, 'f', 'form');
                 break;
             case 'form.submissions':
                 $event->applyDateFilters($qb, 'date_submitted', 'fs');

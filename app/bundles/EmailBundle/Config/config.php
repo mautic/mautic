@@ -20,6 +20,10 @@ return [
                 'path'       => '/emails/{objectAction}/{objectId}',
                 'controller' => 'MauticEmailBundle:Email:execute',
             ],
+            'mautic_email_contacts' => [
+                'path'       => '/emails/contacts/{objectId}',
+                'controller' => 'MauticEmailBundle:Email:contacts',
+            ],
         ],
         'api' => [
             'mautic_api_emailstandard' => [
@@ -124,6 +128,13 @@ return [
                     'mautic.email.model.email',
                     'mautic.campaign.model.event',
                     'mautic.channel.model.queue',
+                    'mautic.email.model.send_email_to_user',
+                ],
+            ],
+            'mautic.email.campaignbundle.condition_subscriber' => [
+                'class'     => 'Mautic\EmailBundle\EventListener\CampaignConditionSubscriber',
+                'arguments' => [
+                    'mautic.validator.email',
                 ],
             ],
             'mautic.email.formbundle.subscriber' => [
@@ -142,6 +153,12 @@ return [
                 'class'     => 'Mautic\EmailBundle\EventListener\PointSubscriber',
                 'arguments' => [
                     'mautic.point.model.point',
+                ],
+            ],
+            'mautic.email.touser.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\EmailToUserSubscriber::class,
+                'arguments' => [
+                    'mautic.email.model.send_email_to_user',
                 ],
             ],
             'mautic.email.calendarbundle.subscriber' => [
@@ -170,6 +187,7 @@ return [
                 'class'     => 'Mautic\EmailBundle\EventListener\PageSubscriber',
                 'arguments' => [
                     'mautic.email.model.email',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.email.dashboard.subscriber' => [
@@ -210,6 +228,10 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'emailform',
             ],
+            'mautic.form.type.email.utm_tags' => [
+                'class' => 'Mautic\EmailBundle\Form\Type\EmailUtmTagsType',
+                'alias' => 'utm_tags',
+            ],
             'mautic.form.type.emailvariant' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\VariantType',
                 'arguments' => 'mautic.factory',
@@ -218,6 +240,10 @@ return [
             'mautic.form.type.email_list' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailListType',
                 'alias' => 'email_list',
+            ],
+            'mautic.form.type.email_click_decision' => [
+                'class' => 'Mautic\EmailBundle\Form\Type\EmailClickDecisionType',
+                'alias' => 'email_click_decision',
             ],
             'mautic.form.type.emailopen_list' => [
                 'class' => 'Mautic\EmailBundle\Form\Type\EmailOpenType',
@@ -259,14 +285,12 @@ return [
                 'class' => 'Mautic\EmailBundle\Form\Type\DashboardEmailsInTimeWidgetType',
                 'alias' => 'email_dashboard_emails_in_time_widget',
             ],
+            'mautic.form.type.email_to_user' => [
+                'class' => Mautic\EmailBundle\Form\Type\EmailToUserType::class,
+                'alias' => 'email_to_user',
+            ],
         ],
         'other' => [
-            'mautic.validator.leadlistaccess' => [
-                'class'     => 'Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccessValidator',
-                'arguments' => 'mautic.factory',
-                'tag'       => 'validator.constraint_validator',
-                'alias'     => 'leadlist_access',
-            ],
             'mautic.helper.mailbox' => [
                 'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
                 'arguments' => [
@@ -303,7 +327,7 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
                     'setUsername'      => ['%mautic.mailer_user%'],
-                    'setPassword'      => ['%mautic.mailer_password%'],
+                    'setPassword'      => ['%mautic.mailer_api_key%'],
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],
@@ -357,6 +381,13 @@ return [
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],
+            'mautic.validator.email' => [
+                'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -371,6 +402,12 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
+                ],
+            ],
+            'mautic.email.model.send_email_to_user' => [
+                'class'     => \Mautic\EmailBundle\Model\SendEmailToUser::class,
+                'arguments' => [
+                    'mautic.email.model.email',
                 ],
             ],
         ],
@@ -413,6 +450,7 @@ return [
         'show_contact_segments'               => false,
         'mailer_mailjet_sandbox'              => false,
         'mailer_mailjet_sandbox_default_mail' => null,
+        'disable_trackable_urls'              => false,
 
     ],
 ];
