@@ -426,7 +426,7 @@ $view['slots']->set(
             <!--/ #device-container -->
 
             <!-- #pushids-container -->
-            <?php if (!empty($devices)): ?>
+            <?php if (!empty($pushIds)): ?>
                 <div class="tab-pane fade bdr-w-0" id="pushids-container">
                     <?php
                     echo $view->render('MauticLeadBundle:Push:list.html.php',
