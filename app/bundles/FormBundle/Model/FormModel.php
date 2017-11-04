@@ -23,6 +23,8 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\Event;
@@ -80,6 +82,11 @@ class FormModel extends CommonFormModel
     protected $leadFieldModel;
 
     /**
+     * @var FormUploader
+     */
+    private $formUploader;
+
+    /**
      * FormModel constructor.
      *
      * @param RequestStack        $requestStack
@@ -91,6 +98,7 @@ class FormModel extends CommonFormModel
      * @param LeadModel           $leadModel
      * @param FormFieldHelper     $fieldHelper
      * @param LeadFieldModel      $leadFieldModel
+     * @param FormUploader        $formUploader
      */
     public function __construct(
         RequestStack $requestStack,
@@ -101,7 +109,8 @@ class FormModel extends CommonFormModel
         FieldModel $formFieldModel,
         LeadModel $leadModel,
         FormFieldHelper $fieldHelper,
-        LeadFieldModel $leadFieldModel
+        LeadFieldModel $leadFieldModel,
+        FormUploader $formUploader
     ) {
         $this->request             = $requestStack->getCurrentRequest();
         $this->templatingHelper    = $templatingHelper;
@@ -112,6 +121,7 @@ class FormModel extends CommonFormModel
         $this->leadModel           = $leadModel;
         $this->fieldHelper         = $fieldHelper;
         $this->leadFieldModel      = $leadFieldModel;
+        $this->formUploader        = $formUploader;
     }
 
     /**
@@ -277,16 +287,27 @@ class FormModel extends CommonFormModel
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (isset($existingFields[$fieldId])) {
-                $entity->removeField($fieldId, $existingFields[$fieldId]);
-                $deleteFields[] = $fieldId;
+            if (!isset($existingFields[$fieldId])) {
+                continue;
             }
+            $this->handleFilesDelete($existingFields[$fieldId]);
+            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $deleteFields[] = $fieldId;
         }
 
         // Delete fields from db
         if (count($deleteFields)) {
             $this->formFieldModel->deleteEntities($deleteFields);
         }
+    }
+
+    private function handleFilesDelete(Field $field)
+    {
+        if (!$field->isFileType()) {
+            return;
+        }
+
+        $this->formUploader->deleteAllFilesOfFormField($field);
     }
 
     /**
@@ -410,6 +431,10 @@ class FormModel extends CommonFormModel
             $cachedHtml = $this->generateHtml($form, $useCache);
         }
 
+        if (!$form->getInKioskMode()) {
+            $this->populateValuesWithLead($form, $cachedHtml);
+        }
+
         if ($withScript) {
             $cachedHtml = $this->getFormScript($form)."\n\n".$cachedHtml;
         }
@@ -450,14 +475,14 @@ class FormModel extends CommonFormModel
         //generate cached HTML
         $theme       = $entity->getTemplate();
         $submissions = null;
-        $lead        = $this->leadModel->getCurrentLead();
+        $lead        = ($this->request) ? $this->leadModel->getCurrentLead() : null;
         $style       = '';
 
         if (!empty($theme)) {
             $theme .= '|';
         }
 
-        if ($entity->usesProgressiveProfiling()) {
+        if ($lead && $entity->usesProgressiveProfiling()) {
             $submissions = $this->getLeadSubmissions($entity, $lead->getId());
         }
 
@@ -524,6 +549,7 @@ class FormModel extends CommonFormModel
                 'fieldSettings' => $this->getCustomComponents()['fields'],
                 'fields'        => $fields,
                 'contactFields' => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields' => $this->leadFieldModel->getFieldListWithProperties('company'),
                 'form'          => $entity,
                 'theme'         => $theme,
                 'submissions'   => $submissions,
@@ -534,7 +560,6 @@ class FormModel extends CommonFormModel
                 'inBuilder'     => false,
             ]
         );
-
         if (!$entity->usesProgressiveProfiling()) {
             $entity->setCachedHtml($html);
 
@@ -587,7 +612,10 @@ class FormModel extends CommonFormModel
      */
     public function deleteEntity($entity)
     {
+        /* @var Form $entity */
         parent::deleteEntity($entity);
+
+        $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
             //delete the associated results table
@@ -605,12 +633,19 @@ class FormModel extends CommonFormModel
         $entities     = parent::deleteEntities($ids);
         $schemaHelper = $this->schemaHelperFactory->getSchemaHelper('table');
         foreach ($entities as $id => $entity) {
+            /* @var Form $entity */
             //delete the associated results table
             $schemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
+            $this->deleteFormFiles($entity);
         }
         $schemaHelper->executeChanges();
 
         return $entities;
+    }
+
+    private function deleteFormFiles(Form $form)
+    {
+        $this->formUploader->deleteFilesOfForm($form);
     }
 
     /**
@@ -755,6 +790,10 @@ class FormModel extends CommonFormModel
         $formName = $form->generateFormName();
         $lead     = $this->leadModel->getCurrentLead();
 
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
         $fields = $form->getFields();
         /** @var \Mautic\FormBundle\Entity\Field $f */
         foreach ($fields as $f) {
@@ -780,45 +819,45 @@ class FormModel extends CommonFormModel
     {
         $operatorOptions = [
             '=' => [
-                    'label'       => 'mautic.lead.list.form.operator.equals',
-                    'expr'        => 'eq',
-                    'negate_expr' => 'neq',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.equals',
+                'expr'        => 'eq',
+                'negate_expr' => 'neq',
+            ],
             '!=' => [
-                    'label'       => 'mautic.lead.list.form.operator.notequals',
-                    'expr'        => 'neq',
-                    'negate_expr' => 'eq',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.notequals',
+                'expr'        => 'neq',
+                'negate_expr' => 'eq',
+            ],
             'gt' => [
-                    'label'       => 'mautic.lead.list.form.operator.greaterthan',
-                    'expr'        => 'gt',
-                    'negate_expr' => 'lt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.greaterthan',
+                'expr'        => 'gt',
+                'negate_expr' => 'lt',
+            ],
             'gte' => [
-                    'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
-                    'expr'        => 'gte',
-                    'negate_expr' => 'lt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.greaterthanequals',
+                'expr'        => 'gte',
+                'negate_expr' => 'lt',
+            ],
             'lt' => [
-                    'label'       => 'mautic.lead.list.form.operator.lessthan',
-                    'expr'        => 'lt',
-                    'negate_expr' => 'gt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.lessthan',
+                'expr'        => 'lt',
+                'negate_expr' => 'gt',
+            ],
             'lte' => [
-                    'label'       => 'mautic.lead.list.form.operator.lessthanequals',
-                    'expr'        => 'lte',
-                    'negate_expr' => 'gt',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.lessthanequals',
+                'expr'        => 'lte',
+                'negate_expr' => 'gt',
+            ],
             'like' => [
-                    'label'       => 'mautic.lead.list.form.operator.islike',
-                    'expr'        => 'like',
-                    'negate_expr' => 'notLike',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.islike',
+                'expr'        => 'like',
+                'negate_expr' => 'notLike',
+            ],
             '!like' => [
-                    'label'       => 'mautic.lead.list.form.operator.isnotlike',
-                    'expr'        => 'notLike',
-                    'negate_expr' => 'like',
-                ],
+                'label'       => 'mautic.lead.list.form.operator.isnotlike',
+                'expr'        => 'notLike',
+                'negate_expr' => 'like',
+            ],
         ];
 
         return ($operator === null) ? $operatorOptions : $operatorOptions[$operator];

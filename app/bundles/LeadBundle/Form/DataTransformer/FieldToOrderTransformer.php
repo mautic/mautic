@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Entity\LeadField;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class FieldToOrderTransformer implements DataTransformerInterface
@@ -26,7 +27,7 @@ class FieldToOrderTransformer implements DataTransformerInterface
     /**
      * Transforms an object to an integer (order).
      *
-     * @param LeadField|null $field
+     * @param LeadField|null $order
      *
      * @return string
      */
@@ -46,7 +47,7 @@ class FieldToOrderTransformer implements DataTransformerInterface
     /**
      * Transforms a integer to an object.
      *
-     * @param  int order
+     * @param int $field
      *
      * @return LeadField|null
      */

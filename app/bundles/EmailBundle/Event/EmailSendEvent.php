@@ -27,6 +27,11 @@ class EmailSendEvent extends CommonEvent
     private $helper;
 
     /**
+     * @var Mail
+     */
+    private $email;
+
+    /**
      * @var string
      */
     private $content = '';
@@ -91,6 +96,10 @@ class EmailSendEvent extends CommonEvent
             $this->subject = $args['subject'];
         }
 
+        if (isset($args['email'])) {
+            $this->email = $args['email'];
+        }
+
         if (!$this->subject && isset($args['email']) && $args['email'] instanceof Email) {
             $this->subject = $args['email']->getSubject();
         }
@@ -149,7 +158,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getEmail()
     {
-        return ($this->helper !== null) ? $this->helper->getEmail() : null;
+        return ($this->helper !== null) ? $this->helper->getEmail() : $this->email;
     }
 
     /**
@@ -292,9 +301,15 @@ class EmailSendEvent extends CommonEvent
      *
      * @return array
      */
-    public function getTokens()
+    public function getTokens($includeGlobal = true)
     {
-        return $this->tokens;
+        $tokens = $this->tokens;
+
+        if ($includeGlobal && null !== $this->helper) {
+            $tokens = array_merge($this->helper->getGlobalTokens(), $tokens);
+        }
+
+        return $tokens;
     }
 
     /**

@@ -11,12 +11,21 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
+use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\FormBundle\Helper\TokenHelper as FormTokenHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
+use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -43,17 +52,60 @@ class FocusSubscriber extends CommonSubscriber
     protected $auditLogModel;
 
     /**
+     * @var TrackableModel
+     */
+    protected $trackableModel;
+
+    /**
+     * @var PageTokenHelper
+     */
+    protected $pageTokenHelper;
+
+    /**
+     * @var AssetTokenHelper
+     */
+    protected $assetTokenHelper;
+
+    /**
+     * @var FormTokenHelper
+     */
+    protected $formTokenHelper;
+
+    /**
+     * @var FocusModel
+     */
+    protected $focusModel;
+
+    /**
      * FocusSubscriber constructor.
      *
-     * @param RouterInterface $router
-     * @param IpLookupHelper  $ipLookupHelper
-     * @param AuditLogModel   $auditLogModel
+     * @param RouterInterface  $router
+     * @param IpLookupHelper   $ipLookupHelper
+     * @param AuditLogModel    $auditLogModel
+     * @param TrackableModel   $trackableModel
+     * @param PageTokenHelper  $pageTokenHelper
+     * @param AssetTokenHelper $assetTokenHelper
+     * @param FormTokenHelper  $formTokenHelper
+     * @param FocusModel       $focusModel
      */
-    public function __construct(RouterInterface $router, IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->router        = $router;
-        $this->ipHelper      = $ipLookupHelper;
-        $this->auditLogModel = $auditLogModel;
+    public function __construct(
+        RouterInterface $router,
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        TrackableModel $trackableModel,
+        PageTokenHelper $pageTokenHelper,
+        AssetTokenHelper $assetTokenHelper,
+        FormTokenHelper $formTokenHelper,
+        FocusModel $focusModel
+    ) {
+        $this->router           = $router;
+        $this->ipHelper         = $ipLookupHelper;
+        $this->auditLogModel    = $auditLogModel;
+        $this->trackableModel   = $trackableModel;
+        $this->pageTokenHelper  = $pageTokenHelper;
+        $this->assetTokenHelper = $assetTokenHelper;
+        $this->formTokenHelper  = $formTokenHelper;
+        $this->focusModel       = $focusModel;
     }
 
     /**
@@ -62,9 +114,10 @@ class FocusSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST    => ['onKernelRequest', 0],
-            FocusEvents::POST_SAVE   => ['onFocusPostSave', 0],
-            FocusEvents::POST_DELETE => ['onFocusDelete', 0],
+            KernelEvents::REQUEST          => ['onKernelRequest', 0],
+            FocusEvents::POST_SAVE         => ['onFocusPostSave', 0],
+            FocusEvents::POST_DELETE       => ['onFocusDelete', 0],
+            FocusEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
     }
 
@@ -130,5 +183,48 @@ class FocusSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * @param MauticEvents\TokenReplacementEvent $event
+     */
+    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
+    {
+        /** @var Lead $lead */
+        $lead         = $event->getLead();
+        $content      = $event->getContent();
+        $clickthrough = $event->getClickthrough();
+
+        if ($content) {
+            $tokens = array_merge(
+                $this->pageTokenHelper->findPageTokens($content, $clickthrough),
+                $this->assetTokenHelper->findAssetTokens($content, $clickthrough)
+            );
+
+            if ($lead && $lead->getId()) {
+                $tokens = array_merge($tokens, TokenHelper::findLeadTokens($content, $lead->getProfileFields()));
+            }
+
+            list($content, $trackables) = $this->trackableModel->parseContentForTrackables(
+                $content,
+                $tokens,
+                'focus',
+                $clickthrough['focus_id']
+            );
+
+            $focus = $this->focusModel->getEntity($clickthrough['focus_id']);
+
+            /**
+             * @var string
+             * @var Trackable $trackable
+             */
+            foreach ($trackables as $token => $trackable) {
+                $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $focus->getUtmTags());
+            }
+
+            $content = str_replace(array_keys($tokens), array_values($tokens), $content);
+
+            $event->setContent($content);
+        }
     }
 }

@@ -24,6 +24,9 @@ trait OperatorListTrait
                 '!like',
                 'regexp',
                 '!regexp',
+                'startsWith',
+                'endsWith',
+                'contains',
             ],
         ],
         'select' => [
@@ -61,6 +64,14 @@ trait OperatorListTrait
             'exclude' => [
                 'in',
                 '!in',
+            ],
+        ],
+        'lookup_id' => [
+            'include' => [
+                '=',
+                '!=',
+                'empty',
+                '!empty',
             ],
         ],
     ];
@@ -155,6 +166,21 @@ trait OperatorListTrait
             'expr'        => 'date', //special case
             'negate_expr' => 'date',
             'hide'        => true,
+        ],
+        'startsWith' => [
+            'label'       => 'mautic.core.operator.starts.with',
+            'expr'        => 'startsWith',
+            'negate_expr' => 'startsWith',
+        ],
+        'endsWith' => [
+            'label'       => 'mautic.core.operator.ends.with',
+            'expr'        => 'endsWith',
+            'negate_expr' => 'endsWith',
+        ],
+        'contains' => [
+            'label'       => 'mautic.core.operator.contains',
+            'expr'        => 'contains',
+            'negate_expr' => 'contains',
         ],
     ];
 
@@ -253,7 +279,7 @@ trait OperatorListTrait
             $type = 'bool';
         } elseif (in_array($type, ['country', 'timezone', 'region', 'locale'])) {
             $type = 'select';
-        } elseif (in_array($type, ['lookup', 'lookup_id',  'text', 'email', 'url', 'email', 'tel'])) {
+        } elseif (in_array($type, ['lookup',  'text', 'email', 'url', 'email', 'tel'])) {
             $type = 'text';
         } elseif ($type === 'datetime') {
             $type = 'date';

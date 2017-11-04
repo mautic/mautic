@@ -39,6 +39,13 @@ include 'action_button_helper.php';
         </div>
 
         <div class="col-xs-6 col-lg-4 va-m text-right">
+            <?php if (!empty($buttonHelp)): ?>
+                 <div class="input-group-btn">
+                    <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#<?php echo $searchId; ?>-search-help">
+                        <i class="fa fa-question-circle"></i>
+                    </button>
+                </div>
+            <?php endif; ?>
             <?php echo $view['buttons']->renderButtons(); ?>
         </div>
     </div>

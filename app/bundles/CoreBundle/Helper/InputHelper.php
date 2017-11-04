@@ -345,8 +345,10 @@ class InputHelper
         }
 
         $value = substr($value, 0, 254);
+        $value = filter_var($value, FILTER_SANITIZE_EMAIL);
+        $value = str_replace('..', '.', $value);
 
-        return filter_var($value, FILTER_SANITIZE_EMAIL);
+        return trim($value);
     }
 
     /**
@@ -361,6 +363,12 @@ class InputHelper
     {
         $value = self::clean($value, $urldecode);
 
+        // Return empty array for empty values
+        if (empty($value)) {
+            return [];
+        }
+
+        // Put a value into array if not an array
         if (!is_array($value)) {
             $value = [$value];
         }
@@ -399,6 +407,14 @@ class InputHelper
                 },
                 $value, -1, $needsDecoding);
 
+            // Slecial handling for script tags
+            $value = preg_replace_callback(
+                "/<script>(.*?)<\/script>/is",
+                function ($matches) {
+                    return '<mscript>'.base64_encode($matches[0]).'</mscript>';
+                },
+                $value, -1, $needsScriptDecoding);
+
             // Special handling for HTML comments
             $value = str_replace(['<!--', '-->'], ['<mcomment>', '</mcomment>'], $value, $commentCount);
 
@@ -422,12 +438,23 @@ class InputHelper
                 $value = str_replace(['<mcomment>', '</mcomment>'], ['<!--', '-->'], $value);
             }
 
-            $value = preg_replace_callback(
-                "/<mencoded>(.*?)<\/mencoded>/is",
-                function ($matches) {
-                    return htmlspecialchars_decode($matches[1]);
-                },
-                $value);
+            if ($needsDecoding) {
+                $value = preg_replace_callback(
+                    "/<mencoded>(.*?)<\/mencoded>/is",
+                    function ($matches) {
+                        return htmlspecialchars_decode($matches[1]);
+                    },
+                    $value);
+            }
+
+            if ($needsScriptDecoding) {
+                $value = preg_replace_callback(
+                    "/<mscript>(.*?)<\/mscript>/is",
+                    function ($matches) {
+                        return base64_decode($matches[1]);
+                    },
+                    $value);
+            }
         }
 
         return $value;

@@ -13,19 +13,24 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class EmailController extends FormController
 {
     use BuilderControllerTrait;
+    use FormErrorMessagesTrait;
+    use EntityContactsTrait;
 
     /**
      * @param int $page
@@ -455,6 +460,14 @@ class EmailController extends FormController
                         ['objectId' => $email->getId()],
                         true
                     ),
+                    'contacts' => $this->forward(
+                        'MauticEmailBundle:Email:contacts',
+                        [
+                            'objectId'   => $email->getId(),
+                            'page'       => $this->get('session')->get('mautic.email.contact.page', 1),
+                            'ignoreAjax' => true,
+                        ]
+                    )->getContent(),
                     'dateRangeForm' => $dateRangeForm->createView(),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:details.html.php',
@@ -589,6 +602,22 @@ class EmailController extends FormController
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
+        $routeParams = [
+            'objectAction' => 'new',
+        ];
+        if ($updateSelect) {
+            $routeParams['updateSelect'] = $updateSelect;
+            $routeParams['contentOnly']  = 1;
+        }
+
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'page:preference_center:viewown',
+                'page:preference_center:viewother',
+            ],
+            'RETURN_ARRAY'
+        );
 
         return $this->delegateView(
             [
@@ -602,18 +631,15 @@ class EmailController extends FormController
                     'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'   => $sectionForm->createView(),
                     'updateSelect'  => $updateSelect,
+                    'permissions'   => $permissions,
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_email_index',
-                    'mauticContent' => 'email',
-                    'updateSelect'  => $updateSelect,
-                    'route'         => $this->generateUrl(
-                        'mautic_email_action',
-                        [
-                            'objectAction' => 'new',
-                        ]
-                    ),
+                    'activeLink'      => '#mautic_email_index',
+                    'mauticContent'   => 'email',
+                    'updateSelect'    => $updateSelect,
+                    'route'           => $this->generateUrl('mautic_email_action', $routeParams),
+                    'validationError' => $this->getFormErrorForBuilder($form),
                 ],
             ]
         );
@@ -791,6 +817,23 @@ class EmailController extends FormController
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
         $sectionForm = $this->get('form.factory')->create('builder_section');
+        $routeParams = [
+            'objectAction' => 'edit',
+            'objectId'     => $entity->getId(),
+        ];
+        if ($updateSelect) {
+            $routeParams['updateSelect'] = $updateSelect;
+            $routeParams['contentOnly']  = 1;
+        }
+
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'page:preference_center:viewown',
+                'page:preference_center:viewother',
+            ],
+            'RETURN_ARRAY'
+        );
 
         return $this->delegateView(
             [
@@ -805,19 +848,15 @@ class EmailController extends FormController
                     'attachmentSize'     => $attachmentSize,
                     'builderAssets'      => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                     'sectionForm'        => $sectionForm->createView(),
+                    'permissions'        => $permissions,
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_email_index',
-                    'mauticContent' => 'email',
-                    'updateSelect'  => InputHelper::clean($this->request->query->get('updateSelect')),
-                    'route'         => $this->generateUrl(
-                        'mautic_email_action',
-                        [
-                            'objectAction' => 'edit',
-                            'objectId'     => $entity->getId(),
-                        ]
-                    ),
+                    'activeLink'      => '#mautic_email_index',
+                    'mauticContent'   => 'email',
+                    'updateSelect'    => InputHelper::clean($this->request->query->get('updateSelect')),
+                    'route'           => $this->generateUrl('mautic_email_action', $routeParams),
+                    'validationError' => $this->getFormErrorForBuilder($form),
                 ],
             ]
         );
@@ -1582,5 +1621,24 @@ class EmailController extends FormController
 
         // everything is ok
         return true;
+    }
+
+    /**
+     * @param     $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            ['email:emails:viewown', 'email:emails:viewother'],
+            'email',
+            'email_stats',
+            'email',
+            'email_id'
+        );
     }
 }

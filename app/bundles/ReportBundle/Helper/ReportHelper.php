@@ -26,10 +26,16 @@ class ReportHelper extends Helper
         return 'report';
     }
 
+    /**
+     * @param $type
+     *
+     * @return string
+     */
     public function getReportBuilderFieldType($type)
     {
         switch ($type) {
-            case 'number': return 'int';
+            case 'number':
+                $type = 'int';
                 break;
             case 'lookup':
             case 'text':
@@ -38,12 +44,11 @@ class ReportHelper extends Helper
             case 'tel':
             case 'region':
             case 'country':
-            case 'locale': return 'string';
-                break;
-            case 'datetime': return 'datetime';
-                break;
-            case 'date': return 'date';
+            case 'locale':
+                $type = 'string';
                 break;
         }
+
+        return $type;
     }
 }

@@ -11,7 +11,9 @@
 
 namespace Mautic\FormBundle\Controller\Api;
 
+use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
@@ -154,9 +156,33 @@ class FormApiController extends CommonApiController
                     $requestFieldIds[] = $fieldParams['id'];
                 }
 
+                if (is_null($fieldEntity)) {
+                    $msg = $this->translator->trans(
+                        'mautic.core.error.entity.not.found',
+                        [
+                            '%entity%' => $this->translator->trans('mautic.form.field'),
+                            '%id%'     => $fieldParams['id'],
+                        ],
+                        'flashes'
+                    );
+
+                    return $this->returnError($msg, Codes::HTTP_NOT_FOUND);
+                }
+
                 $fieldEntityArray           = $fieldEntity->convertToArray();
                 $fieldEntityArray['formId'] = $formId;
-                $fieldEntityArray['alias']  = $fieldParams['alias']  = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
+
+                if (!empty($fieldParams['alias'])) {
+                    $fieldParams['alias'] = InputHelper::filename($fieldParams['alias']);
+
+                    if (!in_array($fieldParams['alias'], $aliases)) {
+                        $fieldEntityArray['alias'] = $fieldParams['alias'];
+                    }
+                }
+
+                if (empty($fieldEntityArray['alias'])) {
+                    $fieldEntityArray['alias'] = $fieldParams['alias'] = $fieldModel->generateAlias($fieldEntityArray['label'], $aliases);
+                }
 
                 $fieldForm = $this->createFieldEntityForm($fieldEntityArray);
                 $fieldForm->submit($fieldParams, 'PATCH' !== $method);

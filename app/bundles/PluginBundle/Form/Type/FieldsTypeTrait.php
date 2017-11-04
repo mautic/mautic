@@ -166,13 +166,15 @@ trait FieldsTypeTrait
                                 'attr'        => [
                                     'data-toggle' => 'tooltip',
                                     'title'       => 'mautic.plugin.direction.data.update',
+                                    'disabled'    => (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false,
                                 ],
                             ]
                         );
                     }
                     if (!$fieldObject) {
                         $contactLink['mauticContactTimelineLink'] = $this->translator->trans('mautic.plugin.integration.contact.timeline.link');
-                        $mauticFields = array_merge($mauticFields, $contactLink);
+                        $isContactable['mauticContactIsContactableByEmail'] = $this->translator->trans('mautic.plugin.integration.contact.donotcontact.email');
+                        $mauticFields = array_merge($mauticFields, $contactLink, $isContactable);
                     }
 
                     $form->add(

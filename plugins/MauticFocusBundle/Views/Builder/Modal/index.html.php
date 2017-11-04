@@ -23,21 +23,19 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
 } ?><?php echo $animate; ?>">
         <div class="mf-<?php echo $style; ?>-container">
             <div class="mf-<?php echo $style; ?>-close">
-                <a href="javascript:void(0)"<?php if (!empty($preview)) {
-    echo ' onclick="Mautic.closeFocusModal(\''.$style.'\')"';
-} ?>>x</a>
+                <a href="javascript:void(0)"<?php if (!empty($preview)): echo ' onclick="Mautic.closeFocusModal(\''.$style.'\')"'; endif; ?>>x</a>
             </div>
             <div class="mf-content">
+                <?php if (in_array($htmlMode, ['editor', 'html'])): ?>
+                    <?php echo html_entity_decode($focus[$htmlMode]); ?>
+                <?php else: ?>
                 <div class="mf-headline"><?php echo $props['content']['headline']; ?></div>
                 <?php if ($props['content']['tagline']): ?>
                     <div class="mf-tagline"><?php echo $props['content']['tagline']; ?></div>
                 <?php endif; ?>
                 <div class="mf-inner-container">
-                    <?php if ($focus['type'] == 'form' && !empty($form)): ?>
-                        <?php echo $view->render(
-                            'MauticFocusBundle:Builder:form.html.php',
-                            ['form' => $form, 'style' => $focus['style'], 'focusId' => $focus['id'], 'preview' => $preview]
-                        ); ?>
+                    <?php if ($focus['type'] == 'form'): ?>
+                        {focus_form}
                     <?php elseif ($focus['type'] == 'link'): ?>
                         <a href="<?php echo (empty($preview)) ? $clickUrl
                             : '#'; ?>" class="mf-link" target="<?php echo ($props['content']['link_new_window']) ? '_new' : '_parent'; ?>">
@@ -45,6 +43,7 @@ $animate   = (!empty($preview) && !empty($props['animate'])) ? ' mf-animate' : '
                         </a>
                     <?php endif; ?>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

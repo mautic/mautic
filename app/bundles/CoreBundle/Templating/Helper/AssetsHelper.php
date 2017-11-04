@@ -12,6 +12,7 @@
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Asset\Packages;
 
@@ -125,7 +126,12 @@ class AssetsHelper
         $url = $this->packages->getUrl($path, $packageName, $version);
 
         if ($absolute) {
-            $url = $this->getBaseUrl().$url;
+            $url = $this->getBaseUrl().'/'.$path;
+        }
+
+        // Remove the dev index so the assets work in the dev mode
+        if (strpos($url, '/index_dev.php/')) {
+            $url = str_replace('index_dev.php/', '', $url);
         }
 
         return $url;
@@ -561,6 +567,9 @@ class AssetsHelper
      */
     public function makeLinks($text, $protocols = ['http', 'mail'], array $attributes = [])
     {
+        // clear tags in text
+        $text = InputHelper::clean($text);
+
         // Link attributes
         $attr = '';
         foreach ($attributes as $key => $val) {
