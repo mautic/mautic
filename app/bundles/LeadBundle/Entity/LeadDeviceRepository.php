@@ -62,7 +62,9 @@ class LeadDeviceRepository extends CommonRepository
     public function getDevices($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null, $sort = 'date_added', $order = 'DESC')
     {
         //get totals
-        $sq      = $this->getDeviceQuery($lead, $deviceNames, $deviceBrands, $deviceModels, $deviceOss, $deviceId)->select('*')->orderBy($sort, $order);
+        $sq = $this->getDeviceQuery($lead, $deviceNames, $deviceBrands, $deviceModels, $deviceOss, $deviceId)
+            ->select('*')
+            ->orderBy($sort, $order);
         $devices = $sq->execute()->fetchAll();
 
         return (!empty($devices)) ? $devices : [];
@@ -82,7 +84,9 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null, $sort = 'date_added', $order = 'DESC')
     {
-        $sq     = $this->getDeviceQuery($lead, $deviceNames, $deviceBrands, $deviceModels, $deviceOss, $deviceId)->select('es.id as id, es.device as device, es.device_fingerprint')->orderBy($sort, $order);
+        $sq = $this->getDeviceQuery($lead, $deviceNames, $deviceBrands, $deviceModels, $deviceOss, $deviceId)
+            ->select('es.id as id, es.device as device, es.device_fingerprint')
+            ->orderBy($sort, $order);
         $device = $sq->execute()->fetch();
 
         return (!empty($device)) ? $device : [];
