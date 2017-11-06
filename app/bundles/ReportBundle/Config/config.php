@@ -25,6 +25,7 @@ use Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
+use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator;
@@ -229,7 +230,16 @@ return [
                 'class'     => SendSchedule::class,
                 'arguments' => [
                     'mautic.helper.mailer',
+                    'mautic.report.model.message_schedule',
+                ],
+            ],
+            'mautic.report.model.message_schedule' => [
+                'class'     => MessageSchedule::class,
+                'arguments' => [
                     'translator',
+                    'mautic.helper.file_properties',
+                    'mautic.helper.core_parameters',
+                    'router',
                 ],
             ],
             'mautic.report.model.report_exporter' => [
@@ -297,7 +307,8 @@ return [
     ],
 
     'parameters' => [
-        'report_temp_dir'          => '%kernel.root_dir%/../media/files/temp',
-        'report_export_batch_size' => 1000,
+        'report_temp_dir'                     => '%kernel.root_dir%/../media/files/temp',
+        'report_export_batch_size'            => 1000,
+        'report_export_max_filesize_in_bytes' => 5000000,
     ],
 ];

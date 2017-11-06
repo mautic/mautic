@@ -14,7 +14,6 @@ namespace Mautic\ReportBundle\Scheduler\Model;
 use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Scheduler;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SendSchedule
 {
@@ -24,14 +23,14 @@ class SendSchedule
     private $mailer;
 
     /**
-     * @var TranslatorInterface
+     * @var MessageSchedule
      */
-    private $translator;
+    private $messageSchedule;
 
-    public function __construct(MailHelper $mailer, TranslatorInterface $translator)
+    public function __construct(MailHelper $mailer, MessageSchedule $messageSchedule)
     {
-        $this->mailer     = $mailer->getMailer();
-        $this->translator = $translator;
+        $this->mailer          = $mailer->getMailer();
+        $this->messageSchedule = $messageSchedule;
     }
 
     /**
@@ -43,22 +42,16 @@ class SendSchedule
         $transformer = new ArrayStringTransformer();
         $report      = $scheduler->getReport();
         $emails      = $transformer->reverseTransform($report->getToAddress());
-        $date        = new \DateTime();
-        $subject     = $this->translator->trans(
-            'mautic.report.schedule.email.subject',
-            ['%report_name%' => $report->getName(), '%date%' => $date->format('Y-m-d')]
-        );
-        $message = $this->translator->trans(
-            'mautic.report.schedule.email.message',
-            ['%report_name%' => $report->getName(), '%date%' => $date->format('Y-m-d')]
-        );
+        $subject     = $this->messageSchedule->getSubject($report);
+        $message     = $this->messageSchedule->getMessage($report, $filePath);
 
         $this->mailer->setTo($emails);
         $this->mailer->setSubject($subject);
         $this->mailer->setBody($message);
         $this->mailer->parsePlainText($message);
-        $this->mailer->attachFile($filePath);
-
+        if ($this->messageSchedule->fileCouldBeSend($filePath)) {
+            $this->mailer->attachFile($filePath);
+        }
         $this->mailer->send(true);
     }
 }

@@ -10,6 +10,7 @@
  */
 
 use Mautic\CoreBundle\Helper\FilePathResolver;
+use Mautic\CoreBundle\Helper\FileProperties;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
@@ -532,6 +533,9 @@ return [
                     'symfony.filesystem',
                     'mautic.helper.input_helper',
                 ],
+            ],
+            'mautic.helper.file_properties' => [
+                'class' => FileProperties::class,
             ],
         ],
         'menus' => [

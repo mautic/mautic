@@ -14,13 +14,17 @@ namespace Mautic\ReportBundle\Tests\Model;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
+use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SendScheduleTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSendSchedule()
+    public function testSendScheduleWithFile()
     {
+        $report = new Report();
+        $report->setToAddress('john@doe.com, doe@john.com');
+        $scheduler = new Scheduler($report, new \DateTime());
+
         $mailHelperMock = $this->getMockBuilder(MailHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -30,17 +34,24 @@ class SendScheduleTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn($mailHelperMock);
 
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)
+        $messageSchedule = $this->getMockBuilder(MessageSchedule::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $translatorMock->expects($this->at(0))
-            ->method('trans')
+        $messageSchedule->expects($this->once())
+            ->method('getSubject')
+            ->with($report)
             ->willReturn('Subject');
 
-        $translatorMock->expects($this->at(1))
-            ->method('trans')
+        $messageSchedule->expects($this->once())
+            ->method('getMessage')
+            ->with($report, 'path-to-a-file')
             ->willReturn('Message');
+
+        $messageSchedule->expects($this->once())
+            ->method('fileCouldBeSend')
+            ->with('path-to-a-file')
+            ->willReturn(true);
 
         $mailHelperMock->expects($this->once())
             ->method('setTo')
@@ -66,11 +77,69 @@ class SendScheduleTest extends \PHPUnit_Framework_TestCase
             ->method('send')
             ->with(true);
 
-        $sendSchedule = new SendSchedule($mailHelperMock, $translatorMock);
+        $sendSchedule = new SendSchedule($mailHelperMock, $messageSchedule);
 
+        $sendSchedule->send($scheduler, 'path-to-a-file');
+    }
+
+    public function testSendScheduleWithoutFile()
+    {
         $report = new Report();
         $report->setToAddress('john@doe.com, doe@john.com');
         $scheduler = new Scheduler($report, new \DateTime());
+
+        $mailHelperMock = $this->getMockBuilder(MailHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailHelperMock->expects($this->once())
+            ->method('getMailer')
+            ->with()
+            ->willReturn($mailHelperMock);
+
+        $messageSchedule = $this->getMockBuilder(MessageSchedule::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $messageSchedule->expects($this->once())
+            ->method('getSubject')
+            ->with($report)
+            ->willReturn('Subject');
+
+        $messageSchedule->expects($this->once())
+            ->method('getMessage')
+            ->with($report, 'path-to-a-file')
+            ->willReturn('Message');
+
+        $messageSchedule->expects($this->once())
+            ->method('fileCouldBeSend')
+            ->with('path-to-a-file')
+            ->willReturn(false);
+
+        $mailHelperMock->expects($this->once())
+            ->method('setTo')
+            ->with(['john@doe.com', 'doe@john.com']);
+
+        $mailHelperMock->expects($this->once())
+            ->method('setSubject')
+            ->with('Subject');
+
+        $mailHelperMock->expects($this->once())
+            ->method('setBody')
+            ->with('Message');
+
+        $mailHelperMock->expects($this->once())
+            ->method('parsePlainText')
+            ->with('Message');
+
+        $mailHelperMock->expects($this->never())
+            ->method('attachFile');
+
+        $mailHelperMock->expects($this->once())
+            ->method('send')
+            ->with(true);
+
+        $sendSchedule = new SendSchedule($mailHelperMock, $messageSchedule);
 
         $sendSchedule->send($scheduler, 'path-to-a-file');
     }
