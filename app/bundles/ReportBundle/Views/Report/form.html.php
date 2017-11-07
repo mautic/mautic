@@ -145,9 +145,7 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="pa-md">
-                                        <div class="checkbox">
-                                            <?php echo $view['form']->row($form['isScheduled']); ?>
-                                        </div>
+                                        <?php echo $view['form']->row($form['isScheduled']); ?>
                                     </div>
                                 </div>
                             </div>
