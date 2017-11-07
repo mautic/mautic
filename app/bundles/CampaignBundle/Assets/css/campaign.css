@@ -218,6 +218,9 @@
 
 .preview .builder-content {
     position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 }
 
 .preview .builder-active {
