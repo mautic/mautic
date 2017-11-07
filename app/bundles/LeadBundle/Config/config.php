@@ -252,7 +252,11 @@ return [
                 'path'            => '/devices',
                 'controller'      => 'MauticLeadBundle:Api\DeviceApi',
             ],
-
+            'mautic_api_contactsrecentwebactivity' => [
+                'path'       => '/contacts/recentwebactivity/{minutes}',
+                'controller' => 'MauticLeadBundle:Api\LeadApi:getContactsRecentWebActivity',
+                'method'     => 'GET',
+            ],
             // @deprecated 2.6.0 to be removed in 3.0
             'bc_mautic_api_segmentaddcontact' => [
                 'path'       => '/segments/{id}/contact/add/{leadId}',
