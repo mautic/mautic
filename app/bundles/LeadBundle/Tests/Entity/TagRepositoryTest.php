@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
@@ -109,5 +110,34 @@ class TagRepositoryTest extends \PHPUnit_Framework_TestCase
         $mockRepository->saveEntity($entity);
 
         $this->assertSame(23, $entity->getId());
+    }
+
+    public function testRemoveMinusFromTags()
+    {
+        $mockEntityManager = $this->getMockBuilder(EntityManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockMetadata = $this->getMockBuilder(ClassMetadata::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repository = new TagRepository($mockEntityManager, $mockMetadata);
+
+        $tags = [
+            'sometag1',
+            '-sometag2',
+            'sometag3',
+            '-sometag4',
+        ];
+
+        $expected = [
+            'sometag1',
+            'sometag2',
+            'sometag3',
+            'sometag4',
+        ];
+
+        $this->assertSame($expected, $repository->removeMinusFromTags($tags));
     }
 }

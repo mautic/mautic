@@ -58,8 +58,8 @@ class TagRepository extends CommonRepository
             return [];
         }
 
-        array_walk($tags, create_function('&$val', 'if (strpos($val, "-") === 0) $val = substr($val, 1);'));
-        $qb = $this->createQueryBuilder('t', 't.tag');
+        $tags = $this->removeMinusFromTags($tags);
+        $qb   = $this->createQueryBuilder('t', 't.tag');
 
         if ($tags) {
             $qb->where(
@@ -69,6 +69,21 @@ class TagRepository extends CommonRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Goes through each element in the array expecting it to be a tag label and removes the '-' character infront of it.
+     * The minus character is used to identify that the tag should be removed.
+     *
+     * @param array $tags
+     *
+     * @return array
+     */
+    public function removeMinusFromTags(array $tags)
+    {
+        return array_map(function ($val) {
+            return (strpos($val, '-') === 0) ? substr($val, 1) : $val;
+        }, $tags);
     }
 
     /**
