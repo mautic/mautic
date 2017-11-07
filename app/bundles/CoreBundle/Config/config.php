@@ -721,8 +721,8 @@ return [
                 'arguments' => [
                     'service_container',
                     'mautic.cipher.mcrypt',
-                    'mautic.cipher.openssl'
-                ]
+                    'mautic.cipher.openssl',
+                ],
             ],
             'mautic.helper.language' => [
                 'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',

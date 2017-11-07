@@ -19,8 +19,7 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class EncryptionHelper
- * @package Mautic\CoreBundle\Helper
+ * Class EncryptionHelper.
  */
 class EncryptionHelper
 {
@@ -70,12 +69,12 @@ class EncryptionHelper
         $initVector = $this->openSSLCipher->getRandomInitVector();
         $encrypted  = $this->openSSLCipher->encrypt(serialize($data), $this->key, $initVector);
 
-        return (base64_encode($encrypted).'|'.base64_encode($initVector));
+        return base64_encode($encrypted).'|'.base64_encode($initVector);
     }
 
     /**
      * Decrypt string.
-     * Returns false in case of failed decryption
+     * Returns false in case of failed decryption.
      *
      * @param string $data
      * @param bool   $mainDecryptOnly

@@ -18,8 +18,7 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class EncryptionHelperTest
- * @package Mautic\CoreBundle\Tests\Helper
+ * Class EncryptionHelperTest.
  */
 class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -85,7 +84,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
         $this->openSSLCipherMock->expects($this->at(0))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
-            ->willThrowException(new InvalidDecryptionException);
+            ->willThrowException(new InvalidDecryptionException());
         $this->mcryptCipherMock->expects($this->at(0))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
@@ -101,11 +100,11 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
         $this->openSSLCipherMock->expects($this->at(0))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
-            ->willThrowException(new InvalidDecryptionException);
+            ->willThrowException(new InvalidDecryptionException());
         $this->mcryptCipherMock->expects($this->at(0))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
-            ->willThrowException(new InvalidDecryptionException);
+            ->willThrowException(new InvalidDecryptionException());
         $encryptionHelper = $this->getEncryptionHelper();
         $actualReturn     = $encryptionHelper->decrypt($toDecrypt, false);
         $this->assertFalse($actualReturn);
