@@ -59,9 +59,7 @@ class TagRepository extends CommonRepository
         }
 
         array_walk($tags, create_function('&$val', 'if (strpos($val, "-") === 0) $val = substr($val, 1);'));
-        $qb = $this->_em->createQueryBuilder()
-            ->select('t')
-            ->from(Tag::class, 't', 't.tag');
+        $qb = $this->createQueryBuilder('t', 't.tag');
 
         if ($tags) {
             $qb->where(
