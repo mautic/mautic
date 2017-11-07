@@ -120,8 +120,8 @@ class TagRepository extends CommonRepository
     /**
      * Save an entity through the repository.
      *
-     * @param object $entity
-     * @param bool   $flush  true by default; use false if persisting in batches
+     * @param Tag  $entity
+     * @param bool $flush  true by default; use false if persisting in batches
      *
      * @return int
      */

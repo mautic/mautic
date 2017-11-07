@@ -48,7 +48,7 @@ class TagModel extends FormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
+     * @param int $id
      *
      * @return null|object
      */
@@ -64,7 +64,7 @@ class TagModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
+     * @param Tag   $entity
      * @param       $formFactory
      * @param null  $action
      * @param array $options
