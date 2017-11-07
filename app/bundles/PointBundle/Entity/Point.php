@@ -60,6 +60,11 @@ class Point extends FormEntity
     private $delta = 0;
 
     /**
+     * @var ArrayCollection
+     */
+    private $tags;
+
+    /**
      * @var array
      */
     private $properties = [];
@@ -86,7 +91,8 @@ class Point extends FormEntity
      */
     public function __construct()
     {
-        $this->log = new ArrayCollection();
+        $this->log  = new ArrayCollection();
+        $this->tags = new ArrayCollection();
     }
 
     /**
@@ -117,6 +123,18 @@ class Point extends FormEntity
             ->cascadePersist()
             ->cascadeRemove()
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToMany('tags', 'Mautic\LeadBundle\Entity\Tag')
+            ->setJoinTable('point_tags_xref')
+            ->addInverseJoinColumn('tag_id', 'id', false)
+            ->addJoinColumn('point_id', 'id', false, false, 'CASCADE')
+            ->setOrderBy(['tag' => 'ASC'])
+            ->setIndexBy('tag')
+            ->fetchLazy()
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
             ->build();
 
         $builder->addCategory();
@@ -162,6 +180,7 @@ class Point extends FormEntity
                     'publishUp',
                     'publishDown',
                     'delta',
+                    'tags',
                     'properties',
                 ]
             )
@@ -401,5 +420,29 @@ class Point extends FormEntity
     public function setDelta($delta)
     {
         $this->delta = (int) $delta;
+    }
+
+    /**
+     * Get tags.
+     *
+     * @return mixed
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * Set tags.
+     *
+     * @param $tags
+     *
+     * @return $this
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+
+        return $this;
     }
 }

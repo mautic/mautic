@@ -292,7 +292,12 @@ class PointModel extends CommonFormModel
                         $delta,
                         $ipAddress
                     );
-
+                    
+                    $actionTags = $action->getTags();
+                    if (!empty($actionTags)) {
+                        $lead->setTags($actionTags);
+                    }
+                    
                     $event = new PointActionEvent($action, $lead);
                     $this->dispatcher->dispatch(PointEvents::POINT_ON_ACTION, $event);
 
