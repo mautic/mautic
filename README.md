@@ -54,8 +54,8 @@ Installing from source is only recommended if you are comfortable using the comm
 
 1. See [Mautic requirements](https://www.mautic.org/download/requirements).
 2. PHP modules:
-	- required: `zip`, `xml`, `mcrypt`, `imap`, `mailparse`
-	- recommended: `openssl`, `opcache` / `apcu` / `memcached`
+	- required: `zip`, `xml`, `openssl`, `imap`, `mailparse`
+	- recommended: `mcrypt`, `opcache` / `apcu` / `memcached`
 	- recommended for development: `xdebug`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
 

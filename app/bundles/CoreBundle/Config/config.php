@@ -591,6 +591,14 @@ return [
             'translator.class'                   => 'Mautic\CoreBundle\Translation\Translator',
             'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
             // System uses
+            'mautic.cipher.mcrypt' => [
+                'class'     => 'Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher',
+                'arguments' => 'translator',
+            ],
+            'mautic.cipher.openssl' => [
+                'class'     => 'Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher',
+                'arguments' => 'translator',
+            ],
             'mautic.factory' => [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
@@ -710,7 +718,11 @@ return [
             ],
             'mautic.helper.encryption' => [
                 'class'     => 'Mautic\CoreBundle\Helper\EncryptionHelper',
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'service_container',
+                    'mautic.cipher.mcrypt',
+                    'mautic.cipher.openssl'
+                ]
             ],
             'mautic.helper.language' => [
                 'class'     => 'Mautic\CoreBundle\Helper\LanguageHelper',
