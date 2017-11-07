@@ -223,6 +223,7 @@ class FocusModel extends FormModel
         $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
         $focusContent = $tokenEvent->getContent();
         $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
+        $focusContent = str_replace('</form>', '<input type="hidden" name="mauticform[focusId]" value="'.$focus->getId().'" /></form>', $focusContent);
         if (!$formReplaced && !empty($cached['form'])) {
             // Form token missing so just append the form
             $focusContent .= $cached['form'];
