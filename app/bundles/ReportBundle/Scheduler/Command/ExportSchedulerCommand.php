@@ -38,7 +38,7 @@ class ExportSchedulerCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('mautic:repots:scheduler')
+            ->setName('mautic:reports:scheduler')
             ->setDescription('Processes scheduler for report\'s export')
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
     }
