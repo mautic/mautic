@@ -592,11 +592,11 @@ return [
             'templating.helper.translator.class' => 'Mautic\CoreBundle\Templating\Helper\TranslatorHelper',
             // System uses
             'mautic.cipher.mcrypt' => [
-                'class'     => 'Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher',
+                'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher::class,
                 'arguments' => 'translator',
             ],
             'mautic.cipher.openssl' => [
-                'class'     => 'Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher',
+                'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => 'translator',
             ],
             'mautic.factory' => [
