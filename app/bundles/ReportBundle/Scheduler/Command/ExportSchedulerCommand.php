@@ -18,6 +18,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ExportSchedulerCommand extends Command
 {
@@ -26,10 +27,16 @@ class ExportSchedulerCommand extends Command
      */
     private $reportExporter;
 
-    public function __construct(ReportExporter $reportExporter)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(ReportExporter $reportExporter, TranslatorInterface $translator)
     {
         parent::__construct();
         $this->reportExporter = $reportExporter;
+        $this->translator     = $translator;
     }
 
     /**
@@ -53,13 +60,15 @@ class ExportSchedulerCommand extends Command
         try {
             $exportOption = new ExportOption($report);
         } catch (\InvalidArgumentException $e) {
-            $output->writeln('<error>parameter "report" have to be number</error>');
+            $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
             return;
         }
 
         try {
             $this->reportExporter->processExport($exportOption);
+
+            $output->writeln('<info>'.$this->translator->trans('mautic.report.schedule.command.finished').'</info>');
         } catch (FileIOException $e) {
             $output->writeln('<error>'.$e->getMessage().'</error>');
 

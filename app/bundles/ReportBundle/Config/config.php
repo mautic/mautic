@@ -300,6 +300,7 @@ return [
                 'class'     => ExportSchedulerCommand::class,
                 'arguments' => [
                     'mautic.report.model.report_exporter',
+                    'translator',
                 ],
                 'tag' => 'console.command',
             ],
