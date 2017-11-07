@@ -84,8 +84,8 @@ class PointType extends AbstractType
                 ],
             'precision' => 0,
         ]);
-        
-         $builder->add(
+
+        $builder->add(
             'tags',
             'lead_tag',
             [
@@ -99,7 +99,7 @@ class PointType extends AbstractType
                 ],
             ]
         );
-        
+
         $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
         if ($type) {
             $formType = (!empty($options['pointActions']['actions'][$type]['formType'])) ?
