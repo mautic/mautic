@@ -23,7 +23,7 @@ class TagEvent extends CommonEvent
      * @param Tag  $tag
      * @param bool $isNew
      */
-    public function __construct(Tag &$tag, $isNew = false)
+    public function __construct(Tag $tag, $isNew = false)
     {
         $this->entity = &$tag;
         $this->isNew  = $isNew;
@@ -37,15 +37,5 @@ class TagEvent extends CommonEvent
     public function getTag()
     {
         return $this->entity;
-    }
-
-    /**
-     * Sets the Tag entity.
-     *
-     * @param tag $tag
-     */
-    public function setTag(Tag $tag)
-    {
-        $this->entity = $tag;
     }
 }
