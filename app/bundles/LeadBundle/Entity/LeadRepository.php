@@ -149,33 +149,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param     $uniqueFieldsWithData
      * @param int $leadId
-     * @param int $limit
      *
      * @return array
      */
-    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
+    public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('l.*')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
-        // loop through the fields and
-        foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
-                ->setParameter($col, $val);
-        }
-
-        // if we have a lead ID lets use it
-        if (!empty($leadId)) {
-            // make sure that its not the id we already have
-            $q->andWhere('l.id != '.$leadId);
-        }
-
-        if ($limit) {
-            $q->setMaxResults($limit);
-        }
-
-        $results = $q->execute()->fetchAll();
+        $results = $this->getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId);
 
         // Collect the IDs
         $leads = [];
@@ -213,12 +192,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get list of lead Ids by unique field data.
      *
-     * @param $uniqueFieldsWithData is an array of columns & values to filter by
-     * @param int $leadId is the current lead id. Added to query to skip and find other leads
+     * @param array $uniqueFieldsWithData An array of columns & values to filter by
+     * @param int   $leadId               is the current lead id. Added to query to skip and find other leads
      *
      * @return array
      */
-    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    public function getLeadIdsByUniqueFields(array $uniqueFieldsWithData, $leadId = null)
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -226,8 +205,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
-                ->setParameter($col, $val);
+            $q->orWhere("LOWER(l.$col) = :".$col)
+                ->setParameter($col, strtolower($val));
         }
 
         // if we have a lead ID lets use it

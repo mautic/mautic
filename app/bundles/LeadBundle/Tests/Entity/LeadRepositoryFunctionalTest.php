@@ -93,4 +93,24 @@ class LeadRepositoryFunctionalTest extends MauticWebTestCase
         $changes = $lead->getChanges(true);
         $this->assertEquals(60, $changes['points'][1]);
     }
+
+    /**
+     * @testdox Check that finding a contact based on a unique identifier is case insensitive
+     *
+     * @covers  \Mautic\LeadBundle\Entity\LeadRepository::getLeadsByUniqueFields()
+     * @covers  \Mautic\LeadBundle\Entity\LeadRepository::getLeadIdsByUniqueFields()
+     */
+    public function testUniqueIdentifierIsCaseInsensitive()
+    {
+        $repository = $this->container->get('doctrine')->getRepository('MauticLeadBundle:Lead');
+
+        $leads = $repository->getLeadsByUniqueFields(['email' => 'RoxieLShaw@fleckens.hu']);
+        $this->assertCount(1, $leads);
+        $leadId = $leads[0]->getId();
+
+        // Assert that the same lead is found by a capital email
+        $leads = $repository->getLeadsByUniqueFields(['email' => 'ROXIELSHAW@FLECKENS.HU']);
+        $this->assertCount(1, $leads);
+        $this->assertEquals($leadId, $leads[0]->getId());
+    }
 }
