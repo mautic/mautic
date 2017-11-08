@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EncryptionHelper
 {
     /** @var ISymmetricCipher[] */
-    private $possibleCiphers;
+    private $availableCiphers;
 
     /** @var string */
     private $key;
@@ -40,19 +40,21 @@ class EncryptionHelper
         ISymmetricCipher $possibleCipher1,
         ISymmetricCipher $possibleCipher2 = null
     ) {
-        $args            = func_get_args();
-        $totalArgs       = func_num_args();
-        $nonCipherArgs   = 1;
-        $possibleCiphers = [];
-        for ($i = $nonCipherArgs; $i < $totalArgs; $i++) {
-            $possibleCipher = $args[$i];
+        $nonCipherArgs = 1;
+        for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {
+            $possibleCipher = func_get_arg($i);
             if (!($possibleCipher instanceof ISymmetricCipher)) {
-                throw new \LogicException(get_class($possibleCipher).' has to implement '.ISymmetricCipher::class);
+                throw new \InvalidArgumentException(get_class($possibleCipher).' has to implement '.ISymmetricCipher::class);
             }
-            $possibleCiphers[] = $possibleCipher;
+            if (!$possibleCipher->isSupported()) {
+                continue;
+            }
+            $this->availableCiphers[] = $possibleCipher;
         }
-        $this->possibleCiphers = $possibleCiphers;
-        $this->key             = $container->getParameter('mautic.secret_key');
+        if (count($this->availableCiphers) === 0) {
+            throw new \RuntimeException('None of possible cryptography libraries is supported');
+        }
+        $this->key = $container->getParameter('mautic.secret_key');
     }
 
     /**
@@ -71,22 +73,14 @@ class EncryptionHelper
      * @param mixed $data
      *
      * @return string
+     *
      * @throws \LogicException If there isn't supported cipher available
      */
     public function encrypt($data)
     {
-        $encryptionCipher = null;
-        foreach ($this->possibleCiphers as $possibleCipher) {
-            if ($possibleCipher->isSupported()) {
-                $encryptionCipher = $possibleCipher;
-                break;
-            }
-        }
-        if ($encryptionCipher === null) {
-            throw new \LogicException('None of possible ciphers is supported');
-        }
-        $initVector = $encryptionCipher->getRandomInitVector();
-        $encrypted  = $encryptionCipher->encrypt(serialize($data), $this->key, $initVector);
+        $encryptionCipher = reset($this->availableCiphers);
+        $initVector       = $encryptionCipher->getRandomInitVector();
+        $encrypted        = $encryptionCipher->encrypt(serialize($data), $this->key, $initVector);
 
         return base64_encode($encrypted).'|'.base64_encode($initVector);
     }
@@ -106,15 +100,12 @@ class EncryptionHelper
         $encryptedMessage = base64_decode($encryptData[0]);
         $initVector       = base64_decode($encryptData[1]);
         $mainTried        = false;
-        foreach ($this->possibleCiphers as $possibleCipher) {
-            if (!$possibleCipher->isSupported()) {
-                continue;
-            }
+        foreach ($this->availableCiphers as $availableCipher) {
             if ($mainDecryptOnly && $mainTried) {
                 return false;
             }
             try {
-                return unserialize($possibleCipher->decrypt($encryptedMessage, $this->key, $initVector));
+                return unserialize($availableCipher->decrypt($encryptedMessage, $this->key, $initVector));
             } catch (InvalidDecryptionException $ex) {
             }
             $mainTried = true;
