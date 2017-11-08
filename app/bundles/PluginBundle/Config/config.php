@@ -36,7 +36,9 @@ return [
                 'path'       => '/plugins/reload',
                 'controller' => 'MauticPluginBundle:Plugin:reload',
             ],
-            'mautic_plugin_view_settings' => [
+        ],
+        'api' => [
+            'mautic_api_plugin_view_settings' => [
                 'path'       => '/plugins/settings/{name}',
                 'controller' => 'MauticPluginBundle:Plugin:viewSettings',
             ],
