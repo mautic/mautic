@@ -62,7 +62,9 @@ class PluginModel extends FormModel
      */
     public function getLeadFields()
     {
-        return $this->leadFieldModel->getFieldList();
+        $leadFields = $this->leadFieldModel->getFieldList();
+        $leadFields['Core']['id'] = 'Contact ID';
+        return $leadFields;
     }
 
     /**
