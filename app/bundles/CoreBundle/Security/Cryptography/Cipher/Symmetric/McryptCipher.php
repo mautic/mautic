@@ -5,8 +5,8 @@ namespace Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
 /**
- * Class McryptCryptography
- * @package Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric
+ * Class McryptCryptography.
+ *
  * @deprecated
  */
 class McryptCipher implements ISymmetricCipher
@@ -38,6 +38,7 @@ class McryptCipher implements ISymmetricCipher
      * @param string $originalInitVector
      *
      * @return string
+     *
      * @throws InvalidDecryptionException
      */
     public function decrypt($encryptedMessage, $key, $originalInitVector)
@@ -93,4 +94,3 @@ class McryptCipher implements ISymmetricCipher
         return hash_hmac('sha256', $data, $key);
     }
 }
-

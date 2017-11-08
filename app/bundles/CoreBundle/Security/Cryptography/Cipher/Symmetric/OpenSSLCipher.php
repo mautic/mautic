@@ -5,8 +5,7 @@ namespace Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
 /**
- * Class OpenSSLCryptography
- * @package Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric
+ * Class OpenSSLCryptography.
  */
 class OpenSSLCipher implements ISymmetricCipher
 {
@@ -34,6 +33,7 @@ class OpenSSLCipher implements ISymmetricCipher
      * @param string $originalInitVector
      *
      * @return string
+     *
      * @throws InvalidDecryptionException
      */
     public function decrypt($encryptedMessage, $key, $originalInitVector)
@@ -72,7 +72,7 @@ class OpenSSLCipher implements ISymmetricCipher
         }
         $testForRandom = $this->getRandomInitVector();
 
-        return ($testForRandom !== false);
+        return $testForRandom !== false;
     }
 
     /**
