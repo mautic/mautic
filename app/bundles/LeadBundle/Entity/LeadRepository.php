@@ -1225,6 +1225,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $changes['points'][1] = $newPoints;
                 $entity->setChanges($changes);
             }
+
+            $this->pointChanges = null;
         }
     }
 }
