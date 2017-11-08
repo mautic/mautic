@@ -13,8 +13,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher;
-use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
+use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\ISymmetricCipher;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -23,28 +22,37 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EncryptionHelper
 {
-    /** @var McryptCipher */
-    private $mcryptCipher;
-
-    /** @var OpenSSLCipher */
-    private $openSSLCipher;
+    /** @var ISymmetricCipher[] */
+    private $possibleCiphers;
 
     /** @var string */
     private $key;
 
     /**
-     * @param ContainerInterface $container
-     * @param McryptCipher       $mcryptCipher
-     * @param OpenSSLCipher      $openSSLCipher
+     * EncryptionHelper constructor.
+     *
+     * @param ContainerInterface    $container
+     * @param ISymmetricCipher      $possibleCipher1
+     * @param ISymmetricCipher|null $possibleCipher2
      */
     public function __construct(
         ContainerInterface $container,
-        McryptCipher $mcryptCipher,
-        OpenSSLCipher $openSSLCipher
+        ISymmetricCipher $possibleCipher1,
+        ISymmetricCipher $possibleCipher2 = null
     ) {
-        $this->mcryptCipher  = $mcryptCipher;
-        $this->openSSLCipher = $openSSLCipher;
-        $this->key           = $container->getParameter('mautic.secret_key');
+        $args            = func_get_args();
+        $totalArgs       = func_num_args();
+        $nonCipherArgs   = 1;
+        $possibleCiphers = [];
+        for ($i = $nonCipherArgs; $i < $totalArgs; $i++) {
+            $possibleCipher = $args[$i];
+            if (!($possibleCipher instanceof ISymmetricCipher)) {
+                throw new \LogicException(get_class($possibleCipher).' has to implement '.ISymmetricCipher::class);
+            }
+            $possibleCiphers[] = $possibleCipher;
+        }
+        $this->possibleCiphers = $possibleCiphers;
+        $this->key             = $container->getParameter('mautic.secret_key');
     }
 
     /**
@@ -63,11 +71,22 @@ class EncryptionHelper
      * @param mixed $data
      *
      * @return string
+     * @throws \LogicException If there isn't supported cipher available
      */
     public function encrypt($data)
     {
-        $initVector = $this->openSSLCipher->getRandomInitVector();
-        $encrypted  = $this->openSSLCipher->encrypt(serialize($data), $this->key, $initVector);
+        $encryptionCipher = null;
+        foreach ($this->possibleCiphers as $possibleCipher) {
+            if ($possibleCipher->isSupported()) {
+                $encryptionCipher = $possibleCipher;
+                break;
+            }
+        }
+        if ($encryptionCipher === null) {
+            throw new \LogicException('None of possible ciphers is supported');
+        }
+        $initVector = $encryptionCipher->getRandomInitVector();
+        $encrypted  = $encryptionCipher->encrypt(serialize($data), $this->key, $initVector);
 
         return base64_encode($encrypted).'|'.base64_encode($initVector);
     }
@@ -86,19 +105,21 @@ class EncryptionHelper
         $encryptData      = explode('|', $data);
         $encryptedMessage = base64_decode($encryptData[0]);
         $initVector       = base64_decode($encryptData[1]);
-        // Try OpenSSL
-        try {
-            return unserialize($this->openSSLCipher->decrypt($encryptedMessage, $this->key, $initVector));
-        } catch (InvalidDecryptionException $ex) {
-            if ($mainDecryptOnly) {
+        $mainTried        = false;
+        foreach ($this->possibleCiphers as $possibleCipher) {
+            if (!$possibleCipher->isSupported()) {
+                continue;
+            }
+            if ($mainDecryptOnly && $mainTried) {
                 return false;
             }
+            try {
+                return unserialize($possibleCipher->decrypt($encryptedMessage, $this->key, $initVector));
+            } catch (InvalidDecryptionException $ex) {
+            }
+            $mainTried = true;
         }
-        // Try Mcrypt
-        try {
-            return unserialize($this->mcryptCipher->decrypt($encryptedMessage, $this->key, $initVector));
-        } catch (InvalidDecryptionException $ex) {
-            return false;
-        }
+
+        return false;
     }
 }

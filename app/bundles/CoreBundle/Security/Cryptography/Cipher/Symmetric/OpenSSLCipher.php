@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric;
 
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
-use Mautic\CoreBundle\Translation\Translator;
 
 /**
  * Class OpenSSLCryptography
@@ -13,18 +12,6 @@ class OpenSSLCipher implements ISymmetricCipher
 {
     /** @var string */
     private $cipher = 'AES-256-CBC';
-
-    /**
-     * OpenSSLCryptography constructor.
-     *
-     * @param Translator $translator
-     */
-    public function __construct(Translator $translator)
-    {
-        if (!extension_loaded('openssl')) {
-            throw new \RuntimeException($translator->trans('mautic.core.error.no.openssl'));
-        }
-    }
 
     /**
      * @param string $secretMessage
@@ -73,6 +60,19 @@ class OpenSSLCipher implements ISymmetricCipher
     public function getRandomInitVector()
     {
         return openssl_random_pseudo_bytes($this->getInitVectorSize());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSupported()
+    {
+        if (!extension_loaded('openssl')) {
+            return false;
+        }
+        $testForRandom = $this->getRandomInitVector();
+
+        return ($testForRandom !== false);
     }
 
     /**

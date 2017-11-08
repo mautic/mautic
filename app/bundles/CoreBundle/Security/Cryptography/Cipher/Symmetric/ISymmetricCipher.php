@@ -33,4 +33,9 @@ interface ISymmetricCipher
      * @return string
      */
     public function getRandomInitVector();
+
+    /**
+     * @return bool
+     */
+    public function isSupported();
 }

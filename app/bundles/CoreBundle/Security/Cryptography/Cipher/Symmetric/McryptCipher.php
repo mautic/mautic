@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric;
 
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
-use Mautic\CoreBundle\Translation\Translator;
 
 /**
  * Class McryptCryptography
@@ -17,21 +16,6 @@ class McryptCipher implements ISymmetricCipher
 
     /** @var string */
     private $mode = MCRYPT_MODE_CBC;
-
-    /**
-     * McryptCryptography constructor.
-     *
-     * @param Translator $translator
-     *
-     * @throws \RuntimeException if the mcrypt extension is not enabled
-     */
-    public function __construct(Translator $translator)
-    {
-        // Toss an Exception back if mcrypt is not found
-        if (!extension_loaded('mcrypt')) {
-            throw new \RuntimeException($translator->trans('mautic.core.error.no.mcrypt'));
-        }
-    }
 
     /**
      * @param string $secretMessage
@@ -80,6 +64,14 @@ class McryptCipher implements ISymmetricCipher
     public function getRandomInitVector()
     {
         return mcrypt_create_iv($this->getInitVectorSize(), MCRYPT_DEV_URANDOM);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSupported()
+    {
+        return extension_loaded('mcrypt');
     }
 
     /**

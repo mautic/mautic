@@ -26,36 +26,40 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
     private $containerMock;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $mcryptCipherMock;
+    private $mainCipherMock;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $openSSLCipherMock;
+    private $secondaryCipherMock;
 
     /** @var string */
     private $key = 'totallySecretKeyHere';
 
     protected function setUp()
     {
-        $this->containerMock     = $this->createMock(ContainerInterface::class);
-        $this->mcryptCipherMock  = $this->createMock(McryptCipher::class);
-        $this->openSSLCipherMock = $this->createMock(OpenSSLCipher::class);
+        $this->containerMock       = $this->createMock(ContainerInterface::class);
+        $this->mainCipherMock      = $this->createMock(OpenSSLCipher::class);
+        $this->secondaryCipherMock = $this->createMock(McryptCipher::class);
 
         $this->containerMock->method('getParameter')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
     }
 
-    public function testEncrypt()
+    public function testEncryptMain()
     {
         $initVector       = 'totallyRandomInitializationVector';
         $secretMessage    = 'totallySecretMessage';
         $encryptedMessage = 'encryptionIsMagical';
         $expectedReturn   = base64_encode($encryptedMessage).'|'.base64_encode($initVector);
 
-        $this->openSSLCipherMock->expects($this->at(0))
+        $this->mainCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(true);
+
+        $this->mainCipherMock->expects($this->at(1))
             ->method('getRandomInitVector')
             ->willReturn($initVector);
-        $this->openSSLCipherMock->expects($this->at(1))
+        $this->mainCipherMock->expects($this->at(2))
             ->method('encrypt')
             ->with(serialize($secretMessage), $this->key, $initVector)
             ->willReturn($encryptedMessage);
@@ -64,11 +68,40 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedReturn, $actualReturn);
     }
 
-    public function testDecryptOpenSSL()
+    public function testEncryptMainNotSupported()
+    {
+        $initVector       = 'totallyRandomInitializationVector';
+        $secretMessage    = 'totallySecretMessage';
+        $encryptedMessage = 'encryptionIsMagical';
+        $expectedReturn   = base64_encode($encryptedMessage).'|'.base64_encode($initVector);
+
+        $this->mainCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(false);
+        $this->secondaryCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(true);
+
+        $this->secondaryCipherMock->expects($this->at(1))
+            ->method('getRandomInitVector')
+            ->willReturn($initVector);
+        $this->secondaryCipherMock->expects($this->at(2))
+            ->method('encrypt')
+            ->with(serialize($secretMessage), $this->key, $initVector)
+            ->willReturn($encryptedMessage);
+        $encryptionHelper = $this->getEncryptionHelper();
+        $actualReturn     = $encryptionHelper->encrypt($secretMessage);
+        $this->assertSame($expectedReturn, $actualReturn);
+    }
+
+    public function testDecryptMain()
     {
         $toDecrypt      = 'ZW5jcnlwdGlvbklzTWFnaWNhbA==|dG90YWxseVJhbmRvbUluaXRpYWxpemF0aW9uVmVjdG9y';
         $expectedReturn = 'totallySecretMessage';
-        $this->openSSLCipherMock->expects($this->at(0))
+        $this->mainCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(true);
+        $this->mainCipherMock->expects($this->at(1))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
             ->willReturn('s:20:"totallySecretMessage";');
@@ -77,15 +110,21 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedReturn, $actualReturn);
     }
 
-    public function testDecryptMcrypt()
+    public function testDecryptSecondary()
     {
         $toDecrypt      = 'ZW5jcnlwdGlvbklzTWFnaWNhbA==|dG90YWxseVJhbmRvbUluaXRpYWxpemF0aW9uVmVjdG9y';
         $expectedReturn = 'totallySecretMessage';
-        $this->openSSLCipherMock->expects($this->at(0))
+        $this->mainCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(true);
+        $this->mainCipherMock->expects($this->at(1))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
             ->willThrowException(new InvalidDecryptionException());
-        $this->mcryptCipherMock->expects($this->at(0))
+        $this->secondaryCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(true);
+        $this->secondaryCipherMock->expects($this->at(1))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
             ->willReturn('s:20:"totallySecretMessage";');
@@ -97,17 +136,42 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
     public function testDecryptFalse()
     {
         $toDecrypt = 'ZW5jcnlwdGlvbklzTWFnaWNhbA==|dG90YWxseVJhbmRvbUluaXRpYWxpemF0aW9uVmVjdG9y';
-        $this->openSSLCipherMock->expects($this->at(0))
+        $this->mainCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(true);
+        $this->mainCipherMock->expects($this->at(1))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
             ->willThrowException(new InvalidDecryptionException());
-        $this->mcryptCipherMock->expects($this->at(0))
+        $this->secondaryCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(true);
+        $this->secondaryCipherMock->expects($this->at(1))
             ->method('decrypt')
             ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
             ->willThrowException(new InvalidDecryptionException());
         $encryptionHelper = $this->getEncryptionHelper();
         $actualReturn     = $encryptionHelper->decrypt($toDecrypt, false);
         $this->assertFalse($actualReturn);
+    }
+
+    public function testDecryptNotSupported()
+    {
+        $toDecrypt      = 'ZW5jcnlwdGlvbklzTWFnaWNhbA==|dG90YWxseVJhbmRvbUluaXRpYWxpemF0aW9uVmVjdG9y';
+        $expectedReturn = 'totallySecretMessage';
+        $this->mainCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(false);
+        $this->secondaryCipherMock->expects($this->at(0))
+            ->method('isSupported')
+            ->willReturn(true);
+        $this->secondaryCipherMock->expects($this->at(1))
+            ->method('decrypt')
+            ->with('encryptionIsMagical', $this->key, 'totallyRandomInitializationVector')
+            ->willReturn('s:20:"totallySecretMessage";');
+        $encryptionHelper = $this->getEncryptionHelper();
+        $actualReturn     = $encryptionHelper->decrypt($toDecrypt);
+        $this->assertSame($expectedReturn, $actualReturn);
     }
 
     /**
@@ -117,8 +181,8 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
     {
         return new EncryptionHelper(
             $this->containerMock,
-            $this->mcryptCipherMock,
-            $this->openSSLCipherMock
+            $this->mainCipherMock,
+            $this->secondaryCipherMock
         );
     }
 }
