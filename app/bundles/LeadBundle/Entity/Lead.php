@@ -858,7 +858,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getPointChanges()
     {
-        return $this->pointChanges;
+        $pointChanges       = $this->pointChanges;
+        $this->pointChanges = [];
+
+        return $pointChanges;
     }
 
     /**
