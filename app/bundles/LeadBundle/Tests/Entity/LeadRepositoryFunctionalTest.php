@@ -93,4 +93,23 @@ class LeadRepositoryFunctionalTest extends MauticWebTestCase
         $changes = $lead->getChanges(true);
         $this->assertEquals(60, $changes['points'][1]);
     }
+
+    public function testMixedModelAndRepositorySavesDoNotDoublePoints()
+    {
+        $model = $this->container->get('mautic.lead.model.lead');
+        $lead  = $model->getEntity(1);
+        $lead->adjustPoints(120, Lead::POINTS_ADD);
+        $model->saveEntity($lead);
+        // Changes should be stored with points
+        $changes = $lead->getChanges(true);
+        $this->assertEquals(220, $changes['points'][1]);
+        // Points should now not be in changes
+        $model->saveEntity($lead);
+        $changes = $lead->getChanges(true);
+        $this->assertFalse(isset($changes['points']));
+        // Points should remain the same
+        $model->saveEntity($lead);
+        $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+        $this->assertEquals(220, $lead->getPoints());
+    }
 }
