@@ -411,14 +411,14 @@ class FocusModel extends FormModel
 
         if ($focus->getType() != 'notification') {
             if ($focus->getType() == 'link') {
-                $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_CLICK,'focus_id' => $focus->getId()]);
+                $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_CLICK, 'focus_id' => $focus->getId()]);
                 if (!$canViewOthers) {
                     $this->limitQueryToCreator($q);
                 }
                 $data = $query->loadAndBuildTimeData($q);
                 $chart->setDataset($this->translator->trans('mautic.focus.graph.clicks'), $data);
             } else {
-                $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_FORM,'focus_id' => $focus->getId()]);
+                $q = $query->prepareTimeDataQuery('focus_stats', 'date_added', ['type' => Stat::TYPE_FORM, 'focus_id' => $focus->getId()]);
                 if (!$canViewOthers) {
                     $this->limitQueryToCreator($q);
                 }
