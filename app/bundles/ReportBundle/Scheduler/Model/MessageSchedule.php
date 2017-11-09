@@ -52,6 +52,12 @@ class MessageSchedule
         $this->router               = $router;
     }
 
+    /**
+     * @param Report $report
+     * @param string $filePath
+     *
+     * @return string
+     */
     public function getMessage(Report $report, $filePath)
     {
         if ($this->fileCouldBeSend($filePath)) {
@@ -71,6 +77,11 @@ class MessageSchedule
         );
     }
 
+    /**
+     * @param Report $report
+     *
+     * @return string
+     */
     public function getSubject(Report $report)
     {
         $date = new \DateTime();
@@ -81,6 +92,13 @@ class MessageSchedule
         );
     }
 
+    /**
+     * @param string $filePath
+     *
+     * @return bool
+     *
+     * @throws \Mautic\CoreBundle\Exception\FileInvalidException
+     */
     public function fileCouldBeSend($filePath)
     {
         $filesize    = $this->fileProperties->getFileSize($filePath);

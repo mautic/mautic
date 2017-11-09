@@ -52,6 +52,9 @@ class ExportHandler
         return $handler;
     }
 
+    /**
+     * @param resource $handler
+     */
     public function closeHandler($handler)
     {
         fclose($handler);

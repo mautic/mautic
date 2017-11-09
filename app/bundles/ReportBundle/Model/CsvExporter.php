@@ -29,6 +29,11 @@ class CsvExporter
         $this->formatterHelper = $formatterHelper;
     }
 
+    /**
+     * @param ReportDataResult $reportDataResult
+     * @param resource         $handle
+     * @param int              $page
+     */
     public function export(ReportDataResult $reportDataResult, $handle, $page = 1)
     {
         if ($page === 1) {
@@ -48,6 +53,10 @@ class CsvExporter
         }
     }
 
+    /**
+     * @param ReportDataResult $reportDataResult
+     * @param resource         $handle
+     */
     private function putHeader(ReportDataResult $reportDataResult, $handle)
     {
         fputcsv($handle, $reportDataResult->getHeaders());
