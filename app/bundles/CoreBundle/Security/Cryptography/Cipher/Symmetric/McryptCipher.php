@@ -27,7 +27,7 @@ class McryptCipher implements SymmetricCipherInterface
     public function encrypt($secretMessage, $key, $randomInitVector)
     {
         $key  = pack('H*', $key);
-        $data = $secretMessage.$this->getHash($secretMessage, substr(bin2hex($key), -32));
+        $data = $secretMessage.$this->getHash($secretMessage, $this->getHashKey($key));
 
         return mcrypt_encrypt($this->cipher, $key, $data, $randomInitVector);
     }
@@ -46,12 +46,13 @@ class McryptCipher implements SymmetricCipherInterface
         if (strlen($originalInitVector) !== $this->getInitVectorSize()) {
             throw new InvalidDecryptionException();
         }
-        $key       = pack('H*', $key);
-        $decrypted = trim(mcrypt_decrypt($this->cipher, $key, $encryptedMessage, $this->mode, $originalInitVector));
-        // 64 is length of SHA256
-        $secretMessage = substr($decrypted, 0, -64);
-        $originalHash  = substr($decrypted, -64);
-        $newHash       = $this->getHash($secretMessage, substr(bin2hex($key), -32));
+        $key           = pack('H*', $key);
+        $decrypted     = trim(mcrypt_decrypt($this->cipher, $key, $encryptedMessage, $this->mode, $originalInitVector));
+        $sha256Length  = 64;
+        $secretMessage = substr($decrypted, 0, -$sha256Length);
+        $originalHash  = substr($decrypted, -$sha256Length);
+
+        $newHash = $this->getHash($secretMessage, $this->getHashKey($key));
         if (!hash_equals($originalHash, $newHash)) {
             throw new InvalidDecryptionException();
         }
@@ -92,5 +93,17 @@ class McryptCipher implements SymmetricCipherInterface
     private function getHash($data, $key)
     {
         return hash_hmac('sha256', $data, $key);
+    }
+
+    /**
+     * @param $binaryKey
+     *
+     * @return string
+     */
+    private function getHashKey($binaryKey)
+    {
+        $hexKey = bin2hex($binaryKey);
+        // Get second half of hexKey version (stable but different than original key)
+        return substr($hexKey, -32);
     }
 }
