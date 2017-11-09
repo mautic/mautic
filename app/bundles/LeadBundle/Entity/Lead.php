@@ -903,7 +903,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     public function setActualPoints($points)
     {
         $this->actualPoints = (int) $points;
-        $this->resetPointChanges();
+        $this->pointChanges = [];
     }
 
     /**

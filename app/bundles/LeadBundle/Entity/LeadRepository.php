@@ -1200,15 +1200,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param Lead $entity
      */
-    protected function preSaveEntity($entity)
-    {
-        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
-        $this->pointChanges = $entity->getPointChanges();
-    }
-
-    /**
-     * @param Lead $entity
-     */
     protected function postSaveEntity($entity)
     {
         // Check if points need to be appended
