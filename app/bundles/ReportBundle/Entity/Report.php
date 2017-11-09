@@ -173,25 +173,10 @@ class Report extends FormEntity implements SchedulerInterface
             ->columnName('is_scheduled')
             ->build();
 
-        $builder->createField('scheduleUnit', Type::STRING)
-            ->columnName('schedule_unit')
-            ->nullable()
-            ->build();
-
-        $builder->createField('toAddress', Type::STRING)
-            ->columnName('to_address')
-            ->nullable()
-            ->build();
-
-        $builder->createField('scheduleDay', Type::STRING)
-            ->columnName('schedule_day')
-            ->nullable()
-            ->build();
-
-        $builder->createField('scheduleMonthFrequency', Type::STRING)
-            ->columnName('schedule_month_frequency')
-            ->nullable()
-            ->build();
+        $builder->addNullableField('scheduleUnit', Type::STRING, 'schedule_unit');
+        $builder->addNullableField('toAddress', Type::STRING, 'to_address');
+        $builder->addNullableField('scheduleDay', Type::STRING, 'schedule_day');
+        $builder->addNullableField('scheduleMonthFrequency', Type::STRING, 'schedule_month_frequency');
     }
 
     /**
