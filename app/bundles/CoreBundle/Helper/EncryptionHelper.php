@@ -72,8 +72,6 @@ class EncryptionHelper
      * @param mixed $data
      *
      * @return string
-     *
-     * @throws \LogicException If there isn't supported cipher available
      */
     public function encrypt($data)
     {
