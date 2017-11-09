@@ -1203,8 +1203,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     protected function postSaveEntity($entity)
     {
         // Check if points need to be appended
-        if ($this->pointChanges) {
-            $newPoints = $this->updateContactPoints($this->pointChanges, $entity->getId());
+        if ($entity->getPointChanges()) {
+            $newPoints = $this->updateContactPoints($entity->getPointChanges(), $entity->getId());
 
             // Set actual points so that code using getPoints knows the true value
             $entity->setActualPoints($newPoints);
@@ -1216,7 +1216,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $changes['points'][1] = $newPoints;
                 $entity->setChanges($changes);
             }
-            $this->pointChanges = [];
         }
     }
 }
