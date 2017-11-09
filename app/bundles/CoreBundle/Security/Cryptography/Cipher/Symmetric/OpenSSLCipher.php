@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 /**
  * Class OpenSSLCryptography.
  */
-class OpenSSLCipher implements ISymmetricCipher
+class OpenSSLCipher implements SymmetricCipherInterface
 {
     /** @var string */
     private $cipher = 'AES-256-CBC';

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
  *
  * @deprecated
  */
-class McryptCipher implements ISymmetricCipher
+class McryptCipher implements SymmetricCipherInterface
 {
     /** @var string */
     private $cipher = MCRYPT_RIJNDAEL_256;

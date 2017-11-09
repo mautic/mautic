@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 /**
  * Interface ISymmetricCryptography.
  */
-interface ISymmetricCipher
+interface SymmetricCipherInterface
 {
     /**
      * @param string $secretMessage

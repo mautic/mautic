@@ -13,7 +13,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\ISymmetricCipher;
+use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInterface;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EncryptionHelper
 {
-    /** @var ISymmetricCipher[] */
+    /** @var SymmetricCipherInterface[] */
     private $availableCiphers;
 
     /** @var string */
@@ -31,20 +31,20 @@ class EncryptionHelper
     /**
      * EncryptionHelper constructor.
      *
-     * @param ContainerInterface    $container
-     * @param ISymmetricCipher      $possibleCipher1
-     * @param ISymmetricCipher|null $possibleCipher2
+     * @param ContainerInterface            $container
+     * @param SymmetricCipherInterface      $possibleCipher1
+     * @param SymmetricCipherInterface|null $possibleCipher2
      */
     public function __construct(
         ContainerInterface $container,
-        ISymmetricCipher $possibleCipher1,
-        ISymmetricCipher $possibleCipher2 = null
+        SymmetricCipherInterface $possibleCipher1,
+        SymmetricCipherInterface $possibleCipher2 = null
     ) {
         $nonCipherArgs = 1;
         for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {
             $possibleCipher = func_get_arg($i);
-            if (!($possibleCipher instanceof ISymmetricCipher)) {
-                throw new \InvalidArgumentException(get_class($possibleCipher).' has to implement '.ISymmetricCipher::class);
+            if (!($possibleCipher instanceof SymmetricCipherInterface)) {
+                throw new \InvalidArgumentException(get_class($possibleCipher).' has to implement '.SymmetricCipherInterface::class);
             }
             if (!$possibleCipher->isSupported()) {
                 continue;
