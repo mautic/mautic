@@ -11,11 +11,11 @@
 
 namespace Mautic\CoreBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\McryptCipher;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class EncryptionHelperTest.
@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $containerMock;
+    private $coreParametersHelperMock;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $mainCipherMock;
@@ -36,11 +36,11 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->containerMock       = $this->createMock(ContainerInterface::class);
-        $this->mainCipherMock      = $this->createMock(OpenSSLCipher::class);
-        $this->secondaryCipherMock = $this->createMock(McryptCipher::class);
+        $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+        $this->mainCipherMock           = $this->createMock(OpenSSLCipher::class);
+        $this->secondaryCipherMock      = $this->createMock(McryptCipher::class);
 
-        $this->containerMock->method('getParameter')
+        $this->coreParametersHelperMock->method('getParameter')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
     }
@@ -178,7 +178,7 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
     private function getEncryptionHelper()
     {
         return new EncryptionHelper(
-            $this->containerMock,
+            $this->coreParametersHelperMock,
             $this->mainCipherMock,
             $this->secondaryCipherMock
         );
