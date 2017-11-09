@@ -48,7 +48,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private $triggerModel;
 
     /**
-     * @var
+     * @var array
      */
     private $pointChanges;
 
@@ -1200,11 +1200,20 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param Lead $entity
      */
+    protected function preSaveEntity($entity)
+    {
+        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
+        $this->pointChanges = $entity->getPointChanges();
+    }
+
+    /**
+     * @param Lead $entity
+     */
     protected function postSaveEntity($entity)
     {
         // Check if points need to be appended
-        if ($entity->getPointChanges()) {
-            $newPoints = $this->updateContactPoints($entity->getPointChanges(), $entity->getId());
+        if ($this->pointChanges) {
+            $newPoints = $this->updateContactPoints($this->pointChanges, $entity->getId());
 
             // Set actual points so that code using getPoints knows the true value
             $entity->setActualPoints($newPoints);
@@ -1216,6 +1225,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $changes['points'][1] = $newPoints;
                 $entity->setChanges($changes);
             }
+            $this->pointChanges = [];
         }
     }
 }
