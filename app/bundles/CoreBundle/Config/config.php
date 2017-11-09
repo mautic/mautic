@@ -717,7 +717,7 @@ return [
             'mautic.helper.encryption' => [
                 'class'     => 'Mautic\CoreBundle\Helper\EncryptionHelper',
                 'arguments' => [
-                    'service_container',
+                    'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
                     'mautic.cipher.mcrypt',
                 ],
