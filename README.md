@@ -6,6 +6,8 @@ Mautic Introduction
 
 The GitHub version is recommended for development or testing. Production package ready for install with all the libraries is at [https://www.mautic.org/download](https://www.mautic.org/download).
 
+Documentation on how to use Mautic is available at [https://www.mautic.org/docs](https://www.mautic.org/docs).
+
 This is a simple 3 step installation process. You'll want to make sure you already have [Composer](http://getcomposer.org) available on your computer as this is a development release and you'll need to use Composer to download the vendor packages.
 
 <table width="100%" border="0">
@@ -90,86 +92,6 @@ If you're satisfied with the queries, execute them with
 
 Your schema should now be up-to-date with the source.
 
-# Usage
-
-Learning how to use marketing automation can be challenging. The first step is to understand what marketing automation is and how it can help your business be more successful. This quick usage outline is not meant to be comprehensive but will outline a few key areas of Mautic and how to use each of them.
-
-*You can find more detailed information at <a href="https://docs.mautic.org">https://docs.mautic.org</a>*
-
-### 1. Monitoring
-
-The act of monitoring website traffic and visitors is often the first step in a marketing automation system. This step involves collecting details and information about each visitor to your website.
-
-#### Visitor Types
-There are two types of visitor, **anonymous** and **known**.
-
-**Anonymous visitors** are all visitors which browse to your website. These visitors are monitored and certain key pieces of information are collected. This information includes:
-
-* The visitor's IP address
-* Country
-* Pages visited
-* Length of visit
-* Any actions taken on site
-
-**Known visitors** are visitors which have provided an email address or some other identifying characteristic (e.g. social network handle).  Much more information can be gathered from known visitors. Any information desired can be manually or automatically collected, here are just a few common ideas to get you started:
-
-* Email address
-* Photos/images
-* Physical address
-* Social network handles
-* Social media posts
-* Notes
-* Events
-
-These fields may be *automatically* discovered and added by the Mautic system or they may be manually added by you or the visitor.
-
-#### Visitor Transitions
-
-You will probably want to know how to move a visitor from anonymous to known status. This is critical as the amount of information collected from known visitors is much more in-depth and valuable to your business. You will learn more about this transition process a bit later on.
-
-### 2. Connecting
-
-The next step in the marketing automation process is connecting with your known visitors. These known visitors are your leads (You may call your potential clients something different, for simplicity they are called leads in these docs). Connecting with your leads is important in establishing a relationship and nurturing them along the sales cycle.
-
-This **nurturing** can be for any purpose you desire. You may wish to demonstrate your knowledge of a subject, encourage your leads to become involved, or generate a sale and become a customer.
-
-#### Methods for Connecting
-
-There are several ways to connect with your leads. The three most common are **emails**, **social media**, and **landing pages**.
-
-**Emails** are by far the most common way to connect with leads. These are tracked and monitored by Mautic for who opens the email, what links are clicked within that email, and what emails bounce (never reach the recipient).
-
-**Social media** is quickly becoming a more popular way for connecting with leads. Mautic helps you monitor the social profiles of your leads and can be used to interact with them through their preferred network.
-
-**Landing pages** are usually the first step in the connection process as these are used to make initial contact with leads and collect the information to move them from an anonymous visitor to a known visitor. These pages are used to funnel visitors to a specific call to action. This call to action is usually a form to collect the visitor's information.
-
-### 3. Automating
-
-One of Mautic's main purposes is to enable automation of specific tasks. The task of connecting with leads is one such area where automation becomes increasingly valuable. Mautic allows you to define specific times, events, or actions when a connection should be triggered. Here is an example of an automation process.
-
-**Example**
-A visitor fills out a call-to-action form on your landing page. This form collects their email address and automatically moves them from an **anonymous** to a **known** visitor. As a known visitor they are now added as a new lead to a specific campaign. This campaign will send the new lead an email you have pre-defined. You can then define additional actions to be taken based on the lead's response to your email.
-
-This example demonstrates several uses of automation. First, the visitor is *automatically* moved from anonymous to known status. Second, the visitor is *automatically* added to a particular campaign. Lastly the visitor is sent an email *automatically* as a new lead.
-
-There are many more ways in which automation can be used throughout Mautic to improve efficiency and reduce the time you spend connecting with your leads. As mentioned earlier, refer to [https://docs.mautic.org](https://docs.mautic.org) for more details.
-
-## Customizing - Plugins, Themes
-
-There are many benefits to using Mautic as your marketing automation tool. As the first and only community-driven, open source marketing automation platform there are many distinct advantages. You can choose whether you want to submit your feature to the community as a pull request or whether to build it as a plugin or theme.
-
-Read more about plugins and themes in the [Mautic Developer Documentation](https://developer.mautic.org).
-
-## Connecting - API, Webhooks
-
-Mautic have a REST API which you can use to connect it with another app. You can use the webhooks to send the updates which happen in Mautic to another app.
-
-Read more about API and webhooks in the [Mautic Developer Documentation](https://developer.mautic.org).
-
-## Translations
-
-One benefit of using Mautic is the ability to modify and customize the solution to fit your needs. Mautic allows you to quickly change to your preferred language, or modify any string through the language files. These language files are available for translation by the community at [Transifex](https://www.transifex.com/mautic/mautic/dashboard) and if you are interested you can add more languages, or help to translate the current ones.
-
 ## How to test a pull request
 
 Everyone can test submitted features and bug fixes. No programming skills are required. All you have to do is to follow the steps below.
@@ -208,11 +130,35 @@ Every change to Mautic core happens via PRs. Every PR must have 2 successful tes
 ## Testing
 
 Mautic uses [Codeception](https://codeception.com), [PHPUnit](https://phpunit.de), and [Selenium](http://www.seleniumhq.org)
-as our suite of testing tools.
+as our suite of testing tools. 
+
+### PHPUnit Testing
+
+Before executing unit tests, copy the `.env.dist` file to `.env` then update to reflect your local environment
+configuration.
+
+**Running functional tests without setting the .env file with a different database will result in the configured database being overwritten.**
+
+To run the entire test suite: 
+
+```bash
+bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist
+```
+
+To run tests for a specific bundle:
+```bash
+bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter EmailBundle
+```
+
+To run a specific test:
+```bash
+bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter "/::testVariantEmailWeightsAreAppropriateForMultipleContacts( .*)?$/" Mautic\EmailBundle\Tests\EmailModelTest app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
+```
+
+### Codeception/Selenium Testing
 
 If you plan on running the acceptance test suite, you'll need to have the Selenium Server Standalone installed and the
 Chrome WebDriver available locally.
-
 
 #### Mac OS
 
@@ -240,9 +186,6 @@ java -jar -Dwebdriver.chrome.driver=/path/to/chromedriver /full/path/to/selenium
 ```
 
 #### Executing Tests
-
-Before executing unit tests, modify the `.env.test` file in your project root to reflect your local environment
-configuration.
 
 All test suites can be executed by running `bin/codecept run` from the project root. Optionally, you can specify
 running just the `acceptance`, `functional`, or `unit` test suites by adding one of those words after the `run` command.
