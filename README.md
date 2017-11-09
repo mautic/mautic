@@ -131,7 +131,7 @@ You will probably want to know how to move a visitor from anonymous to known sta
 
 The next step in the marketing automation process is connecting with your known visitors. These known visitors are your leads (You may call your potential clients something different, for simplicity they are called leads in these docs). Connecting with your leads is important in establishing a relationship and nurturing them along the sales cycle.
 
-This **nurturing** can be for any purpose you desire. You may wish to demonstrate your knowledge of a subject, encourage your leads to become involved, or generate a sale and become a customer.
+This **nurturing** can be for any purpose you desire. You may wish to demonstrate your knowledge of a subject, encourage your leads to become involved, or generate a sale and have them become a customer.
 
 #### Methods for Connecting
 
