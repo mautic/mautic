@@ -48,11 +48,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private $triggerModel;
 
     /**
-     * @var array
-     */
-    private $pointChanges;
-
-    /**
      * Used by search functions to search social profiles.
      *
      * @param array $fields
