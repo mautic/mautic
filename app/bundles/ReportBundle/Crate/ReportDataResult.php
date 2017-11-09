@@ -74,11 +74,19 @@ class ReportDataResult
         return $this->headers;
     }
 
+    /**
+     * @param string $column
+     *
+     * @return string
+     */
     public function getType($column)
     {
         return isset($this->types[$column]) ? $this->types[$column] : 'string';
     }
 
+    /**
+     * @param array $data
+     */
     private function buildHeader($data)
     {
         if (!isset($this->data[0])) {
@@ -93,6 +101,9 @@ class ReportDataResult
         }
     }
 
+    /**
+     * @param array $data
+     */
     private function buildTypes($data)
     {
         if (!isset($this->data[0])) {
