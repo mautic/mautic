@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -132,62 +133,62 @@ class Report extends FormEntity implements SchedulerInterface
 
         $builder->addIdColumns();
 
-        $builder->addField('system', 'boolean');
+        $builder->addField('system', Type::BOOLEAN);
 
-        $builder->addField('source', 'string');
+        $builder->addField('source', Type::STRING);
 
-        $builder->createField('columns', 'array')
+        $builder->createField('columns', Type::TARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('filters', 'array')
+        $builder->createField('filters', Type::TARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('tableOrder', 'array')
+        $builder->createField('tableOrder', Type::TARRAY)
             ->columnName('table_order')
             ->nullable()
             ->build();
 
-        $builder->createField('graphs', 'array')
+        $builder->createField('graphs', Type::TARRAY)
             ->nullable()
             ->build();
 
-        $builder->createField('groupBy', 'array')
+        $builder->createField('groupBy', Type::TARRAY)
             ->columnName('group_by')
             ->nullable()
             ->build();
 
-        $builder->createField('aggregators', 'array')
+        $builder->createField('aggregators', Type::TARRAY)
             ->columnName('aggregators')
             ->nullable()
             ->build();
 
-        $builder->createField('settings', 'json_array')
+        $builder->createField('settings', Type::JSON_ARRAY)
             ->columnName('settings')
             ->nullable()
             ->build();
 
-        $builder->createField('isScheduled', 'boolean')
+        $builder->createField('isScheduled', Type::BOOLEAN)
             ->columnName('is_scheduled')
             ->build();
 
-        $builder->createField('scheduleUnit', 'string')
+        $builder->createField('scheduleUnit', Type::STRING)
             ->columnName('schedule_unit')
             ->nullable()
             ->build();
 
-        $builder->createField('toAddress', 'string')
+        $builder->createField('toAddress', Type::STRING)
             ->columnName('to_address')
             ->nullable()
             ->build();
 
-        $builder->createField('scheduleDay', 'string')
+        $builder->createField('scheduleDay', Type::STRING)
             ->columnName('schedule_day')
             ->nullable()
             ->build();
 
-        $builder->createField('scheduleMonthFrequency', 'string')
+        $builder->createField('scheduleMonthFrequency', Type::STRING)
             ->columnName('schedule_month_frequency')
             ->nullable()
             ->build();

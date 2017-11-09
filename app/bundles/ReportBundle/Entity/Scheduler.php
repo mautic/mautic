@@ -11,6 +11,7 @@
 
 namespace Mautic\ReportBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -50,7 +51,7 @@ class Scheduler
             ->addJoinColumn('report_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createField('scheduleDate', 'datetime')
+        $builder->createField('scheduleDate', Type::DATETIME)
             ->columnName('schedule_date')
             ->nullable(false)
             ->build();
