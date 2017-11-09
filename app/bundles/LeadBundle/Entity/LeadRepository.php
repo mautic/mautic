@@ -213,8 +213,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get list of lead Ids by unique field data.
      *
-     * @param $uniqueFieldsWithData is an array of columns & values to filter by
-     * @param int $leadId is the current lead id. Added to query to skip and find other leads
+     * @param     $uniqueFieldsWithData is an array of columns & values to filter by
+     * @param int $leadId               is the current lead id. Added to query to skip and find other leads
      *
      * @return array
      */
@@ -518,7 +518,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get contacts for a specific channel entity.
      *
-     * @param $args - same as getEntity/getEntities
+     * @param        $args             - same as getEntity/getEntities
      * @param        $joinTable
      * @param        $entityId
      * @param array  $filters
@@ -527,8 +527,15 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return array
      */
-    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id')
-    {
+    public function getEntityContacts(
+        $args,
+        $joinTable,
+        $entityId,
+        $filters = [],
+        $entityColumnName = 'id',
+        array $additionalJoins = null,
+        $contactColumnName = 'lead_id'
+    ) {
         $qb = $this->getEntitiesDbalQueryBuilder();
 
         if (empty($contactColumnName)) {
@@ -635,16 +642,19 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $exprType = ($filter->not) ? 'negate_expr' : 'expr';
 
         $operators = $this->getFilterExpressionFunctions();
-        $operators = array_merge($operators, [
-            'x' => [
-                'expr'        => 'andX',
-                'negate_expr' => 'orX',
-            ],
-            'null' => [
-                'expr'        => 'isNull',
-                'negate_expr' => 'isNotNull',
-            ],
-        ]);
+        $operators = array_merge(
+            $operators,
+            [
+                'x' => [
+                    'expr'        => 'andX',
+                    'negate_expr' => 'orX',
+                ],
+                'null' => [
+                    'expr'        => 'isNull',
+                    'negate_expr' => 'isNotNull',
+                ],
+            ]
+        );
 
         $innerJoinTables = (isset($this->advancedFilterCommands[$command])
             && SearchStringHelper::COMMAND_NEGATE !== $this->advancedFilterCommands[$command]);
@@ -710,7 +720,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         ],
                     ],
                     $innerJoinTables,
-                    $this->generateFilterExpression($q, 'list.alias', $eqExpr, $unique, ($filter->not) ? true : null,
+                    $this->generateFilterExpression(
+                        $q,
+                        'list.alias',
+                        $eqExpr,
+                        $unique,
+                        ($filter->not) ? true : null,
                         // orX for filter->not either manuall removed or is null
                         $q->expr()->$xExpr(
                             $q->expr()->$eqExpr('list_lead.manually_removed', 0)
@@ -1200,20 +1215,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param Lead $entity
      */
-    protected function preSaveEntity($entity)
-    {
-        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
-        $this->pointChanges = $entity->getPointChanges();
-    }
-
-    /**
-     * @param Lead $entity
-     */
     protected function postSaveEntity($entity)
     {
         // Check if points need to be appended
-        if ($this->pointChanges) {
-            $newPoints = $this->updateContactPoints($this->pointChanges, $entity->getId());
+        if ($entity->getPointChanges()) {
+            $newPoints = $this->updateContactPoints($entity->getPointChanges(), $entity->getId());
 
             // Set actual points so that code using getPoints knows the true value
             $entity->setActualPoints($newPoints);
