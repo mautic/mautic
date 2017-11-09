@@ -579,21 +579,33 @@ class Report extends FormEntity implements SchedulerInterface
         $this->setScheduleMonthFrequency(null);
     }
 
+    /**
+     * @return bool
+     */
     public function isScheduledDaily()
     {
         return $this->getScheduleUnit() === SchedulerEnum::UNIT_DAILY;
     }
 
+    /**
+     * @return bool
+     */
     public function isScheduledWeekly()
     {
         return $this->getScheduleUnit() === SchedulerEnum::UNIT_WEEKLY;
     }
 
+    /**
+     * @return bool
+     */
     public function isScheduledMonthly()
     {
         return $this->getScheduleUnit() === SchedulerEnum::UNIT_MONTHLY;
     }
 
+    /**
+     * @return bool
+     */
     public function isScheduledWeekDays()
     {
         return $this->getScheduleDay() === SchedulerEnum::DAY_WEEK_DAYS;
