@@ -81,6 +81,10 @@ Each time you update Mautic's source after the initial setup/installation via a 
 
 (Note that if you are accessing Mautic through the dev environment (via index_dev.php), you would need to add the <code>--env=dev</code> from the command).
 
+### Vendors
+
+Run `composer install` to ensure new vendors are installed and/or existing upgraded.
+
 ### Database Schema
 
 Before running these commands, please make a backup of your database.
