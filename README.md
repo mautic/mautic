@@ -37,7 +37,7 @@ This is a simple 3 step installation process. You'll want to make sure you alrea
 
 **Get stuck?** *No problem. Check out [general troubleshooting](https://mautic.org/docs/en/tips/troubleshooting.html) and if it won't solve your issue join us at the <a href="https://www.mautic.org/community">Mautic community</a> for help and answers.*
 
-# Disclaimer
+## Disclaimer
 Installing from source is only recommended if you are comfortable using the command line. You'll be required to use various CLI commands to get Mautic working and to keep it working. If the source and/or database schema gets out of sync with Mautic's releases, the release updater may not work and will require manual updates. For production the pre-packaged Mautic available at [mautic.com/download](https://www.mautic.org/download) is recommended.
 
 *Also note that the source outside <a href="https://github.com/mautic/mautic/releases">a tagged release</a> should be considered "alpha" and may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*
@@ -61,7 +61,16 @@ Installing from source is only recommended if you are comfortable using the comm
 	- recommended for development: `xdebug`
 3. Recommended memory limit: minimally 256 MB for testing, 512 MB and more for production.
 
-# Keeping Up-To-Date
+## Installation
+
+1. Open a Terminal/Console window.
+2. Change directory to the server root (i.e. `cd /var/www` if your local server root is at /var/www).
+3. Clone the repository (`git clone https://github.com/mautic/mautic.git`)
+4. The **mautic** directory should appear in the server root. Change directory to mautic directory (`cd mautic`).
+5. Install dependencies (`composer install`).
+6. Visit Mautic in a browser (probably at http://localhost/mautic) and follow installation steps.
+
+## Keeping Up-To-Date
 
 ### Source Files
 
@@ -92,20 +101,7 @@ If you're satisfied with the queries, execute them with
 
 Your schema should now be up-to-date with the source.
 
-## How to test a pull request
-
-Everyone can test submitted features and bug fixes. No programming skills are required. All you have to do is to follow the steps below.
-
-### Install the latest GitHub version
-
-1. Open a Terminal/Console window.
-2. Change directory to the server root (i.e. `cd /var/www` if your local server root is at /var/www).
-3. Clone the repository (`git clone https://github.com/mautic/mautic.git`)
-4. The **mautic** directory should appear in the server root. Change directory to mautic directory (`cd mautic`).
-5. Install dependencies (`composer install`).
-6. Visit Mautic in a browser (probably at http://localhost/mautic) and follow installation steps.
-
-### Development environment
+## Development environment
 
 Mautic downloaded from GitHub has the development environment. You can access it by adding `index_dev.php` after the Mautic URL. Eg. `http://localhost/mautic/index_dev.php/s/`. Or in case of CLI commands, add `--env=dev` attribute to it.
 
@@ -115,7 +111,11 @@ In case of assets like JS, CSS, the source files are loaded instead of concatena
 
 In many cases, the CSS files are built from LESS files. To compile the changes in the LESS files, run `grunt compile-less` command.
 
-### Test a pull request (PR)
+## Testing
+
+### Pull Request Testing
+
+Everyone can test submitted features and bug fixes. No programming skills are required. All you have to do is to follow the steps below.
 
 Every change to Mautic core happens via PRs. Every PR must have 2 successful tests to be merged to the core and released in the next version. Testing a PR is a great way to move Mautic forward and personally improve its quality and stability.
 
@@ -127,12 +127,12 @@ Every change to Mautic core happens via PRs. Every PR must have 2 successful tes
 5. Follow the steps from the PR description again to see if the result is as described.
 6. Write a comment about how the test went. If there is a problem, provide as much information as possible including error log messages.
 
-## Testing
+### Automated Testing
 
 Mautic uses [Codeception](https://codeception.com), [PHPUnit](https://phpunit.de), and [Selenium](http://www.seleniumhq.org)
 as our suite of testing tools. 
 
-### PHPUnit Testing
+#### PHPUnit
 
 Before executing unit tests, copy the `.env.dist` file to `.env` then update to reflect your local environment
 configuration.
@@ -155,12 +155,12 @@ To run a specific test:
 bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter "/::testVariantEmailWeightsAreAppropriateForMultipleContacts( .*)?$/" Mautic\EmailBundle\Tests\EmailModelTest app/bundles/EmailBundle/Tests/Model/EmailModelTest.php
 ```
 
-### Codeception/Selenium Testing
+#### Codeception/Selenium
 
 If you plan on running the acceptance test suite, you'll need to have the Selenium Server Standalone installed and the
 Chrome WebDriver available locally.
 
-#### Mac OS
+##### Mac OS
 
 If you're on a Mac and you use [Homebrew](https://brew.sh), you can install Selenium by running `brew install selenium-server-standalone`.
 You'll also need to download the latest [Chrome WebDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads).
@@ -176,7 +176,7 @@ In the `<dict><array>` block under `ProgramArguments`, add the following after t
 
 With that completed, you may now start the Selenium server using `brew services start selenium-server-standalone`.
 
-#### Other Platforms
+##### Other Platforms
 
 Follow the standard installation procedure for Selenium server standalone. Ensure that you have the chrome driver
 available, and startup the server with the following command:
@@ -185,16 +185,16 @@ available, and startup the server with the following command:
 java -jar -Dwebdriver.chrome.driver=/path/to/chromedriver /full/path/to/selenium-server-standalone.3.x.x.jar
 ```
 
-#### Executing Tests
+##### Executing Tests
 
 All test suites can be executed by running `bin/codecept run` from the project root. Optionally, you can specify
 running just the `acceptance`, `functional`, or `unit` test suites by adding one of those words after the `run` command.
 
-## Static Analysis
+### Static Analysis
 
 Mautic uses [PHPSTAN](https://github.com/phpstan/phpstan) for some of its parts during continuous integration tests. If you want to test your specific contribution locally, install PHPSTAN globally with `composer global require phpstan/phpstan-shim`. Mautic cannot have PHPSTAN as its dev dependency, because it requires PHP7+. To run analysis on a specific bundle, run `~/.composer/vendor/phpstan/phpstan-shim/phpstan.phar analyse app/bundles/*Bundle`
 
-# FAQ and Contact Information
+## FAQ and Contact Information
 Marketing automation has historically been a difficult tool to implement in a business. The Mautic community is a rich environment for you to learn from others and share your knowledge as well. Open source means more than open code. Open source is providing equality for all and a chance to improve. If you have questions then the Mautic community can help provide the answers.
 
 **Ready to get started with the community?** You can get <a href="https://www.mautic.org/get-involved">more involved</a> on the <a href="https://www.mautic.org">Mautic</a> website. Or follow Mautic on social media just to stay current with what's happening!
