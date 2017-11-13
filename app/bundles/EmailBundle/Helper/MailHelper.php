@@ -242,6 +242,11 @@ class MailHelper
     private $contentHash;
 
     /**
+     * @var array
+     */
+    private $copies = [];
+
+    /**
      * @param MauticFactory $factory
      * @param               $mailer
      * @param null          $from
@@ -378,7 +383,7 @@ class MailHelper
             if (!empty($this->body['content']) || empty($this->plainText)) {
                 $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
             }
-            $this->setMessagePlainText($isQueueFlush);
+            $this->setMessagePlainText();
 
             if (!$isQueueFlush) {
                 // Replace token content
@@ -455,14 +460,14 @@ class MailHelper
                 // Clear the log so that previous output is not associated with new errors
                 $this->logger->clear();
             } catch (\Exception $e) {
-                $this->logError($e, 'send');
-
                 // Exception encountered when sending so all recipients are considered failures
                 $this->errors['failures'] = array_merge(
                     array_keys((array) $this->message->getTo()),
                     array_keys((array) $this->message->getCc()),
                     array_keys((array) $this->message->getBcc())
                 );
+
+                $this->logError($e, 'send');
             }
         }
 
@@ -594,7 +599,7 @@ class MailHelper
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
-        if ($this->tokenizationEnabled && count($this->metadata) && empty($this->fatal)) {
+        if ($this->tokenizationEnabled && count($this->metadata) && $flushed) {
             $errors             = $this->errors;
             $errors['failures'] = [];
             $flushed            = false;
@@ -661,33 +666,40 @@ class MailHelper
      */
     public function reset($cleanSlate = true)
     {
-        unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
-
-        $this->eventTokens   = $this->queuedRecipients   = $this->errors   = [];
-        $this->lead          = $this->idHash          = $this->contentHash          = null;
-        $this->internalSend  = $this->fatal  = false;
-        $this->idHashState   = true;
-        $this->useGlobalFrom = false;
+        $this->eventTokens      = [];
+        $this->queuedRecipients = [];
+        $this->errors           = [];
+        $this->lead             = null;
+        $this->idHash           = null;
+        $this->contentHash      = null;
+        $this->internalSend     = false;
+        $this->fatal            = false;
+        $this->idHashState      = true;
+        $this->useGlobalFrom    = false;
 
         $this->logger->clear();
 
         if ($cleanSlate) {
             $this->appendTrackingPixel = false;
-
-            unset($this->headers, $this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText, $this->assets, $this->attachedAssets);
-            $this->from    = $this->systemFrom;
-            $this->headers = $this->source = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = [];
-            $this->email   = null;
-            $this->subject = $this->plainText = '';
-            $this->body    = [
+            $this->queueEnabled        = false;
+            $this->from                = $this->systemFrom;
+            $this->headers             = [];
+            $this->source              = [];
+            $this->assets              = [];
+            $this->globalTokens        = [];
+            $this->assets              = [];
+            $this->attachedAssets      = [];
+            $this->email               = null;
+            $this->copies              = [];
+            $this->message             = $this->getMessageInstance();
+            $this->subject             = '';
+            $this->plainText           = '';
+            $this->plainTextSet        = false;
+            $this->body                = [
                 'content'     => '',
                 'contentType' => 'text/html',
                 'charset'     => null,
             ];
-
-            $this->plainTextSet = false;
-
-            $this->message = $this->getMessageInstance();
         }
     }
 
@@ -1088,8 +1100,8 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param mixed $addresses
-     * @param sting $name
+     * @param mixed  $addresses
+     * @param string $name
      *
      * @return bool
      */
@@ -1638,6 +1650,10 @@ class MailHelper
 
         if ($context) {
             $error .= " ($context)";
+
+            if ('send' === $context) {
+                $error .= '; '.implode(', ', $this->errors['failures']);
+            }
         }
 
         $this->errors[] = $errorMessage;
@@ -1671,6 +1687,7 @@ class MailHelper
     public function clearErrors()
     {
         $this->errors = [];
+        $this->fatal  = false;
     }
 
     /**
@@ -1807,8 +1824,6 @@ class MailHelper
      */
     public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
     {
-        static $copies = [];
-
         //create a stat
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
@@ -1850,7 +1865,7 @@ class MailHelper
 
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
-        if (!isset($copies[$id])) {
+        if (!isset($this->copies[$id])) {
             $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
 
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
@@ -1865,12 +1880,12 @@ class MailHelper
             }
 
             if ($copy || $copyCreated) {
-                $copies[$id] = $hash;
+                $this->copies[$id] = $hash;
             }
         }
 
-        if (isset($copies[$id])) {
-            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
+        if (isset($this->copies[$id])) {
+            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $this->copies[$id]));
         }
 
         if ($persist) {
