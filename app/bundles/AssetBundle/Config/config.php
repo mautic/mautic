@@ -9,6 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\AssetBundle\EventListener\ReportSubscriber;
 use Mautic\AssetBundle\EventListener\UploadSubscriber;
 
 return [
@@ -88,7 +89,10 @@ return [
                 ],
             ],
             'mautic.asset.reportbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\ReportSubscriber',
+                'class'     => ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
             'mautic.asset.builder.subscriber' => [
                 'class'     => 'Mautic\AssetBundle\EventListener\BuilderSubscriber',

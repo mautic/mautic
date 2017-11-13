@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -79,14 +80,21 @@ class ReportSubscriber extends CommonSubscriber
     protected $channelActions;
 
     /**
+     * @var CompanyReportData
+     */
+    private $companyReportData;
+
+    /**
      * ReportSubscriber constructor.
      *
-     * @param ListModel     $listModel
-     * @param FieldModel    $fieldModel
-     * @param LeadModel     $leadModel
-     * @param StageModel    $stageModel
-     * @param CampaignModel $campaignModel
-     * @param UserModel     $userModel
+     * @param ListModel         $listModel
+     * @param FieldModel        $fieldModel
+     * @param LeadModel         $leadModel
+     * @param StageModel        $stageModel
+     * @param CampaignModel     $campaignModel
+     * @param UserModel         $userModel
+     * @param CompanyModel      $companyModel
+     * @param CompanyReportData $companyReportData
      */
     public function __construct(
         ListModel $listModel,
@@ -95,15 +103,17 @@ class ReportSubscriber extends CommonSubscriber
         StageModel $stageModel,
         CampaignModel $campaignModel,
         UserModel $userModel,
-        CompanyModel $companyModel
+        CompanyModel $companyModel,
+        CompanyReportData $companyReportData
     ) {
-        $this->listModel     = $listModel;
-        $this->fieldModel    = $fieldModel;
-        $this->leadModel     = $leadModel;
-        $this->stageModel    = $stageModel;
-        $this->campaignModel = $campaignModel;
-        $this->userModel     = $userModel;
-        $this->companyModel  = $companyModel;
+        $this->listModel         = $listModel;
+        $this->fieldModel        = $fieldModel;
+        $this->leadModel         = $leadModel;
+        $this->stageModel        = $stageModel;
+        $this->campaignModel     = $campaignModel;
+        $this->userModel         = $userModel;
+        $this->companyModel      = $companyModel;
+        $this->companyReportData = $companyReportData;
     }
 
     /**
@@ -239,56 +249,12 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         if ($event->checkContext($companyContexts)) {
-            $companyColumns = [
-                'comp.id' => [
-                    'label' => 'mautic.lead.report.company.company_id',
-                    'type'  => 'int',
-                    'link'  => 'mautic_company_action',
-                ],
-                'comp.companyname' => [
-                    'label' => 'mautic.lead.report.company.company_name',
-                    'type'  => 'string',
-                    'link'  => 'mautic_company_action',
-                ],
-                'comp.companycity' => [
-                    'label' => 'mautic.lead.report.company.company_city',
-                    'type'  => 'string',
-                    'link'  => 'mautic_company_action',
-                ],
-                'comp.companystate' => [
-                    'label' => 'mautic.lead.report.company.company_state',
-                    'type'  => 'string',
-                    'link'  => 'mautic_company_action',
-                ],
-                'comp.companycountry' => [
-                    'label' => 'mautic.lead.report.company.company_country',
-                    'type'  => 'string',
-                    'link'  => 'mautic_company_action',
-                ],
-                'comp.companyindustry' => [
-                    'label' => 'mautic.lead.report.company.company_industry',
-                    'type'  => 'string',
-                    'link'  => 'mautic_company_action',
-                ],
-            ];
-            $companyFields = $this->fieldModel->getEntities([
-                'filter' => [
-                    'force' => [
-                            [
-                                'column' => 'f.object',
-                                'expr'   => 'like',
-                                'value'  => 'company',
-                            ],
-                        ],
-                    ],
-                ]);
-
-            $companyFilters = $companyColumns = array_merge($companyColumns, $this->getFieldColumns($companyFields, 'comp.'));
+            $companyColumns = $this->companyReportData->getCompanyData();
 
             $data = [
                 'display_name' => 'mautic.lead.lead.companies',
                 'columns'      => $companyColumns,
-                'filters'      => $companyFilters,
+                'filters'      => $companyColumns,
             ];
 
             $event->addTable('companies', $data, 'companies');

@@ -20,7 +20,7 @@ use Mautic\ReportBundle\Model\ReportModel;
 /**
  * Class ReportGeneratorEvent.
  */
-class ReportGeneratorEvent extends AbstractReportEvent
+class ReportGeneratorEvent extends AbstractReportEvent implements ReportEventInterface
 {
     /**
      * @var array
@@ -357,7 +357,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         static $sorted;
 
-        if (null == $sorted) {
+        if (null === $sorted) {
             $columns = $this->getReport()->getColumns();
 
             foreach ($columns as $field) {

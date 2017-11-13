@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\LeadBundle\EventListener\ReportSubscriber;
+
 return [
     'routes' => [
         'main' => [
@@ -367,7 +369,7 @@ return [
                 ],
             ],
             'mautic.lead.reportbundle.subscriber' => [
-                'class'     => 'Mautic\LeadBundle\EventListener\ReportSubscriber',
+                'class'     => ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.lead.model.field',
@@ -376,6 +378,7 @@ return [
                     'mautic.campaign.model.campaign',
                     'mautic.user.model.user',
                     'mautic.lead.model.company',
+                    'mautic.lead.model.company_report_data',
                 ],
             ],
             'mautic.lead.calendarbundle.subscriber' => [
@@ -745,6 +748,12 @@ return [
                     'mautic.core.model.notification',
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.company',
+                ],
+            ],
+            'mautic.lead.model.company_report_data' => [
+                'class'     => \Mautic\LeadBundle\Model\CompanyReportData::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
                 ],
             ],
             'mautic.lead.model.dnc' => [

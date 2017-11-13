@@ -11,8 +11,10 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -23,6 +25,19 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class ReportSubscriber extends CommonSubscriber
 {
+    const CONTEXT_ASSET          = 'asset';
+    const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
+
+    /**
+     * @var CompanyReportData
+     */
+    private $companyReportData;
+
+    public function __construct(CompanyReportData $companyReportData)
+    {
+        $this->companyReportData = $companyReportData;
+    }
+
     /**
      * @return array
      */
@@ -42,7 +57,7 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if ($event->checkContext(['assets', 'asset.downloads'])) {
+        if ($event->checkContext([self::CONTEXT_ASSET, self::CONTEXT_ASSET_DOWNLOAD])) {
             // Assets
             $prefix  = 'a.';
             $columns = [
@@ -76,14 +91,14 @@ class ReportSubscriber extends CommonSubscriber
             );
 
             $event->addTable(
-                'assets',
+                self::CONTEXT_ASSET,
                 [
                     'display_name' => 'mautic.asset.assets',
                     'columns'      => $columns,
                 ]
             );
 
-            if ($event->checkContext(['asset.downloads'])) {
+            if ($event->checkContext([self::CONTEXT_ASSET_DOWNLOAD])) {
                 // Downloads
                 $downloadPrefix  = 'ad.';
                 $downloadColumns = [
@@ -110,22 +125,26 @@ class ReportSubscriber extends CommonSubscriber
                     ],
                 ];
 
+                $companyColumns = $this->companyReportData->getCompanyData();
+
                 $event->addTable(
-                    'asset.downloads',
+                    self::CONTEXT_ASSET_DOWNLOAD,
                     [
                         'display_name' => 'mautic.asset.report.downloads.table',
                         'columns'      => array_merge(
                             $columns,
                             $downloadColumns,
                             $event->getLeadColumns(),
-                            $event->getIpColumn()
+                            $event->getIpColumn(),
+                            $companyColumns
                         ),
+                        'filters' => $companyColumns,
                     ],
-                    'assets'
+                    self::CONTEXT_ASSET
                 );
 
                 // Add Graphs
-                $context = 'asset.downloads';
+                $context = self::CONTEXT_ASSET_DOWNLOAD;
                 $event->addGraph($context, 'line', 'mautic.asset.graph.line.downloads');
                 $event->addGraph($context, 'table', 'mautic.asset.table.most.downloaded');
                 $event->addGraph($context, 'table', 'mautic.asset.table.top.referrers');
@@ -141,13 +160,12 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        $context      = $event->getContext();
         $queryBuilder = $event->getQueryBuilder();
 
-        if ($context == 'assets') {
+        if ($event->checkContext(self::CONTEXT_ASSET)) {
             $queryBuilder->from(MAUTIC_TABLE_PREFIX.'assets', 'a');
             $event->addCategoryLeftJoin($queryBuilder, 'a');
-        } elseif ($context == 'asset.downloads') {
+        } elseif ($event->checkContext(self::CONTEXT_ASSET_DOWNLOAD)) {
             $event->applyDateFilters($queryBuilder, 'date_download', 'ad');
 
             $queryBuilder->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad')
@@ -156,6 +174,11 @@ class ReportSubscriber extends CommonSubscriber
             $event->addLeadLeftJoin($queryBuilder, 'ad');
             $event->addIpAddressLeftJoin($queryBuilder, 'ad');
             $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
+
+            if ($this->companyReportData->eventHasCompanyColumns($event)) {
+                $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
+                $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
+            }
         }
 
         $event->setQueryBuilder($queryBuilder);
@@ -169,13 +192,13 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         // Context check, we only want to fire for Lead reports
-        if (!$event->checkContext('asset.downloads')) {
+        if (!$event->checkContext(self::CONTEXT_ASSET_DOWNLOAD)) {
             return;
         }
 
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
-        $downloadRepo = $this->em->getRepository('MauticAssetBundle:Download');
+        $downloadRepo = $this->em->getRepository(Download::class);
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
