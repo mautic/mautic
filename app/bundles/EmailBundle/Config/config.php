@@ -419,7 +419,7 @@ return [
                 ],
             ],
             'mautic.email.model.send_email_to_contacts' => [
-                'class'     => \Mautic\EmailBundle\Model\SendEmailToContacts::class,
+                'class'     => \Mautic\EmailBundle\Model\SendEmailToContact::class,
                 'arguments' => [
                     'mautic.helper.mailer',
                     'mautic.email.repository.stat',

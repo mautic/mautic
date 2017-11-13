@@ -35,6 +35,7 @@ use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -122,16 +123,16 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * EmailModel constructor.
      *
-     * @param IpLookupHelper      $ipLookupHelper
-     * @param ThemeHelper         $themeHelper
-     * @param Mailbox             $mailboxHelper
-     * @param MailHelper          $mailHelper
-     * @param LeadModel           $leadModel
-     * @param CompanyModel        $companyModel
-     * @param TrackableModel      $pageTrackableModel
-     * @param UserModel           $userModel
-     * @param MessageQueueModel   $messageQueueModel
-     * @param SendEmailToContacts $sendModel
+     * @param IpLookupHelper     $ipLookupHelper
+     * @param ThemeHelper        $themeHelper
+     * @param Mailbox            $mailboxHelper
+     * @param MailHelper         $mailHelper
+     * @param LeadModel          $leadModel
+     * @param CompanyModel       $companyModel
+     * @param TrackableModel     $pageTrackableModel
+     * @param UserModel          $userModel
+     * @param MessageQueueModel  $messageQueueModel
+     * @param SendEmailToContact $sendModel
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -143,7 +144,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         TrackableModel $pageTrackableModel,
         UserModel $userModel,
         MessageQueueModel $messageQueueModel,
-        SendEmailToContacts $sendModel
+        SendEmailToContact $sendModel
     ) {
         $this->ipLookupHelper     = $ipLookupHelper;
         $this->themeHelper        = $themeHelper;
@@ -1122,7 +1123,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *                   int   listId
      *                   bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
      *                   bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
-     *                   bool  sendBatchMail    If false, the function will not send batched mail but will defer to calling function to handle it
      *                   array assetAttachments Array of optional Asset IDs to attach
      *
      * @return mixed
@@ -1134,7 +1134,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $listId              = (isset($options['listId'])) ? $options['listId'] : null;
         $ignoreDNC           = (isset($options['ignoreDNC'])) ? $options['ignoreDNC'] : false;
         $tokens              = (isset($options['tokens'])) ? $options['tokens'] : [];
-        $sendBatchMail       = (isset($options['sendBatchMail'])) ? $options['sendBatchMail'] : true;
         $assetAttachments    = (isset($options['assetAttachments'])) ? $options['assetAttachments'] : [];
         $customHeaders       = (isset($options['customHeaders'])) ? $options['customHeaders'] : [];
         $emailType           = (isset($options['email_type'])) ? $options['email_type'] : '';
@@ -1187,7 +1186,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         // Process frequency rules for email
         if ($isMarketing && count($sendTo)) {
-            $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1] : null;
+            $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
+                : null;
             $this->messageQueueModel->processFrequencyRules(
                 $sendTo,
                 'email',
@@ -1221,10 +1221,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $emailSettings[$eid]['limit'] = $count;
             }
         }
-
-        // Setup the mailer
-        $mailer = $this->mailHelper->getMailer(!$sendBatchMail);
-        $mailer->enableQueue();
 
         // Randomize the contacts for statistic purposes
         shuffle($sendTo);
@@ -1283,13 +1279,18 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {
-                    if ($this->sendModel->sendToContact($contact, $tokens)) {
+                    try {
+                        $this->sendModel->setContact($contact, $tokens)
+                            ->send();
+
                         // Update $emailSetting so campaign a/b tests are handled correctly
                         ++$emailSettings[$parentId]['sentCount'];
 
                         if (!empty($emailSettings[$parentId]['isVariant'])) {
                             ++$emailSettings[$parentId]['variantCount'];
                         }
+                    } catch (FailedToSendToContactException $exception) {
+                        // move along to the next contact
                     }
                 }
             }
@@ -1297,8 +1298,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         // Flush the queue and store pending email stats
         $this->sendModel->finalFlush();
-        list($errors, $errorMessages) = $this->sendModel->getErrors();
-        $sentCounts                   = $this->sendModel->getSentCounts();
+
+        // Get the errors to return
+        $errorMessages  = $this->sendModel->getErrors();
+        $failedContacts = $this->sendModel->getFailedContacts();
+
+        // Get sent counts to update email stats
+        $sentCounts = $this->sendModel->getSentCounts();
+
+        // Reset the model for the next send
         $this->sendModel->reset();
 
         // Update sent counts
@@ -1316,18 +1324,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
         }
 
-        // Free RAM
-        $this->em->clear(Stat::class);
-        $this->em->clear(DoNotContact::class);
-
         unset($emailSettings, $options, $sendTo);
 
-        $success = empty($errors);
+        $success = empty($failedContacts);
         if (!$success && $returnErrorMessages) {
             return $singleEmail ? $errorMessages[$singleEmail] : $errorMessages;
         }
 
-        return $singleEmail ? $success : $errors;
+        return $singleEmail ? $success : $failedContacts;
     }
 
     /**

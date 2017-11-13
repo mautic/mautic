@@ -14,13 +14,14 @@ namespace Mautic\EmailBundle\Model;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SendEmailToContacts
+class SendEmailToContact
 {
     /**
      * @var MailHelper
@@ -65,7 +66,7 @@ class SendEmailToContacts
     /**
      * @var array
      */
-    protected $errors = [];
+    protected $failedContacts = [];
 
     /**
      * @var array
@@ -101,6 +102,11 @@ class SendEmailToContacts
      * @var int
      */
     protected $statBatchCounter = 0;
+
+    /**
+     * @var array
+     */
+    protected $contact = [];
 
     /**
      * Send constructor.
@@ -141,6 +147,9 @@ class SendEmailToContacts
         return $this;
     }
 
+    /**
+     * Flush any remaining queued contacts, process spending stats, create DNC entries and reset this class
+     */
     public function finalFlush()
     {
         $this->flush();
@@ -149,22 +158,22 @@ class SendEmailToContacts
         if (count($this->saveEntities)) {
             $this->statRepo->saveEntities($this->saveEntities);
         }
+
+        // Delete stats that failed after the queue was flushed
         if (count($this->deleteEntities)) {
             $this->statRepo->deleteEntities($this->deleteEntities);
         }
 
         $this->processBadEmails();
-
-        $this->reset();
     }
 
     /**
      * Use an Email entity to populate content, from, etc.
      *
      * @param Email $email
-     * @param array $channel          ['channelName', 'channelId']
+     * @param array $channel ['channelName', 'channelId']
      * @param array $assetAttachments
-     * @param array $slots            @deprecated to be removed in 3.0; support for old email template format
+     * @param array $slots   @deprecated to be removed in 3.0; support for old email template format
      *
      * @return $this
      */
@@ -173,6 +182,9 @@ class SendEmailToContacts
         // Flush anything that's pending from a previous email
         $this->flush();
 
+        // Enable the queue if applicable to the transport
+        $this->mailer->enableQueue();
+
         if ($this->mailer->setEmail($email, true, $slots, $assetAttachments)) {
             $this->mailer->setSource($channel);
             $this->mailer->setCustomHeaders($customHeaders);
@@ -180,6 +192,7 @@ class SendEmailToContacts
             // Note that the entity is set so that addContact does not generate errors
             $this->emailEntityId = $email->getId();
         } else {
+            // Fail all the contacts in this batch
             $this->emailEntityErrors = $this->mailer->getErrors();
             $this->emailEntityId     = null;
         }
@@ -194,7 +207,7 @@ class SendEmailToContacts
      */
     public function setListId($id)
     {
-        $this->listId = (null !== $id) ? (int) $id : $id;
+        $this->listId = empty($id) ? null : (int) $id;
 
         return $this;
     }
@@ -202,14 +215,18 @@ class SendEmailToContacts
     /**
      * @param array $contact
      * @param array $tokens
+     *
+     * @return $this
+     *
+     * @throws FailedToSendToContactException
      */
-    public function sendToContact(array $contact, array $tokens = [])
+    public function setContact(array $contact, array $tokens = [])
     {
+        $this->contact = $contact;
+
         if (!$this->emailEntityId) {
             // There was an error configuring the email so auto fail
-            $this->failContact($contact, $this->emailEntityErrors);
-
-            return false;
+            $this->failContact(false, $this->emailEntityErrors);
         }
 
         $this->mailer->setTokens($tokens);
@@ -218,22 +235,33 @@ class SendEmailToContacts
 
         try {
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
-                $this->failContact($contact);
-
-                return false;
+                $this->failContact();
             }
         } catch (BatchQueueMaxException $e) {
             // Queue full so flush then try again
             $this->flush(false);
 
             if (!$this->mailer->addTo($contact['email'], $contact['firstname'].' '.$contact['lastname'])) {
-                $this->failContact($contact);
-
-                return false;
+                $this->failContact();
             }
         }
 
-        return $this->send($contact);
+        return $this;
+    }
+
+    /**
+     * @throws FailedToSendToContactException
+     */
+    public function send()
+    {
+        //queue or send the message
+        list($queued, $queueErrors) = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
+        if (!$queued) {
+            unset($queueErrors['failures']);
+            $this->failContact(true, implode('; ', (array) $queueErrors));
+        }
+
+        $this->createContactStatEntry($this->contact['email']);
     }
 
     /**
@@ -246,13 +274,17 @@ class SendEmailToContacts
         $this->statEntities      = [];
         $this->badEmails         = [];
         $this->errorMessages     = [];
-        $this->errors            = [];
+        $this->failedContacts    = [];
         $this->emailEntityErrors = null;
         $this->emailEntityId     = null;
         $this->emailSentCounts   = [];
         $this->singleEmailMode   = null;
         $this->listId            = null;
         $this->statBatchCounter  = 0;
+        $this->contact           = [];
+
+        $this->statRepo->clear();
+        $this->dncModel->clearEntities();
 
         $this->mailer->reset();
     }
@@ -266,48 +298,42 @@ class SendEmailToContacts
     }
 
     /**
-     * @return array [array $rawErrors, array $errorMessages]
+     * @return array
      */
     public function getErrors()
     {
-        return [$this->errors, $this->errorMessages];
+        return $this->errorMessages;
     }
 
     /**
-     * @param array $contact
-     *
-     * @return bool
+     * @return array
      */
-    protected function send(array $contact)
+    public function getFailedContacts()
     {
-        //queue or send the message
-        list($queued, $queueErrors) = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
-        if (!$queued) {
-            unset($queueErrors['failures']);
-            $this->failContact($contact, implode('; ', $queueErrors));
-
-            return false;
-        }
-
-        $this->createContactStatEntry($contact['email']);
-
-        return true;
+        return $this->failedContacts;
     }
 
     /**
-     * @param array $contact
-     * @param mixed $errorMessages
+     * @param bool $hasBadEmail
+     * @param string $errorMessages
+     *
+     * @throws FailedToSendToContactException
      */
-    protected function failContact(array $contact, $errorMessages = null)
+    protected function failContact($hasBadEmail = true, $errorMessages = null)
     {
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send
-            $errorMessages = $this->mailer->getErrors();
+            $errorMessages = implode('; ', (array) $this->mailer->getErrors());
         }
 
-        $this->errorMessages[$contact['id']] = $errorMessages;
-        $this->errors[$contact['id']]        = $contact['email'];
-        $this->badEmails[$contact['id']]     = $contact['email'];
+        $this->errorMessages[$this->contact['id']]  = $errorMessages;
+        $this->failedContacts[$this->contact['id']] = $this->contact['email'];
+
+        if ($hasBadEmail) {
+            $this->badEmails[$this->contact['id']] = $this->contact['email'];
+        }
+
+        throw new FailedToSendToContactException($errorMessages);
     }
 
     /**
@@ -324,8 +350,8 @@ class SendEmailToContacts
             /** @var Stat $stat */
             $stat = $this->statEntities[$failedEmail];
             // Add lead ID to list of failures
-            $this->errors[$stat->getLead()->getId()]        = $failedEmail;
-            $this->errorMessages[$stat->getLead()->getId()] = $error;
+            $this->failedContacts[$stat->getLead()->getId()] = $failedEmail;
+            $this->errorMessages[$stat->getLead()->getId()]  = $error;
 
             // Down sent counts
             $emailId = $stat->getEmail()->getId();
@@ -365,7 +391,14 @@ class SendEmailToContacts
     {
         ++$this->statBatchCounter;
 
-        $stat = $this->saveEntities[$email] = $this->mailer->createEmailStat(false, null, $this->listId);
+        $stat = $this->mailer->createEmailStat(false, null, $this->listId);
+        // Store it in the saveEntities array so that every 20 are persisted to prevent mass duplciation resends if
+        // something goes wrong
+        $this->saveEntities[$email] = $stat;
+        // Store it in the statEntities array so that the stat can be deleted if the transport fails the
+        // send for whatever reason after flushing the queue
+        $this->statEntities[$email] = $stat;
+
         $this->upEmailSentCount($stat->getEmail()->getId());
 
         if (20 === $this->statBatchCounter) {
@@ -385,6 +418,7 @@ class SendEmailToContacts
         if (!isset($this->emailSentCounts[$emailId])) {
             $this->emailSentCounts[$emailId] = 0;
         }
+
         ++$this->emailSentCounts[$emailId];
     }
 
