@@ -168,7 +168,7 @@ class ReportSubscriber extends CommonSubscriber
             'columns'      => $columns,
             'filters'      => $companyColumns,
         ];
-        $event->addTable('campaign_lead_event_log', $data);
+        $event->addTable(self::CONTEXT_CAMPAIGN_LEAD_EVENT_LOG, $data);
 
         // Register graphs
         //$event->addGraph($context, 'line', 'mautic.page.graph.line.hits');
