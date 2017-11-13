@@ -141,9 +141,10 @@ return [
                 'class' => 'Mautic\EmailBundle\EventListener\FormSubscriber',
             ],
             'mautic.email.reportbundle.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'mautic.lead.model.company_report_data',
                 ],
             ],
             'mautic.email.leadbundle.subscriber' => [
