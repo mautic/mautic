@@ -12,7 +12,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\FormBundle\Entity\Field;
-use Mautic\ReportBundle\Event\ReportEventInterface;
+use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 
 class CompanyReportData
 {
@@ -47,11 +47,11 @@ class CompanyReportData
     }
 
     /**
-     * @param ReportEventInterface $event
+     * @param ReportGeneratorEvent $event
      *
      * @return bool
      */
-    public function eventHasCompanyColumns(ReportEventInterface $event)
+    public function eventHasCompanyColumns(ReportGeneratorEvent $event)
     {
         $companyColumns = $this->getCompanyColumns();
         foreach ($companyColumns as $key => $column) {

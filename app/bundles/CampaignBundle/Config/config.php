@@ -163,7 +163,10 @@ return [
                 ],
             ],
             'mautic.campaign.report.subscriber' => [
-                'class' => \Mautic\CampaignBundle\EventListener\ReportSubscriber::class,
+                'class'     => \Mautic\CampaignBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
         ],
         'forms' => [

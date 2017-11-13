@@ -176,8 +176,7 @@ class ReportSubscriber extends CommonSubscriber
             $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
 
             if ($this->companyReportData->eventHasCompanyColumns($event)) {
-                $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
-                $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
+                $event->addCompanyLeftJoin($queryBuilder);
             }
         }
 

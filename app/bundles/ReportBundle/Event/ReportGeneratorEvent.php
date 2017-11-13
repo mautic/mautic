@@ -20,7 +20,7 @@ use Mautic\ReportBundle\Model\ReportModel;
 /**
  * Class ReportGeneratorEvent.
  */
-class ReportGeneratorEvent extends AbstractReportEvent implements ReportEventInterface
+class ReportGeneratorEvent extends AbstractReportEvent
 {
     /**
      * @var array
@@ -307,6 +307,17 @@ class ReportGeneratorEvent extends AbstractReportEvent implements ReportEventInt
         }
 
         return $this;
+    }
+
+    /**
+     * Add company left join.
+     *
+     * @param QueryBuilder $queryBuilder
+     */
+    public function addCompanyLeftJoin(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
+        $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
     }
 
     /**
