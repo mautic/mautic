@@ -200,4 +200,12 @@ class DoNotContact
         // Re-add the entry to the lead
         $contact->addDoNotContactEntry($dnc);
     }
+
+    /**
+     * Clear DoNotContact entities from Doctrine UnitOfWork.
+     */
+    public function clearEntities()
+    {
+        $this->dncRepo->clear();
+    }
 }
