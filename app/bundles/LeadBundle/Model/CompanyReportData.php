@@ -99,6 +99,10 @@ class CompanyReportData
                 'type'  => 'string',
                 'link'  => 'mautic_company_action',
             ],
+            'companies_lead.is_primary' => [
+                'label' => 'mautic.lead.report.company.is_primary',
+                'type'  => 'bool',
+            ],
         ];
     }
 
