@@ -646,14 +646,14 @@ class AjaxController extends CommonAjaxController
         $tags = json_decode($tags, true);
 
         if (is_array($tags)) {
-            $newTags = [];
+            $leadModel = $this->getModel('lead');
+            $newTags   = [];
+
             foreach ($tags as $tag) {
                 if (!is_numeric($tag)) {
-                    $newTags[] = $leadModel->getTagByNameOrCreateNewOne($tag);
+                    $newTags[] = $leadModel->getTagRepository()->getTagByNameOrCreateNewOne($tag);
                 }
             }
-
-            $leadModel = $this->getModel('lead');
 
             if (!empty($newTags)) {
                 $leadModel->getTagRepository()->saveEntities($newTags);
