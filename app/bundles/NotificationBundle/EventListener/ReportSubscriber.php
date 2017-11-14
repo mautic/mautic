@@ -14,6 +14,7 @@ namespace Mautic\NotificationBundle\EventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -24,19 +25,29 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class ReportSubscriber extends CommonSubscriber
 {
+    const MOBILE_NOTIFICATIONS       = 'mobile_notifications';
+    const MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
+
     /**
      * @var Connection
      */
     protected $db;
 
     /**
+     * @var CompanyReportData
+     */
+    private $companyReportData;
+
+    /**
      * ReportSubscriber constructor.
      *
-     * @param Connection $db
+     * @param Connection        $db
+     * @param CompanyReportData $companyReportData
      */
-    public function __construct(Connection $db)
+    public function __construct(Connection $db, CompanyReportData $companyReportData)
     {
-        $this->db = $db;
+        $this->db                = $db;
+        $this->companyReportData = $companyReportData;
     }
 
     /**
@@ -58,115 +69,128 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if ($event->checkContext(['mobile_notifications', 'mobile_notifications.stats'])) {
-            $prefix               = 'pn.';
-            $channelUrlTrackables = 'cut.';
-            $columns              = [
-                $prefix.'heading' => [
-                    'label' => 'mautic.notification.mobile_notification.heading',
+        if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
+            return;
+        }
+
+        $prefix               = 'pn.';
+        $channelUrlTrackables = 'cut.';
+        $columns              = [
+            $prefix.'heading' => [
+                'label' => 'mautic.notification.mobile_notification.heading',
+                'type'  => 'string',
+            ],
+            $prefix.'lang' => [
+                'label' => 'mautic.core.language',
+                'type'  => 'string',
+            ],
+            $prefix.'read_count' => [
+                'label' => 'mautic.mobile_notification.report.read_count',
+                'type'  => 'int',
+            ],
+            'read_ratio' => [
+                'alias'   => 'read_ratio',
+                'label'   => 'mautic.mobile_notification.report.read_ratio',
+                'type'    => 'string',
+                'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100),\'%\')',
+            ],
+            $prefix.'sent_count' => [
+                'label' => 'mautic.mobile_notification.report.sent_count',
+                'type'  => 'int',
+            ],
+            'hits' => [
+                'alias'   => 'hits',
+                'label'   => 'mautic.mobile_notification.report.hits_count',
+                'type'    => 'string',
+                'formula' => $channelUrlTrackables.'hits',
+            ],
+            'unique_hits' => [
+                'alias'   => 'unique_hits',
+                'label'   => 'mautic.mobile_notification.report.unique_hits_count',
+                'type'    => 'string',
+                'formula' => $channelUrlTrackables.'unique_hits',
+            ],
+            'hits_ratio' => [
+                'alias'   => 'hits_ratio',
+                'label'   => 'mautic.mobile_notification.report.hits_ratio',
+                'type'    => 'string',
+                'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count * '.$channelUrlTrackables
+                    .'trackable_count)*100),\'%\')',
+            ],
+            'unique_ratio' => [
+                'alias'   => 'unique_ratio',
+                'label'   => 'mautic.mobile_notification.report.unique_ratio',
+                'type'    => 'string',
+                'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
+                    .'trackable_count)*100),\'%\')',
+            ],
+        ];
+
+        $columns = array_merge(
+            $columns,
+            $event->getStandardColumns($prefix, [], 'mautic_mobile_notification_action'),
+            $event->getCategoryColumns()
+        );
+        $data = [
+            'display_name' => 'mautic.notification.mobile_notifications',
+            'columns'      => $columns,
+        ];
+
+        $event->addTable(self::MOBILE_NOTIFICATIONS, $data);
+
+        if ($event->checkContext(self::MOBILE_NOTIFICATIONS_STATS)) {
+            // Ratios are not applicable for individual stats
+            unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
+
+            // Mobile Notification counts are not applicable for individual stats
+            unset($columns[$prefix.'read_count']);
+
+            $statPrefix  = 'pns.';
+            $statColumns = [
+                $statPrefix.'date_sent' => [
+                    'label'          => 'mautic.mobile_notifications.report.stat.date_sent',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$statPrefix.'date_sent)',
+                ],
+                $statPrefix.'date_read' => [
+                    'label'          => 'mautic.mobile_notifications.report.stat.date_read',
+                    'type'           => 'datetime',
+                    'groupByFormula' => 'DATE('.$statPrefix.'date_read)',
+                ],
+                $statPrefix.'source' => [
+                    'label' => 'mautic.report.field.source',
                     'type'  => 'string',
                 ],
-                $prefix.'lang' => [
-                    'label' => 'mautic.core.language',
-                    'type'  => 'string',
-                ],
-                $prefix.'read_count' => [
-                    'label' => 'mautic.mobile_notification.report.read_count',
+                $statPrefix.'source_id' => [
+                    'label' => 'mautic.report.field.source_id',
                     'type'  => 'int',
-                ],
-                'read_ratio' => [
-                    'alias'   => 'read_ratio',
-                    'label'   => 'mautic.mobile_notification.report.read_ratio',
-                    'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND(('.$prefix.'read_count/'.$prefix.'sent_count)*100),\'%\')',
-                ],
-                $prefix.'sent_count' => [
-                    'label' => 'mautic.mobile_notification.report.sent_count',
-                    'type'  => 'int',
-                ],
-                'hits' => [
-                    'alias'   => 'hits',
-                    'label'   => 'mautic.mobile_notification.report.hits_count',
-                    'type'    => 'string',
-                    'formula' => $channelUrlTrackables.'hits',
-                ],
-                'unique_hits' => [
-                    'alias'   => 'unique_hits',
-                    'label'   => 'mautic.mobile_notification.report.unique_hits_count',
-                    'type'    => 'string',
-                    'formula' => $channelUrlTrackables.'unique_hits',
-                ],
-                'hits_ratio' => [
-                    'alias'   => 'hits_ratio',
-                    'label'   => 'mautic.mobile_notification.report.hits_ratio',
-                    'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                        .'trackable_count)*100),\'%\')',
-                ],
-                'unique_ratio' => [
-                    'alias'   => 'unique_ratio',
-                    'label'   => 'mautic.mobile_notification.report.unique_ratio',
-                    'type'    => 'string',
-                    'formula' => 'CONCAT(ROUND('.$channelUrlTrackables.'unique_hits/('.$prefix.'sent_count * '.$channelUrlTrackables
-                        .'trackable_count)*100),\'%\')',
                 ],
             ];
-            $columns = array_merge(
+
+            $companyColumns = $this->companyReportData->getCompanyData();
+
+            $mobileStatsColumns = array_merge(
                 $columns,
-                $event->getStandardColumns($prefix, [], 'mautic_mobile_notification_action'),
-                $event->getCategoryColumns()
+                $statColumns,
+                $event->getLeadColumns(),
+                $event->getIpColumn(),
+                $companyColumns
             );
+
             $data = [
-                'display_name' => 'mautic.notification.mobile_notifications',
-                'columns'      => $columns,
+                'display_name' => 'mautic.mobile_notification.stats.report.table',
+                'columns'      => $mobileStatsColumns,
             ];
+            $context = self::MOBILE_NOTIFICATIONS_STATS;
 
-            $event->addTable('mobile_notifications', $data);
+            // Register table
+            $event->addTable($context, $data, self::MOBILE_NOTIFICATIONS);
 
-            if ($event->checkContext('mobile_notifications.stats')) {
-                // Ratios are not applicable for individual stats
-                unset($columns['read_ratio'], $columns['unsubscribed_ratio'], $columns['hits_ratio'], $columns['unique_ratio']);
-
-                // Mobile Notification counts are not applicable for individual stats
-                unset($columns[$prefix.'read_count']);
-
-                $statPrefix  = 'pns.';
-                $statColumns = [
-                    $statPrefix.'date_sent' => [
-                        'label'          => 'mautic.mobile_notifications.report.stat.date_sent',
-                        'type'           => 'datetime',
-                        'groupByFormula' => 'DATE('.$statPrefix.'date_sent)',
-                    ],
-                    $statPrefix.'date_read' => [
-                        'label'          => 'mautic.mobile_notifications.report.stat.date_read',
-                        'type'           => 'datetime',
-                        'groupByFormula' => 'DATE('.$statPrefix.'date_read)',
-                    ],
-                    $statPrefix.'source' => [
-                        'label' => 'mautic.report.field.source',
-                        'type'  => 'string',
-                    ],
-                    $statPrefix.'source_id' => [
-                        'label' => 'mautic.report.field.source_id',
-                        'type'  => 'int',
-                    ],
-                ];
-
-                $data = [
-                    'display_name' => 'mautic.mobile_notification.stats.report.table',
-                    'columns'      => array_merge($columns, $statColumns, $event->getLeadColumns(), $event->getIpColumn()),
-                ];
-                $context = 'mobile_notifications.stats';
-
-                // Register table
-                $event->addTable($context, $data, 'mobile_notifications');
-
-                // Register Graphs
-                $event->addGraph($context, 'line', 'mautic.mobile_notification.graph.line.stats');
-                $event->addGraph($context, 'table', 'mautic.mobile_notification.table.most.mobile_notifications.sent');
-                $event->addGraph($context, 'table', 'mautic.mobile_notification.table.most.mobile_notifications.read');
-                $event->addGraph($context, 'table', 'mautic.mobile_notification.table.most.mobile_notifications.read.percent');
-            }
+            // Register Graphs
+            $event->addGraph($context, 'line', 'mautic.mobile_notification.graph.line.stats');
+            $event->addGraph($context, 'table', 'mautic.mobile_notification.table.most.mobile_notifications.sent');
+            $event->addGraph($context, 'table', 'mautic.mobile_notification.table.most.mobile_notifications.read');
+            $event->addGraph($context, 'table', 'mautic.mobile_notification.table.most.mobile_notifications.read.percent');
         }
     }
 
@@ -177,20 +201,21 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        $context = $event->getContext();
-        $qb      = $event->getQueryBuilder();
+        if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
+            return;
+        }
+
+        $qb = $event->getQueryBuilder();
 
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
         $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio'];
 
-        if ($event->checkContext(['mobile_notifications', 'mobile_notifications.stats'])) {
-            // Ensure this only stats mobile notifications
-            $qb->andWhere('pn.mobile = 1');
-        }
+        // Ensure this only stats mobile notifications
+        $qb->andWhere('pn.mobile = 1');
 
-        switch ($context) {
-            case 'mobile_notifications':
+        switch ($event->getContext()) {
+            case self::MOBILE_NOTIFICATIONS:
                 $qb->from(MAUTIC_TABLE_PREFIX.'push_notifications', 'pn');
                 $event->addCategoryLeftJoin($qb, 'pn');
 
@@ -206,7 +231,7 @@ class ReportSubscriber extends CommonSubscriber
                     $qb->leftJoin('pn', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'pn.id = cut.channel_id');
                 }
                 break;
-            case 'mobile_notifications.stats':
+            case self::MOBILE_NOTIFICATIONS_STATS:
                 $qb->from(MAUTIC_TABLE_PREFIX.'push_notification_stats', 'pns')
                     ->leftJoin('pns', MAUTIC_TABLE_PREFIX.'push_notifications', 'pn', 'pn.id = pns.notification_id');
 
@@ -228,6 +253,11 @@ class ReportSubscriber extends CommonSubscriber
                         ->groupBy('cut2.channel_id, ph.lead_id');
                     $qb->leftJoin('pn', sprintf('(%s)', $qbcut->getSQL()), 'cut', 'pn.id = cut.channel_id AND pns.lead_id = cut.lead_id');
                 }
+
+                if ($this->companyReportData->eventHasCompanyColumns($event)) {
+                    $event->addCompanyLeftJoin($qb);
+                }
+
                 break;
         }
 
@@ -242,7 +272,7 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         // Context check, we only want to fire for Mobile Notification reports
-        if (!$event->checkContext('mobile_notification.stats')) {
+        if (!$event->checkContext(self::MOBILE_NOTIFICATIONS_STATS)) {
             return;
         }
 

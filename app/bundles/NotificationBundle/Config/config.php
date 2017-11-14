@@ -70,6 +70,7 @@ return [
                 'class'     => \Mautic\NotificationBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'mautic.lead.model.company_report_data',
                 ],
             ],
         ],
