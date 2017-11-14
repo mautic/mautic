@@ -31,8 +31,13 @@ class Parser
         $this->message = $message;
     }
 
+    public function getFailedRecipients()
+    {
+        return (isset($this->message->xHeaders['x-failed-recipients'])) ? $this->message->xHeaders['x-failed-recipients'] : null;
+    }
+
     /**
-     * @return \Mautic\EmailBundle\MonitoredEmail\BouncedEmail
+     * @return BouncedEmail
      *
      * @throws BounceNotFound
      */
@@ -51,10 +56,5 @@ class Parser
         $bounce->setBounceAddress($bouncerAddress);
 
         return $bounce;
-    }
-
-    public function getFailedRecipients()
-    {
-        return (isset($this->message->xHeaders['x-failed-recipients'])) ? $this->message->xHeaders['x-failed-recipients'] : null;
     }
 }

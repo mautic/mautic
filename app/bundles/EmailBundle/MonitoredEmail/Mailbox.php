@@ -123,6 +123,11 @@ class Mailbox
     /**
      *  Match mails that have not been answered.
      */
+    const CRITERIA_UID = 'UID';
+
+    /**
+     *  Match mails that have not been answered.
+     */
     const CRITERIA_UNANSWERED = 'UNANSWERED';
 
     /**

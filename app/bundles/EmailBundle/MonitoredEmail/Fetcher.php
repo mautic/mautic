@@ -118,6 +118,7 @@ class Fetcher
                     }
                 } catch (\Exception $e) {
                     $this->log[] = $e->getMessage();
+                    die(var_dump($e));
                 }
             }
         }

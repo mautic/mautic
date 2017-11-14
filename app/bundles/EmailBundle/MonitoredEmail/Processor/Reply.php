@@ -11,14 +11,26 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\EmailReply;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Event\EmailReplyEvent;
 use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Reply implements InterfaceProcessor
 {
+    /**
+     * @var StatRepository
+     */
+    protected $statRepo;
+
     /**
      * @var ContactFinder
      */
@@ -30,9 +42,9 @@ class Reply implements InterfaceProcessor
     protected $leadModel;
 
     /**
-     * @var TranslatorInterface
+     * @var EventDispatcher
      */
-    protected $translator;
+    protected $dispatcher;
 
     /**
      * @var LoggerInterface
@@ -45,22 +57,25 @@ class Reply implements InterfaceProcessor
     protected $message;
 
     /**
-     * FeedBackLoop constructor.
+     * Reply constructor.
      *
-     * @param ContactFinder       $contactFinder
-     * @param LeadModel           $leadModel
-     * @param TranslatorInterface $translator
-     * @param LoggerInterface     $logger
+     * @param StatRepository           $statRepository
+     * @param ContactFinder            $contactFinder
+     * @param LeadModel                $leadModel
+     * @param EventDispatcherInterface $dispatcher
+     * @param LoggerInterface          $logger
      */
     public function __construct(
+        StatRepository $statRepository,
         ContactFinder $contactFinder,
         LeadModel $leadModel,
-        TranslatorInterface $translator,
+        EventDispatcherInterface $dispatcher,
         LoggerInterface $logger
     ) {
+        $this->statRepo      = $statRepository;
         $this->contactFinder = $contactFinder;
         $this->leadModel     = $leadModel;
-        $this->translator    = $translator;
+        $this->dispatcher    = $dispatcher;
         $this->logger        = $logger;
     }
 
@@ -70,60 +85,83 @@ class Reply implements InterfaceProcessor
      */
     public function process(Message $message)
     {
-        $this->logger->debug('Processing reply mail.');
+        $this->message = $message;
 
-        $mailIds = $this->mailbox->searchMailbox('TO '.$mailId);
-        $mails   = $this->mailbox->getMailsInfo($mailIds);
-        foreach ($mails as $mail) {
-            if ($mail->message_id == $refid) {
-                $this->checkMail($mail->uid);
-            }
-        }
-    }
+        $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for a reply');
 
-    /**
-     * @param $mailUid
-     *
-     * @return bool
-     */
-    public function check($mailUid)
-    {
-        $mail = $this->mailbox->getMail($mailUid);
-        if ($mail->returnPath && preg_match('#^(.*?)\+(.*?)@(.*?)$#', $mail->returnPath, $parts)) {
-            if (strstr($parts[2], '_')) {
-                // Has an ID hash so use it to find the lead
-                list($ignore, $hashId) = explode('_', $parts[2]);
-            }
-        }
-        if (empty($hashId) && preg_match('/email\/(.*?)\.gif/', $mail->textHtml, $parts)) {
-            $hashId = $parts[1];
+        $parser       = new Parser($message);
+        $repliedEmail = $parser->parse();
+
+        if (!$hashId = $repliedEmail->getStatHash()) {
+            // No stat found so bail as we won't consider this a reply
+            $this->logger->debug('MONITORED EMAIL: No hash ID found in the email body');
+
+            return;
         }
 
-        if (empty($hashId)) {
-            $this->logger->debug('Could not find the email identifier(hashId).');
+        $result = $this->contactFinder->findByHash($hashId);
+        if (!$stat = $result->getStat()) {
+            // No stat found so bail as we won't consider this a reply
+            $this->logger->debug('MONITORED EMAIL: Stat not found');
 
-            return false;
+            return;
         }
-        $em = $this->factory->getEntityManager();
-        // Search for the lead
-        $statRepository = $em->getRepository('MauticEmailBundle:Stat');
-        // Search by hashId
-        $stat = $statRepository->findOneBy(['trackingHash' => $hashId]);
-        if (!$stat) {
-            $this->logger->debug('Could not find the replied email.');
 
-            return false;
+        // A stat has been found so let's compare to the From address for the contact to prevent false positives
+        $contactEmail = $this->cleanEmail($stat->getLead()->getEmail());
+        $fromEmail    = $this->cleanEmail($repliedEmail->getFromAddress());
+        if ($contactEmail !== $fromEmail) {
+            // We can't reliably assume this email was from the originating contact
+            $this->logger->debug('MONITORED EMAIL: '.$contactEmail.' != '.$fromEmail.' so cannot confirm match');
+
+            return;
         }
-        $this->logger->debug('Stat found with ID# '.$stat->getId());
-        $this->leadModel->setCurrentLead($stat->getLead());
-        $stat->setIsReplyed(1);
-        $em->flush($stat);
+
+        $this->createReply($stat);
+
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
+            $this->leadModel->setSystemCurrentLead($stat->getLead());
+
             $event = new EmailReplyEvent($stat);
             $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_REPLY, $event);
             unset($event);
         }
 
-        return true;
+        $this->statRepo->clear();
+        $this->leadModel->clearEntities();
+    }
+
+    /**
+     * @param $stat
+     */
+    protected function createReply(Stat $stat)
+    {
+        $replies = $stat->getReplies()->filter(
+            function (EmailReply $reply) {
+                return $reply->getMessageId() === $this->message->id;
+            }
+        );
+
+        if (!$replies->count()) {
+            $emailReply = new EmailReply();
+            $emailReply->setStat($stat)
+                ->setMessageId($this->message->id)
+                ->setDateReplied(new \DateTime());
+
+            $stat->addReply($emailReply);
+            $this->statRepo->saveEntity($stat);
+        }
+    }
+
+    /**
+     * Clean the email for comparison.
+     *
+     * @param $email
+     *
+     * @return mixed
+     */
+    protected function cleanEmail($email)
+    {
+        return strtolower(preg_replace("/[^a-z0-9\.@]/i", '', $email));
     }
 }

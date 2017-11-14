@@ -11,9 +11,11 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -21,11 +23,17 @@ class ProcessReplySubscriber implements EventSubscriberInterface
 {
     const BUNDLE     = 'EmailBundle';
     const FOLDER_KEY = 'replies';
+    const CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
 
     /**
      * @var Reply
      */
     protected $replier;
+
+    /**
+     * @var CacheStorageHelper
+     */
+    protected $cache;
 
     /**
      * @return array
@@ -44,9 +52,10 @@ class ProcessReplySubscriber implements EventSubscriberInterface
      *
      * @param Reply $replier
      */
-    public function __construct(Reply $replier)
+    public function __construct(Reply $replier, CacheStorageHelper $cache)
     {
         $this->replier = $replier;
+        $this->cache   = $cache;
     }
 
     /**
@@ -62,7 +71,10 @@ class ProcessReplySubscriber implements EventSubscriberInterface
      */
     public function onEmailPreFetch(ParseEmailEvent $event)
     {
-        $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, '');
+        $lastFetch = $this->cache->get(self::CACHE_KEY);
+        if ($lastFetch) {
+            $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID.' '.$lastFetch.':*');
+        }
     }
 
     /**
@@ -72,9 +84,13 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
             // Process the messages
-            $messages = $event->getMessages();
-            foreach ($messages as $message) {
-                $this->replier->process($message);
+            if ($messages = $event->getMessages()) {
+                foreach ($messages as $message) {
+                    $this->replier->process($message);
+                }
+
+                // Store the last UID
+                $this->cache->set(self::CACHE_KEY, $message->id);
             }
         }
     }

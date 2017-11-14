@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -123,9 +124,14 @@ class Stat
     private $openDetails = [];
 
     /**
-     * @var EmailReply[]
+     * @var ArrayCollection|EmailReply[]
      */
     private $replies;
+
+    public function __construct()
+    {
+        $this->replies = new ArrayCollection();
+    }
 
     /**
      * @param ORM\ClassMetadata $metadata
@@ -632,10 +638,18 @@ class Stat
     }
 
     /**
-     * @return EmailReply[]
+     * @return ArrayCollection|EmailReply[]
      */
     public function getReplies()
     {
         return $this->replies;
+    }
+
+    /**
+     * @param EmailReply $reply
+     */
+    public function addReply(EmailReply $reply)
+    {
+        $this->replies[] = $reply;
     }
 }

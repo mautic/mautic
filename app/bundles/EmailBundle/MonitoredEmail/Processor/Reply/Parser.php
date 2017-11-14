@@ -31,16 +31,17 @@ class Parser
     }
 
     /**
-     * @return null|string
+     * Only sure way is to parse the content for the stat ID otherwise attempt the from.
+     *
+     * @return RepliedEmail
      */
     public function parse()
     {
-        if (preg_match('/Received:.*for (.*);.*?/isU', $this->message->textPlain, $match)) {
-            if ($parsedAddressList = Address::parseList($match[1])) {
-                return key($parsedAddressList);
-            }
+        $hashId = null;
+        if (preg_match('/email\/(.*?)\.gif/', $this->message->textHtml, $parts)) {
+            $hashId = $parts[1];
         }
 
-        return null;
+        return new RepliedEmail($this->message->fromAddress, $hashId);
     }
 }

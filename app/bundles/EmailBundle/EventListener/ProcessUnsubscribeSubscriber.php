@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop;
@@ -41,6 +42,8 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
             EmailEvents::EMAIL_PARSE            => ['onEmailParse', 0],
+            EmailEvents::EMAIL_ON_SEND          => ['onEmailSend', 0],
+
         ];
     }
 
@@ -77,6 +80,24 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
                     $this->looper->process($message);
                 }
             }
+        }
+    }
+
+    /**
+     * Add an unsubscribe email to the List-Unsubscribe header if applicable.
+     *
+     * @param EmailSendEvent $event
+     */
+    public function onEmailSend(EmailSendEvent $event)
+    {
+        $helper = $event->getHelper();
+        if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
+            $headers          = $event->getTextHeaders();
+            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
+            $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
+            $updatedHeader    = ($existing) ? $unsubscribeEmail.', '.$existing : $unsubscribeEmail;
+
+            $event->addTextHeader('List-Unsubscribe', $updatedHeader);
         }
     }
 }

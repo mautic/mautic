@@ -123,6 +123,13 @@ return [
                     'mautic.message.processor.feedbackloop',
                 ],
             ],
+            'mautic.email.monitored.unsubscribe.replier' => [
+                'class'     => \Mautic\EmailBundle\EventListener\ProcessReplySubscriber::class,
+                'arguments' => [
+                    'mautic.message.processor.replier',
+                    'mautic.helper.cache_storage',
+                ],
+            ],
             'mautic.emailbuilder.subscriber' => [
                 'class'     => 'Mautic\EmailBundle\EventListener\BuilderSubscriber',
                 'arguments' => [
@@ -428,6 +435,16 @@ return [
                     'mautic.message.search.contact',
                     'mautic.lead.model.lead',
                     'translator',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.message.processor.replier' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class,
+                'arguments' => [
+                    'mautic.email.repository.stat',
+                    'mautic.message.search.contact',
+                    'mautic.lead.model.lead',
+                    'event_dispatcher',
                     'monolog.logger.mautic',
                 ],
             ],

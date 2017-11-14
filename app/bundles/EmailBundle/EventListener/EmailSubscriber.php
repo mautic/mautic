@@ -65,7 +65,6 @@ class EmailSubscriber extends CommonSubscriber
             EmailEvents::EMAIL_POST_SAVE   => ['onEmailPostSave', 0],
             EmailEvents::EMAIL_POST_DELETE => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED      => ['onEmailFailed', 0],
-            EmailEvents::EMAIL_ON_SEND     => ['onEmailSend', 0],
             EmailEvents::EMAIL_RESEND      => ['onEmailResend', 0],
             QueueEvents::EMAIL_HIT         => ['onEmailHit', 0],
         ];
@@ -129,24 +128,6 @@ class EmailSubscriber extends CommonSubscriber
                 ]);
                 $this->emailModel->setDoNotContact($stat, $reason);
             }
-        }
-    }
-
-    /**
-     * Add an unsubscribe email to the List-Unsubscribe header if applicable.
-     *
-     * @param Events\EmailSendEvent $event
-     */
-    public function onEmailSend(Events\EmailSendEvent $event)
-    {
-        $helper = $event->getHelper();
-        if ($helper && $unsubscribeEmail = $helper->generateUnsubscribeEmail()) {
-            $headers          = $event->getTextHeaders();
-            $existing         = (isset($headers['List-Unsubscribe'])) ? $headers['List-Unsubscribe'] : '';
-            $unsubscribeEmail = "<mailto:$unsubscribeEmail>";
-            $updatedHeader    = ($existing) ? $unsubscribeEmail.', '.$existing : $unsubscribeEmail;
-
-            $event->addTextHeader('List-Unsubscribe', $updatedHeader);
         }
     }
 
