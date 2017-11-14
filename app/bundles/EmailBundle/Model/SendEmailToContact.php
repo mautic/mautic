@@ -148,7 +148,7 @@ class SendEmailToContact
     }
 
     /**
-     * Flush any remaining queued contacts, process spending stats, create DNC entries and reset this class
+     * Flush any remaining queued contacts, process spending stats, create DNC entries and reset this class.
      */
     public function finalFlush()
     {
@@ -171,9 +171,9 @@ class SendEmailToContact
      * Use an Email entity to populate content, from, etc.
      *
      * @param Email $email
-     * @param array $channel ['channelName', 'channelId']
+     * @param array $channel          ['channelName', 'channelId']
      * @param array $assetAttachments
-     * @param array $slots   @deprecated to be removed in 3.0; support for old email template format
+     * @param array $slots            @deprecated to be removed in 3.0; support for old email template format
      *
      * @return $this
      */
@@ -314,7 +314,7 @@ class SendEmailToContact
     }
 
     /**
-     * @param bool $hasBadEmail
+     * @param bool   $hasBadEmail
      * @param string $errorMessages
      *
      * @throws FailedToSendToContactException
