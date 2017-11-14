@@ -132,6 +132,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @return \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi
+     */
+    public function getApiHelper()
+    {
+        return parent::getApiHelper();
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -426,6 +434,16 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'portalSecurityLevel'    => ['type' => 'string', 'required' => false],
             'disablePortalLoginFlag' => ['type' => 'boolean', 'required' => false],
             'unsubscribeFlag'        => ['type' => 'boolean', 'required' => false],
+            'userDefinedField1'      => ['type' => 'string', 'required' => false],
+            'userDefinedField2'      => ['type' => 'string', 'required' => false],
+            'userDefinedField3'      => ['type' => 'string', 'required' => false],
+            'userDefinedField4'      => ['type' => 'string', 'required' => false],
+            'userDefinedField5'      => ['type' => 'string', 'required' => false],
+            'userDefinedField6'      => ['type' => 'string', 'required' => false],
+            'userDefinedField7'      => ['type' => 'string', 'required' => false],
+            'userDefinedField8'      => ['type' => 'string', 'required' => false],
+            'userDefinedField9'      => ['type' => 'string', 'required' => false],
+            'userDefinedField10'     => ['type' => 'string', 'required' => false],
             'gender'                 => ['type' => 'string', 'required' => false],
             'birthDay'               => ['type' => 'string', 'required' => false],
             'anniversary'            => ['type' => 'string', 'required' => false],
@@ -649,6 +667,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if ($personFound) {
                 foreach ($cwContactExists as $cwContact) { // go through array of contacts found since Connectwise lets you duplicate records with same email address
                     $mappedData = $this->getMappedFields($object, $lead, $personFound, $config, $cwContact);
+
                     if (!empty($mappedData)) {
                         $personData = $this->getApiHelper()->updateContact($mappedData, $cwContact['id']);
                     } else {
@@ -762,11 +781,11 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             if ($integrationKey == 'communicationItems') {
                 $communicationItems = [];
                 foreach ($field['items']['keys'] as $keyItem => $item) {
-                    $defaulValue = [];
-                    $keyExists   = false;
+                    $defaultValue = [];
+                    $keyExists    = false;
                     if (isset($leadFields[$item])) {
                         if ($item == 'Email') {
-                            $defaulValue = ['defaultFlag' => true];
+                            $defaultValue = ['defaultFlag' => true];
                         }
                         $mauticKey = $leadFields[$item];
                         if (isset($fields[$mauticKey]) && !empty($fields[$mauticKey]['value'])) {
@@ -779,7 +798,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                             if (!$keyExists) {
                                 $type = [
                                     'type' => ['id' => $keyItem + 1, 'name' => $item], ];
-                                $values = array_merge(['value' => $this->cleanPushData($fields[$mauticKey]['value'])], $defaulValue);
+                                $values = array_merge(['value' => $this->cleanPushData($fields[$mauticKey]['value'])], $defaultValue);
 
                                 $communicationItems[] = array_merge($type, $values);
                             }
@@ -793,6 +812,21 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 if (!empty($communicationItems)) {
                     $matched[$integrationKey] = $communicationItems;
                 }
+            }
+
+            if ($integrationKey === 'company' && isset($fields['company']) && !empty($fields['company']['value'])) {
+                try {
+                    $foundCompanies = $this->getApiHelper()->getCompanies([
+                        'conditions' => [
+                            sprintf('Name = "%s"', $fields['company']['value']),
+                        ],
+                    ]);
+                } catch (ApiErrorException $e) {
+                    // No matching companies were found
+                    continue;
+                }
+
+                $matched['company'] = ['identifier' => $foundCompanies[0]['identifier']];
             }
 
             if (isset($leadFields[$integrationKey])) {

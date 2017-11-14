@@ -993,7 +993,7 @@ abstract class AbstractIntegration
         // Check for custom content-type header
         if (!empty($settings['content_type'])) {
             $settings['encoding_headers_set'] = true;
-            $headers[]                        = "Content-type: {$settings['content_type']}";
+            $headers[]                        = "Content-Type: {$settings['content_type']}";
         }
 
         if ($method !== 'GET') {
@@ -1061,6 +1061,7 @@ abstract class AbstractIntegration
                 case 'POST':
                 case 'PUT':
                 case 'PATCH':
+                    var_dump($parameters);
                     $connectorMethod = strtolower($method);
                     $result          = $connector->$connectorMethod($url, $parameters, $headers, $timeout);
                     break;
