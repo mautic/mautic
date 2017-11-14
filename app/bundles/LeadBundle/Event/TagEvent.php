@@ -25,7 +25,7 @@ class TagEvent extends CommonEvent
      */
     public function __construct(Tag $tag, $isNew = false)
     {
-        $this->entity = &$tag;
+        $this->entity = $tag;
         $this->isNew  = $isNew;
     }
 
