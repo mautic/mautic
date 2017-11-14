@@ -262,8 +262,6 @@ class ConfigController extends FormController
      *
      * @param array $forms
      * @param array $doNotChange
-     *
-     * @return array
      */
     private function mergeParamsWithLocal(&$forms, $doNotChange)
     {
@@ -279,14 +277,29 @@ class ConfigController extends FormController
         $localParams = $parameters;
 
         foreach ($forms as &$form) {
-
             // Merge the bundle params with the local params
-            foreach ($form['parameters'] as $key => $value) {
-                if (in_array($key, $doNotChange)) {
-                    unset($form['parameters'][$key]);
-                } elseif (array_key_exists($key, $localParams)) {
-                    $form['parameters'][$key] = (is_string($localParams[$key])) ? str_replace('%%', '%', $localParams[$key]) : $localParams[$key];
-                }
+            $this->applyRestrictions($form['parameters'], $localParams, $doNotChange);
+        }
+    }
+
+    /**
+     * @param array $parameters
+     * @param array $localParams
+     * @param array $doNotChange
+     */
+    private function applyRestrictions(array &$parameters, array $localParams, array $doNotChange)
+    {
+        foreach ($parameters as $key => $parameter) {
+            $removed = false;
+            if (in_array($key, $doNotChange)) {
+                unset($parameters[$key]);
+                $removed = true;
+            } elseif (array_key_exists($key, $doNotChange)) {
+                $this->applyRestrictions($parameters[$key], $localParams[$key], $doNotChange[$key]);
+            }
+
+            if (!$removed && array_key_exists($key, $localParams)) {
+                $parameters[$key] = (is_string($localParams[$key])) ? str_replace('%%', '%', $localParams[$key]) : $localParams[$key];
             }
         }
     }
