@@ -18,98 +18,39 @@ use Mautic\LeadBundle\Entity\TagRepository;
 
 class TagRepositoryTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSaveEntityWithUniqueNewTag()
+    public function testGetTagByNameOrCreateNewOneWithSomeExistingTag()
     {
-        $entity = new Tag('sometag');
-
-        $mockEntityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['persist', 'flush'])
-            ->getMock();
-
-        $mockEntityManager->expects($this->once())
-            ->method('persist')
-            ->with($entity);
+        $fetchedEntity = new Tag('sometag');
 
         $mockRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getEntityManager', 'findOneBy'])
+            ->setMethods(['findOneBy'])
             ->getMock();
 
-        $mockRepository->method('getEntityManager')
-            ->willReturn($mockEntityManager);
+        $mockRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['tag' => 'sometag'])
+            ->willReturn($fetchedEntity);
+
+        $this->assertSame($fetchedEntity, $mockRepository->getTagByNameOrCreateNewOne('sometag'));
+    }
+
+    public function testGetTagByNameOrCreateNewOneWithSomeNewTag()
+    {
+        $mockRepository = $this->getMockBuilder(TagRepository::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['findOneBy'])
+            ->getMock();
 
         $mockRepository->expects($this->once())
             ->method('findOneBy')
             ->with(['tag' => 'sometag'])
             ->willReturn(null);
 
-        $mockRepository->saveEntity($entity);
+        $newEntity = $mockRepository->getTagByNameOrCreateNewOne('sometag');
 
-        $this->assertNull($entity->getId());
-    }
-
-    public function testSaveEntityWithExistingTag()
-    {
-        $entity = new Tag('sometag');
-        $entity->setId(45);
-
-        $mockEntityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['persist', 'flush'])
-            ->getMock();
-
-        $mockEntityManager->expects($this->once())
-            ->method('persist')
-            ->with($entity);
-
-        $mockRepository = $this->getMockBuilder(TagRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getEntityManager', 'findOneBy'])
-            ->getMock();
-
-        $mockRepository->method('getEntityManager')
-            ->willReturn($mockEntityManager);
-
-        $mockRepository->expects($this->never())
-            ->method('findOneBy');
-
-        $mockRepository->saveEntity($entity);
-
-        $this->assertSame(45, $entity->getId());
-    }
-
-    public function testSaveEntityWithNewDuplicatedTag()
-    {
-        $entity = new Tag('sometag');
-
-        $mockEntityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['persist', 'flush'])
-            ->getMock();
-
-        $mockEntityManager->expects($this->never())
-            ->method('persist');
-
-        $mockRepository = $this->getMockBuilder(TagRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getEntityManager', 'findOneBy'])
-            ->getMock();
-
-        $mockRepository->method('getEntityManager')
-            ->willReturn($mockEntityManager);
-
-        $existingTag = new Tag('sometag');
-        $existingTag->setId(23);
-
-        $mockRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['tag' => 'sometag'])
-            ->willReturn($existingTag);
-
-        $mockRepository->saveEntity($entity);
-
-        $this->assertSame(23, $entity->getId());
+        $this->assertSame('sometag', $newEntity->getTag());
+        $this->assertNull($newEntity->getId());
     }
 
     public function testRemoveMinusFromTags()

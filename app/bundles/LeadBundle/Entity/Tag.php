@@ -75,18 +75,6 @@ class Tag
     }
 
     /**
-     * @param int
-     *
-     * @return Tag
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getTag()
@@ -98,8 +86,6 @@ class Tag
      * @param string $tag
      *
      * @return Tag
-     *
-     * @deprecated in 2.12.0. To be removed in 3.0.0. Use constructor instead
      */
     public function setTag($tag)
     {

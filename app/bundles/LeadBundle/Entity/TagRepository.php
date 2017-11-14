@@ -118,22 +118,22 @@ class TagRepository extends CommonRepository
     }
 
     /**
-     * Save an entity through the repository.
+     * @param string $name
      *
-     * @param Tag  $entity
-     * @param bool $flush  true by default; use false if persisting in batches
-     *
-     * @return int
+     * @return Tag
      */
-    public function saveEntity($entity, $flush = true)
+    public function getTagByNameOrCreateNewOne($name)
     {
-        if (!$entity->getId() && $existingTag = $this->findOneBy(['tag' => $entity->getTag()])) {
-            // Do not save if the tag exists and instead add the ID of the existing tag to the entity
-            $entity->setId($existingTag->getId());
+        $tag = $this->findOneBy(
+            [
+                'tag' => $name,
+            ]
+        );
 
-            return;
+        if (!$tag) {
+            $tag = new Tag($name);
         }
 
-        parent::saveEntity($entity, $flush);
+        return $tag;
     }
 }

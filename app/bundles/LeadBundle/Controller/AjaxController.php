@@ -649,7 +649,7 @@ class AjaxController extends CommonAjaxController
             $newTags = [];
             foreach ($tags as $tag) {
                 if (!is_numeric($tag)) {
-                    $newTags[] = new Tag($tag);
+                    $newTags[] = $leadModel->getTagByNameOrCreateNewOne($tag);
                 }
             }
 

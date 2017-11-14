@@ -1943,7 +1943,9 @@ class LeadModel extends FormModel
                         $this->em->getReference('MauticLeadBundle:Tag', $tag)
                     );
                 } else {
-                    $lead->addTag(new Tag($tag));
+                    $lead->addTag(
+                        $this->getTagRepository()->getTagByNameOrCreateNewOne($tag)
+                    );
                 }
             }
             $leadModified = true;
