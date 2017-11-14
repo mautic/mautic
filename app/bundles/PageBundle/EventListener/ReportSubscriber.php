@@ -302,6 +302,11 @@ class ReportSubscriber extends CommonSubscriber
                 $event->addCategoryLeftJoin($qb, 'p');
                 $event->addLeadLeftJoin($qb, 'ph');
                 $event->addCampaignByChannelJoin($qb, 'p', 'page');
+
+                if ($this->companyReportData->eventHasCompanyColumns($event)) {
+                    $event->addCompanyLeftJoin($qb);
+                }
+
                 break;
         }
 

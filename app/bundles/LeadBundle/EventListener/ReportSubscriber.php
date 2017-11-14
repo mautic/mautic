@@ -45,6 +45,16 @@ class ReportSubscriber extends CommonSubscriber
 
     const GROUP_CONTACTS = 'contacts';
 
+    private $leadContexts = [
+        self::CONTEXT_LEADS,
+        self::CONTEXT_LEAD_POINT_LOG,
+        self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
+        self::CONTEXT_CONTACT_ATTRIBUTION_FIRST,
+        self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
+        self::CONTEXT_CONTACT_FREQUENCYRULES,
+    ];
+    private $companyContexts = [self::CONTEXT_COMPANIES];
+
     /**
      * @var ListModel
      */
@@ -147,17 +157,11 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $leadContexts = [
-            self::CONTEXT_LEADS,
-            self::CONTEXT_LEAD_POINT_LOG,
-            self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
-            self::CONTEXT_CONTACT_ATTRIBUTION_FIRST,
-            self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
-            self::CONTEXT_CONTACT_FREQUENCYRULES,
-        ];
-        $companyContexts = [self::CONTEXT_COMPANIES];
+        if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
+            return;
+        }
 
-        if ($event->checkContext($leadContexts)) {
+        if ($event->checkContext($this->leadContexts)) {
             $columns = [
                 'l.id' => [
                     'label' => 'mautic.lead.report.contact_id',
@@ -272,7 +276,7 @@ class ReportSubscriber extends CommonSubscriber
             }
         }
 
-        if ($event->checkContext($companyContexts)) {
+        if ($event->checkContext($this->companyContexts)) {
             $companyColumns = $this->companyReportData->getCompanyData();
 
             $data = [
@@ -295,6 +299,10 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
+        if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
+            return;
+        }
+
         $context = $event->getContext();
         $qb      = $event->getQueryBuilder();
 
