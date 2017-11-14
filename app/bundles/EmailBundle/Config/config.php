@@ -292,8 +292,8 @@ return [
                 'alias'     => 'monitored_mailboxes',
             ],
             'mautic.form.type.coreconfig_monitored_email' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType::class,
+                'arguments' => 'event_dispatcher',
                 'alias'     => 'monitored_email',
             ],
             'mautic.form.type.email_dashboard_emails_in_time_widget' => [
@@ -393,7 +393,7 @@ return [
                 ],
             ],
             'mautic.message.search.contact' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\Contact::class,
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
                 'arguments' => [
                     'mautic.email.repository.stat',
                     'mautic.lead.repository.lead',
