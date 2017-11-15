@@ -17,8 +17,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class RealTransportCompiler implements CompilerPassInterface
 {
     /**
-     * The real transport is only set when email queuing is enabled. But it's helpful for services to have access to the real transport for processing
-     * webhooks and the like. So let's make sure that swiftmailer.transport.real is set regardless.
+     * The swiftmailer.transport.real is only set by a Swiftmailer bundle's dependency injection compiler when email queuing (to filesystem) is enabled.
+     * This makes it tricky to use the "real" transport in services which is helpful for services to have access to the real transport for processing
+     * webhooks and the like. So this makes sure that swiftmailer.transport.real service is available regardless.
      *
      * @param ContainerBuilder $container
      */
