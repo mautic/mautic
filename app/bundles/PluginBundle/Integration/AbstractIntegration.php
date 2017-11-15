@@ -1185,6 +1185,9 @@ abstract class AbstractIntegration
                         'Authorization' => 'Basic '.base64_encode($this->keys['username'].':'.$this->keys['password']),
                     ];
                     break;
+                case 'JWT' :
+                    $headers = ['Authorization' => 'Bearer '.$this->getBearerToken()];
+                    break;
                 case 'oauth1a':
                     $oauthHelper = new oAuthHelper($this, $this->request, $settings);
                     $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
