@@ -95,7 +95,7 @@ class DynamicContentHelper
         if ($lead instanceof Lead) {
             $leadArray = $this->convertLeadToArray($lead);
         }
-        $dwcs = $this->getDwcsBySlotName($slotName);
+        $dwcs = $this->getDwcsBySlotName($slotName, true);
         /** @var DynamicContent $dwc */
         foreach ($dwcs as $dwc) {
             if ($dwc->getIsCampaignBased()) {
@@ -203,22 +203,33 @@ class DynamicContentHelper
 
     /**
      * @param string $slotName
+     * @param bool   $publishedOnly
      *
      * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getDwcsBySlotName($slotName)
+    public function getDwcsBySlotName($slotName, $publishedOnly = false)
     {
+        $filter = [
+            'where' => [
+                [
+                    'col'  => 'e.slotName',
+                    'expr' => 'eq',
+                    'val'  => $slotName,
+                ],
+            ],
+        ];
+
+        if ($publishedOnly) {
+            $filter['where'][] = [
+                'col'  => 'e.isPublished',
+                'expr' => 'eq',
+                'val'  => 1,
+            ];
+        }
+
         return $this->dynamicContentModel->getEntities(
             [
-                'filter' => [
-                    'where' => [
-                        [
-                            'col'  => 'e.slotName',
-                            'expr' => 'eq',
-                            'val'  => $slotName,
-                        ],
-                    ],
-                ],
+                'filter'           => $filter,
                 'ignore_paginator' => true,
             ]
         );

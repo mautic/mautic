@@ -160,6 +160,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
             ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
             ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
+            ->andWhere($qb->expr()->eq('dc.is_published', 1))
             ->setParameter('slot', $slot)
             ->setParameter('lead_id', $id)
             ->orderBy('dcld.date_added', 'DESC')
