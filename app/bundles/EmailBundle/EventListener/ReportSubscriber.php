@@ -287,7 +287,7 @@ class ReportSubscriber extends CommonSubscriber
         // channel_url_trackables subquery
         $qbcut        = $this->db->createQueryBuilder();
         $clickColumns = ['hits', 'unique_hits', 'hits_ratio', 'unique_ratio', 'is_hit'];
-        $dncColumns   = ['unsubscribed', 'unsubscribed_ratio'];
+        $dncColumns   = ['unsubscribed', 'unsubscribed_ratio', 'bounced', 'bounced_ratio'];
 
         switch ($context) {
             case 'emails':
