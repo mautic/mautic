@@ -44,6 +44,7 @@ class CampaignSubscriber extends CommonSubscriber
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
             WebinarEvents::ON_WEBINAR_EVENT => ['onWebinarEvent', 0],
+            WebinarEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onWebinarAction', 0],
         ];
     }
 
@@ -71,6 +72,18 @@ class CampaignSubscriber extends CommonSubscriber
 
                 $event->addCondition('mautic.plugin.webinar.' . $name, $condition);
             }
+            //Add webinar action subscribe to webinar
+            if (method_exists($s,'subscribeToWebinar')) {
+                $action = [
+                    'label'       => 'mautic.plugin.webinar.subscribe_contact',
+                    'description' => $s->getName(),
+                    'formType'    => $s->getName() . '_campaignevent_webinars',
+                    'formTypeOptions' => ['integrationObject' => $s],
+                    'eventName'   => WebinarEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                ];
+
+                $event->addAction('plugin.subscribtcontact_'.$name, $action);
+            }
         }
     }
 
@@ -87,9 +100,9 @@ class CampaignSubscriber extends CommonSubscriber
     public function onWebinarEvent(CampaignExecutionEvent $event)
     {
         $config   = $event->getConfig();
-        $lead = $event->getLead();
+        $contact = $event->getLead();
         $subscribed = false;
-        if ($lead) {
+        if ($contact) {
             $services = $this->integrationHelper->getIntegrationObjects();
             foreach ($services as $name => $s) {
                 $settings = $s->getIntegrationSettings();
@@ -97,10 +110,32 @@ class CampaignSubscriber extends CommonSubscriber
                     continue;
                 }
 
-                $subscribed = $s->hasAttendedWebinar($config['webinar'], $lead);
+                $subscribed = $s->hasAttendedWebinar($config['webinar'], $contact);
             }
         }
 
         return $subscribed;
+    }
+
+    public function onWebinarAction(CampaignExecutionEvent $event)
+    {
+        $config   = $event->getConfig();
+        $contact = $event->getLead();
+        $subscriptionSuccess = false;
+        $campaignName = $event->getEvent()->getCampaign()->getName();
+
+        if ($contact) {
+            $services = $this->integrationHelper->getIntegrationObjects();
+            foreach ($services as $name => $s) {
+                $settings = $s->getIntegrationSettings();
+                if (!$settings->isPublished() && !method_exists($s, 'subscribeToWebinar')) {
+                    continue;
+                }
+
+                $subscriptionSuccess = $s->subscribeToWebinar($config['webinar'], $contact, $campaignName);
+            }
+        }
+
+        return $event->setResult($subscriptionSuccess);
     }
 }

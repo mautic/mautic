@@ -174,7 +174,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     {
         $leadEmail = $lead->getEmail();
 
-        if ($leadEmail) {
+        if ($leadEmail && isset($webinar['id'])) {
             $subscriptions = $this->getApiHelper()->getSubscriptions($webinar, $filters);
             return $this->findSubscriptionByEmail($subscriptions, $leadEmail);
         }
@@ -196,5 +196,42 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         }
 
         return null;
+    }
+
+    /**
+     * @param $webinar
+     * @param $contact
+     * @return bool
+     */
+    public function subscribeToWebinar($webinar, Lead $contact, $campaign)
+    {
+        if (!isset($webinar['id'])) {
+            return false;
+        }
+
+        $contactDataToPost = $this->formatContactData($contact, $campaign);
+        $response = $this->getApiHelper()->subscribeContact($webinar['id'], $contactDataToPost);
+
+        return isset($response['source']);
+    }
+
+    /**
+     * @param Lead $contact
+     * @param $campaign
+     * @return array
+     */
+    private function formatContactData(Lead $contact, $campaign)
+    {
+        return [
+            'user' => [
+                'email' => $contact->getEmail(),
+                'firstName' => $contact->getFirstname(),
+                'lastName' => $contact->getLastname(),
+                'phone' => $contact->getPhone(),
+                'functionLabel' => $contact->getPosition(),
+                'companyLabel' => $contact->getCompany()
+            ],
+            'trackingCampaign' => $campaign
+        ];
     }
 }
