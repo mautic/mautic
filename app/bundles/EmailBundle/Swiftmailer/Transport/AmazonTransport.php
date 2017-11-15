@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Class AmazonTransport.
  */
-class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport, InterfaceBounceProcessor, InterfaceUnsubscriptionProcessor
+class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
     /**
      * From address for SNS email.

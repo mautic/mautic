@@ -19,7 +19,7 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceBounceProcessor;
+use Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -105,7 +105,7 @@ class Bounce implements InterfaceProcessor
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for a bounce');
 
         // Does the transport have special handling such as Amazon SNS?
-        if ($this->transport instanceof InterfaceBounceProcessor) {
+        if ($this->transport instanceof BounceProcessorInterface) {
             try {
                 $bounce = $this->transport->processBounce($this->message);
             } catch (BounceNotFound $exception) {

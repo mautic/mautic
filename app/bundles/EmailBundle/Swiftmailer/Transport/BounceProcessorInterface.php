@@ -18,7 +18,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
 /**
  * Interface InterfaceBounceProcessor.
  */
-interface InterfaceBounceProcessor
+interface BounceProcessorInterface
 {
     /**
      * Get the email address that bounced.

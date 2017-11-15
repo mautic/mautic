@@ -16,7 +16,7 @@ use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
-use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceUnsubscriptionProcessor;
+use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
@@ -93,7 +93,7 @@ class Unsubscribe implements InterfaceProcessor
         $unsubscription = false;
 
         // Does the transport have special handling like Amazon SNS
-        if ($this->transport instanceof InterfaceUnsubscriptionProcessor) {
+        if ($this->transport instanceof UnsubscriptionProcessorInterface) {
             try {
                 $unsubscription = $this->transport->processUnsubscription($this->message);
             } catch (UnsubscriptionNotFound $exception) {

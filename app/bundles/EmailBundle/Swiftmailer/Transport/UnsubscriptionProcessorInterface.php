@@ -18,7 +18,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail
 /**
  * Interface InterfaceUnsubscriptionProcessor.
  */
-interface InterfaceUnsubscriptionProcessor
+interface UnsubscriptionProcessorInterface
 {
     /**
      * Get the email address that unsubscribed.
