@@ -230,7 +230,6 @@ class ResultController extends CommonFormController
         if (!$fs->exists($file)) {
             throw $this->createNotFoundException();
         }
-
         $response = new BinaryFileResponse($file);
         $response::trustXSendfileTypeHeader();
         $response->setContentDisposition(

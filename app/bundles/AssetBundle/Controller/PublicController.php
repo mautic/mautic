@@ -42,7 +42,12 @@ class PublicController extends CommonFormController
             $published = $entity->isPublished();
 
             //make sure the asset is published or deny access if not
-            if ((!$published) && (!$security->hasEntityAccess('asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()))) {
+            if ((!$published) && (!$security->hasEntityAccess(
+                    'asset:assets:viewown',
+                    'asset:assets:viewother',
+                    $entity->getCreatedBy()
+                ))
+            ) {
                 $model->trackDownload($entity, $this->request, 401);
 
                 return $this->accessDenied();
@@ -73,7 +78,12 @@ class PublicController extends CommonFormController
                 $dispatcher->dispatch(AssetEvents::ASSET_ON_DOWNLOAD, $event);
             }
 
-            if ($entity->isRemote()) {
+            // Use standard download for form source
+            $clickthrough = $this->request->get('ct');
+            if (!empty($clickthrough)) {
+                $clickthrough = $model->decodeArrayFromUrl($clickthrough);
+            }
+            if ($entity->isRemote() && (empty($clickthrough) || $clickthrough[0] != 'form')) {
                 $model->trackDownload($entity, $this->request, 200);
 
                 // Redirect to remote URL
@@ -95,7 +105,10 @@ class PublicController extends CommonFormController
 
                 $stream = $this->request->get('stream', 0);
                 if (!$stream) {
-                    $response->headers->set('Content-Disposition', 'attachment;filename="'.$entity->getOriginalFileName());
+                    $response->headers->set(
+                        'Content-Disposition',
+                        'attachment;filename="'.$entity->getOriginalFileName()
+                    );
                 }
                 $response->setContent($contents);
             }
