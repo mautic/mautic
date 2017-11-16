@@ -221,12 +221,20 @@ EOT
         defined('SOCIAL_MONITOR_IMPORT') or define('SOCIAL_MONITOR_IMPORT', 1);
 
         // Get a list of existing leads to tone down on queries
-        $twitterLeads = [];
-        $qb           = $leadModel->getRepository()->createQueryBuilder('f');
-        $expr         = $qb->expr();
+        $twitterLeads      = [];
+        $qb                = $leadModel->getRepository()->createQueryBuilder('f');
+        $expr              = $qb->expr();
+        $monitorProperties = $monitor->getProperties();
         foreach ($statusList as $status) {
             if ($status['user']['screen_name']) {
                 $twitterLeads[$status['user']['screen_name']] = $expr->literal($status['user']['screen_name']);
+            }
+            if ($status['user']['name'] && strpos($status['user']['name'], ' ') !== false) {
+                $names = $this->splitName($status['user']['name']);
+                if (!empty($names[0]) && !empty($names[1])) {
+                    $twitterFirstNames[$names[0]] = $expr->literal($names[0]);
+                    $twitterLastNames[$names[1]]  = $expr->literal($names[1]);
+                }
             }
         }
         unset($qb, $expr);
@@ -245,6 +253,38 @@ EOT
                     ],
                 ]
             );
+            if ($monitorProperties['matchnames'] === 1) {
+                $leadsByName = $leadModel->getRepository()->getEntities(
+                    [
+                        'filter' => [
+                            'force' => [
+                                [
+                                    'column' => 'l.firstname',
+                                    'expr'   => 'in',
+                                    'value'  => $twitterFirstNames,
+                                ],
+                                [
+                                    'column' => 'l.lastname',
+                                    'expr'   => 'in',
+                                    'value'  => $twitterLastNames,
+                                ],
+                                [
+                                    'column' => 'l.'.$handleField,
+                                    'expr'   => 'isNull',
+                                ],
+                            ],
+                        ],
+                    ]
+                );
+
+                $namedLeads = [];
+                foreach ($leadsByName as $leadId => $lead) {
+                    $fields                                           = $lead->getFields();
+                    $firstNameHandle                                  = $fields['core']['firstname']['value'];
+                    $lastNameHandle                                   = $fields['core']['lastname']['value'];
+                    $namedLeads[$firstNameHandle.' '.$lastNameHandle] = $lead;
+                }
+            }
 
             // Key by twitter handle
             $twitterLeads = [];
@@ -255,6 +295,7 @@ EOT
             }
 
             unset($leads);
+            unset($leadsByName);
         }
 
         $processedLeads = [];
@@ -272,7 +313,19 @@ EOT
             if (!isset($processedLeads[$handle])) {
                 $processedLeads[$handle] = 1;
 
-                if (isset($twitterLeads[$handle])) {
+                if (isset($namedLeads[$status['user']['name']])) {
+                    ++$this->updatedLeads;
+
+                    $isNew      = false;
+                    $leadEntity = $namedLeads[$status['user']['name']];
+                    $fields     = [
+                        $handleField => $handle,
+                    ];
+                    // set field values
+                    $leadModel->setFieldValues($leadEntity, $fields, false);
+
+                    $this->output->writeln('Updating existing lead ID #'.$leadEntity->getId().' ('.$handle.'). First and lastname matched');
+                } elseif (isset($twitterLeads[$handle])) {
                     ++$this->updatedLeads;
 
                     $isNew      = false;
