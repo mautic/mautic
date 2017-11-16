@@ -82,7 +82,7 @@ class Result
      */
     public function setContacts(array $contacts)
     {
-        return $this->contacts;
+        $this->contacts = $contacts;
     }
 
     /**

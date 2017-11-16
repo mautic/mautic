@@ -44,8 +44,19 @@ class Parser
      *
      * @throws BounceNotFound
      */
-    public function parse($bouncerAddress = null)
+    public function parse()
     {
+        $bouncerAddress = null;
+        foreach ($this->message->to as $to => $name) {
+            // Some ISPs strip the + email so will still process the content for a bounce
+            // even if a +bounce address was not found
+            if (strpos($to, '+bounce') !== false) {
+                $bouncerAddress = $to;
+
+                break;
+            }
+        }
+
         // First parse for a DSN report
         $dsnParser = new DsnParser();
         try {

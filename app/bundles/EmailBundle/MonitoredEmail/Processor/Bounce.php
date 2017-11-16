@@ -114,12 +114,8 @@ class Bounce implements ProcessorInterface
         }
 
         if (!$bounce) {
-            if (!$this->isApplicable()) {
-                return false;
-            }
-
             try {
-                $bounce = (new Parser($this->message))->parse($this->bouncerAddress);
+                $bounce = (new Parser($this->message))->parse();
             } catch (BounceNotFound $exception) {
                 return false;
             }
@@ -147,22 +143,6 @@ class Bounce implements ProcessorInterface
         }
 
         return true;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isApplicable()
-    {
-        foreach ($this->message->to as $to => $name) {
-            if (strpos($to, '+bounce') !== false) {
-                $this->bouncerAddress = $to;
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
