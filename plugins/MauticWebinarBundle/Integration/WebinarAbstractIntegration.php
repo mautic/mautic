@@ -25,7 +25,7 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        return [];
+        return ['push_subscriptions', 'get_subscriptions'];
     }
 
     /**
@@ -131,4 +131,23 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
         return $keys[$this->getAuthTokenKey()];
     }
 
+    /**
+     * @param array $settings
+     *
+     * @return array|mixed
+     *
+     * @throws \Exception
+     */
+    public function getFormLeadFields($settings = [])
+    {
+        return ($this->isAuthorized()) ? $this->getAvailableLeadFields($settings) : [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAvailableLeadFields($settings = [])
+    {
+        return [];
+    }
 }

@@ -27,11 +27,20 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.webinar.formbundle.subscriber' => [
+                'class'     => MauticPlugin\MauticWebinarBundle\EventListener\FormSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.webikeo.campaigncondition' => [
                 'class' => MauticPlugin\MauticWebinarBundle\Form\Type\WebikeoCampaignWebinarsType::class,
                 'alias' => 'Webikeo_campaignevent_webinars',
+                'arguments' => [
+                    'mautic.helper.integration',
+                ],
             ],
         ],
     ],

@@ -66,23 +66,23 @@ class CampaignSubscriber extends CommonSubscriber
                     'label' => 'mautic.plugin.webinars.attended',
                     'description' => $s->getName(),
                     'formType' => $s->getName() . '_campaignevent_webinars',
-                    'formTypeOptions' => ['integrationObject' => $s],
+                    'formTypeOptions' => ['integration_object_name' => $s->getName()],
                     'eventName' => WebinarEvents::ON_WEBINAR_EVENT,
                 ];
 
-                $event->addCondition('mautic.plugin.webinar.' . $name, $condition);
+                $event->addCondition('plugin.webinar_' . $s->getName(), $condition);
             }
             //Add webinar action subscribe to webinar
             if (method_exists($s,'subscribeToWebinar')) {
                 $action = [
-                    'label'       => 'mautic.plugin.webinar.subscribe_contact',
+                    'label'       => $this->translator->trans('mautic.plugin.webinar.subscribe_contact', ['%name%' => $s->getName()]),,
                     'description' => $s->getName(),
                     'formType'    => $s->getName() . '_campaignevent_webinars',
-                    'formTypeOptions' => ['integrationObject' => $s],
+                    'formTypeOptions' => ['integration_object_name' => $s->getName()],
                     'eventName'   => WebinarEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 ];
 
-                $event->addAction('plugin.subscribtcontact_'.$name, $action);
+                $event->addAction('plugin.subscribecontact_'.$s->getName(), $action);
             }
         }
     }
@@ -106,7 +106,7 @@ class CampaignSubscriber extends CommonSubscriber
             $services = $this->integrationHelper->getIntegrationObjects();
             foreach ($services as $name => $s) {
                 $settings = $s->getIntegrationSettings();
-                if (!$settings->isPublished() && !method_exists($s, 'getWebinarSubscription')) {
+                if (!$settings->isPublished() || !method_exists($s, 'hasAttendedWebinar')) {
                     continue;
                 }
 
@@ -122,17 +122,17 @@ class CampaignSubscriber extends CommonSubscriber
         $config   = $event->getConfig();
         $contact = $event->getLead();
         $subscriptionSuccess = false;
-        $campaignName = $event->getEvent()->getCampaign()->getName();
+        $campaignName = $event->getEvent()['campaign']['name'];
 
         if ($contact) {
             $services = $this->integrationHelper->getIntegrationObjects();
             foreach ($services as $name => $s) {
                 $settings = $s->getIntegrationSettings();
-                if (!$settings->isPublished() && !method_exists($s, 'subscribeToWebinar')) {
+                if (!$settings->isPublished() || !method_exists($s, 'subscribeToWebinar')) {
                     continue;
                 }
 
-                $subscriptionSuccess = $s->subscribeToWebinar($config['webinar'], $contact, $campaignName);
+                $subscriptionSuccess = $s->subscribeToWebinar($config, $contact, $campaignName);
             }
         }
 

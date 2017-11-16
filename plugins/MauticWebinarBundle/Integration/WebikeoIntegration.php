@@ -133,6 +133,21 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAvailableLeadFields($settings = [])
+    {
+        return [
+            'email'       => ['label' => 'Email', 'type' => 'string'],
+            'firstName'    => ['label' => 'First Name','type' => 'string'],
+            'lastName'       => ['label' => 'Last Name','type' => 'string'],
+            'phone'  => ['label' => 'Phone','type' => 'string'],
+            'functionLabel'      => ['label' => 'Position','type' => 'string'],
+            'companyLabel'   => ['label' => 'Company','type' => 'string']
+        ];
+    }
+
+    /**
      * @param array $filters
      * @return array
      */
@@ -144,6 +159,8 @@ class WebikeoIntegration extends WebinarAbstractIntegration
 
         $webinars = $this->getApiHelper()->getWebinars($filters);
         $formattedWebinars = [];
+        $webinars = $webinars['_embedded']['webinar'];
+
         foreach ($webinars as $webinar) {
             if (isset($webinar['id'])) {
                 $formattedWebinars[$webinar['id']] = $webinar['title'];
@@ -173,8 +190,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     public function getWebinarSubscription($webinar, Lead $lead, $filters = [])
     {
         $leadEmail = $lead->getEmail();
-
-        if ($leadEmail && isset($webinar['id'])) {
+        if ($leadEmail && isset($webinar['webinar'])) {
             $subscriptions = $this->getApiHelper()->getSubscriptions($webinar, $filters);
             return $this->findSubscriptionByEmail($subscriptions, $leadEmail);
         }
@@ -205,12 +221,12 @@ class WebikeoIntegration extends WebinarAbstractIntegration
      */
     public function subscribeToWebinar($webinar, Lead $contact, $campaign)
     {
-        if (!isset($webinar['id'])) {
+        if (!isset($webinar['webinar'])) {
             return false;
         }
 
         $contactDataToPost = $this->formatContactData($contact, $campaign);
-        $response = $this->getApiHelper()->subscribeContact($webinar['id'], $contactDataToPost);
+        $response = $this->getApiHelper()->subscribeContact($webinar['webinar'], $contactDataToPost);
 
         return isset($response['source']);
     }
@@ -222,14 +238,11 @@ class WebikeoIntegration extends WebinarAbstractIntegration
      */
     private function formatContactData(Lead $contact, $campaign)
     {
+        $matchedData = $this->populateLeadData($contact);
+
         return [
             'user' => [
-                'email' => $contact->getEmail(),
-                'firstName' => $contact->getFirstname(),
-                'lastName' => $contact->getLastname(),
-                'phone' => $contact->getPhone(),
-                'functionLabel' => $contact->getPosition(),
-                'companyLabel' => $contact->getCompany()
+                $matchedData
             ],
             'trackingCampaign' => $campaign
         ];
