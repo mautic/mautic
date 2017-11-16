@@ -133,12 +133,4 @@ class Unsubscribe implements ProcessorInterface
 
         return true;
     }
-
-    /**
-     * @return bool
-     */
-    protected function isApplicable()
-    {
-        return false;
-    }
 }

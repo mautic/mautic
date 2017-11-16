@@ -28,7 +28,7 @@ class ReplyTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Test that the message is processed appropriately
      *
-     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::process()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Reply::process()
      */
     public function testContactIsFoundFromMessageAndDncRecordAdded()
     {
