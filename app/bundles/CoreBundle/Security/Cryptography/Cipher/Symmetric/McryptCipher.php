@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptio
 /**
  * Class McryptCryptography.
  *
- * @deprecated
+ * @deprecated Use \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher instead
  */
 class McryptCipher implements SymmetricCipherInterface
 {
