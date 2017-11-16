@@ -167,7 +167,7 @@ class ReportSubscriberTest extends WebTestCase
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(['checkContext'])
+            ->setMethods(['checkContext', 'getRequestedGraphs'])
             ->getMock();
 
         $mockEvent->expects($this->once())
