@@ -40,7 +40,8 @@ class EncryptionHelperTest extends \PHPUnit_Framework_TestCase
         $this->mainCipherMock           = $this->createMock(OpenSSLCipher::class);
         $this->secondaryCipherMock      = $this->createMock(McryptCipher::class);
 
-        $this->coreParametersHelperMock->method('getParameter')
+        $this->coreParametersHelperMock->expects($this->at(0))
+            ->method('getParameter')
             ->with('mautic.secret_key')
             ->willReturn($this->key);
     }
