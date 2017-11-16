@@ -1081,118 +1081,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Merge two leads; if a conflict of data occurs, the newest lead will get precedence.
-     *
-     * @param Lead $lead
-     * @param Lead $lead2
-     * @param bool $autoMode If true, the newest lead will be merged into the oldes then deleted; otherwise, $lead will be merged into $lead2 then deleted
-     *
-     * @return Lead
-     */
-    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
-    {
-        $this->logger->debug('LEAD: Merging leads');
-
-        $leadId  = $lead->getId();
-        $lead2Id = $lead2->getId();
-
-        //if they are the same lead, then just return one
-        if ($leadId === $lead2Id) {
-            $this->logger->debug('LEAD: Leads are the same');
-
-            return $lead;
-        }
-
-        if ($autoMode) {
-            //which lead is the oldest?
-            $mergeWith = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
-            $mergeFrom = ($mergeWith->getId() === $leadId) ? $lead2 : $lead;
-        } else {
-            $mergeWith = $lead2;
-            $mergeFrom = $lead;
-        }
-        $this->logger->debug('LEAD: Lead ID# '.$mergeFrom->getId().' will be merged into ID# '.$mergeWith->getId());
-
-        //dispatch pre merge event
-        $event = new LeadMergeEvent($mergeWith, $mergeFrom);
-        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_PRE_MERGE)) {
-            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_MERGE, $event);
-        }
-
-        //merge IP addresses
-        $ipAddresses = $mergeFrom->getIpAddresses();
-        foreach ($ipAddresses as $ip) {
-            $mergeWith->addIpAddress($ip);
-
-            $this->logger->debug('LEAD: Associating with IP '.$ip->getIpAddress());
-        }
-
-        //merge fields
-        $mergeFromFields = $mergeFrom->getFields();
-        foreach ($mergeFromFields as $group => $groupFields) {
-            foreach ($groupFields as $alias => $details) {
-                if ('points' === $alias) {
-                    // We have to ignore this as it's a special field and it will reset the points for the contact
-                    continue;
-                }
-
-                //overwrite old lead's data with new lead's if new lead's is not empty
-                if (!empty($details['value'])) {
-                    $mergeWith->addUpdatedField($alias, $details['value']);
-
-                    $this->logger->debug('LEAD: Updated '.$alias.' = '.$details['value']);
-                }
-            }
-        }
-
-        //merge owner
-        $oldOwner = $mergeWith->getOwner();
-        $newOwner = $mergeFrom->getOwner();
-
-        if ($oldOwner === null && $newOwner !== null) {
-            $mergeWith->setOwner($newOwner);
-
-            $this->logger->debug('LEAD: New owner is '.$newOwner->getId());
-        }
-
-        // Sum points
-        $mergeFromPoints = $mergeFrom->getPoints();
-        $mergeWithPoints = $mergeWith->getPoints();
-        $mergeWith->adjustPoints($mergeFromPoints);
-        $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points from lead ID #'.$mergeFrom->getId().' to lead ID #'.$mergeWith->getId().' with '.$mergeWithPoints.' points');
-
-        //merge tags
-        $mergeFromTags = $mergeFrom->getTags();
-        $addTags       = $mergeFromTags->getKeys();
-        $this->modifyTags($mergeWith, $addTags, null, false);
-
-        //save the updated lead
-        $this->saveEntity($mergeWith, false);
-
-        // Update merge records for the lead about to be deleted
-        $this->getMergeRecordRepository()->moveMergeRecord($mergeFrom->getId(), $mergeWith->getId());
-
-        // Create an entry this contact was merged
-        $mergeRecord = new MergeRecord();
-        $mergeRecord->setContact($mergeWith)
-            ->setDateAdded()
-            ->setName($mergeFrom->getPrimaryIdentifier())
-            ->setMergedId($mergeFrom->getId());
-        $this->getMergeRecordRepository()->saveEntity($mergeRecord);
-
-        //post merge events
-        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
-            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
-        }
-
-        //delete the old
-        $this->deleteEntity($mergeFrom);
-
-        //return the merged lead
-        return $mergeWith;
-    }
-
-    /**
      * @depreacated 2.6.0 to be removed in 3.0; use getFrequencyRules() instead
      *
      * @param Lead $lead
@@ -2795,5 +2683,119 @@ class LeadModel extends FormModel
         @trigger_error('setSystemCurrentLead is deprecated and will be removed in 3.0; Use the ContactTracker::setSystemContac instead', E_USER_DEPRECATED);
 
         $this->contactTracker->setSystemContact($lead);
+    }
+
+    /**
+     * Merge two leads; if a conflict of data occurs, the newest lead will get precedence.
+     *
+     * @deprecated 2.13.0; to be removed in 3.0. Use \Mautic\LeadBundle\Model\MergeModel instead
+     *
+     * @param Lead $lead
+     * @param Lead $lead2
+     * @param bool $autoMode If true, the newest lead will be merged into the oldes then deleted; otherwise, $lead will be merged into $lead2 then deleted
+     *
+     * @return Lead
+     */
+    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
+    {
+        $this->logger->debug('LEAD: Merging leads');
+
+        $leadId  = $lead->getId();
+        $lead2Id = $lead2->getId();
+
+        //if they are the same lead, then just return one
+        if ($leadId === $lead2Id) {
+            $this->logger->debug('LEAD: Leads are the same');
+
+            return $lead;
+        }
+
+        if ($autoMode) {
+            //which lead is the oldest?
+            $mergeWith = ($lead->getDateAdded() < $lead2->getDateAdded()) ? $lead : $lead2;
+            $mergeFrom = ($mergeWith->getId() === $leadId) ? $lead2 : $lead;
+        } else {
+            $mergeWith = $lead2;
+            $mergeFrom = $lead;
+        }
+        $this->logger->debug('LEAD: Lead ID# '.$mergeFrom->getId().' will be merged into ID# '.$mergeWith->getId());
+
+        //dispatch pre merge event
+        $event = new LeadMergeEvent($mergeWith, $mergeFrom);
+        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_PRE_MERGE)) {
+            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_MERGE, $event);
+        }
+
+        //merge IP addresses
+        $ipAddresses = $mergeFrom->getIpAddresses();
+        foreach ($ipAddresses as $ip) {
+            $mergeWith->addIpAddress($ip);
+
+            $this->logger->debug('LEAD: Associating with IP '.$ip->getIpAddress());
+        }
+
+        //merge fields
+        $mergeFromFields = $mergeFrom->getFields();
+        foreach ($mergeFromFields as $group => $groupFields) {
+            foreach ($groupFields as $alias => $details) {
+                if ('points' === $alias) {
+                    // We have to ignore this as it's a special field and it will reset the points for the contact
+                    continue;
+                }
+
+                //overwrite old lead's data with new lead's if new lead's is not empty
+                if (!empty($details['value'])) {
+                    $mergeWith->addUpdatedField($alias, $details['value']);
+
+                    $this->logger->debug('LEAD: Updated '.$alias.' = '.$details['value']);
+                }
+            }
+        }
+
+        //merge owner
+        $oldOwner = $mergeWith->getOwner();
+        $newOwner = $mergeFrom->getOwner();
+
+        if ($oldOwner === null && $newOwner !== null) {
+            $mergeWith->setOwner($newOwner);
+
+            $this->logger->debug('LEAD: New owner is '.$newOwner->getId());
+        }
+
+        // Sum points
+        $mergeFromPoints = $mergeFrom->getPoints();
+        $mergeWithPoints = $mergeWith->getPoints();
+        $mergeWith->adjustPoints($mergeFromPoints);
+        $this->logger->debug('LEAD: Adding '.$mergeFromPoints.' points from lead ID #'.$mergeFrom->getId().' to lead ID #'.$mergeWith->getId().' with '.$mergeWithPoints.' points');
+
+        //merge tags
+        $mergeFromTags = $mergeFrom->getTags();
+        $addTags       = $mergeFromTags->getKeys();
+        $this->modifyTags($mergeWith, $addTags, null, false);
+
+        //save the updated lead
+        $this->saveEntity($mergeWith, false);
+
+        // Update merge records for the lead about to be deleted
+        $this->getMergeRecordRepository()->moveMergeRecord($mergeFrom->getId(), $mergeWith->getId());
+
+        // Create an entry this contact was merged
+        $mergeRecord = new MergeRecord();
+        $mergeRecord->setContact($mergeWith)
+            ->setDateAdded()
+            ->setName($mergeFrom->getPrimaryIdentifier())
+            ->setMergedId($mergeFrom->getId());
+        $this->getMergeRecordRepository()->saveEntity($mergeRecord);
+
+        //post merge events
+        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
+            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
+        }
+
+        //delete the old
+        $this->deleteEntity($mergeFrom);
+
+        //return the merged lead
+        return $mergeWith;
     }
 }

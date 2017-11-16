@@ -834,6 +834,24 @@ return [
                     'mautic.lead.model.company',
                 ],
             ],
+            'mautic.lead.model.dedup' => [
+                'class'     => Mautic\LeadBundle\Model\DedupModel::class,
+                'arguments' => [
+                    'mautic.lead.model.field',
+                    'mautic.lead.model.merge',
+                    'mautic.lead.repository.lead',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'mautic.lead.model.merge' => [
+                'class'     => Mautic\LeadBundle\Model\MergeModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.repository.merged_records',
+                    'event_dispatcher',
+                    'monolog.logger.mautic',
+                ],
+            ],
             'mautic.lead.model.tag' => [
                 'class' => \Mautic\LeadBundle\Model\TagModel::class,
             ],

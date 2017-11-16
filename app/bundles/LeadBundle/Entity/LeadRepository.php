@@ -219,7 +219,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->expr()->in('l.id', ':ids')
         )
             ->setParameter('ids', array_keys($leads))
-            ->orderBy('l.dateAdded', 'DESC');
+            ->orderBy('l.dateAdded', 'DESC')
+            ->addOrderBy('l.id', 'DESC');
         $entities = $q->getQuery()->getResult();
 
         /** @var Lead $lead */
@@ -253,7 +254,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("l.$col = :".$col)
+            $q->andWhere("l.$col = :".$col)
                 ->setParameter($col, $val);
         }
 
@@ -1066,6 +1067,48 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function getTableAlias()
     {
         return 'l';
+    }
+
+    /**
+     * Get the count of identified contacts.
+     *
+     * @return int
+     */
+    public function getIdentifiedContactCount()
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('count(*)')
+            ->from($this->getTableName(), $this->getTableAlias());
+
+        $qb->where(
+            $qb->expr()->isNotNull($this->getTableAlias().'.date_identified')
+        );
+
+        return (int) $qb->execute()->fetchColumn();
+    }
+
+    /**
+     * Get the next contact after an specific ID; mainly used in deduplication.
+     *
+     * @return Lead
+     */
+    public function getNextIdentifiedContact($lastId)
+    {
+        $alias = $this->getTableAlias();
+        $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select("$alias.id")
+            ->from($this->getTableName(), $this->getTableAlias());
+
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->gt("$alias.id", (int) $lastId),
+                $qb->expr()->isNotNull("$alias.date_identified")
+            )
+        )
+            ->orderBy("$alias.id")
+            ->setMaxResults(1);
+
+        return ($next = $qb->execute()->fetchColumn()) ? $this->getEntity($next) : null;
     }
 
     /**
