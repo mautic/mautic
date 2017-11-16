@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 
+use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 
 class Parser
@@ -34,13 +35,16 @@ class Parser
      * Only sure way is to parse the content for the stat ID otherwise attempt the from.
      *
      * @return RepliedEmail
+     *
+     * @throws ReplyNotFound
      */
     public function parse()
     {
-        $hashId = null;
-        if (preg_match('/email\/(.*?)\.gif/', $this->message->textHtml, $parts)) {
-            $hashId = $parts[1];
+        if (!preg_match('/email\/(.*?)\.gif/', $this->message->textHtml, $parts)) {
+            throw new ReplyNotFound();
         }
+
+        $hashId = $parts[1];
 
         return new RepliedEmail($this->message->fromAddress, $hashId);
     }

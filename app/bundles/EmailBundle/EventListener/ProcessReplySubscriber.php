@@ -43,7 +43,7 @@ class ProcessReplySubscriber implements EventSubscriberInterface
         return [
             EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
             EmailEvents::EMAIL_PRE_FETCH        => ['onEmailPreFetch', 0],
-            EmailEvents::EMAIL_PARSE            => ['onEmailParse', 0],
+            EmailEvents::EMAIL_PARSE            => ['onEmailParse', 1],
         ];
     }
 

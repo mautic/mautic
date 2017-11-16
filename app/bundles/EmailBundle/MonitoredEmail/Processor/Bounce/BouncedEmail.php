@@ -141,7 +141,7 @@ class BouncedEmail
      */
     public function setIsFinal($final)
     {
-        $this->final = (int) $final;
+        $this->final = (bool) $final;
 
         return $this;
     }

@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailReplyEvent;
+use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
@@ -24,7 +25,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Reply implements InterfaceProcessor
+class Reply implements ProcessorInterface
 {
     /**
      * @var StatRepository
@@ -89,16 +90,17 @@ class Reply implements InterfaceProcessor
 
         $this->logger->debug('MONITORED EMAIL: Processing message ID '.$this->message->id.' for a reply');
 
-        $parser       = new Parser($message);
-        $repliedEmail = $parser->parse();
-
-        if (!$hashId = $repliedEmail->getStatHash()) {
+        try {
+            $parser       = new Parser($message);
+            $repliedEmail = $parser->parse();
+        } catch (ReplyNotFound $exception) {
             // No stat found so bail as we won't consider this a reply
             $this->logger->debug('MONITORED EMAIL: No hash ID found in the email body');
 
             return;
         }
 
+        $hashId = $repliedEmail->getStatHash();
         $result = $this->contactFinder->findByHash($hashId);
         if (!$stat = $result->getStat()) {
             // No stat found so bail as we won't consider this a reply

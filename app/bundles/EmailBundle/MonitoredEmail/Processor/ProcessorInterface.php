@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
 use Mautic\EmailBundle\MonitoredEmail\Message;
 
-interface InterfaceProcessor
+interface ProcessorInterface
 {
     /**
      * Process the message.

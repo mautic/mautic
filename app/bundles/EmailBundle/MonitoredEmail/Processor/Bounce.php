@@ -24,7 +24,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class Bounce implements InterfaceProcessor
+class Bounce implements ProcessorInterface
 {
     /**
      * @var \Swift_Transport

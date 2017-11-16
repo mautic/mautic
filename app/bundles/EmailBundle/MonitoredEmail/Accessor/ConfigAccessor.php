@@ -30,7 +30,7 @@ class ConfigAccessor
      */
     public function getPath()
     {
-        return $this->config['imap_path'];
+        return $this->getProperty('imap_path');
     }
 
     /**
@@ -38,7 +38,7 @@ class ConfigAccessor
      */
     public function getUser()
     {
-        return $this->config['user'];
+        return $this->getProperty('user');
     }
 
     /**
@@ -46,7 +46,7 @@ class ConfigAccessor
      */
     public function getHost()
     {
-        return $this->config['host'];
+        return $this->getProperty('host');
     }
 
     /**
@@ -54,7 +54,7 @@ class ConfigAccessor
      */
     public function getFolder()
     {
-        return $this->config['folder'];
+        return $this->getProperty('folder');
     }
 
     /**
@@ -71,5 +71,15 @@ class ConfigAccessor
     public function isConfigured()
     {
         return $this->getHost() && $this->getFolder();
+    }
+
+    /**
+     * @param $property
+     *
+     * @return mixed|null
+     */
+    protected function getProperty($property)
+    {
+        return isset($this->config[$property]) ? $this->config[$property] : null;
     }
 }

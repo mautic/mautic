@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\EmailBundle\Swiftmailer\Transport\UnsubscriptionProcessorInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -22,7 +22,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class Unsubscribe implements InterfaceProcessor
+class Unsubscribe implements ProcessorInterface
 {
     /**
      * @var \Swift_Transport
@@ -102,11 +102,15 @@ class Unsubscribe implements InterfaceProcessor
         }
 
         if (!$unsubscription) {
-            if (!$this->isApplicable()) {
+            try {
+                $parser         = new Parser($message);
+                $unsubscription = $parser->parse();
+            } catch (UnsubscriptionNotFound $exception) {
+                // No stat found so bail as we won't consider this a reply
+                $this->logger->debug('MONITORED EMAIL: Unsubscription email was not found');
+
                 return false;
             }
-
-            $unsubscription = new UnsubscribedEmail($this->message->fromAddress, $this->unsubscriptionAddress);
         }
 
         $searchResult = $this->contactFinder->find($unsubscription->getContactEmail(), $unsubscription->getUnsubscriptionAddress());
@@ -135,14 +139,6 @@ class Unsubscribe implements InterfaceProcessor
      */
     protected function isApplicable()
     {
-        foreach ($this->message->to as $to => $name) {
-            if (strpos($to, '+unsubscribe') !== false) {
-                $this->unsubscriptionAddress = $to;
-
-                return true;
-            }
-        }
-
         return false;
     }
 }

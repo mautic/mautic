@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop;
 
+use Mautic\EmailBundle\MonitoredEmail\Exception\FeedBackLoopNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 
@@ -32,16 +33,39 @@ class Parser
     }
 
     /**
-     * @return null|string
+     * @return int|null|string
+     *
+     * @throws FeedBackLoopNotFound
      */
     public function parse()
     {
-        if (preg_match('/Received:.*for (.*);.*?/isU', $this->message->textPlain, $match)) {
+        if (null === $this->message->fblReport) {
+            throw new FeedBackLoopNotFound();
+        }
+
+        if ($email = $this->searchMessage('Original-Rcpt-To: (.*)', $this->message->fblReport)) {
+            return $email;
+        }
+
+        if ($email = $this->searchMessage('Received:.*for (.*);.*?', $this->message->textPlain)) {
+            return $email;
+        }
+
+        throw new FeedBackLoopNotFound();
+    }
+
+    /**
+     * @param $content
+     * @param $pattern
+     *
+     * @return int|null|string
+     */
+    protected function searchMessage($pattern, $content)
+    {
+        if (preg_match('/'.$pattern.'/i', $content, $match)) {
             if ($parsedAddressList = Address::parseList($match[1])) {
                 return key($parsedAddressList);
             }
         }
-
-        return null;
     }
 }
