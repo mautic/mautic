@@ -15,7 +15,6 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 
 class ContactFinder
@@ -31,27 +30,21 @@ class ContactFinder
     protected $leadRepository;
 
     /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
      * @var LoggerInterface
      */
     protected $logger;
 
     /**
-     * ContactSearch constructor.
+     * ContactFinder constructor.
      *
-     * @param StatRepository $statRepository
-     * @param LeadRepository $leadRepository
-     * @param LeadModel      $leadModel
+     * @param StatRepository  $statRepository
+     * @param LeadRepository  $leadRepository
+     * @param LoggerInterface $logger
      */
-    public function __construct(StatRepository $statRepository, LeadRepository $leadRepository, LeadModel $leadModel, LoggerInterface $logger)
+    public function __construct(StatRepository $statRepository, LeadRepository $leadRepository, LoggerInterface $logger)
     {
         $this->statRepository = $statRepository;
         $this->leadRepository = $leadRepository;
-        $this->leadModel      = $leadModel;
         $this->logger         = $logger;
     }
 

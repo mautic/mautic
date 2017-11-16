@@ -32,6 +32,10 @@ class BounceTest extends \PHPUnit_Framework_TestCase
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::process()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::updateStat()
      * @covers  \Mautic\EmailBundle\Swiftmailer\Transport\BounceProcessorInterface::processBounce()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
     public function testProcessorInterfaceProcessesMessage()
     {
@@ -94,6 +98,10 @@ class BounceTest extends \PHPUnit_Framework_TestCase
      *
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::process()
      * @covers  \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::updateStat()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setStat()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getStat()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::setContacts()
+     * @covers  \Mautic\EmailBundle\MonitoredEmail\Search\Result::getContacts()
      */
     public function testContactIsFoundFromMessageAndDncRecordAdded()
     {

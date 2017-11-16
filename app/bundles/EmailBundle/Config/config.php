@@ -404,7 +404,6 @@ return [
                 'arguments' => [
                     'mautic.email.repository.stat',
                     'mautic.lead.repository.lead',
-                    'mautic.lead.model.lead',
                     'monolog.logger.mautic',
                 ],
             ],

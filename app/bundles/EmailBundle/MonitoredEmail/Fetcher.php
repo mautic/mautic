@@ -75,7 +75,7 @@ class Fetcher
     /**
      * @param $limit
      */
-    public function fetch($limit)
+    public function fetch($limit = null)
     {
         /** @var ParseEmailEvent $event */
         $event = $this->dispatcher->dispatch(EmailEvents::EMAIL_PRE_FETCH, new ParseEmailEvent());
@@ -103,9 +103,11 @@ class Fetcher
                     $messages  = $this->getMessages($mailIds, $limit, $markAsSeen);
                     $processed = count($messages);
 
-                    $event->setMessages($messages)
-                        ->setKeys($mailboxes);
-                    $this->dispatcher->dispatch(EmailEvents::EMAIL_PARSE, $event);
+                    if ($messages) {
+                        $event->setMessages($messages)
+                            ->setKeys($mailboxes);
+                        $this->dispatcher->dispatch(EmailEvents::EMAIL_PARSE, $event);
+                    }
 
                     $this->log[] = $this->translator->transChoice(
                         'mautic.email.fetch.processed',
