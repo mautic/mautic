@@ -120,7 +120,7 @@ return [
                 'class'     => \Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber::class,
                 'arguments' => [
                     'mautic.message.processor.unsubscribe',
-                    'mautic.message.processor.feedbackloop',
+                    'mautic.message.processor.FeedbackLoop',
                 ],
             ],
             'mautic.email.monitored.unsubscribe.replier' => [
@@ -429,8 +429,8 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-            'mautic.message.processor.feedbackloop' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop::class,
+            'mautic.message.processor.FeedbackLoop' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
                 'arguments' => [
                     'mautic.message.search.contact',
                     'mautic.lead.model.lead',

@@ -33,7 +33,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
-use Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop;
+use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 
 /**
@@ -54,7 +54,7 @@ class MessageHelper
     protected $unsubscriber;
 
     /**
-     * @var FeedBackLoop
+     * @var FeedbackLoop
      */
     protected $looper;
 
@@ -63,9 +63,9 @@ class MessageHelper
      *
      * @param Bounce       $bouncer
      * @param Unsubscribe  $unsubscriber
-     * @param FeedBackLoop $looper
+     * @param FeedbackLoop $looper
      */
-    public function __construct(Bounce $bouncer, Unsubscribe $unsubscriber, FeedBackLoop $looper)
+    public function __construct(Bounce $bouncer, Unsubscribe $unsubscriber, FeedbackLoop $looper)
     {
         @trigger_error('MessageHelper is deprecated and to be removed in 3.0. Use the appropriate InterfaceProcessor instead.', E_USER_DEPRECATED);
 

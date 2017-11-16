@@ -15,7 +15,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
-use Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop;
+use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -30,7 +30,7 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     protected $unsubscriber;
 
     /**
-     * @var FeedBackLoop
+     * @var FeedbackLoop
      */
     protected $looper;
 
@@ -51,9 +51,9 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
      * ProcessUnsubscribeSubscriber constructor.
      *
      * @param Unsubscribe  $unsubscriber
-     * @param FeedBackLoop $looper
+     * @param FeedbackLoop $looper
      */
-    public function __construct(Unsubscribe $unsubscriber, FeedBackLoop $looper)
+    public function __construct(Unsubscribe $unsubscriber, FeedbackLoop $looper)
     {
         $this->unsubscriber = $unsubscriber;
         $this->looper       = $looper;

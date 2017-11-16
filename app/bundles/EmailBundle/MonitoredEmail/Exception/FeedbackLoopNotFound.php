@@ -11,6 +11,6 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Exception;
 
-class FeedBackLoopNotFound extends \Exception
+class FeedbackLoopNotFound extends \Exception
 {
 }

@@ -11,16 +11,16 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
-use Mautic\EmailBundle\MonitoredEmail\Exception\FeedBackLoopNotFound;
+use Mautic\EmailBundle\MonitoredEmail\Exception\FeedbackLoopNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
-use Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop\Parser;
+use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class FeedBackLoop implements ProcessorInterface
+class FeedbackLoop implements ProcessorInterface
 {
     /**
      * @var ContactFinder
@@ -48,7 +48,7 @@ class FeedBackLoop implements ProcessorInterface
     protected $message;
 
     /**
-     * FeedBackLoop constructor.
+     * FeedbackLoop constructor.
      *
      * @param ContactFinder       $contactFinder
      * @param LeadModel           $leadModel
@@ -85,7 +85,7 @@ class FeedBackLoop implements ProcessorInterface
                 // A contact email was not found in the FBL report
                 return false;
             }
-        } catch (FeedBackLoopNotFound $exception) {
+        } catch (FeedbackLoopNotFound $exception) {
             return false;
         }
 

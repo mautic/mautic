@@ -9,9 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\MonitoredEmail\Processor\FeedBackLoop;
+namespace Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 
-use Mautic\EmailBundle\MonitoredEmail\Exception\FeedBackLoopNotFound;
+use Mautic\EmailBundle\MonitoredEmail\Exception\FeedbackLoopNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 
@@ -35,12 +35,12 @@ class Parser
     /**
      * @return int|null|string
      *
-     * @throws FeedBackLoopNotFound
+     * @throws FeedbackLoopNotFound
      */
     public function parse()
     {
         if (null === $this->message->fblReport) {
-            throw new FeedBackLoopNotFound();
+            throw new FeedbackLoopNotFound();
         }
 
         if ($email = $this->searchMessage('Original-Rcpt-To: (.*)', $this->message->fblReport)) {
@@ -51,7 +51,7 @@ class Parser
             return $email;
         }
 
-        throw new FeedBackLoopNotFound();
+        throw new FeedbackLoopNotFound();
     }
 
     /**
