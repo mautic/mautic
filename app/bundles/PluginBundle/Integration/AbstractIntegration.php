@@ -661,7 +661,6 @@ abstract class AbstractIntegration
             if (count($keys) !== 0 && count($decrypted) === 0) {
                 $decrypted = $this->decryptApiKeys($keys);
                 $this->encryptAndSetApiKeys($decrypted, $entity);
-                $this->em->persist($entity);
                 $this->em->flush($entity);
             }
             $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
