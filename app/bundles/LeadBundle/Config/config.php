@@ -675,6 +675,13 @@ return [
                 'tag'       => 'validator.constraint_validator',
                 'alias'     => 'uniqueleadlist',
             ],
+            'mautic.lead.repository.dnc' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\DoNotContact::class,
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
@@ -738,6 +745,13 @@ return [
                     'mautic.core.model.notification',
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.company',
+                ],
+            ],
+            'mautic.lead.model.dnc' => [
+                'class'     => \Mautic\LeadBundle\Model\DoNotContact::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.repository.dnc',
                 ],
             ],
         ],
