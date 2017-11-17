@@ -22,17 +22,17 @@ class ContactFinder
     /**
      * @var StatRepository
      */
-    protected $statRepository;
+    private $statRepository;
 
     /**
      * @var LeadRepository
      */
-    protected $leadRepository;
+    private $leadRepository;
 
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * ContactFinder constructor.
@@ -49,8 +49,8 @@ class ContactFinder
     }
 
     /**
-     * @param      $returnPathEmail
-     * @param null $contactEmail
+     * @param string $returnPathEmail
+     * @param null   $contactEmail
      *
      * @return Result
      */
@@ -60,7 +60,9 @@ class ContactFinder
 
         // We have a return path email so let's figure out who it originated to
         if ($returnPathEmail && $hash = Address::parseAddressForStatHash($returnPathEmail)) {
-            if ($result = $this->findByHash($hash)) {
+            $result = $this->findByHash($hash);
+            if ($result->getStat()) {
+                // A stat was found so need to search by email
                 return $result;
             }
         }
@@ -69,13 +71,13 @@ class ContactFinder
     }
 
     /**
-     * @param      $hash
-     * @param null $contactEmail
+     * @param $hash
+     *
+     * @return Result
      */
     public function findByHash($hash)
     {
         $result = new Result();
-
         $this->logger->debug('MONITORED EMAIL: Searching for a contact by hash '.$hash);
 
         /** @var Stat $stat */
@@ -91,6 +93,8 @@ class ContactFinder
 
     /**
      * @param $address
+     *
+     * @return Result
      */
     public function findByAddress($address)
     {
