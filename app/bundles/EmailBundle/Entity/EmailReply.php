@@ -41,11 +41,6 @@ class EmailReply
      */
     private $messageId;
 
-    public function __construct()
-    {
-        $this->id = Uuid::uuid4()->toString();
-    }
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -89,6 +84,21 @@ class EmailReply
                 ]
             )
             ->build();
+    }
+
+    /**
+     * EmailReply constructor.
+     *
+     * @param Stat           $stat
+     * @param                $messageId
+     * @param \DateTime|null $dateReplied
+     */
+    public function __construct(Stat $stat, $messageId, \DateTime $dateReplied = null)
+    {
+        $this->id          = Uuid::uuid4()->toString();
+        $this->stat        = $stat;
+        $this->messageId   = $messageId;
+        $this->dateReplied = (null === $dateReplied) ? new \DateTime() : $dateReplied;
     }
 
     /**

@@ -145,11 +145,7 @@ class Reply implements ProcessorInterface
         );
 
         if (!$replies->count()) {
-            $emailReply = new EmailReply();
-            $emailReply->setStat($stat)
-                ->setMessageId($this->message->id)
-                ->setDateReplied(new \DateTime());
-
+            $emailReply = new EmailReply($stat, $this->message->id);
             $stat->addReply($emailReply);
             $this->statRepo->saveEntity($stat);
         }
