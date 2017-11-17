@@ -58,12 +58,23 @@ class Fetcher
      * @param TranslatorInterface      $translator
      * @param array                    $mailboxes
      */
-    public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator, array $mailboxes)
+    public function __construct(Mailbox $imapHelper, EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
     {
         $this->imapHelper = $imapHelper;
         $this->dispatcher = $dispatcher;
         $this->translator = $translator;
-        $this->mailboxes  = $mailboxes;
+    }
+
+    /**
+     * @param array $mailboxes
+     *
+     * @return $this
+     */
+    public function setMailboxes(array $mailboxes)
+    {
+        $this->mailboxes = $mailboxes;
+
+        return $this;
     }
 
     /**

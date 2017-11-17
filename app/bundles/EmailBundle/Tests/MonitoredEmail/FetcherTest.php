@@ -94,7 +94,8 @@ class FetcherTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $fetcher = new Fetcher($mailbox, $dispatcher, $translator, array_keys($this->mailboxes));
-        $fetcher->fetch();
+        $fetcher = new Fetcher($mailbox, $dispatcher, $translator);
+        $fetcher->setMailboxes(array_keys($this->mailboxes))
+            ->fetch();
     }
 }

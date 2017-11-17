@@ -11,8 +11,9 @@
 
 namespace Mautic\EmailBundle\Command;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\MonitoredEmail\Fetcher;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,8 +21,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI command to check for messages.
  */
-class ProcessFetchEmailCommand extends ContainerAwareCommand
+class ProcessFetchEmailCommand extends Command
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    private $parametersHelper;
+
+    /**
+     * @var Fetcher
+     */
+    private $fetcher;
+
+    /**
+     * ProcessFetchEmailCommand constructor.
+     *
+     * @param CoreParametersHelper $parametersHelper
+     * @param Fetcher              $fetcher
+     */
+    public function __construct(CoreParametersHelper $parametersHelper, Fetcher $fetcher)
+    {
+        parent::__construct();
+
+        $this->parametersHelper = $parametersHelper;
+        $this->fetcher          = $fetcher;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -46,25 +71,22 @@ EOT
     }
 
     /**
-     * {@inheritdoc}
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container  = $this->getContainer();
-        $dispatcher = $container->get('event_dispatcher');
-        $translator = $container->get('translator');
-        $limit      = $input->getOption('message-limit');
-        $mailboxes  = $container->get('mautic.helper.core_parameters')->getParameter('monitored_email');
+        $limit     = $input->getOption('message-limit');
+        $mailboxes = $this->parametersHelper->getParameter('monitored_email');
         unset($mailboxes['general']);
         $mailboxes = array_keys($mailboxes);
 
-        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $imapHelper */
-        $imapHelper = $container->get('mautic.helper.mailbox');
+        $this->fetcher->setMailboxes($mailboxes)
+            ->fetch($limit);
 
-        $fetcher = new Fetcher($imapHelper, $dispatcher, $translator, $mailboxes);
-        $fetcher->fetch($limit);
-
-        foreach ($fetcher->getLog() as $log) {
+        foreach ($this->fetcher->getLog() as $log) {
             $output->writeln($log);
         }
 

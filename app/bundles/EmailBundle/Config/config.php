@@ -501,6 +501,25 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.email.fetcher' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
+                'arguments' => [
+                    'mautic.helper.mailbox',
+                    'event_dispatcher',
+                    'translator',
+
+                ],
+            ],
+        ],
+        'commands' => [
+            'mautic.email.command.fetch' => [
+                'class'     => \Mautic\EmailBundle\Command\ProcessFetchEmailCommand::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.email.fetcher',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [
