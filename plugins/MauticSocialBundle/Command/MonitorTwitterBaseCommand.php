@@ -11,75 +11,169 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event\SocialMonitorEvent;
-use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
-use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
+use MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper;
+use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
 {
-    /** @var \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration */
+    /**
+     * @var TwitterIntegration
+     */
     protected $twitter;
 
-    protected $output;
-
-    protected $input;
-
-    protected $maxRuns = 5;
-
-    protected $runCount = 0;
-
-    protected $newLeads = 0;
-
-    protected $updatedLeads = 0;
-
-    protected $queryCount = 100;
-
-    protected $manipulatedLeads = [];
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
 
     /**
-     * @var MonitoringModel
+     * @var EventDispatcherInterface
      */
-    protected $monitoringModel;
+    protected $dispatcher;
 
-    /*
+    /**
+     * @var TwitterCommandHelper
+     */
+    private $twitterCommandHelper;
+
+    /**
+     * @var InputInterface
+     */
+    protected $input;
+
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
+
+    /**
+     * @var int
+     */
+    protected $maxRuns = 5;
+
+    /**
+     * @var int
+     */
+    protected $runCount = 0;
+
+    /**
+     * @var int
+     */
+    protected $queryCount = 100;
+
+    /**
+     * MonitorTwitterBaseCommand constructor.
+     *
+     * @param EventDispatcherInterface $dispatcher
+     * @param TranslatorInterface      $translator
+     * @param IntegrationHelper        $integrationHelper
+     * @param TwitterCommandHelper     $twitterCommandHelper
+     * @param CoreParametersHelper     $coreParametersHelper
+     */
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        TranslatorInterface $translator,
+        IntegrationHelper $integrationHelper,
+        TwitterCommandHelper $twitterCommandHelper,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        $this->dispatcher           = $dispatcher;
+        $this->translator           = $translator;
+        $this->twitter              = $integrationHelper->getIntegrationObject('Twitter');
+        $this->twitterCommandHelper = $twitterCommandHelper;
+
+        $this->translator->setLocale($coreParametersHelper->getParameter('mautic.locale', 'en_US'));
+
+        parent::__construct();
+    }
+
+    /**
      * Command configuration. Set the name, description, and options here.
      */
     protected function configure()
     {
-        $this->setHelp(
-            <<<'EOT'
-            I'm not sure what to put here yet
-EOT
-        )
-            ->addOption('mid', null, InputOption::VALUE_REQUIRED, 'The id of the monitor record')
-            ->addOption('max-runs', null, InputOption::VALUE_REQUIRED, 'The maximum number of recursive iterations permitted')
-            ->addOption('query-count', null, InputOption::VALUE_OPTIONAL, 'The number of records to search for per iteration. Default is 100.', 100)
-            ->addOption('show-posts', null, InputOption::VALUE_NONE, 'Use this option to display the posts retrieved')
-            ->addOption('show-stats', null, InputOption::VALUE_NONE, 'Use this option to display the stats of the tweets fetched');
+        $this
+            ->addOption(
+                'mid',
+                'i',
+                InputOption::VALUE_REQUIRED,
+                'The id of the monitor record'
+            )
+            ->addOption(
+                'max-runs',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The maximum number of recursive iterations permitted',
+                5
+            )
+            ->addOption(
+                'query-count',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The number of records to search for per iteration.',
+                100
+            )
+            ->addOption(
+                'show-posts',
+                null,
+                InputOption::VALUE_NONE,
+                'Use this option to display the posts retrieved'
+            )
+            ->addOption(
+                'show-stats',
+                null,
+                InputOption::VALUE_NONE,
+                'Use this option to display the stats of the tweets fetched'
+            );
     }
 
-    /*
+    /**
+     * Used in various areas to set name of the network being searched.
+     *
+     * @return string twitter|facebook|linkedin etc..
+     */
+    abstract public function getNetworkName();
+
+    /**
+     * Search for tweets by creating your own search criteria.
+     *
+     * @param Monitoring $monitor
+     *
+     * @return array The results of makeRequest
+     */
+    abstract protected function getTweets($monitor);
+
+    /**
      * Main execution method. Gets the integration settings, processes the search criteria.
+     *
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int|null
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input           = $input;
-        $this->output          = $output;
-        $this->maxRuns         = $this->input->getOption('max-runs');
-        $this->queryCount      = $this->input->getOption('query-count');
-        $this->monitoringModel = $this->getContainer()->get('mautic.social.model.monitoring');
-        $this->translator      = $this->getContainer()->get('translator');
+        $this->input      = $input;
+        $this->output     = $output;
+        $this->maxRuns    = $this->input->getOption('max-runs');
+        $this->queryCount = $this->input->getOption('query-count');
 
-        $this->translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
+        if ($this->twitter === false || $this->twitter->getIntegrationSettings()->getIsPublished() === false) {
+            $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.published'));
 
-        // get the twitter integration
-        $this->twitter = $this->getTwitterIntegration();
+            return 1;
+        }
 
         if (!$this->twitter->isAuthorized()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.configured'));
@@ -96,8 +190,9 @@ EOT
             return 1;
         }
 
-        // monitor record
-        $monitor = $this->getMonitor($mid);
+        $this->twitterCommandHelper->setOutput($output);
+
+        $monitor = $this->twitterCommandHelper->getMonitor($mid);
 
         if (!$monitor || !$monitor->getId()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.monitor.does.not.exist', ['%id%' => $mid]));
@@ -108,18 +203,23 @@ EOT
         // process the monitor
         $this->processMonitor($monitor);
 
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
-
-        $dispatcher->dispatch(
+        $this->dispatcher->dispatch(
             SocialEvents::MONITOR_POST_PROCESS,
-            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->manipulatedLeads, $this->newLeads, $this->updatedLeads)
+            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount())
         );
 
         return 0;
     }
 
-    /*
-     * Process the monitor record
+    /**
+     * Process the monitor record.
+     *
+     * @Note: Keeping this method here instead of in the twitterCommandHelper
+     *        so that the hashtag and mention commands can easily extend it.
+     *
+     * @param Monitoring $monitor
+     *
+     * @return bool
      */
     protected function processMonitor($monitor)
     {
@@ -134,18 +234,16 @@ EOT
                 }
             }
 
-            return;
+            return 0;
         }
 
         if (count($results['statuses'])) {
-            $this->createLeadsFromStatuses($results['statuses'], $monitor);
+            $this->twitterCommandHelper->createLeadsFromStatuses($results['statuses'], $monitor);
         } else {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.no.new.tweets'));
         }
 
-        $this->setMonitorStats($monitor, $results['search_metadata']);
-
-        // @todo set this up to only print on verbose
+        $this->twitterCommandHelper->setMonitorStats($monitor, $results['search_metadata']);
         $this->printInformation($monitor, $results);
 
         // get stats after being updated
@@ -162,285 +260,21 @@ EOT
             // recursive
             $this->processMonitor($monitor);
         }
+
+        return 0;
     }
 
-    /*
-     * Search for tweets by creating your own search criteria.
+    /**
+     * Prints all the returned tweets.
      *
-     * @return a makeRequest results array object.
-     */
-    abstract protected function getTweets($monitor);
-
-    /*
-     * Get monitor record entity
-     *
-     * @return \MauticPlugin\MauticSocialBundle\Entity\Monitoring $entity
-     */
-    protected function getMonitor($mid)
-    {
-        // get the entity record
-        $entity = $this->monitoringModel->getEntity($mid);
-
-        return $entity;
-    }
-
-    /*
-     * Processes a list of tweets and creates / updates leads in Mautic
-     *
-     */
-    protected function createLeadsFromStatuses($statusList, $monitor)
-    {
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $leadModel = $this->getContainer()
-            ->get('mautic.lead.model.lead');
-
-        /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
-        $leadFieldModel = $this->getContainer()
-            ->get('mautic.lead.model.field');
-
-        // handle field
-        $handleField = $this->getContainer()->getParameter('mautic.twitter_handle_field', $this->getNetworkName());
-
-        $leadField = $leadFieldModel->getRepository()->findOneBy(
-            [
-                'alias' => $handleField,
-            ]
-        );
-
-        if (!$leadField) {
-            // Field has been deleted or something
-            $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.filed.not.found'));
-
-            return;
-        }
-
-        $handleFieldGroup = $leadField->getGroup();
-
-        // Just a means to let any LeadEvents listeners know that many leads are likely coming in case that matters to their logic
-        defined('MASS_LEADS_MANIPULATION') or define('MASS_LEADS_MANIPULATION', 1);
-        defined('SOCIAL_MONITOR_IMPORT') or define('SOCIAL_MONITOR_IMPORT', 1);
-
-        // Get a list of existing leads to tone down on queries
-        $twitterLeads = [];
-        $qb           = $leadModel->getRepository()->createQueryBuilder('f');
-        $expr         = $qb->expr();
-        foreach ($statusList as $status) {
-            if ($status['user']['screen_name']) {
-                $twitterLeads[$status['user']['screen_name']] = $expr->literal($status['user']['screen_name']);
-            }
-        }
-        unset($qb, $expr);
-
-        if (!empty($twitterLeads)) {
-            $leads = $leadModel->getRepository()->getEntities(
-                [
-                    'filter' => [
-                        'force' => [
-                            [
-                                'column' => 'l.'.$handleField,
-                                'expr'   => 'in',
-                                'value'  => $twitterLeads,
-                            ],
-                        ],
-                    ],
-                ]
-            );
-
-            // Key by twitter handle
-            $twitterLeads = [];
-            foreach ($leads as $leadId => $lead) {
-                $fields                       = $lead->getFields();
-                $twitterHandle                = strtolower($fields[$handleFieldGroup][$handleField]['value']);
-                $twitterLeads[$twitterHandle] = $lead;
-            }
-
-            unset($leads);
-        }
-
-        $processedLeads = [];
-        foreach ($statusList as $status) {
-            if (empty($status['user']['screen_name'])) {
-                continue;
-            }
-
-            // tweet timestamp
-            $tweetTimestamp = $status['created_at'];
-            $lastActive     = new \DateTime($tweetTimestamp);
-            $handle         = strtolower($status['user']['screen_name']);
-
-            /* @var \Mautic\LeadBundle\Entity\Lead $leadEntity */
-            if (!isset($processedLeads[$handle])) {
-                $processedLeads[$handle] = 1;
-
-                if (isset($twitterLeads[$handle])) {
-                    ++$this->updatedLeads;
-
-                    $isNew      = false;
-                    $leadEntity = $twitterLeads[$handle];
-
-                    $this->output->writeln('Updating existing lead ID #'.$leadEntity->getId().' ('.$handle.')');
-                } else {
-                    ++$this->newLeads;
-
-                    $this->output->writeln('Creating new lead');
-
-                    $isNew      = true;
-                    $leadEntity = new Lead();
-                    $leadEntity->setNewlyCreated(true);
-
-                    list($firstName, $lastName) = $this->splitName($status['user']['name']);
-
-                    // build new lead fields
-                    $fields = [
-                        $handleField => $handle,
-                        'firstname'  => $firstName,
-                        'lastname'   => $lastName,
-                        'country'    => $status['user']['location'],
-                    ];
-
-                    // set field values
-                    $leadModel->setFieldValues($leadEntity, $fields, false);
-
-                    // mark as identified just to be sure
-                    $leadEntity->setDateIdentified(new \DateTime());
-                }
-
-                $leadEntity->setPreferredProfileImage(ucfirst($this->getNetworkName()));
-
-                // save the lead now
-                $leadEntity->setLastActive($lastActive->format('Y-m-d H:i:s'));
-
-                try {
-                    // save the lead entity
-                    $leadModel->saveEntity($leadEntity);
-
-                    // Note lead ids
-                    $this->manipulatedLeads[$leadEntity->getId()] = 1;
-
-                    // add lead entity to the lead list
-                    $leadModel->addToLists($leadEntity, $monitor->getLists());
-
-                    if ($isNew) {
-                        $this->setMonitorLeadStat($monitor, $leadEntity);
-                    }
-                } catch (ExitMonitorException $e) {
-                    $this->output->writeln($e->getMessage());
-
-                    return;
-                } catch (\Exception $e) {
-                    $this->output->writeln($e->getMessage());
-
-                    continue;
-                }
-            }
-
-            // Increment the post count
-            $this->incrementPostCount($monitor, $status);
-        }
-
-        unset($processedLeads);
-
-        return;
-    }
-
-    /*
-     * handles splitting a string handle into first / last name based on a space
-     *
-     * @return array($first, $last)
-     */
-    private function splitName($name)
-    {
-        // array the entire name
-        $nameParts = explode(' ', $name);
-
-        // last part of the array is our last
-        $lastName = array_pop($nameParts);
-
-        // push the rest of the name into first name
-        $firstName = implode(' ', $nameParts);
-
-        return [$firstName, $lastName];
-    }
-
-    /*
-     * Add new monitoring_leads record to track leads found via the search
-     */
-    private function setMonitorLeadStat($monitor, $lead)
-    {
-        // track the lead in our monitor_leads table
-        $monitorLead = new \MauticPlugin\MauticSocialBundle\Entity\Lead();
-        $monitorLead->setMonitor($monitor);
-        $monitorLead->setLead($lead);
-        $monitorLead->setDateAdded(new \DateTime());
-
-        /* @var \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorRepository */
-        $monitorRepository = $this->getContainer()->get('doctrine.orm.entity_manager')->getRepository('MauticSocialBundle:lead');
-
-        // save it
-        $monitorRepository->saveEntity($monitorLead);
-    }
-
-    /*
-     * Increment the post counter
-     */
-    protected function incrementPostCount($monitor, $tweet)
-    {
-        /** @var \MauticPlugin\MauticSocialBundle\Model\PostCountModel $postCount */
-        $postCount = $this->getContainer()
-            ->get('mautic.social.model.postcount');
-
-        $date = new \DateTime($tweet['created_at']);
-
-        $postCount->updatePostCount($monitor, $date);
-    }
-
-    /*
-     * Gets the twitter integration addon object and returns the settings
-     *
-     * @return \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration
-     */
-    protected function getTwitterIntegration()
-    {
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->getContainer()->get('mautic.helper.integration');
-
-        /** @var \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration $twitterIntegration */
-        $twitterIntegration = $integrationHelper->getIntegrationObject('Twitter');
-
-        return $twitterIntegration;
-    }
-
-    /*
-     * Set the monitor's stat record with the metadata.
-     */
-    protected function setMonitorStats($monitor, $searchMeta)
-    {
-        $monitor->setStats($searchMeta);
-
-        $this->monitoringModel->saveEntity($monitor);
-    }
-
-    /*
-     * takes an array of query params for twitter and gives a list back.
-     *
-     * URL Encoding done in makeRequest()
-     */
-    protected function buildTwitterSearchQuery(array $query)
-    {
-        $queryString = implode(' ', $query);
-
-        return $queryString;
-    }
-
-    /*
-     * Prints all the returned tweets
+     * @param array $statuses
      */
     protected function printTweets($statuses)
     {
-        // don't show posts unless explicitly requested
-        if (!$this->input->getOption('show-posts')) {
+        if (!$this->input->getOption('show-posts') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERY_VERBOSE) {
             return;
         }
+
         foreach ($statuses as $status) {
             $this->output->writeln('-- tweet -- ');
             $this->output->writeln('ID: '.$status['id']);
@@ -454,15 +288,18 @@ EOT
         }
     }
 
-    /*
-     * Prints the search query metadata from twitter
+    /**
+     * Prints the search query metadata from twitter.
+     * Only shows stats if explicitly requested or if we're in verbose mode.
+     *
+     * @param array $metadata
      */
     protected function printQueryMetadata($metadata)
     {
-        // don't show stats unless explicitly requested
-        if (!$this->input->getOption('show-stats')) {
+        if (!$this->input->getOption('show-stats') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
             return;
         }
+
         $this->output->writeln('-- search meta -- ');
         $this->output->writeln('max_id_str: '.$metadata['max_id_str']);
         $this->output->writeln('since_id_str: '.$metadata['since_id_str']);
@@ -472,33 +309,74 @@ EOT
         if (array_key_exists('next_results', $metadata)) {
             $this->output->writeln('next results: '.$metadata['next_results']);
         }
+
         $this->output->writeln('// search meta // ');
     }
 
-    /*
-     * Prints a summary of the search query
+    /**
+     * Prints a summary of the search query.
+     * Only shows stats if explicitly requested or if we're in verbose mode.
+     *
+     * @param Monitoring $monitor
+     * @param array      $results
      */
     protected function printInformation($monitor, $results)
     {
-        // don't show ststs unless explicitly requested
-        if (!$this->input->getOption('show-stats')) {
+        if (!$this->input->getOption('show-stats') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
             return;
         }
+
         $this->output->writeln('------------------------');
         $this->output->writeln($monitor->getTitle());
         $this->output->writeln('Published '.$monitor->isPublished());
         $this->output->writeln($monitor->getNetworkType());
-        $this->output->writeln('New Leads '.$this->newLeads);
-        $this->output->writeln('Updated Leads '.$this->updatedLeads);
+        $this->output->writeln('New Leads '.$this->twitterCommandHelper->getNewLeadsCount());
+        $this->output->writeln('Updated Leads '.$this->twitterCommandHelper->getUpdatedLeadsCount());
         $this->printQueryMetadata($results['search_metadata']);
         $this->printTweets($results['statuses']);
         $this->output->writeln('------------------------');
     }
 
-    /*
-     * Used in various areas to set name of the network being searched.
+    /**
+     * Processes a list of tweets and creates / updates leads in Mautic.
      *
-     * @return string twitter|facebook|linkedin etc..
+     * @deprecated 2.12 to be removed in 3.0 Use the TwitterCommandHelper directly
+     *
+     * @param array      $statusList
+     * @param Monitoring $monitor
+     *
+     * @return int
      */
-    abstract public function getNetworkName();
+    protected function createLeadsFromStatuses($statusList, $monitor)
+    {
+        return $this->twitterCommandHelper->createLeadsFromStatuses($statusList, $monitor);
+    }
+
+    /**
+     * Gets the twitter integration object and returns the settings.
+     *
+     * @deprecated 2.12 to be removed in 3.0 Use $this->twitter directly
+     *
+     * @return TwitterIntegration
+     */
+    protected function getTwitterIntegration()
+    {
+        return $this->twitter;
+    }
+
+    /**
+     * takes an array of query params for twitter and gives a list back.
+     *
+     * URL Encoding done in makeRequest()
+     *
+     * @deprecated 2.12 to be removed in 3.0 Just implode directly in your code
+     *
+     * @param array $query
+     *
+     * @return string
+     */
+    protected function buildTwitterSearchQuery(array $query)
+    {
+        return implode(' ', $query);
+    }
 }
