@@ -19,7 +19,7 @@ class CompanyModelTest extends \PHPUnit_Framework_TestCase
     /**
      * @testdox Ensure that an array value is flattened before saving
      *
-     * @covers \Mautic\CoreBundle\\Helper\AbstractFormFieldHelper::parseList
+     * @covers \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList
      */
     public function testArrayValueIsFlattenedBeforeSave()
     {

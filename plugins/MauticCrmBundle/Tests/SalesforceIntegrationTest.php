@@ -987,7 +987,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function () use ($maxSfContacts, $maxSfLeads) {
                         $args = func_get_args();
-
                         // Determine what to return by analyzing the URL and query parameters
                         switch (true) {
                             case strpos($args[0], '/query') !== false:
@@ -997,6 +996,12 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                     return 'fetched campaigns';
                                 } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Account') !== false) {
                                     return 'fetched accounts';
+                                } elseif (isset($args[1]['q']) && $args[1]['q'] === 'SELECT CreatedDate from Organization') {
+                                    return [
+                                        'records' => [
+                                                ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
+                                            ],
+                                        ];
                                 } else {
                                     // Extract emails
                                     $found = preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
