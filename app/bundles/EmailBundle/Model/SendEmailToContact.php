@@ -26,92 +26,95 @@ class SendEmailToContact
     /**
      * @var MailHelper
      */
-    protected $mailer;
+    private $mailer;
 
     /**
      * @var StatRepository
      */
-    protected $statRepo;
+    private $statRepo;
 
     /**
      * @var DoNotContact
      */
-    protected $dncModel;
+    private $dncModel;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var null|string
      */
-    protected $singleEmailMode = null;
+    private $singleEmailMode = null;
 
     /**
      * @var Stat[]
      */
-    protected $statEntities = [];
+    private $statEntities = [];
 
     /**
      * @var Stat[]
      */
-    protected $saveEntities = [];
+    private $saveEntities = [];
 
     /**
      * @var Stat[]
      */
-    protected $deleteEntities = [];
+    private $deleteEntities = [];
 
     /**
      * @var array
      */
-    protected $failedContacts = [];
+    private $failedContacts = [];
 
     /**
      * @var array
      */
-    protected $errorMessages = [];
+    private $errorMessages = [];
 
     /**
      * @var array
      */
-    protected $badEmails = [];
+    private $badEmails = [];
 
     /**
      * @var array
      */
-    protected $emailSentCounts = [];
+    private $emailSentCounts = [];
 
     /**
      * @var
      */
-    protected $emailEntityErrors;
+    private $emailEntityErrors;
 
     /**
      * @var null|int
      */
-    protected $emailEntityId;
+    private $emailEntityId;
 
     /**
      * @var null|int
      */
-    protected $listId;
+    private $listId;
 
     /**
      * @var int
      */
-    protected $statBatchCounter = 0;
+    private $statBatchCounter = 0;
 
     /**
      * @var array
      */
-    protected $contact = [];
+    private $contact = [];
 
     /**
-     * Send constructor.
+     * SendEmailToContact constructor.
      *
-     * @param MailHelper $mailer
+     * @param MailHelper          $mailer
+     * @param StatRepository      $statRepository
+     * @param DoNotContact        $dncModel
+     * @param TranslatorInterface $translator
      */
     public function __construct(MailHelper $mailer, StatRepository $statRepository, DoNotContact $dncModel, TranslatorInterface $translator)
     {
