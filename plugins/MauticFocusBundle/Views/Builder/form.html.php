@@ -44,8 +44,8 @@ if (empty($preview)):
             var headline = document.getElementsByClassName('mf-headline');
             if (headline.length) {
                 headline[0].style.display = "none";
-
             }
+
             var tagline = document.getElementsByClassName('mf-tagline');
             if (tagline.length) {
                 tagline[0].style.display = "none";

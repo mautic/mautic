@@ -627,9 +627,12 @@ class ReportModel extends FormModel
 
                 // Get the count
                 $query->select('COUNT(*) as count');
+                $countQuery = clone $query;
+                $countQuery->resetQueryPart('groupBy');
 
-                $result       = $query->execute()->fetchAll();
+                $result       = $countQuery->execute()->fetchAll();
                 $totalResults = (!empty($result[0]['count'])) ? $result[0]['count'] : 0;
+                unset($countQuery);
 
                 // Set the limit and get the results
                 if ($limit > 0) {
@@ -638,9 +641,9 @@ class ReportModel extends FormModel
                 }
 
                 $query->select($select);
-                $query->add('orderBy', $order);
             }
 
+            $query->add('orderBy', $order);
             $queryTime = microtime(true);
             $data      = $query->execute()->fetchAll();
             $queryTime = round((microtime(true) - $queryTime) * 1000);

@@ -32,7 +32,9 @@ use Mautic\PluginBundle\Event\PluginIntegrationFormDisplayEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
+use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -50,7 +52,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @method pushLead(Lead $lead, array $config = [])
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
- * @method getLeads(array $params, string $query, &$executed, array $result = [],  $object = 'Lead')
+ * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
  * @method getCompanies(array $params)
  */
 abstract class AbstractIntegration
@@ -189,6 +191,11 @@ abstract class AbstractIntegration
     protected $persistIntegrationEntities = [];
 
     /**
+     * @var IntegrationEntityModel
+     */
+    protected $integrationEntityModel;
+
+    /**
      * AbstractIntegration constructor.
      */
     public function __construct(MauticFactory $factory = null)
@@ -200,21 +207,22 @@ abstract class AbstractIntegration
          *            integration pass to set all of these properties
          */
         if ($factory) {
-            $this->factory           = $factory;
-            $this->dispatcher        = $factory->getDispatcher();
-            $this->cache             = $factory->getHelper('cache_storage')->getCache($this->getName());
-            $this->em                = $factory->getEntityManager();
-            $this->session           = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
-            $this->request           = $factory->getRequest();
-            $this->router            = $factory->getRouter();
-            $this->translator        = $factory->getTranslator();
-            $this->logger            = $factory->getLogger();
-            $this->encryptionHelper  = $factory->getHelper('encryption');
-            $this->leadModel         = $factory->getModel('lead');
-            $this->companyModel      = $factory->getModel('lead.company');
-            $this->pathsHelper       = $factory->getHelper('paths');
-            $this->notificationModel = $factory->getModel('core.notification');
-            $this->fieldModel        = $factory->getModel('lead.field');
+            $this->factory                = $factory;
+            $this->dispatcher             = $factory->getDispatcher();
+            $this->cache                  = $factory->getHelper('cache_storage')->getCache($this->getName());
+            $this->em                     = $factory->getEntityManager();
+            $this->session                = (!defined('IN_MAUTIC_CONSOLE')) ? $factory->getSession() : null;
+            $this->request                = $factory->getRequest();
+            $this->router                 = $factory->getRouter();
+            $this->translator             = $factory->getTranslator();
+            $this->logger                 = $factory->getLogger();
+            $this->encryptionHelper       = $factory->getHelper('encryption');
+            $this->leadModel              = $factory->getModel('lead');
+            $this->companyModel           = $factory->getModel('lead.company');
+            $this->pathsHelper            = $factory->getHelper('paths');
+            $this->notificationModel      = $factory->getModel('core.notification');
+            $this->fieldModel             = $factory->getModel('lead.field');
+            $this->integrationEntityModel = $factory->getModel('plugin.integration_entity');
         }
 
         $this->init();
@@ -341,6 +349,14 @@ abstract class AbstractIntegration
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param IntegrationEntityModel $integrationModel
+     */
+    public function setIntegrationEntityModel(IntegrationEntityModel $integrationEntityModel)
+    {
+        $this->integrationEntityModel = $integrationEntityModel;
     }
 
     /**
@@ -641,9 +657,15 @@ abstract class AbstractIntegration
 
         $serialized = serialize($keys);
         if (empty($decryptedKeys[$serialized])) {
+            $decrypted = $this->decryptApiKeys($keys, true);
+            if (count($keys) !== 0 && count($decrypted) === 0) {
+                $decrypted = $this->decryptApiKeys($keys);
+                $this->encryptAndSetApiKeys($decrypted, $entity);
+                $this->em->flush($entity);
+            }
             $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
                 PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
-                $this->decryptApiKeys($keys)
+                $decrypted
             );
         }
 
@@ -673,15 +695,19 @@ abstract class AbstractIntegration
      * Decrypts API keys.
      *
      * @param array $keys
+     * @param bool  $mainDecryptOnly
      *
      * @return array
      */
-    public function decryptApiKeys(array $keys)
+    public function decryptApiKeys(array $keys, $mainDecryptOnly = false)
     {
         $decrypted = [];
 
         foreach ($keys as $name => $key) {
-            $key              = $this->encryptionHelper->decrypt($key);
+            $key = $this->encryptionHelper->decrypt($key, $mainDecryptOnly);
+            if ($key === false) {
+                return [];
+            }
             $decrypted[$name] = $key;
         }
 
@@ -1824,7 +1850,10 @@ abstract class AbstractIntegration
                 }
                 $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && $fields[$mauticKey]['value'] !== '' && $fields[$mauticKey]['value'] !== null) {
-                    $matched[$matchIntegrationKey] = $this->cleanPushData($fields[$mauticKey]['value'], (isset($field['type'])) ? $field['type'] : 'string');
+                    $matched[$matchIntegrationKey] = $this->cleanPushData(
+                        $fields[$mauticKey]['value'],
+                        (isset($field['type'])) ? $field['type'] : 'string'
+                    );
                 }
             }
 
@@ -1837,14 +1866,14 @@ abstract class AbstractIntegration
     }
 
     /**
-     * Match lead data with integration fields.
+     * Match Company data with integration fields.
      *
-     * @param $lead
+     * @param $entity
      * @param $config
      *
      * @return array
      */
-    public function populateCompanyData($lead, $config = [])
+    public function populateCompanyData($entity, $config = [])
     {
         if (!isset($config['companyFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -1854,10 +1883,10 @@ abstract class AbstractIntegration
             }
         }
 
-        if ($lead instanceof Lead) {
-            $fields = $lead->getPrimaryCompany();
+        if ($entity instanceof Lead) {
+            $fields = $entity->getPrimaryCompany();
         } else {
-            $fields = $lead['primaryCompany'];
+            $fields = $entity['primaryCompany'];
         }
 
         $companyFields   = $config['companyFields'];
@@ -2471,23 +2500,7 @@ abstract class AbstractIntegration
      */
     public function cleanPushData($value, $fieldType = self::FIELD_TYPE_STRING)
     {
-        $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
-        switch ($fieldType) {
-            case self::FIELD_TYPE_BOOL:
-                return (bool) $clean;
-            case self::FIELD_TYPE_NUMBER:
-                return (float) $clean;
-            case self::FIELD_TYPE_DATETIME:
-                $dateTimeValue = new \DateTime($value);
-
-                return (!empty($clean)) ? $dateTimeValue->format('c') : '';
-            case self::FIELD_TYPE_DATE:
-                $dateTimeValue = new \DateTime($value);
-
-                return (!empty($clean)) ? $dateTimeValue->format('Y-m-d') : '';
-            default:
-                return $clean;
-        }
+        return Cleaner::clean($value, $fieldType);
     }
 
     /**
@@ -2682,7 +2695,7 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param $leadId
+     * @param        $leadId
      * @param string $channel
      *
      * @return int

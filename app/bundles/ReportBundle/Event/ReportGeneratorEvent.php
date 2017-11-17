@@ -334,11 +334,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         if ($dateOnly) {
-            $queryBuilder->andWhere('DATE('.$tablePrefix.$dateColumn.') BETWEEN :dateFrom AND :dateTo');
+            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
         } else {
-            $queryBuilder->andWhere($tablePrefix.$dateColumn.' BETWEEN :dateFrom AND :dateTo');
+            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
         }

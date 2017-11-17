@@ -48,11 +48,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private $triggerModel;
 
     /**
-     * @var
-     */
-    private $pointChanges;
-
-    /**
      * Used by search functions to search social profiles.
      *
      * @param array $fields
@@ -1200,20 +1195,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param Lead $entity
      */
-    protected function preSaveEntity($entity)
-    {
-        // Get the point changes prior to persisting since the Doctrine postPersist lifecycle callback will reset
-        $this->pointChanges = $entity->getPointChanges();
-    }
-
-    /**
-     * @param Lead $entity
-     */
     protected function postSaveEntity($entity)
     {
         // Check if points need to be appended
-        if ($this->pointChanges) {
-            $newPoints = $this->updateContactPoints($this->pointChanges, $entity->getId());
+        if ($entity->getPointChanges()) {
+            $newPoints = $this->updateContactPoints($entity->getPointChanges(), $entity->getId());
 
             // Set actual points so that code using getPoints knows the true value
             $entity->setActualPoints($newPoints);

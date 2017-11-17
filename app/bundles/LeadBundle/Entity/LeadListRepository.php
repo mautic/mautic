@@ -948,6 +948,7 @@ class LeadListRepository extends CommonRepository
                 case 'hit_url':
                 case 'referer':
                 case 'source':
+                case 'source_id':
                 case 'url_title':
                     $operand = in_array(
                         $func,
@@ -1293,7 +1294,7 @@ class LeadListRepository extends CommonRepository
                     $select  = 'COUNT(id)';
                     if ($details['field'] == 'lead_email_read_count') {
                         $table  = 'email_stats';
-                        $select = 'SUM(open_count)';
+                        $select = 'COALESCE(SUM(open_count),0)';
                     }
                     $subqb = $this->getEntityManager()->getConnection()
                         ->createQueryBuilder()
@@ -1581,8 +1582,9 @@ class LeadListRepository extends CommonRepository
 
                     break;
                 case 'integration_campaigns':
-                    $operand = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
-                    //get integration campaign members here
+                    $parameter2       = $this->generateRandomParameterName();
+                    $operand          = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
+                    $ignoreAutoFilter = true;
 
                     $subQb = $this->getEntityManager()->getConnection()
                         ->createQueryBuilder()
@@ -1591,13 +1593,23 @@ class LeadListRepository extends CommonRepository
                     switch ($func) {
                         case 'eq':
                         case 'neq':
-                            $parameters[$parameter] = $details['filter'];
+                            if (strpos($details['filter'], '::') !== false) {
+                                list($integrationName, $campaignId) = explode('::', $details['filter']);
+                            } else {
+                                // Assuming this is a Salesforce integration for BC with pre 2.11.0
+                                $integrationName = 'Salesforce';
+                                $campaignId      = $details['filter'];
+                            }
+
+                            $parameters[$parameter]  = $campaignId;
+                            $parameters[$parameter2] = $integrationName;
                             $subQb->where(
                                 $q->expr()->andX(
-                                    $q->expr()->eq($alias.'.internal_entity_id', 'l.id'),
+                                    $q->expr()->eq($alias.'.integration', ":$parameter2"),
+                                    $q->expr()->eq($alias.'.integration_entity', "'CampaignMember'"),
                                     $q->expr()->eq($alias.'.integration_entity_id', ":$parameter"),
                                     $q->expr()->eq($alias.'.internal_entity', "'lead'"),
-                                    $q->expr()->eq($alias.'.integration_entity', "'CampaignMember'")
+                                    $q->expr()->eq($alias.'.internal_entity_id', 'l.id')
                                 )
                             );
                             break;
@@ -1743,6 +1755,7 @@ class LeadListRepository extends CommonRepository
                             $groupExpr->add($q->expr()->$func($field, $exprParameter));
                     }
             }
+
             if (!$ignoreAutoFilter) {
                 if (!is_array($details['filter'])) {
                     switch ($details['type']) {
