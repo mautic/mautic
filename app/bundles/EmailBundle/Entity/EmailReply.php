@@ -118,18 +118,6 @@ class EmailReply
     }
 
     /**
-     * @param Stat $stat
-     *
-     * @return EmailReply
-     */
-    public function setStat(Stat $stat)
-    {
-        $this->stat = $stat;
-
-        return $this;
-    }
-
-    /**
      * @return \DateTime
      */
     public function getDateReplied()
@@ -138,34 +126,10 @@ class EmailReply
     }
 
     /**
-     * @param \DateTime $dateReplied
-     *
-     * @return EmailReply
-     */
-    public function setDateReplied(\DateTime $dateReplied)
-    {
-        $this->dateReplied = $dateReplied;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getMessageId()
     {
         return $this->messageId;
-    }
-
-    /**
-     * @param string $messageId
-     *
-     * @return EmailReply
-     */
-    public function setMessageId($messageId)
-    {
-        $this->messageId = $messageId;
-
-        return $this;
     }
 }
