@@ -14,6 +14,7 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Class EmailReply.
@@ -39,6 +40,11 @@ class EmailReply
      * @var string
      */
     private $messageId;
+
+    public function __construct()
+    {
+        $this->id = Uuid::uuid4()->toString();
+    }
 
     /**
      * @param ORM\ClassMetadata $metadata

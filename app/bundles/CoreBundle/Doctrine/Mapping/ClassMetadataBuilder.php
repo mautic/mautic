@@ -142,7 +142,6 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     {
         $this->createField('id', 'guid')
             ->makePrimaryKey()
-            ->generatedValue('UUID')
             ->build();
 
         return $this;

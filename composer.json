@@ -109,7 +109,8 @@
         "symfony/dotenv": "^3.3",
         "php-amqplib/rabbitmq-bundle": "^1.10",
         "leezy/pheanstalk-bundle": "^3.2",
-        "simshaun/recurr": "^3.0"
+        "simshaun/recurr": "^3.0",
+        "ramsey/uuid": "^3.7"
     },
     "require-dev": {
         "symfony/web-profiler-bundle": "~2.8",
