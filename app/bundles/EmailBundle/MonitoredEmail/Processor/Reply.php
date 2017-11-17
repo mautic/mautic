@@ -30,32 +30,32 @@ class Reply implements ProcessorInterface
     /**
      * @var StatRepository
      */
-    protected $statRepo;
+    private $statRepo;
 
     /**
      * @var ContactFinder
      */
-    protected $contactFinder;
+    private $contactFinder;
 
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var EventDispatcher
      */
-    protected $dispatcher;
+    private $dispatcher;
 
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @var Message
      */
-    protected $message;
+    private $message;
 
     /**
      * Reply constructor.
@@ -94,7 +94,7 @@ class Reply implements ProcessorInterface
             $parser       = new Parser($message);
             $repliedEmail = $parser->parse();
         } catch (ReplyNotFound $exception) {
-            // No stat found so bail as we won't consider this a reply
+            // No hash found so bail as we won't consider this a reply
             $this->logger->debug('MONITORED EMAIL: No hash ID found in the email body');
 
             return;
@@ -134,7 +134,7 @@ class Reply implements ProcessorInterface
     }
 
     /**
-     * @param $stat
+     * @param Stat $stat
      */
     protected function createReply(Stat $stat)
     {
@@ -154,9 +154,9 @@ class Reply implements ProcessorInterface
     /**
      * Clean the email for comparison.
      *
-     * @param $email
+     * @param string $email
      *
-     * @return mixed
+     * @return string
      */
     protected function cleanEmail($email)
     {

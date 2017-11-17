@@ -27,12 +27,12 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
     /**
      * @var Unsubscribe
      */
-    protected $unsubscriber;
+    private $unsubscriber;
 
     /**
      * @var FeedbackLoop
      */
-    protected $looper;
+    private $looper;
 
     /**
      * @return array

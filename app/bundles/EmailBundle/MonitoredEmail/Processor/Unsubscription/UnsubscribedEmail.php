@@ -16,18 +16,18 @@ class UnsubscribedEmail
     /**
      * @var string
      */
-    protected $contactEmail;
+    private $contactEmail;
 
     /**
      * @var
      */
-    protected $unsubscriptionAddress;
+    private $unsubscriptionAddress;
 
     /**
      * UnsubscribedEmail constructor.
      *
-     * @param $contactEmail
-     * @param $unsubscriptionAddress
+     * @param string $contactEmail
+     * @param string $unsubscriptionAddress
      */
     public function __construct($contactEmail, $unsubscriptionAddress)
     {
@@ -44,7 +44,7 @@ class UnsubscribedEmail
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getUnsubscriptionAddress()
     {

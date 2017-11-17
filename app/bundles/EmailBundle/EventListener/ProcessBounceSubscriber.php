@@ -25,7 +25,7 @@ class ProcessBounceSubscriber implements EventSubscriberInterface
     /**
      * @var Bounce
      */
-    protected $bouncer;
+    private $bouncer;
 
     /**
      * @return array

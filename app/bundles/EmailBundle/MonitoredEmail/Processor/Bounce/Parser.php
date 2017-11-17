@@ -19,7 +19,7 @@ class Parser
     /**
      * @var Message
      */
-    protected $message;
+    private $message;
 
     /**
      * Parser constructor.

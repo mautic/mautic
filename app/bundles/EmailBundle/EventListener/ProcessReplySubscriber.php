@@ -28,12 +28,12 @@ class ProcessReplySubscriber implements EventSubscriberInterface
     /**
      * @var Reply
      */
-    protected $replier;
+    private $replier;
 
     /**
      * @var CacheStorageHelper
      */
-    protected $cache;
+    private $cache;
 
     /**
      * @return array

@@ -21,7 +21,7 @@ interface TokenTransportInterface
     /**
      * Function required to check that $this->message is instanceof MauticMessage, return $this->message->getMetadata() if it is and array() if not.
      *
-     * @return mixed
+     * @return array
      */
     public function getMetadata();
 
@@ -39,7 +39,7 @@ interface TokenTransportInterface
      * @param int            $toBeAdded Number of emails about to be added
      * @param string         $type      Type of emails being added (to, cc, bcc)
      *
-     * @return mixed
+     * @return int
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to');
 }

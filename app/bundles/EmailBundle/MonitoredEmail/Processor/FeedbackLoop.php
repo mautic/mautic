@@ -25,27 +25,27 @@ class FeedbackLoop implements ProcessorInterface
     /**
      * @var ContactFinder
      */
-    protected $contactFinder;
+    private $contactFinder;
 
     /**
      * @var LeadModel
      */
-    protected $leadModel;
+    private $leadModel;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    private $logger;
 
     /**
      * @var Message
      */
-    protected $message;
+    private $message;
 
     /**
      * FeedbackLoop constructor.

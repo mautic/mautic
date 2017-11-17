@@ -53,7 +53,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *
-     * @return mixed
+     * @return string
      */
     public function getCallbackPath()
     {
@@ -66,7 +66,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
      * @param Request       $request
      * @param MauticFactory $factory
      *
-     * @return mixed
+     * @return array
      */
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
@@ -221,9 +221,9 @@ class AmazonTransport extends \Swift_SmtpTransport implements CallbackTransportI
     }
 
     /**
-     * @param $body
+     * @param string $body
      *
-     * @return mixed
+     * @return array
      */
     protected function getSnsPayload($body)
     {

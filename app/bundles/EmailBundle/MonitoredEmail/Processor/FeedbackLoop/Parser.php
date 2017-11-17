@@ -20,7 +20,7 @@ class Parser
     /**
      * @var Message
      */
-    protected $message;
+    private $message;
 
     /**
      * Parser constructor.
@@ -33,7 +33,7 @@ class Parser
     }
 
     /**
-     * @return int|null|string
+     * @return null|string
      *
      * @throws FeedbackLoopNotFound
      */
@@ -55,10 +55,10 @@ class Parser
     }
 
     /**
-     * @param $content
-     * @param $pattern
+     * @param string $content
+     * @param string $pattern
      *
-     * @return int|null|string
+     * @return null|string
      */
     protected function searchMessage($pattern, $content)
     {

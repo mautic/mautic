@@ -19,17 +19,17 @@ class Category
     /**
      * @var string
      */
-    protected $category;
+    private $category;
 
     /**
      * @var string
      */
-    protected $type;
+    private $type;
 
     /**
      * @var bool
      */
-    protected $isPermanent;
+    private $isPermanent;
 
     /**
      * Category constructor.

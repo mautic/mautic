@@ -13,7 +13,7 @@ namespace Mautic\EmailBundle\MonitoredEmail\Accessor;
 
 class ConfigAccessor
 {
-    protected $config;
+    private $config;
 
     /**
      * ConfigAccessor constructor.
@@ -26,7 +26,7 @@ class ConfigAccessor
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPath()
     {
@@ -34,7 +34,7 @@ class ConfigAccessor
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getUser()
     {
@@ -42,7 +42,7 @@ class ConfigAccessor
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getHost()
     {
@@ -50,7 +50,7 @@ class ConfigAccessor
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getFolder()
     {
@@ -76,7 +76,7 @@ class ConfigAccessor
     /**
      * @param $property
      *
-     * @return mixed|null
+     * @return string|null
      */
     protected function getProperty($property)
     {

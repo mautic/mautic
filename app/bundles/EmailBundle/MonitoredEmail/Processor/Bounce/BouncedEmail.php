@@ -19,35 +19,35 @@ class BouncedEmail
     /**
      * @var
      */
-    protected $email;
+    private $email;
 
     /**
      * @var
      */
-    protected $ruleCategory;
+    private $ruleCategory;
 
     /**
      * @var
      */
-    protected $ruleNumber;
+    private $ruleNumber;
 
     /**
      * @var
      */
-    protected $bounceType;
+    private $bounceType;
 
     /**
      * @var int
      */
-    protected $final = 0;
+    private $final = 0;
 
     /**
      * @var
      */
-    protected $bounceAddress;
+    private $bounceAddress;
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getContactEmail()
     {
@@ -55,7 +55,7 @@ class BouncedEmail
     }
 
     /**
-     * @param mixed $email
+     * @param string $email
      *
      * @return BouncedEmail
      */
@@ -67,7 +67,7 @@ class BouncedEmail
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getRuleCategory()
     {
@@ -75,7 +75,7 @@ class BouncedEmail
     }
 
     /**
-     * @param mixed $ruleCategory
+     * @param string $ruleCategory
      *
      * @return BouncedEmail
      */
@@ -87,7 +87,7 @@ class BouncedEmail
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getRuleNumber()
     {
@@ -95,7 +95,7 @@ class BouncedEmail
     }
 
     /**
-     * @param mixed $ruleNumber
+     * @param string $ruleNumber
      *
      * @return BouncedEmail
      */
@@ -107,7 +107,7 @@ class BouncedEmail
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getType()
     {
@@ -147,7 +147,7 @@ class BouncedEmail
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getBounceAddress()
     {
@@ -155,7 +155,7 @@ class BouncedEmail
     }
 
     /**
-     * @param mixed $originalTo
+     * @param string $originalTo
      *
      * @return BouncedEmail
      */

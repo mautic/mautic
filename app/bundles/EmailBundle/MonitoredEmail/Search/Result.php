@@ -19,17 +19,17 @@ class Result
     /**
      * @var Stat
      */
-    protected $stat;
+    private $stat;
 
     /**
      * @var Lead[]
      */
-    protected $contacts = [];
+    private $contacts = [];
 
     /**
      * @var string
      */
-    protected $email;
+    private $email;
 
     /**
      * @return Stat

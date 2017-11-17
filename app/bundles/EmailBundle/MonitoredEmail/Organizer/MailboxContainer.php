@@ -75,7 +75,7 @@ class MailboxContainer
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPath()
     {

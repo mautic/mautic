@@ -16,18 +16,18 @@ class RepliedEmail
     /**
      * @var string
      */
-    protected $fromAddress;
+    private $fromAddress;
 
     /**
      * @var null|string
      */
-    protected $statHash;
+    private $statHash;
 
     /**
      * RepliedEmail constructor.
      *
-     * @param      $fromAddress
-     * @param null $statHash
+     * @param string $fromAddress
+     * @param null   $statHash
      */
     public function __construct($fromAddress, $statHash = null)
     {

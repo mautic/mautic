@@ -15,46 +15,40 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class Fetcher
 {
     /**
-     * @var OutputInterface
-     */
-    protected $output;
-
-    /**
      * @var Mailbox
      */
-    protected $imapHelper;
+    private $imapHelper;
 
     /**
      * @var EventDispatcherInterface
      */
-    protected $dispatcher;
+    private $dispatcher;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var array
      */
-    protected $mailboxes;
+    private $mailboxes;
 
     /**
      * @var array
      */
-    protected $log = [];
+    private $log = [];
 
     /**
      * @var int
      */
-    protected $processedMessageCounter = 0;
+    private $processedMessageCounter = 0;
 
     /**
      * Fetcher constructor.
@@ -73,7 +67,7 @@ class Fetcher
     }
 
     /**
-     * @param $limit
+     * @param int $limit
      */
     public function fetch($limit = null)
     {
@@ -135,22 +129,24 @@ class Fetcher
 
     /**
      * @param array $mailIds
-     * @param       $limit
-     * @param       $markAsSeen
+     * @param int   $limit
+     * @param bool  $markAsSeen
      *
      * @return array
      */
-    protected function getMessages(array $mailIds, $limit, $markAsSeen)
+    private function getMessages(array $mailIds, $limit, $markAsSeen)
     {
-        $messages = [];
-        if (count($mailIds)) {
-            foreach ($mailIds as $id) {
-                $messages[] = $this->imapHelper->getMail($id, $markAsSeen);
-                ++$this->processedMessageCounter;
+        if (!count($mailIds)) {
+            return [];
+        }
 
-                if ($limit && $this->processedMessageCounter >= $limit) {
-                    break;
-                }
+        $messages = [];
+        foreach ($mailIds as $id) {
+            $messages[] = $this->imapHelper->getMail($id, $markAsSeen);
+            ++$this->processedMessageCounter;
+
+            if ($limit && $this->processedMessageCounter >= $limit) {
+                break;
             }
         }
 
@@ -160,7 +156,7 @@ class Fetcher
     /**
      * @return array
      */
-    protected function getConfigs()
+    private function getConfigs()
     {
         $mailboxes = [];
         foreach ($this->mailboxes as $mailbox) {
