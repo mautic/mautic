@@ -121,7 +121,7 @@ class Mailbox
     const CRITERIA_TO = 'TO';
 
     /**
-     *  Match mails that have not been answered.
+     *  Get messages since a specific UID. Eg. UID 2:* will return all messages with UID 2 and above (IMAP includes the given UID).
      */
     const CRITERIA_UID = 'UID';
 
