@@ -13,25 +13,47 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInterface;
+use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 
+/**
+ * Class EncryptionHelper.
+ */
 class EncryptionHelper
 {
+    /** @var SymmetricCipherInterface[] */
+    private $availableCiphers;
+
+    /** @var string */
     private $key;
 
     /**
-     * @param MauticFactory $factory
+     * EncryptionHelper constructor.
      *
-     * @throws \RuntimeException if the mcrypt extension is not enabled
+     * @param CoreParametersHelper          $coreParametersHelper
+     * @param SymmetricCipherInterface      $possibleCipher1
+     * @param SymmetricCipherInterface|null $possibleCipher2
      */
-    public function __construct(MauticFactory $factory)
-    {
-        // Toss an Exception back if mcrypt is not found
-        if (!extension_loaded('mcrypt')) {
-            throw new \RuntimeException($factory->getTranslator()->trans('mautic.core.error.no.mcrypt'));
+    public function __construct(
+        CoreParametersHelper $coreParametersHelper,
+        SymmetricCipherInterface $possibleCipher1,
+        SymmetricCipherInterface $possibleCipher2 = null
+    ) {
+        $nonCipherArgs = 1;
+        for ($i = $nonCipherArgs; $i < func_num_args(); ++$i) {
+            $possibleCipher = func_get_arg($i);
+            if (!($possibleCipher instanceof SymmetricCipherInterface)) {
+                throw new \InvalidArgumentException(get_class($possibleCipher).' has to implement '.SymmetricCipherInterface::class);
+            }
+            if (!$possibleCipher->isSupported()) {
+                continue;
+            }
+            $this->availableCiphers[] = $possibleCipher;
         }
-
-        $this->key = $factory->getParameter('secret_key');
+        if (count($this->availableCiphers) === 0) {
+            throw new \RuntimeException('None of possible cryptography libraries is supported');
+        }
+        $this->key = $coreParametersHelper->getParameter('mautic.secret_key');
     }
 
     /**
@@ -47,48 +69,45 @@ class EncryptionHelper
     /**
      * Encrypt string.
      *
-     * @param $encrypt
+     * @param mixed $data
      *
      * @return string
      */
-    public function encrypt($encrypt)
+    public function encrypt($data)
     {
-        $encrypt   = serialize($encrypt);
-        $iv        = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC), MCRYPT_DEV_URANDOM);
-        $key       = pack('H*', $this->key);
-        $mac       = hash_hmac('sha256', $encrypt, substr(bin2hex($key), -32));
-        $passcrypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $encrypt.$mac, MCRYPT_MODE_CBC, $iv);
-        $encoded   = base64_encode($passcrypt).'|'.base64_encode($iv);
+        $encryptionCipher = reset($this->availableCiphers);
+        $initVector       = $encryptionCipher->getRandomInitVector();
+        $encrypted        = $encryptionCipher->encrypt(serialize($data), $this->key, $initVector);
 
-        return $encoded;
+        return base64_encode($encrypted).'|'.base64_encode($initVector);
     }
 
     /**
      * Decrypt string.
+     * Returns false in case of failed decryption.
      *
-     * @param $decrypt
+     * @param string $data
+     * @param bool   $mainDecryptOnly
      *
-     * @return bool|mixed|string
+     * @return mixed|false
      */
-    public function decrypt($decrypt)
+    public function decrypt($data, $mainDecryptOnly = false)
     {
-        $decrypt = explode('|', $decrypt.'|');
-        $decoded = base64_decode($decrypt[0]);
-        $iv      = base64_decode($decrypt[1]);
-        if (strlen($iv) !== mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC)) {
-            return false;
+        $encryptData      = explode('|', $data);
+        $encryptedMessage = base64_decode($encryptData[0]);
+        $initVector       = base64_decode($encryptData[1]);
+        $mainTried        = false;
+        foreach ($this->availableCiphers as $availableCipher) {
+            if ($mainDecryptOnly && $mainTried) {
+                return false;
+            }
+            try {
+                return unserialize($availableCipher->decrypt($encryptedMessage, $this->key, $initVector));
+            } catch (InvalidDecryptionException $ex) {
+            }
+            $mainTried = true;
         }
 
-        $key       = pack('H*', $this->key);
-        $decrypted = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $decoded, MCRYPT_MODE_CBC, $iv));
-        $mac       = substr($decrypted, -64);
-        $decrypted = substr($decrypted, 0, -64);
-        $calcmac   = hash_hmac('sha256', $decrypted, substr(bin2hex($key), -32));
-        if ($calcmac !== $mac) {
-            return false;
-        }
-        $decrypted = unserialize($decrypted);
-
-        return $decrypted;
+        return false;
     }
 }
