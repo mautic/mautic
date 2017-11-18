@@ -195,7 +195,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         // if we have a lead ID lets use it
         if (!empty($leadId)) {
             // make sure that its not the id we already have
-            $q->andWhere('l.id != '.$leadId);
+            $q->andWhere('l.id != :leadId')
+                ->setParameter('leadId', $leadId);
         }
 
         if ($limit) {
@@ -221,7 +222,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('ids', array_keys($leads))
             ->orderBy('l.dateAdded', 'DESC')
             ->addOrderBy('l.id', 'DESC');
-        $entities = $q->getQuery()->getResult();
+        $entities = $q->getQuery()
+            ->getResult();
 
         /** @var Lead $lead */
         foreach ($entities as $lead) {
@@ -349,12 +351,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $this->buildSelectClause($q, $id);
                 $contactId = (int) $id['id'];
             } else {
-                $q->select('l, u, i')
+                $q->select('l')
                     ->leftJoin('l.ipAddresses', 'i')
                     ->leftJoin('l.owner', 'u');
                 $contactId = $id;
             }
-            $q->andWhere($this->getTableAlias().'.id = '.(int) $contactId);
+            $q->andWhere($this->getTableAlias().'.id = :id')
+                ->setParameter('id', (int) $contactId);
             $entity = $q->getQuery()->getSingleResult();
         } catch (\Exception $e) {
             $entity = null;
@@ -1108,7 +1111,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->orderBy("$alias.id")
             ->setMaxResults(1);
 
-        return ($next = $qb->execute()->fetchColumn()) ? $this->getEntity($next) : null;
+        $next = $qb->execute()->fetchColumn();
+
+        return ($next) ? $this->getEntity($next) : null;
     }
 
     /**
