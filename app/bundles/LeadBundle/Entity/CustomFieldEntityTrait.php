@@ -121,6 +121,11 @@ trait CustomFieldEntityTrait
      */
     public function addUpdatedField($alias, $value, $oldValue = null)
     {
+        // Don't allow overriding ID
+        if ('id' === $alias) {
+            return $this;
+        }
+
         $property = (defined('self::FIELD_ALIAS')) ? str_replace(self::FIELD_ALIAS, '', $alias) : $alias;
         $field    = $this->getField($alias);
         $setter   = 'set'.ucfirst($property);
