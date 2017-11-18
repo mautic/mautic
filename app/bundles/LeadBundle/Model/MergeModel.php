@@ -116,9 +116,7 @@ class MergeModel
 
         // Dispatch pre merge event
         $event = new LeadMergeEvent($winner, $loser);
-        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_PRE_MERGE)) {
-            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_MERGE, $event);
-        }
+        $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_MERGE, $event);
 
         // Merge everything
         $this->updateMergeRecords();
@@ -133,9 +131,7 @@ class MergeModel
         $this->leadModel->saveEntity($winner, false);
 
         // Dispatch post merge event
-        if ($this->dispatcher->hasListeners(LeadEvents::LEAD_POST_MERGE)) {
-            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
-        }
+        $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
 
         // Delete the loser
         $this->leadModel->deleteEntity($loser);
@@ -175,6 +171,7 @@ class MergeModel
             ->setMergedId($this->loser->getId());
 
         $this->repo->saveEntity($mergeRecord);
+        $this->repo->clear();
     }
 
     /**
@@ -207,9 +204,8 @@ class MergeModel
         $oldestFields = $oldest->getProfileFields();
 
         $winnerFields = $this->winner->getProfileFields();
-
         foreach (array_keys($winnerFields) as $field) {
-            if ('points' === $field) {
+            if (in_array($field, ['id', 'points'])) {
                 // Let mergePoints() take care of this
                 continue;
             }
