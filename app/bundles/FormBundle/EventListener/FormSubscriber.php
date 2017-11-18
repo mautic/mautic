@@ -180,7 +180,7 @@ class FormSubscriber extends CommonSubscriber
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
-        $leadEmail = $lead->getEmail();
+        $leadEmail = $lead !== null ? $lead->getEmail() : null;
         $emails    = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
@@ -213,9 +213,10 @@ class FormSubscriber extends CommonSubscriber
             $this->mailer->send(true);
         }
 
-        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && $lead->getOwner()) {
+        $owner = $lead !== null ? $lead->getOwner() : null;
+        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && null !== $owner) {
             // Send copy to owner
-            $this->setMailer($config, $tokens, $lead->getOwner()->getEmail());
+            $this->setMailer($config, $tokens, $owner->getEmail());
 
             $this->mailer->setLead($lead->getProfileFields());
 
