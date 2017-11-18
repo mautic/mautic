@@ -118,9 +118,8 @@ class DedupModel
 
     /**
      * @param array $queryFields
-     * @param bool  $returnWithQueryFields
      *
-     * @return array|Lead
+     * @return Lead[]
      */
     public function checkForDuplicateContacts(array $queryFields)
     {
