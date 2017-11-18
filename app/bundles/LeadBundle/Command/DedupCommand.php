@@ -44,7 +44,16 @@ EOT
         /** @var DedupModel $dedupModel */
         $dedupModel     = $this->getContainer()->get('mautic.lead.model.dedup');
         $newerIntoOlder = (bool) $input->getOption('newer-into-older');
+        $count          = $dedupModel->dedup($newerIntoOlder, $output);
 
-        $dedupModel->dedup($newerIntoOlder, $output);
+        $output->writeln('');
+        $output->writeln(
+            $this->getContainer()->get('translator')->trans(
+                'mautic.lead.merge.count',
+                [
+                    '%count%' => $count,
+                ]
+            )
+        );
     }
 }

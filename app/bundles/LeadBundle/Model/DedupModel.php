@@ -68,6 +68,8 @@ class DedupModel
     /**
      * @param bool                 $mergeNewerIntoOlder
      * @param OutputInterface|null $output
+     *
+     * @return int
      */
     public function dedup($mergeNewerIntoOlder = false, OutputInterface $output = null)
     {
@@ -80,6 +82,7 @@ class DedupModel
             $progress = new ProgressBar($output, $totalContacts);
         }
 
+        $dupCount = 0;
         while ($contact = $this->repository->getNextIdentifiedContact($lastContactId)) {
             $lastContactId = $contact->getId();
             $fields        = $contact->getProfileFields();
@@ -91,6 +94,7 @@ class DedupModel
 
             // Were duplicates found?
             if (count($duplicates) > 1) {
+                $dupCount += count($duplicates) - 1;
                 $loser = reset($duplicates);
                 while ($winner = next($duplicates)) {
                     $this->mergeModel->merge($loser, $winner);
@@ -106,7 +110,10 @@ class DedupModel
 
             // Clear all entities in memory for RAM control
             $this->em->clear();
+            gc_collect_cycles();
         }
+
+        return $dupCount;
     }
 
     /**
