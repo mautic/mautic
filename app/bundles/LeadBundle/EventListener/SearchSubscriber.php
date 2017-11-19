@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
@@ -39,14 +40,20 @@ class SearchSubscriber extends CommonSubscriber
     private $leadRepo;
 
     /**
+     * @var EmailRepository
+     */
+    private $emailRepository;
+
+    /**
      * SearchSubscriber constructor.
      *
      * @param LeadModel $leadModel
      */
-    public function __construct(LeadModel $leadModel)
+    public function __construct(LeadModel $leadModel, EntityManager $entityManager)
     {
-        $this->leadModel = $leadModel;
-        $this->leadRepo  = $leadModel->getRepository();
+        $this->leadModel       = $leadModel;
+        $this->leadRepo        = $leadModel->getRepository();
+        $this->emailRepository = $entityManager->getRepository(Email::class);
     }
 
     /**
@@ -184,44 +191,46 @@ class SearchSubscriber extends CommonSubscriber
      */
     private function buildEmailPendingQuery(LeadBuildSearchEvent $event)
     {
-        $q = $event->getQueryBuilder();
-        /** @var EmailRepository $emailRepo */
-        $emailRepo = $event->getEntityManager()->getRepository('MauticEmailBundle:Email');
-        $emailId   = (int) $event->getString();
+        $q       = $event->getQueryBuilder();
+        $emailId = (int) $event->getString();
         /** @var Email $email */
-        $email = $emailRepo->getEntity($emailId);
-        if ($email instanceof Email) {
+        $email = $this->emailRepository->getEntity($emailId);
+        if (null !== $email) {
             $variantIds = $email->getRelatedEntityIds();
-            $nq         = $emailRepo->getEmailPendingQuery($emailId, $variantIds);
-            if ($nq instanceof QueryBuilder) {
-                $nq->select('l.id'); // select only id
-                $nsql = $nq->getSQL();
-                foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
-                    $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
-                }
-                $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
-                $event->setSubQuery($query);
+            $nq         = $this->emailRepository->getEmailPendingQuery($emailId, $variantIds);
+            if (!$nq instanceof QueryBuilder) {
+                return;
             }
-        } else {
-            $tables = [
-                [
-                    'from_alias' => 'l',
-                    'table'      => 'message_queue',
-                    'alias'      => 'mq',
-                    'condition'  => 'l.id = mq.lead_id',
-                ],
-            ];
 
-            $config = [
-                'column' => 'mq.channel_id',
-                'params' => [
-                    'mq.channel' => 'email',
-                    'mq.status'  => MessageQueue::STATUS_PENDING,
-                ],
-            ];
+            $nq->select('l.id'); // select only id
+            $nsql = $nq->getSQL();
+            foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
+                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+            }
+            $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
+            $event->setSubQuery($query);
 
-            $this->buildJoinQuery($event, $tables, $config);
+            return;
         }
+
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'message_queue',
+                'alias'      => 'mq',
+                'condition'  => 'l.id = mq.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'mq.channel_id',
+            'params' => [
+                'mq.channel' => 'email',
+                'mq.status'  => MessageQueue::STATUS_PENDING,
+            ],
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
     }
 
     /**

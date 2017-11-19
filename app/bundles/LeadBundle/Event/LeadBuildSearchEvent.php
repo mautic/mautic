@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 /**
@@ -71,21 +70,19 @@ class LeadBuildSearchEvent extends CommonEvent
     protected $parameters;
 
     /**
-     * @param string        $string
-     * @param string        $command
-     * @param string        $alias
-     * @param string        $negate
-     * @param QueryBuilder  $queryBuilder
-     * @param EntityManager $entityManager
+     * @param string       $string
+     * @param string       $command
+     * @param string       $alias
+     * @param string       $negate
+     * @param QueryBuilder $queryBuilder
      */
-    public function __construct($string, $command, $alias, $negate, QueryBuilder $queryBuilder, EntityManager $entityManager)
+    public function __construct($string, $command, $alias, $negate, QueryBuilder $queryBuilder)
     {
         $this->string           = $string;
         $this->command          = $command;
         $this->alias            = $alias;
         $this->negate           = $negate;
         $this->queryBuilder     = $queryBuilder;
-        $this->em               = $entityManager;
         $this->subQuery         = '';
         $this->isSearchDone     = false;
         $this->strict           = false;
@@ -123,14 +120,6 @@ class LeadBuildSearchEvent extends CommonEvent
     public function isNegation()
     {
         return $this->negate;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    public function getEntityManager()
-    {
-        return $this->em;
     }
 
     /**
