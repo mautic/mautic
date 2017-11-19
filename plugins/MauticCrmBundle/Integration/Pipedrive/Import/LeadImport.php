@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadImport extends AbstractImport
@@ -39,8 +40,7 @@ class LeadImport extends AbstractImport
         $lead->setDateAdded(new \DateTime());
         $lead->setPreferredProfileImage('gravatar');
 
-        $this->em->persist($lead);
-        $this->em->flush();
+        $this->em->getRepository(Lead::class)->saveEntity($lead);
 
         $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
 
@@ -63,6 +63,7 @@ class LeadImport extends AbstractImport
             return $this->create($data);
         }
 
+        /** @var $lead LeadModel */
         $lead         = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
         $data         = $this->convertPipedriveData($data);
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
@@ -81,7 +82,7 @@ class LeadImport extends AbstractImport
 
         $integrationEntity->setLastSyncDate(new \DateTime());
 
-        $this->em->persist($lead);
+        $this->em->getRepository(Lead::class)->saveEntity($lead);
         $this->em->persist($integrationEntity);
 
         if (!$this->getIntegration()->isCompanySupportEnabled()) {
