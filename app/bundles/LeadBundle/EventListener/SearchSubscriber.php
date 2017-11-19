@@ -47,7 +47,8 @@ class SearchSubscriber extends CommonSubscriber
     /**
      * SearchSubscriber constructor.
      *
-     * @param LeadModel $leadModel
+     * @param LeadModel     $leadModel
+     * @param EntityManager $entityManager
      */
     public function __construct(LeadModel $leadModel, EntityManager $entityManager)
     {
