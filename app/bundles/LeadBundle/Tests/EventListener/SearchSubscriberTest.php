@@ -49,7 +49,7 @@ class SearchSubscriberTest extends CommonMocks
                        return preg_replace('/^.*\.([^\.]*)$/', '\1', $key); // return command name
                    });
 
-        $subscriber = new SearchSubscriber($leadModel);
+        $subscriber = new SearchSubscriber($leadModel, $em);
         $subscriber->setTranslator($translator);
 
         $dispatcher = new EventDispatcher();
@@ -59,49 +59,49 @@ class SearchSubscriberTest extends CommonMocks
 
         // test email read
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent('1', 'email_read', $alias, false, $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'email_read', $alias, false, $qb);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (es.email_id = ?) AND (es.is_read = ?) GROUP BY l.id', $sql);
 
         // test email sent
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent('1', 'email_sent', $alias, false, $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'email_sent', $alias, false, $qb);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE es.email_id = ? GROUP BY l.id', $sql);
 
         // test email pending
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent('1', 'email_pending', $alias, false, $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'email_pending', $alias, false, $qb);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
 
         // test email queued
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent('1', 'email_queued', $alias, false, $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'email_queued', $alias, false, $qb);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
 
         // test sms sent
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent('1', 'sms_sent', $alias, false, $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'sms_sent', $alias, false, $qb);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE ss.sms_id = ? GROUP BY l.id', $sql);
 
         // test web sent
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent('1', 'web_sent', $alias, false, $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'web_sent', $alias, false, $qb);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
 
         // test mobile sent
         $qb    = $connection->createQueryBuilder();
-        $event = new LeadBuildSearchEvent('1', 'mobile_sent', $alias, false, $qb, $em);
+        $event = new LeadBuildSearchEvent('1', 'mobile_sent', $alias, false, $qb);
         $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
