@@ -127,9 +127,9 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     public function getAvailableLeadFields($settings = [])
     {
         return [
-            'email'       => ['label' => 'Email', 'type' => 'string'],
-            'firstName'    => ['label' => 'First Name','type' => 'string'],
-            'lastName'       => ['label' => 'Last Name','type' => 'string'],
+            'email'       => ['label' => 'Email', 'type' => 'string', 'required' => true],
+            'firstName'    => ['label' => 'First Name','type' => 'string', 'required' => true],
+            'lastName'       => ['label' => 'Last Name','type' => 'string', 'required' => true],
             'phone'  => ['label' => 'Phone','type' => 'string'],
             'functionLabel'      => ['label' => 'Position','type' => 'string'],
             'companyLabel'   => ['label' => 'Company','type' => 'string']
@@ -231,11 +231,8 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     private function formatContactData(Lead $contact, $campaign)
     {
         $matchedData = $this->populateLeadData($contact);
-
         return [
-            'user' => [
-                $matchedData
-            ],
+            'user' => $matchedData,
             'trackingCampaign' => $campaign
         ];
     }
