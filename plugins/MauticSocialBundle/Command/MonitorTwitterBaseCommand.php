@@ -43,6 +43,11 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
     protected $dispatcher;
 
     /**
+     * @var IntegrationHelper
+     */
+    protected $integrationHelper;
+
+    /**
      * @var TwitterCommandHelper
      */
     private $twitterCommandHelper;
@@ -90,7 +95,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
     ) {
         $this->dispatcher           = $dispatcher;
         $this->translator           = $translator;
-        $this->twitter              = $integrationHelper->getIntegrationObject('Twitter');
+        $this->integrationHelper    = $integrationHelper;
         $this->twitterCommandHelper = $twitterCommandHelper;
 
         $this->translator->setLocale($coreParametersHelper->getParameter('mautic.locale', 'en_US'));
@@ -168,6 +173,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
         $this->output     = $output;
         $this->maxRuns    = $this->input->getOption('max-runs');
         $this->queryCount = $this->input->getOption('query-count');
+        $this->twitter    = $this->integrationHelper->getIntegrationObject('Twitter');
 
         if ($this->twitter === false || $this->twitter->getIntegrationSettings()->getIsPublished() === false) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.published'));
