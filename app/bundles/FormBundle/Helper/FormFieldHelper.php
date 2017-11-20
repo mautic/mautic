@@ -230,7 +230,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
 
                 foreach ($value as $val) {
-                    $val = urldecode($val);
+                    $val = $this->sanitizeValue($val);
                     if (preg_match(
                         '/<input(.*?)id="mauticform_checkboxgrp_checkbox(.*?)"(.*?)value="'.$val.'"(.*?)\/>/i',
                         $formHtml,
@@ -243,7 +243,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
                 break;
             case 'radiogrp':
-                $value = urldecode($value);
+                $value = $this->sanitizeValue($value);
                 if (preg_match('/<input(.*?)id="mauticform_radiogrp_radio(.*?)"(.*?)value="'.$value.'"(.*?)\/>/i', $formHtml, $match)) {
                     $replace = '<input'.$match[1].'id="mauticform_radiogrp_radio'.$match[2].'"'.$match[3].'value="'.$value.'"'.$match[4]
                         .' checked />';
@@ -256,8 +256,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 if (preg_match($regex, $formHtml, $match)) {
                     $origText = $match[0];
                     $replace  = str_replace(
-                        '<option value="'.urldecode($value).'">',
-                        '<option value="'.urldecode($value).'" selected="selected">',
+                        '<option value="'.$this->sanitizeValue($value).'">',
+                        '<option value="'.$this->sanitizeValue($value).'" selected="selected">',
                         $origText
                     );
                     $formHtml = str_replace($origText, $replace, $formHtml);
@@ -267,8 +267,13 @@ class FormFieldHelper extends AbstractFormFieldHelper
         }
     }
 
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
     public function sanitizeValue($value)
     {
-        return strip_tags(urldecode($value));
+        return str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(urldecode($value)));
     }
 }
