@@ -33,6 +33,13 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.webinar.leadbundle.subscriber' => [
+                'class'     => MauticPlugin\MauticWebinarBundle\EventListener\LeadListSubscriber::class,
+                'arguments' => [
+                    'mautic.helper.integration',
+                    'mautic.lead.model.list',
+                ],
+            ],
         ],
         'forms' => [
             'mautic.form.type.webikeo.campaigncondition' => [

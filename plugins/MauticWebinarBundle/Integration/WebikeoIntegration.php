@@ -98,7 +98,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
      */
     public function authCallback($settings = [], $parameters = [])
     {
-        if ($this->isAuthorized()) {
+        if ($this->isAuthorized() && !$settings['use_refresh_token']) {
             return true;
         }
         $autUrl   = $this->getAccessTokenUrl();
@@ -108,10 +108,10 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         $error = false;
         try {
             $response = $this->makeRequest($autUrl, $parameters, 'POST', $settings);
-            if (!isset($response['token'])) {
+            if (!isset($response[$this->getAuthTokenKey()])) {
                 $error = $response;
             } else {
-                $this->keys['token'] = $response['token'];
+                $this->extractAuthKeys($response, $this->getAuthTokenKey());
             }
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -120,17 +120,6 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         return $error;
     }
 
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function isAuthorized()
-    {
-        $keys = $this->getKeys();
-        return isset($keys[$this->getAuthTokenKey()]);
-    }
 
     /**
      * {@inheritdoc}
@@ -163,7 +152,10 @@ class WebikeoIntegration extends WebinarAbstractIntegration
 
         foreach ($webinars as $webinar) {
             if (isset($webinar['id'])) {
-                $formattedWebinars[$webinar['id']] = $webinar['title'];
+                $formattedWebinars[] = [
+                    'value' => $webinar['id'],
+                    'label' => $webinar['title'],
+                ];
             }
         }
 
@@ -247,4 +239,88 @@ class WebikeoIntegration extends WebinarAbstractIntegration
             'trackingCampaign' => $campaign
         ];
     }
+
+    public function getWebinarAllSubscribers($webinar, $isNoShow = null)
+    {
+        $filters = [];
+        if ($isNoShow !== null) {
+            $filters = ['isNoShow' => $isNoShow];
+        }
+
+        return $this->getApiHelper()->getSubscriptions($webinar, $filters);
+    }
+
+    /**
+     * @param $webinar
+     * @param null $isNoShow
+     * @param $segmentId
+     */
+    public function getSubscribersForSegmentProcessing($webinar, $isNoShow = null, $segmentId)
+    {
+        $webinarSubscriberObject = new IntegrationObject('WebinarSubscriber', 'lead');
+        $subscriberObject = new IntegrationObject('Contact', 'lead');
+        $subscribers = $this->getWebinarAllSubscribers($webinar,$isNoShow);
+        $subscribers = isset($subscribers['_embedded']['subscription']) ? $subscribers['_embedded']['subscription'] : [] ;
+        if (empty($subscribers)) {
+            return;
+        }
+        $recordList           = $this->getRecordList($subscribers, 'id');
+        $syncedContacts = $this->integrationEntityModel->getSyncedRecords($subscriberObject, $this->getName(), $recordList);
+
+        // these synced records need to check the id of the segment first
+        $existingContactsIds = array_map(
+            function ($contact) {
+                return ($contact['integration_entity'] == 'Contact') ? $contact['integration_entity_id'] : [];
+            },
+            $syncedContacts
+        );
+
+        $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));
+
+        if (!empty($contactsToFetch)) {
+            foreach ($subscribers as $subscriber) {
+                if (array_key_exists($subscriber['id'],$contactsToFetch)) {
+                    $this->createMauticContact($subscriber);
+                }
+            }
+            $allSubscribers = array_merge($existingContactsIds, array_keys($contactsToFetch));
+        } else {
+            $allSubscribers = $existingContactsIds;
+        }
+
+        $this->saveSyncedWebinarSubscribers($allSubscribers, $webinarSubscriberObject, $webinar, $segmentId);
+    }
+
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function createMauticContact ($data)
+    {
+        $executed = 0;
+
+        if (!empty($data)) {
+            $webinarObject = new IntegrationObject('Contact', 'lead');
+
+            if (is_array($data)) {
+                $id = $data['id'];
+                $formattedData = $this->matchUpData($data['user']);
+                $entity = $this->getMauticLead($formattedData, true);
+
+                if ($entity) {
+                    $integrationEntities[] = $this->saveSyncedData($entity, $webinarObject, $id);
+                    $this->em->detach($entity);
+                    unset($entity);
+                    ++$executed;
+                }
+            }
+        }
+        if ($integrationEntities) {
+            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+            $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+        }
+
+        return $executed;
+    }
+
 }

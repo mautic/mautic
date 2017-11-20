@@ -1193,7 +1193,7 @@ abstract class AbstractIntegration
                     $headers     = $oauthHelper->getAuthorizationHeader($url, $parameters, $method);
                     break;
                 case 'oauth2':
-                    if ($bearerToken = $this->getBearerToken()) {
+                    if ($bearerToken = $this->getBearerToken(true)) {
                         $headers = [
                             "Authorization: Bearer {$bearerToken}",
                             //"Content-Type: application/x-www-form-urlencoded;charset=UTF-8"

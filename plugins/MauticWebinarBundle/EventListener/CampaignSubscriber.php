@@ -75,7 +75,7 @@ class CampaignSubscriber extends CommonSubscriber
             //Add webinar action subscribe to webinar
             if (method_exists($s,'subscribeToWebinar')) {
                 $action = [
-                    'label'       => $this->translator->trans('mautic.plugin.webinar.subscribe_contact', ['%name%' => $s->getName()]),,
+                    'label'       => $this->translator->trans('mautic.plugin.webinar.subscribe_contact', ['%name%' => $s->getName()]),
                     'description' => $s->getName(),
                     'formType'    => $s->getName() . '_campaignevent_webinars',
                     'formTypeOptions' => ['integration_object_name' => $s->getName()],

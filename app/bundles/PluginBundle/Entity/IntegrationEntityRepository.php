@@ -137,7 +137,7 @@ class IntegrationEntityRepository extends CommonRepository
      *
      * @return IntegrationEntity[]
      */
-    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds)
+    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds, $internal = null)
     {
         $q = $this->createQueryBuilder('i', 'i.internalEntityId');
 
@@ -154,8 +154,13 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setParameter('internalEntityIds', $internalEntityIds);
 
-        $results = $q->getQuery()->getResult();
+        if ($internal) {
+            $q->andWhere(
+                $q->expr()->andX( $q->expr()->eq('i.internal', ':internal') ))
+                ->setParameter('internal', $internal);
+        }
 
+        $results = $q->getQuery()->getResult();
         return $results;
     }
 
