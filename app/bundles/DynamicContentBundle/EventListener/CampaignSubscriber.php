@@ -113,6 +113,8 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return bool|CampaignExecutionEvent
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
@@ -120,20 +122,25 @@ class CampaignSubscriber extends CommonSubscriber
         $eventDetails = $event->getEventDetails();
         $lead         = $event->getLead();
 
-        if ($eventConfig['dwc_slot_name'] === $eventDetails) {
-            $defaultDwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+        // stop
+        if ($eventConfig['dwc_slot_name'] !== $eventDetails) {
+            $event->setResult(false);
 
-            if ($defaultDwc instanceof DynamicContent) {
-                // Set the default content in case none of the actions return data
-                $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
-            }
-
-            $this->session->set('dwc.slot_name.lead.'.$lead->getId(), $eventDetails);
-
-            $event->stopPropagation();
-
-            return $event->setResult(true);
+            return false;
         }
+
+        $defaultDwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
+
+        if ($defaultDwc instanceof DynamicContent) {
+            // Set the default content in case none of the actions return data
+            $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
+        }
+
+        $this->session->set('dwc.slot_name.lead.'.$lead->getId(), $eventDetails);
+
+        $event->stopPropagation();
+
+        return $event->setResult(true);
     }
 
     /**
