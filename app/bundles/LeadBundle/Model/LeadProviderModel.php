@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Monolog\Logger;
 
 /**
  * Class LeadProviderModel.
@@ -26,16 +27,24 @@ class LeadProviderModel
     /** @var LeadModel */
     private $leadModel;
 
+    /** @var Logger */
+    private $logger;
+
     /**
      * LeadProviderModel constructor.
      *
      * @param EntityManager $entityManager
      * @param LeadModel     $leadModel
+     * @param Logger        $logger
      */
-    public function __construct(EntityManager $entityManager, LeadModel $leadModel)
-    {
+    public function __construct(
+        EntityManager $entityManager,
+        LeadModel $leadModel,
+        Logger $logger
+    ) {
         $this->em        = $entityManager;
         $this->leadModel = $leadModel;
+        $this->logger    = $logger;
     }
 
     /**
@@ -56,18 +65,21 @@ class LeadProviderModel
                 return $this->updateLead($bestMatchLead, $template);
             }
         }
-        $this->createLead($template);
 
-        return $template;
+        return $this->createLead($template);
     }
 
     /**
      * @param Lead $template
+     *
+     * @return Lead
      */
     private function createLead(Lead $template)
     {
         $template->setNewlyCreated(true);
         $this->leadModel->saveEntity($template, false);
+
+        return $template;
     }
 
     /**
@@ -106,7 +118,15 @@ class LeadProviderModel
             }
         }
         $target->setSocialCache(array_merge($target->getSocialCache(), $source->getSocialCache()));
-        $this->em->flush($target);
+        $target->setInternal(array_merge($target->getInternal(), $source->getInternal()));
+        if (empty($target->getChanges(true))) {
+            return $target;
+        }
+        try {
+            $this->leadModel->saveEntity($target, false);
+        } catch (\Exception $ex) {
+            $this->logger->addWarning($ex->getMessage());
+        }
 
         return $target;
     }
