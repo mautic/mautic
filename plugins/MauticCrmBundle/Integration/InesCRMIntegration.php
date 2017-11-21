@@ -507,7 +507,7 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 break;
 
                 default:
-                    $this->logger->warning('INES: Invalid update flag', compact('inesField', 'shouldUpdateMautic'));
+                    // $this->logger->warning('INES: Invalid update flag', compact('inesField', 'shouldUpdateMautic'));
                 break;
             }
         }
@@ -731,10 +731,11 @@ class InesCRMIntegration extends CrmAbstractIntegration
             'client' => self::getClientTemplate(),
         ];
 
+        $data->client->Contacts=new \stdClass();
         $data->client->Contacts->ContactInfoAuto = [];
 
         for ($i = 0; $i < $nbContacts; $i += 1) {
-            $data->client->Contacts->ContactInfoAuto[] = self::getContactTemplate();
+            $data->client->Contacts->ContactInfoAuto[]= self::getContactTemplate();
         }
 
         return $data;
