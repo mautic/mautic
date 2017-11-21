@@ -25,7 +25,7 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class ReportSubscriber extends CommonSubscriber
 {
-    const CONTEXT_ASSET          = 'asset';
+    const CONTEXT_ASSET          = 'assets';
     const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
     /**
