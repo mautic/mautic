@@ -183,7 +183,6 @@ class ReportSubscriber extends CommonSubscriber
             $columns,
             $event->getStandardColumns($prefix, [], 'mautic_email_action'),
             $event->getCategoryColumns(),
-            $event->getCampaignByChannelColumns(),
             $companyColumns
         );
         $data = [
@@ -272,6 +271,7 @@ class ReportSubscriber extends CommonSubscriber
                 'columns'      => array_merge(
                     $columns,
                     $statColumns,
+                    $event->getCampaignByChannelColumns(),
                     $event->getLeadColumns(),
                     $event->getIpColumn()
                 ),

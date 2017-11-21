@@ -89,8 +89,7 @@ class ReportSubscriber extends CommonSubscriber
         $columns = array_merge(
             $columns,
             $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'),
-            $event->getCategoryColumns(),
-            $event->getCampaignByChannelColumns()
+            $event->getCategoryColumns()
         );
 
         $event->addTable(
@@ -137,6 +136,7 @@ class ReportSubscriber extends CommonSubscriber
                     'columns'      => array_merge(
                         $columns,
                         $downloadColumns,
+                        $event->getCampaignByChannelColumns(),
                         $event->getLeadColumns(),
                         $event->getIpColumn(),
                         $companyColumns

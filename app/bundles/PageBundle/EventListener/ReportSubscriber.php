@@ -120,8 +120,7 @@ class ReportSubscriber extends CommonSubscriber
         $columns = array_merge(
             $columns,
             $event->getStandardColumns('p.', ['name', 'description'], 'mautic_page_action'),
-            $event->getCategoryColumns(),
-            $event->getCampaignByChannelColumns()
+            $event->getCategoryColumns()
         );
         $data = [
             'display_name' => 'mautic.page.pages',
@@ -246,6 +245,7 @@ class ReportSubscriber extends CommonSubscriber
             $pageHitsColumns = array_merge(
                 $columns,
                 $hitColumns,
+                $event->getCampaignByChannelColumns(),
                 $event->getLeadColumns(),
                 $event->getIpColumn(),
                 $companyColumns

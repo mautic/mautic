@@ -71,8 +71,7 @@ class ReportSubscriber extends CommonSubscriber
         $columns = array_merge(
             $columns,
             $event->getStandardColumns($prefix, [], 'mautic_form_action'),
-            $event->getCategoryColumns(),
-            $event->getCampaignByChannelColumns()
+            $event->getCategoryColumns()
         );
         $data = [
             'display_name' => 'mautic.form.forms',
@@ -110,6 +109,7 @@ class ReportSubscriber extends CommonSubscriber
             $formSubmissionColumns = array_merge(
                 $submissionColumns,
                 $columns,
+                $event->getCampaignByChannelColumns(),
                 $event->getLeadColumns(),
                 $event->getIpColumn(),
                 $companyColumns
