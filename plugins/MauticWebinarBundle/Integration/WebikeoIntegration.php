@@ -183,7 +183,11 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     {
         $leadEmail = $lead->getEmail();
         if ($leadEmail && isset($webinar['webinar'])) {
-            $subscriptions = $this->getApiHelper()->getSubscriptions($webinar, $filters);
+            try {
+                $subscriptions = $this->getApiHelper()->getSubscriptions($webinar, $filters);
+            } catch (\Exception $e) {
+                $this->logIntegrationError($e);
+            }
             return $this->findSubscriptionByEmail($subscriptions, $leadEmail);
         }
 
@@ -218,8 +222,11 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         }
 
         $contactDataToPost = $this->formatContactData($contact, $campaign);
-        $response = $this->getApiHelper()->subscribeContact($webinar['webinar'], $contactDataToPost);
-
+        try {
+            $response = $this->getApiHelper()->subscribeContact($webinar['webinar'], $contactDataToPost);
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
+        }
         return isset($response['source']);
     }
 
