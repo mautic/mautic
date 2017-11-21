@@ -623,8 +623,7 @@ class LeadApiController extends CommonApiController
         //Since the request can be from 3rd party, check for an IP address if included
         if (isset($originalParams['ipAddress'])) {
             $ipAddress = $this->factory->getIpAddress($originalParams['ipAddress']);
-
-            if (!$entity->getIpAddresses()->contains($ipAddress)) {
+            if (!in_array($ipAddress, $entity->getIpAddresses())) {
                 $entity->addIpAddress($ipAddress);
             }
 

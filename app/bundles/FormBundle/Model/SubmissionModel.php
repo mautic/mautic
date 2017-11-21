@@ -991,7 +991,7 @@ class SubmissionModel extends CommonFormModel
             }
         } elseif (!$inKioskMode) {
             $leadIpAddresses = $lead->getIpAddresses();
-            if (!$leadIpAddresses->contains($ipAddress)) {
+            if (!in_array($ipAddress, $leadIpAddresses)) {
                 $lead->addIpAddress($ipAddress);
 
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
