@@ -1227,7 +1227,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Get social cache.
      *
-     * @return mixed
+     * @return array
      */
     public function getSocialCache()
     {
