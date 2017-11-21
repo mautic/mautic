@@ -325,7 +325,7 @@ class ReportSubscriber extends CommonSubscriber
                     break;
 
                 case 'mautic.mobile_notification.table.most.mobile_notifications.read':
-                    $queryBuilder->select('pn.id, pn.heading as title, count(CASE WHEN pns.is_read THEN 1 ELSE null END) as "read"')
+                    $queryBuilder->select('pn.id, pn.heading as title, count(CASE WHEN pns.date_read THEN 1 ELSE null END) as "read"')
                         ->groupBy('pn.id, pn.heading')
                         ->orderBy('"read"', 'DESC');
                     $limit                  = 10;
