@@ -190,7 +190,10 @@ return [
                 ],
             ],
             'mautic.form.reportbundle.subscriber' => [
-                'class' => ReportSubscriber::class,
+                'class'     => ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
             'mautic.form.campaignbundle.subscriber' => [
                 'class'     => CampaignSubscriber::class,

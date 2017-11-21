@@ -310,6 +310,17 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add company left join.
+     *
+     * @param QueryBuilder $queryBuilder
+     */
+    public function addCompanyLeftJoin(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
+        $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
+    }
+
+    /**
      * Apply date filters to the query.
      *
      * @param QueryBuilder $queryBuilder
@@ -357,7 +368,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         static $sorted;
 
-        if (null == $sorted) {
+        if (null === $sorted) {
             $columns = $this->getReport()->getColumns();
 
             foreach ($columns as $field) {
