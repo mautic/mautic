@@ -79,7 +79,9 @@ class BuildJsSubscriber extends CommonSubscriber
                      'submittingMessage': "{$this->translator->trans('mautic.form.submission.pleasewait')}"
         };
             }
-MauticJS.replaceDynamicContent = function () {
+MauticJS.replaceDynamicContent = function (params) {
+    params = params || {};
+
     var dynamicContentSlots = document.querySelectorAll('.mautic-slot, [data-slot="dwc"]');
     if (dynamicContentSlots.length) {
         MauticJS.iterateCollection(dynamicContentSlots)(function(node, i) {
@@ -92,11 +94,18 @@ MauticJS.replaceDynamicContent = function () {
                 return;
             }
             var url = '{$dwcUrl}'.replace('slotNamePlaceholder', slotName);
-            MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
-                if (response.length) {
-                    node.innerHTML = response;
+
+            MauticJS.makeCORSRequest('GET', url, params, function(response, xhr) {
+                if (response.content) {
+                    var dwcContent = response.content;
+                    node.innerHTML = dwcContent;
+
+                    if (response.id && response.sid) {
+                        MauticJS.setTrackedContact(response);
+                    }
+
                     // form load library
-                    if (response.search("mauticform_wrapper") > 0) {
+                    if (dwcContent.search("mauticform_wrapper") > 0) {
                         // if doesn't exist
                         if (typeof MauticSDK == 'undefined') {
                             MauticJS.insertScript('{$this->assetsHelper->getUrl('media/js/mautic-form.js', null, null, true)}');
@@ -116,13 +125,13 @@ MauticJS.replaceDynamicContent = function () {
                     var m;
                     var regEx = /<script[^>]+src="?([^"\s]+)"?\s/g;                    
                     
-                    while (m = regEx.exec(response)) {
+                    while (m = regEx.exec(dwcContent)) {
                         if ((m[1]).search("/focus/") > 0) {
                             MauticJS.insertScript(m[1]);
                         }
                     }
 
-                    if (response.search("fr-gatedvideo") > 0) {
+                    if (dwcContent.search("fr-gatedvideo") > 0) {
                         MauticJS.initGatedVideo();
                     }
                 }
@@ -131,7 +140,7 @@ MauticJS.replaceDynamicContent = function () {
     }
 };
 
-MauticJS.onFirstEventDelivery(MauticJS.replaceDynamicContent);
+MauticJS.beforeFirstEventDelivery(MauticJS.replaceDynamicContent);
 JS;
         $event->appendJs($js, 'Mautic Dynamic Content');
     }

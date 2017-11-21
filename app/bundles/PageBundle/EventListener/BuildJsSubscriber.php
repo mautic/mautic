@@ -121,11 +121,23 @@ class BuildJsSubscriber extends CommonSubscriber
             
             return;
         }
-        
+
         if (m.fingerprintComponents) {
             params = m.addFingerprint(params);
         }
-        
+
+        // Pre delivery events always take all known params and should use them in the request
+        if (m.preEventDeliveryQueue.length && m.beforeFirstDeliveryMade === false) {
+            for(var i = 0; i < m.preEventDeliveryQueue.length; i++) {
+                m.preEventDeliveryQueue[i](params);
+            }
+
+            // In case the first delivery set sid, append it
+            params = m.appendTrackedContact(params);
+
+            m.beforeFirstDeliveryMade = true;
+        }
+
         MauticJS.makeCORSRequest('POST', m.pageTrackingCORSUrl, params, 
         function(response) {
             MauticJS.dispatchEvent('mauticPageEventDelivered', {'event': event, 'params': params, 'response': response});
