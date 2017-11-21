@@ -65,6 +65,13 @@ class FormFieldHelperTest extends \PHPUnit_Framework_TestCase
                 'Tags should be stripped from textarea field values submitted via GET to prevent XSS.',
             ],
             [
+                $this->getField('Description', 'textarea'),
+                '%22%20onfocus=%22alert(123)',
+                '<textarea id="mauticform_input_mautic_description"></textarea>',
+                '<textarea id="mauticform_input_mautic_description">&quot; onfocus=&quot;alert(123)</textarea>',
+                'Tags should be stripped from textarea field values submitted via GET to prevent XSS.',
+            ],
+            [
                 $this->getField('Checkbox Single', 'checkboxgrp'),
                 'myvalue',
                 '<input id="mauticform_checkboxgrp_checkbox1" value="myvalue"/><input id="mauticform_checkboxgrp_checkbox2" value="notmyvalue"/>',
