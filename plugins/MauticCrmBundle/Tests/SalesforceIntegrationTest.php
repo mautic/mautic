@@ -29,6 +29,7 @@ use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -147,7 +148,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $sf    = $this->getSalesforceIntegration();
         $stats = $sf->pushLeads();
 
-        $this->assertEquals(400, count($this->getPersistedIntegrationEntities()));
+        $this->assertCount(400, $this->getPersistedIntegrationEntities());
         $this->assertEquals(300, $stats[0], var_export($stats, true)); // update
         $this->assertEquals(100, $stats[1], var_export($stats, true)); // create
     }
@@ -160,11 +161,11 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         // Validate there are only two integration entities (two contacts with same email)
         $integrationEntities = $this->getPersistedIntegrationEntities();
-        $this->assertEquals(2, count($integrationEntities));
+        $this->assertCount(2, $integrationEntities);
 
-        // Validate that there were 4 found entries (two duplciate leads)
+        // Validate that there were 4 found entries (two duplicate leads)
         $sfEntities = $this->getReturnedSfEntities();
-        $this->assertEquals(4, count($sfEntities));
+        $this->assertCount(4, $sfEntities);
     }
 
     public function testThatMultipleSfContactsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated()
@@ -497,6 +498,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $sf->pushLeadToCampaign($lead, 1, 'Active', ['Lead' => [1]]);
     }
+
     public function testPushCompany()
     {
         $this->sfObjects     = ['Account'];
@@ -1100,6 +1102,12 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs([$mockFactory])
             ->setMethods($this->sfMockMethods)
             ->getMock();
+
+        $integrationEntityModelMock = $this->getMockBuilder(IntegrationEntityModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $sf->setIntegrationEntityModel($integrationEntityModelMock);
 
         $sf->method('makeRequest')
             ->will(
