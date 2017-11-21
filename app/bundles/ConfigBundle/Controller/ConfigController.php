@@ -16,7 +16,6 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,28 +40,18 @@ class ConfigController extends FormController
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.paths'), $this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
-        // Extract and base64 encode file contents
-        $fileFields             = $event->getFileFields();
-        $formConfigs            = $event->getForms();
-        $formThemes             = $event->getFormThemes();
-        $doNotChange            = $this->coreParametersHelper->getParameter('security.restrictedConfigFields');
-        $doNotChangeDisplayMode = $this->coreParametersHelper->getParameter('security.restrictedConfigFields.displayMode', 'remove');
-
-        $this->mergeParamsWithLocal($formConfigs, $doNotChange);
-
-        /* @type \Mautic\ConfigBundle\Model\ConfigModel $model */
-        $model = $this->getModel('config');
+        $fileFields  = $event->getFileFields();
+        $formThemes  = $event->getFormThemes();
+        $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
-        $form   = $model->createForm(
+        $form   = $this->get('form.factory')->create(
+            'config',
             $formConfigs,
-            $this->get('form.factory'),
             [
-                'action'                 => $action,
-                'doNotChange'            => $doNotChange,
-                'doNotChangeDisplayMode' => $doNotChangeDisplayMode,
-                'fileFields'             => $fileFields,
+                'action'     => $action,
+                'fileFields' => $fileFields,
             ]
         );
 
@@ -255,52 +244,5 @@ class ConfigController extends FormController
         }
 
         return new JsonResponse(['success' => $success]);
-    }
-
-    /**
-     * Merges default parameters from each subscribed bundle with the local (real) params.
-     *
-     * @param array $forms
-     * @param array $doNotChange
-     */
-    private function mergeParamsWithLocal(&$forms, $doNotChange)
-    {
-        // Import the current local configuration, $parameters is defined in this file
-
-        /** @var \AppKernel $kernel */
-        $kernel          = $this->container->get('kernel');
-        $localConfigFile = $kernel->getLocalConfigFile();
-
-        /** @var $parameters */
-        include $localConfigFile;
-
-        $localParams = $parameters;
-
-        foreach ($forms as &$form) {
-            // Merge the bundle params with the local params
-            $this->applyRestrictions($form['parameters'], $localParams, $doNotChange);
-        }
-    }
-
-    /**
-     * @param array $parameters
-     * @param array $localParams
-     * @param array $doNotChange
-     */
-    private function applyRestrictions(array &$parameters, array $localParams, array $doNotChange)
-    {
-        foreach ($parameters as $key => $parameter) {
-            $removed = false;
-            if (in_array($key, $doNotChange)) {
-                unset($parameters[$key]);
-                $removed = true;
-            } elseif (array_key_exists($key, $doNotChange)) {
-                $this->applyRestrictions($parameters[$key], $localParams[$key], $doNotChange[$key]);
-            }
-
-            if (!$removed && array_key_exists($key, $localParams)) {
-                $parameters[$key] = (is_string($localParams[$key])) ? str_replace('%%', '%', $localParams[$key]) : $localParams[$key];
-            }
-        }
     }
 }

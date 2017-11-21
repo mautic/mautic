@@ -28,9 +28,8 @@ class FetcherTest extends \PHPUnit_Framework_TestCase
             'encryption'        => '/ssl',
             'user'              => 'user',
             'password'          => 'password',
-            'override_settings' => '',
+            'override_settings' => 0,
             'folder'            => 'INBOX',
-            'ssl'               => '1',
             'imap_path'         => '{mail.test.com:993/imap/ssl}',
         ],
         'EmailBundle_unsubscribes' => [
@@ -40,9 +39,8 @@ class FetcherTest extends \PHPUnit_Framework_TestCase
             'encryption'        => '/ssl',
             'user'              => 'user',
             'password'          => 'password',
-            'override_settings' => '',
+            'override_settings' => 0,
             'folder'            => 'INBOX',
-            'ssl'               => '1',
             'imap_path'         => '{mail.test.com:993/imap/ssl}',
         ],
         'EmailBundle_replies' => [
@@ -52,9 +50,8 @@ class FetcherTest extends \PHPUnit_Framework_TestCase
             'encryption'        => '/ssl',
             'user'              => 'user',
             'password'          => 'password',
-            'override_settings' => '',
+            'override_settings' => 0,
             'folder'            => 'INBOX',
-            'ssl'               => '1',
             'imap_path'         => '{mail.test.com:993/imap/ssl}',
         ],
     ];
