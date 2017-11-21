@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\FormBundle\Entity\Field;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CompanyReportData
 {
@@ -21,11 +22,26 @@ class CompanyReportData
      */
     private $fieldModel;
 
-    public function __construct(FieldModel $fieldModel)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * CompanyReportData constructor.
+     *
+     * @param FieldModel          $fieldModel
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(FieldModel $fieldModel, TranslatorInterface $translator)
     {
         $this->fieldModel = $fieldModel;
+        $this->translator = $translator;
     }
 
+    /**
+     * @return array
+     */
     public function getCompanyData()
     {
         $companyColumns = $this->getCompanyColumns();
@@ -143,7 +159,7 @@ class CompanyReportData
                     break;
             }
             $columns[$prefix.$f->getAlias()] = [
-                'label' => $f->getLabel(),
+                'label' => $this->translator->trans('mautic.report.field.company.label', ['%field%' => $f->getLabel()]),
                 'type'  => $type,
             ];
         }

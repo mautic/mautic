@@ -752,6 +752,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Model\CompanyReportData::class,
                 'arguments' => [
                     'mautic.lead.model.field',
+                    'translator',
                 ],
             ],
             'mautic.lead.model.dnc' => [

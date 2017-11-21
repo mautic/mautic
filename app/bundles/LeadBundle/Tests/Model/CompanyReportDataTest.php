@@ -11,13 +11,34 @@
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function setUp()
+    {
+        $this->translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translator->method('trans')
+            ->willReturnCallback(
+                function ($key) {
+                    return $key;
+                }
+            );
+    }
+
     /**
      * @covers \Mautic\LeadBundle\Model\CompanyReportData::getCompanyData
      */
@@ -46,7 +67,7 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
             ->method('getEntities')
             ->willReturn($fields);
 
-        $companyReportData = new CompanyReportData($fieldModelMock);
+        $companyReportData = new CompanyReportData($fieldModelMock, $this->translator);
 
         $result = $companyReportData->getCompanyData();
 
@@ -86,11 +107,11 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
                 'type'  => 'bool',
             ],
             'comp.boolField' => [
-                'label' => 'boolFieldLabel',
+                'label' => 'mautic.report.field.company.label',
                 'type'  => 'bool',
             ],
             'comp.emailField' => [
-                'label' => 'emailFieldLabel',
+                'label' => 'mautic.report.field.company.label',
                 'type'  => 'email',
             ],
         ];
@@ -116,7 +137,7 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
             ->with('comp.id')
             ->willReturn(true);
 
-        $companyReportData = new CompanyReportData($fieldModelMock);
+        $companyReportData = new CompanyReportData($fieldModelMock, $this->translator);
 
         $result = $companyReportData->eventHasCompanyColumns($eventMock);
 
@@ -140,7 +161,7 @@ class CompanyReportDataTest extends \PHPUnit_Framework_TestCase
             ->method('hasColumn')
             ->willReturn(false);
 
-        $companyReportData = new CompanyReportData($fieldModelMock);
+        $companyReportData = new CompanyReportData($fieldModelMock, $this->translator);
 
         $result = $companyReportData->eventHasCompanyColumns($eventMock);
 
