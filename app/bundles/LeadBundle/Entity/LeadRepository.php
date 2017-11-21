@@ -856,7 +856,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         if ($this->dispatcher) {
-            $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q, $this->getEntityManager());
+            $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
             $this->dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
             if ($event->isSearchDone()) {
                 $returnParameter = $event->getReturnParameters();
