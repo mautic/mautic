@@ -353,7 +353,7 @@ class ReportSubscriber extends CommonSubscriber
 
                 if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
-                    $event->addIpAddressLeftJoin($qb, 'lp');
+                    $event->addIpAddressLeftJoin($qb, 'lip');
                 }
 
                 break;
