@@ -9,8 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\LeadBundle\EventListener\ReportSubscriber;
-
 return [
     'routes' => [
         'main' => [
@@ -369,7 +367,7 @@ return [
                 ],
             ],
             'mautic.lead.reportbundle.subscriber' => [
-                'class'     => ReportSubscriber::class,
+                'class'     => \Mautic\LeadBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'mautic.lead.model.list',
                     'mautic.lead.model.field',
