@@ -1107,6 +1107,9 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $integrationEntityModelMock->method('getEntityByIdAndSetSyncDate')
+            ->willReturn(new IntegrationEntity());
+
         $sf->setIntegrationEntityModel($integrationEntityModelMock);
 
         $sf->method('makeRequest')
