@@ -78,6 +78,34 @@ class LeadProviderModel
      */
     private function updateLead(Lead $target, Lead $source)
     {
+        $target->setPoints($source->getPoints());
+        $target->setCountry($source->getCountry());
+        $target->setTimezone($target->getTimezone());
+        $target->setZipcode($target->getZipcode());
+        $target->setMobile($target->getMobile());
+        $target->setAddress1($source->getAddress1());
+        $target->setAddress2($source->getAddress2());
+        $target->setCity($source->getCity());
+        $target->setState($source->getState());
+        $target->setEmail($source->getEmail());
+        $target->setPhone($source->getPhone());
+        $target->setMobile($source->getMobile());
+        $target->setPosition($source->getPosition());
+        $target->setCompany($source->getCompany());
+        $target->setTitle($source->getTitle());
+        $target->setOwner($source->getOwner());
+        $target->setColor($source->getColor());
+        $target->setFirstname($source->getFirstname());
+        $target->setLastname($source->getLastname());
+        $target->setStage($source->getStage());
+        $sourceIpAddresses = $source->getIpAddresses();
+        $targetIpAddresses = $target->getIpAddresses();
+        foreach ($sourceIpAddresses as $sourceIpAddress) {
+            if (!in_array($sourceIpAddress, $targetIpAddresses)) {
+                $target->addIpAddress($sourceIpAddress);
+            }
+        }
+        $target->setSocialCache(array_merge($target->getSocialCache(), $source->getSocialCache()));
         $this->em->flush($target);
 
         return $target;
