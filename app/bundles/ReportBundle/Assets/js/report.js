@@ -57,12 +57,15 @@ Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
     Mautic.checkIsScheduled($isScheduled);
 
     var unitVal = mQuery($unitTypeId).val();
-    mQuery('#scheduleDay, #scheduleMonthFrequency').hide();
+    mQuery('#scheduleDay, #scheduleDay label, #scheduleMonthFrequency').hide();
     if (unitVal === 'WEEKLY' || unitVal === 'MONTHLY') {
         mQuery('#scheduleDay').show();
     }
     if (unitVal === 'MONTHLY') {
         mQuery('#scheduleMonthFrequency').show();
+        mQuery('#scheduleDay label').hide();
+    } else {
+        mQuery('#scheduleDay label').show();
     }
     Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
 };
@@ -99,8 +102,8 @@ Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $sch
 };
 
 Mautic.checkIsScheduled = function ($isScheduled) {
-    var $scheduleForm = mQuery('#schedule_form');
-    if (!mQuery(mQuery($isScheduled)).prop("checked")) {
+    var $scheduleForm = mQuery('#schedule-container .schedule_form');
+    if (!mQuery($isScheduled).prop("checked")) {
         $scheduleForm.show();
         return;
     }

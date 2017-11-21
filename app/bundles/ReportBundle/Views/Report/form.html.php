@@ -144,44 +144,29 @@ $showGraphTab = count($form['graphs']->vars['choices']);
                         <div class="tab-pane fade bdr-w-0" id="schedule-container">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="pa-md">
-                                        <?php echo $view['form']->row($form['isScheduled']); ?>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="schedule_form">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="pa-md">
-                                            <?php echo $view['form']->row($form['toAddress']); ?>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row" id="schedule_form">
-                                    <div class="col-md-6">
-                                        <div class="pa-md">
-                                            <?php echo $view['form']->row($form['scheduleUnit']); ?>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="pa-md">
-                                            <div id='scheduleMonthFrequency''>
-                                                <?php echo $view['form']->row($form['scheduleMonthFrequency']); ?>
-                                            </div>
-                                            <div id='scheduleDay'>
-                                                <?php echo $view['form']->row($form['scheduleDay']); ?>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <?php echo $view['form']->row($form['isScheduled']); ?>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12">
-                                    <div class="pa-md">
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="schedule_form">
+                                        <?php echo $view['form']->row($form['toAddress']); ?>
+                                        <?php echo $view['form']->row($form['scheduleUnit']); ?>
+
+                                        <div id='scheduleMonthFrequency''>
+                                            <?php echo $view['form']->row($form['scheduleMonthFrequency']); ?>
+                                        </div>
+                                        <div id='scheduleDay'>
+                                            <?php echo $view['form']->row($form['scheduleDay']); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="schedule_form well well-sm mt-lg">
                                         <span id="schedule_preview_url" data-url="<?php echo $view['router']->path('mautic_report_schedule_preview'); ?>"></span>
                                         <div id="schedule_preview_data">
                                             <strong><?php echo $view['translator']->trans('mautic.report.schedule.preview_data'); ?></strong>
-                                            <div id="schedule_preview_data_content"></div>
+                                            <div id="schedule_preview_data_content" class="mt-sm"></div>
                                         </div>
                                     </div>
                                 </div>
