@@ -9,27 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\ReportBundle\Adapter\ReportDataAdapter;
-use Mautic\ReportBundle\EventListener\SchedulerSubscriber;
-use Mautic\ReportBundle\Form\Type\ReportType;
-use Mautic\ReportBundle\Model\CsvExporter;
-use Mautic\ReportBundle\Model\ExcelExporter;
-use Mautic\ReportBundle\Model\ExportHandler;
-use Mautic\ReportBundle\Model\ReportExporter;
-use Mautic\ReportBundle\Model\ReportExportOptions;
-use Mautic\ReportBundle\Model\ReportFileWriter;
-use Mautic\ReportBundle\Model\ReportModel;
-use Mautic\ReportBundle\Model\ScheduleModel;
-use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
-use Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand;
-use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
-use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
-use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
-use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
-use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
-use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
-use Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator;
-
 return [
     'routes' => [
         'main' => [
@@ -119,13 +98,13 @@ return [
                 ],
             ],
             'mautic.report.scheduler.report_scheduler_subscriber' => [
-                'class'     => ReportSchedulerSubscriber::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_planner',
                 ],
             ],
             'mautic.report.report.schedule_subscriber' => [
-                'class'     => SchedulerSubscriber::class,
+                'class'     => \Mautic\ReportBundle\EventListener\SchedulerSubscriber::class,
                 'arguments' => [
                     'mautic.report.model.send_schedule',
                 ],
@@ -133,7 +112,7 @@ return [
         ],
         'forms' => [
             'mautic.form.type.report' => [
-                'class'     => ReportType::class,
+                'class'     => \Mautic\ReportBundle\Form\Type\ReportType::class,
                 'arguments' => [
                     'mautic.report.model.report',
                     'translator',
@@ -180,7 +159,7 @@ return [
         ],
         'models' => [
             'mautic.report.model.report' => [
-                'class'     => ReportModel::class,
+                'class'     => \Mautic\ReportBundle\Model\ReportModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.templating',
@@ -192,49 +171,49 @@ return [
                 ],
             ],
             'mautic.report.model.csv_exporter' => [
-                'class'     => CsvExporter::class,
+                'class'     => \Mautic\ReportBundle\Model\CsvExporter::class,
                 'arguments' => [
                     'mautic.helper.template.formatter',
                 ],
             ],
             'mautic.report.model.excel_exporter' => [
-                'class'     => ExcelExporter::class,
+                'class'     => \Mautic\ReportBundle\Model\ExcelExporter::class,
                 'arguments' => [
                     'mautic.helper.template.formatter',
                 ],
             ],
             'mautic.report.model.scheduler_builder' => [
-                'class'     => SchedulerBuilder::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_template_factory',
                 ],
             ],
             'mautic.report.model.scheduler_template_factory' => [
-                'class'     => SchedulerTemplateFactory::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory::class,
                 'arguments' => [],
             ],
             'mautic.report.model.scheduler_date_builder' => [
-                'class'     => DateBuilder::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\Date\DateBuilder::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_builder',
                 ],
             ],
             'mautic.report.model.scheduler_planner' => [
-                'class'     => SchedulerPlanner::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_date_builder',
                     'doctrine.orm.default_entity_manager',
                 ],
             ],
             'mautic.report.model.send_schedule' => [
-                'class'     => SendSchedule::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\Model\SendSchedule::class,
                 'arguments' => [
                     'mautic.helper.mailer',
                     'mautic.report.model.message_schedule',
                 ],
             ],
             'mautic.report.model.message_schedule' => [
-                'class'     => MessageSchedule::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\Model\MessageSchedule::class,
                 'arguments' => [
                     'translator',
                     'mautic.helper.file_properties',
@@ -243,7 +222,7 @@ return [
                 ],
             ],
             'mautic.report.model.report_exporter' => [
-                'class'     => ReportExporter::class,
+                'class'     => \Mautic\ReportBundle\Model\ReportExporter::class,
                 'arguments' => [
                     'mautic.report.model.schedule_model',
                     'mautic.report.model.report_data_adapter',
@@ -253,33 +232,33 @@ return [
                 ],
             ],
             'mautic.report.model.schedule_model' => [
-                'class'     => ScheduleModel::class,
+                'class'     => \Mautic\ReportBundle\Model\ScheduleModel::class,
                 'arguments' => [
                     'doctrine.orm.default_entity_manager',
                     'mautic.report.model.scheduler_planner',
                 ],
             ],
             'mautic.report.model.report_data_adapter' => [
-                'class'     => ReportDataAdapter::class,
+                'class'     => \Mautic\ReportBundle\Adapter\ReportDataAdapter::class,
                 'arguments' => [
                     'mautic.report.model.report',
                 ],
             ],
             'mautic.report.model.report_export_options' => [
-                'class'     => ReportExportOptions::class,
+                'class'     => \Mautic\ReportBundle\Model\ReportExportOptions::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.report.model.report_file_writer' => [
-                'class'     => ReportFileWriter::class,
+                'class'     => \Mautic\ReportBundle\Model\ReportFileWriter::class,
                 'arguments' => [
                     'mautic.report.model.csv_exporter',
                     'mautic.report.model.export_handler',
                 ],
             ],
             'mautic.report.model.export_handler' => [
-                'class'     => ExportHandler::class,
+                'class'     => \Mautic\ReportBundle\Model\ExportHandler::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.file_path_resolver',
@@ -288,7 +267,7 @@ return [
         ],
         'validator' => [
             'mautic.report.validator.schedule_is_valid_validator' => [
-                'class'     => ScheduleIsValidValidator::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator::class,
                 'arguments' => [
                     'mautic.report.model.scheduler_builder',
                 ],
@@ -297,7 +276,7 @@ return [
         ],
         'command' => [
             'mautic.report.command.export_scheduler' => [
-                'class'     => ExportSchedulerCommand::class,
+                'class'     => \Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand::class,
                 'arguments' => [
                     'mautic.report.model.report_exporter',
                     'translator',
