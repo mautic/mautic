@@ -389,13 +389,6 @@ class ReportController extends FormController
                     //reset old columns
                     $entity->setColumns($oldColumns);
                     $entity->setGraphs($oldGraphs);
-                    if ($this->getFormErrorMessages($form)) {
-                        foreach ($this->getFormErrorMessages($form) as $error) {
-                            $this->addFlash($error[0], [], 'error');
-                        }
-                    } else {
-                        $this->addFlash('mautic.core.error.not.valid', [], 'error');
-                    }
                 }
             } else {
                 //unlock the entity
@@ -421,7 +414,7 @@ class ReportController extends FormController
                         ]
                     )
                 );
-            } else {
+            } elseif ($valid) {
                 // Rebuild the form for updated columns
                 $form = $model->createForm($entity, $this->get('form.factory'), $action);
             }
