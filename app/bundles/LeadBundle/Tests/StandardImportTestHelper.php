@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -137,6 +138,7 @@ abstract class StandardImportTestHelper extends CommonMocks
 
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
+            ->setMethods(['getEventLogRepository', 'saveEntity'])
             ->getMock();
 
         $leadModel->setEntityManager($entityManager);
@@ -145,11 +147,47 @@ abstract class StandardImportTestHelper extends CommonMocks
             ->method('getEventLogRepository')
             ->will($this->returnValue($logRepository));
 
+        $leadModel->expects($this->any())
+            ->method('saveEntity')
+            ->willReturn(true);
+
+        $this->assertNotNull($leadModel);
+
+        $leadFieldModel = $this->getMockBuilder(FieldModel::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['getEntities'])
+            ->getMock();
+
+        // @ToDo Needs to return actual lead fields
+        $leadFieldModel->expects($this->any())
+            ->method('getEntities')
+            ->willReturn([]);
+
+        $reflected = new \ReflectionProperty(LeadModel::class, 'leadFieldModel');
+
+        $reflected->setAccessible(true);
+
+        $reflected->setValue($leadModel, $leadFieldModel);
+
         $companyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
+            ->setMethods(['getEventLogRepository', 'fetchCompanyFields'])
             ->getMock();
 
         $companyModel->setEntityManager($entityManager);
+
+        // @ToDo Needs to return actual company fields
+        $companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
+
+        $this->assertNotNull($companyModel);
+
+        $reflected = new \ReflectionProperty(LeadModel::class, 'companyModel');
+
+        $reflected->setAccessible(true);
+
+        $reflected->setValue($leadModel, $companyModel);
 
         $notificationModel = $this->getMockBuilder(NotificationModel::class)
             ->disableOriginalConstructor()
