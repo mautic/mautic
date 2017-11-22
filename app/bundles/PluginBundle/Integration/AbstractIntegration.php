@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -1864,7 +1865,7 @@ abstract class AbstractIntegration
                     continue;
                 }
                 if ('mauticContactIsContactableByEmail' === $leadFields[$integrationKey]) {
-                    $matched[$integrationKey] = $lead->getDoNotContact();
+                    $matched[$integrationKey] = $this->getLeadDoNotContact($leadId);
 
                     continue;
                 }
@@ -2720,13 +2721,12 @@ abstract class AbstractIntegration
      *
      * @return int
      */
-    public function getLeadDonotContact($leadId, $channel = 'email',  $sfObject = 'Lead', $sfIds = [])
+    public function getLeadDoNotContact($leadId, $channel = 'email')
     {
         $isContactable = 1;
-        $lead          = $this->leadModel->getEntity($leadId);
-        if ($lead) {
+        if ($lead = $this->leadModel->getEntity($leadId)) {
             $isContactableReason = $this->leadModel->isContactable($lead, $channel);
-            if ($isContactableReason === 0) {
+            if (DoNotContact::IS_CONTACTABLE !== $isContactableReason) {
                 $isContactable = 0;
             }
         }
@@ -2741,11 +2741,11 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function getCompoundMauticFields($lead, $sfObject = 'Lead')
+    public function getCompoundMauticFields($lead)
     {
         if ($lead['internal_entity_id']) {
             $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);
-            $lead['mauticContactIsContactableByEmail'] = $this->getLeadDonotContact($lead['internal_entity_id']);
+            $lead['mauticContactIsContactableByEmail'] = $this->getLeadDoNotContact($lead['internal_entity_id']);
         }
 
         return $lead;

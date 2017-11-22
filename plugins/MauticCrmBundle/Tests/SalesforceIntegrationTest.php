@@ -497,6 +497,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $sf->pushLeadToCampaign($lead, 1, 'Active', ['Lead' => [1]]);
     }
+
     public function testPushCompany()
     {
         $this->sfObjects     = ['Account'];
