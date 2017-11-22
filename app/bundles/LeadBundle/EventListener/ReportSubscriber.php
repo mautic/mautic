@@ -159,7 +159,9 @@ class ReportSubscriber extends CommonSubscriber
                 ),
             ];
 
-            $event->addTable(self::CONTEXT_LEADS, $data, self::GROUP_CONTACTS);
+            foreach ($this->leadContexts as $context) {
+                $event->addTable($context, $data, self::GROUP_CONTACTS);
+            }
 
             $attributionTypes = [
                 self::CONTEXT_CONTACT_ATTRIBUTION_MULTI,
@@ -180,13 +182,14 @@ class ReportSubscriber extends CommonSubscriber
             if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_LEAD_POINT_LOG])) {
                 // Add shared graphs
                 $event->addGraph(self::CONTEXT_LEADS, 'line', 'mautic.lead.graph.line.leads');
+                $event->addGraph(self::CONTEXT_LEAD_POINT_LOG, 'line', 'mautic.lead.graph.line.leads');
 
                 if ($event->checkContext(self::CONTEXT_LEAD_POINT_LOG)) {
                     $this->injectPointsReportData($event, $columns);
                 }
             }
 
-            if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_CONTACT_FREQUENCYRULES])) {
+            if ($event->checkContext([self::CONTEXT_CONTACT_FREQUENCYRULES])) {
                 $this->injectFrequencyReportData($event, $columns);
             }
         }
@@ -202,11 +205,13 @@ class ReportSubscriber extends CommonSubscriber
                 'filters'      => $companyFilters,
             ];
 
-            $event->addTable(self::CONTEXT_COMPANIES, $data, self::CONTEXT_COMPANIES);
-            $event->addGraph(self::CONTEXT_COMPANIES, 'line', 'mautic.lead.graph.line.companies');
-            $event->addGraph(self::CONTEXT_COMPANIES, 'pie', 'mautic.lead.graph.pie.companies.industry');
-            $event->addGraph(self::CONTEXT_COMPANIES, 'pie', 'mautic.lead.table.pie.company.country');
-            $event->addGraph(self::CONTEXT_COMPANIES, 'table', 'mautic.lead.company.table.top.cities');
+            foreach ($this->companyContexts as $context) {
+                $event->addTable($context, $data, self::CONTEXT_COMPANIES);
+                $event->addGraph($context, 'line', 'mautic.lead.graph.line.companies');
+                $event->addGraph($context, 'pie', 'mautic.lead.graph.pie.companies.industry');
+                $event->addGraph($context, 'pie', 'mautic.lead.table.pie.company.country');
+                $event->addGraph($context, 'table', 'mautic.lead.company.table.top.cities');
+            }
         }
     }
 
