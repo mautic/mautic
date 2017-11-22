@@ -429,6 +429,15 @@ return [
                 ],
             ],
         ],
+        'validator' => [
+            'mautic.email.validator.multiple_emails_valid_validator' => [
+                'class'     => \Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
+        ],
     ],
     'parameters' => [
         'mailer_api_key'                      => null, // Api key from mail delivery provider.

@@ -32,6 +32,82 @@ Mautic.reportOnLoad = function (container) {
     Mautic.updateReportGlueTriggers();
     Mautic.checkSelectedGroupBy();
     Mautic.initDateRangePicker();
+
+    var $isScheduled = mQuery('[data-report-schedule="isScheduled"]');
+    var $unitTypeId = mQuery('[data-report-schedule="scheduleUnit"]');
+    var $scheduleDay = mQuery('[data-report-schedule="scheduleDay"]');
+    var $scheduleMonthFrequency = mQuery('[data-report-schedule="scheduleMonthFrequency"]');
+
+    mQuery($isScheduled).change(function () {
+        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    mQuery($unitTypeId).change(function () {
+        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    mQuery($scheduleDay).change(function () {
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    mQuery($scheduleMonthFrequency).change(function () {
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+};
+
+Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
+    Mautic.checkIsScheduled($isScheduled);
+
+    var unitVal = mQuery($unitTypeId).val();
+    mQuery('#scheduleDay, #scheduleDay label, #scheduleMonthFrequency').hide();
+    if (unitVal === 'WEEKLY' || unitVal === 'MONTHLY') {
+        mQuery('#scheduleDay').show();
+    }
+    if (unitVal === 'MONTHLY') {
+        mQuery('#scheduleMonthFrequency').show();
+        mQuery('#scheduleDay label').hide();
+    } else {
+        mQuery('#scheduleDay label').show();
+    }
+    Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+};
+
+Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
+    var previewUrl = mQuery('#schedule_preview_url').data('url');
+    var $schedulePreviewData = mQuery('#schedule_preview_data');
+
+    var isScheduledVal = 0;
+    if (!mQuery($isScheduled).prop("checked")) { //$isScheduled.val() does not work
+        isScheduledVal = 1;
+    }
+
+    if (!isScheduledVal) {
+        $schedulePreviewData.hide();
+
+        return;
+    }
+    var unitVal = mQuery($unitTypeId).val();
+    var scheduleDayVal = mQuery($scheduleDay).val();
+    var scheduleMonthFrequencyVal = mQuery($scheduleMonthFrequency).val();
+
+    mQuery.get(
+        previewUrl + '/' + isScheduledVal + '/' + unitVal + '/' + scheduleDayVal + '/' + scheduleMonthFrequencyVal,
+        function( data ) {
+            if (!data.html) {
+                return;
+            }
+
+            mQuery("#schedule_preview_data_content").html(data.html);
+            $schedulePreviewData.show();
+        }
+    );
+};
+
+Mautic.checkIsScheduled = function ($isScheduled) {
+    var $scheduleForm = mQuery('#schedule-container .schedule_form');
+    if (!mQuery($isScheduled).prop("checked")) {
+        $scheduleForm.show();
+        return;
+    }
+    $scheduleForm.hide();
 };
 
 /**
