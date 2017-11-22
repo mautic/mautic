@@ -160,7 +160,11 @@ class RabbitMQIntegration extends AbstractIntegration
             'Email' => 'email',
             'FirstName' => 'first_name',
             'LastName' => 'last_name',
-            'Company' => 'company'
+            'Company' => 'company',
+            'Address' => 'address',
+            'MobilePhone' => 'mobile',
+            'Gender__c' => 'gender',
+            'Birthday__c' => 'birthday'
         ];
     }
 
