@@ -389,7 +389,7 @@ final class LeadEvents
     const DEVICE_POST_DELETE = 'mautic.lead_device_post_delete';
 
     /**
-     * The mautic.lead_device_pre_save event is dispatched right before a lead tag is persisted.
+     * The mautic.lead_tag_pre_save event is dispatched right before a lead tag is persisted.
      *
      * The event listener receives a
      * Mautic\LeadBundle\Event\TagEvent instance.
@@ -399,7 +399,7 @@ final class LeadEvents
     const TAG_PRE_SAVE = 'mautic.lead_tag_pre_save';
 
     /**
-     * The mautic.lead_device_post_save event is dispatched right after a lead tag is persisted.
+     * The mautic.lead_tag_post_save event is dispatched right after a lead tag is persisted.
      *
      * The event listener receives a
      * Mautic\LeadBundle\Event\TagEvent instance.
@@ -409,7 +409,7 @@ final class LeadEvents
     const TAG_POST_SAVE = 'mautic.lead_tag_post_save';
 
     /**
-     * The mautic.lead_device_pre_delete event is dispatched before a lead tag is deleted.
+     * The mautic.lead_tag_pre_delete event is dispatched before a lead tag is deleted.
      *
      * The event listener receives a
      * Mautic\LeadBundle\Event\TagEvent instance.
@@ -419,7 +419,7 @@ final class LeadEvents
     const TAG_PRE_DELETE = 'mautic.lead_tag_pre_delete';
 
     /**
-     * The mautic.lead_device_post_delete event is dispatched after a lead tag is deleted.
+     * The mautic.lead_tag_post_delete event is dispatched after a lead tag is deleted.
      *
      * The event listener receives a
      * Mautic\LeadBundle\Event\TagEvent instance.
