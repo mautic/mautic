@@ -702,6 +702,13 @@ return [
                     \Mautic\LeadBundle\Entity\DoNotContact::class,
                 ],
             ],
+            'mautic.lead.repository.lead' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\Lead::class,
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [

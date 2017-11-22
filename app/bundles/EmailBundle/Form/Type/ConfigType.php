@@ -11,9 +11,9 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -23,13 +23,18 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class ConfigType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var TranslatorInterface
      */
-    private $factory;
+    private $translator;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * ConfigType constructor.
+     *
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->factory = $factory;
+        $this->translator = $translator;
     }
 
     /**
@@ -51,7 +56,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (array_key_exists('unsubscribe_text', $options['data']) && !empty($options['data']['unsubscribe_text']))
                     ? $options['data']['unsubscribe_text']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.unsubscribe.text',
                         ['%link%' => '|URL|']
                     ),
@@ -71,7 +76,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (array_key_exists('webview_text', $options['data']) && !empty($options['data']['webview_text']))
                     ? $options['data']['webview_text']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.webview.text',
                         ['%link%' => '|URL|']
                     ),
@@ -91,7 +96,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (array_key_exists('unsubscribe_message', $options['data']) && !empty($options['data']['unsubscribe_message']))
                     ? $options['data']['unsubscribe_message']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.unsubscribed.success',
                         [
                             '%resubscribeUrl%' => '|URL|',
@@ -114,7 +119,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (array_key_exists('resubscribe_message', $options['data']) && !empty($options['data']['resubscribe_message']))
                     ? $options['data']['resubscribe_message']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.resubscribed.success',
                         [
                             '%unsubscribeUrl%' => '|URL|',
@@ -137,7 +142,7 @@ class ConfigType extends AbstractType
                 'required' => false,
                 'data'     => (!empty($options['data']['default_signature_text']))
                     ? $options['data']['default_signature_text']
-                    : $this->factory->getTranslator()->trans(
+                    : $this->translator->trans(
                         'mautic.email.default.signature',
                         [
                             '%from_name%' => '|FROM_NAME|',

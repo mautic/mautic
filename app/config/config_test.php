@@ -21,7 +21,7 @@ $envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
 $env->load($envFile);
 
 // Define some constants from .env
-defined('MAUTIC_DB_PREFIX') || define('MAUTIC_DB_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
 
 $container->loadFromExtension('framework', [
