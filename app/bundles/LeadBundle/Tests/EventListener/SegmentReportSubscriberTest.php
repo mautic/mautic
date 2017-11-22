@@ -212,6 +212,16 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn('segment.membership');
 
+        $reportMock->expects($this->exactly(2))
+            ->method('getColumns')
+            ->with()
+            ->willReturn([]);
+
+        $reportMock->expects($this->exactly(2))
+            ->method('getFilters')
+            ->with()
+            ->willReturn([]);
+
         $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();

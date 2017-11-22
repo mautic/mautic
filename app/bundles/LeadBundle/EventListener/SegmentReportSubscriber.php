@@ -95,8 +95,16 @@ class SegmentReportSubscriber extends CommonSubscriber
         $qb = $event->getQueryBuilder();
         $qb->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
             ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lll.lead_id')
-            ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 's', 's.id = lll.leadlist_id')
-            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+            ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 's', 's.id = lll.leadlist_id');
+
+        if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+            $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+        }
+
+        if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+            $event->addLeadIpAddressLeftJoin($qb);
+        }
+
         $event->setQueryBuilder($qb);
     }
 }
