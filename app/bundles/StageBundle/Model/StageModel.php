@@ -199,7 +199,7 @@ class StageModel extends CommonFormModel
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getUserStages()
     {

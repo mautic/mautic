@@ -18,16 +18,14 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
-use Mautic\UserBundle\Model\UserModel;
 
 /**
  * Class ReportSubscriber.
@@ -56,16 +54,6 @@ class ReportSubscriber extends CommonSubscriber
     private $companyContexts = [self::CONTEXT_COMPANIES];
 
     /**
-     * @var ListModel
-     */
-    protected $listModel;
-
-    /**
-     * @var ListModel
-     */
-    protected $fieldModel;
-
-    /**
      * @var LeadModel
      */
     protected $leadModel;
@@ -86,9 +74,9 @@ class ReportSubscriber extends CommonSubscriber
     protected $companyModel;
 
     /**
-     * @var UserModel
+     * @var FieldsBuilder
      */
-    protected $userModel;
+    private $fieldsBuilder;
 
     /**
      * @var array
@@ -106,35 +94,27 @@ class ReportSubscriber extends CommonSubscriber
     private $companyReportData;
 
     /**
-     * ReportSubscriber constructor.
-     *
-     * @param ListModel         $listModel
-     * @param FieldModel        $fieldModel
      * @param LeadModel         $leadModel
      * @param StageModel        $stageModel
      * @param CampaignModel     $campaignModel
-     * @param UserModel         $userModel
      * @param CompanyModel      $companyModel
      * @param CompanyReportData $companyReportData
+     * @param FieldsBuilder     $fieldsBuilder
      */
     public function __construct(
-        ListModel $listModel,
-        FieldModel $fieldModel,
         LeadModel $leadModel,
         StageModel $stageModel,
         CampaignModel $campaignModel,
-        UserModel $userModel,
         CompanyModel $companyModel,
-        CompanyReportData $companyReportData
+        CompanyReportData $companyReportData,
+        FieldsBuilder $fieldsBuilder
     ) {
-        $this->listModel         = $listModel;
-        $this->fieldModel        = $fieldModel;
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;
         $this->campaignModel     = $campaignModel;
-        $this->userModel         = $userModel;
         $this->companyModel      = $companyModel;
         $this->companyReportData = $companyReportData;
+        $this->fieldsBuilder     = $fieldsBuilder;
     }
 
     /**
@@ -162,81 +142,17 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         if ($event->checkContext($this->leadContexts)) {
-            $columns = [
-                'l.id' => [
-                    'label' => 'mautic.lead.report.contact_id',
-                    'type'  => 'int',
-                    'link'  => 'mautic_contact_action',
-                ],
-                'i.ip_address' => [
-                    'label' => 'mautic.core.ipaddress',
-                    'type'  => 'text',
-                ],
-                'l.date_identified' => [
-                    'label'          => 'mautic.lead.report.date_identified',
-                    'type'           => 'datetime',
-                    'groupByFormula' => 'DATE(l.date_identified)',
-                ],
-                'l.points' => [
-                    'label' => 'mautic.lead.points',
-                    'type'  => 'int',
-                ],
-                'l.owner_id' => [
-                    'label' => 'mautic.lead.report.owner_id',
-                    'type'  => 'int',
-                    'link'  => 'mautic_user_action',
-                ],
-                'u.first_name' => [
-                    'label' => 'mautic.lead.report.owner_firstname',
-                    'type'  => 'string',
-                ],
-                'u.last_name' => [
-                    'label' => 'mautic.lead.report.owner_lastname',
-                    'type'  => 'string',
-                ],
-            ];
-
-            $leadFields = $this->fieldModel->getEntities([
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'f.object',
-                            'expr'   => 'like',
-                            'value'  => 'lead',
-                        ],
-                    ],
-                ],
-            ]);
-
             $companyColumns = $this->companyReportData->getCompanyData();
 
-            $filters = $columns = array_merge(
-                $columns,
-                $companyColumns,
-                $this->getFieldColumns($leadFields, 'l.')
+            $columns = array_merge(
+                $this->fieldsBuilder->getLeadFieldsColumns('l.'),
+                $companyColumns
             );
 
-            // Append segment filters
-            $userSegments = $this->listModel->getUserLists();
-            $list         = [];
-            foreach ($userSegments as $segment) {
-                $list[$segment['id']] = $segment['name'];
-            }
-            $filters['s.leadlist_id'] = [
-                'alias'     => 'segment_id',
-                'label'     => 'mautic.core.filter.lists',
-                'type'      => 'select',
-                'list'      => $list,
-                'operators' => [
-                    'eq' => 'mautic.core.operator.equals',
-                ],
-            ];
-
-            $filters['l.owner_id'] = [
-                'label' => 'mautic.lead.list.filter.owner',
-                'type'  => 'select',
-                'list'  => $this->userModel->getRepository()->getUserList('', 0),
-            ];
+            $filters = array_merge(
+                $this->fieldsBuilder->getLeadFilter('l.', 's.'),
+                $companyColumns
+            );
 
             $data = [
                 'display_name' => 'mautic.lead.leads',
@@ -257,7 +173,7 @@ class ReportSubscriber extends CommonSubscriber
                 foreach ($attributionTypes as $attributionType) {
                     if (empty($context) || $event->checkContext($attributionType)) {
                         $type = str_replace('contact.attribution.', '', $attributionType);
-                        $this->injectAttributionReportData($event, $columns, $type);
+                        $this->injectAttributionReportData($event, $columns, $filters, $type);
                     }
                 }
             }
@@ -265,30 +181,36 @@ class ReportSubscriber extends CommonSubscriber
             if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_LEAD_POINT_LOG])) {
                 // Add shared graphs
                 $event->addGraph(self::CONTEXT_LEADS, 'line', 'mautic.lead.graph.line.leads');
+                $event->addGraph(self::CONTEXT_LEAD_POINT_LOG, 'line', 'mautic.lead.graph.line.leads');
 
                 if ($event->checkContext(self::CONTEXT_LEAD_POINT_LOG)) {
-                    $this->injectPointsReportData($event, $columns);
+                    $this->injectPointsReportData($event, $columns, $filters);
                 }
             }
 
-            if ($event->checkContext([self::CONTEXT_LEADS, self::CONTEXT_CONTACT_FREQUENCYRULES])) {
-                $this->injectFrequencyReportData($event, $columns);
+            if ($event->checkContext([self::CONTEXT_CONTACT_FREQUENCYRULES])) {
+                $this->injectFrequencyReportData($event, $columns, $filters);
             }
         }
 
         if ($event->checkContext($this->companyContexts)) {
-            $companyColumns = $this->companyReportData->getCompanyData();
+            $companyColumns = $this->fieldsBuilder->getCompanyFieldsColumns('comp.');
+
+            $companyFilters = $companyColumns;
 
             $data = [
                 'display_name' => 'mautic.lead.lead.companies',
                 'columns'      => $companyColumns,
+                'filters'      => $companyFilters,
             ];
 
-            $event->addTable(self::CONTEXT_COMPANIES, $data, self::CONTEXT_COMPANIES);
-            $event->addGraph(self::CONTEXT_COMPANIES, 'line', 'mautic.lead.graph.line.companies');
-            $event->addGraph(self::CONTEXT_COMPANIES, 'pie', 'mautic.lead.graph.pie.companies.industry');
-            $event->addGraph(self::CONTEXT_COMPANIES, 'pie', 'mautic.lead.table.pie.company.country');
-            $event->addGraph(self::CONTEXT_COMPANIES, 'table', 'mautic.lead.company.table.top.cities');
+            foreach ($this->companyContexts as $context) {
+                $event->addTable($context, $data, self::CONTEXT_COMPANIES);
+                $event->addGraph($context, 'line', 'mautic.lead.graph.line.companies');
+                $event->addGraph($context, 'pie', 'mautic.lead.graph.pie.companies.industry');
+                $event->addGraph($context, 'pie', 'mautic.lead.table.pie.company.country');
+                $event->addGraph($context, 'table', 'mautic.lead.company.table.top.cities');
+            }
         }
     }
 
@@ -315,8 +237,7 @@ class ReportSubscriber extends CommonSubscriber
                 }
 
                 if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
-                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
-                    $event->addIpAddressLeftJoin($qb, 'lip');
+                    $event->addLeadIpAddressLeftJoin($qb);
                 }
 
                 if ($event->hasFilter('s.leadlist_id')) {
@@ -337,8 +258,7 @@ class ReportSubscriber extends CommonSubscriber
                 }
 
                 if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
-                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
-                    $event->addIpAddressLeftJoin($qb, 'lp');
+                    $event->addLeadIpAddressLeftJoin($qb);
                 }
 
                 break;
@@ -352,8 +272,7 @@ class ReportSubscriber extends CommonSubscriber
                 }
 
                 if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
-                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
-                    $event->addIpAddressLeftJoin($qb, 'lip');
+                    $event->addLeadIpAddressLeftJoin($qb);
                 }
 
                 break;
@@ -730,8 +649,9 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @param ReportBuilderEvent $event
      * @param array              $columns
+     * @param array              $filters
      */
-    private function injectPointsReportData(ReportBuilderEvent $event, array $columns)
+    private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $pointColumns = [
             'lp.type' => [
@@ -759,6 +679,7 @@ class ReportSubscriber extends CommonSubscriber
         $data = [
             'display_name' => 'mautic.lead.report.points.table',
             'columns'      => array_merge($columns, $pointColumns, $event->getIpColumn()),
+            'filters'      => $filters,
         ];
         $event->addTable(self::CONTEXT_LEAD_POINT_LOG, $data, self::GROUP_CONTACTS);
 
@@ -775,8 +696,9 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @param ReportBuilderEvent $event
      * @param array              $columns
+     * @param array              $filters
      */
-    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns)
+    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters)
     {
         $frequencyColumns = [
             'lf.frequency_number' => [
@@ -811,7 +733,8 @@ class ReportSubscriber extends CommonSubscriber
         ];
         $data = [
             'display_name' => 'mautic.lead.report.frequency.messages',
-            'columns'      => array_merge($columns, $frequencyColumns, $event->getIpColumn()),
+            'columns'      => array_merge($columns, $frequencyColumns),
+            'filters'      => $filters,
         ];
         $event->addTable(self::CONTEXT_CONTACT_FREQUENCYRULES, $data, self::GROUP_CONTACTS);
     }
@@ -819,8 +742,10 @@ class ReportSubscriber extends CommonSubscriber
     /**
      * @param ReportBuilderEvent $event
      * @param array              $columns
+     * @param array              $filters
+     * @param string             $type
      */
-    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, $type)
+    private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, array $filters, $type)
     {
         $attributionColumns = [
             'log.campaign_id' => [
@@ -867,7 +792,8 @@ class ReportSubscriber extends CommonSubscriber
             ],
         ];
 
-        $filters = $columns = array_merge($columns, $event->getCategoryColumns('cat.'), $attributionColumns);
+        $columns = array_merge($columns, $event->getCategoryColumns('cat.'), $attributionColumns);
+        $filters = array_merge($filters, $event->getCategoryColumns('cat.'), $attributionColumns);
 
         // Setup available channels
         $availableChannels = $this->campaignModel->getEvents();
@@ -981,50 +907,5 @@ class ReportSubscriber extends CommonSubscriber
 
         $event->setData($data);
         unset($data);
-    }
-
-    /**
-     * @param $fields
-     * @param $prefix
-     *
-     * @return array
-     */
-    protected function getFieldColumns($fields, $prefix)
-    {
-        $columns = [];
-        foreach ($fields as $f) {
-            switch ($f->getType()) {
-                case 'boolean':
-                    $type = 'bool';
-                    break;
-                case 'date':
-                    $type = 'date';
-                    break;
-                case 'datetime':
-                    $type = 'datetime';
-                    break;
-                case 'time':
-                    $type = 'time';
-                    break;
-                case 'url':
-                    $type = 'url';
-                    break;
-                case 'email':
-                    $type = 'email';
-                    break;
-                case 'number':
-                    $type = 'float';
-                    break;
-                default:
-                    $type = 'string';
-                    break;
-            }
-            $columns[$prefix.$f->getAlias()] = [
-                'label' => $f->getLabel(),
-                'type'  => $type,
-            ];
-        }
-
-        return $columns;
     }
 }
