@@ -156,6 +156,9 @@ trait RequestTrait
             case 'number':
                 $fieldData[$leadField['alias']] = (float) $fieldData[$leadField['alias']];
                 break;
+            case 'email':
+                $fieldData[$leadField['alias']] = InputHelper::email($fieldData[$leadField['alias']]);
+                break;
         }
     }
 }

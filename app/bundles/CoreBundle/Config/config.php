@@ -9,6 +9,12 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\CoreBundle\Helper\FilePathResolver;
+use Mautic\CoreBundle\Helper\FileUploader;
+use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Validator\FileUploadValidator;
+use Symfony\Component\Filesystem\Filesystem;
+
 return [
     'routes' => [
         'main' => [
@@ -284,6 +290,13 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotButtonType',
                 'alias' => 'slot_button',
             ],
+            'mautic.form.type.slot.saveprefsbutton' => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
+                'alias'     => 'slot_saveprefsbutton',
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'mautic.form.type.slot.image' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotImageType',
                 'alias' => 'slot_image',
@@ -308,9 +321,41 @@ return [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotSocialFollowType',
                 'alias' => 'slot_socialfollow',
             ],
+            'mautic.form.type.slot.segmentlist' => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
+                'alias'     => 'slot_segmentlist',
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.slot.categorylist' => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotCategoryListType',
+                'alias'     => 'slot_categorylist',
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.slot.preferredchannel' => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotPreferredChannelType',
+                'alias'     => 'slot_preferredchannel',
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.form.type.slot.channelfrequency' => [
+                'class'     => 'Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType',
+                'alias'     => 'slot_channelfrequency',
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'mautic.form.type.slot.codemode' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\SlotCodeModeType',
                 'alias' => 'slot_codemode',
+            ],
+            'mautic.form.type.slot.dwc' => [
+                'class' => 'Mautic\CoreBundle\Form\Type\SlotDwcType',
+                'alias' => 'slot_dwc',
             ],
             'mautic.form.type.theme.upload' => [
                 'class' => 'Mautic\CoreBundle\Form\Type\ThemeUploadType',
@@ -471,6 +516,22 @@ return [
             'mautic.helper.phone_number' => [
                 'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
             ],
+            'mautic.helper.input_helper' => [
+                'class' => InputHelper::class,
+            ],
+            'mautic.helper.file_uploader' => [
+                'class'     => FileUploader::class,
+                'arguments' => [
+                    'mautic.helper.file_path_resolver',
+                ],
+            ],
+            'mautic.helper.file_path_resolver' => [
+                'class'     => FilePathResolver::class,
+                'arguments' => [
+                    'symfony.filesystem',
+                    'mautic.helper.input_helper',
+                ],
+            ],
         ],
         'menus' => [
             'mautic.menu.main' => [
@@ -496,6 +557,10 @@ return [
             ],
         ],
         'other' => [
+            'symfony.filesystem' => [
+                'class' => Filesystem::class,
+            ],
+
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',
@@ -804,6 +869,14 @@ return [
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
                     'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
+        'validator' => [
+            'mautic.core.validator.file_upload' => [
+                'class'     => FileUploadValidator::class,
+                'arguments' => [
+                    'translator',
                 ],
             ],
         ],

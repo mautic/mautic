@@ -295,7 +295,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->addIndex(['date_added'], 'lead_date_added');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -1542,7 +1542,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
 
         if (!empty($attribution) && empty($attributionDate)) {
             $this->addUpdatedField('attribution_date', (new \DateTime())->format('Y-m-d'));
-        } elseif (empty($attribution)) {
+        } elseif (empty($attribution) && !empty($attributionDate)) {
             $this->addUpdatedField('attribution_date', null);
         }
     }

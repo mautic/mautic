@@ -133,10 +133,52 @@ class SalesforceApi extends CrmApi
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
             $findLead = 'select '.$fields.' from Lead where email = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['Lead']['Email'])).'\' and ConvertedContactId = NULL';
-            $response = $this->request('query', ['q' => $findLead], 'GET', false, null, $queryUrl);
+            $response = $this->request('queryAll', ['q' => $findLead], 'GET', false, null, $queryUrl);
 
             if (!empty($response['records'])) {
                 $sfRecords['Lead'] = $response['records'];
+            }
+        }
+
+        return $sfRecords;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    public function getCompany(array $data)
+    {
+        $config    = $this->integration->mergeConfigToFeatureSettings([]);
+        $queryUrl  = $this->integration->getQueryUrl();
+        $sfRecords = [
+            'Account' => [],
+        ];
+
+        $appendToQuery = '';
+
+        //try searching for lead as this has been changed before in updated done to the plugin
+        if (isset($config['objects']) && false !== array_search('company', $config['objects']) && !empty($data['company']['Name'])) {
+            $fields = $this->integration->getFieldsForQuery('Account');
+
+            if (isset($data['company']['BillingCountry']) && !empty($data['company']['BillingCountry'])) {
+                $appendToQuery .= ' and BillingCountry =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingCountry'])).'\'';
+            }
+            if (isset($data['company']['BillingCity']) && !empty($data['company']['BillingCity'])) {
+                $appendToQuery .= ' and BillingCity =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingCity'])).'\'';
+            }
+            if (isset($data['company']['BillingState']) && !empty($data['company']['BillingState'])) {
+                $appendToQuery .= ' and BillingState =  \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['BillingState'])).'\'';
+            }
+
+            $fields[]    = 'Id';
+            $fields      = implode(', ', array_unique($fields));
+            $findContact = 'select '.$fields.' from Account where Name = \''.str_replace("'", "\'", $this->integration->cleanPushData($data['company']['Name'])).'\''.$appendToQuery;
+            $response    = $this->request('queryAll', ['q' => $findContact], 'GET', false, null, $queryUrl);
+
+            if (!empty($response['records'])) {
+                $sfRecords['company'] = $response['records'];
             }
         }
 
@@ -216,7 +258,7 @@ class SalesforceApi extends CrmApi
      *
      * @return array|mixed|string
      */
-    public function createLeadActivity(array $activity, $object)
+    public function createLeadActivity(array $activity, $object, $filters = [])
     {
         $config              = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
@@ -308,9 +350,9 @@ class SalesforceApi extends CrmApi
             }
 
             $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'].$ignoreConvertedLeads;
-            $result        = $this->request('query', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
+            $result        = $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         } else {
-            $result = $this->request('query', ['q' => $query], 'GET', false, null, $queryUrl);
+            $result = $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
         }
 
         return $result;

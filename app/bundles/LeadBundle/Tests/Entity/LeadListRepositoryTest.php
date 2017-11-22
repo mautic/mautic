@@ -47,11 +47,11 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $expr   = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
         $string = (string) $expr;
 
-        $found = preg_match_all('/EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
+        $found = preg_match_all('/EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'leads .*? LEFT JOIN '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(2, $found, $string);
 
         // Segment filters combined by OR to keep consistent behavior with the use of leadlist_id IN (1,2,3)
-        $found = preg_match_all('/OR \(EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
+        $found = preg_match_all('/OR \(EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'leads .*? LEFT JOIN '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(1, $found, $string);
 
         $found = preg_match_all('/\(l.email = :(.*?)\)/', $string, $matches);
@@ -86,11 +86,11 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $string = (string) $expr;
 
         // Two segments included
-        $found = preg_match_all('/EXISTS \(SELECT null FROM lead_lists_leads/', $string, $matches);
+        $found = preg_match_all('/EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(2, $found, $string);
 
         // Segment filters combined by OR to keep consistent behavior with the use of leadlist_id IN (1,2,3)
-        $found = preg_match_all('/OR \(EXISTS \(SELECT null FROM lead_lists_leads/', $string, $matches);
+        $found = preg_match_all('/OR \(EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(1, $found, $string);
     }
 
@@ -117,11 +117,11 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $expr   = $reflectedMethod->invokeArgs($mockRepository, [$filters, &$parameters, $qb]);
         $string = (string) $expr;
 
-        $found = preg_match_all('/NOT EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
+        $found = preg_match_all('/NOT EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'leads .*? LEFT JOIN '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(2, $found, $string);
 
         // Segment filters combined by AND to keep consistent behavior with the use of leadlist_id IN (1,2,3)
-        $found = preg_match_all('/AND \(NOT EXISTS \(SELECT null FROM leads .*? LEFT JOIN lead_lists_leads/', $string, $matches);
+        $found = preg_match_all('/AND \(NOT EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'leads .*? LEFT JOIN '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(1, $found, $string);
 
         $found = preg_match_all('/\(l.email = :(.*?)\)/', $string, $matches);
@@ -156,11 +156,11 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
         $string = (string) $expr;
 
         // Two segments included
-        $found = preg_match_all('/NOT EXISTS \(SELECT null FROM lead_lists_leads/', $string, $matches);
+        $found = preg_match_all('/NOT EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(2, $found, $string);
 
         // Segment filters combined by AND to keep consistent behavior with the use of leadlist_id NOT IN (1,2,3)
-        $found = preg_match_all('/AND \(NOT EXISTS \(SELECT null FROM lead_lists_leads/', $string, $matches);
+        $found = preg_match_all('/AND \(NOT EXISTS \(SELECT null FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads/', $string, $matches);
         $this->assertEquals(1, $found, $string);
     }
 

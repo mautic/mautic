@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\UserBundle\Entity\User;
+use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 /**
  * Class CrmAbstractIntegration.
@@ -60,8 +61,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $config
+     * @param Lead|array $lead
+     * @param array      $config
      *
      * @return array|bool
      */
@@ -83,7 +84,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         try {
             if ($this->isAuthorized()) {
-                $LeadData = $this->getApiHelper()->createLead($mappedData, $lead);
+                $this->getApiHelper()->createLead($mappedData, $lead);
 
                 return true;
             }
@@ -174,7 +175,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * Get the API helper.
      *
-     * @return object
+     * @return CrmApi
      */
     public function getApiHelper()
     {
@@ -187,6 +188,13 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     }
 
     /**
+     * @param array $params
+     */
+    public function pushLeadActivity($params = [])
+    {
+    }
+
+    /**
      * @param \DateTime|null $startDate
      * @param \DateTime|null $endDate
      * @param                $leadId
@@ -195,14 +203,91 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     public function getLeadData(\DateTime $startDate = null, \DateTime $endDate = null, $leadId)
     {
-        return [];
-    }
+        $leadIds      = (!is_array($leadId)) ? [$leadId] : $leadId;
+        $leadActivity = [];
 
-    /**
-     * @param array $params
-     */
-    public function pushLeadActivity($params = [])
-    {
+        $config = $this->mergeConfigToFeatureSettings();
+        if (!isset($config['activityEvents'])) {
+            // BC for pre 2.11.0
+            $config['activityEvents'] = ['point.gained', 'form.submitted', 'email.read'];
+        } elseif (empty($config['activityEvents'])) {
+            // Inclusive filter meaning we only send events if something is selected
+            return [];
+        }
+
+        $filters = [
+            'search'        => '',
+            'includeEvents' => $config['activityEvents'],
+            'excludeEvents' => [],
+        ];
+
+        if ($startDate) {
+            $filters['dateFrom'] = $startDate;
+            $filters['dateTo']   = $endDate;
+        }
+
+        foreach ($leadIds as $leadId) {
+            $i        = 0;
+            $activity = [];
+            $lead     = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $page     = 1;
+
+            while (true) {
+                $engagements = $this->leadModel->getEngagements($lead, $filters, null, $page, 100, false);
+                $events      = $engagements[0]['events'];
+
+                if (empty($events)) {
+                    break;
+                }
+
+                // inject lead into events
+                foreach ($events as $event) {
+                    $link  = '';
+                    $label = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
+                    if (is_array($label)) {
+                        $link  = $label['href'];
+                        $label = $label['label'];
+                    }
+
+                    $activity[$i]['eventType']   = $event['eventType'];
+                    $activity[$i]['name']        = $event['eventType'].' - '.$label;
+                    $activity[$i]['description'] = $link;
+                    $activity[$i]['dateAdded']   = $event['timestamp'];
+
+                    // We must keep BC with pre 2.11.0 formatting in order to prevent duplicates
+                    switch ($event['eventType']) {
+                        case 'point.gained':
+                            $id = str_replace($event['eventType'], 'pointChange', $event['eventId']);
+                            break;
+                        case 'form.submitted':
+                            $id = str_replace($event['eventType'], 'formSubmission', $event['eventId']);
+                            break;
+                        case 'email.read':
+                            $id = str_replace($event['eventType'], 'emailStat', $event['eventId']);
+                            break;
+                        default:
+                            // Just to keep congruent formatting with the three above
+                            $id = str_replace(' ', '', ucwords(str_replace('.', ' ', $event['eventId'])));
+                    }
+
+                    $activity[$i]['id'] = $id;
+                    ++$i;
+                }
+
+                ++$page;
+
+                // Lots of entities will be loaded into memory while compiling these events so let's prevent memory overload by clearing the EM
+                $this->em->clear();
+            }
+
+            $leadActivity[$leadId] = [
+                'records' => $activity,
+            ];
+
+            unset($activity);
+        }
+
+        return $leadActivity;
     }
 
     /**
@@ -473,7 +558,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     public function getBlankFieldsToUpdate($fields, $sfRecord, $objectFields, $config)
     {
         //check if update blank fields is selected
-        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0]) && $config['updateBlanks'][0] == 'updateBlanks' && !empty($sfRecord)) {
+        if (isset($config['updateBlanks']) && isset($config['updateBlanks'][0])
+            && $config['updateBlanks'][0] == 'updateBlanks'
+            && !empty($sfRecord)
+            && isset($objectFields['required']['fields'])
+        ) {
             foreach ($sfRecord as $fieldName => $sfField) {
                 if (array_key_exists($fieldName, $objectFields['required']['fields'])) {
                     continue; // this will be treated differently

@@ -624,6 +624,10 @@ return [
                 'arguments' => ['router'],
                 'alias'     => 'addtocompany_action',
             ],
+            'mautic.lead.events.changeowner.type.form' => [
+                'class'     => 'Mautic\LeadBundle\Form\Type\ChangeOwnerType',
+                'arguments' => ['mautic.user.model.user'],
+            ],
             'mautic.company.list.type.form' => [
                 'class'     => 'Mautic\LeadBundle\Form\Type\CompanyListType',
                 'arguments' => [
@@ -696,6 +700,8 @@ return [
                     'mautic.channel.helper.channel_list',
                     '%mautic.track_contact_by_ip%',
                     'mautic.helper.core_parameters',
+                    'mautic.validator.email',
+                    'mautic.user.provider',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -721,6 +727,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.field',
                     'session',
+                    'mautic.validator.email',
                 ],
             ],
             'mautic.lead.model.import' => [

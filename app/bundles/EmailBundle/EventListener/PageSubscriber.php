@@ -89,7 +89,7 @@ class PageSubscriber extends CommonSubscriber
                 // Check to see if it has been marked as opened
                 if (!$stat->isRead()) {
                     // Mark it as read
-                    $this->emailModel->hitEmail($stat, $this->request);
+                    $this->emailModel->hitEmail($stat, $this->request ?: $event->getRequest());
                 }
             }
         }

@@ -75,6 +75,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 Url::class => ['message' => 'mautic.form.submission.url.invalid'],
             ],
         ],
+        'file' => [],
     ];
 
     /**
@@ -210,14 +211,14 @@ class FormFieldHelper extends AbstractFormFieldHelper
             case 'email':
             case 'hidden':
                 if (preg_match('/<input(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)value="(.*?)"(.*?)\/>/i', $formHtml, $match)) {
-                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.urldecode($value).'"'
+                    $replace = '<input'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'value="'.$this->sanitizeValue($value).'"'
                         .$match[4].'/>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
             case 'textarea':
                 if (preg_match('/<textarea(.*?)id="mauticform_input_'.$formName.'_'.$alias.'"(.*?)>(.*?)<\/textarea>/i', $formHtml, $match)) {
-                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.urldecode($value).'</textarea>';
+                    $replace  = '<textarea'.$match[1].'id="mauticform_input_'.$formName.'_'.$alias.'"'.$match[2].'>'.$this->sanitizeValue($value).'</textarea>';
                     $formHtml = str_replace($match[0], $replace, $formHtml);
                 }
                 break;
@@ -264,5 +265,10 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
                 break;
         }
+    }
+
+    public function sanitizeValue($value)
+    {
+        return strip_tags(urldecode($value));
     }
 }

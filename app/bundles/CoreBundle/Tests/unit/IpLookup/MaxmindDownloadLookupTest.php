@@ -21,7 +21,7 @@ class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
     public function testDownloadDataStore()
     {
         // Keep the file contained to cache/test
-        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../cache/test');
+        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
 
         $result = $ipService->downloadRemoteDataStore();
 
@@ -31,7 +31,7 @@ class MaxmindDownloadLookupTest extends \PHPUnit_Framework_TestCase
     public function testIpLookupSuccessful()
     {
         // Keep the file contained to cache/test
-        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../cache/test');
+        $ipService = new MaxmindDownloadLookup(null, null, __DIR__.'/../../../../../cache/test');
 
         $details = $ipService->setIpAddress('192.30.252.131')->getDetails();
 

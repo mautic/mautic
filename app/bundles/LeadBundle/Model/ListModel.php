@@ -273,7 +273,7 @@ class ListModel extends FormModel
                     'type'     => 'lookup_id',
                     'callback' => 'activateSegmentFilterTypeahead',
                 ],
-                'operators' => $this->getOperatorsForFieldType('text'),
+                'operators' => $this->getOperatorsForFieldType('lookup_id'),
                 'object'    => 'lead',
             ],
             'points' => [
@@ -585,6 +585,14 @@ class ListModel extends FormModel
                     ]
                 ),
                 'object' => 'lead',
+            ],
+            'source_id' => [
+                'label'      => $this->translator->trans('mautic.lead.list.filter.source.id'),
+                'properties' => [
+                    'type' => 'number',
+                ],
+                'operators' => $this->getOperatorsForFieldType('default'),
+                'object'    => 'lead',
             ],
             'notification' => [
                 'label'      => $this->translator->trans('mautic.lead.list.filter.notification'),

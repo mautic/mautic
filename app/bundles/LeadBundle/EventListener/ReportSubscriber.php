@@ -126,7 +126,7 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        $leadContexts    = ['leads', 'lead.pointlog', 'contact.attribution.multi', 'contact.attribution.first', 'contact.attribution.last'];
+        $leadContexts    = ['leads', 'lead.pointlog', 'contact.attribution.multi', 'contact.attribution.first', 'contact.attribution.last', 'contact.frequencyrules'];
         $companyContexts = ['companies'];
 
         if ($event->checkContext($leadContexts)) {
@@ -232,6 +232,10 @@ class ReportSubscriber extends CommonSubscriber
                     $this->injectPointsReportData($event, $columns);
                 }
             }
+
+            if ($event->checkContext(['leads', 'contact.frequencyrules'])) {
+                $this->injectFrequencyReportData($event, $columns);
+            }
         }
 
         if ($event->checkContext($companyContexts)) {
@@ -330,6 +334,21 @@ class ReportSubscriber extends CommonSubscriber
                 $event->applyDateFilters($qb, 'date_added', 'lp');
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
                     ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
+
+                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+                }
+
+                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_ips_xref', 'lip', 'lip.lead_id = l.id');
+                    $event->addIpAddressLeftJoin($qb, 'lp');
+                }
+
+                break;
+            case 'contact.frequencyrules':
+                $event->applyDateFilters($qb, 'date_added', 'lf');
+                $qb->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'lf')
+                    ->leftJoin('lf', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lf.lead_id');
 
                 if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
@@ -752,6 +771,50 @@ class ReportSubscriber extends CommonSubscriber
      * @param ReportBuilderEvent $event
      * @param array              $columns
      */
+    private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns)
+    {
+        $frequencyColumns = [
+            'lf.frequency_number' => [
+                'label' => 'mautic.lead.report.frequency.frequency_number',
+                'type'  => 'int',
+            ],
+            'lf.frequency_time' => [
+                'label' => 'mautic.lead.report.frequency.frequency_time',
+                'type'  => 'string',
+            ],
+            'lf.channel' => [
+                'label' => 'mautic.lead.report.frequency.channel',
+                'type'  => 'string',
+            ],
+            'lf.preferred_channel' => [
+                'label' => 'mautic.lead.report.frequency.preferred_channel',
+                'type'  => 'boolean',
+            ],
+            'lf.pause_from_date' => [
+                'label' => 'mautic.lead.report.frequency.pause_from_date',
+                'type'  => 'datetime',
+            ],
+            'lf.pause_to_date' => [
+                'label' => 'mautic.lead.report.frequency.pause_to_date',
+                'type'  => 'datetime',
+            ],
+            'lf.date_added' => [
+                'label'          => 'mautic.lead.report.frequency.date_added',
+                'type'           => 'datetime',
+                'groupByFormula' => 'DATE(lf.date_added)',
+            ],
+        ];
+        $data = [
+            'display_name' => 'mautic.lead.report.frequency.messages',
+            'columns'      => array_merge($columns, $frequencyColumns, $event->getIpColumn()),
+        ];
+        $event->addTable('contact.frequencyrules', $data, 'contacts');
+    }
+
+    /**
+     * @param ReportBuilderEvent $event
+     * @param array              $columns
+     */
     private function injectAttributionReportData(ReportBuilderEvent $event, array $columns, $type)
     {
         $attributionColumns = [
@@ -882,7 +945,7 @@ class ReportSubscriber extends CommonSubscriber
     {
         $data = $event->getData();
 
-        if ($event->checkContext(['contact.attribution.first', 'contact.attribution.last', 'contact.attribution.multi'])) {
+        if ($event->checkContext(['contact.attribution.first', 'contact.attribution.last', 'contact.attribution.multi', 'contact.message.frequency'])) {
             if (isset($data[0]['channel']) || isset($data[0]['channel_action']) || (isset($data[0]['activity_count']) && isset($data[0]['attribution']))) {
                 foreach ($data as $key => &$row) {
                     if (isset($row['channel'])) {

@@ -21,6 +21,11 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
  */
 class FieldApiController extends CommonApiController
 {
+    /**
+     * Can have value of 'contact' or 'company'.
+     *
+     * @var string
+     */
     protected $fieldObject;
 
     public function initialize(FilterControllerEvent $event)
@@ -45,6 +50,24 @@ class FieldApiController extends CommonApiController
         ];
 
         parent::initialize($event);
+    }
+
+    /**
+     * Sanitizes and returns an array of where statements from the request.
+     *
+     * @return array
+     */
+    protected function getWhereFromRequest()
+    {
+        $where = parent::getWhereFromRequest();
+
+        $where[] = [
+            'col'  => 'object',
+            'expr' => 'eq',
+            'val'  => $this->fieldObject,
+        ];
+
+        return $where;
     }
 
     /**

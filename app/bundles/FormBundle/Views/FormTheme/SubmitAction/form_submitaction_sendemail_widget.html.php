@@ -24,6 +24,8 @@
         <?php echo $view['form']->row($form['message']); ?>
     </div>
     <div class="col-sm-4">
+        <?php echo $view['form']->row($form['email_to_owner']); ?>
+
         <label class="control-label"><?php echo $view['translator']->trans('mautic.form.action.sendemail.dragfield'); ?></label>
         <div id="formFieldTokens" class="list-group" style="max-height: 250px; overflow-y: auto;">
             <?php foreach ($formFields as $token => $field): ?>

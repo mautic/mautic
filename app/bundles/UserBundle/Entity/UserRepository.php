@@ -203,6 +203,31 @@ class UserRepository extends CommonRepository
     }
 
     /**
+     * Return list of Users for formType Choice.
+     *
+     * @return array
+     */
+    public function getOwnerListChoices()
+    {
+        $q = $this->createQueryBuilder('u');
+
+        $q->select('partial u.{id, firstName, lastName}');
+
+        $q->andWhere('u.isPublished = true')
+            ->orderBy('u.firstName, u.lastName');
+
+        $users = $q->getQuery()->getResult();
+
+        $result = [];
+        /** @var User $user */
+        foreach ($users as $user) {
+            $result[$user->getId()] = $user->getName(true);
+        }
+
+        return $result;
+    }
+
+    /**
      * @param string $search
      * @param int    $limit
      * @param int    $start

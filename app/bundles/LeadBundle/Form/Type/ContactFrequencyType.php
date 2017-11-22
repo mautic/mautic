@@ -94,7 +94,7 @@ class ContactFrequencyType extends AbstractType
                         [
                             'precision'  => 0,
                             'label'      => 'mautic.lead.list.frequency.number',
-                            'label_attr' => ['class' => 'text-muted fw-n'],
+                            'label_attr' => ['class' => 'text-muted fw-n label1'],
                             'attr'       => array_merge(
                                 $attr,
                                 [
@@ -115,7 +115,7 @@ class ContactFrequencyType extends AbstractType
                                 FrequencyRule::TIME_MONTH => 'mautic.core.time.months',
                             ],
                             'label'      => 'mautic.lead.list.frequency.times',
-                            'label_attr' => ['class' => 'text-muted fw-n frequency-label'],
+                            'label_attr' => ['class' => 'text-muted fw-n frequency-label label2'],
                             'multiple'   => false,
                             'required'   => false,
                             'attr'       => array_merge(
@@ -152,7 +152,7 @@ class ContactFrequencyType extends AbstractType
                             [
                                 'widget'     => 'single_text',
                                 'label'      => false, //'mautic.lead.frequency.contact.start.date',
-                                'label_attr' => ['class' => 'text-muted fw-n'],
+                                'label_attr' => ['class' => 'text-muted fw-n label3'],
                                 'attr'       => $attributes,
                                 'format'     => 'yyyy-MM-dd',
                                 'required'   => false,
@@ -164,7 +164,7 @@ class ContactFrequencyType extends AbstractType
                             [
                                 'widget'     => 'single_text',
                                 'label'      => 'mautic.lead.frequency.contact.end.date',
-                                'label_attr' => ['class' => 'frequency-label text-muted fw-n'],
+                                'label_attr' => ['class' => 'frequency-label text-muted fw-n label4'],
                                 'attr'       => $attributes,
                                 'format'     => 'yyyy-MM-dd',
                                 'required'   => false,

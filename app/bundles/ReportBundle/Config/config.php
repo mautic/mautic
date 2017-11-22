@@ -123,6 +123,10 @@ return [
                 'alias'     => 'aggregator',
                 'arguments' => 'translator',
             ],
+            'mautic.form.type.report.settings' => [
+                'class' => \Mautic\ReportBundle\Form\Type\ReportSettingsType::class,
+                'alias' => 'report_settings',
+            ],
         ],
         'helpers' => [
             'mautic.report.helper.report' => [

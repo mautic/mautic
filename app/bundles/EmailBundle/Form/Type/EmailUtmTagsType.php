@@ -52,7 +52,7 @@ class EmailUtmTagsType extends AbstractType
         );
 
         $builder->add(
-            'utmName',
+            'utmCampaign',
             'text',
             [
                 'label'      => 'mautic.email.campaign_name',

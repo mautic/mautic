@@ -205,19 +205,47 @@ Every change to Mautic core happens via PRs. Every PR must have 2 successful tes
 5. Follow the steps from the PR description again to see if the result is as described.
 6. Write a comment about how the test went. If there is a problem, provide as much information as possible including error log messages.
 
-## Unit Tests
+## Testing
 
-Before executing unit tests, copy the `app/phpunit.xml.dist` file to `app/phpunit.xml`, then edit that file and update the
-database parameters to point to your test database. If you leave out those credentials, or do not update them to point to
-your test database, then your production database WILL BE TRUNCATED.
+Mautic uses [Codeception](https://codeception.com), [PHPUnit](https://phpunit.de), and [Selenium](http://www.seleniumhq.org)
+as our suite of testing tools.
 
-The unit tests can be executed in the Mautic root directory with `composer test` command.
+If you plan on running the acceptance test suite, you'll need to have the Selenium Server Standalone installed and the
+Chrome WebDriver available locally.
 
-If you get the following error when running `composer test`, you need to copy the `app/phpunit.xml.dist` file to `app/phpunit.xml`.
 
-```bash
-<error>Script phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml handling the test event returned with error code 1</error>
+#### Mac OS
+
+If you're on a Mac and you use [Homebrew](https://brew.sh), you can install Selenium by running `brew install selenium-server-standalone`.
+You'll also need to download the latest [Chrome WebDriver](https://sites.google.com/a/chromium.org/chromedriver/downloads).
+Unzip and move the `chromedriver` file to `/usr/local/Cellar/selenium-server-standalone/drivers/chromedriver`.
+Once you have Selenium installed and the WebDriver available at the specified location, open and modify the plist file found at `/usr/local/Cellar/selenium-server-standalone/3.5.3/homebrew.mxcl.selenium-server-standalone.plist`.
+In the `<dict><array>` block under `ProgramArguments`, add the following after the line containing `<string>-jar</string>`"
+
+```xml
+...
+<string>-Dwebdriver.chrome.driver=/usr/local/Cellar/selenium-server-standalone/drivers/chromedriver</string>
+...
 ```
+
+With that completed, you may now start the Selenium server using `brew services start selenium-server-standalone`.
+
+#### Other Platforms
+
+Follow the standard installation procedure for Selenium server standalone. Ensure that you have the chrome driver
+available, and startup the server with the following command:
+
+```sh
+java -jar -Dwebdriver.chrome.driver=/path/to/chromedriver /full/path/to/selenium-server-standalone.3.x.x.jar
+```
+
+#### Executing Tests
+
+Before executing unit tests, modify the `.env.test` file in your project root to reflect your local environment
+configuration.
+
+All test suites can be executed by running `bin/codecept run` from the project root. Optionally, you can specify
+running just the `acceptance`, `functional`, or `unit` test suites by adding one of those words after the `run` command.
 
 ## Static Analysis
 

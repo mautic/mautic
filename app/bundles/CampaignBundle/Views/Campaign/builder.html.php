@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="hide builder campaign-builder">
+<div class="hide builder campaign-builder live">
     <button type="button" class="btn btn-primary btn-close-campaign-builder" onclick="Mautic.closeCampaignBuilder();">
         <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
     </button>

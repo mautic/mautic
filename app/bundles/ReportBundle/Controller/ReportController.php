@@ -630,8 +630,20 @@ class ReportController extends FormController
 
         // Setup dynamic filters
         $filterDefinitions = $model->getFilterList($entity->getSource());
-        $dynamicFilters    = $session->get('mautic.report.'.$objectId.'.filters', []);
-        $filterSettings    = [];
+        /** @var array $dynamicFilters */
+        $dynamicFilters = $session->get('mautic.report.'.$objectId.'.filters', []);
+        $filterSettings = [];
+
+        if (count($dynamicFilters) > 0 && count($entity->getFilters()) > 0) {
+            foreach ($entity->getFilters() as $fid => $filter) {
+                foreach ($dynamicFilters as $dfcol => $dfval) {
+                    if (1 === $filter['dynamic'] && $filter['column'] === $dfcol) {
+                        $dynamicFilters[$dfcol]['expr'] = $filter['condition'];
+                        break;
+                    }
+                }
+            }
+        }
 
         foreach ($dynamicFilters as $filter) {
             $filterSettings[$filterDefinitions->definitions[$filter['column']]['alias']] = $filter['value'];
@@ -788,6 +800,9 @@ class ReportController extends FormController
         $date    = (new DateTimeHelper())->toLocalString();
         $name    = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
         $options = ['dateFrom' => new \DateTime($fromDate), 'dateTo' => new \DateTime($toDate)];
+
+        $dynamicFilters            = $session->get('mautic.report.'.$objectId.'.filters', []);
+        $options['dynamicFilters'] = $dynamicFilters;
 
         if ($format === 'csv') {
             $response = new HttpFoundation\StreamedResponse(
