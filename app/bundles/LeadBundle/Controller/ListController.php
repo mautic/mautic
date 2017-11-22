@@ -12,15 +12,18 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends FormController
 {
+    use EntityContactsTrait;
     /**
      * Generate's default list view.
      *
@@ -543,6 +546,158 @@ class ListController extends FormController
             array_merge($postActionVars, [
                 'flashes' => $flashes,
             ])
+        );
+    }
+
+    /**
+     * Loads a specific form into the detailed panel.
+     *
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function viewAction($objectId)
+    {
+        /** @var \Mautic\LeadBundle\Model\ListModel $model */
+        $model    = $this->getModel('lead.list');
+        $security = $this->get('mautic.security');
+
+        /** @var \Mautic\LeadBundle\Entity\LeadList $list */
+        $list = $model->getEntity($objectId);
+        //set the page we came from
+        $page = $this->get('session')->get('mautic.segment.page', 1);
+
+        if ($this->request->getMethod() === 'POST' && $this->request->request->has('includeEvents')) {
+            $filters = [
+                'includeEvents' => InputHelper::clean($this->request->get('includeEvents', [])),
+            ];
+            $this->get('session')->set('mautic.segment.filters', $filters);
+        } else {
+            $filters = [];
+        }
+
+        if ($list === null) {
+            //set the return URL
+            $returnUrl = $this->generateUrl('mautic_segment_index', ['page' => $page]);
+
+            return $this->postActionRedirect([
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['page' => $page],
+                'contentTemplate' => 'MauticLeadBundle:List:index',
+                'passthroughVars' => [
+                    'activeLink'    => '#mautic_segment_index',
+                    'mauticContent' => 'list',
+                ],
+                'flashes' => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.list.error.notfound',
+                        'msgVars' => ['%id%' => $objectId],
+                    ],
+                ],
+            ]);
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'lead:lists:viewother',
+            'lead:lists:editother',
+            'lead:lists:deleteother',
+            $list->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+        $translator      = $this->get('translator');
+        $dateRangeValues = $this->request->get('daterange', []);
+        $action          = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $objectId]);
+        $dateRangeForm   = $this->get('form.factory')->create('daterange', $dateRangeValues, ['action' => $action]);
+        $stats           = $this->getModel('lead.list')->getSegmentContactsLineChartData(
+            null,
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            null,
+           ['leadlist_id' => ['value'          => $objectId,
+                            'list_column_name' => 't.lead_id', ], 't.leadlist_id' => $objectId]
+        );
+
+        return $this->delegateView([
+            'returnUrl'      => $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $list->getId()]),
+            'viewParameters' => [
+                'list'        => $list,
+                'permissions' => $security->isGranted([
+                    'lead:leads:editown',
+                    'lead:lists:viewother',
+                    'lead:lists:editother',
+                    'lead:lists:deleteother',
+                ], 'RETURN_ARRAY'),
+                'security'      => $security,
+                'stats'         => $stats,
+                'dateRangeForm' => $dateRangeForm->createView(),
+                'events'        => [
+                    'filters' => $filters,
+                    'types'   => [
+                        'manually_added'   => $translator->trans('mautic.segment.contact.manually.added'),
+                        'manually_removed' => $translator->trans('mautic.segment.contact.manually.removed'),
+                        'filter_added'     => $translator->trans('mautic.segment.contact.filter.added'),
+                    ],
+                ],
+                'contacts' => $this->forward(
+                    'MauticLeadBundle:List:contacts',
+                    [
+                        'objectId'   => $list->getId(),
+                        'page'       => $this->get('session')->get('mautic.segment.contact.page', 1),
+                        'ignoreAjax' => true,
+                        'filters'    => $filters,
+                    ]
+                )->getContent(),
+            ],
+            'contentTemplate' => 'MauticLeadBundle:List:details.html.php',
+            'passthroughVars' => [
+                'activeLink'    => '#mautic_segment_index',
+                'mauticContent' => 'list',
+            ],
+        ]);
+    }
+
+    /**
+     * @param     $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        $manuallyRemoved = 0;
+        $listFilters     = ['manually_removed' => $manuallyRemoved];
+        if ($this->request->getMethod() === 'POST' && $this->request->request->has('includeEvents')) {
+            $filters = [
+                'includeEvents' => InputHelper::clean($this->request->get('includeEvents', [])),
+            ];
+            $this->get('session')->set('mautic.segment.filters', $filters);
+        } else {
+            $filters = [];
+        }
+
+        if (!empty($filters)) {
+            if (isset($filters['includeEvents']) && in_array('manually_added', $filters['includeEvents'])) {
+                $listFilters = array_merge($listFilters, ['manually_added' => 1]);
+            }
+            if (isset($filters['includeEvents']) && in_array('manually_removed', $filters['includeEvents'])) {
+                $listFilters = array_merge($listFilters, ['manually_removed' => 1]);
+            }
+            if (isset($filters['includeEvents']) && in_array('filter_added', $filters['includeEvents'])) {
+                $listFilters = array_merge($listFilters, ['manually_added' => 0]);
+            }
+        }
+
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'lead:lists:viewother',
+            'segment',
+            'lead_lists_leads',
+            null,
+            'leadlist_id',
+            $listFilters
+
         );
     }
 }

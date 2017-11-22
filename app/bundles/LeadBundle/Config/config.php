@@ -128,6 +128,10 @@ return [
                 'path'       => '/companies/{objectAction}/{objectId}',
                 'controller' => 'MauticLeadBundle:Company:execute',
             ],
+            'mautic_segment_contacts' => [
+                'path'       => '/segment/view/{objectId}/contact/{page}',
+                'controller' => 'MauticLeadBundle:List:contacts',
+            ],
         ],
         'api' => [
             'mautic_api_contactsstandard' => [
