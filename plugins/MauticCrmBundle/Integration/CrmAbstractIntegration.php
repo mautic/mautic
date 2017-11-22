@@ -408,6 +408,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $leadFields = $this->cleanPriorityFields($config, $object);
         if (!$lead->isNewlyCreated()) {
+            $params = $this->commandParameters;
+
+            $this->getLeadDoNotContactByDate('email', $matchedFields, $object, $lead, $data, $params);
+
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
             if (empty($fieldsToUpdateInMautic)) {

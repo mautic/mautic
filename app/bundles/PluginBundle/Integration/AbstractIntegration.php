@@ -196,6 +196,11 @@ abstract class AbstractIntegration
     protected $integrationEntityModel;
 
     /**
+     * @var array
+     */
+    protected $commandParameters = [];
+
+    /**
      * AbstractIntegration constructor.
      */
     public function __construct(MauticFactory $factory = null)
@@ -359,6 +364,11 @@ abstract class AbstractIntegration
         $this->integrationEntityModel = $integrationEntityModel;
     }
 
+    public function setCommandParameters(array $params)
+    {
+        $this->commandParameters = $params;
+    }
+
     /**
      * @return CacheStorageHelper
      */
@@ -401,6 +411,16 @@ abstract class AbstractIntegration
     public function getPriority()
     {
         return 9999;
+    }
+
+    /**
+     * Determines if DNC records should be updated by date or by priority.
+     *
+     * @return int
+     */
+    public function updateDncByDate()
+    {
+        return false;
     }
 
     /**
@@ -2700,7 +2720,7 @@ abstract class AbstractIntegration
      *
      * @return int
      */
-    public function getLeadDonotContact($leadId, $channel = 'email')
+    public function getLeadDonotContact($leadId, $channel = 'email',  $sfObject = 'Lead', $sfIds = [])
     {
         $isContactable = 1;
         $lead          = $this->leadModel->getEntity($leadId);
@@ -2721,7 +2741,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function getCompoundMauticFields($lead)
+    public function getCompoundMauticFields($lead, $sfObject = 'Lead')
     {
         if ($lead['internal_entity_id']) {
             $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);
@@ -2739,10 +2759,30 @@ abstract class AbstractIntegration
     public function isCompoundMauticField($fieldName)
     {
         $compoundFields = [
-            'mauticContactTimelineLink'         => 'mauticContactTimelineLink',
-            'mauticContactIsContactableByEmail' => 'mauticContactIsContactableByEmail',
+            'mauticContactTimelineLink' => 'mauticContactTimelineLink',
         ];
 
+        if ($this->updateDncByDate() === true) {
+            $compoundFields['mauticContactIsContactableByEmail'] = 'mauticContactIsContactableByEmail';
+        }
+
         return isset($compoundFields[$fieldName]);
+    }
+
+    /**
+     * Update the record in each system taking the last modified record.
+     *
+     * @param $leadId
+     * @param string $channel
+     * @param string $sfObject
+     * @param array  $sfIds
+     *
+     * @return int
+     *
+     * @throws ApiErrorException
+     */
+    public function getLeadDoNotContactByDate($channel,  $records, $object, $lead, $integrationData, $params = [])
+    {
+        return $records;
     }
 }

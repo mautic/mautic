@@ -72,17 +72,25 @@ class DoNotContact
      * Create a DNC entry for a lead.
      *
      * @param int          $contactId
-     * @param string|array $channel            If an array with an ID, use the structure ['email' => 123]
+     * @param string|array $channel                  If an array with an ID, use the structure ['email' => 123]
      * @param string       $comments
-     * @param int          $reason             Must be a class constant from the DoNotContact class
+     * @param int          $reason                   Must be a class constant from the DoNotContact class
      * @param bool         $persist
      * @param bool         $checkCurrentStatus
+     * @param bool         $allowUnsubscribeOverride
      *
      * @return bool|DNC If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                  and has the specified reason, nothing is done and this returns false
      */
-    public function addDncForContact($contactId, $channel, $reason = DNC::BOUNCED, $comments = '', $persist = true, $checkCurrentStatus = true)
-    {
+    public function addDncForContact(
+        $contactId,
+        $channel,
+        $reason = DNC::BOUNCED,
+        $comments = '',
+        $persist = true,
+        $checkCurrentStatus = true,
+        $allowUnsubscribeOverride = false
+    ) {
         $dnc     = false;
         $contact = $this->leadModel->getEntity($contactId);
 
@@ -97,8 +105,11 @@ class DoNotContact
 
             /** @var DNC $dnc */
             foreach ($contact->getDoNotContact() as $dnc) {
+                // Only update if the contact did not unsubscribe themselves or if the code forces it
+                $allowOverride = ($allowUnsubscribeOverride || $dnc->getReason() !== DNC::UNSUBSCRIBED);
+
                 // Only update if the contact did not unsubscribe themselves
-                if ($dnc->getChannel() === $channel && $dnc->getReason() !== DNC::UNSUBSCRIBED) {
+                if ($allowOverride && $dnc->getChannel() === $channel) {
                     // Note the outdated entry for listeners
                     $contact->removeDoNotContactEntry($dnc);
 

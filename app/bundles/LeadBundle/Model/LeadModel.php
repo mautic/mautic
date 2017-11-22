@@ -2816,11 +2816,12 @@ class LeadModel extends FormModel
      * @param int          $reason             Must be a class constant from the DoNotContact class
      * @param bool         $persist
      * @param bool         $checkCurrentStatus
+     * @param bool         $override
      *
      * @return bool|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                           and has the specified reason, nothing is done and this returns false
      */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true)
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = false)
     {
         // if !$checkCurrentStatus, assume is contactable due to already being valided
         $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DoNotContact::IS_CONTACTABLE;
@@ -2856,7 +2857,10 @@ class LeadModel extends FormModel
             /** @var DoNotContact $dnc */
             foreach ($lead->getDoNotContact() as $dnc) {
                 // Only update if the contact did not unsubscribe themselves
-                if ($dnc->getChannel() === $channel && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
+                if (!$override && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
+                    $override = true;
+                }
+                if ($dnc->getChannel() === $channel && $override) {
                     // Remove the outdated entry
                     $lead->removeDoNotContactEntry($dnc);
 
