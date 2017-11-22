@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "00b45fa031bef3d6f91ef4722cdb6df5",
-    "content-hash": "a4fb2f8d592bb0dbe90d0aac116bd2db",
+    "hash": "3ce2fd3f086c41c31b40c7d72d44d0ea",
+    "content-hash": "c73f356f830430b59defd66558631ebc",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -4799,7 +4799,7 @@
                 "recurring",
                 "rrule"
             ],
-            "time": "2017-08-03T23:25:58+00:00"
+            "time": "2017-08-03 23:25:58"
         },
         {
             "name": "sonata-project/exporter",
