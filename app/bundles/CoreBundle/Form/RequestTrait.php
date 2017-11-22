@@ -33,7 +33,7 @@ trait RequestTrait
                         if (is_object($entity)) {
                             $setter = 'set'.ucfirst($name);
                             // Symfony fails to recognize true values on PATCH and add support for all boolean types (on, off, true, false, 1, 0)
-                            // If value is array and count 1, return value = checkboxgroup
+                            // If value is array and count 1, return value of array as string
                             if (is_array($params[$name]) && count($params[$name]) == 1) {
                                 $params[$name] = end($params[$name]);
                             }
