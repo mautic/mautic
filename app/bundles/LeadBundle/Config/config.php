@@ -519,6 +519,9 @@ return [
                     'mautic.lead.model.dnc',
                 ],
             ],
+            'mautic.lead.pagebundle.subscriber' => [
+                'class' => \Mautic\LeadBundle\EventListener\PageSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.lead' => [
