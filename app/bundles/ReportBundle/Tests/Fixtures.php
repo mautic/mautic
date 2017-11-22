@@ -11,7 +11,7 @@
 
 namespace Mautic\ReportBundle\Tests;
 
-class Fixures
+class Fixtures
 {
     /**
      * @return array

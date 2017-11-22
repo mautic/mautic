@@ -21,7 +21,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
-use Mautic\ReportBundle\Tests\Fixures;
+use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReportExporterTest extends \PHPUnit_Framework_TestCase
@@ -30,7 +30,7 @@ class ReportExporterTest extends \PHPUnit_Framework_TestCase
     {
         $exportOption = new ExportOption(null);
 
-        $reportDataResult = new ReportDataResult(Fixures::getValidReportResult());
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
         $report1    = new Report();
         $report2    = new Report();

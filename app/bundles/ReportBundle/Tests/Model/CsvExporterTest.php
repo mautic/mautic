@@ -16,7 +16,7 @@ use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Model\CsvExporter;
-use Mautic\ReportBundle\Tests\Fixures;
+use Mautic\ReportBundle\Tests\Fixtures;
 
 class CsvExporterTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,7 +41,7 @@ class CsvExporterTest extends \PHPUnit_Framework_TestCase
 
         $formatterHelperMock = new FormatterHelper($mauticFactoryMock);
 
-        $reportDataResult = new ReportDataResult(Fixures::getValidReportResult());
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
         $csvExporter = new CsvExporter($formatterHelperMock);
 

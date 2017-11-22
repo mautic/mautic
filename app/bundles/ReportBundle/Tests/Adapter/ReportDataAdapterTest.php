@@ -16,7 +16,7 @@ use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
-use Mautic\ReportBundle\Tests\Fixures;
+use Mautic\ReportBundle\Tests\Fixtures;
 
 class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,15 +50,15 @@ class ReportDataAdapterTest extends \PHPUnit_Framework_TestCase
         $reportModelMock->expects($this->once())
             ->method('getReportData')
             ->with($report, null, $options)
-            ->willReturn(Fixures::getValidReportResult());
+            ->willReturn(Fixtures::getValidReportResult());
 
         $result = $reportDataAdapter->getReportData($report, $reportExportOptions);
 
-        $this->assertSame(Fixures::getValidReportData(), $result->getData());
-        $this->assertSame(Fixures::getValidReportHeaders(), $result->getHeaders());
-        $this->assertSame(Fixures::getValidReportTotalResult(), $result->getTotalResults());
-        $this->assertSame(Fixures::getStringType(), $result->getType('city'));
-        $this->assertSame(Fixures::getDateType(), $result->getType('date_identified'));
-        $this->assertSame(Fixures::getEmailType(), $result->getType('email'));
+        $this->assertSame(Fixtures::getValidReportData(), $result->getData());
+        $this->assertSame(Fixtures::getValidReportHeaders(), $result->getHeaders());
+        $this->assertSame(Fixtures::getValidReportTotalResult(), $result->getTotalResults());
+        $this->assertSame(Fixtures::getStringType(), $result->getType('city'));
+        $this->assertSame(Fixtures::getDateType(), $result->getType('date_identified'));
+        $this->assertSame(Fixtures::getEmailType(), $result->getType('email'));
     }
 }

@@ -19,7 +19,7 @@ use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Model\ExportHandler;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
-use Mautic\ReportBundle\Tests\Fixures;
+use Mautic\ReportBundle\Tests\Fixtures;
 
 class ReportFileWriterTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +38,7 @@ class ReportFileWriterTest extends \PHPUnit_Framework_TestCase
         $report    = new Report();
         $scheduler = new Scheduler($report, new \DateTime());
 
-        $reportDataResult = new ReportDataResult(Fixures::getValidReportResult());
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
         $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
             ->disableOriginalConstructor()

@@ -12,20 +12,20 @@
 namespace Mautic\ReportBundle\Tests\Crate;
 
 use Mautic\ReportBundle\Crate\ReportDataResult;
-use Mautic\ReportBundle\Tests\Fixures;
+use Mautic\ReportBundle\Tests\Fixtures;
 
 class ReportDataResultTest extends \PHPUnit_Framework_TestCase
 {
     public function testValidData()
     {
-        $reportDataResult = new ReportDataResult(Fixures::getValidReportResult());
+        $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
-        $this->assertSame(Fixures::getValidReportData(), $reportDataResult->getData());
-        $this->assertSame(Fixures::getValidReportHeaders(), $reportDataResult->getHeaders());
-        $this->assertSame(Fixures::getValidReportTotalResult(), $reportDataResult->getTotalResults());
-        $this->assertSame(Fixures::getStringType(), $reportDataResult->getType('city'));
-        $this->assertSame(Fixures::getDateType(), $reportDataResult->getType('date_identified'));
-        $this->assertSame(Fixures::getEmailType(), $reportDataResult->getType('email'));
+        $this->assertSame(Fixtures::getValidReportData(), $reportDataResult->getData());
+        $this->assertSame(Fixtures::getValidReportHeaders(), $reportDataResult->getHeaders());
+        $this->assertSame(Fixtures::getValidReportTotalResult(), $reportDataResult->getTotalResults());
+        $this->assertSame(Fixtures::getStringType(), $reportDataResult->getType('city'));
+        $this->assertSame(Fixtures::getDateType(), $reportDataResult->getType('date_identified'));
+        $this->assertSame(Fixtures::getEmailType(), $reportDataResult->getType('email'));
     }
 
     public function testNoDataProvided()
@@ -33,7 +33,7 @@ class ReportDataResultTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Keys 'data', 'dataColumns' and 'columns' have to be provided");
 
-        $data = Fixures::getValidReportResult();
+        $data = Fixtures::getValidReportResult();
         unset($data['data']);
         new ReportDataResult($data);
     }
@@ -43,7 +43,7 @@ class ReportDataResultTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Keys 'data', 'dataColumns' and 'columns' have to be provided");
 
-        $data = Fixures::getValidReportResult();
+        $data = Fixtures::getValidReportResult();
         unset($data['dataColumns']);
         new ReportDataResult($data);
     }
@@ -53,7 +53,7 @@ class ReportDataResultTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Keys 'data', 'dataColumns' and 'columns' have to be provided");
 
-        $data = Fixures::getValidReportResult();
+        $data = Fixtures::getValidReportResult();
         unset($data['columns']);
         new ReportDataResult($data);
     }
