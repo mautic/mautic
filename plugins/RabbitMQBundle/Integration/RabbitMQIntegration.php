@@ -161,7 +161,7 @@ class RabbitMQIntegration extends AbstractIntegration
             'FirstName' => 'first_name',
             'LastName' => 'last_name',
             'Company' => 'company',
-            'Address' => 'address',
+            'Street' => 'address',
             'MobilePhone' => 'mobile',
             'Gender__c' => 'gender',
             'Birthday__c' => 'birthday'
