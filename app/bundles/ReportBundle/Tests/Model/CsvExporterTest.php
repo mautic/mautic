@@ -11,17 +11,22 @@
 
 namespace Mautic\ReportBundle\Tests\Model;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CsvExporterTest extends \PHPUnit_Framework_TestCase
 {
     public function testExport()
     {
+        $appVersion = $this->getMockBuilder(AppVersion::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $dateHelperMock = $this->getMockBuilder(DateHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -30,16 +35,11 @@ class CsvExporterTest extends \PHPUnit_Framework_TestCase
             ->method('toFull')
             ->willReturn('2017-10-01');
 
-        $mauticFactoryMock = $this->getMockBuilder(MauticFactory::class)
+        $translator = $this->getMockBuilder(TranslatorInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mauticFactoryMock->expects($this->once())
-            ->method('getHelper')
-            ->with('template.date')
-            ->willReturn($dateHelperMock);
-
-        $formatterHelperMock = new FormatterHelper($mauticFactoryMock);
+        $formatterHelperMock = new FormatterHelper($appVersion, $dateHelperMock, $translator);
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 

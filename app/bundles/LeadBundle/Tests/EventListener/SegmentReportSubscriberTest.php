@@ -132,11 +132,6 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
                         'type'  => 'bool',
                         'alias' => 'manually_added',
                     ],
-                    'i.ip_address' => [
-                        'label' => null,
-                        'type'  => 'string',
-                        'alias' => 'ip_address',
-                    ],
                     's.id' => [
                         'label' => null,
                         'type'  => 'int',
@@ -171,16 +166,6 @@ class SegmentReportSubscriberTest extends \PHPUnit_Framework_TestCase
                         'label' => null,
                         'type'  => 'string',
                         'alias' => 's_description',
-                    ],
-                    's.publish_up' => [
-                        'label' => null,
-                        'type'  => 'datetime',
-                        'alias' => 's_publish_up',
-                    ],
-                    's.publish_down' => [
-                        'label' => null,
-                        'type'  => 'datetime',
-                        'alias' => 's_publish_down',
                     ],
                     's.is_published' => [
                         'label' => null,
