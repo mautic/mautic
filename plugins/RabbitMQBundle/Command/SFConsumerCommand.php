@@ -184,6 +184,9 @@ class SFConsumerCommand extends ModeratedCommand
                     } else {
                         $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
                     }
+                } else {
+                    $output->writeln("<info>[!] No such lead found, nothing to delete!</info>");
+                    $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
                 }
             } else {
                 if(!empty($id)){
