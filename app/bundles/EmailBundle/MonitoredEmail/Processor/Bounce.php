@@ -12,6 +12,7 @@
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
@@ -133,8 +134,10 @@ class Bounce implements ProcessorInterface
             // Update stat entry
             $this->updateStat($stat, $bounce);
 
-            // We know the email ID so set it to append to the the DNC record
-            $channel = ['email' => $stat->getEmail()->getId()];
+            if ($stat->getEmail() instanceof Email) {
+                // We know the email ID so set it to append to the the DNC record
+                $channel = ['email' => $stat->getEmail()->getId()];
+            }
         }
 
         $comments = $this->translator->trans('mautic.email.bounce.reason.'.$bounce->getRuleCategory());
