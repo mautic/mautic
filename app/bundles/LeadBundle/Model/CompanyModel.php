@@ -216,10 +216,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param Company    $company
      * @param array      $data
      * @param bool|false $overwriteWithBlank
-     *
-     * @return array
      */
-    public function setFieldValues(Company &$company, array $data, $overwriteWithBlank = false)
+    public function setFieldValues(Company $company, array $data, $overwriteWithBlank = false)
     {
         //save the field values
         $fieldValues = $company->getFields();
@@ -238,7 +236,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
             $fieldValues = $fields;
         }
-
         //update existing values
         foreach ($fieldValues as $group => &$groupFields) {
             foreach ($groupFields as $alias => &$field) {
@@ -249,6 +246,10 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 if (array_key_exists($alias, $data)) {
                     $curValue = $field['value'];
                     $newValue = $data[$alias];
+
+                    if (is_array($newValue)) {
+                        $newValue = implode('|', $newValue);
+                    }
 
                     if ($curValue !== $newValue && (strlen($newValue) > 0 || (strlen($newValue) === 0 && $overwriteWithBlank))) {
                         $field['value'] = $newValue;

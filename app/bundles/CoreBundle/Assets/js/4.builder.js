@@ -107,6 +107,10 @@ Mautic.launchBuilder = function (formName, actionName) {
     applyBtn.off('click').on('click', function(e) {
         Mautic.activateButtonLoadingIndicator(applyBtn);
         Mautic.sendBuilderContentToTextarea(function() {
+            // Trigger slot:destroy event
+            document.getElementById('builder-template-content').contentWindow.Mautic.destroySlots();
+            // Clear the customize forms
+            mQuery('#slot-form-container, #section-form-container').html('');
             Mautic.inBuilderSubmissionOn(form);
             var bgApplyBtn = mQuery('.btn-apply');
             if (0 === bgApplyBtn.length && ("1" === Mautic.getUrlParameter('contentOnly') || Mautic.isInBuilder)) {
@@ -136,38 +140,7 @@ Mautic.launchBuilder = function (formName, actionName) {
     var assets = Mautic.htmlspecialchars_decode(mQuery('[data-builder-assets]').html());
     themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
-    // Turn Dynamic Content Tokens into builder slots
-    themeHtml = Mautic.prepareDynamicContentBlocksForBuilder(themeHtml);
-
-    // hide preference center slots
-    var isPrefCenterEnabled = eval(parent.mQuery('input[name="page[isPreferenceCenter]"]:checked').val());
-    if (!isPrefCenterEnabled) {
-        var slots = [
-            'segmentlist',
-            'categorylist',
-            'preferredchannel',
-            'channelfrequency',
-            'saveprefsbutton'
-        ];
-        mQuery.each(slots, function (i, s) {
-            // delete existing tokens
-            themeHtml = themeHtml.replace('{' + s + '}', '');
-        });
-        var parser = new DOMParser();
-        var el = parser.parseFromString(themeHtml, "text/html");
-        var $b = mQuery(el);
-        mQuery.each(slots, function (i, s) {
-            // delete existing slots
-            $b.find('[data-slot=' + s + ']').remove();
-        });
-        themeHtml = Mautic.domToString($b);
-    }
-
-    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
-        mQuery('#builder-overlay').addClass('hide');
-        btnCloseBuilder.prop('disabled', false);
-        applyBtn.prop('disabled', false);
-    });
+    Mautic.initBuilderIframe(themeHtml, btnCloseBuilder, applyBtn);
 };
 
 /**
@@ -594,7 +567,7 @@ Mautic.destroySlots = function() {
     }
 
     // Destroy sortable
-    Mautic.builderContents.find('[data-slot-container]').sortable('destroy');
+    Mautic.builderContents.find('[data-slot-container]').sortable().sortable('destroy');
 
     // Remove empty class="" attr
     Mautic.builderContents.find('*[class=""]').removeAttr('class');
@@ -1048,17 +1021,16 @@ Mautic.getSlotFocus = function() {
 };
 
 Mautic.cloneFocusForm = function(decId, removeFroala) {
-    // reattach DEC
-    if (typeof Mautic.activeDEC !== 'undefined') {
-        var element = Mautic.activeDEC.detach();
-        Mautic.activeDECParent.append(element);
-    }
+    Mautic.reattachDEC();
+
     var focusForm = parent.mQuery('#emailform_dynamicContent_' + decId);
     Mautic.activeDECParent = focusForm.parent();
     // show if hidden
     focusForm.removeClass('fade');
     // remove delete default button
     focusForm.find('.tab-pane:first').find('.remove-item').hide();
+    // hide add variant button
+    focusForm.find('.addNewDynamicContentFilter').hide();
     var element =focusForm.detach();
     Mautic.activeDEC = element;
     return element;
@@ -1094,7 +1066,10 @@ Mautic.initEmailDynamicContentSlotEdit = function (clickedSlot) {
 Mautic.removeAddVariantButton = function() {
     // Remove the Add Variant button for dynamicContent slots
     parent.mQuery('#customize-slot-panel').find('.panel-heading button').remove();
-    // reattach DEC
+    Mautic.reattachDEC();
+};
+
+Mautic.reattachDEC = function() {
     if (typeof Mautic.activeDEC !== 'undefined') {
         var element = Mautic.activeDEC.detach();
         Mautic.activeDECParent.append(element);
@@ -1560,11 +1535,7 @@ Mautic.initSlotListeners = function() {
     });
 
     Mautic.builderContents.on('slot:destroy', function(event, params) {
-        // reattach DEC
-        if (typeof Mautic.activeDEC !== 'undefined') {
-            var element = Mautic.activeDEC.detach();
-            Mautic.activeDECParent.append(element);
-        }
+        Mautic.reattachDEC();
 
         if (params.type === 'text') {
             if (parent.mQuery('#slot_text_content').length) {
@@ -1730,6 +1701,71 @@ Mautic.getBuilderTokensMethod = function() {
         method = 'email:getBuilderTokens';
     }
     return method;
+};
+
+Mautic.prepareBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
+    // find DEC tokens and inject them to builderTokens
+    var decTokenRegex  = /(?:{)dynamiccontent="(.*?)(?:")}/g;
+    var match = decTokenRegex.exec(themeHtml);
+    while (match !== null) {
+        var dynConToken = match[0];
+        var dynConName = match[1];
+        // Add the dynamic content tokens
+        if (!Mautic.builderTokens.hasOwnProperty(dynConToken)) {
+            Mautic.builderTokens[dynConToken] = dynConName;
+        }
+
+        // fetch next token
+        match = decTokenRegex.exec(themeHtml);
+    }
+
+    // Turn Dynamic Content Tokens into builder slots
+    themeHtml = Mautic.prepareDynamicContentBlocksForBuilder(themeHtml);
+
+    // hide preference center slots
+    var isPrefCenterEnabled = eval(parent.mQuery('input[name="page[isPreferenceCenter]"]:checked').val());
+    if (!isPrefCenterEnabled) {
+        var slots = [
+            'segmentlist',
+            'categorylist',
+            'preferredchannel',
+            'channelfrequency',
+            'saveprefsbutton'
+        ];
+        mQuery.each(slots, function (i, s) {
+            // delete existing tokens
+            themeHtml = themeHtml.replace('{' + s + '}', '');
+        });
+        var parser = new DOMParser();
+        var el = parser.parseFromString(themeHtml, "text/html");
+        var $b = mQuery(el);
+        mQuery.each(slots, function (i, s) {
+            // delete existing slots
+            $b.find('[data-slot=' + s + ']').remove();
+        });
+        themeHtml = Mautic.domToString($b);
+    }
+
+    Mautic.buildBuilderIframe(themeHtml, 'builder-template-content', function() {
+        mQuery('#builder-overlay').addClass('hide');
+        btnCloseBuilder.prop('disabled', false);
+        applyBtn.prop('disabled', false);
+    });
+};
+
+Mautic.initBuilderIframe = function(themeHtml, btnCloseBuilder, applyBtn) {
+    // Avoid to request the tokens if not necessary
+    if (Mautic.builderTokensRequestInProgress) {
+        // Wait till previous request finish
+        var intervalID = setInterval(function(){
+            if (!Mautic.builderTokensRequestInProgress) {
+                clearInterval(intervalID);
+                Mautic.prepareBuilderIframe(themeHtml, btnCloseBuilder, applyBtn);
+            }
+        }, 500);
+    } else {
+        Mautic.prepareBuilderIframe(themeHtml, btnCloseBuilder, applyBtn);
+    }
 };
 
 Mautic.prepareDynamicContentBlocksForBuilder = function(builderHtml) {

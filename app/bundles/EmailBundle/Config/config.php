@@ -141,9 +141,10 @@ return [
                 'class' => 'Mautic\EmailBundle\EventListener\FormSubscriber',
             ],
             'mautic.email.reportbundle.subscriber' => [
-                'class'     => 'Mautic\EmailBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\EmailBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                    'mautic.lead.model.company_report_data',
                 ],
             ],
             'mautic.email.leadbundle.subscriber' => [
@@ -309,6 +310,13 @@ return [
                     'mailer',
                 ],
             ],
+            'mautic.email.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\Stat::class,
+                ],
+            ],
             // Mailers
             'mautic.transport.amazon' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
@@ -402,6 +410,7 @@ return [
                     'mautic.page.model.trackable',
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
+                    'mautic.email.model.send_email_to_contacts',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
@@ -409,6 +418,24 @@ return [
                 'arguments' => [
                     'mautic.email.model.email',
                 ],
+            ],
+            'mautic.email.model.send_email_to_contacts' => [
+                'class'     => \Mautic\EmailBundle\Model\SendEmailToContact::class,
+                'arguments' => [
+                    'mautic.helper.mailer',
+                    'mautic.email.repository.stat',
+                    'mautic.lead.model.dnc',
+                    'translator',
+                ],
+            ],
+        ],
+        'validator' => [
+            'mautic.email.validator.multiple_emails_valid_validator' => [
+                'class'     => \Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,
+                'arguments' => [
+                    'mautic.validator.email',
+                ],
+                'tag' => 'validator.constraint_validator',
             ],
         ],
     ],

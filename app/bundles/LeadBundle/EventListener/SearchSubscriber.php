@@ -11,9 +11,17 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
+use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 
 /**
@@ -27,13 +35,26 @@ class SearchSubscriber extends CommonSubscriber
     protected $leadModel;
 
     /**
+     * @var LeadRepository
+     */
+    private $leadRepo;
+
+    /**
+     * @var EmailRepository
+     */
+    private $emailRepository;
+
+    /**
      * SearchSubscriber constructor.
      *
-     * @param LeadModel $leadModel
+     * @param LeadModel     $leadModel
+     * @param EntityManager $entityManager
      */
-    public function __construct(LeadModel $leadModel)
+    public function __construct(LeadModel $leadModel, EntityManager $entityManager)
     {
-        $this->leadModel = $leadModel;
+        $this->leadModel       = $leadModel;
+        $this->leadRepo        = $leadModel->getRepository();
+        $this->emailRepository = $entityManager->getRepository(Email::class);
     }
 
     /**
@@ -42,8 +63,9 @@ class SearchSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::GLOBAL_SEARCH      => ['onGlobalSearch', 0],
-            CoreEvents::BUILD_COMMAND_LIST => ['onBuildCommandList', 0],
+            CoreEvents::GLOBAL_SEARCH              => ['onGlobalSearch', 0],
+            CoreEvents::BUILD_COMMAND_LIST         => ['onBuildCommandList', 0],
+            LeadEvents::LEAD_BUILD_SEARCH_COMMANDS => ['onBuildSearchCommands', 0],
         ];
     }
 
@@ -124,5 +146,259 @@ class SearchSubscriber extends CommonSubscriber
                 $this->leadModel->getCommandList()
             );
         }
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function onBuildSearchCommands(LeadBuildSearchEvent $event)
+    {
+        switch ($event->getCommand()) {
+            case $this->translator->trans('mautic.lead.lead.searchcommand.email_read'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.email_read', [], null, 'en_US'):
+                    $this->buildEmailReadQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.email_sent'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.email_sent', [], null, 'en_US'):
+                    $this->buildEmailSentQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.email_queued'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.email_queued', [], null, 'en_US'):
+                    $this->buildEmailQueuedQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.email_pending'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.email_pending', [], null, 'en_US'):
+                    $this->buildEmailPendingQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.sms_sent', [], null, 'en_US'):
+                    $this->buildSmsSentQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.web_sent'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.web_sent', [], null, 'en_US'):
+                    $this->buildWebSentQuery($event);
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.mobile_sent'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.mobile_sent', [], null, 'en_US'):
+                    $this->buildMobileSentQuery($event);
+                break;
+        }
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildEmailPendingQuery(LeadBuildSearchEvent $event)
+    {
+        $q       = $event->getQueryBuilder();
+        $emailId = (int) $event->getString();
+        /** @var Email $email */
+        $email = $this->emailRepository->getEntity($emailId);
+        if (null !== $email) {
+            $variantIds = $email->getRelatedEntityIds();
+            $nq         = $this->emailRepository->getEmailPendingQuery($emailId, $variantIds);
+            if (!$nq instanceof QueryBuilder) {
+                return;
+            }
+
+            $nq->select('l.id'); // select only id
+            $nsql = $nq->getSQL();
+            foreach ($nq->getParameters() as $pk => $pv) { // replace all parameters
+                $nsql = preg_replace('/:'.$pk.'/', is_bool($pv) ? (int) $pv : $pv, $nsql);
+            }
+            $query = $q->expr()->in('l.id', sprintf('(%s)', $nsql));
+            $event->setSubQuery($query);
+
+            return;
+        }
+
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'message_queue',
+                'alias'      => 'mq',
+                'condition'  => 'l.id = mq.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'mq.channel_id',
+            'params' => [
+                'mq.channel' => 'email',
+                'mq.status'  => MessageQueue::STATUS_PENDING,
+            ],
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildEmailQueuedQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'message_queue',
+                'alias'      => 'mq',
+                'condition'  => 'l.id = mq.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'mq.channel_id',
+            'params' => [
+                'mq.channel' => 'email',
+                'mq.status'  => MessageQueue::STATUS_SENT,
+            ],
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildEmailSentQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'email_stats',
+                'alias'      => 'es',
+                'condition'  => 'l.id = es.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'es.email_id',
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildEmailReadQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'email_stats',
+                'alias'      => 'es',
+                'condition'  => 'l.id = es.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'es.email_id',
+            'params' => [
+                'es.is_read' => 1,
+            ],
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildSmsSentQuery(LeadBuildSearchEvent $event)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'sms_message_stats',
+                'alias'      => 'ss',
+                'condition'  => 'l.id = ss.lead_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'ss.sms_id',
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildWebSentQuery(LeadBuildSearchEvent $event)
+    {
+        $this->buildNotificationSentQuery($event);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     */
+    private function buildMobileSentQuery(LeadBuildSearchEvent $event)
+    {
+        $this->buildNotificationSentQuery($event, true);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     * @param bool                 $isMobile
+     */
+    private function buildNotificationSentQuery(LeadBuildSearchEvent $event, $isMobile = false)
+    {
+        $tables = [
+            [
+                'from_alias' => 'l',
+                'table'      => 'push_notification_stats',
+                'alias'      => 'ns',
+                'condition'  => 'l.id = ns.lead_id',
+            ],
+            [
+                'from_alias' => 'ns',
+                'table'      => 'push_notifications',
+                'alias'      => 'pn',
+                'condition'  => 'pn.id = ns.notification_id',
+            ],
+        ];
+
+        $config = [
+            'column' => 'pn.id',
+            'params' => [
+                'pn.mobile' => (int) $isMobile,
+            ],
+        ];
+
+        $this->buildJoinQuery($event, $tables, $config);
+    }
+
+    /**
+     * @param LeadBuildSearchEvent $event
+     * @param array                $tables
+     * @param array                $config
+     */
+    private function buildJoinQuery(LeadBuildSearchEvent $event, array $tables, array $config)
+    {
+        if (!isset($config['column']) || 0 === count($tables)) {
+            return;
+        }
+
+        $alias = $event->getAlias();
+        $q     = $event->getQueryBuilder();
+        $expr  = $q->expr()->andX(sprintf('%s = :%s', $config['column'], $alias));
+
+        if (isset($config['params'])) {
+            $params = (array) $config['params'];
+            foreach ($params as $name => $value) {
+                $param = $q->createNamedParameter($value);
+                $expr->add(sprintf('%s = %s', $name, $param));
+            }
+        }
+
+        $this->leadRepo->applySearchQueryRelationship($q, $tables, true, $expr);
+
+        $event->setReturnParameters(true); // replace search string
+        $event->setStrict(true);           // don't use like
+        $event->setSearchStatus(true);     // finish searching
     }
 }

@@ -4,6 +4,7 @@
 | --- | ---
 | Bug fix? | 
 | New feature? | 
+| Automated tests included? |
 | Related user documentation PR URL | 
 | Related developer documentation PR URL | 
 | Issues addressed (#s or URLs) | 

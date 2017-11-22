@@ -90,4 +90,13 @@ final class ReportEvents
      * @var string
      */
     const REPORT_ON_GRAPH_GENERATE = 'mautic.report_on_graph_generate';
+
+    /**
+     * The mautic.report_schedule_send event is dispatched to send an exported report to a user.
+     *
+     * The event listener receives a Mautic\ReportBundle\Event\ReportScheduleSendEvent instance.
+     *
+     * @var string
+     */
+    const REPORT_SCHEDULE_SEND = 'mautic.report_schedule_send';
 }
