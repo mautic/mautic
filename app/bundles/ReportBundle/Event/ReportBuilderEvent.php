@@ -157,7 +157,9 @@ class ReportBuilderEvent extends AbstractReportEvent
     /**
      * Returns standard form fields such as id, name, publish_up, etc.
      *
-     * @param   $prefix
+     * @param string $prefix
+     * @param array  $removeColumns
+     * @param null   $idLink
      *
      * @return array
      */

@@ -82,7 +82,10 @@ return [
                 'class' => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
             ],
             'mautic.channel.reportbundle.subscriber' => [
-                'class' => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
+                'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
 
         ],

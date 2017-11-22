@@ -52,7 +52,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  *
  * @method pushLead(Lead $lead, array $config = [])
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
- * @method getLeads(array $params, string $query, &$executed, array $result = [],  $object = 'Lead')
+ * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
  * @method getCompanies(array $params)
  */
 abstract class AbstractIntegration
@@ -194,6 +194,11 @@ abstract class AbstractIntegration
      * @var IntegrationEntityModel
      */
     protected $integrationEntityModel;
+
+    /**
+     * @var array
+     */
+    protected $commandParameters = [];
 
     /**
      * AbstractIntegration constructor.
@@ -359,6 +364,11 @@ abstract class AbstractIntegration
         $this->integrationEntityModel = $integrationEntityModel;
     }
 
+    public function setCommandParameters(array $params)
+    {
+        $this->commandParameters = $params;
+    }
+
     /**
      * @return CacheStorageHelper
      */
@@ -401,6 +411,16 @@ abstract class AbstractIntegration
     public function getPriority()
     {
         return 9999;
+    }
+
+    /**
+     * Determines if DNC records should be updated by date or by priority.
+     *
+     * @return int
+     */
+    public function updateDncByDate()
+    {
+        return false;
     }
 
     /**
@@ -657,9 +677,15 @@ abstract class AbstractIntegration
 
         $serialized = serialize($keys);
         if (empty($decryptedKeys[$serialized])) {
+            $decrypted = $this->decryptApiKeys($keys, true);
+            if (count($keys) !== 0 && count($decrypted) === 0) {
+                $decrypted = $this->decryptApiKeys($keys);
+                $this->encryptAndSetApiKeys($decrypted, $entity);
+                $this->em->flush($entity);
+            }
             $decryptedKeys[$serialized] = $this->dispatchIntegrationKeyEvent(
                 PluginEvents::PLUGIN_ON_INTEGRATION_KEYS_DECRYPT,
-                $this->decryptApiKeys($keys)
+                $decrypted
             );
         }
 
@@ -689,15 +715,19 @@ abstract class AbstractIntegration
      * Decrypts API keys.
      *
      * @param array $keys
+     * @param bool  $mainDecryptOnly
      *
      * @return array
      */
-    public function decryptApiKeys(array $keys)
+    public function decryptApiKeys(array $keys, $mainDecryptOnly = false)
     {
         $decrypted = [];
 
         foreach ($keys as $name => $key) {
-            $key              = $this->encryptionHelper->decrypt($key);
+            $key = $this->encryptionHelper->decrypt($key, $mainDecryptOnly);
+            if ($key === false) {
+                return [];
+            }
             $decrypted[$name] = $key;
         }
 
@@ -1843,7 +1873,10 @@ abstract class AbstractIntegration
                 }
                 $mauticKey = $leadFields[$integrationKey];
                 if (isset($fields[$mauticKey]) && $fields[$mauticKey]['value'] !== '' && $fields[$mauticKey]['value'] !== null) {
-                    $matched[$matchIntegrationKey] = $this->cleanPushData($fields[$mauticKey]['value'], (isset($field['type'])) ? $field['type'] : 'string');
+                    $matched[$matchIntegrationKey] = $this->cleanPushData(
+                        $fields[$mauticKey]['value'],
+                        (isset($field['type'])) ? $field['type'] : 'string'
+                    );
                 }
             }
 
@@ -2685,12 +2718,12 @@ abstract class AbstractIntegration
     }
 
     /**
-     * @param $leadId
+     * @param        $leadId
      * @param string $channel
      *
      * @return int
      */
-    public function getLeadDonotContact($leadId, $channel = 'email')
+    public function getLeadDonotContact($leadId, $channel = 'email',  $sfObject = 'Lead', $sfIds = [])
     {
         $isContactable = 1;
         $lead          = $this->leadModel->getEntity($leadId);
@@ -2711,7 +2744,7 @@ abstract class AbstractIntegration
      *
      * @return mixed
      */
-    public function getCompoundMauticFields($lead)
+    public function getCompoundMauticFields($lead, $sfObject = 'Lead')
     {
         if ($lead['internal_entity_id']) {
             $lead['mauticContactTimelineLink']         = $this->getContactTimelineLink($lead['internal_entity_id']);
@@ -2729,10 +2762,30 @@ abstract class AbstractIntegration
     public function isCompoundMauticField($fieldName)
     {
         $compoundFields = [
-            'mauticContactTimelineLink'         => 'mauticContactTimelineLink',
-            'mauticContactIsContactableByEmail' => 'mauticContactIsContactableByEmail',
+            'mauticContactTimelineLink' => 'mauticContactTimelineLink',
         ];
 
+        if ($this->updateDncByDate() === true) {
+            $compoundFields['mauticContactIsContactableByEmail'] = 'mauticContactIsContactableByEmail';
+        }
+
         return isset($compoundFields[$fieldName]);
+    }
+
+    /**
+     * Update the record in each system taking the last modified record.
+     *
+     * @param $leadId
+     * @param string $channel
+     * @param string $sfObject
+     * @param array  $sfIds
+     *
+     * @return int
+     *
+     * @throws ApiErrorException
+     */
+    public function getLeadDoNotContactByDate($channel,  $records, $object, $lead, $integrationData, $params = [])
+    {
+        return $records;
     }
 }

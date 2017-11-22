@@ -166,6 +166,18 @@ return [
                     'mautic.social.model.tweet',
                 ],
             ],
+            'mautic.social.helper.twitter_command' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.field',
+                    'mautic.social.model.monitoring',
+                    'mautic.social.model.postcount',
+                    'translator',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
         ],
         'integrations' => [
             'mautic.integration.facebook' => [
@@ -202,6 +214,28 @@ return [
                 'class'     => \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration::class,
                 'arguments' => [
 
+                ],
+            ],
+        ],
+        'command' => [
+            'mautic.social.command.twitter_hashtags' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Command\MonitorTwitterHashtagsCommand::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'translator',
+                    'mautic.helper.integration',
+                    'mautic.social.helper.twitter_command',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.social.command.twitter_mentions' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Command\MonitorTwitterMentionsCommand::class,
+                'arguments' => [
+                    'event_dispatcher',
+                    'translator',
+                    'mautic.helper.integration',
+                    'mautic.social.helper.twitter_command',
+                    'mautic.helper.core_parameters',
                 ],
             ],
         ],

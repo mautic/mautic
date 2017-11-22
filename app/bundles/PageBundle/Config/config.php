@@ -117,7 +117,10 @@ return [
 
             ],
             'mautic.page.reportbundle.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
             'mautic.page.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\CampaignSubscriber',

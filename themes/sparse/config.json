@@ -1,0 +1,8 @@
+{
+  "name": "Sparse",
+  "author": "Mautic",
+  "authorUrl": "http://www.mautic.com",
+  "features": [
+    "email"
+  ]
+}
