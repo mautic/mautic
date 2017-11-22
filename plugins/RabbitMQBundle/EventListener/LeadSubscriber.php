@@ -60,7 +60,7 @@ class LeadSubscriber extends CommonSubscriber
         ob_flush();
         ob_start();
         var_dump($lead);
-        file_put_contents("/opt/bitnami/apps/mauticAlfa/htdocs/app/cache/".date('Y_m_d_h_i_s').".log", ob_get_flush());
+        file_put_contents("/opt/bitnami/apps/mauticAlfa/htdocs/app/cache/".date('Y_m_d_h_i_s').".log", ob_get_flush());die;
 
         $leadData = $integrationObject->formatData($lead);
 
