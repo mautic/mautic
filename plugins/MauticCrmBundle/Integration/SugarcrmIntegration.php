@@ -1209,7 +1209,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         $checkEmailsInSugar = [];
         $deletedSugarLeads  = [];
-        $sugarIdMapping     = [];
         foreach ($leadsToUpdate as $object => $records) {
             foreach ($records as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
@@ -1280,7 +1279,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $result = $apiHelper->syncLeadsToSugar($mauticData);
         }
 
-        return $this->processCompositeResponse($result, $sugarIdMapping);
+        return $this->processCompositeResponse($result);
     }
 
     /**
@@ -1467,12 +1466,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param       $response
-     * @param array $sugarcrmIdMapping
+     * @param array $response
      *
      * @return array
      */
-    protected function processCompositeResponse($response, array $sugarcrmIdMapping = [])
+    protected function processCompositeResponse($response)
     {
         $created         = 0;
         $errored         = 0;
@@ -1538,7 +1536,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $integrationEntity->setLastSyncDate(new \DateTime());
                         $integrationEntity->setIntegration($this->getName());
                         $integrationEntity->setIntegrationEntity($object);
-                        $integrationEntity->setIntegrationEntityId($sugarcrmIdMapping[$contactId]);
+                        $integrationEntity->setIntegrationEntityId($item['id']);
                         $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($contactId);
                     }
