@@ -142,7 +142,11 @@ class RabbitMQIntegration extends AbstractIntegration
         return [
             'email' => 'email',
             'firstname' => 'first_name',
-            'lastname' => 'last_name'
+            'lastname' => 'last_name',
+            'mobile' => 'mobile',
+            'address1' => 'address',
+            'gender' => 'gender',
+            'birthday' => 'birthday'
         ];
     }
 
