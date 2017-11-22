@@ -73,7 +73,7 @@ class SegmentReportSubscriber extends CommonSubscriber
 
         $data = [
             'display_name' => 'mautic.lead.report.segment.membership',
-            'columns'      => array_merge($columns, $segmentColumns, $event->getIpColumn(), $event->getStandardColumns('s.')),
+            'columns'      => array_merge($columns, $segmentColumns, $event->getStandardColumns('s.', ['publish_up', 'publish_down'])),
             'filters'      => $filters,
         ];
         $event->addTable(self::SEGMENT_MEMBERSHIP, $data, ReportSubscriber::GROUP_CONTACTS);
@@ -95,8 +95,8 @@ class SegmentReportSubscriber extends CommonSubscriber
         $qb = $event->getQueryBuilder();
         $qb->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
             ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lll.lead_id')
-            ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 's', 's.id = lll.leadlist_id');
-
+            ->leftJoin('lll', MAUTIC_TABLE_PREFIX.'lead_lists', 's', 's.id = lll.leadlist_id')
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
         $event->setQueryBuilder($qb);
     }
 }
