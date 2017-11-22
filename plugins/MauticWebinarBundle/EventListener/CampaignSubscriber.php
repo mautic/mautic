@@ -110,7 +110,7 @@ class CampaignSubscriber extends CommonSubscriber
                     continue;
                 }
 
-                $subscribed = $s->hasAttendedWebinar($config['webinar'], $contact);
+                $subscribed = $s->hasAttendedWebinar($config, $contact);
             }
         }
 

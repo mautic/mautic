@@ -14,7 +14,6 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
-use Mautic\UserBundle\Entity\User;
 use Mautic\PluginBundle\Integration\IntegrationObject;
 
 /**
