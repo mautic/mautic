@@ -256,6 +256,12 @@ return [
                 'path'            => '/devices',
                 'controller'      => 'MauticLeadBundle:Api\DeviceApi',
             ],
+            'mautic_api_tagsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'tags',
+                'path'            => '/tags',
+                'controller'      => 'MauticLeadBundle:Api\TagApi',
+            ],
 
             // @deprecated 2.6.0 to be removed in 3.0
             'bc_mautic_api_segmentaddcontact' => [
@@ -539,19 +545,23 @@ return [
                 'alias'     => 'lead_quickemail',
             ],
             'mautic.form.type.lead_tags' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\TagListType',
+                'class'     => \Mautic\LeadBundle\Form\Type\TagListType::class,
                 'alias'     => 'lead_tags',
-                'arguments' => ['mautic.factory'],
+                'arguments' => ['translator'],
             ],
             'mautic.form.type.lead_tag' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\TagType',
+                'class'     => \Mautic\LeadBundle\Form\Type\TagType::class,
                 'alias'     => 'lead_tag',
-                'arguments' => ['mautic.factory'],
+                'arguments' => ['doctrine.orm.entity_manager'],
             ],
             'mautic.form.type.modify_lead_tags' => [
-                'class'     => 'Mautic\LeadBundle\Form\Type\ModifyLeadTagsType',
+                'class'     => \Mautic\LeadBundle\Form\Type\ModifyLeadTagsType::class,
                 'alias'     => 'modify_lead_tags',
-                'arguments' => ['mautic.factory'],
+                'arguments' => ['translator'],
+            ],
+            'mautic.form.type.lead_entity_tag' => [
+                'class' => \Mautic\LeadBundle\Form\Type\TagEntityType::class,
+                'alias' => \Mautic\LeadBundle\Form\Type\TagEntityType::class,
             ],
             'mautic.form.type.lead_batch' => [
                 'class' => 'Mautic\LeadBundle\Form\Type\BatchType',
@@ -752,6 +762,9 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.lead.model.company',
                 ],
+            ],
+            'mautic.lead.model.tag' => [
+                'class' => \Mautic\LeadBundle\Model\TagModel::class,
             ],
             'mautic.lead.model.company_report_data' => [
                 'class'     => \Mautic\LeadBundle\Model\CompanyReportData::class,
