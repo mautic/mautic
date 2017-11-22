@@ -75,12 +75,15 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return $this|void
      */
     public function onCampaignTriggerActionChangeStage(CampaignExecutionEvent $event)
     {
         if (!$event->checkContext('stage.change')) {
             return;
         }
+
         $stageChange = false;
         $lead        = $event->getLead();
         $leadStage   = null;
