@@ -11,11 +11,8 @@
 namespace MauticPlugin\MauticWebinarBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
-use Mautic\PluginBundle\Exception\ApiErrorException;
 use Mautic\PluginBundle\Integration\IntegrationObject;
-use Symfony\Component\Form\FormBuilder;
+
 
 /**
  * Class ConnectwiseIntegration.
@@ -169,7 +166,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
      */
     public function hasAttendedWebinar($webinar, Lead $lead)
     {
-        $filters = ['isNoShow' => false];
+        $filters = ['isNoShow' => true];
         return $this->getWebinarSubscription($webinar, $lead, $filters) ? true : false;
     }
 
@@ -184,9 +181,9 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         $leadEmail = $lead->getEmail();
         if ($leadEmail && isset($webinar['webinar'])) {
             try {
-                $subscriptions = $this->getApiHelper()->getSubscriptions($webinar, $filters);
+                $subscriptions = $this->getApiHelper()->getSubscriptions($webinar['webinar'], $filters);
             } catch (\Exception $e) {
-                $this->logIntegrationError($e);
+                return $e->getMessage();
             }
             return $this->findSubscriptionByEmail($subscriptions, $leadEmail);
         }
@@ -201,8 +198,13 @@ class WebikeoIntegration extends WebinarAbstractIntegration
      */
     private function findSubscriptionByEmail($subscriptions, $email)
     {
+        if (!isset($subscriptions['_embedded']['subscription'])) {
+            return null;
+        } else {
+            $subscriptions = $subscriptions['_embedded']['subscription'];
+        }
         foreach ($subscriptions as $subscription) {
-            if ($subscription['email'] = $email) {
+            if ($subscription['user']['email'] == $email) {
                 return $subscription;
             }
         }
@@ -225,7 +227,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         try {
             $response = $this->getApiHelper()->subscribeContact($webinar['webinar'], $contactDataToPost);
         } catch (\Exception $e) {
-            $this->logIntegrationError($e);
+            return $e->getMessage();
         }
         return isset($response['source']);
     }
