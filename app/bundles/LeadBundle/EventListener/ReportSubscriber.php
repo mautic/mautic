@@ -142,14 +142,21 @@ class ReportSubscriber extends CommonSubscriber
         }
 
         if ($event->checkContext($this->leadContexts)) {
-            $columns = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+            $columns        = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+            $companyColumns = $this->companyReportData->getCompanyData();
 
             $filters = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
             $data = [
                 'display_name' => 'mautic.lead.leads',
-                'columns'      => $columns,
-                'filters'      => $filters,
+                'columns'      => array_merge(
+                    $columns,
+                    $companyColumns
+                ),
+                'filters' => array_merge(
+                    $filters,
+                    $companyColumns
+                ),
             ];
 
             $event->addTable(self::CONTEXT_LEADS, $data, self::GROUP_CONTACTS);
