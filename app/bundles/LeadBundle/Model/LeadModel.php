@@ -1027,13 +1027,16 @@ class LeadModel extends FormModel
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
         if (null == $this->availableLeadFields) {
+            $filter = ['isPublished' => true];
+
+            if ($onlyPubliclyUpdateable) {
+                $filter['isPubliclyUpdatable'] = true;
+            }
+
             $this->availableLeadFields = $this->leadFieldModel->getFieldList(
                 false,
                 false,
-                [
-                    'isPublished'         => true,
-                    'isPubliclyUpdatable' => $onlyPubliclyUpdateable,
-                ]
+                $filter
             );
         }
 
