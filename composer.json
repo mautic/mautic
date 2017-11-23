@@ -122,7 +122,7 @@
         "phpunit/dbunit": "^2.0",
         "sebastian/exporter": "~2.0",
         "phpunit/phpunit-mock-objects": "~3.4.4",
-        "friendsofphp/php-cs-fixer": "^1.12",
+        "friendsofphp/php-cs-fixer": "^2.2",
         "symfony/var-dumper": "^3.2",
         "phpunit/phpunit-selenium": "^3.0",
         "codeception/codeception": "^2.3"

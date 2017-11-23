@@ -12,7 +12,6 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -384,7 +383,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $params['max_results'] = 100;
         if (!isset($params['offset'])) {
             //First call
-             $params['offset'] = 0;
+            $params['offset'] = 0;
         }
 
         $query = $params;
@@ -605,7 +604,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function prepareRequest($url, $parameters, $method, $settings, $authType)
     {
         if ($authType == 'oauth2' && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
-
             // Append the access token as the oauth-token header
             $headers = [
                 "oauth-token: {$this->keys['access_token']}",
@@ -722,8 +720,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         if (isset($data[$RECORDS_LIST_NAME]) and $object !== 'Activity') {
-
-        //Get assigned user ids
+            //Get assigned user ids
             $assignedUserIds            = [];
             $onwerEmailByAssignedUserId = [];
             if ($object == 'Leads' || $object == 'Contacts' || $object == 'Accounts') {
@@ -746,7 +743,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 $onwerEmailByAssignedUserId = $this->getApiHelper()->getEmailBySugarUserId(['ids' => $assignedUserIds]);
             }
 
-//Get all leads emails
+            //Get all leads emails
             $checkEmailsInSugar = [];
             if ($object == 'Leads') {
                 if ($SUGAR_VERSION == '6') {
@@ -1020,8 +1017,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $settings                           = parent::getFormSettings();
         $settings['requires_callback']      = false;
         $settings['requires_authorization'] = true;
-            //'requires_callback'      => false,
-            //'requires_authorization' => true,
+        //'requires_callback'      => false,
+        //'requires_authorization' => true,
         return $settings;
     }
 
@@ -1361,7 +1358,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                 $contactSugarFields = $this->getBlankFieldsToUpdate($contactSugarFields, $sugarLeadRecord, $sugarFieldMappings['Contacts'], $config);
                             }
                             if (isset($sugarFieldMappings['Leads']) && !empty($sugarFieldMappings['Leads'])) {
-                                $leadSugarFields = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord,  $sugarFieldMappings['Leads'], $config);
+                                $leadSugarFields = $this->getBlankFieldsToUpdate($leadSugarFields, $sugarLeadRecord, $sugarFieldMappings['Leads'], $config);
                             }
                             $this->buildCompositeBody(
                                 $mauticData,
@@ -1387,6 +1384,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
+
     /**
      * @param $lead
      *
@@ -1564,6 +1562,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return [$updated, $created, $errored];
     }
+
     /**
      * @param       $fieldsToUpdate
      * @param array $objects
@@ -1587,6 +1586,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         return $fieldsToUpdate;
     }
+
     /**
      * @param        $config
      * @param null   $object

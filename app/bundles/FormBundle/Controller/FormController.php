@@ -43,7 +43,6 @@ class FormController extends CommonFormController
                 'form:forms:deleteother',
                 'form:forms:publishown',
                 'form:forms:publishother',
-
             ],
             'RETURN_ARRAY'
         );
@@ -194,7 +193,6 @@ class FormController extends CommonFormController
                 'form:forms:deleteother',
                 'form:forms:publishown',
                 'form:forms:publishother',
-
             ],
             'RETURN_ARRAY'
         );
@@ -320,7 +318,6 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
 
                         try {
-
                             // Set alias to prevent SQL errors
                             $alias = $model->cleanAlias($entity->getName(), '', 10);
                             $entity->setAlias($alias);

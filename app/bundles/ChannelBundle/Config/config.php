@@ -34,7 +34,6 @@ return [
             ],
         ],
         'public' => [
-
         ],
     ],
 
@@ -48,13 +47,10 @@ return [
             ],
         ],
         'admin' => [
-
         ],
         'profile' => [
-
         ],
         'extra' => [
-
         ],
     ],
 
@@ -87,7 +83,6 @@ return [
                     'mautic.lead.model.company_report_data',
                 ],
             ],
-
         ],
         'forms' => [
             \Mautic\ChannelBundle\Form\Type\MessageType::class => [
@@ -139,6 +134,5 @@ return [
     ],
 
     'parameters' => [
-
     ],
 ];

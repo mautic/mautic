@@ -71,7 +71,6 @@ $container->loadFromExtension('doctrine', [
                     'point' => 'string',
                     'bit'   => 'string',
                 ],
-
             ],
         ],
     ],

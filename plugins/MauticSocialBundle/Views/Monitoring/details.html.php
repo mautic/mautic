@@ -13,7 +13,7 @@ if (!$isEmbedded) {
 
     $view['slots']->set('mauticContent', 'monitoring');
     $view['slots']->set('headerTitle', $activeMonitoring->getTitle());
-// @todo finish ACL here
+    // @todo finish ACL here
     $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
         'item'            => $activeMonitoring,
         'templateButtons' => [

@@ -665,7 +665,6 @@ class LeadModel extends FormModel
                             if (!empty($socialFeatureSettings[$service]['leadFields'])
                                 && in_array($field['alias'], $socialFeatureSettings[$service]['leadFields'])
                             ) {
-
                                 //check to see if the data is available
                                 $key = array_search($field['alias'], $socialFeatureSettings[$service]['leadFields']);
                                 if (isset($details['profile'][$key])) {
@@ -1275,6 +1274,7 @@ class LeadModel extends FormModel
     {
         $this->leadListModel->removeLead($lead, $lists, $manuallyRemoved);
     }
+
     /**
      * Add lead to Stage.
      *
@@ -1881,7 +1881,6 @@ class LeadModel extends FormModel
                 // Skip if the value is in the CSV row
                 continue;
             } elseif ($leadField['defaultValue']) {
-
                 // Fill in the default value if any
                 $fieldData[$leadField['alias']] = ('multiselect' === $leadField['type']) ? [$leadField['defaultValue']] : $leadField['defaultValue'];
             }

@@ -640,7 +640,6 @@ class ReportSubscriber extends CommonSubscriber
                     $graphData['iconClass'] = 'fa-building';
                     $event->setGraph($g, $graphData);
                     break;
-
             }
             unset($queryBuilder);
         }

@@ -64,7 +64,6 @@ class ConfigController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $isValid = false;
                 if ($isWritabale && $isValid = $this->isFormValid($form)) {
-
                     // Bind request to the form
                     $post     = $this->request->request;
                     $formData = $form->getData();

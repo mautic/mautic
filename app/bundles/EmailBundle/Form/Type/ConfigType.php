@@ -246,7 +246,6 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.convert.embed.images.tooltip',
-
                 ],
                 'data'     => empty($options['data']['mailer_convert_embed_images']) ? false : true,
                 'required' => false,
@@ -262,7 +261,6 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.append.tracking.pixel.tooltip',
-
                 ],
                 'data'     => empty($options['data']['mailer_append_tracking_pixel']) ? false : true,
                 'required' => false,
@@ -278,7 +276,6 @@ class ConfigType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.disable.trackable.urls.tooltip',
-
                 ],
                 'data'     => empty($options['data']['disable_trackable_urls']) ? false : true,
                 'required' => false,

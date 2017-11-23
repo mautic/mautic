@@ -191,7 +191,6 @@ class VtigerIntegration extends CrmAbstractIntegration
             if ($this->isAuthorized()) {
                 if (!empty($vTigerObjects) && is_array($vTigerObjects)) {
                     foreach ($vTigerObjects as $object) {
-
                         // The object key for contacts should be 0 for some BC reasons
                         if ($object == 'contacts') {
                             $object = 0;

@@ -168,7 +168,7 @@ class ListController extends FormController
         $action    = $this->generateUrl('mautic_segment_action', ['objectAction' => 'new']);
 
         //get the user form factory
-        $form = $model->createForm($list, $this->get('form.factory'),  $action);
+        $form = $model->createForm($list, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
         if ($this->request->getMethod() == 'POST') {
@@ -178,7 +178,7 @@ class ListController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($list);
 
-                    $this->addFlash('mautic.core.notice.created',  [
+                    $this->addFlash('mautic.core.notice.created', [
                         '%name%'      => $list->getName().' ('.$list->getAlias().')',
                         '%menu_link%' => 'mautic_segment_index',
                         '%url%'       => $this->generateUrl('mautic_segment_action', [
@@ -279,7 +279,7 @@ class ListController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($list, $form->get('buttons')->get('save')->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated',  [
+                    $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $list->getName().' ('.$list->getAlias().')',
                         '%menu_link%' => 'mautic_segment_index',
                         '%url%'       => $this->generateUrl('mautic_segment_action', [
