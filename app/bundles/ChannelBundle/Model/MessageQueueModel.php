@@ -96,8 +96,8 @@ class MessageQueueModel extends FormModel
 
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
         $frequencyRulesRepo     = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
-        $defaultFrequencyNumber = $this->coreParametersHelper->getParameter('email_frequency_number');
-        $defaultFrequencyTime   = $this->coreParametersHelper->getParameter('email_frequency_time');
+        $defaultFrequencyNumber = $this->coreParametersHelper->getParameter($channel.'_frequency_number');
+        $defaultFrequencyTime   = $this->coreParametersHelper->getParameter($channel.'_frequency_time');
 
         $dontSendTo = $frequencyRulesRepo->getAppliedFrequencyRules(
             $channel,
@@ -112,7 +112,7 @@ class MessageQueueModel extends FormModel
         $queuedContacts = [];
         if (!empty($dontSendTo)) {
             foreach ($dontSendTo as $frequencyRuleMet) {
-                $scheduleInterval = $frequencyRuleMet['frequency_number'].substr($frequencyRuleMet['frequency_time'], 0, 1);
+                $scheduleInterval = '1'.substr($frequencyRuleMet['frequency_time'], 0, 1);
                 if ($messageQueue && isset($messageQueue[$frequencyRuleMet['lead_id']])) {
                     $this->rescheduleMessage($messageQueue[$frequencyRuleMet['lead_id']], $scheduleInterval);
                 } else {

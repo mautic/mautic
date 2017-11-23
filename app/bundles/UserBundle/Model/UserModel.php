@@ -55,7 +55,7 @@ class UserModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticUserBundle:User');
+        return $this->em->getRepository(User::class);
     }
 
     /**
@@ -78,6 +78,21 @@ class UserModel extends FormModel
         }
 
         parent::saveEntity($entity, $unlock);
+    }
+
+    /**
+     * Get a list of users for an autocomplete input.
+     *
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @param array  $permissionLimiter
+     *
+     * @return array
+     */
+    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
+    {
+        return $this->getRepository()->getUserList($search, $limit, $start, $permissionLimiter);
     }
 
     /**
@@ -336,5 +351,15 @@ class UserModel extends FormModel
                 }
             }
         }
+    }
+
+    /**
+     * Return list of Users for formType Choice.
+     *
+     * @return array
+     */
+    public function getOwnerListChoices()
+    {
+        return $this->getRepository()->getOwnerListChoices();
     }
 }

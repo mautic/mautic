@@ -52,6 +52,11 @@
     margin-left:20px;
 }
 
+
+.selected-filters .glue-select {
+    margin-top:2px;
+}
+
 .selected-filters .panel {
     margin-bottom:0;
     margin-top:20px;

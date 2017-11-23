@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticCrmBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -27,6 +28,8 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
+use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -42,6 +45,11 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     const SC_CONVERTED_SF_LEAD        = 'converted_sf_lead';
     const SC_EMAIL_WITH_APOSTROPHE    = 'email_with_apostrophe';
     const SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
+
+    /**
+     * @var array
+     */
+    protected $maxInvocations = [];
 
     /**
      * @var
@@ -140,7 +148,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $sf    = $this->getSalesforceIntegration();
         $stats = $sf->pushLeads();
 
-        $this->assertEquals(400, count($this->getPersistedIntegrationEntities()));
+        $this->assertCount(400, $this->getPersistedIntegrationEntities());
         $this->assertEquals(300, $stats[0], var_export($stats, true)); // update
         $this->assertEquals(100, $stats[1], var_export($stats, true)); // create
     }
@@ -153,11 +161,11 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         // Validate there are only two integration entities (two contacts with same email)
         $integrationEntities = $this->getPersistedIntegrationEntities();
-        $this->assertEquals(2, count($integrationEntities));
+        $this->assertCount(2, $integrationEntities);
 
-        // Validate that there were 4 found entries (two duplciate leads)
+        // Validate that there were 4 found entries (two duplicate leads)
         $sfEntities = $this->getReturnedSfEntities();
-        $this->assertEquals(4, count($sfEntities));
+        $this->assertCount(4, $sfEntities);
     }
 
     public function testThatMultipleSfContactsReturnedAreUpdatedButOnlyOneIntegrationRecordIsCreated()
@@ -311,10 +319,54 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testLeadsAreNotCreatedInSfIfFoundToAlreadyExistAsContacts()
     {
+        $this->sfObjects     = ['Lead', 'Contact'];
+        $this->sfMockMethods = ['makeRequest', 'getSalesforceObjectsByEmails', 'prepareMauticContactsToCreate'];
+        $sf                  = $this->getSalesforceIntegration(0, 2);
+
+        /*
+         * This forces the integration to think the contact exists in SF,
+         * and removes those emails from the array for creation.
+         */
+        $sf->method('getSalesforceObjectsByEmails')
+            ->willReturnCallback(
+                function () {
+                    $args = func_get_args();
+                    $emails = array_column($args[1], 'email');
+
+                    return $this->getSalesforceObjects($emails, 0, 1);
+                }
+            );
+
+        $sf->expects($this->never())
+            ->method('prepareMauticContactsToCreate');
+
+        $sf->pushLeads();
     }
 
     public function testLeadsAreNotCreatedInSfIfFoundToAlreadyExistAsLeads()
     {
+        $this->sfObjects     = ['Lead'];
+        $this->sfMockMethods = ['makeRequest', 'getSalesforceObjectsByEmails', 'prepareMauticContactsToCreate'];
+        $sf                  = $this->getSalesforceIntegration(0, 1);
+
+        /*
+         * This forces the integration to think the contact exists in SF,
+         * and removes those emails from the array for creation.
+         */
+        $sf->method('getSalesforceObjectsByEmails')
+            ->willReturnCallback(
+                function () {
+                    $args = func_get_args();
+                    $emails = array_column($args[1], 'email');
+
+                    return $this->getSalesforceObjects($emails, 0, 1);
+                }
+            );
+
+        $sf->expects($this->never())
+            ->method('prepareMauticContactsToCreate');
+
+        $sf->pushLeads();
     }
 
     public function testIntegrationEntityRecordIsCreatedForFoundSfContacts()
@@ -327,6 +379,16 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testExceptionIsThrownIfSfReturnsErrorOnEmailLookup()
     {
+        $this->sfObjects     = ['Lead'];
+        $this->sfMockMethods = ['makeRequest', 'getSalesforceObjectsByEmails'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $sf->method('getSalesforceObjectsByEmails')
+            ->willReturn('Some Error');
+
+        $this->setExpectedException(ApiErrorException::class);
+
+        $sf->pushLeads();
     }
 
     public function testIntegrationPushFindsDuplicate()
@@ -345,10 +407,375 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    public function testMauticContactTimelineLinkPopulatedsPayload()
+    public function testGetCampaigns()
     {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $sf->expects($this->once())
+            ->method('makeRequest')
+            ->with(
+                'https://sftest.com/services/data/v34.0/query',
+                [
+                    'q' => 'Select Id, Name from Campaign where isDeleted = false',
+                ]
+            );
+
+        $sf->getCampaigns();
     }
 
+    public function testGetCampaignMembers()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $sf->expects($this->once())
+            ->method('makeRequest')
+            ->with(
+                'https://sftest.com/services/data/v34.0/query',
+                [
+                    'q' => "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '1'",
+                ]
+            );
+
+        $sf->getCampaignMembers(1, []);
+    }
+
+    public function testGetCampaignMemberStatus()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $sf->expects($this->once())
+            ->method('makeRequest')
+            ->with(
+                'https://sftest.com/services/data/v34.0/query',
+                [
+                    'q' => "Select Id, Label from CampaignMemberStatus where isDeleted = false and CampaignId='1'",
+                ]
+            );
+
+        $sf->getCampaignMemberStatus(1);
+    }
+
+    public function testPushToCampaign()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $lead = new Lead();
+
+        $lead->setFirstname('Lead1');
+        $lead->setEmail('Lead1@sftest.com');
+        $lead->setId(1);
+
+        $sf->expects($this->any())
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function () {
+                    $args = func_get_args();
+
+                    // Checking for campaign members should return empty array for testing purposes
+                    if (strpos($args[0], '/query') !== false && strpos($args[1]['q'], 'CampaignMember') !== false) {
+                        return [];
+                    }
+
+                    if (strpos($args[0], '/composite') !== false) {
+                        $this->assertSame(
+                            '1-CampaignMemberNew-null-1',
+                            $args[1]['compositeRequest'][0]['referenceId'],
+                            'The composite request when pushing a campaign member should contain the correct referenceId.'
+                        );
+
+                        return true;
+                    }
+                }
+            );
+
+        $sf->pushLeadToCampaign($lead, 1, 'Active', ['Lead' => [1]]);
+    }
+
+    public function testPushCompany()
+    {
+        $this->sfObjects     = ['Account'];
+        $this->sfMockMethods = ['makeRequest'];
+        $sf                  = $this->getSalesforceIntegration();
+
+        $company = new Company();
+
+        $company->setName('MyCompanyName');
+
+        $sf->expects($this->any())
+            ->method('makeRequest')
+            ->willReturnCallback(
+                function () {
+                    $args = func_get_args();
+
+                    // Checking for campaign members should return empty array for testing purposes
+                    if (strpos($args[0], '/query') !== false && strpos($args[1]['q'], 'Account') !== false) {
+                        return [];
+                    }
+
+                    if (strpos($args[0], '/composite') !== false) {
+                        $this->assertSame(
+                            '1-Account-null-1',
+                            $args[1]['compositeRequest'][0]['referenceId'],
+                            'The composite request when pushing an account should contain the correct referenceId.'
+                        );
+
+                        return true;
+                    }
+                }
+            );
+
+        $result = $sf->pushCompany($company);
+    }
+
+    public function testExportingContactActivity()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest', 'getSalesforceObjectsByEmails', 'isAuthorized', 'getFetchQuery', 'getLeadData'];
+        $sf                  = $this->getSalesforceIntegration(2, 2);
+
+        $sf->expects($this->once())
+            ->method('isAuthorized')
+            ->willReturn(true);
+
+        $sf->expects($this->once())
+            ->method('getFetchQuery')
+            ->with([])
+            ->willReturnCallback(
+                function () {
+                    return [
+                        'start' => '-1 week',
+                        'end'   => 'now',
+                    ];
+                }
+            );
+
+        $this->setMaxInvocations('getIntegrationsEntityId', 1);
+
+        $sf->expects($this->once())
+            ->method('getLeadData')
+            ->willReturnCallback(
+                function () {
+                    $leadIds = func_get_arg(2);
+                    $data = [];
+
+                    foreach ($leadIds as $i => $id) {
+                        ++$i;
+
+                        $data[$id] = [
+                            'records' => [
+                                [
+                                    'eventType'   => 'email',
+                                    'name'        => 'Email Name',
+                                    'description' => 'Email sent',
+                                    'dateAdded'   => new \DateTime(),
+                                    'id'          => 'pointChange'.$i,
+                                ],
+                            ],
+                        ];
+                    }
+
+                    return $data;
+                }
+            );
+
+        /*
+         * Ensures that makeRequest is called with the mautic_timeline__c endpoint.
+         * If it is, then we've successfully exported contact activity.
+         */
+        $sf->expects($this->exactly(1))
+            ->method('makeRequest')
+            ->with('https://sftest.com/services/data/v38.0/composite/')
+            ->willReturnCallback(
+                function () {
+                    return $this->getSalesforceCompositeResponse(func_get_arg(1));
+                }
+            );
+
+        $sf->pushLeadActivity();
+    }
+
+    public function testMauticContactTimelineLinkPopulatedsPayload()
+    {
+        $this->sfObjects     = ['Contact'];
+        $this->sfMockMethods = ['makeRequest', 'getSalesforceObjectsByEmails'];
+        $sf                  = $this->getSalesforceIntegration(2, 2);
+
+        /*
+         * When checking if contacts need to be created, the mauticContactTimelineLink
+         * has been populated at this point. If populated here, the test passes.
+         * We return the salesforce objects so as not to throw an error.
+         */
+        $sf->method('getSalesforceObjectsByEmails')
+            ->willReturnCallback(
+                function () {
+                    $args = func_get_args();
+                    $emails = array_column($args[1], 'email');
+
+                    return $this->getSalesforceObjects($emails, 0, 1);
+                }
+            );
+
+        /*
+         * With the given SF integration setup, the `getSalesforceObjectsByEmails` method
+         * will be called once, and have the given parameters, which contains the contact
+         * timeline link.
+         */
+        $sf->expects($this->once())
+            ->method('getSalesforceObjectsByEmails')
+            ->with(
+                'Contact',
+                [
+                    'contact1@sftest.com' => [
+                        'integration_entity_id'             => 'SF1',
+                        'integration_entity'                => 'Contact',
+                        'id'                                => 1,
+                        'internal_entity_id'                => 1,
+                        'firstname'                         => 'Contact1',
+                        'lastname'                          => 'Contact1',
+                        'company'                           => 'Contact1',
+                        'email'                             => 'Contact1@sftest.com',
+                        'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
+                        'mauticContactIsContactableByEmail' => 1,
+                    ],
+                    'contact2@sftest.com' => [
+                        'integration_entity_id'             => 'SF2',
+                        'integration_entity'                => 'Contact',
+                        'id'                                => 2,
+                        'internal_entity_id'                => 2,
+                        'firstname'                         => 'Contact2',
+                        'lastname'                          => 'Contact2',
+                        'company'                           => 'Contact2',
+                        'email'                             => 'Contact2@sftest.com',
+                        'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
+                        'mauticContactIsContactableByEmail' => 1,
+                    ],
+                ],
+                'FirstName,LastName,Email'
+            );
+
+        $sf->pushLeads();
+    }
+
+    public function testUpdateDncBySfDate()
+    {
+        $this->sfMockMethods = ['makeRequest', 'updateDncByDate', 'getDncHistory'];
+
+        $objects = ['Contact', 'Lead'];
+        foreach ($objects as $object) {
+            $mappedData = [
+                'contact1@sftest.com' => [
+                    'integration_entity_id'             => 'SF1',
+                    'integration_entity'                => $object,
+                    'id'                                => 1,
+                    'internal_entity_id'                => 1,
+                    'firstname'                         => 'Contact1',
+                    'lastname'                          => 'Contact1',
+                    'company'                           => 'Contact1',
+                    'email'                             => 'Contact1@sftest.com',
+                    'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
+                    'mauticContactIsContactableByEmail' => 1,
+
+                ],
+                'contact2@sftest.com' => [
+                    'integration_entity_id'             => 'SF2',
+                    'integration_entity'                => $object,
+                    'id'                                => 2,
+                    'internal_entity_id'                => 2,
+                    'firstname'                         => 'Contact2',
+                    'lastname'                          => 'Contact2',
+                    'company'                           => 'Contact2',
+                    'email'                             => 'Contact2@sftest.com',
+                    'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
+                    'mauticContactIsContactableByEmail' => 0,
+                ],
+            ];
+
+            $sf = $this->getSalesforceIntegration(2, 2);
+            $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
+            $sf->expects($this->any())
+                ->method('getDncHistory')
+                ->willReturn(
+                    $this->getSalesforceDNCHistory($object, 'SF')
+            );
+            $sf->pushLeadDoNotContactByDate('email', $mappedData, $object, ['start' => '2017-10-16 13:00:00.000000']);
+
+            foreach ($mappedData as $assertion) {
+                $this->assertArrayHasKey('mauticContactIsContactableByEmail', $assertion);
+            }
+        }
+    }
+
+    public function testUpdateDncByMauticDate()
+    {
+        $this->sfMockMethods = ['makeRequest', 'updateDncByDate', 'getDncHistory'];
+
+        $objects = ['Contact', 'Lead'];
+        foreach ($objects as $object) {
+            $mappedData = [
+                'contact1@sftest.com' => [
+                    'integration_entity_id'             => 'SF1',
+                    'integration_entity'                => $object,
+                    'id'                                => 1,
+                    'internal_entity_id'                => 1,
+                    'firstname'                         => 'Contact1',
+                    'lastname'                          => 'Contact1',
+                    'company'                           => 'Contact1',
+                    'email'                             => 'Contact1@sftest.com',
+                    'mauticContactTimelineLink'         => 'mautic_plugin_timeline_view',
+                    'mauticContactIsContactableByEmail' => 1,
+
+                ],
+            ];
+
+            $sf = $this->getSalesforceIntegration(2, 2);
+            $sf->expects($this->any())->method('updateDncByDate')->willReturn(true);
+            $sf->expects($this->any())->method('getDncHistory')->willReturn($this->getSalesforceDNCHistory($object, 'Mautic'));
+
+            $sf->pushLeadDoNotContactByDate('email', $mappedData, $object, ['start' => '2017-10-15T10:00:00.000000']);
+            foreach ($mappedData as $assertion) {
+                $this->assertArrayNotHasKey('mauticContactIsContactableByEmail', $assertion);
+            }
+        }
+    }
+
+    /**
+     * @param string $name
+     * @param int    $max
+     *
+     * @return $this
+     */
+    protected function setMaxInvocations($name, $max)
+    {
+        $this->maxInvocations[$name] = $max;
+
+        return $this;
+    }
+
+    /**
+     * @param $name
+     *
+     * @return int
+     */
+    protected function getMaxInvocations($name)
+    {
+        if (isset($this->maxInvocations[$name])) {
+            return $this->maxInvocations[$name];
+        }
+
+        return 1;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function getMockFactory()
     {
         defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
@@ -366,34 +793,77 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         // we need insight into the entities persisted
         $mockIntegrationEntityRepository->method('saveEntities')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        $args = func_get_args();
-                        $this->persistedIntegrationEntities = array_merge($this->persistedIntegrationEntities, $args[0]);
-                    }
-                )
+            ->willReturnCallback(
+                function () {
+                    $this->persistedIntegrationEntities = array_merge($this->persistedIntegrationEntities, func_get_arg(0));
+                }
             );
+
+        $mockIntegrationEntityRepository
+            ->expects($spy = $this->any())
+            ->method('getIntegrationsEntityId')
+            ->willReturnCallback(
+                function () use ($spy) {
+                    if (count($spy->getInvocations()) > $this->getMaxInvocations('getIntegrationsEntityId')) {
+                        return null;
+                    }
+
+                    // Just return some bogus entities for testing
+                    return $this->getLeadsToUpdate('Lead', 2, 2, 'Lead')['Lead'];
+                }
+            );
+        $mockAuditLogRepo = $this->getMockBuilder(AuditLogRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockAuditLogRepo
+            ->expects($this->any())
+            ->method('getAuditLogsForLeads')
+            ->willReturn(
+                [
+                    [
+                        'userName' => 'Salesforce',
+                        'userId'   => 0,
+                        'bundle'   => 'lead',
+                        'object'   => 'lead',
+                        'objectId' => 1,
+                        'action'   => 'update',
+                        'details'  => [
+                                'dnc_channel_status' => [
+                                        'email' => [
+                                                'reason'   => 3,
+                                                'comments' => 'Set by Salesforce',
+                                            ],
+                                    ],
+                                'dnc_status' => [
+                                        'manual',
+                                        'Set by Salesforce',
+                                    ],
+                            ],
+                        'dateAdded' => new \DateTime('2017-10-16 15:00:36.000000', new \DateTimeZone('UTC')),
+                        'ipAddress' => '127.0.0.1',
+                    ],
+                ]
+            );
+
         $mockEntityManager->method('getRepository')
             ->will(
                 $this->returnValueMap(
                     [
                         ['MauticPluginBundle:IntegrationEntity', $mockIntegrationEntityRepository],
+                        ['MauticCoreBundle:AuditLog', $mockAuditLogRepo],
                     ]
                 )
             );
 
         $mockEntityManager->method('getReference')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        $args = func_get_args();
-                        switch ($args[0]) {
-                            case 'MauticPluginBundle:IntegrationEntity':
-                                return new IntegrationEntity();
-                        }
+            ->willReturnCallback(
+                function () {
+                    switch (func_get_arg(0)) {
+                        case 'MauticPluginBundle:IntegrationEntity':
+                            return new IntegrationEntity();
                     }
-                )
+                }
             );
 
         $mockFactory->method('getEntityManager')
@@ -407,20 +877,25 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $mockRouter = $this->getMockBuilder(Router::class)
             ->disableOriginalConstructor()
+            ->setMethods(['generate'])
             ->getMock();
+
+        $mockRouter->method('generate')
+            ->willReturnArgument(0);
+
         $mockFactory->method('getRouter')
             ->willReturn($mockRouter);
 
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $mockLeadModel->method('getEntity')
+            ->willReturn(new Lead());
         $mockCompanyModel = $this->getMockBuilder(CompanyModel::class)
             ->disableOriginalConstructor()
             ->getMock();
         $mockCompanyModel->method('getEntity')
-            ->willReturn(
-                new Company()
-            );
+            ->willReturn(new Company());
         $mockFieldModel = $this->getMockBuilder(FieldModel::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -584,7 +1059,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                     'FirstName__Contact' => 'firstname',
                     'LastName__Contact'  => 'lastname',
                     'Email__Contact'     => 'email',
-
                 ],
             'update_mautic' => [
                     'Company__Lead'      => '0',
@@ -627,20 +1101,48 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             ->setMethods($this->sfMockMethods)
             ->getMock();
 
+        $integrationEntityModelMock = $this->getMockBuilder(IntegrationEntityModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $integrationEntityModelMock->method('getEntityByIdAndSetSyncDate')
+            ->willReturn(new IntegrationEntity());
+
+        $sf->setIntegrationEntityModel($integrationEntityModelMock);
+
         $sf->method('makeRequest')
             ->will(
                 $this->returnCallback(
-                    function () use ($maxSfContacts, $maxSfLeads) {
+                    function () use ($maxSfContacts, $maxSfLeads, $updateObject) {
                         $args = func_get_args();
-
                         // Determine what to return by analyzing the URL and query parameters
                         switch (true) {
                             case strpos($args[0], '/query') !== false:
-                                // Extract emails
-                                preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
-                                $emails = explode("','", $match[1]);
+                                if (isset($args[1]['q']) && strpos($args[0], 'from CampaignMember') !== false) {
+                                    return [];
+                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Campaign') !== false) {
+                                    return 'fetched campaigns';
+                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Account') !== false) {
+                                    return 'fetched accounts';
+                                } elseif (isset($args[1]['q']) && $args[1]['q'] === 'SELECT CreatedDate from Organization') {
+                                    return [
+                                        'records' => [
+                                            ['CreatedDate' => '2012-10-30T17:56:50.000+0000'],
+                                        ],
+                                    ];
+                                } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from '.$updateObject.'History') !== false) {
+                                    return $this->getSalesforceDNCHistory($updateObject);
+                                } else {
+                                    // Extract emails
+                                    $found = preg_match('/Email in \(\'(.*?)\'\)/', $args[1]['q'], $match);
+                                    if ($found) {
+                                        $emails = explode("','", $match[1]);
 
-                                return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
+                                        return $this->getSalesforceObjects($emails, $maxSfContacts, $maxSfLeads);
+                                    } else {
+                                        return $this->getSalesforceObjects([], $maxSfContacts, $maxSfLeads);
+                                    }
+                                }
                             case strpos($args[0], '/composite') !== false:
                                 return $this->getSalesforceCompositeResponse($args[1]);
                         }
@@ -683,32 +1185,30 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     protected function setLeadsToUpdate(\PHPUnit_Framework_MockObject_MockObject $mockRepository, $max, $maxSfContacts, $maxSfLeads, $specificObject)
     {
         $mockRepository->method('findLeadsToUpdate')
-            ->will(
-                $this->returnCallback(
-                    function () use ($max, $specificObject, $maxSfContacts, $maxSfLeads) {
-                        $args = func_get_args();
-                        $object = $args[6];
+            ->willReturnCallback(
+                function () use ($max, $specificObject, $maxSfContacts, $maxSfLeads) {
+                    $args = func_get_args();
+                    $object = $args[6];
 
-                        // determine whether to return a count or records
-                        $results = [];
-                        if (false === $args[3]) {
-                            foreach ($object as $object) {
-                                if ($specificObject && $specificObject !== $object) {
-                                    continue;
-                                }
-
-                                // Should be 100 contacts and 100 leads
-                                $results[$object] = $max;
+                    // determine whether to return a count or records
+                    $results = [];
+                    if (false === $args[3]) {
+                        foreach ($object as $object) {
+                            if ($specificObject && $specificObject !== $object) {
+                                continue;
                             }
 
-                            return $results;
+                            // Should be 100 contacts and 100 leads
+                            $results[$object] = $max;
                         }
-
-                        $results = $this->getLeadsToUpdate($object, $args[3], $max, $specificObject);
 
                         return $results;
                     }
-                )
+
+                    $results = $this->getLeadsToUpdate($object, $args[3], $max, $specificObject);
+
+                    return $results;
+                }
             );
     }
 
@@ -719,25 +1219,23 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     protected function setLeadsToCreate(\PHPUnit_Framework_MockObject_MockObject $mockRepository, $max = 200)
     {
         $mockRepository->method('findLeadsToCreate')
-            ->will(
-                $this->returnCallback(
-                    function () use (&$restart, $max) {
-                        $args = func_get_args();
+            ->willReturnCallback(
+                function () use (&$restart, $max) {
+                    $args = func_get_args();
 
-                        if (false === $args[2]) {
-                            return $max;
-                        }
-
-                        $createLeads = $this->getLeadsToCreate($args[2], $max);
-
-                        // determine whether to return a count or records
-                        if (false === $args[2]) {
-                            return count($createLeads);
-                        }
-
-                        return $createLeads;
+                    if (false === $args[2]) {
+                        return $max;
                     }
-                )
+
+                    $createLeads = $this->getLeadsToCreate($args[2], $max);
+
+                    // determine whether to return a count or records
+                    if (false === $args[2]) {
+                        return count($createLeads);
+                    }
+
+                    return $createLeads;
+                }
             );
     }
 
@@ -792,8 +1290,8 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
     /**
      * Simulate looping over Mautic leads to create.
      *
-     * @param $start
      * @param $limit
+     * @param $max
      *
      * @return array
      */
@@ -843,36 +1341,38 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $contactCount = 0;
         $leadCount    = 0;
 
-        foreach ($emails as $email) {
-            // Extact ID
-            preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
-            $object = $match[1];
+        if (!empty($emails)) {
+            foreach ($emails as $email) {
+                // Extact ID
+                preg_match('/(Lead|Contact)([0-9]*)@sftest\.com/', $email, $match);
+                $object = $match[1];
 
-            if ('Lead' === $object) {
-                if ($leadCount >= $maxLeads) {
-                    continue;
+                if ('Lead' === $object) {
+                    if ($leadCount >= $maxLeads) {
+                        continue;
+                    }
+                    ++$leadCount;
+                } else {
+                    if ($contactCount >= $maxContacts) {
+                        continue;
+                    }
+                    ++$contactCount;
                 }
-                ++$leadCount;
-            } else {
-                if ($contactCount >= $maxContacts) {
-                    continue;
-                }
-                ++$contactCount;
-            }
 
-            $id        = $match[2];
-            $records[] = [
-                'attributes' => [
+                $id        = $match[2];
+                $records[] = [
+                    'attributes' => [
                         'type' => $object,
                         'url'  => "/services/data/v34.0/sobjects/$object/SF$id",
                     ],
-                'Id'        => 'SF'.$id,
-                'FirstName' => $object.$id,
-                'LastName'  => $object.$id,
-                'Email'     => $object.$id.'@sftest.com',
-            ];
+                    'Id'        => 'SF'.$id,
+                    'FirstName' => $object.$id,
+                    'LastName'  => $object.$id,
+                    'Email'     => $object.$id.'@sftest.com',
+                ];
 
-            $this->addSpecialCases($id, $records);
+                $this->addSpecialCases($id, $records);
+            }
         }
 
         $this->returnedSfEntities = array_merge($this->returnedSfEntities, $records);
@@ -884,6 +1384,56 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * Mock SF response.
+     *
+     * @return array
+     */
+    protected function getSalesforceDNCHistory($object, $priority)
+    {
+        $records      = [];
+        $datePriority = [
+            'SF'     => '2017-10-16T00:43:43.000+0000',
+            'Mautic' => '2017-10-16T18:43:43.000+0000',
+            ];
+
+        $records = [
+            'totalSize' => 3,
+            'done'      => 1,
+            'records'   => [
+                [
+                    'attributes' => [
+                        'type' => 'ContactHistory',
+                        'url'  => '/services/data/v34.0/sobjects/'.$object.'History/0170SFH1',
+                        ],
+                    'Field'       => 'HasOptedOutOfEmail',
+                    $object.'Id'  => 'SF1',
+                    'CreatedDate' => $datePriority[$priority],
+                    'IsDeleted'   => false,
+                    'NewValue'    => true,
+                ],
+                [
+                    'attributes' => [
+                        'type' => 'ContactHistory',
+                        'url'  => '/services/data/v34.0/sobjects/'.$object.'History/0170SFH3',
+                    ],
+                    'Field'       => 'HasOptedOutOfEmail',
+                    $object.'Id'  => 'SF2',
+                    'CreatedDate' => $datePriority[$priority],
+                    'IsDeleted'   => false,
+                    'NewValue'    => true,
+                ],
+
+            ],
+        ];
+
+        return $records;
+    }
+
+    /**
+     * @param $id
+     * @param $records
+     */
     protected function addSpecialCases($id, &$records)
     {
         switch ($this->specialSfCase) {
@@ -923,6 +1473,8 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      * Mock SF response.
      *
      * @param $data
+     *
+     * @return array
      */
     protected function getSalesforceCompositeResponse($data)
     {
@@ -938,10 +1490,13 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
             } else {
                 $contactId = '';
                 $parts     = explode('-', $subrequest['referenceId']);
+
                 if (count($parts) === 3) {
                     list($contactId, $sfObject, $id) = $parts;
                 } elseif (count($parts) === 2) {
                     list($contactId, $sfObject) = $parts;
+                } elseif (count($parts) === 4) {
+                    list($contactId, $sfObject, $empty, $campaignId) = $parts;
                 }
                 $response[] = [
                     'body' => [

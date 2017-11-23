@@ -40,6 +40,7 @@ class StatsSubscriber extends CommonStatsSubscriber
                 'MauticLeadBundle:CompanyLead',
                 'MauticLeadBundle:LeadCategory',
                 'MauticLeadBundle:LeadDevice',
+                'MauticLeadBundle:LeadEventLog',
                 'MauticLeadBundle:ListLead',
                 'MauticLeadBundle:DoNotContact',
                 'MauticLeadBundle:FrequencyRule',

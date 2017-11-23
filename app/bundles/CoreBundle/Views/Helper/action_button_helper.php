@@ -68,6 +68,10 @@ if (!isset($indexRoute)) {
     }
 }
 
+if (!isset($routeVars)) {
+    $routeVars = [];
+}
+
 //Extra HTML to be inserted after the buttons
 if (!isset($extraHtml)) {
     $extraHtml = '';

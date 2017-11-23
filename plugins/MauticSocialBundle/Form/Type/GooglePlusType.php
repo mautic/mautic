@@ -44,7 +44,6 @@ class GooglePlusType extends AbstractType
                 ''   => 'mautic.integration.GooglePlus.share.height.standard',
                 '15' => 'mautic.integration.GooglePlus.share.height.small',
                 '24' => 'mautic.integration.GooglePlus.share.height.large',
-
             ],
             'label'       => 'mautic.integration.GooglePlus.share.height',
             'required'    => false,

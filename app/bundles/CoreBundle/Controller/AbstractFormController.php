@@ -167,11 +167,12 @@ abstract class AbstractFormController extends CommonController
     /**
      * Binds form data, checks validity, and determines cancel request.
      *
-     * @param Form $form
+     * @param Form  $form
+     * @param array $data
      *
-     * @return int
+     * @return bool
      */
-    protected function isFormValid(Form $form)
+    protected function isFormValid(Form $form, array $data = null)
     {
         //bind request to the form
         $form->handleRequest($this->request);

@@ -54,7 +54,6 @@ class MailchimpType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $helper */
         $helper = $this->factory->getHelper('integration');
 

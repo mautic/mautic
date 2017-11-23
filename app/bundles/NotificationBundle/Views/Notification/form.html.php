@@ -33,11 +33,12 @@ $view['slots']->set('headerTitle', $header);
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['name']); ?>
                                 <?php echo $view['form']->row($form['heading']); ?>
+                                <?php echo $view['form']->row($form['message']); ?>
                                 <?php echo $view['form']->row($form['url']); ?>
                                 <?php echo $view['form']->row($form['button']); ?>
                             </div>
                             <div class="col-md-6">
-                                <?php echo $view['form']->row($form['message']); ?>
+                                <?php include 'preview.html.php'; ?>
                             </div>
                         </div>
                     </div>

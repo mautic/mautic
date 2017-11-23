@@ -63,6 +63,16 @@ interface CustomFieldEntityInterface
     public function getFieldValue($field, $group = null);
 
     /**
+     * Get field details.
+     *
+     * @param string $key
+     * @param string $group
+     *
+     * @return array|false
+     */
+    public function getField($key, $group = null);
+
+    /**
      * Get flat array of profile fields without groups.
      *
      * @return mixed

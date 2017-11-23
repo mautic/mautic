@@ -73,6 +73,7 @@ class NotificationType extends AbstractType
                 'label'      => 'mautic.notification.form.heading',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
+                'required'   => false,
             ]
         );
 
@@ -86,6 +87,7 @@ class NotificationType extends AbstractType
                     'class' => 'form-control',
                     'rows'  => 6,
                 ],
+                'required' => true,
             ]
         );
 

@@ -2,6 +2,8 @@
 !.gitignore
 !.htaccess
 !.gitkeep
+.php_cs.cache
+/.env
 /composer.phar
 
 /app/bootstrap*
@@ -34,6 +36,7 @@
 /bin/*
 /bundles
 /node_modules
+/build/coverage
 /build/packaging
 /build/packages/*
 !/build/packages/.placeholder
@@ -69,15 +72,23 @@
 !/plugins/index.html
 
 /themes/*
+!/themes/aurora
 !/themes/blank
+!/themes/cards
 !/themes/coffee
+!/themes/fresh-center
+!/themes/fresh-fixed
+!/themes/fresh-left
+!/themes/fresh-wide
 !/themes/goldstar
 !/themes/Mauve
 !/themes/nature
 !/themes/neopolitan
 !/themes/oxygen
 !/themes/skyline
+!/themes/sparse
 !/themes/sunday
+!/themes/vibrant
 !/themes/blank.png
 !/themes/blank-big.png
 

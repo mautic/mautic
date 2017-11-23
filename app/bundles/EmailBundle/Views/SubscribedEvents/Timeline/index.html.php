@@ -27,7 +27,7 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
                 [
                     '%date%'     => $view['date']->toFull($event['timestamp']),
                     '%interval%' => $view['date']->formatRange($event['timestamp']),
-                    '%sent%'     => $view['date']->toFull($event['dateSent']),
+                    '%sent%'     => $view['date']->toFull($item['dateSent']),
                 ]
             ); ?>
         <?php endif; ?>

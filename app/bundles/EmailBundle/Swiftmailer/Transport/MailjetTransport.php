@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class MailjetlTransport.
  */
-class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
+class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransportInterface
 {
     private $sandboxMode;
 
@@ -38,7 +38,6 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
 
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
-
         // add leadIdHash to track this email
         if (isset($message->leadIdHash)) {
             // contact leadidHeash and email to be sure not applying email stat to bcc

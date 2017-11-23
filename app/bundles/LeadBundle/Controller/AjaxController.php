@@ -120,7 +120,7 @@ class AjaxController extends CommonAjaxController
                             'id'    => $r['id'],
                         ];
                     }
-                } elseif (in_array($leadField, ['hit_url', 'referer', 'url_title', 'source'])) {
+                } elseif (in_array($leadField, ['hit_url', 'referer', 'url_title', 'source', 'source_id'])) {
                     $dataArray[] = [
                         'value' => '',
                     ];
@@ -254,7 +254,7 @@ class AjaxController extends CommonAjaxController
         $includeEvents = InputHelper::clean($request->request->get('includeEvents', []));
         $excludeEvents = InputHelper::clean($request->request->get('excludeEvents', []));
         $search        = InputHelper::clean($request->request->get('search'));
-        $leadId        = InputHelper::int($request->request->get('leadId'));
+        $leadId        = (int) $request->request->get('leadId');
 
         if (!empty($leadId)) {
             //find the lead
@@ -307,8 +307,8 @@ class AjaxController extends CommonAjaxController
     protected function toggleLeadListAction(Request $request)
     {
         $dataArray = ['success' => 0];
-        $leadId    = InputHelper::int($request->request->get('leadId'));
-        $listId    = InputHelper::int($request->request->get('listId'));
+        $leadId    = (int) $request->request->get('leadId');
+        $listId    = (int) $request->request->get('listId');
         $action    = InputHelper::clean($request->request->get('listAction'));
 
         if (!empty($leadId) && !empty($listId) && in_array($action, ['remove', 'add'])) {
@@ -336,7 +336,7 @@ class AjaxController extends CommonAjaxController
     protected function togglePreferredLeadChannelAction(Request $request)
     {
         $dataArray = ['success' => 0];
-        $leadId    = InputHelper::int($request->request->get('leadId'));
+        $leadId    = (int) $request->request->get('leadId');
         $channel   = InputHelper::clean($request->request->get('channel'));
         $action    = InputHelper::clean($request->request->get('channelAction'));
 
@@ -366,8 +366,8 @@ class AjaxController extends CommonAjaxController
     protected function toggleLeadCampaignAction(Request $request)
     {
         $dataArray  = ['success' => 0];
-        $leadId     = InputHelper::int($request->request->get('leadId'));
-        $campaignId = InputHelper::int($request->request->get('campaignId'));
+        $leadId     = (int) $request->request->get('leadId');
+        $campaignId = (int) $request->request->get('campaignId');
         $action     = InputHelper::clean($request->request->get('campaignAction'));
 
         if (!empty($leadId) && !empty($campaignId) && in_array($action, ['remove', 'add'])) {
@@ -395,8 +395,8 @@ class AjaxController extends CommonAjaxController
     protected function toggleCompanyLeadAction(Request $request)
     {
         $dataArray = ['success' => 0];
-        $leadId    = InputHelper::int($request->request->get('leadId'));
-        $companyId = InputHelper::int($request->request->get('companyId'));
+        $leadId    = (int) $request->request->get('leadId');
+        $companyId = (int) $request->request->get('companyId');
         $action    = InputHelper::clean($request->request->get('companyAction'));
 
         if (!empty($leadId) && !empty($companyId) && in_array($action, ['remove', 'add'])) {
@@ -646,17 +646,14 @@ class AjaxController extends CommonAjaxController
         $tags = json_decode($tags, true);
 
         if (is_array($tags)) {
-            $newTags = [];
+            $leadModel = $this->getModel('lead');
+            $newTags   = [];
+
             foreach ($tags as $tag) {
                 if (!is_numeric($tag)) {
-                    // New tag
-                    $tagEntity = new Tag();
-                    $tagEntity->setTag(InputHelper::clean($tag));
-                    $newTags[] = $tagEntity;
+                    $newTags[] = $leadModel->getTagRepository()->getTagByNameOrCreateNewOne($tag);
                 }
             }
-
-            $leadModel = $this->getModel('lead');
 
             if (!empty($newTags)) {
                 $leadModel->getTagRepository()->saveEntities($newTags);
@@ -738,8 +735,8 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray = ['success' => 0];
         $order     = InputHelper::clean($request->request->get('field'));
-        $page      = InputHelper::int($request->get('page'));
-        $limit     = InputHelper::int($request->get('limit'));
+        $page      = (int) $request->get('page');
+        $limit     = (int) $request->get('limit');
 
         if (!empty($order)) {
             /** @var \Mautic\LeadBundle\Model\FieldModel $model */
@@ -763,7 +760,7 @@ class AjaxController extends CommonAjaxController
         $alias     = InputHelper::clean($request->request->get('alias'));
         $operator  = InputHelper::clean($request->request->get('operator'));
         $changed   = InputHelper::clean($request->request->get('changed'));
-        $dataArray = ['success' => 0, 'options' => null, 'operators' => null, 'disabled' => false];
+        $dataArray = ['success' => 0, 'options' => null, 'optionsAttr' => [], 'operators' => null, 'disabled' => false];
         $leadField = $this->getModel('lead.field')->getRepository()->findOneBy(['alias' => $alias]);
 
         if ($leadField) {
@@ -800,6 +797,16 @@ class AjaxController extends CommonAjaxController
                             $fieldHelper = new FormFieldHelper();
                             $fieldHelper->setTranslator($this->get('translator'));
                             $options = $fieldHelper->getDateChoices();
+                            $options = array_merge(
+                                [
+                                    'custom' => $this->translator->trans('mautic.campaign.event.timed.choice.custom'),
+                                ],
+                                $options
+                            );
+
+                            $dataArray['optionsAttr']['custom'] = [
+                                'data-custom' => 1,
+                            ];
                         }
                         break;
                     default:

@@ -10,7 +10,6 @@
  */
 
 namespace Mautic\CoreBundle\ErrorHandler {
-
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
@@ -209,6 +208,8 @@ namespace Mautic\CoreBundle\ErrorHandler {
             if ($returnContent) {
                 return $content;
             }
+
+            http_response_code(500);
 
             if (!empty($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'])) {
                 header('Content-Type: application/json');
@@ -575,7 +576,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
 }
 
 namespace {
-
     use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 
     if (!function_exists('debugIt')) {

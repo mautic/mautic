@@ -9,6 +9,7 @@ module.exports = function (grunt) {
     require('time-grunt')(grunt);
 
     //grunt.loadNpmTasks('grunt-remove');
+    require('grunt-remove')(grunt);
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -39,17 +40,17 @@ module.exports = function (grunt) {
                 },
                 dest: ''
             }
-        }
+        },
 
         // Remove prod's css files to force recompilation
-        /*
         remove: {
             default_options: {
                 trace: true,
-                fileList: ['<%= mautic.rootAssets %>/app.css', '<%= mautic.rootAssets %>/libraries.css']
+                fileList: ['<%= mautic.rootAssets %>/app.css', '<%= mautic.rootAssets %>/libraries.css'],
+                tasks: ['remove'],
+                dest: ''
             }
         }
-        */
     });
 
     grunt.registerTask('compile-less', [

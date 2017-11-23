@@ -43,7 +43,6 @@ class FormController extends CommonFormController
                 'form:forms:deleteother',
                 'form:forms:publishown',
                 'form:forms:publishother',
-
             ],
             'RETURN_ARRAY'
         );
@@ -194,7 +193,6 @@ class FormController extends CommonFormController
                 'form:forms:deleteother',
                 'form:forms:publishown',
                 'form:forms:publishother',
-
             ],
             'RETURN_ARRAY'
         );
@@ -320,7 +318,6 @@ class FormController extends CommonFormController
                         $model->setFields($entity, $fields);
 
                         try {
-
                             // Set alias to prevent SQL errors
                             $alias = $model->cleanAlias($entity->getName(), '', 10);
                             $entity->setAlias($alias);
@@ -451,6 +448,7 @@ class FormController extends CommonFormController
                     'activeForm'     => $entity,
                     'form'           => $form->createView(),
                     'contactFields'  => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields'  => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'      => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
@@ -707,10 +705,11 @@ class FormController extends CommonFormController
             $this->clearSessionComponents($objectId);
 
             //load existing fields into session
-            $modifiedFields = [];
-            $usedLeadFields = [];
-            $existingFields = $entity->getFields()->toArray();
-            $submitButton   = false;
+            $modifiedFields    = [];
+            $usedLeadFields    = [];
+            $usedCompanyFields = [];
+            $existingFields    = $entity->getFields()->toArray();
+            $submitButton      = false;
 
             foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
@@ -824,7 +823,8 @@ class FormController extends CommonFormController
                     'activeForm'         => $entity,
                     'form'               => $form->createView(),
                     'forceTypeSelection' => $forceTypeSelection,
-                    'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties('lead'),
+                    'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'          => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',

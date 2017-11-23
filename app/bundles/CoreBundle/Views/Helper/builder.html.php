@@ -18,9 +18,8 @@
     </div>
     <div class="builder-panel">
         <div class="builder-panel-top">
-            <button type="button" class="btn btn-primary btn-close-builder" onclick="Mautic.closeBuilder('<?php echo $type; ?>');">
-                <?php echo $view['translator']->trans('mautic.core.close.builder'); ?>
-            </button>
+            <?php echo $view->render('MauticCoreBundle:Helper:builder_buttons.html.php', ['onclick' => "Mautic.closeBuilder('$type');"]); ?>
+
             <div class="code-mode-toolbar <?php echo $isCodeMode ? '' : 'hide'; ?>">
                 <button class="btn btn-default btn-nospin" onclick="Mautic.openMediaManager()" data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.core.media.manager.desc'); ?>">
                     <i class="fa fa-photo"></i>

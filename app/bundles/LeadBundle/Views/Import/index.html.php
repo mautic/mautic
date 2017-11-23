@@ -19,8 +19,11 @@ $view['slots']->set(
             'templateButtons' => [
                 'new' => $permissions[$permissionBase.':create'],
             ],
-            'routeBase' => 'contact_import',
+            'routeBase' => 'import',
             'langVar'   => $translationBase,
+            'query'     => [
+                    'object' => $view['request']->getParameter('object'),
+            ],
         ]
     )
 );

@@ -12,7 +12,12 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionResultLoader;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -184,6 +189,58 @@ class ResultController extends CommonFormController
     }
 
     /**
+     * @param int    $submissionId
+     * @param string $field
+     *
+     * @return BinaryFileResponse
+     */
+    public function downloadFileAction($submissionId, $field)
+    {
+        /** @var SubmissionResultLoader $submissionResultLoader */
+        $submissionResultLoader = $this->getModel('form.submission_result_loader');
+        $submission             = $submissionResultLoader->getSubmissionWithResult($submissionId);
+
+        if (!$submission) {
+            throw $this->createNotFoundException();
+        }
+
+        if (!$this->get('mautic.security')->hasEntityAccess(
+            'form:forms:viewown',
+            'form:forms:viewother',
+            $submission->getForm()->getCreatedBy())
+        ) {
+            return $this->accessDenied();
+        }
+
+        $results     = $submission->getResults();
+        $fieldEntity = $submission->getFieldByAlias($field);
+
+        if (empty($results[$field]) || $fieldEntity === null) {
+            throw $this->createNotFoundException();
+        }
+
+        /** @var FormUploader $formUploader */
+        $formUploader = $this->get('mautic.form.helper.form_uploader');
+
+        $fileName = $results[$field];
+        $file     = $formUploader->getCompleteFilePath($fieldEntity, $fileName);
+
+        $fs = new Filesystem();
+        if (!$fs->exists($file)) {
+            throw $this->createNotFoundException();
+        }
+
+        $response = new BinaryFileResponse($file);
+        $response::trustXSendfileTypeHeader();
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $fileName
+        );
+
+        return $response;
+    }
+
+    /**
      * @param int    $objectId
      * @param string $format
      *
@@ -262,8 +319,8 @@ class ResultController extends CommonFormController
         if ($this->request->getMethod() == 'POST') {
             $model = $this->getModel('form.submission');
 
-                // Find the result
-                $entity = $model->getEntity($objectId);
+            // Find the result
+            $entity = $model->getEntity($objectId);
 
             if ($entity === null) {
                 $flashes[] = [

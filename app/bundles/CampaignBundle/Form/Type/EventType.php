@@ -87,6 +87,7 @@ class EventType extends AbstractType
                     'required'    => false,
                     'attr'        => [
                         'onchange' => 'Mautic.campaignToggleTimeframes();',
+                        'tooltip'  => 'mautic.campaign.form.type.help',
                     ],
                     'data' => $triggerMode,
                 ]

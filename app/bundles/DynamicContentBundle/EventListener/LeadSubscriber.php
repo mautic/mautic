@@ -43,28 +43,29 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey      = 'dynamic.content.sent';
         $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.sent');
         $event->addEventType($eventTypeKey, $eventTypeNameSent);
+        $event->addSerializerGroup('dwcList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository */
         $statRepository = $this->em->getRepository('MauticDynamicContentBundle:Stat');
-        $stats          = $statRepository->getLeadStats($lead->getId(), $event->getQueryOptions());
+        $stats          = $statRepository->getLeadStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $stats);
 
         if (!$event->isEngagementCount()) {
-
             // Add the events to the event array
             foreach ($stats['results'] as $stat) {
+                $contactId = $stat['lead_id'];
+                unset($stat['lead_id']);
                 if ($stat['dateSent']) {
                     $event->addEvent(
                         [
                             'event'      => $eventTypeKey,
+                            'eventId'    => $eventTypeKey.$stat['id'],
                             'eventLabel' => [
                                 'label' => $stat['name'],
                                 'href'  => $this->router->generate(
@@ -80,6 +81,7 @@ class LeadSubscriber extends CommonSubscriber
                             ],
                             'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
                             'icon'            => 'fa-envelope',
+                            'contactId'       => $contactId,
                         ]
                     );
                 }

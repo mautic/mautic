@@ -95,6 +95,7 @@ return [
                     'templating.helper.assets',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.page.model.page',
                 ],
             ],
             'mautic.pagebuilder.subscriber' => [
@@ -113,16 +114,20 @@ return [
                 'arguments' => [
                     'mautic.point.model.point',
                 ],
-
             ],
             'mautic.page.reportbundle.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
             'mautic.page.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.page.model.page',
                     'mautic.campaign.model.event',
+                    'mautic.lead.model.lead',
+                    'mautic.page.helper.tracking',
                 ],
             ],
             'mautic.page.leadbundle.subscriber' => [
@@ -167,6 +172,7 @@ return [
                 'class'     => 'Mautic\PageBundle\EventListener\BuildJsSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
+                    'mautic.page.helper.tracking',
                 ],
             ],
             'mautic.page.maintenance.subscriber' => [
@@ -210,6 +216,11 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'page_list',
             ],
+            'mautic.form.type.preferencecenterlist' => [
+                'class'     => 'Mautic\PageBundle\Form\Type\PreferenceCenterListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'preference_center_list',
+            ],
             'mautic.form.type.page_abtest_settings' => [
                 'class' => 'Mautic\PageBundle\Form\Type\AbTestPropertiesType',
                 'alias' => 'page_abtest_settings',
@@ -221,6 +232,10 @@ return [
             'mautic.form.type.pageconfig' => [
                 'class' => 'Mautic\PageBundle\Form\Type\ConfigType',
                 'alias' => 'pageconfig',
+            ],
+            'mautic.form.type.trackingconfig' => [
+                'class' => 'Mautic\PageBundle\Form\Type\ConfigTrackingPageType',
+                'alias' => 'trackingconfig',
             ],
             'mautic.form.type.slideshow_config' => [
                 'class' => 'Mautic\PageBundle\Form\Type\SlideshowGlobalConfigType',
@@ -239,6 +254,13 @@ return [
                 'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
                 'alias' => 'page_dashboard_hits_in_time_widget',
             ],
+            'mautic.page.tracking.pixel.send' => [
+                'class'     => 'Mautic\PageBundle\Form\Type\TrackingPixelSendType',
+                'alias'     => 'tracking_pixel_send_action',
+                'arguments' => [
+                    'mautic.page.helper.tracking',
+                ],
+            ],
         ],
         'models' => [
             'mautic.page.model.page' => [
@@ -250,6 +272,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
+                    'mautic.queue.service',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [
@@ -285,6 +308,15 @@ return [
                 'class'     => 'Mautic\PageBundle\Helper\TokenHelper',
                 'arguments' => 'mautic.page.model.page',
             ],
+            'mautic.page.helper.tracking' => [
+                'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'session',
+                    'mautic.helper.core_parameters',
+                    'request_stack',
+                ],
+            ],
         ],
     ],
 
@@ -298,5 +330,11 @@ return [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
+        'google_analytics_id'                   => null,
+        'google_analytics_trackingpage_enabled' => false,
+        'google_analytics_landingpage_enabled'  => false,
+        'facebook_pixel_id'                     => null,
+        'facebook_pixel_trackingpage_enabled'   => false,
+        'facebook_pixel_landingpage_enabled'    => false,
     ],
 ];

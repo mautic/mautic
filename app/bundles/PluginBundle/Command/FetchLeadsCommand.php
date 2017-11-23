@@ -99,6 +99,16 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $integrationHelper = $container->get('mautic.helper.integration');
 
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
+
+            if (!$integrationObject->isAuthorized()) {
+                $output->writeln(sprintf('<error>ERROR:</error> <info>'.$translator->trans('mautic.plugin.command.notauthorized').'</info>', $integration));
+
+                return null;
+            }
+
+            // Tell audit log to use integration name
+            define('MAUTIC_AUDITLOG_USER', $integration);
+
             $config            = $integrationObject->mergeConfigToFeatureSettings();
             $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
@@ -113,6 +123,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $params['limit']    = $limit;
             $params['fetchAll'] = $fetchAll;
             $params['output']   = $output;
+
+            $integrationObject->setCommandParameters($params);
 
             // set this constant to ensure that all contacts have the same date modified time and date synced time to prevent a pull/push loop
             define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
@@ -216,7 +228,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 }
             }
 
-            if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures)) {
+            if (isset($supportedFeatures) && in_array('push_leads', $supportedFeatures) && method_exists($integrationObject, 'pushLeads')) {
                 $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.leads', ['%integration%' => $integration]).'</info>');
                 $result  = $integrationObject->pushLeads($params);
                 $ignored = 0;
@@ -232,6 +244,33 @@ class FetchLeadsCommand extends ContainerAwareCommand
                 $output->writeln(
                     '<comment>'.$translator->trans(
                         'mautic.plugin.command.fetch.pushing.leads.events_executed',
+                        [
+                            '%updated%' => $updated,
+                            '%created%' => $created,
+                            '%errored%' => $errored,
+                            '%ignored%' => $ignored,
+                        ]
+                    )
+                    .'</comment>'."\n"
+                );
+            }
+
+            if (method_exists($integrationObject, 'pushCompanies')) {
+                $output->writeln('<info>'.$translator->trans('mautic.plugin.command.pushing.companies', ['%integration%' => $integration]).'</info>');
+                $result  = $integrationObject->pushCompanies($params);
+                $ignored = 0;
+
+                if (4 === count($result)) {
+                    list($updated, $created, $errored, $ignored) = $result;
+                } elseif (3 === count($result)) {
+                    list($updated, $created, $errored) = $result;
+                } else {
+                    $errored                 = '?';
+                    list($updated, $created) = $result;
+                }
+                $output->writeln(
+                    '<comment>'.$translator->trans(
+                        'mautic.plugin.command.fetch.pushing.companies.events_executed',
                         [
                             '%updated%' => $updated,
                             '%created%' => $created,

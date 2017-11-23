@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_LIST_ACTIONS, ButtonHelper::TYPE_DROPDOWN, $item);
 include 'action_button_helper.php';
@@ -31,6 +31,7 @@ if (is_array($item)) {
         <button type="button" class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
             <i class="fa fa-angle-down "></i>
         </button>
+        <?php if (!empty($tooltip)): ?> <i class="fa fa-question-circle"></i><?php endif; ?>
         <ul class="pull-<?php echo $pull; ?> page-list-actions dropdown-menu" role="menu">
             <?php
             if (!empty($templateButtons['edit'])):

@@ -157,4 +157,76 @@ class FocusController extends FormController
 
         return $args;
     }
+
+    /**
+     * @param array $args
+     * @param       $action
+     *
+     * @return array
+     */
+    protected function getPostActionRedirectArguments(array $args, $action)
+    {
+        $updateSelect = ($this->request->getMethod() == 'POST')
+            ? $this->request->request->get('focus[updateSelect]', false, true)
+            : $this->request->get(
+                'updateSelect',
+                false
+            );
+        if ($updateSelect) {
+            switch ($action) {
+                case 'new':
+                case 'edit':
+                    $passthrough = $args['passthroughVars'];
+                    $passthrough = array_merge(
+                        $passthrough,
+                        [
+                            'updateSelect' => $updateSelect,
+                            'id'           => $args['entity']->getId(),
+                            'name'         => $args['entity']->getName(),
+                        ]
+                    );
+                    $args['passthroughVars'] = $passthrough;
+                    break;
+            }
+        }
+
+        return $args;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getEntityFormOptions()
+    {
+        $updateSelect = ($this->request->getMethod() == 'POST')
+            ? $this->request->request->get('focus[updateSelect]', false, true)
+            : $this->request->get(
+                'updateSelect',
+                false
+            );
+        if ($updateSelect) {
+            return ['update_select' => $updateSelect];
+        }
+    }
+
+    /**
+     * Return array of options update select response.
+     *
+     * @param string $updateSelect HTML id of the select
+     * @param object $entity
+     * @param string $nameMethod   name of the entity method holding the name
+     * @param string $groupMethod  name of the entity method holding the select group
+     *
+     * @return array
+     */
+    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage')
+    {
+        $options = [
+            'updateSelect' => $updateSelect,
+            'id'           => $entity->getId(),
+            'name'         => $entity->$nameMethod(),
+        ];
+
+        return $options;
+    }
 }

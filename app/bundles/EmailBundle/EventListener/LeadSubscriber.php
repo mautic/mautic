@@ -65,19 +65,18 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'email.'.$state;
         $eventTypeName = $this->translator->trans('mautic.email.'.$state);
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('emailList');
 
         // Decide if those events are filtered
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepository */
         $statRepository        = $this->em->getRepository('MauticEmailBundle:Stat');
         $queryOptions          = $event->getQueryOptions();
         $queryOptions['state'] = $state;
-        $stats                 = $statRepository->getLeadStats($lead->getId(), $queryOptions);
+        $stats                 = $statRepository->getLeadStats($event->getLeadId(), $queryOptions);
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $stats);
@@ -107,19 +106,24 @@ class LeadSubscriber extends CommonSubscriber
                 } else {
                     $dateSent = 'read';
                 }
+
+                $contactId = $stat['lead_id'];
+                unset($stat['lead_id']);
+
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$stat['id'],
                         'eventLabel' => $eventName,
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $stat['date'.ucfirst($dateSent)],
-                        'dateSent'   => $stat['dateSent'],
                         'extra'      => [
                             'stat' => $stat,
                             'type' => $state,
                         ],
                         'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => ($state == 'read') ? 'fa-envelope-o' : 'fa-envelope',
+                        'contactId'       => $contactId,
                     ]
                 );
             }

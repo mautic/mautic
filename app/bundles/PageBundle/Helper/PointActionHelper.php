@@ -92,7 +92,7 @@ class PointActionHelper
             }
 
             if (isset($hitStats['sum'])) {
-                if ($now->getTimestamp() - $latestHit->getTimestamp() == $hitStats['sum']) {
+                if ($action['properties']['accumulative_time'] <= $hitStats['sum']) {
                     $changePoints['accumulative_time'] = true;
                 } else {
                     $changePoints['accumulative_time'] = false;

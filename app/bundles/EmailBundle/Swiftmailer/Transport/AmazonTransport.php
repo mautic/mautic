@@ -19,6 +19,13 @@ use Aws\Ses\SesClient;
 use Joomla\Http\Exception\UnexpectedResponseException;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
+use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
+use Mautic\EmailBundle\MonitoredEmail\Message;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -26,8 +33,16 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Class AmazonTransport.
  */
-class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport, InterfaceCallbackTransport
+class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport, InterfaceCallbackTransport, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
+    /**
+     * From address for SNS email.
+     */
+    const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
+
+    /**
+     * @var Http
+     */
     private $httpClient;
     private $region;
     private $username;
@@ -414,7 +429,7 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *
-     * @return mixed
+     * @return string
      */
     public function getCallbackPath()
     {
@@ -439,7 +454,7 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
      * @param Request       $request
      * @param MauticFactory $factory
      *
-     * @return mixed
+     * @return array
      */
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
@@ -542,5 +557,63 @@ class AmazonTransport extends AbstractTokenArrayTransport implements \Swift_Tran
         }
 
         return $rows;
+    }
+
+    /**
+     * @param Message $message
+     *
+     * @throws BounceNotFound
+     */
+    public function processBounce(Message $message)
+    {
+        if (self::SNS_ADDRESS !== $message->fromAddress) {
+            throw new BounceNotFound();
+        }
+
+        $message = $this->getSnsPayload($message->textPlain);
+        if ('Bounce' !== $message['notificationType']) {
+            throw new BounceNotFound();
+        }
+
+        $bounce = new BouncedEmail();
+        $bounce->setContactEmail($message['bounce']['bouncedRecipients'][0]['emailAddress'])
+            ->setBounceAddress($message['mail']['source'])
+            ->setType(Type::UNKNOWN)
+            ->setRuleCategory(Category::UNKNOWN)
+            ->setRuleNumber('0013')
+            ->setIsFinal(true);
+
+        return $bounce;
+    }
+
+    /**
+     * @param Message $message
+     *
+     * @return UnsubscribedEmail
+     *
+     * @throws UnsubscriptionNotFound
+     */
+    public function processUnsubscription(Message $message)
+    {
+        if (self::SNS_ADDRESS !== $message->fromAddress) {
+            throw new UnsubscriptionNotFound();
+        }
+
+        $message = $this->getSnsPayload($message->textPlain);
+        if ('Complaint' !== $message['notificationType']) {
+            throw new UnsubscriptionNotFound();
+        }
+
+        return new UnsubscribedEmail($message['complaint']['complainedRecipients'][0]['emailAddress'], $message['mail']['source']);
+    }
+
+    /**
+     * @param string $body
+     *
+     * @return array
+     */
+    protected function getSnsPayload($body)
+    {
+        return json_decode(strtok($body, "\n"), true);
     }
 }

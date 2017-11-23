@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class ElasticEmailTransport.
  */
-class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
+class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTransportInterface
 {
     private $httpClient;
 
@@ -31,6 +31,17 @@ class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCal
         parent::__construct('smtp.elasticemail.com', 2525, null);
 
         $this->setAuthMode('login');
+    }
+
+    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    {
+        // IsTransactional header for all non bulk messages
+        // https://elasticemail.com/support/guides/unsubscribe/
+        if ($message->getHeaders()->get('Precedence') != 'Bulk') {
+            $message->getHeaders()->addTextHeader('IsTransactional', 'True');
+        }
+
+        parent::send($message, $failedRecipients);
     }
 
     /**

@@ -129,6 +129,19 @@ class Submission
                     'results',
                 ]
             )
+            ->setGroupPrefix('submissionEvent')
+            ->addProperties(
+                [
+                    'id',
+                    'ipAddress',
+                    'form',
+                    'trackingId',
+                    'dateSubmitted',
+                    'referer',
+                    'page',
+                    'results',
+                ]
+            )
             ->build();
     }
 
@@ -335,5 +348,21 @@ class Submission
     public function getCreatedBy()
     {
         return $this->getForm()->getCreatedBy();
+    }
+
+    /**
+     * @param string $alias
+     *
+     * @return Field|null
+     */
+    public function getFieldByAlias($alias)
+    {
+        foreach ($this->getForm()->getFields() as $field) {
+            if ($field->getAlias() === $alias) {
+                return $field;
+            }
+        }
+
+        return null;
     }
 }

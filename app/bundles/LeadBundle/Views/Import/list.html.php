@@ -106,7 +106,7 @@ endif;
         'page'       => $page,
         'limit'      => $limit,
         'menuLinkId' => $indexRoute,
-        'baseUrl'    => $view['router']->path($indexRoute),
+        'baseUrl'    => $view['router']->path($indexRoute, ['object' => $app->getRequest()->get('object', 'contacts')]),
         'sessionVar' => $sessionVar,
     ]); ?>
 </div>

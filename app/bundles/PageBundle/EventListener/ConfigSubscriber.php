@@ -27,8 +27,11 @@ class ConfigSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
-            ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigSave', 0],
+            ConfigEvents::CONFIG_ON_GENERATE => [
+                ['onConfigGenerate', 0],
+                ['onConfigGenerateTracking', 0],
+            ],
+            ConfigEvents::CONFIG_PRE_SAVE => ['onConfigSave', 0],
         ];
     }
 
@@ -37,6 +40,16 @@ class ConfigSubscriber extends CommonSubscriber
         $event->addForm([
             'bundle'     => 'PageBundle',
             'formAlias'  => 'pageconfig',
+            'formTheme'  => 'MauticPageBundle:FormTheme\Config',
+            'parameters' => $event->getParametersFromConfig('MauticPageBundle'),
+        ]);
+    }
+
+    public function onConfigGenerateTracking(ConfigBuilderEvent $event)
+    {
+        $event->addForm([
+            'bundle'     => 'PageBundle',
+            'formAlias'  => 'trackingconfig',
             'formTheme'  => 'MauticPageBundle:FormTheme\Config',
             'parameters' => $event->getParametersFromConfig('MauticPageBundle'),
         ]);

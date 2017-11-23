@@ -25,3 +25,6 @@
 .email-filters {
 
 }
+
+.clickable-stat a { color: #fff; }
+.clickable-stat a:hover { color: #fff; }

@@ -141,6 +141,18 @@ var Mautic = {
             mQuery('#globalSearchContainer .search-button').click();
         });
 
+        Mautic.addKeyboardShortcut('mod+z', 'Undo change', function (e) {
+            if (mQuery('.btn-undo').length) {
+                mQuery('.btn-undo').click();
+            }
+        });
+
+        Mautic.addKeyboardShortcut('mod+shift+z', 'Redo change', function (e) {
+            if (mQuery('.btn-redo').length) {
+                mQuery('.btn-redo').click();
+            }
+        });
+
         Mousetrap.bind('?', function (e) {
             var modalWindow = mQuery('#MauticSharedModal');
 
@@ -270,6 +282,28 @@ var Mautic = {
      */
     stopModalLoadingBar: function (modalTarget) {
         mQuery(modalTarget + ' .modal-loading-bar').removeClass('active');
+    },
+
+    /**
+     * Activate label loading spinner
+     *
+     * @param button (jQuery element)
+     */
+    activateButtonLoadingIndicator: function (button) {
+        button.prop('disabled', true);
+        if (!button.find('.fa-spinner.fa-spin').length) {
+            button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+        }
+    },
+
+    /**
+     * Remove the spinner from label
+     *
+     * @param button (jQuery element)
+     */
+    removeButtonLoadingIndicator: function (button) {
+        button.prop('disabled', false);
+        button.find('.fa-spinner').remove();
     },
 
     /**
@@ -825,5 +859,22 @@ var Mautic = {
                 }
             }
         });
+    },
+
+    /**
+     * Check if the browser supports local storage
+     *
+     * @returns {boolean}
+     */
+    isLocalStorageSupported: function() {
+        try {
+            // Check if localStorage is supported
+            localStorage.setItem('mautic.test', 'mautic');
+            localStorage.removeItem('mautic.test');
+
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 };

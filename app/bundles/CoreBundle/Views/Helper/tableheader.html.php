@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 if (!isset($target)) {
     $target = '.page-list';
@@ -36,7 +36,7 @@ if (!empty($checkall)):
             break;
     endswitch;
 ?>
-<th class="col-actions">
+<th class="col-actions" <?php if (!empty($tooltip)): ?> data-toggle="tooltip" title="" data-placement="top" data-original-title="<?php echo $view['translator']->trans($tooltip); ?>"<?php endif; ?>>
     <?php if ($view['buttons']->getButtonCount()): ?>
     <div class="input-group input-group-sm">
     <span class="input-group-addon">

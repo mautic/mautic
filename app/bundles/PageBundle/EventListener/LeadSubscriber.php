@@ -76,16 +76,15 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'page.hit';
         $eventTypeName = $this->translator->trans('mautic.page.event.hit');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('pageList', 'hitDetails');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
         /** @var \Mautic\PageBundle\Entity\HitRepository $hitRepository */
         $hitRepository = $this->em->getRepository('MauticPageBundle:Hit');
-        $hits          = $hitRepository->getLeadHits($lead->getId(), $event->getQueryOptions());
+        $hits          = $hitRepository->getLeadHits($event->getLeadId(), $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventTypeKey, $hits);
@@ -148,6 +147,9 @@ class LeadSubscriber extends CommonSubscriber
                     ];
                 }
 
+                $contactId = $hit['lead_id'];
+                unset($hit['lead_id']);
+
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
@@ -159,6 +161,7 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => $template,
                         'icon'            => $icon,
+                        'contactId'       => $contactId,
                     ]
                 );
             }
@@ -176,6 +179,7 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'page.videohit';
         $eventTypeName = $this->translator->trans('mautic.page.event.videohit');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup('pageList', 'hitDetails');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
@@ -184,7 +188,7 @@ class LeadSubscriber extends CommonSubscriber
         /** @var \Mautic\PageBundle\Entity\VideoHitRepository $hitRepository */
         $hitRepository = $this->em->getRepository('MauticPageBundle:VideoHit');
 
-        $hits = $hitRepository->getTimelineStats($event->getLead()->getId(), $event->getQueryOptions());
+        $hits = $hitRepository->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
 
         $event->addToCounter($eventTypeKey, $hits);
 

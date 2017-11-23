@@ -206,6 +206,10 @@ class CommonController extends Controller implements MauticController
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
         }
 
+        if (!isset($args['passthroughVars']['inBuilder']) && $inBuilder = $this->request->get('inBuilder')) {
+            $args['passthroughVars']['inBuilder'] = (bool) $inBuilder;
+        }
+
         if (!isset($args['viewParameters']['mauticContent'])) {
             if (isset($args['passthroughVars']['mauticContent'])) {
                 $mauticContent = $args['passthroughVars']['mauticContent'];

@@ -420,6 +420,30 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
+            [ // ID 23
+                'name'    => 'Segment membership based on regex with special characters',
+                'alias'   => 'segment-membership-regexp',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'email',
+                        'operator' => 'regexp',
+                        'filter'   => '^.*(#|!|\\\\$|%|&|\\\\*|\\\\(|\\\\)|\\\\^|\\\\?|\\\\+|-|dayrep\\\\.com|http|gmail|abc|qwe|[0-9]).*$',
+                        'display'  => '',
+                    ],
+                    [
+                        'glue'     => 'and',
+                        'type'     => 'text',
+                        'field'    => 'email',
+                        'operator' => '!empty',
+                        'filter'   => null,
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
