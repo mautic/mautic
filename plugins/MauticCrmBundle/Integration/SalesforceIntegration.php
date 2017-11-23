@@ -659,12 +659,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $keys   = array_keys($fields);
         }
 
-        foreach ($keys as $key) {
-            foreach ($objects as $obj) {
-                if (!isset($leadFields[$obj])) {
-                    $leadFields[$obj] = [];
-                }
+        foreach ($objects as $obj) {
+            if (!isset($leadFields[$obj])) {
+                $leadFields[$obj] = [];
+            }
 
+            foreach ($keys as $key) {
                 if (strpos($key, '__'.$obj)) {
                     $newKey                    = str_replace('__'.$obj, '', $key);
                     $leadFields[$obj][$newKey] = $fields[$key];
@@ -2704,6 +2704,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         foreach ($sfRecords as $leadEmail => $record) {
+            if (empty($record['integration_entity_id'])) {
+                continue;
+            }
+
             $leadIds[$record['internal_entity_id']]    = $record['integration_entity_id'];
             $leadEmails[$record['internal_entity_id']] = $record['email'];
         }
