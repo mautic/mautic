@@ -54,7 +54,7 @@ class AbstractIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'dnc' => 1,
+                'dnc' => 0,
             ],
             $matched
         );
