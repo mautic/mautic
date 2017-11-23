@@ -11,25 +11,11 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
-use Symfony\Component\HttpFoundation\Request;
-
-interface InterfaceCallbackTransport
+/**
+ * @deprecated 2.12.0; to be removed in 3.0; use CallbackTransportInterface instead
+ *
+ * Interface InterfaceCallbackTransport
+ */
+interface InterfaceCallbackTransport extends CallbackTransportInterface
 {
-    /**
-     * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
-     *
-     * @return mixed
-     */
-    public function getCallbackPath();
-
-    /**
-     * Handle response.
-     *
-     * @param Request       $request
-     * @param MauticFactory $factory
-     *
-     * @return array array('bounces' => array('hashID' => 'reason', ...));
-     */
-    public function handleCallbackResponse(Request $request, MauticFactory $factory);
 }

@@ -343,7 +343,7 @@ class ReportModel extends FormModel
         foreach ($filters as $filter => $data) {
             if (isset($data['label'])) {
                 $return->definitions[$filter] = $data;
-                $return->choices [$filter]    = $data['label'];
+                $return->choices[$filter]     = $data['label'];
                 $return->choiceHtml .= "<option value=\"$filter\">{$data['label']}</option>\n";
 
                 $return->operatorChoices[$filter] = $this->getOperatorOptions($data);

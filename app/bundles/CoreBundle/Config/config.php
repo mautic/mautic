@@ -394,6 +394,9 @@ return [
             ],
         ],
         'helpers' => [
+            'mautic.helper.app_version' => [
+                'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
+            ],
             'mautic.helper.template.menu' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
                 'arguments' => ['knp_menu.helper'],
@@ -458,9 +461,20 @@ return [
                 'alias' => 'content',
             ],
             'mautic.helper.template.formatter' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'formatter',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\FormatterHelper::class,
+                'arguments' => [
+                    'mautic.helper.app_version',
+                    'mautic.helper.template.date',
+                    'translator',
+                ],
+                'alias' => 'formatter',
+            ],
+            'mautic.helper.template.version' => [
+                'class'     => \Mautic\CoreBundle\Templating\Helper\VersionHelper::class,
+                'arguments' => [
+                    'mautic.helper.app_version',
+                ],
+                'alias' => 'version',
             ],
             'mautic.helper.template.security' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',

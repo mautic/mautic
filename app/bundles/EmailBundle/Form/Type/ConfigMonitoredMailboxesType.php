@@ -11,12 +11,12 @@
 
 namespace Mautic\EmailBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 
 /**
@@ -25,13 +25,18 @@ use Symfony\Component\Validator\Constraints\Email;
 class ConfigMonitoredMailboxesType extends AbstractType
 {
     /**
-     * @var MauticFactory
+     * @var Mailbox
      */
-    private $factory;
+    private $imapHelper;
 
-    public function __construct(MauticFactory $factory)
+    /**
+     * ConfigMonitoredMailboxesType constructor.
+     *
+     * @param Mailbox $imapHelper
+     */
+    public function __construct(Mailbox $imapHelper)
     {
-        $this->factory = $factory;
+        $this->imapHelper = $imapHelper;
     }
 
     /**
@@ -171,11 +176,9 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 ]
             );
 
-            /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $mailbox */
-            $mailbox  = $this->factory->getHelper('mailbox');
             $settings = (empty($options['data']['override_settings'])) ? $options['general_settings'] : $options['data'];
 
-            $mailbox->setMailboxSettings($settings);
+            $this->imapHelper->setMailboxSettings($settings);
 
             // Check for IMAP connection and get a folder list
             $choices = [
@@ -183,9 +186,9 @@ class ConfigMonitoredMailboxesType extends AbstractType
                 'Trash' => 'Trash',
             ];
 
-            if ($mailbox->isConfigured()) {
+            if ($this->imapHelper->isConfigured()) {
                 try {
-                    $folders = $mailbox->getListingFolders();
+                    $folders = $this->imapHelper->getListingFolders();
                     $choices = array_combine($folders, $folders);
                 } catch (\Exception $e) {
                     // If the connection failed - add back the selected folder just in case it's a temporary connection issue
@@ -233,7 +236,7 @@ class ConfigMonitoredMailboxesType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['mailbox', 'default_folder', 'general_settings']);
     }

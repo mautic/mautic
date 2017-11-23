@@ -15,7 +15,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -659,12 +658,12 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $keys   = array_keys($fields);
         }
 
-        foreach ($keys as $key) {
-            foreach ($objects as $obj) {
-                if (!isset($leadFields[$obj])) {
-                    $leadFields[$obj] = [];
-                }
+        foreach ($objects as $obj) {
+            if (!isset($leadFields[$obj])) {
+                $leadFields[$obj] = [];
+            }
 
+            foreach ($keys as $key) {
                 if (strpos($key, '__'.$obj)) {
                     $newKey                    = str_replace('__'.$obj, '', $key);
                     $leadFields[$obj][$newKey] = $fields[$key];
@@ -681,7 +680,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead($lead,  $config = [])
+    public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -782,7 +781,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return array|bool
      */
-    public function pushCompany($company,  $config = [])
+    public function pushCompany($company, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -2069,11 +2068,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     $this->logIntegrationError($exception);
                     $integrationEntity = null;
                     if ($integrationEntityId && $object !== 'CampaignMember') {
-                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
-                        $integrationEntity->setLastSyncDate(new \DateTime());
-                    } elseif (isset($campaignId) && $campaignId != null) {
-                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $campaignId);
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
+                        $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($integrationEntityId, new \DateTime());
+                    } elseif (isset($campaignId)) {
+                        $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($campaignId, $this->getLastSyncDate());
                     } elseif ($contactId) {
                         $integrationEntity = $this->createIntegrationEntity(
                             $object,
@@ -2113,15 +2110,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } elseif (204 === $item['httpStatusCode']) {
                     // Record was updated
                     if ($integrationEntityId) {
-                        /** @var IntegrationEntity $integrationEntity */
-                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                        $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($integrationEntityId, $this->getLastSyncDate());
+                        if ($integrationEntity) {
+                            if (isset($this->salesforceIdMapping[$contactId])) {
+                                $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                            }
 
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
-                        if (isset($this->salesforceIdMapping[$contactId])) {
-                            $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                            $this->persistIntegrationEntities[] = $integrationEntity;
                         }
-
-                        $this->persistIntegrationEntities[] = $integrationEntity;
                     } elseif (!empty($this->salesforceIdMapping[$contactId])) {
                         // Found in Salesforce so create a new record for it
                         $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
@@ -2154,15 +2150,14 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     ++$totalErrored;
 
                     if ($integrationEntityId) {
-                        /** @var IntegrationEntity $integrationEntity */
-                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                        $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($integrationEntityId, $this->getLastSyncDate());
+                        if ($integrationEntity) {
+                            if (isset($this->salesforceIdMapping[$contactId])) {
+                                $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                            }
 
-                        $integrationEntity->setLastSyncDate($this->getLastSyncDate());
-                        if (isset($this->salesforceIdMapping[$contactId])) {
-                            $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
+                            $this->persistIntegrationEntities[] = $integrationEntity;
                         }
-
-                        $this->persistIntegrationEntities[] = $integrationEntity;
                     } elseif (!empty($this->salesforceIdMapping[$contactId])) {
                         // Found in Salesforce so create a new record for it
                         $this->persistIntegrationEntities[] = $this->createIntegrationEntity(
@@ -2577,6 +2572,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $mappedData;
     }
+
     /**
      * @param Lead $lead
      * @param      $config
@@ -2708,6 +2704,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         foreach ($sfRecords as $leadEmail => $record) {
+            if (empty($record['integration_entity_id'])) {
+                continue;
+            }
+
             $leadIds[$record['internal_entity_id']]    = $record['integration_entity_id'];
             $leadEmails[$record['internal_entity_id']] = $record['email'];
         }
@@ -3148,6 +3148,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return 0 === $toUpdateCount;
     }
+
     /**
      * @param      $checkIdsInSF
      * @param      $mauticCompanyFieldString

@@ -244,6 +244,24 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add IP left join with lead join.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param string       $ipXrefPrefix
+     * @param string       $ipPrefix
+     * @param string       $leadPrefix
+     *
+     * @return $this
+     */
+    public function addLeadIpAddressLeftJoin(QueryBuilder $queryBuilder, $ipXrefPrefix = 'lip', $ipPrefix = 'i', $leadPrefix = 'l')
+    {
+        $this->addIpAddressLeftJoin($queryBuilder, $ipXrefPrefix, $ipPrefix);
+        $queryBuilder->leftJoin($leadPrefix, MAUTIC_TABLE_PREFIX.'lead_ips_xref', $ipXrefPrefix, $ipXrefPrefix.'.lead_id = '.$leadPrefix.'.id');
+
+        return $this;
+    }
+
+    /**
      * Add IP left join.
      *
      * @param QueryBuilder $queryBuilder

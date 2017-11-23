@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**

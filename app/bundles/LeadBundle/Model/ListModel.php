@@ -729,7 +729,7 @@ class ListModel extends FormModel
     /**
      * @param string $alias
      *
-     * @return mixed
+     * @return array
      */
     public function getUserLists($alias = '')
     {
@@ -1318,6 +1318,7 @@ class ListModel extends FormModel
 
         return $results;
     }
+
     /**
      * Get a list of top (by leads added) lists.
      *

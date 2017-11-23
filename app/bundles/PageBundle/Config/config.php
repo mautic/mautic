@@ -114,7 +114,6 @@ return [
                 'arguments' => [
                     'mautic.point.model.point',
                 ],
-
             ],
             'mautic.page.reportbundle.subscriber' => [
                 'class'     => \Mautic\PageBundle\EventListener\ReportSubscriber::class,

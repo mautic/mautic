@@ -25,7 +25,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  * Class SparkpostTransport
  * The referrence class for this was provided by.
  */
-class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport, InterfaceCallbackTransport
+class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
     /**
      * @var string|null

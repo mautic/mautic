@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 /**
  * Class ConfigModel.
+ *
+ * @deprecated 2.12.0; to be removed in 3.0 as this is pointless
  */
 class ConfigModel extends AbstractCommonModel
 {

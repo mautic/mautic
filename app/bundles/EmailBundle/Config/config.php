@@ -107,6 +107,27 @@ return [
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
                     'mautic.email.model.email',
+                    'mautic.helper.message',
+                ],
+            ],
+            'mautic.email.monitored.bounce.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\ProcessBounceSubscriber::class,
+                'arguments' => [
+                    'mautic.message.processor.bounce',
+                ],
+            ],
+            'mautic.email.monitored.unsubscribe.subscriber' => [
+                'class'     => \Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber::class,
+                'arguments' => [
+                    'mautic.message.processor.unsubscribe',
+                    'mautic.message.processor.FeedbackLoop',
+                ],
+            ],
+            'mautic.email.monitored.unsubscribe.replier' => [
+                'class'     => \Mautic\EmailBundle\EventListener\ProcessReplySubscriber::class,
+                'arguments' => [
+                    'mautic.message.processor.replier',
+                    'mautic.helper.cache_storage',
                 ],
             ],
             'mautic.emailbuilder.subscriber' => [
@@ -269,17 +290,19 @@ return [
             ],
             'mautic.form.type.emailconfig' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\ConfigType',
-                'arguments' => 'mautic.factory',
+                'arguments' => ['translator'],
                 'alias'     => 'emailconfig',
             ],
             'mautic.form.type.coreconfig_monitored_mailboxes' => [
                 'class'     => 'Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'monitored_mailboxes',
+                'arguments' => [
+                    'mautic.helper.mailbox',
+                ],
+                'alias' => 'monitored_mailboxes',
             ],
             'mautic.form.type.coreconfig_monitored_email' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType',
-                'arguments' => 'mautic.factory',
+                'class'     => \Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType::class,
+                'arguments' => 'event_dispatcher',
                 'alias'     => 'monitored_email',
             ],
             'mautic.form.type.email_dashboard_emails_in_time_widget' => [
@@ -292,31 +315,6 @@ return [
             ],
         ],
         'other' => [
-            'mautic.helper.mailbox' => [
-                'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                ],
-            ],
-            'mautic.helper.message' => [
-                'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
-                'arguments' => 'mautic.factory',
-            ],
-            'mautic.helper.mailer' => [
-                'class'     => 'Mautic\EmailBundle\Helper\MailHelper',
-                'arguments' => [
-                    'mautic.factory',
-                    'mailer',
-                ],
-            ],
-            'mautic.email.repository.stat' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\EmailBundle\Entity\Stat::class,
-                ],
-            ],
             // Mailers
             'mautic.transport.amazon' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport',
@@ -389,6 +387,83 @@ return [
                     'setMauticFactory' => ['mautic.factory'],
                 ],
             ],
+            'mautic.helper.mailbox' => [
+                'class'     => 'Mautic\EmailBundle\MonitoredEmail\Mailbox',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
+                ],
+            ],
+            'mautic.email.repository.stat' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\EmailBundle\Entity\Stat::class,
+                ],
+            ],
+            'mautic.message.search.contact' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder::class,
+                'arguments' => [
+                    'mautic.email.repository.stat',
+                    'mautic.lead.repository.lead',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.message.processor.bounce' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce::class,
+                'arguments' => [
+                    'swiftmailer.transport.real',
+                    'mautic.message.search.contact',
+                    'mautic.email.repository.stat',
+                    'mautic.lead.model.lead',
+                    'translator',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.message.processor.unsubscribe' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe::class,
+                'arguments' => [
+                    'swiftmailer.transport.real',
+                    'mautic.message.search.contact',
+                    'mautic.lead.model.lead',
+                    'translator',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.message.processor.FeedbackLoop' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
+                'arguments' => [
+                    'mautic.message.search.contact',
+                    'mautic.lead.model.lead',
+                    'translator',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.message.processor.replier' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\Reply::class,
+                'arguments' => [
+                    'mautic.email.repository.stat',
+                    'mautic.message.search.contact',
+                    'mautic.lead.model.lead',
+                    'event_dispatcher',
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.helper.message' => [
+                'class'     => 'Mautic\EmailBundle\Helper\MessageHelper',
+                'arguments' => [
+                    'mautic.message.processor.bounce',
+                    'mautic.message.processor.unsubscribe',
+                    'mautic.message.processor.feedbackloop',
+                ],
+            ],
+            'mautic.helper.mailer' => [
+                'class'     => 'Mautic\EmailBundle\Helper\MailHelper',
+                'arguments' => [
+                    'mautic.factory',
+                    'mailer',
+                ],
+            ],
             'mautic.validator.email' => [
                 'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
                 'arguments' => [
@@ -428,6 +503,25 @@ return [
                     'translator',
                 ],
             ],
+            'mautic.email.fetcher' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
+                'arguments' => [
+                    'mautic.helper.mailbox',
+                    'event_dispatcher',
+                    'translator',
+
+                ],
+            ],
+        ],
+        'commands' => [
+            'mautic.email.command.fetch' => [
+                'class'     => \Mautic\EmailBundle\Command\ProcessFetchEmailCommand::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.email.fetcher',
+                ],
+                'tag' => 'console.command',
+            ],
         ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [
@@ -440,31 +534,71 @@ return [
         ],
     ],
     'parameters' => [
-        'mailer_api_key'                      => null, // Api key from mail delivery provider.
-        'mailer_from_name'                    => 'Mautic',
-        'mailer_from_email'                   => 'email@yoursite.com',
-        'mailer_return_path'                  => null,
-        'mailer_transport'                    => 'mail',
-        'mailer_append_tracking_pixel'        => true,
-        'mailer_convert_embed_images'         => false,
-        'mailer_host'                         => '',
-        'mailer_port'                         => null,
-        'mailer_user'                         => null,
-        'mailer_password'                     => null,
-        'mailer_encryption'                   => null, //tls or ssl,
-        'mailer_auth_mode'                    => null, //plain, login or cram-md5
-        'mailer_amazon_region'                => 'email-smtp.us-east-1.amazonaws.com',
-        'mailer_spool_type'                   => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'                   => '%kernel.root_dir%/spool',
-        'mailer_spool_msg_limit'              => null,
-        'mailer_spool_time_limit'             => null,
-        'mailer_spool_recover_timeout'        => 900,
-        'mailer_spool_clear_timeout'          => 1800,
-        'unsubscribe_text'                    => null,
-        'webview_text'                        => null,
-        'unsubscribe_message'                 => null,
-        'resubscribe_message'                 => null,
-        'monitored_email'                     => [],
+        'mailer_api_key'               => null, // Api key from mail delivery provider.
+        'mailer_from_name'             => 'Mautic',
+        'mailer_from_email'            => 'email@yoursite.com',
+        'mailer_return_path'           => null,
+        'mailer_transport'             => 'mail',
+        'mailer_append_tracking_pixel' => true,
+        'mailer_convert_embed_images'  => false,
+        'mailer_host'                  => '',
+        'mailer_port'                  => null,
+        'mailer_user'                  => null,
+        'mailer_password'              => null,
+        'mailer_encryption'            => null, //tls or ssl,
+        'mailer_auth_mode'             => null, //plain, login or cram-md5
+        'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
+        'mailer_spool_type'            => 'memory', //memory = immediate; file = queue
+        'mailer_spool_path'            => '%kernel.root_dir%/spool',
+        'mailer_spool_msg_limit'       => null,
+        'mailer_spool_time_limit'      => null,
+        'mailer_spool_recover_timeout' => 900,
+        'mailer_spool_clear_timeout'   => 1800,
+        'unsubscribe_text'             => null,
+        'webview_text'                 => null,
+        'unsubscribe_message'          => null,
+        'resubscribe_message'          => null,
+        'monitored_email'              => [
+            'general' => [
+                'address'    => null,
+                'host'       => null,
+                'port'       => '993',
+                'encryption' => '/ssl',
+                'user'       => null,
+                'password'   => null,
+
+            ],
+            'EmailBundle_bounces' => [
+                'address'           => null,
+                'host'              => null,
+                'port'              => '993',
+                'encryption'        => '/ssl',
+                'user'              => null,
+                'password'          => null,
+                'override_settings' => 0,
+                'folder'            => null,
+            ],
+            'EmailBundle_unsubscribes' => [
+                'address'           => null,
+                'host'              => null,
+                'port'              => '993',
+                'encryption'        => '/ssl',
+                'user'              => null,
+                'password'          => null,
+                'override_settings' => 0,
+                'folder'            => null,
+            ],
+            'EmailBundle_replies' => [
+                'address'           => null,
+                'host'              => null,
+                'port'              => '993',
+                'encryption'        => '/ssl',
+                'user'              => null,
+                'password'          => null,
+                'override_settings' => 0,
+                'folder'            => null,
+            ],
+        ],
         'mailer_is_owner'                     => false,
         'default_signature_text'              => null,
         'email_frequency_number'              => null,
@@ -478,6 +612,5 @@ return [
         'mailer_mailjet_sandbox'              => false,
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
-
     ],
 ];
