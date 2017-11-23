@@ -18,12 +18,12 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends FormController
 {
     use EntityContactsTrait;
+
     /**
      * Generate's default list view.
      *
@@ -697,7 +697,6 @@ class ListController extends FormController
             null,
             'leadlist_id',
             $listFilters
-
         );
     }
 }

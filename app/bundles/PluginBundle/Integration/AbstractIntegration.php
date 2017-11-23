@@ -2781,7 +2781,7 @@ abstract class AbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function getLeadDoNotContactByDate($channel,  $records, $object, $lead, $integrationData, $params = [])
+    public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
     {
         return $records;
     }

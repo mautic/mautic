@@ -509,7 +509,6 @@ return [
                     'mautic.helper.mailbox',
                     'event_dispatcher',
                     'translator',
-
                 ],
             ],
         ],
@@ -566,7 +565,6 @@ return [
                 'encryption' => '/ssl',
                 'user'       => null,
                 'password'   => null,
-
             ],
             'EmailBundle_bounces' => [
                 'address'           => null,
