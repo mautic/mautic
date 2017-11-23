@@ -56,7 +56,16 @@ class LeadSubscriber extends CommonSubscriber
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('RabbitMQ');
         $lead = $event->getLead()->convertToArray();
-        $leadData = $integrationObject->formatData($lead);
+
+        // The main array contains only the defaults fields, the custom ones will be listed in the 'field' key
+        $leadData = array();
+        foreach ($lead['fields'] as $group) {
+            foreach ($group as $key => $value) {
+                $leadData[$key] = $value['value'];
+            }
+        }
+
+        $leadData = $integrationObject->formatData($leadData);
 
         // There is a solution for sending only the changed data.        
         // $changes = $event->getChanges();
