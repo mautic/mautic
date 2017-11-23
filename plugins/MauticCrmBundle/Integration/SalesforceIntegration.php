@@ -721,7 +721,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     $accountId = $this->getCompanyName($fieldsToUpdate['AccountId'], 'Id', 'Name');
                                     if (!$accountId) {
                                         //company was not found so create a new company in Salesforce
-                                            $company = $lead->getPrimaryCompany();
+                                        $company = $lead->getPrimaryCompany();
                                         if (!empty($company)) {
                                             $company   = $this->companyModel->getEntity($company['id']);
                                             $sfCompany = $this->pushCompany($company);
@@ -1839,7 +1839,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (!$accountId) {
                         //company was not found so create a new company in Salesforce
-                            $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
+                        $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
                         if ($lead) {
                             $companies = $this->leadModel->getCompanies($lead);
                             if (!empty($companies)) {
@@ -2682,6 +2682,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
         return $historySF;
     }
+
     /**
      * Update the record in each system taking the last modified record.
      *
@@ -2694,7 +2695,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function pushLeadDoNotContactByDate($channel,  &$sfRecords, $sfObject, $params = [])
+    public function pushLeadDoNotContactByDate($channel, &$sfRecords, $sfObject, $params = [])
     {
         $filters = [];
         $leadIds = [];
