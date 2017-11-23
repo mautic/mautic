@@ -156,11 +156,12 @@ class IntegrationEntityRepository extends CommonRepository
 
         if ($internal) {
             $q->andWhere(
-                $q->expr()->andX( $q->expr()->eq('i.internal', ':internal') ))
+                $q->expr()->andX($q->expr()->eq('i.internal', ':internal')))
                 ->setParameter('internal', $internal);
         }
 
         $results = $q->getQuery()->getResult();
+
         return $results;
     }
 

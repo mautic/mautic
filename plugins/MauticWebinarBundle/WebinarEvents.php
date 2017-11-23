@@ -25,7 +25,7 @@ final class WebinarEvents
      *
      * @var string
      */
-    const ON_WEBINAR_EVENT = 'mautic.on_webinar_event';
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.on_campaign_trigger_action';
+    const ON_WEBINAR_EVENT                = 'mautic.on_webinar_event';
+    const ON_CAMPAIGN_TRIGGER_ACTION      = 'mautic.on_campaign_trigger_action';
     const ON_FORM_SUBMIT_ACTION_TRIGGERED = 'mautic.onFormSubmitActionTriggered';
 }

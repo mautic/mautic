@@ -13,7 +13,6 @@ namespace MauticPlugin\MauticWebinarBundle\Integration;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Integration\IntegrationObject;
 
-
 /**
  * Class ConnectwiseIntegration.
  */
@@ -28,6 +27,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     {
         return 'Webikeo';
     }
+
     /**
      * {@inheritdoc}
      *
@@ -98,11 +98,11 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         if ($this->isAuthorized() && !$settings['use_refresh_token']) {
             return true;
         }
-        $autUrl   = $this->getAccessTokenUrl();
+        $autUrl                        = $this->getAccessTokenUrl();
         $settings['encode_parameters'] = 'json';
-        $parameters['username'] = $this->keys['username'];
-        $parameters['password'] = $this->keys['password'];
-        $error = false;
+        $parameters['username']        = $this->keys['username'];
+        $parameters['password']        = $this->keys['password'];
+        $error                         = false;
         try {
             $response = $this->makeRequest($autUrl, $parameters, 'POST', $settings);
             if (!isset($response[$this->getAuthTokenKey()])) {
@@ -117,35 +117,35 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         return $error;
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function getAvailableLeadFields($settings = [])
     {
         return [
-            'email'       => ['label' => 'Email', 'type' => 'string', 'required' => true],
-            'firstName'    => ['label' => 'First Name','type' => 'string', 'required' => true],
-            'lastName'       => ['label' => 'Last Name','type' => 'string', 'required' => true],
-            'phone'  => ['label' => 'Phone','type' => 'string'],
-            'functionLabel'      => ['label' => 'Position','type' => 'string'],
-            'companyLabel'   => ['label' => 'Company','type' => 'string']
+            'email'              => ['label' => 'Email', 'type' => 'string', 'required' => true],
+            'firstName'          => ['label' => 'First Name', 'type' => 'string', 'required' => true],
+            'lastName'           => ['label' => 'Last Name', 'type' => 'string', 'required' => true],
+            'phone'              => ['label' => 'Phone', 'type' => 'string'],
+            'functionLabel'      => ['label' => 'Position', 'type' => 'string'],
+            'companyLabel'       => ['label' => 'Company', 'type' => 'string'],
         ];
     }
 
     /**
      * @param array $filters
+     *
      * @return array
      */
     public function getWebinars($filters = [])
     {
         if (empty($filters)) {
-            $filters = ['fromDate' => date("Y-m-d H:i:s")];
+            $filters = ['fromDate' => date('Y-m-d H:i:s')];
         }
 
-        $webinars = $this->getApiHelper()->getWebinars($filters);
+        $webinars          = $this->getApiHelper()->getWebinars($filters);
         $formattedWebinars = [];
-        $webinars = $webinars['_embedded']['webinar'];
+        $webinars          = $webinars['_embedded']['webinar'];
 
         foreach ($webinars as $webinar) {
             if (isset($webinar['id'])) {
@@ -162,18 +162,21 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     /**
      * @param $webinar
      * @param Lead $lead
+     *
      * @return bool
      */
     public function hasAttendedWebinar($webinar, Lead $lead)
     {
         $filters = ['isNoShow' => true];
+
         return $this->getWebinarSubscription($webinar, $lead, $filters) ? true : false;
     }
 
     /**
      * @param $webinar
-     * @param Lead $lead
+     * @param Lead  $lead
      * @param array $filters
+     *
      * @return mixed
      */
     public function getWebinarSubscription($webinar, Lead $lead, $filters = [])
@@ -185,6 +188,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
             } catch (\Exception $e) {
                 return $e->getMessage();
             }
+
             return $this->findSubscriptionByEmail($subscriptions, $leadEmail);
         }
 
@@ -194,6 +198,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     /**
      * @param $subscriptions
      * @param $email
+     *
      * @return mixed
      */
     private function findSubscriptionByEmail($subscriptions, $email)
@@ -215,6 +220,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     /**
      * @param $webinar
      * @param $contact
+     *
      * @return bool
      */
     public function subscribeToWebinar($webinar, Lead $contact, $campaign)
@@ -229,20 +235,23 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         } catch (\Exception $e) {
             return $e->getMessage();
         }
+
         return isset($response['source']);
     }
 
     /**
      * @param Lead $contact
      * @param $campaign
+     *
      * @return array
      */
     private function formatContactData(Lead $contact, $campaign)
     {
         $matchedData = $this->populateLeadData($contact);
+
         return [
-            'user' => $matchedData,
-            'trackingCampaign' => $campaign
+            'user'             => $matchedData,
+            'trackingCampaign' => $campaign,
         ];
     }
 
@@ -264,14 +273,14 @@ class WebikeoIntegration extends WebinarAbstractIntegration
     public function getSubscribersForSegmentProcessing($webinar, $isNoShow = null, $segmentId)
     {
         $webinarSubscriberObject = new IntegrationObject('WebinarSubscriber', 'lead');
-        $subscriberObject = new IntegrationObject('Contact', 'lead');
-        $subscribers = $this->getWebinarAllSubscribers($webinar,$isNoShow);
-        $subscribers = isset($subscribers['_embedded']['subscription']) ? $subscribers['_embedded']['subscription'] : [] ;
+        $subscriberObject        = new IntegrationObject('Contact', 'lead');
+        $subscribers             = $this->getWebinarAllSubscribers($webinar, $isNoShow);
+        $subscribers             = isset($subscribers['_embedded']['subscription']) ? $subscribers['_embedded']['subscription'] : [];
         if (empty($subscribers)) {
             return;
         }
         $recordList           = $this->getRecordList($subscribers, 'id');
-        $syncedContacts = $this->integrationEntityModel->getSyncedRecords($subscriberObject, $this->getName(), $recordList);
+        $syncedContacts       = $this->integrationEntityModel->getSyncedRecords($subscriberObject, $this->getName(), $recordList);
 
         // these synced records need to check the id of the segment first
         $existingContactsIds = array_map(
@@ -285,7 +294,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
 
         if (!empty($contactsToFetch)) {
             foreach ($subscribers as $subscriber) {
-                if (array_key_exists($subscriber['id'],$contactsToFetch)) {
+                if (array_key_exists($subscriber['id'], $contactsToFetch)) {
                     $this->createMauticContact($subscriber);
                 }
             }
@@ -299,9 +308,10 @@ class WebikeoIntegration extends WebinarAbstractIntegration
 
     /**
      * @param $data
+     *
      * @return mixed
      */
-    public function createMauticContact ($data)
+    public function createMauticContact($data)
     {
         $executed = 0;
 
@@ -309,9 +319,9 @@ class WebikeoIntegration extends WebinarAbstractIntegration
             $webinarObject = new IntegrationObject('Contact', 'lead');
 
             if (is_array($data)) {
-                $id = $data['id'];
+                $id            = $data['id'];
                 $formattedData = $this->matchUpData($data['user']);
-                $entity = $this->getMauticLead($formattedData, true);
+                $entity        = $this->getMauticLead($formattedData, true);
 
                 if ($entity) {
                     $integrationEntities[] = $this->saveSyncedData($entity, $webinarObject, $id);
@@ -328,5 +338,4 @@ class WebikeoIntegration extends WebinarAbstractIntegration
 
         return $executed;
     }
-
 }

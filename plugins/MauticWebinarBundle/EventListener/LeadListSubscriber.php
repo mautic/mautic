@@ -69,7 +69,7 @@ class LeadListSubscriber extends CommonSubscriber
                 $webinars = $integration->getWebinars();
                 if ($webinars) {
                     $integrationName = $integration->getName();
-                        array_walk(
+                    array_walk(
                             $webinars,
                             function (&$choice) use ($integrationName) {
                                 $choice['value'] = $integrationName.'::'.$choice['value'];
@@ -95,7 +95,7 @@ class LeadListSubscriber extends CommonSubscriber
             $configNotAttended = [
                 'label'      => $this->translator->trans('mautic.plugin.webinar.webinars.not.attended'),
                 'properties' => ['type' => 'select', 'list' => $choices],
-                'operators'  =>$this->listModel->getOperatorsForFieldType(
+                'operators'  => $this->listModel->getOperatorsForFieldType(
                     [
                         'include' => ['='],
                     ]
@@ -123,13 +123,14 @@ class LeadListSubscriber extends CommonSubscriber
      * Add/remove contacts to a segment based on contacts.
      *
      * @param ListPreProcessListEvent $event
+     *
      * @return ListPreProcessListEvent
      */
     public function onLeadListPreProcessList(ListPreProcessListEvent $event)
     {
-        $list    = $event->getList();
-        $success = false;
-        $filters = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
+        $list      = $event->getList();
+        $success   = false;
+        $filters   = ($list instanceof LeadList) ? $list->getFilters() : $list['filters'];
         $segmentId = ($list instanceof LeadList) ? $list->getId() : $list['id'];
 
         foreach ($filters as $filter) {
@@ -143,7 +144,7 @@ class LeadListSubscriber extends CommonSubscriber
                 }
 
                 switch ($filter['field']) {
-                    case 'webinar_attended' :
+                    case 'webinar_attended':
                         $isNoShow = 'false';
                         if ($integrationObject->getSubscribersForSegmentProcessing($webinarId, $isNoShow, $segmentId)) {
                             $success = true;
@@ -155,7 +156,7 @@ class LeadListSubscriber extends CommonSubscriber
                             $success = true;
                         }
                         break;
-                    case 'webinar_subscribed' :
+                    case 'webinar_subscribed':
                         if ($integrationObject->getSubscribersForSegmentProcessing($webinarId, null, $segmentId)) {
                             $success = true;
                         }

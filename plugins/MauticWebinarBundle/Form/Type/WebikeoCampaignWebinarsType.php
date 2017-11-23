@@ -13,11 +13,8 @@ namespace MauticPlugin\MauticWebinarBundle\Form\Type;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\ExecutionContextInterface;
 
 /**
  * Class WebikeoCampaignWebinarsType.
@@ -33,6 +30,7 @@ class WebikeoCampaignWebinarsType extends AbstractType
     {
         $this->integrationHelper = $integrationHelper;
     }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -40,7 +38,7 @@ class WebikeoCampaignWebinarsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject($options['integration_object_name']);
-        $webinars = $integrationObject->getWebinars();
+        $webinars          = $integrationObject->getWebinars();
 
         $builder->add(
             'webinar',

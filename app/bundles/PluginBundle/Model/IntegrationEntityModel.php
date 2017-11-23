@@ -35,7 +35,7 @@ class IntegrationEntityModel extends FormModel
             return [];
         }
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
-        $syncedRecords = $integrationEntityRepo->getIntegrationsEntityId(
+        $syncedRecords         = $integrationEntityRepo->getIntegrationsEntityId(
             $integrationName,
             $integrationObject->getType(),
             $integrationObject->getInternalType(),

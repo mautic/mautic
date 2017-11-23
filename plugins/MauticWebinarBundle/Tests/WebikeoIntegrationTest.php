@@ -25,7 +25,6 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationKeyEvent;
-use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticWebinarBundle\Integration\WebikeoIntegration;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -49,12 +48,11 @@ class WebikeoIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWebinars()
     {
-
     }
 
     public function testHasAttendedWebinar()
     {
-        $this->mockMethods = ['makeRequest'];
+        $this->mockMethods  = ['makeRequest'];
         $webinar['webinar'] = 1;
         //contact1 should return true
         $contact1 = new Lead();
@@ -84,7 +82,7 @@ class WebikeoIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function testSubscribeToWebinar()
     {
-        $this->mockMethods = ['makeRequest', 'formatContactData'];
+        $this->mockMethods  = ['makeRequest', 'formatContactData'];
         $webinar['webinar'] = 1;
 
         $contact1 = new Lead();
@@ -97,11 +95,11 @@ class WebikeoIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $postData = [
             'user' => [
-                'email' => null,
+                'email'     => null,
                 'firstName' => null,
-                'lastName'  => null
+                'lastName'  => null,
             ],
-            'trackingCampaign' => $campaign
+            'trackingCampaign' => $campaign,
         ];
 
         $webikeoIntegration = $this->getWebikeoIntegration();
@@ -116,117 +114,116 @@ class WebikeoIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(true, $isSubscribed);
     }
 
-
     public function getSubscriptions()
     {
         return [
-            "_embedded"=> [
-                "subscription"=> [
+            '_embedded'=> [
+                'subscription'=> [
                     [
-                        "source"=> "...",
-                        "createdAt"=> "2017-01-26T09=>23=>23+0200",
-                        "updatedAt"=> "2017-01-27T09=>23=>23+0200",
-                        "engagedAt"=> "2017-01-27T09=>23=>23+0200",
-                        "hasViewed"=> false,
-                        "hasContacted"=> false,
-                        "hasDownloaded"=> false,
-                        "hasRated"=> false,
-                        "hasReplayed"=> false,
-                        "rating"=> null,
-                        "ratingComment"=> null,
-                        "minutesLive"=> 0,
-                        "minutesReplay"=> 0,
-                        "id"=> 1,
-                        "user"=> [
-                            "email"=> 'test@test.com',
-                            "firstName"=> 'FirstName',
-                            "lastName"=> 'LastName',
-                            "companyLabel"=> "Webikeo",
-                            "companySize"=> [
-                                "label"=> "De 11 à 50 employés",
-                                "id"=> 3
+                        'source'       => '...',
+                        'createdAt'    => '2017-01-26T09=>23=>23+0200',
+                        'updatedAt'    => '2017-01-27T09=>23=>23+0200',
+                        'engagedAt'    => '2017-01-27T09=>23=>23+0200',
+                        'hasViewed'    => false,
+                        'hasContacted' => false,
+                        'hasDownloaded'=> false,
+                        'hasRated'     => false,
+                        'hasReplayed'  => false,
+                        'rating'       => null,
+                        'ratingComment'=> null,
+                        'minutesLive'  => 0,
+                        'minutesReplay'=> 0,
+                        'id'           => 1,
+                        'user'         => [
+                            'email'       => 'test@test.com',
+                            'firstName'   => 'FirstName',
+                            'lastName'    => 'LastName',
+                            'companyLabel'=> 'Webikeo',
+                            'companySize' => [
+                                'label'=> 'De 11 à 50 employés',
+                                'id'   => 3,
                             ],
-                            "functionLabel"=> null,
-                            "departmentName"=> "relation-client",
-                            "domainName"=> "services-entreprises",
-                            "countryLabel"=> "France",
-                            "country"=> [
-                                "label"=> "France",
-                                "code"=> "FR",
-                                "id"=> 73,
+                            'functionLabel' => null,
+                            'departmentName'=> 'relation-client',
+                            'domainName'    => 'services-entreprises',
+                            'countryLabel'  => 'France',
+                            'country'       => [
+                                'label'=> 'France',
+                                'code' => 'FR',
+                                'id'   => 73,
                             ],
-                            "phone"=> null,
-                            "id"=> 123456,
-                            "language"=> "fr"
+                            'phone'   => null,
+                            'id'      => 123456,
+                            'language'=> 'fr',
                         ],
-                        "subscriptionLiveCtaTrackings"=> [
+                        'subscriptionLiveCtaTrackings'=> [
                             [
-                                "id"=> 109,
-                                "liveCta"=> [
-                                    "id"=> 5,
-                                    "label"=> "Je souhaite être rappelé"
+                                'id'     => 109,
+                                'liveCta'=> [
+                                    'id'   => 5,
+                                    'label'=> 'Je souhaite être rappelé',
                                 ],
-                                "clickedAt"=> "2017-01-010T10=>40=>11+0200"
-                            ]
+                                'clickedAt'=> '2017-01-010T10=>40=>11+0200',
+                            ],
                         ],
-                        "subscriptionFormFieldAnswers"=> [
+                        'subscriptionFormFieldAnswers'=> [
                             [
-                                "id"=> 1862,
-                                "value"=> "Oui",
-                                "createdAt"=> "2017-01-06T09=>23=>23+0200",
-                                "formFieldOption"=> [
-                                    "id"=> 60,
-                                    "label"=> "Oui"
+                                'id'             => 1862,
+                                'value'          => 'Oui',
+                                'createdAt'      => '2017-01-06T09=>23=>23+0200',
+                                'formFieldOption'=> [
+                                    'id'   => 60,
+                                    'label'=> 'Oui',
                                 ],
-                                "formField"=> [
-                                    "id"=> 41,
-                                    "label"=> "Avez-vous déjà utilisé un outil de provisioning ?"
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'formField'=> [
+                                    'id'   => 41,
+                                    'label'=> 'Avez-vous déjà utilisé un outil de provisioning ?',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
     public function getSubscriptionResponse()
     {
         return [
-            "source"=> "api",
-            "createdAt"=> "2017-11-06T14:07:28+0100",
-            "updatedAt"=> null,
-            "engagedAt"=> null,
-            "hasViewed"=> false,
-            "hasContacted"=> false,
-            "hasDownloaded"=> false,
-            "hasRated"=> false,
-            "hasReplayed"=> false,
-            "rating"=> null,
-            "ratingComment"=> null,
-            "minutesLive"=> 0,
-            "minutesReplay"=> 0,
-            "id"=> 748012,
-            "user"=> [
-                "language"=> "fr",
-                "email"=> "test@test.com",
-                "firstName"=> "FirstName",
-                "lastName"=> "LastName",
-                "companyLabel"=> "Webikeo",
-                "companySize"=> null,
-                "functionLabel"=> "Directeur Performance Media & Programmatic",
-                "departmentName"=> "marketing-communication",
-                "countryLabel"=> "France",
-                "phone"=> "0600000000",
-                "id"=> 191072,
-                "country"=> [
-                    "id"=>1920,
-                    "label"=> "France",
-                     "code"=> "FR"
-                ]
+            'source'       => 'api',
+            'createdAt'    => '2017-11-06T14:07:28+0100',
+            'updatedAt'    => null,
+            'engagedAt'    => null,
+            'hasViewed'    => false,
+            'hasContacted' => false,
+            'hasDownloaded'=> false,
+            'hasRated'     => false,
+            'hasReplayed'  => false,
+            'rating'       => null,
+            'ratingComment'=> null,
+            'minutesLive'  => 0,
+            'minutesReplay'=> 0,
+            'id'           => 748012,
+            'user'         => [
+                'language'      => 'fr',
+                'email'         => 'test@test.com',
+                'firstName'     => 'FirstName',
+                'lastName'      => 'LastName',
+                'companyLabel'  => 'Webikeo',
+                'companySize'   => null,
+                'functionLabel' => 'Directeur Performance Media & Programmatic',
+                'departmentName'=> 'marketing-communication',
+                'countryLabel'  => 'France',
+                'phone'         => '0600000000',
+                'id'            => 191072,
+                'country'       => [
+                    'id'   => 1920,
+                    'label'=> 'France',
+                     'code'=> 'FR',
+                ],
             ],
-            "subscriptionLiveCtaTrackings"=> [],
-            "subscriptionFormFieldAnswers"=> []
+            'subscriptionLiveCtaTrackings'=> [],
+            'subscriptionFormFieldAnswers'=> [],
         ];
     }
 
@@ -237,14 +234,14 @@ class WebikeoIntegrationTest extends \PHPUnit_Framework_TestCase
         $featureSettings = [
             'leadFields' => [
                 'email'        => 'email',
-                'firstName' => 'firstname',
-                'lastName'  => 'lastname',
+                'firstName'    => 'firstname',
+                'lastName'     => 'lastname',
                 'companyLabel' => 'company',
             ],
         ];
 
         $response = [
-            'token' => 'ABC'
+            'token' => 'ABC',
         ];
 
         $integration = new Integration();
@@ -257,7 +254,7 @@ class WebikeoIntegrationTest extends \PHPUnit_Framework_TestCase
             ->setFeatureSettings($featureSettings)
             ->setSupportedFeatures(
                 [
-                    'push_subscriptions', 'get_subscriptions'
+                    'push_subscriptions', 'get_subscriptions',
                 ]
             );
         $wi = $this->getMockBuilder(WebikeoIntegration::class)
@@ -282,6 +279,7 @@ class WebikeoIntegrationTest extends \PHPUnit_Framework_TestCase
                             default:
                                 return $this->getSubscriptions();
                         }
+
                         return [];
                     }
                 )

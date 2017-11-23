@@ -19,4 +19,3 @@ use Mautic\PluginBundle\Bundle\PluginBundleBase;
 class MauticWebinarBundle extends PluginBundleBase
 {
 }
-?>

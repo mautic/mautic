@@ -14,7 +14,7 @@ return [
     'description' => 'Enables integration with Mautic supported Webinar tools.',
     'version'     => '1.0',
     'author'      => 'WebMekanik',
-    'services' => [
+    'services'    => [
         'integrations' => [
             'mautic.integration.webikeo' => [
                 'class'     => \MauticPlugin\MauticWebinarBundle\Integration\WebikeoIntegration::class,
@@ -43,8 +43,8 @@ return [
         ],
         'forms' => [
             'mautic.form.type.webikeo.campaigncondition' => [
-                'class' => MauticPlugin\MauticWebinarBundle\Form\Type\WebikeoCampaignWebinarsType::class,
-                'alias' => 'Webikeo_campaignevent_webinars',
+                'class'     => MauticPlugin\MauticWebinarBundle\Form\Type\WebikeoCampaignWebinarsType::class,
+                'alias'     => 'Webikeo_campaignevent_webinars',
                 'arguments' => [
                     'mautic.helper.integration',
                 ],

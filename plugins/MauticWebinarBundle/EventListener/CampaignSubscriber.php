@@ -27,6 +27,7 @@ class CampaignSubscriber extends CommonSubscriber
      * @var IntegrationHelper
      */
     protected $integrationHelper;
+
     /**
      * CampaignSubscriber constructor.
      *
@@ -36,14 +37,15 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $this->integrationHelper = $integrationHelper;
     }
+
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD => ['onCampaignBuild', 0],
-            WebinarEvents::ON_WEBINAR_EVENT => ['onWebinarEvent', 0],
+            CampaignEvents::CAMPAIGN_ON_BUILD         => ['onCampaignBuild', 0],
+            WebinarEvents::ON_WEBINAR_EVENT           => ['onWebinarEvent', 0],
             WebinarEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onWebinarAction', 0],
         ];
     }
@@ -63,31 +65,29 @@ class CampaignSubscriber extends CommonSubscriber
             //Add webinar condition has attended a webinar
             if (method_exists($s, 'hasAttendedWebinar')) {
                 $condition = [
-                    'label' => 'mautic.plugin.webinars.attended',
-                    'description' => $s->getName(),
-                    'formType' => $s->getName() . '_campaignevent_webinars',
+                    'label'           => 'mautic.plugin.webinars.attended',
+                    'description'     => $s->getName(),
+                    'formType'        => $s->getName().'_campaignevent_webinars',
                     'formTypeOptions' => ['integration_object_name' => $s->getName()],
-                    'eventName' => WebinarEvents::ON_WEBINAR_EVENT,
+                    'eventName'       => WebinarEvents::ON_WEBINAR_EVENT,
                 ];
 
-                $event->addCondition('plugin.webinar_' . $s->getName(), $condition);
+                $event->addCondition('plugin.webinar_'.$s->getName(), $condition);
             }
             //Add webinar action subscribe to webinar
-            if (method_exists($s,'subscribeToWebinar')) {
+            if (method_exists($s, 'subscribeToWebinar')) {
                 $action = [
-                    'label'       => $this->translator->trans('mautic.plugin.webinar.subscribe_contact', ['%name%' => $s->getName()]),
-                    'description' => $s->getName(),
-                    'formType'    => $s->getName() . '_campaignevent_webinars',
+                    'label'           => $this->translator->trans('mautic.plugin.webinar.subscribe_contact', ['%name%' => $s->getName()]),
+                    'description'     => $s->getName(),
+                    'formType'        => $s->getName().'_campaignevent_webinars',
                     'formTypeOptions' => ['integration_object_name' => $s->getName()],
-                    'eventName'   => WebinarEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                    'eventName'       => WebinarEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 ];
 
                 $event->addAction('plugin.subscribecontact_'.$s->getName(), $action);
             }
         }
     }
-
-
 
     /**
      * @param CampaignExecutionEvent $event
@@ -99,8 +99,8 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onWebinarEvent(CampaignExecutionEvent $event)
     {
-        $config   = $event->getConfig();
-        $contact = $event->getLead();
+        $config     = $event->getConfig();
+        $contact    = $event->getLead();
         $subscribed = false;
         if ($contact) {
             $services = $this->integrationHelper->getIntegrationObjects();
@@ -119,10 +119,10 @@ class CampaignSubscriber extends CommonSubscriber
 
     public function onWebinarAction(CampaignExecutionEvent $event)
     {
-        $config   = $event->getConfig();
-        $contact = $event->getLead();
+        $config              = $event->getConfig();
+        $contact             = $event->getLead();
         $subscriptionSuccess = false;
-        $campaignName = $event->getEvent()['campaign']['name'];
+        $campaignName        = $event->getEvent()['campaign']['name'];
 
         if ($contact) {
             $services = $this->integrationHelper->getIntegrationObjects();

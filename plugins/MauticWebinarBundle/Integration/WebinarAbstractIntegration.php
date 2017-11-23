@@ -46,8 +46,6 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
         parent::setIntegrationSettings($settings);
     }
 
-
-
     /**
      * {@inheritdoc}
      *
@@ -57,7 +55,7 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
     {
         return [
             'username'  => 'mautic.webinar.form.username',
-            'password' => 'mautic.webinar.form.password',
+            'password'  => 'mautic.webinar.form.password',
         ];
     }
 
@@ -111,7 +109,6 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
         ];
     }
 
-
     /**
      * {@inheritdoc}
      *
@@ -120,9 +117,9 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
     public function isAuthorized()
     {
         $keys = $this->getKeys();
+
         return isset($keys[$this->getAuthTokenKey()]);
     }
-
 
     /**
      * @param array $settings
@@ -175,18 +172,18 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
         if (empty($allSubscribers)) {
             return;
         }
-        $persistEntities = [];
+        $persistEntities   = [];
         $contactsInSegment = [];
-        $recordList      = $this->getRecordList($allSubscribers);
-        $mauticObject    = new IntegrationObject('Contact', 'lead');
-        $contacts = $this->integrationEntityModel->getSyncedRecords($mauticObject, $this->getName(), $recordList);
-        $searchContacts = $contacts;
+        $recordList        = $this->getRecordList($allSubscribers);
+        $mauticObject      = new IntegrationObject('Contact', 'lead');
+        $contacts          = $this->integrationEntityModel->getSyncedRecords($mauticObject, $this->getName(), $recordList);
+        $searchContacts    = $contacts;
 
         foreach ($contacts as $key => $subscribers) {
             $contactsInSegment[$key] = $subscribers['internal_entity_id'];
         }
 
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo      = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $existingWebinarSubscribers = $integrationEntityRepo->getIntegrationEntities(
             $this->getName(),
             $webinarSubscriberObject->getType(),
@@ -231,7 +228,6 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
             unset($persistEntities);
             $this->em->clear(IntegrationEntity::class);
         }
-
     }
 
     /**
@@ -268,5 +264,4 @@ abstract class WebinarAbstractIntegration extends AbstractIntegration
 
         return $integrationEntity;
     }
-
 }

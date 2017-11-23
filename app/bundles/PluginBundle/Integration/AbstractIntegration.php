@@ -1216,7 +1216,7 @@ abstract class AbstractIntegration
                         'Authorization' => 'Basic '.base64_encode($this->keys['username'].':'.$this->keys['password']),
                     ];
                     break;
-                case 'JWT' :
+                case 'JWT':
                     $headers = ['Authorization' => 'Bearer '.$this->getBearerToken()];
                     break;
                 case 'oauth1a':
@@ -2784,7 +2784,7 @@ abstract class AbstractIntegration
      *
      * @throws ApiErrorException
      */
-    public function getLeadDoNotContactByDate($channel,  $records, $object, $lead, $integrationData, $params = [])
+    public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
     {
         return $records;
     }

@@ -17,7 +17,7 @@ class WebikeoApi extends WebinarApi
 {
     /**
      * @param        $endpoint
-     * @param array $parameters
+     * @param array  $parameters
      * @param string $method
      *
      * @return mixed|string
@@ -31,7 +31,7 @@ class WebikeoApi extends WebinarApi
         $url = sprintf('%s/%s', $apiUrl, $endpoint);
 
         $response = $this->integration->makeRequest($url, $parameters, $method, ['encode_parameters' => 'json']);
-        $errors = [];
+        $errors   = [];
         if (is_array($response) && isset($response['code'])) {
             //get errors
             if ($response['code'] == 401) {
@@ -48,12 +48,15 @@ class WebikeoApi extends WebinarApi
                 throw new ApiErrorException(implode(' ', $errors));
             }
         }
+
         return $response;
     }
 
     /**
      * @param array $filters
+     *
      * @return mixed|string
+     *
      * @throws ApiErrorException
      */
     public function getWebinars($filters = [])
@@ -63,9 +66,10 @@ class WebikeoApi extends WebinarApi
 
     public function getSubscriptions($webinarId, $filters = [])
     {
-        if($webinarId) {
+        if ($webinarId) {
             return $this->request('webinars/'.$webinarId.'/subscriptions', $filters, 'GET');
         }
+
         return [];
     }
 
