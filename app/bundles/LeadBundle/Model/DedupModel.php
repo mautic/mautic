@@ -14,6 +14,7 @@ namespace Mautic\LeadBundle\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Exception\MissingMergeSubjectException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -22,32 +23,32 @@ class DedupModel
     /**
      * @var FieldModel
      */
-    protected $fieldModel;
+    private $fieldModel;
 
     /**
      * @var MergeModel
      */
-    protected $mergeModel;
+    private $mergeModel;
 
     /**
      * @var LeadRepository
      */
-    protected $repository;
+    private $repository;
 
     /**
      * @var EntityManager
      */
-    protected $em;
+    private $em;
 
     /**
      * @var array
      */
-    protected $availableFields;
+    private $availableFields;
 
     /**
      * @var bool
      */
-    protected $mergeNewerIntoOlder = false;
+    private $mergeNewerIntoOlder = false;
 
     /**
      * DedupModel constructor.
@@ -70,6 +71,7 @@ class DedupModel
      * @param OutputInterface|null $output
      *
      * @return int
+     * @throws MissingMergeSubjectException
      */
     public function dedup($mergeNewerIntoOlder = false, OutputInterface $output = null)
     {
@@ -94,10 +96,12 @@ class DedupModel
 
             // Were duplicates found?
             if (count($duplicates) > 1) {
-                $dupCount += count($duplicates) - 1;
                 $loser = reset($duplicates);
                 while ($winner = next($duplicates)) {
-                    $this->mergeModel->merge($loser, $winner);
+                    $this->mergeModel
+                        ->setLoser($loser)
+                        ->setWinner($winner)
+                        ->merge();
 
                     if ($progress) {
                         // Advance the progress bar for the deleted contacts that are no longer in the total count
@@ -143,14 +147,15 @@ class DedupModel
      *
      * @return array
      */
-    protected function getUniqueData(array $queryFields)
+    public function getUniqueData(array $queryFields)
     {
         $uniqueLeadFields    = $this->fieldModel->getUniqueIdentifierFields();
         $uniqueLeadFieldData = [];
         $inQuery             = array_intersect_key($queryFields, $this->getAvailableFields());
         foreach ($inQuery as $k => $v) {
-            if (empty($queryFields[$k])) {
-                unset($inQuery[$k]);
+            // Don't use empty values when checking for duplicates
+            if (empty($v)) {
+                continue;
             }
 
             if (array_key_exists($k, $uniqueLeadFields)) {
@@ -164,7 +169,7 @@ class DedupModel
     /**
      * @return array
      */
-    protected function getAvailableFields()
+    private function getAvailableFields()
     {
         if (null === $this->availableFields) {
             $this->availableFields = $this->fieldModel->getFieldList(
