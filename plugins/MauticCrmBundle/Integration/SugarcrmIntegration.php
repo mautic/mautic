@@ -1181,11 +1181,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $leadFields              = $config['leadFields'];
         if (!empty($leadFields)) {
-            if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
-                unset($leadFields[$key]);
+            if ($keys = array_keys($leadFields, 'mauticContactTimelineLink')) {
+                foreach ($keys as $key) {
+                    unset($leadFields[$key]);
+                }
             }
-            if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
-                unset($leadFields[$key]);
+
+            if ($keys = array_keys($leadFields, 'mauticContactIsContactableByEmail')) {
+                foreach ($keys as $key) {
+                    unset($leadFields[$key]);
+                }
             }
 
             $fields = implode(', l.', $leadFields);
@@ -1209,7 +1214,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
         $checkEmailsInSugar = [];
         $deletedSugarLeads  = [];
-        $sugarIdMapping     = [];
         foreach ($leadsToUpdate as $object => $records) {
             foreach ($records as $lead) {
                 if (isset($lead['email']) && !empty($lead['email'])) {
@@ -1280,7 +1284,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             $result = $apiHelper->syncLeadsToSugar($mauticData);
         }
 
-        return $this->processCompositeResponse($result, $sugarIdMapping);
+        return $this->processCompositeResponse($result);
     }
 
     /**
@@ -1467,12 +1471,11 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param       $response
-     * @param array $sugarcrmIdMapping
+     * @param array $response
      *
      * @return array
      */
-    protected function processCompositeResponse($response, array $sugarcrmIdMapping = [])
+    protected function processCompositeResponse($response)
     {
         $created         = 0;
         $errored         = 0;
@@ -1538,7 +1541,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         $integrationEntity->setLastSyncDate(new \DateTime());
                         $integrationEntity->setIntegration($this->getName());
                         $integrationEntity->setIntegrationEntity($object);
-                        $integrationEntity->setIntegrationEntityId($sugarcrmIdMapping[$contactId]);
+                        $integrationEntity->setIntegrationEntityId($item['id']);
                         $integrationEntity->setInternalEntity('lead');
                         $integrationEntity->setInternalEntityId($contactId);
                     }
