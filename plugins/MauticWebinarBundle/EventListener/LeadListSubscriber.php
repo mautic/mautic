@@ -133,32 +133,34 @@ class LeadListSubscriber extends CommonSubscriber
         $segmentId = ($list instanceof LeadList) ? $list->getId() : $list['id'];
 
         foreach ($filters as $filter) {
-            list($integrationName, $webinarId) = explode('::', $filter['filter']);
+            if (strpos($filter['filter'], '::') !== false) {
+                list($integrationName, $webinarId) = explode('::', $filter['filter']);
 
-            if ($integrationObject = $this->helper->getIntegrationObject($integrationName)) {
-                if (!$integrationObject->getIntegrationSettings()->isPublished() || !method_exists($integrationObject, 'getSubscribersForSegmentProcessing')) {
-                    continue;
+                if ($integrationObject = $this->helper->getIntegrationObject($integrationName)) {
+                    if (!$integrationObject->getIntegrationSettings()->isPublished() || !method_exists($integrationObject, 'getSubscribersForSegmentProcessing')) {
+                        continue;
+                    }
                 }
-            }
 
-            switch ($filter['field']) {
-                case 'webinar_attended' :
-                    $isNoShow = 'false';
-                    if ($integrationObject->getSubscribersForSegmentProcessing($webinarId, $isNoShow, $segmentId)) {
-                        $success = true;
-                    }
-                    break;
-                case 'webinar_not_attended':
-                    $isNoShow = 'true';
-                    if ($integrationObject->getSubscribersForSegmentProcessing($webinarId, $isNoShow, $segmentId)) {
-                        $success = true;
-                    }
-                    break;
-                case 'webinar_subscribed' :
-                    if ($integrationObject->getSubscribersForSegmentProcessing($webinarId, null, $segmentId)) {
-                        $success = true;
-                    }
-                    break;
+                switch ($filter['field']) {
+                    case 'webinar_attended' :
+                        $isNoShow = 'false';
+                        if ($integrationObject->getSubscribersForSegmentProcessing($webinarId, $isNoShow, $segmentId)) {
+                            $success = true;
+                        }
+                        break;
+                    case 'webinar_not_attended':
+                        $isNoShow = 'true';
+                        if ($integrationObject->getSubscribersForSegmentProcessing($webinarId, $isNoShow, $segmentId)) {
+                            $success = true;
+                        }
+                        break;
+                    case 'webinar_subscribed' :
+                        if ($integrationObject->getSubscribersForSegmentProcessing($webinarId, null, $segmentId)) {
+                            $success = true;
+                        }
+                        break;
+                }
             }
         }
 
