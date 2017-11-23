@@ -133,7 +133,7 @@ class LeadListSubscriber extends CommonSubscriber
         $segmentId = ($list instanceof LeadList) ? $list->getId() : $list['id'];
 
         foreach ($filters as $filter) {
-            if (strpos($filter['filter'], '::') !== false) {
+            if (in_array($filter['field'], ['webinar_attended', 'webinar_not_attended', 'webinar_subscribed'])) {
                 list($integrationName, $webinarId) = explode('::', $filter['filter']);
 
                 if ($integrationObject = $this->helper->getIntegrationObject($integrationName)) {
