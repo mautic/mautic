@@ -1181,11 +1181,16 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 1) : [];
         $leadFields              = $config['leadFields'];
         if (!empty($leadFields)) {
-            if ($key = array_search('mauticContactTimelineLink', $leadFields)) {
-                unset($leadFields[$key]);
+            if ($keys = array_keys($leadFields, 'mauticContactTimelineLink')) {
+                foreach ($keys as $key) {
+                    unset($leadFields[$key]);
+                }
             }
-            if ($key = array_search('mauticContactIsContactableByEmail', $leadFields)) {
-                unset($leadFields[$key]);
+
+            if ($keys = array_keys($leadFields, 'mauticContactIsContactableByEmail')) {
+                foreach ($keys as $key) {
+                    unset($leadFields[$key]);
+                }
             }
 
             $fields = implode(', l.', $leadFields);
