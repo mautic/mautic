@@ -520,7 +520,10 @@ return [
                 ],
             ],
             'mautic.lead.pagebundle.subscriber' => [
-                'class' => \Mautic\LeadBundle\EventListener\PageSubscriber::class,
+                'class'     => \Mautic\LeadBundle\EventListener\PageSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
             ],
         ],
         'forms' => [

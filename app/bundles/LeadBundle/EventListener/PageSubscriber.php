@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
@@ -23,9 +24,24 @@ use Mautic\PageBundle\PageEvents;
 class PageSubscriber extends CommonSubscriber
 {
     /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
      * @var string
      */
     private static $contactFieldRegex = '{contactfield=(.*?)}';
+
+    /**
+     * PageSubscriber constructor.
+     *
+     * @param LeadModel $leadModel
+     */
+    public function __construct(LeadModel $leadModel)
+    {
+        $this->leadModel = $leadModel;
+    }
 
     /**
      * @return array
@@ -61,8 +77,7 @@ class PageSubscriber extends CommonSubscriber
         $regex   = '/\\'.str_replace('}', '\\}/', self::$contactFieldRegex);
         preg_match_all($regex, $content, $matches);
 
-        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-        $lead    = $this->factory->getModel('lead')->getCurrentLead();
+        $lead    = $this->leadModel->getCurrentLead();
         $replace = [];
         if (count($matches[1]) > 0) {
             foreach ($matches[1] as $key => $field) {
