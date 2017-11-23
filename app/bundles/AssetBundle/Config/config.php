@@ -9,8 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\AssetBundle\EventListener\UploadSubscriber;
-
 return [
     'routes' => [
         'main' => [
@@ -88,7 +86,10 @@ return [
                 ],
             ],
             'mautic.asset.reportbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
             'mautic.asset.builder.subscriber' => [
                 'class'     => 'Mautic\AssetBundle\EventListener\BuilderSubscriber',
@@ -125,7 +126,7 @@ return [
                 ],
             ],
             'oneup_uploader.pre_upload' => [
-                'class'     => UploadSubscriber::class,
+                'class'     => \Mautic\AssetBundle\EventListener\UploadSubscriber::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.asset.model.asset',

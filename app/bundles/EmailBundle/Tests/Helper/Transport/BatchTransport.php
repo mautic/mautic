@@ -16,15 +16,19 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     private $fromAddresses = [];
     private $metadatas     = [];
     private $validate      = false;
+    private $maxRecipients;
+    private $numberToFail;
 
     /**
      * BatchTransport constructor.
      *
      * @param bool $validate
      */
-    public function __construct($validate = false)
+    public function __construct($validate = false, $maxRecipients = 4, $numberToFail = 1)
     {
-        $this->validate = true;
+        $this->validate      = $validate;
+        $this->maxRecipients = $maxRecipients;
+        $this->numberToFail  = (int) $numberToFail;
     }
 
     /**
@@ -39,7 +43,9 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
 
         $messageArray = $this->messageToArray();
 
-        if ($this->validate) {
+        if ($this->validate && $this->numberToFail) {
+            --$this->numberToFail;
+
             if (empty($messageArray['subject'])) {
                 $this->throwException('Subject empty');
             }
@@ -57,7 +63,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function getMaxBatchLimit()
     {
-        return 4;
+        return $this->maxRecipients;
     }
 
     /**
@@ -69,7 +75,9 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        return count($message->getTo()) + $toBeAdded;
+        $toCount = count($message->getTo());
+
+        return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
     }
 
     /**

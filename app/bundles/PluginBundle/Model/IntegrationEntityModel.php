@@ -12,6 +12,7 @@
 namespace Mautic\PluginBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Integration\IntegrationObject;
 
 /**
@@ -21,7 +22,7 @@ class IntegrationEntityModel extends FormModel
 {
     public function getIntegrationEntityRepository()
     {
-        return $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        return $this->em->getRepository(IntegrationEntity::class);
     }
 
     public function logDataSync(IntegrationObject $integrationObject)
@@ -97,5 +98,21 @@ class IntegrationEntityModel extends FormModel
         );
 
         return $mauticContacts;
+    }
+
+    /**
+     * @param int       $id
+     * @param \DateTime $dateTime
+     *
+     * @return IntegrationEntity|null
+     */
+    public function getEntityByIdAndSetSyncDate($id, \DateTime $dateTime)
+    {
+        $entity = $this->getIntegrationEntityRepository()->find($id);
+        if ($entity) {
+            $entity->setLastSyncDate($dateTime);
+        }
+
+        return $entity;
     }
 }
