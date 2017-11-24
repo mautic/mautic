@@ -351,7 +351,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $this->buildSelectClause($q, $id);
                 $contactId = (int) $id['id'];
             } else {
-                $q->select('l')
+                $q->select('l, u, i')
                     ->leftJoin('l.ipAddresses', 'i')
                     ->leftJoin('l.owner', 'u');
                 $contactId = $id;
