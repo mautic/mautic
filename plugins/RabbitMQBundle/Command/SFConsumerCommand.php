@@ -108,6 +108,7 @@ class SFConsumerCommand extends ModeratedCommand
 
 	    $connection = new AMQPStreamConnection($integrationObject->getLocation(), 5672, $integrationObject->getUser(), $integrationObject->getPassword());
 	    $channel = $connection->channel();
+        $channel->basic_qos(0, 1, false);
 
 	    // exchange, type, passive, durable, auto_delete
 	    $channel->exchange_declare('kiazaki', 'direct', false, true, false);
