@@ -215,7 +215,9 @@ class SFConsumerCommand extends ModeratedCommand
                         $msg->delivery_info['channel']->basic_nack($msg->delivery_info['delivery_tag']);
                         $output->writeln("<error>[!] " . $response['errorCode'] . ": " . $response['message'] ."</error>");
                     } else {
+                        $output->writeln("<info>Before ACK.</info>");
                         $msg->delivery_info['channel']->basic_ack($msg->delivery_info['delivery_tag']);
+                        $output->writeln("<info>After ACK.</info>");
                     }
                 }
             }
