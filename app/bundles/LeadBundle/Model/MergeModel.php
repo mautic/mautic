@@ -95,21 +95,14 @@ class MergeModel
     }
 
     /**
-     * @param Lead $loser
-     * @param Lead $winner
-     *
      * @return Lead
+     *
      * @throws MissingMergeSubjectException
+     * @throws SameContactException
      */
     public function merge()
     {
-        try {
-            $this->checkIfMergeable();
-        } catch (SameContactException $exception) {
-            $this->logger->debug('CONTACT: Contacts are the same');
-
-            return $this->winner;
-        }
+        $this->checkIfMergeable();
 
         $this->logger->debug('CONTACT: ID# '.$this->loser->getId().' will be merged into ID# '.$this->winner->getId());
 
@@ -148,6 +141,7 @@ class MergeModel
      * Merge timestamps.
      *
      * @return $this
+     *
      * @throws SameContactException
      * @throws MissingMergeSubjectException
      */
@@ -172,6 +166,7 @@ class MergeModel
      * Merge IP history into the winner.
      *
      * @return $this
+     *
      * @throws SameContactException
      * @throws MissingMergeSubjectException
      */
@@ -193,6 +188,7 @@ class MergeModel
      * Merge custom field data into winner.
      *
      * @return $this
+     *
      * @throws SameContactException
      * @throws MissingMergeSubjectException
      */
@@ -235,6 +231,7 @@ class MergeModel
      * Merge owners if the winner isn't already assigned an owner.
      *
      * @return $this
+     *
      * @throws SameContactException
      * @throws MissingMergeSubjectException
      */
@@ -258,6 +255,7 @@ class MergeModel
      * Sum points from both contacts.
      *
      * @return $this
+     *
      * @throws SameContactException
      * @throws MissingMergeSubjectException
      */
@@ -277,6 +275,7 @@ class MergeModel
      * Merge tags from loser into winner.
      *
      * @return $this
+     *
      * @throws SameContactException
      * @throws MissingMergeSubjectException
      */
@@ -296,6 +295,7 @@ class MergeModel
      * Merge past merge records into the winner.
      *
      * @return $this
+     *
      * @throws SameContactException
      * @throws MissingMergeSubjectException
      */

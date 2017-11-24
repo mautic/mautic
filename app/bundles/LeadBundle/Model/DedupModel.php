@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Exception\MissingMergeSubjectException;
+use Mautic\LeadBundle\Exception\SameContactException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -71,6 +72,7 @@ class DedupModel
      * @param OutputInterface|null $output
      *
      * @return int
+     *
      * @throws MissingMergeSubjectException
      */
     public function dedup($mergeNewerIntoOlder = false, OutputInterface $output = null)
@@ -98,14 +100,19 @@ class DedupModel
             if (count($duplicates) > 1) {
                 $loser = reset($duplicates);
                 while ($winner = next($duplicates)) {
-                    $this->mergeModel
-                        ->setLoser($loser)
-                        ->setWinner($winner)
-                        ->merge();
+                    try {
+                        $this->mergeModel
+                            ->setLoser($loser)
+                            ->setWinner($winner)
+                            ->merge();
 
-                    if ($progress) {
-                        // Advance the progress bar for the deleted contacts that are no longer in the total count
-                        $progress->advance();
+                        ++$dupCount;
+
+                        if ($progress) {
+                            // Advance the progress bar for the deleted contacts that are no longer in the total count
+                            $progress->advance();
+                        }
+                    } catch (SameContactException $exception) {
                     }
 
                     $loser = $winner;
