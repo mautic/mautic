@@ -22,7 +22,7 @@ class DateBuilderTest extends \PHPUnit_Framework_TestCase
 
         $schedulerEntity = new SchedulerEntity(true, SchedulerEnum::UNIT_DAILY, null, null);
 
-        $date = $dateBuilder->getNexEvent($schedulerEntity);
+        $date = $dateBuilder->getNextEvent($schedulerEntity);
 
         $expectedDate = (new \DateTime())->setTime(0, 0)->modify('+1 day');
         $this->assertEquals($expectedDate, $date);
@@ -45,7 +45,7 @@ class DateBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(NoScheduleException::class);
 
-        $dateBuilder->getNexEvent($schedulerEntity);
+        $dateBuilder->getNextEvent($schedulerEntity);
     }
 
     public function testSchedulerNotSupported()
@@ -65,7 +65,7 @@ class DateBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(NoScheduleException::class);
 
-        $dateBuilder->getNexEvent($schedulerEntity);
+        $dateBuilder->getNextEvent($schedulerEntity);
     }
 
     public function testNoResult()
@@ -85,6 +85,6 @@ class DateBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(NoScheduleException::class);
 
-        $dateBuilder->getNexEvent($schedulerEntity);
+        $dateBuilder->getNextEvent($schedulerEntity);
     }
 }
