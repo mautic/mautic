@@ -289,8 +289,11 @@ return [
                 'alias' => 'batch_send',
             ],
             'mautic.form.type.emailconfig' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\ConfigType',
-                'arguments' => ['translator'],
+                'class'     => \Mautic\EmailBundle\Form\Type\ConfigType::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.email.transport_type',
+                ],
                 'alias'     => 'emailconfig',
             ],
             'mautic.form.type.coreconfig_monitored_mailboxes' => [
@@ -525,6 +528,10 @@ return [
                     'mautic.message.search.contact',
                     'mautic.email.repository.stat',
                 ],
+            ],
+            'mautic.email.transport_type' => [
+                'class'     => \Mautic\EmailBundle\Model\TransportType::class,
+                'arguments' => [],
             ],
         ],
         'commands' => [
