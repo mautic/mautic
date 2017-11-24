@@ -188,8 +188,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->orWhere("strtolower(l.$col) = :".$col)
-                ->setParameter($col, strtolower($val));
+            $q->orWhere("l.$col = :".$col)
+                ->setParameter($col, $val);
         }
 
         // if we have a lead ID lets use it

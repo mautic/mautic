@@ -1529,20 +1529,20 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                         ++$created;
                     } else {
                         // Record was updated
-                    if ($integrationEntityId) {
-                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
-                        $integrationEntity->setLastSyncDate(new \DateTime());
-                    } else {
-                        // Found in Sugarcrm so create a new record for it
-                        $integrationEntity = new IntegrationEntity();
-                        $integrationEntity->setDateAdded(new \DateTime());
-                        $integrationEntity->setLastSyncDate(new \DateTime());
-                        $integrationEntity->setIntegration($this->getName());
-                        $integrationEntity->setIntegrationEntity($object);
-                        $integrationEntity->setIntegrationEntityId($item['id']);
-                        $integrationEntity->setInternalEntity('lead');
-                        $integrationEntity->setInternalEntityId($contactId);
-                    }
+                        if ($integrationEntityId) {
+                            $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                            $integrationEntity->setLastSyncDate(new \DateTime());
+                        } else {
+                            // Found in Sugarcrm so create a new record for it
+                            $integrationEntity = new IntegrationEntity();
+                            $integrationEntity->setDateAdded(new \DateTime());
+                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntity->setIntegration($this->getName());
+                            $integrationEntity->setIntegrationEntity($object);
+                            $integrationEntity->setIntegrationEntityId($item['id']);
+                            $integrationEntity->setInternalEntity('lead');
+                            $integrationEntity->setInternalEntityId($contactId);
+                        }
 
                         $persistEntities[] = $integrationEntity;
                         ++$updated;

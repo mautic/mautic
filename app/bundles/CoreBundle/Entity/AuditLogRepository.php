@@ -162,6 +162,7 @@ class AuditLogRepository extends CommonRepository
 
         return $query->getQuery()->getArrayResult();
     }
+
     /**
      * Get array of objects which belongs to the object.
      *
