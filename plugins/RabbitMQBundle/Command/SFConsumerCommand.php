@@ -129,7 +129,7 @@ class SFConsumerCommand extends ModeratedCommand
             $output->writeln("<info>[x] " . date("Y-m-d H:i:s") . " Received message from '" . $msg->delivery_info['routing_key'] . "': " . $msg->body . "</info>");
 
             // Decode the message.
-            $leadFields = json_decode(unserialize($msg->body), true);
+            $leadFields = json_decode($msg->body, true);
 
             // Check if the data is set.
             if(isset($leadFields['data'])){

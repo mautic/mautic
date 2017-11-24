@@ -126,7 +126,7 @@ class LeadSubscriber extends CommonSubscriber
         // exchange, type, passive, durable, auto_delete
         $channel->exchange_declare('kiazaki', 'direct', false, true, false);
 
-        $msg = new AMQPMessage(serialize($data));
+        $msg = new AMQPMessage($data);
 
         $channel->basic_publish($msg, 'kiazaki', 'mautic');
 

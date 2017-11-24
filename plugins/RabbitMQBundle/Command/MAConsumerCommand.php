@@ -99,7 +99,7 @@ class MAConsumerCommand extends ModeratedCommand
             $lead->setNewlyCreated(true);
 
             // Decode the message.
-            $leadFields = json_decode(unserialize($msg->body), true);
+            $leadFields = json_decode($msg->body, true);
 
             // Check if the data is set.
             if(isset($leadFields['data'])){
