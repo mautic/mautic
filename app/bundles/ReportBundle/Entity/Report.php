@@ -207,6 +207,7 @@ class Report extends FormEntity implements SchedulerInterface
                     'name',
                     'description',
                     'system',
+                    'isScheduled',
                 ]
             )
             ->addProperties(
@@ -218,6 +219,11 @@ class Report extends FormEntity implements SchedulerInterface
                     'graphs',
                     'groupBy',
                     'settings',
+                    'aggregators',
+                    'scheduleUnit',
+                    'toAddress',
+                    'scheduleDay',
+                    'scheduleMonthFrequency',
                 ]
             )
             ->build();
@@ -387,6 +393,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setTableOrder(array $tableOrder)
     {
+        $this->isChanged('tableOrder', $tableOrder);
+
         $this->tableOrder = $tableOrder;
     }
 
@@ -403,6 +411,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setGraphs(array $graphs)
     {
+        $this->isChanged('graphs', $graphs);
+
         $this->graphs = $graphs;
     }
 
@@ -419,6 +429,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setGroupBy(array $groupBy)
     {
+        $this->isChanged('groupBy', $groupBy);
+
         $this->groupBy = $groupBy;
     }
 
@@ -435,6 +447,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setAggregators(array $aggregators)
     {
+        $this->isChanged('aggregators', $aggregators);
+
         $this->aggregators = $aggregators;
     }
 
@@ -443,6 +457,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setSettings(array $settings)
     {
+        $this->isChanged('settings', $settings);
+
         $this->settings = $settings;
     }
 
@@ -467,6 +483,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setIsScheduled($isScheduled)
     {
+        $this->isChanged('isScheduled', $isScheduled);
+
         $this->isScheduled = $isScheduled;
     }
 
@@ -483,6 +501,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setToAddress($toAddress)
     {
+        $this->isChanged('toAddress', $toAddress);
+
         $this->toAddress = $toAddress;
     }
 
@@ -499,6 +519,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setScheduleUnit($scheduleUnit)
     {
+        $this->isChanged('scheduleUnit', $scheduleUnit);
+
         $this->scheduleUnit = $scheduleUnit;
     }
 
@@ -515,6 +537,8 @@ class Report extends FormEntity implements SchedulerInterface
      */
     public function setScheduleDay($scheduleDay)
     {
+        $this->isChanged('scheduleDay', $scheduleDay);
+
         $this->scheduleDay = $scheduleDay;
     }
 

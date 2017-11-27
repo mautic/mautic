@@ -51,7 +51,7 @@ class SchedulerPlanner
     private function planScheduler(Report $report)
     {
         try {
-            $date = $this->dateBuilder->getNexEvent($report);
+            $date = $this->dateBuilder->getNextEvent($report);
         } catch (NoScheduleException $e) {
             return;
         }
