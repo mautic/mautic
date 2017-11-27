@@ -61,6 +61,13 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
+
+        $lead = $event->getLead();
+        if ($lead->isAnonymous()) {
+            // Ignore this contact
+            return;
+        }
+
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
         if (false === $integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
@@ -68,7 +75,14 @@ class LeadSubscriber extends CommonSubscriber
         }
 
         $this->leadExport->setIntegration($integrationObject);
-        $this->leadExport->update($event->getLead());
+
+        $changes = $lead->getChanges(true);
+
+        if(!empty($changes['dateIdentified'])) {
+            $this->leadExport->create($event->getLead());
+        } else{
+            $this->leadExport->update($event->getLead());
+        }
     }
 
     /**
