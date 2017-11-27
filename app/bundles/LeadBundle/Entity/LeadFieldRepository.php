@@ -74,34 +74,6 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
-     *
-     * @return array
-     */
-    protected function addCatchAllWhereClause($q, $filter)
-    {
-        return $this->addStandardCatchAllWhereClause(
-            $q,
-            $filter,
-            [
-                'f.label',
-                'f.alias',
-            ]
-        );
-    }
-
-    /**
-     * @return string
-     */
-    protected function getDefaultOrder()
-    {
-        return [
-            ['f.order', 'ASC'],
-        ];
-    }
-
-    /**
      * Get field aliases for lead table columns.
      *
      * @param string $object name of object using the custom fields
@@ -218,7 +190,7 @@ class LeadFieldRepository extends CommonRepository
                             break;
                         case 'contains':
                             $operatorExpr    = 'like';
-                            $value = '%'.$value.'%';
+                            $value          = '%'.$value.'%';
                             break;
                     }
 
@@ -294,5 +266,33 @@ class LeadFieldRepository extends CommonRepository
         $result = $q->execute()->fetch();
 
         return !empty($result['id']);
+    }
+
+    /**
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
+     *
+     * @return array
+     */
+    protected function addCatchAllWhereClause($q, $filter)
+    {
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                'f.label',
+                'f.alias',
+            ]
+        );
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrder()
+    {
+        return [
+            ['f.order', 'ASC'],
+        ];
     }
 }
