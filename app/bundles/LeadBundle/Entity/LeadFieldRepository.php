@@ -206,6 +206,7 @@ class LeadFieldRepository extends CommonRepository
                         )
                     );
                 } else {
+
                     switch ($operatorExpr) {
                         case 'startsWith':
                             $operatorExpr    = 'like';
