@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -469,6 +470,11 @@ class PageModel extends FormModel
             // Lead came from a non-trackable IP so ignore
             return;
         }
+        $lead->setManipulator(new LeadManipulator(
+            'page',
+            'page',
+            $page->getId()
+        ));
         $this->leadModel->saveEntity($lead);
 
         $ipAddress                                 = $this->ipLookupHelper->getIpAddress();

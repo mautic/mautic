@@ -1007,8 +1007,9 @@ class SubmissionModel extends CommonFormModel
 
         //create a new lead
         $lead->setManipulator(new LeadManipulator(
-            'lead',
-            'form'
+            'form',
+            'submission',
+            $form->getId()
         ));
         $this->leadModel->saveEntity($lead, false);
 

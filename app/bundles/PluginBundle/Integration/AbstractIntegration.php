@@ -2046,8 +2046,8 @@ abstract class AbstractIntegration
             // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
             try {
                 $lead->setManipulator(new LeadManipulator(
-                    'lead',
-                    'integration'
+                    'plugin',
+                    $this->getName()
                 ));
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {

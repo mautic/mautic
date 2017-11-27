@@ -1913,7 +1913,7 @@ class LeadModel extends FormModel
         if ($persist) {
             $lead->setManipulator(new LeadManipulator(
                 'lead',
-                'import'
+                'lead'
             ));
             $this->saveEntity($lead);
 

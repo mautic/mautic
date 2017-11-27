@@ -629,7 +629,8 @@ class LeadController extends FormController
                     //form is valid so process the data
                     $lead->setManipulator(new LeadManipulator(
                         'lead',
-                        'lead'
+                        'lead',
+                        $objectId
                     ));
                     $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
                     $model->modifyCompanies($lead, $companies);
