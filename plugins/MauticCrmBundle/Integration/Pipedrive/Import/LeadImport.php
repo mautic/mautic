@@ -39,7 +39,6 @@ class LeadImport extends AbstractImport
 
         $lead->setDateAdded(new \DateTime());
         $lead->setPreferredProfileImage('gravatar');
-
         $this->em->getRepository(Lead::class)->saveEntity($lead);
 
         $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $data['id'], $lead->getId());
