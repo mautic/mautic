@@ -28,6 +28,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -1910,6 +1911,10 @@ class LeadModel extends FormModel
         }
 
         if ($persist) {
+            $lead->setManipulator(new LeadManipulator(
+                'lead',
+                'import'
+            ));
             $this->saveEntity($lead);
 
             if ($list !== null) {
@@ -2913,6 +2918,10 @@ class LeadModel extends FormModel
         if ($persist) {
             // Set to prevent loops
             $this->currentLead = $lead;
+            $lead->setManipulator(new LeadManipulator(
+                'lead',
+                'lead'
+            ));
             $this->saveEntity($lead, false);
 
             $fields = $this->getLeadDetails($lead);
