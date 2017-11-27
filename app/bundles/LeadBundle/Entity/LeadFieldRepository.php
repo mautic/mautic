@@ -216,8 +216,8 @@ class LeadFieldRepository extends CommonRepository
                             $value = '%'.$value;
                             break;
                         case 'contains':
-                            $operatorExpr    = 'like';
-                            $value = '%'.$value.'%';
+                            $operatorExpr   = 'like';
+                            $value          = '%'.$value.'%';
                             break;
                     }
 
