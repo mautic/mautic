@@ -13,6 +13,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -482,6 +483,10 @@ class HubspotIntegration extends CrmAbstractIntegration
             if ($persist && !empty($lead->getChanges(true))) {
                 // Only persist if instructed to do so as it could be that calling code needs to manipulate the lead prior to executing event listeners
                 try {
+                    $lead->setManipulator(new LeadManipulator(
+                        'lead',
+                        'hubspot'
+                    ));
                     $this->leadModel->saveEntity($lead, false);
                     if (isset($company)) {
                         $this->leadModel->addToCompany($lead, $company);
