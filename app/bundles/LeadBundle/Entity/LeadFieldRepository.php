@@ -220,6 +220,7 @@ class LeadFieldRepository extends CommonRepository
                             $value = '%'.$value.'%';
                             break;
                     }
+
                     $expr->add(
                         $q->expr()->$operatorExpr('l.'.$field, ':value')
                     );
