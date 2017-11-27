@@ -472,7 +472,7 @@ class PageModel extends FormModel
         }
         $lead->setManipulator(new LeadManipulator(
             'page',
-            'page',
+            $page instanceof Page ? 'page' : 'redirect',
             $page->getId()
         ));
         $this->leadModel->saveEntity($lead);
