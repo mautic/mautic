@@ -238,6 +238,54 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
+     * @param Lead $template
+     *
+     * @return Lead[]
+     */
+    public function getSimilarLeads(Lead $template)
+    {
+        $uniqueFields = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('lf.alias')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'lf')
+            ->andWhere('lf.isPublished = 1')
+            ->andWhere('lf.isUniqueIdentifer = 1')
+            ->andWhere('lf.object = :object')
+            ->setParameter('object', 'lead')
+            ->execute()->fetchAll();
+        $uniqueFields = array_column($uniqueFields, 'alias');
+        $q            = $this->getEntityManager()->createQueryBuilder()
+            ->select('l')
+            ->from('MauticLeadBundle:Lead', 'l');
+        foreach ($uniqueFields as $uniqueField) {
+            $uniqueFieldExploded = explode('_', $uniqueField);
+            $getterName          = 'get'.implode('', array_map(function ($value) {
+                return ucfirst($value);
+            }, $uniqueFieldExploded));
+            $q->orWhere('l.'.$uniqueField.' = :'.$uniqueField)
+                ->setParameter($uniqueField, $template->$getterName());
+        }
+        if (is_int($template->getId())) {
+            $q->andWhere('l.id = :id')
+                ->setParameter('id', $template->getId());
+        }
+        $q->orderBy('l.dateAdded', 'DESC');
+        /** @var Lead[] $leads */
+        $leads = $q->getQuery()->getResult();
+        // TODO: Figure out why is this here
+        foreach ($leads as $lead) {
+            $lead->setAvailableSocialFields($this->availableSocialFields);
+            if (!empty($this->triggerModel)) {
+                $lead->setColor($this->triggerModel->getColorForLeadPoints($lead->getPoints()));
+            }
+            $lead->setFields(
+                $this->formatFieldValues($lead->convertToArray())
+            );
+        }
+
+        return $leads;
+    }
+
+    /**
      * Get list of lead Ids by unique field data.
      *
      * @param $uniqueFieldsWithData is an array of columns & values to filter by

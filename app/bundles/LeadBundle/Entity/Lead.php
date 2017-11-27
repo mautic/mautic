@@ -685,11 +685,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Get ipAddresses.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return IpAddress[]
      */
     public function getIpAddresses()
     {
-        return $this->ipAddresses;
+        return $this->ipAddresses->toArray();
     }
 
     /**
@@ -753,8 +753,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             return $this->getEmail();
         } elseif ($socialIdentity = $this->getFirstSocialIdentity()) {
             return $socialIdentity;
-        } elseif (count($ips = $this->getIpAddresses())) {
-            return $ips->first()->getIpAddress();
+        } elseif (count($ips = $this->getIpAddresses()) !== 0) {
+            return reset($ips)->getIpAddress();
         } else {
             return 'mautic.lead.lead.anonymous';
         }
@@ -1227,7 +1227,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Get social cache.
      *
-     * @return mixed
+     * @return array
      */
     public function getSocialCache()
     {

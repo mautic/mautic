@@ -141,7 +141,7 @@ class IpAddress
     /**
      * Get ipDetails.
      *
-     * @return string
+     * @return array
      */
     public function getIpDetails()
     {

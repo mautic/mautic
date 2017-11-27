@@ -465,7 +465,7 @@ class LeadModel extends FormModel
 
         //check to see if we can glean information from ip address
         if (!$entity->imported && count($ips = $entity->getIpAddresses())) {
-            $details = $ips->first()->getIpDetails();
+            $details = reset($ips)->getIpDetails();
             // Only update with IP details if none of the following are set to prevent wrong combinations
             if (empty($fields['core']['city']['value']) && empty($fields['core']['state']['value']) && empty($fields['core']['country']['value']) && empty($fields['core']['zipcode']['value'])) {
                 if (!empty($details['city'])) {

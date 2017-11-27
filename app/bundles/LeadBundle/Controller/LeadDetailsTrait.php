@@ -156,23 +156,22 @@ trait LeadDetailsTrait
     protected function getPlaces(Lead $lead)
     {
         // Get Places from IP addresses
-        $places = [];
-        if ($lead->getIpAddresses()) {
-            foreach ($lead->getIpAddresses() as $ip) {
-                if ($details = $ip->getIpDetails()) {
-                    if (!empty($details['latitude']) && !empty($details['longitude'])) {
-                        $name = 'N/A';
-                        if (!empty($details['city'])) {
-                            $name = $details['city'];
-                        } elseif (!empty($details['region'])) {
-                            $name = $details['region'];
-                        }
-                        $place = [
-                            'latLng' => [$details['latitude'], $details['longitude']],
-                            'name'   => $name,
-                        ];
-                        $places[] = $place;
+        $places      = [];
+        $ipAddresses = $lead->getIpAddresses();
+        foreach ($ipAddresses as $ip) {
+            if ($details = $ip->getIpDetails()) {
+                if (!empty($details['latitude']) && !empty($details['longitude'])) {
+                    $name = 'N/A';
+                    if (!empty($details['city'])) {
+                        $name = $details['city'];
+                    } elseif (!empty($details['region'])) {
+                        $name = $details['region'];
                     }
+                    $place = [
+                        'latLng' => [$details['latitude'], $details['longitude']],
+                        'name'   => $name,
+                    ];
+                    $places[] = $place;
                 }
             }
         }

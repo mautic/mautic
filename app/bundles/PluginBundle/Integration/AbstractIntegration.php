@@ -23,7 +23,9 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadArrayMapper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\LeadProviderModel;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
@@ -134,6 +136,12 @@ abstract class AbstractIntegration
      */
     protected $leadModel;
 
+    /** @var LeadArrayMapper */
+    protected $leadArrayMapper;
+
+    /** @var LeadProviderModel */
+    protected $leadProviderModel;
+
     /**
      * @var CompanyModel
      */
@@ -224,6 +232,8 @@ abstract class AbstractIntegration
             $this->logger                 = $factory->getLogger();
             $this->encryptionHelper       = $factory->getHelper('encryption');
             $this->leadModel              = $factory->getModel('lead');
+            $this->leadArrayMapper        = $factory->getModel('lead.arrayMapper');
+            $this->leadProviderModel      = $factory->getModel('lead.provider');
             $this->companyModel           = $factory->getModel('lead.company');
             $this->pathsHelper            = $factory->getHelper('paths');
             $this->notificationModel      = $factory->getModel('core.notification');
@@ -2010,6 +2020,15 @@ abstract class AbstractIntegration
         if (empty($matchedFields)) {
             return;
         }
+        if (is_array($socialCache)) {
+            $matchedFields['social_cache'] = [$this->getName() => $socialCache];
+        }
+        if (isset($data['internal'])) {
+            $matchedFields['internal'] = [$this->getName() => $data['internal']];
+        }
+        $mappedLead   = $this->leadArrayMapper->getLeadFromArray($matchedFields);
+        $returnedLead = $this->leadProviderModel->getLeadByTemplate($mappedLead);
+        // return $returnedLead;
 
         // Find unique identifier fields used by the integration
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */

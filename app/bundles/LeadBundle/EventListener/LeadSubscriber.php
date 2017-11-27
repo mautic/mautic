@@ -352,7 +352,7 @@ class LeadSubscriber extends CommonSubscriber
             $event->addToCounter($eventTypeKey, $rows);
 
             // Add the entries to the event array
-            $ipAddresses = ($lead instanceof Lead) ? $lead->getIpAddresses()->toArray() : null;
+            $ipAddresses = ($lead instanceof Lead) ? $lead->getIpAddresses() : null;
 
             foreach ($rows['results'] as $row) {
                 if ($ipAddresses !== null && !isset($ipAddresses[$row['ip_address']])) {
