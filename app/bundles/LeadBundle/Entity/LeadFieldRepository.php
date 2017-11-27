@@ -206,7 +206,6 @@ class LeadFieldRepository extends CommonRepository
                         )
                     );
                 } else {
-
                     switch ($operatorExpr) {
                         case 'startsWith':
                             $operatorExpr    = 'like';
@@ -221,8 +220,6 @@ class LeadFieldRepository extends CommonRepository
                             $value = '%'.$value.'%';
                             break;
                     }
-
-
                     $expr->add(
                         $q->expr()->$operatorExpr('l.'.$field, ':value')
                     );
