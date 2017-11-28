@@ -156,12 +156,9 @@ class UserProvider implements UserProviderInterface
         $isNew = !$user->getId();
 
         if ($isNew) {
-            try {
-                $user = $this->findUser($user);
-            } catch (UsernameNotFoundException $exception) {
-                if (!$createIfNotExists) {
-                    throw new BadCredentialsException();
-                }
+            $user = $this->findUser($user);
+            if (!$user->getId() && !$createIfNotExists) {
+                throw new BadCredentialsException();
             }
         }
 
@@ -233,6 +230,6 @@ class UserProvider implements UserProviderInterface
             }
         }
 
-        throw new UsernameNotFoundException();
+        return $user;
     }
 }
