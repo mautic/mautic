@@ -818,7 +818,6 @@ class PageModel extends FormModel
 
                 // if additional data were sent with the tracking pixel
                 if (isset($query)) {
-
                     // URL attr 'd' is encoded so let's decode it first.
                     $decoded = false;
                     if (isset($query['d'])) {

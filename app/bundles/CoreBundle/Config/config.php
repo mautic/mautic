@@ -9,12 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Mautic\CoreBundle\Helper\FilePathResolver;
-use Mautic\CoreBundle\Helper\FileUploader;
-use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Validator\FileUploadValidator;
-use Symfony\Component\Filesystem\Filesystem;
-
 return [
     'routes' => [
         'main' => [
@@ -400,13 +394,16 @@ return [
             ],
         ],
         'helpers' => [
+            'mautic.helper.app_version' => [
+                'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
+            ],
             'mautic.helper.template.menu' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\MenuHelper',
                 'arguments' => ['knp_menu.helper'],
                 'alias'     => 'menu',
             ],
             'mautic.helper.template.date' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\DateHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\DateHelper::class,
                 'arguments' => [
                     '%mautic.date_format_full%',
                     '%mautic.date_format_short%',
@@ -464,9 +461,20 @@ return [
                 'alias' => 'content',
             ],
             'mautic.helper.template.formatter' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\FormatterHelper',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'formatter',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\FormatterHelper::class,
+                'arguments' => [
+                    'mautic.helper.app_version',
+                    'mautic.helper.template.date',
+                    'translator',
+                ],
+                'alias' => 'formatter',
+            ],
+            'mautic.helper.template.version' => [
+                'class'     => \Mautic\CoreBundle\Templating\Helper\VersionHelper::class,
+                'arguments' => [
+                    'mautic.helper.app_version',
+                ],
+                'alias' => 'version',
             ],
             'mautic.helper.template.security' => [
                 'class'     => 'Mautic\CoreBundle\Templating\Helper\SecurityHelper',
@@ -517,20 +525,23 @@ return [
                 'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
             ],
             'mautic.helper.input_helper' => [
-                'class' => InputHelper::class,
+                'class' => \Mautic\CoreBundle\Helper\InputHelper::class,
             ],
             'mautic.helper.file_uploader' => [
-                'class'     => FileUploader::class,
+                'class'     => \Mautic\CoreBundle\Helper\FileUploader::class,
                 'arguments' => [
                     'mautic.helper.file_path_resolver',
                 ],
             ],
             'mautic.helper.file_path_resolver' => [
-                'class'     => FilePathResolver::class,
+                'class'     => \Mautic\CoreBundle\Helper\FilePathResolver::class,
                 'arguments' => [
                     'symfony.filesystem',
                     'mautic.helper.input_helper',
                 ],
+            ],
+            'mautic.helper.file_properties' => [
+                'class' => \Mautic\CoreBundle\Helper\FileProperties::class,
             ],
         ],
         'menus' => [
@@ -558,7 +569,7 @@ return [
         ],
         'other' => [
             'symfony.filesystem' => [
-                'class' => Filesystem::class,
+                'class' => \Symfony\Component\Filesystem\Filesystem::class,
             ],
 
             // Error handler
@@ -884,7 +895,7 @@ return [
         ],
         'validator' => [
             'mautic.core.validator.file_upload' => [
-                'class'     => FileUploadValidator::class,
+                'class'     => \Mautic\CoreBundle\Validator\FileUploadValidator::class,
                 'arguments' => [
                     'translator',
                 ],

@@ -36,7 +36,6 @@ class TriggerController extends FormController
             'point:triggers:edit',
             'point:triggers:delete',
             'point:triggers:publish',
-
         ], 'RETURN_ARRAY');
 
         if (!$permissions['point:triggers:view']) {

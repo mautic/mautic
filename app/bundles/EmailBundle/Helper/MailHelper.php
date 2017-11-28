@@ -355,7 +355,7 @@ class MailHelper
         } // from is set in flushQueue
 
         // Set system return path if applicable
-        if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail($this->idHash))) {
+        if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->setReturnPath($bounceEmail);
         } elseif (!empty($this->returnPath)) {
             $this->message->setReturnPath($this->returnPath);
@@ -501,7 +501,6 @@ class MailHelper
     public function queue($dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
     {
         if ($this->tokenizationEnabled) {
-
             // Dispatch event to get custom tokens from listeners
             if ($dispatchSendEvent) {
                 $this->dispatchSendEvent();
@@ -1930,8 +1929,8 @@ class MailHelper
             // Append the bounce notation
             list($email, $domain) = explode('@', $settings['address']);
             $email .= '+bounce';
-            if ($idHash) {
-                $email .= '_'.$this->idHash;
+            if ($idHash || $this->idHash) {
+                $email .= '_'.($idHash ?: $this->idHash);
             }
             $monitoredEmail = $email.'@'.$domain;
         }
@@ -1954,8 +1953,8 @@ class MailHelper
             // Append the bounce notation
             list($email, $domain) = explode('@', $settings['address']);
             $email .= '+unsubscribe';
-            if ($idHash) {
-                $email .= '_'.$this->idHash;
+            if ($idHash || $this->idHash) {
+                $email .= '_'.($idHash ?: $this->idHash);
             }
             $monitoredEmail = $email.'@'.$domain;
         }

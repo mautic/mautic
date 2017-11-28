@@ -232,6 +232,7 @@ class LeadModel extends FormModel
         static $repoSetup;
 
         $repo = $this->em->getRepository('MauticLeadBundle:Lead');
+        $repo->setDispatcher($this->dispatcher);
 
         if (!$repoSetup) {
             $repoSetup = true;
@@ -542,6 +543,14 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Clear all Lead entities.
+     */
+    public function clearEntities()
+    {
+        $this->getRepository()->clear();
+    }
+
+    /**
      * Populates custom field values for updating the lead. Also retrieves social media data.
      *
      * @param Lead       $lead
@@ -672,7 +681,6 @@ class LeadModel extends FormModel
                             if (!empty($socialFeatureSettings[$service]['leadFields'])
                                 && in_array($field['alias'], $socialFeatureSettings[$service]['leadFields'])
                             ) {
-
                                 //check to see if the data is available
                                 $key = array_search($field['alias'], $socialFeatureSettings[$service]['leadFields']);
                                 if (isset($details['profile'][$key])) {
@@ -1042,13 +1050,16 @@ class LeadModel extends FormModel
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
         if (null == $this->availableLeadFields) {
+            $filter = ['isPublished' => true];
+
+            if ($onlyPubliclyUpdateable) {
+                $filter['isPubliclyUpdatable'] = true;
+            }
+
             $this->availableLeadFields = $this->leadFieldModel->getFieldList(
                 false,
                 false,
-                [
-                    'isPublished'         => true,
-                    'isPubliclyUpdatable' => $onlyPubliclyUpdateable,
-                ]
+                $filter
             );
         }
 
@@ -1279,6 +1290,7 @@ class LeadModel extends FormModel
     {
         $this->leadListModel->removeLead($lead, $lists, $manuallyRemoved);
     }
+
     /**
      * Add lead to Stage.
      *
@@ -1885,7 +1897,6 @@ class LeadModel extends FormModel
                 // Skip if the value is in the CSV row
                 continue;
             } elseif ($leadField['defaultValue']) {
-
                 // Fill in the default value if any
                 $fieldData[$leadField['alias']] = ('multiselect' === $leadField['type']) ? [$leadField['defaultValue']] : $leadField['defaultValue'];
             }
@@ -1962,10 +1973,9 @@ class LeadModel extends FormModel
                         $this->em->getReference('MauticLeadBundle:Tag', $tag)
                     );
                 } else {
-                    // New tag
-                    $newTag = new Tag();
-                    $newTag->setTag(InputHelper::clean($tag));
-                    $lead->addTag($newTag);
+                    $lead->addTag(
+                        $this->getTagRepository()->getTagByNameOrCreateNewOne($tag)
+                    );
                 }
             }
             $leadModified = true;
@@ -2149,8 +2159,7 @@ class LeadModel extends FormModel
                 $tagToBeAdded = null;
 
                 if (!array_key_exists($tag, $foundTags)) {
-                    $tagToBeAdded = new Tag();
-                    $tagToBeAdded->setTag($tag);
+                    $tagToBeAdded = new Tag($tag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $tagToBeAdded = $foundTags[$tag];
                 }
@@ -2835,11 +2844,12 @@ class LeadModel extends FormModel
      * @param int          $reason             Must be a class constant from the DoNotContact class
      * @param bool         $persist
      * @param bool         $checkCurrentStatus
+     * @param bool         $override
      *
      * @return bool|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
      *                           and has the specified reason, nothing is done and this returns false
      */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true)
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = false)
     {
         // if !$checkCurrentStatus, assume is contactable due to already being valided
         $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DoNotContact::IS_CONTACTABLE;
@@ -2875,7 +2885,10 @@ class LeadModel extends FormModel
             /** @var DoNotContact $dnc */
             foreach ($lead->getDoNotContact() as $dnc) {
                 // Only update if the contact did not unsubscribe themselves
-                if ($dnc->getChannel() === $channel && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
+                if (!$override && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
+                    $override = true;
+                }
+                if ($dnc->getChannel() === $channel && $override) {
                     // Remove the outdated entry
                     $lead->removeDoNotContactEntry($dnc);
 

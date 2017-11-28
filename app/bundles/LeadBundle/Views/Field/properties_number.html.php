@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use \Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
+use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 
 $roundMode = (isset($roundMode)) ? $roundMode : '';
 $precision = (isset($precision)) ? $precision : '';

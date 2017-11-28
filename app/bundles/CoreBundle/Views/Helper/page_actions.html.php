@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 if (!isset($item)) {
     $item = null;

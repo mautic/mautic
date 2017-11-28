@@ -57,7 +57,6 @@ class LeadSubscriber extends CommonSubscriber
         $event->addToCounter($eventTypeKey, $stats);
 
         if (!$event->isEngagementCount()) {
-
             // Add the events to the event array
             foreach ($stats['results'] as $stat) {
                 $contactId = $stat['lead_id'];

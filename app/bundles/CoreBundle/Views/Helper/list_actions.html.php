@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-use \Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_LIST_ACTIONS, ButtonHelper::TYPE_DROPDOWN, $item);
 include 'action_button_helper.php';

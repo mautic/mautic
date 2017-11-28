@@ -1179,6 +1179,7 @@ class LeadController extends FormController
             ]
         );
     }
+
     /**
      * Add/remove lead from a company.
      *

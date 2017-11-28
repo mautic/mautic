@@ -148,6 +148,16 @@ final class LeadEvents
     const LEAD_IDENTIFIED = 'mautic.lead_identified';
 
     /**
+     * The mautic.lead_build_search_commands event is dispatched when the search commands are built.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadBuildSearchEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_BUILD_SEARCH_COMMANDS = 'mautic.lead_build_search_commands';
+
+    /**
      * The mautic.current_lead_changed event is dispatched when the current lead is changed to another such as when
      * a new lead is created from a form submit.  This gives opportunity to update session data if applicable.
      *
@@ -377,6 +387,46 @@ final class LeadEvents
      * @var string
      */
     const DEVICE_POST_DELETE = 'mautic.lead_device_post_delete';
+
+    /**
+     * The mautic.lead_tag_pre_save event is dispatched right before a lead tag is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagEvent instance.
+     *
+     * @var string
+     */
+    const TAG_PRE_SAVE = 'mautic.lead_tag_pre_save';
+
+    /**
+     * The mautic.lead_tag_post_save event is dispatched right after a lead tag is persisted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagEvent instance.
+     *
+     * @var string
+     */
+    const TAG_POST_SAVE = 'mautic.lead_tag_post_save';
+
+    /**
+     * The mautic.lead_tag_pre_delete event is dispatched before a lead tag is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagEvent instance.
+     *
+     * @var string
+     */
+    const TAG_PRE_DELETE = 'mautic.lead_tag_pre_delete';
+
+    /**
+     * The mautic.lead_tag_post_delete event is dispatched after a lead tag is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagEvent instance.
+     *
+     * @var string
+     */
+    const TAG_POST_DELETE = 'mautic.lead_tag_post_delete';
 
     /**
      * The mautic.filter_choice_fields event is dispatched when the list filter dropdown is populated.

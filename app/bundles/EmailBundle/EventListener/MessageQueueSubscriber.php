@@ -88,16 +88,16 @@ class MessageQueueSubscriber extends CommonSubscriber
             $options['resend_message_queue'] = $messagesByContact;
             $errors                          = $this->emailModel->sendEmail($email, $sendTo, $options);
 
-                // Let's see who was successful
-                foreach ($messagesByContact as $contactId => $message) {
-                    // If the message is processed, it was rescheduled by sendEmail
-                    if (!$message->isProcessed()) {
-                        $message->setProcessed();
-                        if (empty($errors[$contactId])) {
-                            $message->setSuccess();
-                        }
+            // Let's see who was successful
+            foreach ($messagesByContact as $contactId => $message) {
+                // If the message is processed, it was rescheduled by sendEmail
+                if (!$message->isProcessed()) {
+                    $message->setProcessed();
+                    if (empty($errors[$contactId])) {
+                        $message->setSuccess();
                     }
                 }
+            }
         }
 
         $event->stopPropagation();

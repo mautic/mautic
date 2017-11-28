@@ -244,6 +244,24 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add IP left join with lead join.
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param string       $ipXrefPrefix
+     * @param string       $ipPrefix
+     * @param string       $leadPrefix
+     *
+     * @return $this
+     */
+    public function addLeadIpAddressLeftJoin(QueryBuilder $queryBuilder, $ipXrefPrefix = 'lip', $ipPrefix = 'i', $leadPrefix = 'l')
+    {
+        $this->addIpAddressLeftJoin($queryBuilder, $ipXrefPrefix, $ipPrefix);
+        $queryBuilder->leftJoin($leadPrefix, MAUTIC_TABLE_PREFIX.'lead_ips_xref', $ipXrefPrefix, $ipXrefPrefix.'.lead_id = '.$leadPrefix.'.id');
+
+        return $this;
+    }
+
+    /**
      * Add IP left join.
      *
      * @param QueryBuilder $queryBuilder
@@ -310,6 +328,17 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
+     * Add company left join.
+     *
+     * @param QueryBuilder $queryBuilder
+     */
+    public function addCompanyLeftJoin(QueryBuilder $queryBuilder)
+    {
+        $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
+        $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
+    }
+
+    /**
      * Apply date filters to the query.
      *
      * @param QueryBuilder $queryBuilder
@@ -357,7 +386,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         static $sorted;
 
-        if (null == $sorted) {
+        if (null === $sorted) {
             $columns = $this->getReport()->getColumns();
 
             foreach ($columns as $field) {

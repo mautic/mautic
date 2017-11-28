@@ -67,7 +67,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array|bool
      */
-    public function pushLead($lead,  $config = [])
+    public function pushLead($lead, $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -99,7 +99,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param array $params
      */
-    public function getLeads($params, $query, &$executed, $result = [],  $object = 'Lead')
+    public function getLeads($params, $query, &$executed, $result = [], $object = 'Lead')
     {
         $executed = null;
 
@@ -409,6 +409,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         $leadFields = $this->cleanPriorityFields($config, $object);
         if (!$lead->isNewlyCreated()) {
+            $params = $this->commandParameters;
+
+            $this->getLeadDoNotContactByDate('email', $matchedFields, $object, $lead, $data, $params);
+
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
             if (empty($fieldsToUpdateInMautic)) {
