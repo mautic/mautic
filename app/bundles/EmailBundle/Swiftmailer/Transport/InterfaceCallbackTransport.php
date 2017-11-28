@@ -15,7 +15,7 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Interface InterfaceCallbackTransport
+ * Interface InterfaceCallbackTransport.
  */
 interface InterfaceCallbackTransport
 {
