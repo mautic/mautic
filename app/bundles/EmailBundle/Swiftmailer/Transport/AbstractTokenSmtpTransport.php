@@ -24,11 +24,6 @@ abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implement
     protected $message;
 
     /**
-     * @var MauticFactory
-     */
-    protected $factory;
-
-    /**
      * Do whatever is necessary to $this->message in order to deliver a batched payload. i.e. add custom headers, etc.
      */
     abstract protected function prepareMessage();
@@ -68,13 +63,5 @@ abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implement
     public function getAttachments()
     {
         return ($this->message instanceof MauticMessage) ? $this->message->getAttachments() : [];
-    }
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function setMauticFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
     }
 }

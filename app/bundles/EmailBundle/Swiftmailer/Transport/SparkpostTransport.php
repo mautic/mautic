@@ -15,42 +15,43 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use GuzzleHttp\Client;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use SparkPost\SparkPost;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Class SparkpostTransport
- * The referrence class for this was provided by.
+ * Class SparkpostTransport.
  */
-class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, InterfaceCallbackTransport
+class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
     /**
      * @var string|null
      */
-    protected $apiKey;
-
-    /**
-     * @var MauticFactory
-     */
-    protected $factory;
+    private $apiKey;
 
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
+
+    /**
+     * @var TransportCallback
+     */
+    private $transportCallback;
 
     /**
      * SparkpostTransport constructor.
      *
      * @param $apiKey
      */
-    public function __construct($apiKey, TranslatorInterface $translator)
+    public function __construct($apiKey, TranslatorInterface $translator, TransportCallback $transportCallback)
     {
         $this->setApiKey($apiKey);
-        $this->translator = $translator;
+
+        $this->translator        = $translator;
+        $this->transportCallback = $transportCallback;
     }
 
     /**
@@ -85,8 +86,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * @return SparkPost
-     *
-     * @throws \Swift_TransportException
      */
     protected function createSparkPost()
     {
@@ -119,8 +118,10 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
             $response = $response->wait();
             if (200 == (int) $response->getStatusCode()) {
-                $results   = $response->getBody();
-                $sendCount = $results['results']['total_accepted_recipients'];
+                $results = $response->getBody();
+                if (!$sendCount = $results['results']['total_accepted_recipients']) {
+                    $this->processImmediateSendFeedback($sparkPostMessage, $results);
+                }
             }
         } catch (\Exception $e) {
             $this->throwException($e->getMessage());
@@ -144,8 +145,6 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      * @param \Swift_Mime_Message $message
      *
      * @return array SparkPost Send Message
-     *
-     * @throws \Swift_SwiftException
      */
     public function getSparkPostMessage(\Swift_Mime_Message $message)
     {
@@ -154,7 +153,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
 
         $this->message = $message;
         $metadata      = $this->getMetadata();
-        $mauticTokens  = $mergeVars  = $mergeVarPlaceholders  = [];
+        $mauticTokens  = $mergeVars = $mergeVarPlaceholders = [];
 
         // Sparkpost uses {{ name }} for tokens so Mautic's need to be converted; although using their {{{ }}} syntax to prevent HTML escaping
         if (!empty($metadata)) {
@@ -220,7 +219,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         $content = [
-            'from' => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
+            'from'    => (!empty($message['from']['name'])) ? $message['from']['name'].' <'.$message['from']['email'].'>'
                 : $message['from']['email'],
             'subject' => $message['subject'],
         ];
@@ -313,25 +312,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
     /**
      * Handle response.
      *
-     * @param Request       $request
-     * @param MauticFactory $factory
-     *
-     * @return array array('bounces' => array('hashID' => 'reason', ...));
+     * @param Request $request
      */
-    public function handleCallbackResponse(Request $request, MauticFactory $factory)
+    public function processCallbackRequest(Request $request)
     {
         $payload = $request->request->all();
-
-        $rows = [
-            DoNotContact::BOUNCED => [
-                'hashIds' => [],
-                'emails'  => [],
-            ],
-            DoNotContact::UNSUBSCRIBED => [
-                'hashIds' => [],
-                'emails'  => [],
-            ],
-        ];
 
         foreach ($payload as $msys) {
             $msys = $msys['msys'];
@@ -360,23 +345,42 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 case 'bounce':
                     // Only parse hard bounces - https://support.sparkpost.com/customer/portal/articles/1929896-bounce-classification-codes
                     if (in_array((int) $event['bounce_class'], [10, 30, 50, 51, 52, 53, 54, 90])) {
-                        $rows[DoNotContact::BOUNCED]['hashIds'][$hashId] = $event['raw_reason'];
+                        $this->transportCallback->addFailureByHashId($hashId, $event['raw_reason']);
                     }
                     break;
                 case 'spam_complaint':
-                    $rows[DoNotContact::BOUNCED]['hashIds'][$hashId] = $event['fbtype'];
+                    $this->transportCallback->addFailureByHashId($hashId, $event['fbtype']);
+
                     break;
                 case 'out_of_band':
                 case 'policy_rejection':
-                    $rows[DoNotContact::BOUNCED]['hashIds'][$hashId] = $event['raw_reason'];
+                    $this->transportCallback->addFailureByHashId($hashId, $event['raw_reason']);
                     break;
                 case 'list_unsubscribe':
                 case 'link_unsubscribe':
-                    $rows[DoNotContact::UNSUBSCRIBED]['hashIds'][$hashId] = 'unsubscribed';
+                    $this->transportCallback->addFailureByHashId($hashId, 'unsubscribed', DoNotContact::UNSUBSCRIBED);
                     break;
             }
         }
+    }
 
-        return $rows;
+    /**
+     * Check for SparkPost rejection as they will not send a webhook for a single recipient rejected immediately.
+     *
+     * @param array $message
+     * @param array $response
+     */
+    protected function processImmediateSendFeedback(array $message, array $response)
+    {
+        if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
+            $comments     = $response['errors'][0]['description'];
+            $emailAddress = $message['recipients']['to'][0]['email'];
+            $metadata     = $this->getMetadata();
+
+            if (isset($metadata[$emailAddress]) && isset($metadata[$emailAddress]['leadId'])) {
+                $emailId = (!empty($metadata[$emailAddress]['emailId'])) ? $metadata[$emailAddress]['emailId'] : null;
+                $this->transportCallback->addFailureByContactId($metadata[$emailAddress]['leadId'], $comments, DoNotContact::BOUNCED, $emailId);
+            }
+        }
     }
 }

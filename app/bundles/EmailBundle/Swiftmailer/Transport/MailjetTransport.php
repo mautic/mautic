@@ -11,31 +11,52 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class MailjetlTransport.
  */
-class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
+class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransportInterface
 {
+    /**
+     * @var bool
+     */
     private $sandboxMode;
 
+    /**
+     * @var string
+     */
     private $sandboxMail;
+
+    /**
+     * @var TransportCallback
+     */
+    private $transportCallback;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct($host = 'localhost', $port = 25, $security = null, $sandboxMode = false, $sandboxMail = '')
+    public function __construct(TransportCallback $transportCallback, $sandboxMode = false, $sandboxMail = '')
     {
         parent::__construct('in-v3.mailjet.com', 587, 'tls');
         $this->setAuthMode('login');
 
         $this->setSandboxMode($sandboxMode);
         $this->setSandboxMail($sandboxMail);
+
+        $this->transportCallback = $transportCallback;
     }
 
+    /**
+     * @param \Swift_Mime_Message $message
+     * @param null                $failedRecipients
+     *
+     * @return int|void
+     *
+     * @throws \Exception
+     */
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
         // add leadIdHash to track this email
@@ -65,24 +86,13 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
     /**
      * Handle response.
      *
-     * @param Request       $request
-     * @param MauticFactory $factory
+     * @param Request $request
      *
      * @return mixed
      */
-    public function handleCallbackResponse(Request $request, MauticFactory $factory)
+    public function processCallbackRequest(Request $request)
     {
         $postData = json_decode($request->getContent(), true);
-        $rows     = [
-            DoNotContact::BOUNCED => [
-                'hashIds' => [],
-                'emails'  => [],
-            ],
-            DoNotContact::UNSUBSCRIBED => [
-                'hashIds' => [],
-                'emails'  => [],
-            ],
-        ];
 
         if (is_array($postData) && isset($postData['event'])) {
             // Mailjet API callback V1
@@ -113,19 +123,20 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
                 } elseif ($event['event'] === 'unsub') {
                     $reason = 'User unsubscribed';
                     $type   = DoNotContact::UNSUBSCRIBED;
+                } else {
+                    continue;
                 }
+
                 if (isset($event['CustomID']) && $event['CustomID'] !== '' && strpos($event['CustomID'], '-', 0) !== false) {
                     list($leadIdHash, $leadEmail) = explode('-', $event['CustomID']);
                     if ($event['email'] == $leadEmail) {
-                        $rows[$type]['hashIds'][$leadIdHash] = $reason;
+                        $this->transportCallback->addFailureByHashId($leadIdHash, $reason, $type);
                     }
                 } else {
-                    $rows[$type]['emails'][$event['email']] = $reason;
+                    $this->transportCallback->addFailureByAddress($event['email'], $reason, $type);
                 }
             }
         }
-
-        return $rows;
     }
 
     /**
