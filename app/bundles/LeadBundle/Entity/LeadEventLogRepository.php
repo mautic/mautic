@@ -116,6 +116,21 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
+     * Updates lead ID (e.g. after a lead merge).
+     *
+     * @param int $fromLeadId
+     * @param int $toLeadId
+     */
+    public function updateLead($fromLeadId, $toLeadId)
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'lead_event_log')
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
+            ->execute();
+    }
+
+    /**
      * Defines default table alias for lead_event_log table.
      *
      * @return string

@@ -58,6 +58,7 @@ class LeadSubscriber extends CommonSubscriber
         return [
             LeadEvents::LEAD_POST_SAVE       => ['onLeadPostSave', 0],
             LeadEvents::LEAD_POST_DELETE     => ['onLeadDelete', 0],
+            LeadEvents::LEAD_PRE_MERGE       => ['preLeadMerge', 0],
             LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
             LeadEvents::FIELD_POST_SAVE      => ['onFieldPostSave', 0],
             LeadEvents::FIELD_POST_DELETE    => ['onFieldDelete', 0],
@@ -245,6 +246,17 @@ class LeadSubscriber extends CommonSubscriber
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    /**
+     * @param Events\LeadMergeEvent $event
+     */
+    public function preLeadMerge(Events\LeadMergeEvent $event)
+    {
+        $this->em->getRepository('MauticLeadBundle:LeadEventLog')->updateLead(
+            $event->getLoser()->getId(),
+            $event->getVictor()->getId()
+        );
     }
 
     /**
