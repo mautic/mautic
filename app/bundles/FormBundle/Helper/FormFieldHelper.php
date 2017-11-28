@@ -168,11 +168,8 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
 
                 if($f->getType() == 'tel' && $f->getProperties()['international'] && !empty($value)){
-
+                    continue;
                 }
-
-                /**@var Field $f **/
-
                 if ($type == 'captcha') {
                     $captcha = $f->getProperties()['captcha'];
                     if (empty($captcha) && Blank::class !== $constraint) {
