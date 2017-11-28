@@ -96,14 +96,6 @@ class UserProvider implements UserProviderInterface
             ->setParameter('true', true, 'boolean')
             ->setParameter('username', $username);
 
-        if (func_num_args() > 1 && $email = func_get_arg(1)) {
-            // Checking email from an auth plugin
-            $q->orWhere(
-                'u.email = :email'
-            )
-                ->setParameter('email', $email);
-        }
-
         $user = $q->getQuery()->getOneOrNullResult();
 
         if (empty($user)) {
@@ -157,15 +149,15 @@ class UserProvider implements UserProviderInterface
      * @param bool|true $createIfNotExists
      *
      * @return User
+     * @throws BadCredentialsException
      */
     public function saveUser(User $user, $createIfNotExists = true)
     {
         $isNew = !$user->getId();
 
         if ($isNew) {
-            // Check if user exists and create one if applicable
             try {
-                $user = $this->loadUserByUsername($user->getUsername(), $user->getEmail());
+                $user = $this->findUser($user);
             } catch (UsernameNotFoundException $exception) {
                 if (!$createIfNotExists) {
                     throw new BadCredentialsException();
@@ -217,5 +209,30 @@ class UserProvider implements UserProviderInterface
         }
 
         return $user;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return User
+     */
+    public function findUser(User $user)
+    {
+        try {
+            // Try by username
+            $user = $this->loadUserByUsername($user->getUsername());
+
+            return $user;
+        } catch (UsernameNotFoundException $exception) {
+            // Try by email
+            try {
+                $user = $this->loadUserByUsername($user->getEmail());
+
+                return $user;
+            } catch (UsernameNotFoundException $exception) {
+            }
+        }
+
+        throw new UsernameNotFoundException();
     }
 }
