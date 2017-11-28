@@ -27,5 +27,5 @@ interface CallbackTransportInterface
      *
      * @param Request $request
      */
-    public function processCallbackResponse(Request $request);
+    public function processCallbackRequest(Request $request);
 }

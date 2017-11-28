@@ -413,7 +413,7 @@ class PublicController extends CommonFormController
                     $model->processMailerCallback($response);
                 }
             } elseif ($currentTransport instanceof CallbackTransportInterface) {
-                $currentTransport->processCallbackResponse($this->request);
+                $currentTransport->processCallbackRequest($this->request);
             }
 
             return new Response('success');
