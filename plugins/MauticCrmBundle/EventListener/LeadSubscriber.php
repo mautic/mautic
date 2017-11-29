@@ -65,7 +65,7 @@ class LeadSubscriber extends CommonSubscriber
         $lead = $event->getLead();
         if ($lead->isAnonymous()) {
             // Ignore this contact
-            return;
+             return;
         }
 
         $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
