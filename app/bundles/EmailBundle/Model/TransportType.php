@@ -16,6 +16,7 @@ class TransportType
             'mail'                          => 'mautic.email.config.mailer_transport.mail',
             'mautic.transport.postmark'     => 'mautic.email.config.mailer_transport.postmark',
             'mautic.transport.sendgrid'     => 'mautic.email.config.mailer_transport.sendgrid',
+            'mautic.transport.sendgrid_api' => 'mautic.email.config.mailer_transport.sendgrid_api',
             'sendmail'                      => 'mautic.email.config.mailer_transport.sendmail',
             'mautic.transport.sparkpost'    => 'mautic.email.config.mailer_transport.sparkpost',
         ];
@@ -51,7 +52,8 @@ class TransportType
     {
         return '"mail",
                 "sendmail",
-                "mautic.transport.sparkpost"';
+                "mautic.transport.sparkpost",
+                "mautic.transport.sendgrid_api"';
     }
 
     public function getServiceRequiresPassword()
@@ -69,12 +71,14 @@ class TransportType
         return '"mail",
                 "sendmail",
                 "mautic.transport.sparkpost",
-                "mautic.transport.mandrill"';
+                "mautic.transport.mandrill",
+                "mautic.transport.sendgrid_api"';
     }
 
     public function getServiceRequiresApiKey()
     {
         return '"mautic.transport.sparkpost",
-                "mautic.transport.mandrill"';
+                "mautic.transport.mandrill",
+                "mautic.transport.sendgrid_api"';
     }
 }
