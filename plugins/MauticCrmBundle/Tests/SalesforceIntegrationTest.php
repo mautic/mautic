@@ -1141,7 +1141,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                         return $this->getSalesforceObjects([], $maxSfContacts, $maxSfLeads);
                                     }
                                 }
-                                // no break
                             case strpos($args[0], '/composite') !== false:
                                 return $this->getSalesforceCompositeResponse($args[1]);
                         }

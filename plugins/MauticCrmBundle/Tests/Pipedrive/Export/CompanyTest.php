@@ -23,10 +23,7 @@ class CompanyTest extends PipedriveTest
     {
         $this->loginUser();
 
-        $this->installPipedriveIntegration(
-            true,
-            [],
-            [
+        $this->installPipedriveIntegration(true, [], [
                 'url'   => 'Api/Post',
                 'token' => 'token',
             ]

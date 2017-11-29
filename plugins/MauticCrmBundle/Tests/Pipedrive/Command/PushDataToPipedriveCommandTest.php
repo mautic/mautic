@@ -13,8 +13,7 @@ class PushDataToPipedriveCommandTest extends PipedriveTest
 {
     public function testCommandWithdisableIntegration()
     {
-        $this->installPipedriveIntegration(
-            false,
+        $this->installPipedriveIntegration(false,
             [
                 'objects' => [
                     'company',
@@ -29,8 +28,7 @@ class PushDataToPipedriveCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ],
-            [
+            ], [
                 'url'   => 'Api/Post',
                 'token' => 'token',
             ]
@@ -47,8 +45,7 @@ class PushDataToPipedriveCommandTest extends PipedriveTest
 
     public function testCommandWithDisabledComanyFeature()
     {
-        $this->installPipedriveIntegration(
-            true,
+        $this->installPipedriveIntegration(true,
             [
                 'leadFields' => [
                     'first_name' => 'firstname',
@@ -60,8 +57,7 @@ class PushDataToPipedriveCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ],
-            [
+            ], [
                 'url'   => 'Api/Post',
                 'token' => 'token',
             ]
@@ -79,8 +75,7 @@ class PushDataToPipedriveCommandTest extends PipedriveTest
 
     public function testCommand()
     {
-        $this->installPipedriveIntegration(
-            true,
+        $this->installPipedriveIntegration(true,
             [
                 'objects' => [
                     'company',
@@ -95,8 +90,7 @@ class PushDataToPipedriveCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ],
-            [
+            ], [
                 'url'   => 'Api/Post',
                 'token' => 'token',
             ]
