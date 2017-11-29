@@ -85,7 +85,6 @@ class PipedriveApi extends CrmApi
         return $this->getResponseData($response);
     }
 
-
     /**
      * @param $data
      */
@@ -109,7 +108,6 @@ class PipedriveApi extends CrmApi
 
         return $this->getResponseData($response);
     }
-
 
     /**
      * @param  $email

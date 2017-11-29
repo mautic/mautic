@@ -59,7 +59,6 @@ class LeadExport extends AbstractPipedrive
             $mappedData = $this->getMappedLeadData($lead);
             $this->getIntegration()->getApiHelper()->updateLead($mappedData, $integrationEntity->getIntegrationEntityId());
 
-
             $integrationEntity->setLastSyncDate(new \DateTime());
 
             $this->em->persist($integrationEntity);
