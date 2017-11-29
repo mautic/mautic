@@ -379,6 +379,7 @@ return [
                 'arguments'    => [
                     'mautic.transport.sendgrid_api.sendgrid',
                     'mautic.transport.sendgrid_api.message',
+                    'mautic.transport.sendgrid_api.response',
                 ],
             ],
             'mautic.transport.sendgrid_api.message' => [
@@ -386,6 +387,9 @@ return [
                 'arguments'    => [
                     'mautic.helper.plain_text_message',
                 ],
+            ],
+            'mautic.transport.sendgrid_api.response' => [
+                'class'        => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse::class,
             ],
             'mautic.transport.sendgrid_api.sendgrid' => [
                 'class'        => \SendGrid::class,

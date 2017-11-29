@@ -11,6 +11,8 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\SendGrid;
 
+use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadLoginException;
+
 class SendGridApiFacade
 {
     /**
@@ -23,10 +25,16 @@ class SendGridApiFacade
      */
     private $sendGridApiMessage;
 
-    public function __construct(\SendGrid $sendGrid, SendGridApiMessage $sendGridApiMessage)
+    /**
+     * @var SendGridApiResponse
+     */
+    private $sendGridApiResponse;
+
+    public function __construct(\SendGrid $sendGrid, SendGridApiMessage $sendGridApiMessage, SendGridApiResponse $sendGridApiResponse)
     {
-        $this->sendGrid           = $sendGrid;
-        $this->sendGridApiMessage = $sendGridApiMessage;
+        $this->sendGrid            = $sendGrid;
+        $this->sendGridApiMessage  = $sendGridApiMessage;
+        $this->sendGridApiResponse = $sendGridApiResponse;
     }
 
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
@@ -34,5 +42,11 @@ class SendGridApiFacade
         $mail = $this->sendGridApiMessage->getMessage($message);
 
         $response = $this->sendGrid->client->mail()->send()->post($mail);
+
+        try {
+            $this->sendGridApiResponse->checkResponse($response);
+        } catch (SendGridBadLoginException $e) {
+            throw new \Swift_TransportException();
+        }
     }
 }
