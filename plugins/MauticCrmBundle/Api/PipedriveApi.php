@@ -133,7 +133,7 @@ class PipedriveApi extends CrmApi
     /**
      * @return array
      */
-        public function getDataByEndpoint(array $query, $endpoint)
+    public function getDataByEndpoint(array $query, $endpoint)
     {
         $params = [
             'query' => array_merge($this->getAuthQuery(), $query),

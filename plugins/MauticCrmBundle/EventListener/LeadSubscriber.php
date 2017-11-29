@@ -61,7 +61,6 @@ class LeadSubscriber extends CommonSubscriber
      */
     public function onLeadPostSave(Events\LeadEvent $event)
     {
-
         $lead = $event->getLead();
         if ($lead->isAnonymous()) {
             // Ignore this contact
@@ -78,9 +77,9 @@ class LeadSubscriber extends CommonSubscriber
 
         $changes = $lead->getChanges(true);
 
-        if(!empty($changes['dateIdentified'])) {
+        if (!empty($changes['dateIdentified'])) {
             $this->leadExport->create($event->getLead());
-        } else{
+        } else {
             $this->leadExport->update($event->getLead());
         }
     }

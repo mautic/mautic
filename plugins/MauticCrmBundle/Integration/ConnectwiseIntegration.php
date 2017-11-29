@@ -340,7 +340,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                                 'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
                             ],
                             'data' => (isset($data['campaign_task'])) ? $data['campaign_task'] : [],
-                        ]);
+                        ]
+                );
             }
         }
     }

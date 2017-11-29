@@ -46,7 +46,7 @@ class LeadExport extends AbstractPipedrive
             if (!empty($personData)) {
                 $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $personData['id'], $leadId);
                 $this->em->persist($integrationEntity);
-                 $this->em->flush();
+                $this->em->flush();
             }
         }
 

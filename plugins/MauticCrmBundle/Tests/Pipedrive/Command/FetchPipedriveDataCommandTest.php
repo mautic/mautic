@@ -16,7 +16,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
 {
     public function testCommandWithdisableIntegration()
     {
-        $this->installPipedriveIntegration(false,
+        $this->installPipedriveIntegration(
+            false,
             [
                 'objects' => [
                     'company',
@@ -31,7 +32,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ], [
+            ],
+            [
                 'url'   => 'Api/Get',
                 'token' => 'token',
             ]
@@ -54,7 +56,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
 
     public function testCommand()
     {
-        $this->installPipedriveIntegration(true,
+        $this->installPipedriveIntegration(
+            true,
             [
                 'objects' => [
                     'company',
@@ -69,7 +72,8 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
                     'name'    => 'companyname',
                     'address' => 'companyaddress1',
                 ],
-            ], [
+            ],
+            [
                 'url'   => 'Api/Get',
                 'token' => 'token',
             ]

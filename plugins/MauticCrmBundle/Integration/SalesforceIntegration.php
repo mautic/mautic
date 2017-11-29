@@ -438,6 +438,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     unset($dataObject['AccountId__'.$object]); //no company was found in Salesforce
                                 }
                             }
+                            // no break
                         case 'Lead':
                             // Set owner so that it maps if configured to do so
                             if (!empty($dataObject['Owner__Lead']['Email'])) {
