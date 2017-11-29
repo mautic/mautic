@@ -11,31 +11,16 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use SendGrid\Attachment;
-use SendGrid\BccSettings;
-use SendGrid\Content;
-use SendGrid\Email;
-use SendGrid\Mail;
-use SendGrid\MailSettings;
-use SendGrid\Personalization;
-use SendGrid\ReplyTo;
+use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade;
 use Swift_Events_EventListener;
 use Swift_Mime_Message;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
 {
     /**
-     * @var string
+     * @var SendGridApiFacade
      */
-    private $apiKey;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private $sendGridApiFacade;
 
     /**
      * @var \Swift_Events_SimpleEventDispatcher
@@ -47,10 +32,9 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
      */
     private $started = false;
 
-    public function __construct($apiKey, TranslatorInterface $translator)
+    public function __construct(SendGridApiFacade $sendGridApiFacade)
     {
-        $this->apiKey     = $apiKey;
-        $this->translator = $translator;
+        $this->sendGridApiFacade = $sendGridApiFacade;
     }
 
     /**
@@ -70,11 +54,6 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
      */
     public function start()
     {
-        if (empty($this->apiKey)) {
-            $message = $this->translator->trans('mautic.email.api_key_required', [], 'validators');
-            throw new \Swift_TransportException($message);
-        }
-
         $this->started = true;
     }
 
@@ -98,70 +77,7 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
      */
     public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        $from        = new Email(current($message->getFrom()), key($message->getFrom()));
-        $subject     = $message->getSubject();
-        $contentHtml = new Content('text/html', $message->getBody());
-        $contentText = new Content('text/plain', MailHelper::getPlainTextFromMessage($message));
-
-        // Sendgrid class requires to pass an TO email even if we do not have any general one
-        // Pass a dummy email and clear it in the next 2 lines
-        $to                    = 'dummy-email-to-be-deleted@example.com';
-        $mail                  = new Mail($from, $subject, $to, $contentText);
-        $mail->personalization = [];
-
-        $mail->addContent($contentHtml);
-
-        $mail_settings = new MailSettings();
-
-        $metadata = ($message instanceof MauticMessage) ? $message->getMetadata() : [];
-        foreach ($message->getTo() as $recipientEmail => $recipientName) {
-            if (empty($metadata[$recipientEmail])) {
-                //Recipient is not in metadata = we do not have tokens for this emil. Not sure if this can happen?
-                echo 'NO METADATA for '.$recipientEmail;
-                continue;
-            }
-            $personalization = new Personalization();
-            $to              = new Email($recipientName, $recipientEmail);
-            $personalization->addTo($to);
-
-            foreach ($metadata[$recipientEmail]['tokens'] as $token => $value) {
-                $personalization->addSubstitution($token, $value);
-            }
-
-            $mail->addPersonalization($personalization);
-            unset($metadata[$recipientEmail]);
-        }
-
-        if ($message->getReplyTo()) {
-            $replyTo = new ReplyTo(key($message->getReplyTo()));
-            $mail->setReplyTo($replyTo);
-        }
-        if ($message->getCc()) {
-            $bcc_settings = new BccSettings();
-            $bcc_settings->setEnable(true);
-            $bcc_settings->setEmail(key($message->getCc()));
-            $mail_settings->setBccSettings($bcc_settings);
-        }
-        if ($message->getAttachments()) {
-            foreach ($message->getAttachments() as $emailAttachment) {
-                $fileContent = @file_get_contents($emailAttachment['filePath']);
-                if ($fileContent === false) {
-                    continue;
-                }
-                $base64 = base64_encode($fileContent);
-
-                $attachment = new Attachment();
-                $attachment->setContent($base64);
-                $attachment->setType($emailAttachment['contentType']);
-                $attachment->setFilename($emailAttachment['fileName']);
-                $mail->addAttachment($attachment);
-            }
-        }
-
-        $mail->setMailSettings($mail_settings);
-
-        $sendGrid = new \SendGrid($this->apiKey);
-        $response = $sendGrid->client->mail()->send()->post($mail);
+        $this->sendGridApiFacade->send($message, $failedRecipients);
     }
 
     /**

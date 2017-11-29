@@ -371,8 +371,26 @@ return [
                 'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\SendgridApiTransport::class,
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
+                    'mautic.transport.sendgrid_api.facade',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.facade' => [
+                'class'        => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade::class,
+                'arguments'    => [
+                    'mautic.transport.sendgrid_api.sendgrid',
+                    'mautic.transport.sendgrid_api.message',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.message' => [
+                'class'        => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage::class,
+                'arguments'    => [
+                    'mautic.helper.plain_text_message',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.sendgrid' => [
+                'class'        => \SendGrid::class,
+                'arguments'    => [
                     '%mautic.mailer_api_key%',
-                    'translator',
                 ],
             ],
             'mautic.transport.elasticemail' => [
@@ -476,11 +494,14 @@ return [
                 ],
             ],
             'mautic.helper.mailer' => [
-                'class'     => 'Mautic\EmailBundle\Helper\MailHelper',
+                'class'     => \Mautic\EmailBundle\Helper\MailHelper::class,
                 'arguments' => [
                     'mautic.factory',
                     'mailer',
                 ],
+            ],
+            'mautic.helper.plain_text_message' => [
+                'class'     => \Mautic\EmailBundle\Helper\PlainTextMassageHelper::class,
             ],
             'mautic.validator.email' => [
                 'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
