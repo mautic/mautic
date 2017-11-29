@@ -176,7 +176,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                         // Used as a honeypot
                         $captcha = '';
                     } elseif (Blank::class === $constraint) {
-                                continue;
+                            continue;
                     }
 
                     if (EqualTo::class == $constraint) {
