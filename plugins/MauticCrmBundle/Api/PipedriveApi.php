@@ -85,6 +85,7 @@ class PipedriveApi extends CrmApi
         return $this->getResponseData($response);
     }
 
+
     /**
      * @param $data
      */
@@ -109,10 +110,32 @@ class PipedriveApi extends CrmApi
         return $this->getResponseData($response);
     }
 
+
+    /**
+     * @param  $email
+     * @return array
+     */
+    public function findByEmail($email)
+    {
+        $url = sprintf('%s/%s/find', $this->integration->getApiUrl(), self::PERSONS_API_ENDPOINT);
+
+        $params = [
+            'query' => array_merge($this->getAuthQuery(), [
+                'term' => $email,
+                'search_by_email' => true,
+            ]),
+        ];
+
+        $response = $this->transport->get($url, $params);
+
+        return $this->getResponseData($response);
+    }
+
+
     /**
      * @return array
      */
-    public function getDataByEndpoint(array $query, $endpoint)
+        public function getDataByEndpoint(array $query, $endpoint)
     {
         $params = [
             'query' => array_merge($this->getAuthQuery(), $query),
@@ -142,7 +165,6 @@ class PipedriveApi extends CrmApi
 
         return $this->getResponseData($response);
     }
-
     /**
      * @param ResponseInterface $response
      *
