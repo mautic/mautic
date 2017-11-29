@@ -523,6 +523,7 @@ return [
                 'arguments' => [
                     'mautic.lead.model.dnc',
                     'mautic.message.search.contact',
+                    'mautic.email.repository.stat',
                 ],
             ],
         ],
