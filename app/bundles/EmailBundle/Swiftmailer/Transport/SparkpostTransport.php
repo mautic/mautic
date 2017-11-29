@@ -349,8 +349,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                     }
                     break;
                 case 'spam_complaint':
-                    $this->transportCallback->addFailureByHashId($hashId, $event['fbtype']);
-
+                    $this->transportCallback->addFailureByHashId($hashId, $event['fbtype'], DoNotContact::UNSUBSCRIBED);
                     break;
                 case 'out_of_band':
                 case 'policy_rejection':
