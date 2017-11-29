@@ -17,7 +17,7 @@ class LeadExport extends AbstractPipedrive
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
 
         if ($integrationEntity) {
-            return false;
+            return $this->update($lead);
         } // user has integration with Pipedrive
 
         try {
