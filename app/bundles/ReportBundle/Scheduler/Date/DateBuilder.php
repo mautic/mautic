@@ -65,7 +65,7 @@ class DateBuilder
      *
      * @throws NoScheduleException
      */
-    public function getNexEvent(SchedulerInterface $scheduler)
+    public function getNextEvent(SchedulerInterface $scheduler)
     {
         try {
             $recurrences = $this->schedulerBuilder->getNextEvent($scheduler);
