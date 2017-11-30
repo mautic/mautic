@@ -265,6 +265,10 @@ return [
                 'class' => FormFieldTextType::class,
                 'alias' => 'formfield_text',
             ],
+            'mautic.form.type.field_propertytel' => [
+                'class' => FormFieldTelType::class,
+                'alias' => 'formfield_tel',
+            ],
             'mautic.form.type.field_propertyhtml' => [
                 'class' => FormFieldHTMLType::class,
                 'alias' => 'formfield_html',

@@ -12,6 +12,8 @@
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraint;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Email;
@@ -66,7 +68,11 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'password'  => [],
         'radiogrp'  => [],
         'select'    => [],
-        'tel'       => [],
+        'tel'       => [
+            'constraints' => [
+                PhoneNumberConstraint::class=> ['message' => 'mautic.form.submission.phone.invalid'],
+            ],
+        ],
         'text'      => [],
         'textarea'  => [],
         'url'       => [
@@ -145,9 +151,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @param      $type
-     * @param      $value
-     * @param null $f
+     * @param       $type
+     * @param       $value
+     * @param Field $f
      *
      * @return array
      */
@@ -161,6 +167,9 @@ class FormFieldHelper extends AbstractFormFieldHelper
                     continue;
                 }
 
+                if ($f->getType() == 'tel' && $f->getProperties()['international'] && !empty($value)) {
+                    continue;
+                }
                 if ($type == 'captcha') {
                     $captcha = $f->getProperties()['captcha'];
                     if (empty($captcha) && Blank::class !== $constraint) {
