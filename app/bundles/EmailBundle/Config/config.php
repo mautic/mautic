@@ -391,7 +391,7 @@ return [
             'mautic.transport.sendgrid_api.response' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse::class,
                 'arguments' => [
-                    'logger',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.transport.sendgrid_api.sendgrid' => [
