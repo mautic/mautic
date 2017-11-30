@@ -16,8 +16,8 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
-use Mautic\EmailBundle\Tests\Helper\Transport\BatchInterfaceTokenBcTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
+use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -257,7 +257,7 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
     {
         $mockFactory = $this->getMockFactory();
 
-        $transport   = new BatchInterfaceTokenBcTransport();
+        $transport   = new BcInterfaceTokenTransport();
         $swiftMailer = new \Swift_Mailer($transport);
 
         $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);

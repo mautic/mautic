@@ -15,7 +15,7 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
 use Swift_Events_EventListener;
 
-class BatchInterfaceTokenBcTransport implements InterfaceTokenTransport, \Swift_Transport
+class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Transport
 {
     private $fromAddresses = [];
     private $metadatas     = [];
