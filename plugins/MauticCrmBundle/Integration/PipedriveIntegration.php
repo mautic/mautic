@@ -7,11 +7,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
 {
-    const INTEGRATION_NAME         = 'Pipedrive';
-    const PERSON_ENTITY_TYPE       = 'person';
-    const LEAD_ENTITY_TYPE         = 'lead';
-    const ORGANIZATION_ENTITY_TYPE = 'organization';
-    const COMPANY_ENTITY_TYPE      = 'company';
+    const INTEGRATION_NAME             = 'Pipedrive';
+    const PERSON_ENTITY_TYPE           = 'person';
+    const LEAD_ENTITY_TYPE             = 'lead';
+    const ORGANIZATION_ENTITY_TYPE     = 'organization';
+    const COMPANY_ENTITY_TYPE          = 'company';
 
     private $apiHelper;
 

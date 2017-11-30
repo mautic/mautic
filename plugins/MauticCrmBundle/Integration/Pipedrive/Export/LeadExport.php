@@ -17,7 +17,7 @@ class LeadExport extends AbstractPipedrive
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
 
         if ($integrationEntity) {
-            return false;
+            return $this->update($lead);
         } // user has integration with Pipedrive
 
         try {
@@ -40,8 +40,19 @@ class LeadExport extends AbstractPipedrive
         $leadId            = $lead->getId();
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
 
+        // find contact and create new entity
+        if (!$integrationEntity && !empty($lead->getEmail())) {
+            $personData = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
+            if (!empty($personData)) {
+                $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $personData['id'], $leadId);
+                $this->em->persist($integrationEntity);
+                $this->em->flush();
+            }
+        }
+
         if (!$integrationEntity) {
-            return false;
+            // create new contact
+            return $this->create($lead);
         }
 
         try {
