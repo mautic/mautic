@@ -375,25 +375,28 @@ return [
                 ],
             ],
             'mautic.transport.sendgrid_api.facade' => [
-                'class'        => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade::class,
-                'arguments'    => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade::class,
+                'arguments' => [
                     'mautic.transport.sendgrid_api.sendgrid',
                     'mautic.transport.sendgrid_api.message',
                     'mautic.transport.sendgrid_api.response',
                 ],
             ],
             'mautic.transport.sendgrid_api.message' => [
-                'class'        => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage::class,
-                'arguments'    => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage::class,
+                'arguments' => [
                     'mautic.helper.plain_text_message',
                 ],
             ],
             'mautic.transport.sendgrid_api.response' => [
-                'class'        => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse::class,
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse::class,
+                'arguments' => [
+                    'logger',
+                ],
             ],
             'mautic.transport.sendgrid_api.sendgrid' => [
-                'class'        => \SendGrid::class,
-                'arguments'    => [
+                'class'     => \SendGrid::class,
+                'arguments' => [
                     '%mautic.mailer_api_key%',
                 ],
             ],
