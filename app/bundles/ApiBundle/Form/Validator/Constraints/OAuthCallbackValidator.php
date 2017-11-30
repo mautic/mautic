@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * Modified from \Symfony\Component\Validator\Constraints\UrlValidator.
  *
  * This file is part of the Symfony package.

@@ -13,10 +13,15 @@ $view['slots']->set('mauticContent', 'page');
 $isExisting = $activePage->getId();
 
 $variantParent = $activePage->getVariantParent();
-$subheader     = ($variantParent) ? '<div><span class="small">'.$view['translator']->trans('mautic.core.variant_of', [
-    '%name%'   => $activePage->getTitle(),
-    '%parent%' => $variantParent->getTitle(),
-]).'</span></div>' : '';
+$subheader     = '';
+if ($variantParent) {
+    $subheader = '<div><span class="small">'.$view['translator']->trans('mautic.core.variant_of', [
+                    '%name%'   => $activePage->getTitle(),
+                    '%parent%' => $variantParent->getTitle(),
+                ]).'</span></div>';
+} elseif ($activePage->isVariant(false)) {
+    $subheader = '<div><span class="small">'.$view['translator']->trans('mautic.page.form.has_variants').'</span></div>';
+}
 
 $header = $isExisting ?
     $view['translator']->trans('mautic.page.header.edit',
@@ -29,6 +34,9 @@ $template = $form['template']->vars['data'];
 
 $attr                               = $form->vars['attr'];
 $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
+
+$isCodeMode = ($activePage->getTemplate() === 'mautic_code_mode');
+
 ?>
 
 <?php echo $view['form']->start($form, ['attr' => $attr]); ?>
@@ -40,13 +48,16 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             <div class="col-xs-12">
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                    <li <?php echo !$isExisting ? "class='active'" : ''; ?>><a href="#theme-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.form.theme'); ?></a></li>
-                    <li <?php echo $isExisting ? "class='active'" : ''; ?>><a href="#source-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.content'); ?></a></li>
+                    <li class="active">
+                        <a href="#theme-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.form.theme'); ?>
+                        </a>
+                    </li>
                 </ul>
 
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
-                    <div class="tab-pane fade <?php echo !$isExisting ? 'in active' : ''; ?> bdr-w-0" id="theme-container">
+                    <div class="tab-pane fade in active bdr-w-0" id="theme-container">
                         <div class="row">
                             <div class="col-md-12">
                                 <?php echo $view['form']->row($form['template']); ?>
@@ -58,14 +69,6 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
                             'themes' => $themes,
                             'active' => $form['template']->vars['value'],
                         ]); ?>
-                    </div>
-
-                    <div class="tab-pane fade <?php echo $isExisting ? 'in active' : ''; ?> bdr-w-0" id="source-container">
-                        <div class="row">
-                            <div class="col-md-12" id="customHtmlContainer" style="min-height: 325px;">
-                                <?php echo $view['form']->row($form['customHtml']); ?>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -90,6 +93,11 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
             endif;
 
             echo $view['form']->row($form['isPublished']);
+            if (($permissions['page:preference_center:editown'] ||
+                    $permissions['page:preference_center:editother']) &&
+                        !$activePage->isVariant()) {
+                echo $view['form']->row($form['isPreferenceCenter']);
+            }
             echo $view['form']->row($form['publishUp']);
             echo $view['form']->row($form['publishDown']);
 
@@ -109,12 +117,15 @@ $attr['data-submit-callback-async'] = 'clearThemeHtmlBeforeSave';
         </div>
     </div>
 </div>
+<?php echo $view['form']->row($form['customHtml']); ?>
 <?php echo $view['form']->end($form); ?>
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', [
     'type'          => 'page',
+    'isCodeMode'    => $isCodeMode,
     'sectionForm'   => $sectionForm,
     'builderAssets' => $builderAssets,
     'slots'         => $slots,
+    'sections'      => $sections,
     'objectId'      => $activePage->getSessionId(),
 ]); ?>

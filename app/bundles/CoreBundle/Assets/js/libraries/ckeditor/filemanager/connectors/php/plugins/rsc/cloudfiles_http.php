@@ -1441,6 +1441,7 @@ class CF_Http
             }
         }
     }
+
     private function create_array()
     {
         $this->_text_list = explode("\n", rtrim($this->_return_list, "\n\x0B"));

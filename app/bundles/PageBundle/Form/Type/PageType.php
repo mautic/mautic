@@ -95,7 +95,7 @@ class PageType extends AbstractType
                 'label'    => 'mautic.page.form.customhtml',
                 'required' => false,
                 'attr'     => [
-                    'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens builder-html',
+                    'class'                => 'form-control editor-builder-tokens builder-html',
                     'data-token-callback'  => 'page:getBuilderTokens',
                     'data-token-activator' => '{',
                 ],
@@ -122,6 +122,15 @@ class PageType extends AbstractType
         );
 
         $builder->add('isPublished', 'yesno_button_group');
+
+        $builder->add(
+            'isPreferenceCenter',
+            'yesno_button_group',
+            [
+                'label' => 'mautic.page.config.preference_center',
+                'data'  => $options['data']->isPreferenceCenter() ? $options['data']->isPreferenceCenter() : false,
+            ]
+        );
 
         $builder->add(
             'publishUp',
@@ -222,10 +231,12 @@ class PageType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($formModifier) {
                 $data = $event->getData();
-                $formModifier(
-                    $event->getForm(),
-                    $data['variantParent']
-                );
+                if (isset($data['variantParent'])) {
+                    $formModifier(
+                        $event->getForm(),
+                        $data['variantParent']
+                    );
+                }
             }
         );
 

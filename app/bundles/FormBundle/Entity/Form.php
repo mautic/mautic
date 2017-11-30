@@ -58,7 +58,7 @@ class Form extends FormEntity
     /**
      * @var string
      */
-    private $postAction;
+    private $postAction = 'return';
 
     /**
      * @var string
@@ -232,6 +232,15 @@ class Form extends FormEntity
             'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
             'groups'  => ['urlRequired'],
         ]));
+
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\Url([
+            'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
+            'groups'  => ['urlRequiredPassTwo'],
+        ]));
+
+        $metadata->addPropertyConstraint('formType', new Assert\Choice([
+            'choices' => ['standalone', 'campaign'],
+        ]));
     }
 
     /**
@@ -280,10 +289,11 @@ class Form extends FormEntity
                     'fields',
                     'actions',
                     'template',
-                    'submissionCount',
                     'inKioskMode',
                     'renderStyle',
                     'formType',
+                    'postAction',
+                    'postActionProperty',
                 ]
             )
             ->build();
@@ -295,13 +305,11 @@ class Form extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
         if ($prop == 'actions' || $prop == 'fields') {
             //changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 
@@ -548,11 +556,30 @@ class Form extends FormEntity
     /**
      * Get fields.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Field[]
      */
     public function getFields()
     {
         return $this->fields;
+    }
+
+    /**
+     * Get array of field aliases.
+     *
+     * @return array
+     */
+    public function getFieldAliases()
+    {
+        $aliases = [];
+        $fields  = $this->getFields();
+
+        if ($fields) {
+            foreach ($fields as $field) {
+                $aliases[] = $field->getAlias();
+            }
+        }
+
+        return $aliases;
     }
 
     /**
@@ -607,7 +634,7 @@ class Form extends FormEntity
     /**
      * Get submissions.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Submission[]
      */
     public function getSubmissions()
     {
@@ -633,13 +660,13 @@ class Form extends FormEntity
     }
 
     /**
-     * Remove actions.
+     * Remove action.
      *
-     * @param Action $actions
+     * @param Action $action
      */
-    public function removeAction(Action $actions)
+    public function removeAction(Action $action)
     {
-        $this->actions->removeElement($actions);
+        $this->actions->removeElement($action);
     }
 
     /**

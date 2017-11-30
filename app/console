@@ -8,7 +8,9 @@ date_default_timezone_set('UTC');
 // read http://symfony.com/doc/current/book/installation.html#configuration-and-setup for more information
 //umask(0000);
 
-set_time_limit(0);
+if (function_exists('set_time_limit')) {
+    set_time_limit(0);
+}
 
 defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
 

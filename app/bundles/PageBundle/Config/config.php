@@ -12,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_page_buildertoken_index' => [
-                'path'       => '/pages/buildertokens/{page}',
-                'controller' => 'MauticPageBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_page_index' => [
                 'path'       => '/pages/{page}',
                 'controller' => 'MauticPageBundle:Page:index',
@@ -29,6 +25,10 @@ return [
             'mautic_page_tracker' => [
                 'path'       => '/mtracking.gif',
                 'controller' => 'MauticPageBundle:Public:trackingImage',
+            ],
+            'mautic_page_tracker_cors' => [
+                'path'       => '/mtc/event',
+                'controller' => 'MauticPageBundle:Public:tracking',
             ],
             'mautic_page_tracker_getcontact' => [
                 'path'       => '/mtc',
@@ -52,13 +52,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getpages' => [
-                'path'       => '/pages',
-                'controller' => 'MauticPageBundle:Api\PageApi:getEntities',
-            ],
-            'mautic_api_getpage' => [
-                'path'       => '/pages/{id}',
-                'controller' => 'MauticPageBundle:Api\PageApi:getEntity',
+            'mautic_api_pagesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'pages',
+                'path'            => '/pages',
+                'controller'      => 'MauticPageBundle:Api\PageApi',
             ],
         ],
         'catchall' => [
@@ -97,6 +95,7 @@ return [
                     'templating.helper.assets',
                     'mautic.helper.ip_lookup',
                     'mautic.core.model.auditlog',
+                    'mautic.page.model.page',
                 ],
             ],
             'mautic.pagebuilder.subscriber' => [
@@ -115,16 +114,20 @@ return [
                 'arguments' => [
                     'mautic.point.model.point',
                 ],
-
             ],
             'mautic.page.reportbundle.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\PageBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
             'mautic.page.campaignbundle.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\CampaignSubscriber',
                 'arguments' => [
                     'mautic.page.model.page',
                     'mautic.campaign.model.event',
+                    'mautic.lead.model.lead',
+                    'mautic.page.helper.tracking',
                 ],
             ],
             'mautic.page.leadbundle.subscriber' => [
@@ -154,7 +157,10 @@ return [
                 ],
             ],
             'mautic.page.webhook.subscriber' => [
-                'class' => 'Mautic\PageBundle\EventListener\WebhookSubscriber',
+                'class'       => 'Mautic\PageBundle\EventListener\WebhookSubscriber',
+                'methodCalls' => [
+                    'setWebhookModel' => ['mautic.webhook.model.webhook'],
+                ],
             ],
             'mautic.page.dashboard.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\DashboardSubscriber',
@@ -166,12 +172,19 @@ return [
                 'class'     => 'Mautic\PageBundle\EventListener\BuildJsSubscriber',
                 'arguments' => [
                     'templating.helper.assets',
+                    'mautic.page.helper.tracking',
                 ],
             ],
             'mautic.page.maintenance.subscriber' => [
                 'class'     => 'Mautic\PageBundle\EventListener\MaintenanceSubscriber',
                 'arguments' => [
                     'doctrine.dbal.default_connection',
+                ],
+            ],
+            'mautic.page.stats.subscriber' => [
+                'class'     => \Mautic\PageBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],
@@ -203,6 +216,11 @@ return [
                 'arguments' => 'mautic.factory',
                 'alias'     => 'page_list',
             ],
+            'mautic.form.type.preferencecenterlist' => [
+                'class'     => 'Mautic\PageBundle\Form\Type\PreferenceCenterListType',
+                'arguments' => 'mautic.factory',
+                'alias'     => 'preference_center_list',
+            ],
             'mautic.form.type.page_abtest_settings' => [
                 'class' => 'Mautic\PageBundle\Form\Type\AbTestPropertiesType',
                 'alias' => 'page_abtest_settings',
@@ -214,6 +232,10 @@ return [
             'mautic.form.type.pageconfig' => [
                 'class' => 'Mautic\PageBundle\Form\Type\ConfigType',
                 'alias' => 'pageconfig',
+            ],
+            'mautic.form.type.trackingconfig' => [
+                'class' => 'Mautic\PageBundle\Form\Type\ConfigTrackingPageType',
+                'alias' => 'trackingconfig',
             ],
             'mautic.form.type.slideshow_config' => [
                 'class' => 'Mautic\PageBundle\Form\Type\SlideshowGlobalConfigType',
@@ -232,6 +254,13 @@ return [
                 'class' => 'Mautic\PageBundle\Form\Type\DashboardHitsInTimeWidgetType',
                 'alias' => 'page_dashboard_hits_in_time_widget',
             ],
+            'mautic.page.tracking.pixel.send' => [
+                'class'     => 'Mautic\PageBundle\Form\Type\TrackingPixelSendType',
+                'alias'     => 'tracking_pixel_send_action',
+                'arguments' => [
+                    'mautic.page.helper.tracking',
+                ],
+            ],
         ],
         'models' => [
             'mautic.page.model.page' => [
@@ -243,10 +272,14 @@ return [
                     'mautic.lead.model.field',
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
+                    'mautic.queue.service',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [
                         '%mautic.cat_in_page_url%',
+                    ],
+                    'setTrackByFingerprint' => [
+                        '%mautic.track_by_fingerprint%',
                     ],
                 ],
             ],
@@ -275,16 +308,33 @@ return [
                 'class'     => 'Mautic\PageBundle\Helper\TokenHelper',
                 'arguments' => 'mautic.page.model.page',
             ],
+            'mautic.page.helper.tracking' => [
+                'class'     => 'Mautic\PageBundle\Helper\TrackingHelper',
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'session',
+                    'mautic.helper.core_parameters',
+                    'request_stack',
+                ],
+            ],
         ],
     ],
 
     'parameters' => [
-        'cat_in_page_url'  => false,
-        'google_analytics' => false,
-
-        'redirect_list_types' => [
+        'cat_in_page_url'       => false,
+        'google_analytics'      => false,
+        'track_contact_by_ip'   => false,
+        'track_by_fingerprint'  => false,
+        'track_by_tracking_url' => true,
+        'redirect_list_types'   => [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
+        'google_analytics_id'                   => null,
+        'google_analytics_trackingpage_enabled' => false,
+        'google_analytics_landingpage_enabled'  => false,
+        'facebook_pixel_id'                     => null,
+        'facebook_pixel_trackingpage_enabled'   => false,
+        'facebook_pixel_landingpage_enabled'    => false,
     ],
 ];

@@ -11,16 +11,25 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Event\CampaignTriggerEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Class TriggerCampaignCommand.
  */
 class TriggerCampaignCommand extends ModeratedCommand
 {
+    /**
+     * @var EventDispatcher
+     */
+    protected $dispatcher;
+
     /**
      * {@inheritdoc}
      */
@@ -45,8 +54,7 @@ class TriggerCampaignCommand extends ModeratedCommand
                 InputOption::VALUE_OPTIONAL,
                 'Set max number of events to process per campaign for this script execution. Defaults to all.',
                 0
-            )
-            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force execution even if another process is assumed running.');
+            );
 
         parent::configure();
     }
@@ -58,22 +66,20 @@ class TriggerCampaignCommand extends ModeratedCommand
     {
         $container = $this->getContainer();
 
-        /** @var \Mautic\CoreBundle\Factory\MauticFactory $factory */
-        $factory = $container->get('mautic.factory');
-
         /** @var \Mautic\CampaignBundle\Model\EventModel $model */
-        $model = $factory->getModel('campaign.event');
+        $model = $container->get('mautic.campaign.model.event');
         /** @var \Mautic\CampaignBundle\Model\CampaignModel $campaignModel */
-        $campaignModel = $factory->getModel('campaign');
-        $translator    = $factory->getTranslator();
-        $em            = $factory->getEntityManager();
-        $id            = $input->getOption('campaign-id');
-        $scheduleOnly  = $input->getOption('scheduled-only');
-        $negativeOnly  = $input->getOption('negative-only');
-        $batch         = $input->getOption('batch-limit');
-        $max           = $input->getOption('max-events');
+        $campaignModel    = $container->get('mautic.campaign.model.campaign');
+        $this->dispatcher = $container->get('event_dispatcher');
+        $translator       = $container->get('translator');
+        $em               = $container->get('doctrine')->getManager();
+        $id               = $input->getOption('campaign-id');
+        $scheduleOnly     = $input->getOption('scheduled-only');
+        $negativeOnly     = $input->getOption('negative-only');
+        $batch            = $input->getOption('batch-limit');
+        $max              = $input->getOption('max-events');
 
-        if (!$this->checkRunStatus($input, $output, ($id) ? $id : 'all')) {
+        if (!$this->checkRunStatus($input, $output, $id)) {
             return 0;
         }
 
@@ -82,6 +88,10 @@ class TriggerCampaignCommand extends ModeratedCommand
             $campaign = $campaignModel->getEntity($id);
 
             if ($campaign !== null && $campaign->isPublished()) {
+                if (!$this->dispatchTriggerEvent($campaign)) {
+                    return 0;
+                }
+
                 $totalProcessed = 0;
                 $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $id]).'</info>');
 
@@ -128,6 +138,10 @@ class TriggerCampaignCommand extends ModeratedCommand
                 $c = reset($c);
 
                 if ($c->isPublished()) {
+                    if (!$this->dispatchTriggerEvent($c)) {
+                        continue;
+                    }
+
                     $output->writeln('<info>'.$translator->trans('mautic.campaign.trigger.triggering', ['%id%' => $c->getId()]).'</info>');
                     if (!$negativeOnly && !$scheduleOnly) {
                         //trigger starting action events for newly added contacts
@@ -178,5 +192,25 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->completeRun();
 
         return 0;
+    }
+
+    /**
+     * @param Campaign $campaign
+     *
+     * @return bool
+     */
+    protected function dispatchTriggerEvent(Campaign $campaign)
+    {
+        if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
+            /** @var CampaignTriggerEvent $event */
+            $event = $this->dispatcher->dispatch(
+                CampaignEvents::CAMPAIGN_ON_TRIGGER,
+                new CampaignTriggerEvent($campaign)
+            );
+
+            return $event->shouldTrigger();
+        }
+
+        return true;
     }
 }

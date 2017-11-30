@@ -120,6 +120,7 @@
                 if (typeof data == 'undefined') {
                     data = null;
                 }
+
                 return MauticFormCallback[formId][event](data);
             }
 
@@ -219,13 +220,14 @@
                     var nextButton = pageBreak.querySelector('[data-mautic-form-pagebreak-button="next"]');
 
                     // Add button handlers
-                    prevButton.onclick = function(theForm, showPageNumber) {
+                    prevButton.onclick = function(formId, theForm, showPageNumber) {
                         return function() {
+                            Form.customCallbackHandler(formId, 'onShowPreviousPage', showPageNumber);
                             Form.switchPage(theForm, showPageNumber);
                         }
-                    } (theForm, prevPageNumber);
+                    } (formId, theForm, prevPageNumber);
 
-                    nextButton.onclick = function(theForm, hidePageNumber, showPageNumber) {
+                    nextButton.onclick = function(formId, theForm, hidePageNumber, showPageNumber) {
                         return function () {
                             // Validate fields first
                             var validations = theForm.querySelector('[data-mautic-form-page="' + hidePageNumber + '"]').querySelectorAll('[data-validate]');
@@ -240,9 +242,10 @@
                                 return;
                             }
 
+                            Form.customCallbackHandler(formId, 'onShowNextPage', showPageNumber);
                             Form.switchPage(theForm, showPageNumber);
                         }
-                    } (theForm, pageNumber, nextPageNumber);
+                    } (formId, theForm, pageNumber, nextPageNumber);
 
                     if (1 === pageNumber) {
                         prevButton.setAttribute('disabled', 'disabled');
@@ -272,7 +275,10 @@
             });
 
             // Show the wanted page
-            theForm.querySelector('[data-mautic-form-page="' + showPageNumber + '"]').style.display = 'block';
+            var thePage = theForm.querySelector('[data-mautic-form-page="' + showPageNumber + '"]');
+            if (thePage) {
+                thePage.style.display = 'block'
+            }
             var showPageBreak = theForm.querySelector('[data-mautic-form-pagebreak="' + showPageNumber + '"]');
             if (showPageBreak) {
                 showPageBreak.style.display = 'block';
@@ -286,7 +292,7 @@
             var containerId = Form.getFieldContainerId(formId, fieldId);
 
             // If within a page break - go back to the page that includes this field
-            var pageBreak = pageBreak = Form.findAncestor(document.getElementById(containerId), 'mauticform-page-wrapper');
+            var pageBreak = Form.findAncestor(document.getElementById(containerId), 'mauticform-page-wrapper');
             if (pageBreak) {
                 var page = pageBreak.getAttribute('data-mautic-form-page');
                 if (switchPage) {
@@ -300,12 +306,14 @@
         Form.findAncestor = function (el, cls) {
             var ancestor = false;
             while (true) {
-                var parent = el.parentElement
+                var parent = el.parentElement;
                 if (!parent || Form.hasClass(parent, 'mauticform-innerform')) {
                     break;
                 } else if (Form.hasClass(parent, cls)) {
                     ancestor = parent;
                     break;
+                } else {
+                   el = parent;
                 }
             }
 
@@ -581,6 +589,7 @@
                 resetForm: function () {
 
                     this.clearErrors();
+
                     Form.switchPage(document.getElementById('mauticform_' + formId), 1);
 
                     document.getElementById('mauticform_' + formId).reset();
@@ -622,6 +631,7 @@
 
                 try {
                     var response = JSON.parse(event.data);
+
                     if (response && response.formName) {
                         Core.getValidator(response.formName).parseFormResponse(response);
                     }

@@ -53,7 +53,7 @@ class CleanFormSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        //clean the data
+        // clean the data
         $data = InputHelper::_($data, $this->masks);
 
         $event->setData($data);

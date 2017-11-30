@@ -8,6 +8,9 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\CoreBundle\Helper\InputHelper;
+
 if (!$app->getRequest()->isXmlHttpRequest()):
     //load base template
     $view->extend('MauticUserBundle:Security:base.html.php');
@@ -15,6 +18,9 @@ if (!$app->getRequest()->isXmlHttpRequest()):
 else:
     $view->extend('MauticUserBundle:Security:ajax.html.php');
 endif;
+
+// clean tags and quotes
+$last_username = InputHelper::clean($last_username);
 ?>
 
 <form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="<?php echo $view['router']->path('mautic_user_logincheck') ?>" method="post">

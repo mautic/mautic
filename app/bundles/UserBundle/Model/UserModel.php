@@ -55,7 +55,7 @@ class UserModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticUserBundle:User');
+        return $this->em->getRepository(User::class);
     }
 
     /**
@@ -81,16 +81,38 @@ class UserModel extends FormModel
     }
 
     /**
+     * Get a list of users for an autocomplete input.
+     *
+     * @param string $search
+     * @param int    $limit
+     * @param int    $start
+     * @param array  $permissionLimiter
+     *
+     * @return array
+     */
+    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
+    {
+        return $this->getRepository()->getUserList($search, $limit, $start, $permissionLimiter);
+    }
+
+    /**
      * Checks for a new password and rehashes if necessary.
      *
      * @param User                     $entity
      * @param PasswordEncoderInterface $encoder
      * @param string                   $submittedPassword
+     * @param bool|false               $validate
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, PasswordEncoderInterface $encoder, $submittedPassword)
+    public function checkNewPassword(User $entity, PasswordEncoderInterface $encoder, $submittedPassword, $validate = false)
     {
+        if ($validate) {
+            if (strlen($submittedPassword) < 6) {
+                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', 'validators'));
+            }
+        }
+
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
             return $encoder->encodePassword($submittedPassword, $entity->getSalt());
@@ -329,5 +351,15 @@ class UserModel extends FormModel
                 }
             }
         }
+    }
+
+    /**
+     * Return list of Users for formType Choice.
+     *
+     * @return array
+     */
+    public function getOwnerListChoices()
+    {
+        return $this->getRepository()->getOwnerListChoices();
     }
 }

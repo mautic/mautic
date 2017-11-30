@@ -31,20 +31,31 @@ class CampaignLeadChangeEvent extends Event
     private $lead;
 
     /**
+     * @var array
+     */
+    private $leads = [];
+
+    /**
      * @var string
      */
     private $action;
 
     /**
+     * CampaignLeadChangeEvent constructor.
+     *
      * @param Campaign $campaign
-     * @param Lead     $lead
-     * @param string   $action
+     * @param          $leads
+     * @param          $action
      */
-    public function __construct(Campaign &$campaign, Lead $lead, $action)
+    public function __construct(Campaign $campaign, $leads, $action)
     {
         $this->campaign = $campaign;
-        $this->lead     = $lead;
-        $this->action   = $action;
+        if (is_array($leads)) {
+            $this->leads = $leads;
+        } else {
+            $this->lead = $leads;
+        }
+        $this->action = $action;
     }
 
     /**
@@ -65,6 +76,16 @@ class CampaignLeadChangeEvent extends Event
     public function getLead()
     {
         return $this->lead;
+    }
+
+    /**
+     * If this is a batch event, return array of leads.
+     *
+     * @return array
+     */
+    public function getLeads()
+    {
+        return $this->leads;
     }
 
     /**

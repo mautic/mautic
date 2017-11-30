@@ -12,25 +12,30 @@
 namespace Mautic\EmailBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\ChannelBundle\Entity\MessageRepository;
+use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Model\MessageQueueModel;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EmailModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -62,6 +67,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $mailHelper->method('addTo')
             ->will($this->returnValue(true));
         $mailHelper->method('queue')
+            ->will($this->returnValue([true, []]));
+        $mailHelper->method('setEmail')
             ->will($this->returnValue(true));
 
         $leadModel = $this->getMockBuilder(LeadModel::class)
@@ -76,16 +83,12 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Setup the translator
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup an email variant email
@@ -110,6 +113,15 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $emailEntity->method('isVariant')
             ->will($this->returnValue(true));
+
+        $mailHelper->method('createEmailStat')
+            ->will($this->returnCallback(function () use ($emailEntity) {
+                $stat = new Stat();
+                $stat->setEmail($emailEntity);
+
+                return $stat;
+            }
+        ));
 
         $variantA = $this->getMockBuilder(Email::class)
             ->disableOriginalConstructor()
@@ -206,6 +218,12 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
+        $dncModel = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $sendToContactModel = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -215,8 +233,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper,
-            $messageModel
+            $messageModel,
+            $sendToContactModel
         );
 
         $emailModel->setTranslator($translator);
@@ -284,6 +302,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $mailHelper->method('addTo')
             ->will($this->returnValue(true));
         $mailHelper->method('queue')
+            ->will($this->returnValue([true, []]));
+        $mailHelper->method('setEmail')
             ->will($this->returnValue(true));
 
         $leadModel = $this->getMockBuilder(LeadModel::class)
@@ -298,16 +318,12 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Setup the translator
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup an email variant email
@@ -332,6 +348,15 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $emailEntity->method('isVariant')
             ->will($this->returnValue(true));
+
+        $mailHelper->method('createEmailStat')
+            ->will($this->returnCallback(function () use ($emailEntity) {
+                $stat = new Stat();
+                $stat->setEmail($emailEntity);
+
+                return $stat;
+            }
+            ));
 
         $variantA = $this->getMockBuilder(Email::class)
             ->disableOriginalConstructor()
@@ -428,6 +453,12 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
+        $dncModel = $this->getMockBuilder(DoNotContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $sendToContactModel = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -437,14 +468,15 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper,
-            $messageModel
+            $messageModel,
+            $sendToContactModel
         );
 
         $emailModel->setTranslator($translator);
         $emailModel->setEntityManager($entityManager);
 
-        $count = 12;
+        $count   = 12;
+        $results = [];
         while ($count > 0) {
             $contact = [
                 'id'        => $count,
@@ -454,7 +486,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ];
             --$count;
 
-            $emailModel->sendEmail($emailEntity, [$contact]);
+            $results[] = $emailModel->sendEmail($emailEntity, [$contact]);
         }
 
         $emailSettings = $emailModel->getEmailSettings($emailEntity);
@@ -514,16 +546,12 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Setup the translator
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the StatRepository
@@ -587,6 +615,10 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
+        $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -596,8 +628,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper,
-            $messageModel
+            $messageModel,
+            $sendToContactModel
         );
 
         $emailModel->setTranslator($translator);
@@ -651,16 +683,12 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Setup the translator
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the StatRepository
@@ -727,6 +755,10 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
+        $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -736,8 +768,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper,
-            $messageModel
+            $messageModel,
+            $sendToContactModel
         );
 
         $emailModel->setTranslator($translator);
@@ -791,16 +823,12 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Setup the translator
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the repositories
@@ -845,6 +873,10 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->expects($this->exactly(0))
             ->method('getRepository');
 
+        $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -854,8 +886,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper,
-            $messageModel
+            $messageModel,
+            $sendToContactModel
         );
 
         $emailModel->setTranslator($translator);
@@ -904,16 +936,12 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         // Setup the translator
         $translator = $this->getMockBuilder(Translator::class)
             ->disableOriginalConstructor()
             ->getMock();
         $translator->expects($this->any())
-            ->method('has')
+            ->method('hasId')
             ->will($this->returnValue(false));
 
         // Setup the repositories
@@ -930,6 +958,9 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $frequencyRepository->method('getAppliedFrequencyRules')
             ->will($this->returnValue([['lead_id' => 1, 'frequency_number' => 1, 'frequency_time' => 'DAY']]));
+        $messageRepository = $this->getMockBuilder(MessageRepository::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         // Setup the EntityManager
         $entityManager = $this
@@ -945,17 +976,40 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
                         ['MauticEmailBundle:Email', $emailRepository],
                         ['MauticEmailBundle:Stat', $statRepository],
                         ['MauticLeadBundle:FrequencyRule', $frequencyRepository],
+                        ['MauticChannelBundle:MessageQueue', $messageRepository],
                     ]
                 )
             );
+        $leadEntity = (new Lead())
+            ->setEmail('someone@domain.com');
 
-        $messageModel = $this->getMockBuilder(MessageQueueModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $messageModel->expects($this->exactly(1))
-            ->method('addToQueue');
+        $entityManager->expects($this->any())
+            ->method('getReference')
+            ->will(
+                $this->returnValue($leadEntity)
+            );
 
         $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $coreParametersHelper = $this->getMockBuilder(CoreParametersHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $userHelper = $this->getMockBuilder(UserHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $dispatcher = $this->getMockBuilder(EventDispatcher::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $messageModel = new MessageQueueModel($leadModel, $companyModel, $coreParametersHelper);
+        $messageModel->setEntityManager($entityManager);
+        $messageModel->setUserHelper($userHelper);
+        $messageModel->setDispatcher($dispatcher);
+
+        $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -968,8 +1022,8 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $coreParametersHelper,
-            $messageModel
+            $messageModel,
+            $sendToContactModel
         );
 
         $emailModel->setTranslator($translator);
@@ -981,7 +1035,18 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $emailEntity->method('getId')
             ->will($this->returnValue(1));
 
-        $result = $emailModel->sendEmail($emailEntity, [1 => ['id' => 1, 'email' => 'someone@domain.com']], ['email_type' => 'marketing']);
-        $this->assertTrue(count($result) === 0);
+        $result = $emailModel->sendEmail(
+            $emailEntity,
+            [
+                1 => [
+                    'id'        => 1,
+                    'email'     => 'someone@domain.com',
+                    'firstname' => 'someone',
+                    'lastname'  => 'someone',
+                ],
+            ],
+            ['email_type' => 'marketing']
+        );
+        $this->assertTrue(count($result) === 0, print_r($result, true));
     }
 }

@@ -34,14 +34,14 @@ class AppKernel extends Kernel
      *
      * @const integer
      */
-    const MINOR_VERSION = 2;
+    const MINOR_VERSION = 11;
 
     /**
      * Patch version number.
      *
      * @const integer
      */
-    const PATCH_VERSION = 2;
+    const PATCH_VERSION = 1;
 
     /**
      * Extra version identifier.
@@ -122,7 +122,9 @@ class AppKernel extends Kernel
                         [
                             '%code%' => $e->getCode(),
                         ]
-                    )
+                    ),
+                    0,
+                    $e
                 );
             }
         }
@@ -159,6 +161,7 @@ class AppKernel extends Kernel
             new Mautic\CalendarBundle\MauticCalendarBundle(),
             new Mautic\CampaignBundle\MauticCampaignBundle(),
             new Mautic\CategoryBundle\MauticCategoryBundle(),
+            new Mautic\ChannelBundle\MauticChannelBundle(),
             new Mautic\ConfigBundle\MauticConfigBundle(),
             new Mautic\CoreBundle\MauticCoreBundle(),
             new Mautic\DashboardBundle\MauticDashboardBundle(),
@@ -171,11 +174,18 @@ class AppKernel extends Kernel
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
             new Mautic\PointBundle\MauticPointBundle(),
+            new Mautic\QueueBundle\MauticQueueBundle(),
             new Mautic\ReportBundle\MauticReportBundle(),
             new Mautic\SmsBundle\MauticSmsBundle(),
             new Mautic\StageBundle\MauticStageBundle(),
             new Mautic\UserBundle\MauticUserBundle(),
             new Mautic\WebhookBundle\MauticWebhookBundle(),
+            new LightSaml\SymfonyBridgeBundle\LightSamlSymfonyBridgeBundle(),
+            new LightSaml\SpBundle\LightSamlSpBundle(),
+            new Ivory\OrderedFormBundle\IvoryOrderedFormBundle(),
+            // These two bundles do DI based on config, so they need to be loaded after config is declared in MauticQueueBundle
+            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
+            new Leezy\PheanstalkBundle\LeezyPheanstalkBundle(),
         ];
 
         //dynamically register Mautic Plugin Bundles
@@ -196,6 +206,12 @@ class AppKernel extends Kernel
                 $plugin = new $class();
 
                 if ($plugin instanceof \Symfony\Component\HttpKernel\Bundle\Bundle) {
+                    if (defined($class.'::MINIMUM_MAUTIC_VERSION')) {
+                        // Check if this version supports the plugin before loading it
+                        if (version_compare($this->getVersion(), constant($class.'::MINIMUM_MAUTIC_VERSION'), 'lt')) {
+                            continue;
+                        }
+                    }
                     $bundles[] = $plugin;
                 }
 
@@ -300,7 +316,7 @@ class AppKernel extends Kernel
      *
      * @return bool
      */
-    private function isInstalled()
+    protected function isInstalled()
     {
         static $isInstalled = null;
 

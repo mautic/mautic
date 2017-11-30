@@ -8,6 +8,13 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+/*
+ * THIS PAGE IS USED AND FORMATTED TO FIT THE GMAIL EXTENSION TIMELINE POPUP.
+ * WHEN MAKING CHANGES TO THIS PAGE, MAKE SURE THE TIMELINE STILL LOOKS GOOD.
+ */
+
+$leadId = isset($lead) ? $lead->getId() : null;
 if (isset($tmpl) && $tmpl == 'index') {
     $view->extend('MauticLeadBundle:Timeline:plugin_index.html.php');
 }
@@ -84,6 +91,9 @@ $baseUrl = isset($lead) ? $view['router']->path(
 </style>
 <div class="tl-header">
     <?php echo $view['translator']->trans('mautic.lead.timeline.displaying_events', ['%total%' => $events['total']]); ?>
+    <?php if (isset($lead)) {
+    echo $view['translator']->trans('mautic.lead.timeline.displaying_events_for_contact', ['%contact%' => $lead->getName(), '%id%' => $lead->getId()]);
+} ?>
     (<span class="tl-new"><?php echo $newCount; ?></span> <?php echo $view['translator']->trans(
         'mautic.lead.timeline.events_new'
     ); ?>)
@@ -120,8 +130,9 @@ $baseUrl = isset($lead) ? $view['router']->path(
             echo ' tr-new';
         }
         ?>">
-            <span class="timeline-row-id hide"><?php echo $event['timestamp']->format('U'); ?></span>
-            <span class="timeline-row-lead-id hide"><?php echo $event['leadId']; ?></span>
+            <span class="timeline-row-id hide"><?php echo $view['date']->toText($event['timestamp']); ?>
+                on <?php echo $event['timestamp']->format('Y-m-d H:i:s'); ?></span>
+            <span class="timeline-row-lead-id hide"><?php echo isset($event['leadId']) ? $event['leadId'] : ''; ?></span>
             <div class="btn-group" role="group" style="float: right;">
                 <span class="timeline-icon">
                     <a href="javascript:void(0);"
@@ -143,13 +154,14 @@ $baseUrl = isset($lead) ? $view['router']->path(
                     </a>
                 </span>
             </div>
+            <?php if (isset($event['leadEmail'])):?>
+                <span class="timeline-lead ellipsis"><a href="mailto:<?php echo $event['leadEmail']; ?>"
+                                                        title="<?php echo $event['leadEmail']; ?>"
+                                                        target="_new"><?php echo $event['leadName']; ?></a></span>
 
-            <span class="timeline-lead ellipsis"><a href="mailto:<?php echo $event['leadEmail']; ?>"
-                                                    title="<?php echo $event['leadEmail']; ?>"
-                                                    target="_new"><?php echo $event['leadName']; ?></a></span>
-
-            <span class="timeline-timestamp"> on <?php echo $view['date']->toText($event['timestamp']); ?></span>
-
+                <span class="timeline-timestamp"> <?php echo $view['date']->toText($event['timestamp']); ?>
+                    on <?php echo $event['timestamp']->format('Y-m-d H:i:s'); ?></span>
+            <?php endif; ?>
             <br/>
 
             <span class="timeline-type"><?php if (isset($event['eventType'])) {
@@ -171,18 +183,6 @@ $baseUrl = isset($lead) ? $view['router']->path(
     <?php endforeach; ?>
 
 </div>
-
-<?php //echo $view->render(
-//    'MauticCoreBundle:Helper:pagination.html.php',
-//    [
-//        'page'       => $events['page'],
-//        'fixedPages' => $events['maxPages'],
-//        'fixedLimit' => true,
-//        'baseUrl'    => $baseUrl,
-//        'target'     => '#timeline-table',
-//        'totalItems' => $events['total'],
-//    ]
-//);?>
 
 <!--/ timeline -->
 

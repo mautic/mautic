@@ -52,13 +52,10 @@ class AuditLogModel extends AbstractCommonModel
         $log->setIpAddress($ipAddress);
         $log->setDateAdded(new \DateTime());
 
-        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER')) ? $this->userHelper->getUser() : null;
+        $user     = (!defined('MAUTIC_IGNORE_AUDITLOG_USER') && !defined('MAUTIC_AUDITLOG_USER')) ? $this->userHelper->getUser() : null;
         $userId   = 0;
-        $userName = '';
-        if (!$user instanceof User) {
-            $userId   = 0;
-            $userName = $this->translator->trans('mautic.core.system');
-        } elseif ($user->getId()) {
+        $userName = defined('MAUTIC_AUDITLOG_USER') ? MAUTIC_AUDITLOG_USER : $this->translator->trans('mautic.core.system');
+        if ($user instanceof User && $user->getId()) {
             $userId   = $user->getId();
             $userName = $user->getName();
         }
@@ -83,6 +80,6 @@ class AuditLogModel extends AbstractCommonModel
      */
     public function getLogForObject($object, $id, $afterDate = null, $limit = 10, $bundle = null)
     {
-        return $this->em->getRepository('MauticCoreBundle:AuditLog')->getLogForObject($object, $id, $limit, $afterDate, $bundle);
+        return $this->getRepository()->getLogForObject($object, $id, $limit, $afterDate, $bundle);
     }
 }

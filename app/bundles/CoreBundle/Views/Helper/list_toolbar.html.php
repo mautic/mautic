@@ -8,7 +8,11 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+
 $wrap = true;
+$view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_TOOLBAR_ACTIONS, ButtonHelper::TYPE_GROUP);
 include 'action_button_helper.php';
 ?>
 <div class="panel-body">
@@ -18,7 +22,7 @@ include 'action_button_helper.php';
             <?php echo $view->render('MauticCoreBundle:Helper:search.html.php', [
                     'searchId'    => (empty($searchId)) ? null : $searchId,
                     'searchValue' => $searchValue,
-                    'action'      => $action,
+                    'action'      => (isset($action)) ? $action : '',
                     'searchHelp'  => (isset($searchHelp)) ? $searchHelp : '',
                     'target'      => (empty($target)) ? null : $target,
                     'tmpl'        => (empty($tmpl)) ? null : $tmpl,
@@ -35,25 +39,14 @@ include 'action_button_helper.php';
         </div>
 
         <div class="col-xs-6 col-lg-4 va-m text-right">
-            <?php //TODO - Support more buttons
-            include 'action_button_helper.php';
-            $buttonCount = 0;
-            echo $view['buttons']->renderPreCustomButtons($buttonCount);
-
-            if (!empty($templateButtons['delete'])):
-                echo $view->render('MauticCoreBundle:Helper:confirm.html.php', [
-                    'message'       => $view['translator']->trans('mautic.'.$langVar.'.form.confirmbatchdelete'),
-                    'confirmAction' => $view['router']->path($actionRoute, array_merge(['objectAction' => 'batchDelete'], $query)),
-                    'template'      => 'batchdelete',
-                    'tooltip'       => $view['translator']->trans('mautic.core.form.tooltip.bulkdelete'),
-                    'precheck'      => 'batchActionPrecheck',
-                    'target'        => (empty($target)) ? null : $target,
-                ]);
-                ++$buttonCount;
-            endif;
-
-            echo $view['buttons']->renderPostCustomButtons($buttonCount);
-            ?>
+            <?php if (!empty($buttonHelp)): ?>
+                 <div class="input-group-btn">
+                    <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#<?php echo $searchId; ?>-search-help">
+                        <i class="fa fa-question-circle"></i>
+                    </button>
+                </div>
+            <?php endif; ?>
+            <?php echo $view['buttons']->renderButtons(); ?>
         </div>
     </div>
 </div>

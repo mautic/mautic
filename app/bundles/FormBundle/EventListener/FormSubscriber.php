@@ -177,7 +177,7 @@ class FormSubscriber extends CommonSubscriber
         $emails    = $this->getEmailsFromString($config['to']);
 
         if (!empty($emails)) {
-            $this->mailer->setTo($emails);
+            $this->setMailer($config, $tokens, $emails);
 
             if (!empty($leadEmail)) {
                 // Reply to lead for user convenience
@@ -194,24 +194,23 @@ class FormSubscriber extends CommonSubscriber
                 $this->mailer->setBcc($emails);
             }
 
-            $this->mailer->setSubject($config['subject']);
-
-            $this->mailer->addTokens($tokens);
-            $this->mailer->setBody($config['message']);
-            $this->mailer->parsePlainText($config['message']);
-
             $this->mailer->send(true);
         }
 
         if ($config['copy_lead'] && !empty($leadEmail)) {
             // Send copy to lead
-            $this->mailer->reset();
+            $this->setMailer($config, $tokens, $leadEmail);
+
             $this->mailer->setLead($lead->getProfileFields());
-            $this->mailer->setTo($leadEmail);
-            $this->mailer->setSubject($config['subject']);
-            $this->mailer->addTokens($tokens);
-            $this->mailer->setBody($config['message']);
-            $this->mailer->parsePlainText($config['message']);
+
+            $this->mailer->send(true);
+        }
+
+        if (!empty($config['email_to_owner']) && $config['email_to_owner'] && $lead->getOwner()) {
+            // Send copy to owner
+            $this->setMailer($config, $tokens, $lead->getOwner()->getEmail());
+
+            $this->mailer->setLead($lead->getProfileFields());
 
             $this->mailer->send(true);
         }
@@ -420,5 +419,21 @@ class FormSubscriber extends CommonSubscriber
     private function getEmailsFromString($emailString)
     {
         return (!empty($emailString)) ? array_fill_keys(array_map('trim', explode(',', $emailString)), null) : [];
+    }
+
+    /**
+     * @param array $config
+     * @param array $tokens
+     * @param       $to
+     */
+    private function setMailer(array $config, array $tokens, $to)
+    {
+        $this->mailer->reset();
+
+        $this->mailer->setTo($to);
+        $this->mailer->setSubject($config['subject']);
+        $this->mailer->addTokens($tokens);
+        $this->mailer->setBody($config['message']);
+        $this->mailer->parsePlainText($config['message']);
     }
 }

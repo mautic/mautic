@@ -109,7 +109,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         $leadFields = [];
         foreach ($fields as $f) {
             $leadFields[$f] = [
-                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.field.'.$f),
+                'label'    => $this->translator->trans('mautic.constantcontact.field.'.$f),
                 'type'     => 'string',
                 'required' => ($f == 'email') ? true : false,
             ];
@@ -118,7 +118,7 @@ class ConstantContactIntegration extends EmailAbstractIntegration
         $c = 1;
         while ($c <= 15) {
             $leadFields['customfield_'.$c] = [
-                'label'    => $this->factory->getTranslator()->trans('mautic.constantcontact.customfield.'.$f),
+                'label'    => $this->translator->trans('mautic.constantcontact.customfield.'.$f),
                 'type'     => 'string',
                 'required' => false,
             ];

@@ -11,73 +11,51 @@
 
 namespace Mautic\NotificationBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class NotificationListType.
  */
 class NotificationListType extends AbstractType
 {
-    private $repo;
-    private $viewOther;
-
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
-    {
-        $this->viewOther = $factory->getSecurity()->isGranted('notification:notifications:viewother');
-        $this->repo      = $factory->getModel('notification')->getRepository();
-
-        $this->repo->setCurrentUser($factory->getUser());
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $viewOther = $this->viewOther;
-        $repo      = $this->repo;
-
         $resolver->setDefaults(
             [
-                'choices' => function (Options $options) use ($repo, $viewOther) {
-                    static $choices;
-
-                    if (is_array($choices)) {
-                        return $choices;
-                    }
-
-                    $choices = [];
-
-                    $notifications = $repo->getNotificationList('', 0, 0, $viewOther);
-                    foreach ($notifications as $notification) {
-                        $choices[$notification['language']][$notification['id']] = $notification['name'];
-                    }
-
-                    //sort by language
-                    ksort($choices);
-
-                    return $choices;
+                'modal_route'         => 'mautic_notification_action',
+                'modal_header'        => 'mautic.notification.header.new',
+                'model'               => 'notification',
+                'model_lookup_method' => 'getLookupResults',
+                'lookup_arguments'    => function (Options $options) {
+                    return [
+                        'type'    => 'notification',
+                        'filter'  => '$data',
+                        'limit'   => 0,
+                        'start'   => 0,
+                        'options' => [
+                            'notification_type' => $options['notification_type'],
+                        ],
+                    ];
                 },
-                'expanded'    => false,
-                'multiple'    => true,
-                'required'    => false,
-                'empty_value' => function (Options $options) {
-                    return (empty($options['choices'])) ? 'mautic.notification.no.notifications.note' : 'mautic.core.form.chooseone';
+                'ajax_lookup_action' => function (Options $options) {
+                    $query = [
+                        'notification_type' => $options['notification_type'],
+                    ];
+
+                    return 'notification:getLookupChoiceList&'.http_build_query($query);
                 },
+                'expanded'          => false,
+                'multiple'          => true,
+                'required'          => false,
                 'notification_type' => 'template',
-                'disabled'          => function (Options $options) {
-                    return empty($options['choices']);
-                },
             ]
         );
-
-        $resolver->setOptional(['notification_type']);
     }
 
     /**
@@ -93,6 +71,6 @@ class NotificationListType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return EntityLookupType::class;
     }
 }

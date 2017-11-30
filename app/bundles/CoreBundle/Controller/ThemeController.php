@@ -22,13 +22,6 @@ use Symfony\Component\HttpFoundation\Response;
 class ThemeController extends FormController
 {
     /**
-     * Default themes which cannot be deleted.
-     *
-     * @var array
-     */
-    protected $defaultThemes = ['sunday', 'skyline', 'oxygen', 'goldstar', 'neopolitan', 'blank', 'system'];
-
-    /**
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function indexAction()
@@ -65,21 +58,25 @@ class ThemeController extends FormController
                         $fileName  = InputHelper::filename($fileData->getClientOriginalName());
                         $themeName = basename($fileName, '.zip');
 
-                        if (in_array($themeName, $this->defaultThemes)) {
-                            $form->addError(
-                                new FormError(
-                                    $this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
-                                )
-                            );
-                        } elseif (!empty($fileData)) {
-                            try {
-                                $fileData->move($dir, $fileName);
-                                $themeHelper->install($dir.'/'.$fileName);
-                                $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
-                            } catch (\Exception $e) {
+                        if (!empty($fileData)) {
+                            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+
+                            if ($extension === 'zip') {
+                                try {
+                                    $fileData->move($dir, $fileName);
+                                    $themeHelper->install($dir.'/'.$fileName);
+                                    $this->addFlash('mautic.core.theme.installed', ['%name%' => $themeName]);
+                                } catch (\Exception $e) {
+                                    $form->addError(
+                                        new FormError(
+                                            $this->translator->trans($e->getMessage(), [], 'validators')
+                                        )
+                                    );
+                                }
+                            } else {
                                 $form->addError(
                                     new FormError(
-                                        $this->translator->trans($e->getMessage(), [], 'validators')
+                                        $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
                                     )
                                 );
                             }
@@ -98,7 +95,7 @@ class ThemeController extends FormController
         return $this->delegateView([
             'viewParameters' => [
                 'items'         => $themeHelper->getInstalledThemes('all', true, true),
-                'defaultThemes' => $this->defaultThemes,
+                'defaultThemes' => $themeHelper->getDefaultThemes(),
                 'form'          => $form->createView(),
                 'permissions'   => $permissions,
                 'security'      => $this->get('mautic.security'),
@@ -243,7 +240,7 @@ class ThemeController extends FormController
             ];
         } elseif (!$this->get('mautic.security')->isGranted('core:themes:delete')) {
             return $this->accessDenied();
-        } elseif (in_array($themeName, $this->defaultThemes)) {
+        } elseif (in_array($themeName, $themeHelper->getDefaultThemes())) {
             $flashes[] = [
                 'type'    => 'error',
                 'msg'     => 'mautic.core.theme.cannot.be.removed',

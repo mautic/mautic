@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.FE.PLUGINS.lists = function (editor) {
     function _openFlag(tag_name) {
@@ -214,13 +214,13 @@
      */
     function refresh($btn, tag_name) {
       var $el = $(editor.selection.element());
-      if ($el.get(0) != editor.$el.get(0)) {
+      if ($el.get(0) != editor.el) {
         var li = $el.get(0);
         if (li.tagName != 'LI') {
           li = $el.parents('li').get(0);
         }
 
-        if (li && li.parentNode.tagName == tag_name && editor.$el.get(0).contains(li.parentNode)) {
+        if (li && li.parentNode.tagName == tag_name && editor.el.contains(li.parentNode)) {
           $btn.addClass('fr-active');
         }
       }
@@ -235,23 +235,29 @@
         // There should be a previous li.
         var prev_li = blocks[i].previousSibling;
         if (prev_li) {
-          var nl = $(blocks[i]).find('> ul, > ol').get(0);
+          var nl = $(blocks[i]).find('> ul, > ol').last().get(0);
 
           // Current LI has a nested list.
           if (nl) {
+            // Build a new list item and prepend it to the list.
             var $li = $('<li>').prependTo($(nl));
+
+            // Get first node of the list item.
             var node = editor.node.contents(blocks[i])[0];
+
+            // While node and it is not a list, append to the new list item.
             while (node && !editor.node.isList(node)) {
               var tmp = node.nextSibling;
               $li.append(node);
               node = tmp;
             }
 
+            // Append current list to the previous node.
             $(prev_li).append($(nl));
             $(blocks[i]).remove();
           }
           else {
-            var prev_nl = $(prev_li).find('> ul, > ol').get(0);
+            var prev_nl = $(prev_li).find('> ul, > ol').last().get(0);
             if (prev_nl) {
               $(prev_nl).append($(blocks[i]));
             }
@@ -312,21 +318,20 @@
       // TAB key in lists.
       editor.events.on('keydown', function (e) {
         if (e.which == $.FE.KEYCODE.TAB) {
-          var do_indent;
           var blocks = editor.selection.blocks();
           var blks = [];
           for (var i = 0; i < blocks.length; i++) {
             if (blocks[i].tagName == 'LI') {
-              do_indent = true;
               blks.push(blocks[i]);
             }
             else if (blocks[i].parentNode.tagName == 'LI') {
-              do_indent = true;
-              blks.push(blocks[i].parentNode);
+              blks.push(blocks[i].parentNode)
             }
           }
 
-          if (do_indent) {
+          // There is more than one list item selected.
+          // Selection is at the beginning of the selected list item.
+          if (blks.length > 1 || (blks.length && (editor.selection.info(blks[0]).atStart || editor.node.isEmpty(blks[0])))) {
             e.preventDefault();
             e.stopPropagation();
 

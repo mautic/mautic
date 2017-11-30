@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -22,7 +21,7 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('p')
@@ -66,13 +65,14 @@ class PageRepository extends CommonRepository
      * @param bool   $viewOther
      * @param bool   $topLevel
      * @param array  $ignoreIds
+     * @param array  $extraColumns
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [])
     {
         $q = $this->createQueryBuilder('p');
-        $q->select('partial p.{id, title, language, alias}');
+        $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('p.title', ':search'))
@@ -108,7 +108,7 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -123,37 +123,20 @@ class PageRepository extends CommonRepository
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
+        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
+
         switch ($command) {
-            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-                $expr            = $q->expr()->eq('p.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-                $expr            = $q->expr()->eq('p.isPublished', ":$unique");
-                $forceParameters = [$unique => false];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isuncategorized'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->isNull('p.category'),
-                    $q->expr()->eq('p.category', $q->expr()->literal(''))
-                );
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-                $expr            = $q->expr()->eq('IDENTITY(p.createdBy)', $this->currentUser->getId());
-                $returnParameter = false;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.category'):
-                $expr           = $q->expr()->like('c.alias', ":$unique");
-                $filter->strict = true;
-                break;
             case $this->translator->trans('mautic.core.searchcommand.lang'):
+            case $this->translator->trans('mautic.core.searchcommand.lang', [], null, 'en_US'):
                 $langUnique      = $this->generateRandomParameterName();
                 $langValue       = $filter->string.'_%';
                 $forceParameters = [
@@ -164,6 +147,12 @@ class PageRepository extends CommonRepository
                     $q->expr()->eq('p.language', ":$unique"),
                     $q->expr()->like('p.language', ":$langUnique")
                 );
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.page.searchcommand.isprefcenter'):
+            case $this->translator->trans('mautic.page.searchcommand.isprefcenter', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":$unique");
+                $forceParameters = [$unique => true];
                 break;
         }
 
@@ -173,9 +162,7 @@ class PageRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif (!$returnParameter) {
-            $parameters = [];
-        } else {
+        } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
@@ -188,14 +175,17 @@ class PageRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.core.searchcommand.ispublished',
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.isuncategorized',
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.page.searchcommand.isprefcenter',
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

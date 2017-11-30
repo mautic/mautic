@@ -42,12 +42,12 @@ class LeadField extends FormEntity
     /**
      * @var string
      */
-    private $type;
+    private $type = 'text';
 
     /**
      * @var string
      */
-    private $group;
+    private $group = 'core';
 
     /**
      * @var string
@@ -99,7 +99,7 @@ class LeadField extends FormEntity
     /**
      * @var int
      */
-    private $order = 0;
+    private $order = 1;
 
     /**
      * @var string
@@ -109,7 +109,7 @@ class LeadField extends FormEntity
     /**
      * @var array
      */
-    private $properties;
+    private $properties = [];
 
     public function __clone()
     {
@@ -181,7 +181,9 @@ class LeadField extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->addField('object', 'string');
+        $builder->createField('object', 'string')
+            ->nullable()
+            ->build();
 
         $builder->createField('properties', 'array')
             ->nullable()
@@ -461,6 +463,7 @@ class LeadField extends FormEntity
     {
         return $this->object;
     }
+
     /**
      * Set object.
      *
@@ -485,6 +488,7 @@ class LeadField extends FormEntity
     {
         return $this->order;
     }
+
     /**
      * Set isVisible.
      *

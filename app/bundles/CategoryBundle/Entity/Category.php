@@ -83,9 +83,23 @@ class Category extends FormEntity
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('title', new NotBlank([
-            'message' => 'mautic.core.title.required',
-        ]));
+        $metadata->addPropertyConstraint(
+            'title',
+            new NotBlank(
+                [
+                    'message' => 'mautic.core.title.required',
+                ]
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'bundle',
+            new NotBlank(
+                [
+                    'message' => 'mautic.core.value.required',
+                ]
+            )
+        );
     }
 
     /**
@@ -103,6 +117,7 @@ class Category extends FormEntity
                     'alias',
                     'description',
                     'color',
+                    'bundle',
                 ]
             )
             ->build();

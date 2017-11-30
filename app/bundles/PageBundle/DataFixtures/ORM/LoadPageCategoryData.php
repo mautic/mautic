@@ -41,10 +41,8 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
      */
     public function load(ObjectManager $manager)
     {
-        $trans   = $this->container->get('translator');
-        $factory = $this->container->get('mautic.factory');
-        $repo    = $factory->getModel('category.category')->getRepository();
-        $today   = new \DateTime();
+        $repo  = $this->container->get('mautic.category.model.category')->getRepository();
+        $today = new \DateTime();
 
         $cat = new Category();
         $cat->setBundle('page');

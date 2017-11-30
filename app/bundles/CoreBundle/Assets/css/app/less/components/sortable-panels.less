@@ -1,0 +1,32 @@
+@import "../../../libraries/bootstrap/less/variables";
+
+.sortable-panels .panel  {
+  position: relative;
+
+  &.sortable-has-error {
+    border-color: @brand-danger;
+  }
+
+  .sortable-panel-label {
+    font-weight: bold;
+  }
+
+  .sortable-panel-buttons {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
+
+  .sortable-panel-content {
+    min-height: 50px;
+    padding: 10px;
+  }
+
+  &.new-panel {
+    border: none;
+
+    .sortable-panel-wrapper {
+      display: none;
+    }
+  }
+}

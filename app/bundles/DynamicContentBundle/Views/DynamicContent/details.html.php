@@ -10,7 +10,9 @@
  */
 
 /** @var \Mautic\DynamicContentBundle\Entity\DynamicContent $entity */
-$view->extend('MauticCoreBundle:Default:content.html.php');
+if (!$isEmbedded) {
+    $view->extend('MauticCoreBundle:Default:content.html.php');
+}
 $view['slots']->set('mauticContent', 'dynamicContent');
 $view['slots']->set('headerTitle', $entity->getName());
 
@@ -26,40 +28,41 @@ $translationContent = $view->render(
 $showTranslations = !empty(trim($translationContent));
 
 $customButtons = [];
-
-$view['slots']->set(
-    'actions',
-    $view->render(
-        'MauticCoreBundle:Helper:page_actions.html.php',
-        [
-            'item'            => $entity,
-            'customButtons'   => (isset($customButtons)) ? $customButtons : [],
-            'templateButtons' => [
-                'edit' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:editown'],
-                    $permissions['dynamicContent:dynamicContents:editother'],
-                    $entity->getCreatedBy()
-                ),
-                'clone'  => $permissions['dynamicContent:dynamicContents:create'],
-                'delete' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:deleteown'],
-                    $permissions['dynamicContent:dynamicContents:deleteother'],
-                    $entity->getCreatedBy()
-                ),
-                'close' => $view['security']->hasEntityAccess(
-                    $permissions['dynamicContent:dynamicContents:viewown'],
-                    $permissions['dynamicContent:dynamicContents:viewother'],
-                    $entity->getCreatedBy()
-                ),
-            ],
-            'routeBase' => 'dynamicContent',
-        ]
-    )
-);
-$view['slots']->set(
-    'publishStatus',
-    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $entity])
-);
+if (!$isEmbedded) {
+    $view['slots']->set(
+        'actions',
+        $view->render(
+            'MauticCoreBundle:Helper:page_actions.html.php',
+            [
+                'item'            => $entity,
+                'customButtons'   => (isset($customButtons)) ? $customButtons : [],
+                'templateButtons' => [
+                    'edit' => $view['security']->hasEntityAccess(
+                        $permissions['dynamiccontent:dynamiccontents:editown'],
+                        $permissions['dynamiccontent:dynamiccontents:editother'],
+                        $entity->getCreatedBy()
+                    ),
+                    'clone'  => $permissions['dynamiccontent:dynamiccontents:create'],
+                    'delete' => $view['security']->hasEntityAccess(
+                        $permissions['dynamiccontent:dynamiccontents:deleteown'],
+                        $permissions['dynamiccontent:dynamiccontents:deleteother'],
+                        $entity->getCreatedBy()
+                    ),
+                    'close' => $view['security']->hasEntityAccess(
+                        $permissions['dynamiccontent:dynamiccontents:viewown'],
+                        $permissions['dynamiccontent:dynamiccontents:viewother'],
+                        $entity->getCreatedBy()
+                    ),
+                ],
+                'routeBase' => 'dynamicContent',
+            ]
+        )
+    );
+    $view['slots']->set(
+        'publishStatus',
+        $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $entity])
+    );
+}
 ?>
 
 <!-- start: box layout -->
@@ -86,11 +89,15 @@ $view['slots']->set(
                                 </a>
                             </div>
                         <?php endif; ?>
+                        <?php if (!$entity->getIsCampaignBased()): ?>
+                            <div class="small">
+                                <?php echo $view['translator']->trans('mautic.dynamicContent.header.is_filter_based', ['%slot%' => $entity->getSlotName()]); ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
             <!--/ page detail header -->
-
             <!-- page detail collapseable -->
             <div class="collapse" id="page-details">
                 <div class="pr-md pl-md pb-md">
@@ -101,6 +108,24 @@ $view['slots']->set(
                                 'MauticCoreBundle:Helper:details.html.php',
                                 ['entity' => $entity]
                             ); ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b">
+                                    <?php echo $view['translator']->trans('mautic.dynamicContent.slot.campaign'); ?>
+                                </td>
+                                <td>
+                                    <?php echo $entity->getIsCampaignBased() ? 'Yes' : 'No'; ?>
+                                </td>
+                            </tr>
+                            <?php if (!$entity->getIsCampaignBased()) : ?>
+                            <tr>
+                                <td width="20%"><span class="fw-b">
+                                    <?php echo $view['translator']->trans('mautic.dynamicContent.label.slot_name'); ?>
+                                </td>
+                                <td>
+                                    <?php echo $entity->getSlotName(); ?>
+                                </td>
+                            </tr>
+                            <?php endif ?>
                             </tbody>
                         </table>
                     </div>
@@ -108,7 +133,6 @@ $view['slots']->set(
             </div>
             <!--/ page detail collapseable -->
         </div>
-
         <div class="bg-auto bg-dark-xs">
             <!-- page detail collapseable toggler -->
             <div class="hr-expand nm">

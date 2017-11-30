@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Exception as MauticException;
 use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ThemeHelper
 {
@@ -22,6 +23,16 @@ class ThemeHelper
      * @var PathsHelper
      */
     private $pathsHelper;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templatingHelper;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     /**
      * @var array|mixed
@@ -49,14 +60,34 @@ class ThemeHelper
     private $themeHelpers = [];
 
     /**
+     * Default themes which cannot be deleted.
+     *
+     * @var array
+     */
+    protected $defaultThemes = ['sunday', 'skyline', 'oxygen', 'goldstar', 'neopolitan', 'blank', 'system'];
+
+    /**
      * ThemeHelper constructor.
      *
-     * @param PathsHelper $pathsHelper
+     * @param PathsHelper         $pathsHelper
+     * @param TemplatingHelper    $templatingHelper
+     * @param TranslatorInterface $translator
      */
-    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper)
+    public function __construct(PathsHelper $pathsHelper, TemplatingHelper $templatingHelper, TranslatorInterface $translator)
     {
         $this->pathsHelper      = $pathsHelper;
         $this->templatingHelper = $templatingHelper;
+        $this->translator       = $translator;
+    }
+
+    /**
+     * Get theme names which are stock Mautic.
+     *
+     * @return array
+     */
+    public function getDefaultThemes()
+    {
+        return $this->defaultThemes;
     }
 
     /**
@@ -247,10 +278,12 @@ class ThemeHelper
     /**
      * @param string $specificFeature
      * @param bool   $extended        returns extended information about the themes
+     * @param bool   $ignoreCache     true to get the fresh info
+     * @param bool   $includeDirs     true to get the theme dir details
      *
      * @return mixed
      */
-    public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false)
+    public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
     {
         if (empty($this->themes[$specificFeature]) || $ignoreCache === true) {
             $dir      = $this->pathsHelper->getSystemPath('themes', true);
@@ -281,8 +314,12 @@ class ThemeHelper
                     $this->themesInfo[$specificFeature][$theme->getBasename()]           = [];
                     $this->themesInfo[$specificFeature][$theme->getBasename()]['name']   = $config['name'];
                     $this->themesInfo[$specificFeature][$theme->getBasename()]['key']    = $theme->getBasename();
-                    $this->themesInfo[$specificFeature][$theme->getBasename()]['dir']    = $theme->getRealPath();
                     $this->themesInfo[$specificFeature][$theme->getBasename()]['config'] = $config;
+
+                    if ($includeDirs) {
+                        $this->themesInfo[$specificFeature][$theme->getBasename()]['dir']            = $theme->getRealPath();
+                        $this->themesInfo[$specificFeature][$theme->getBasename()]['themesLocalDir'] = $this->pathsHelper->getSystemPath('themes', false);
+                    }
                 }
             }
         }
@@ -362,6 +399,13 @@ class ThemeHelper
         }
 
         $themeName = basename($zipFile, '.zip');
+
+        if (in_array($themeName, $this->getDefaultThemes())) {
+            throw new \Exception(
+                $this->translator->trans('mautic.core.theme.default.cannot.overwrite', ['%name%' => $themeName], 'validators')
+            );
+        }
+
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
         $zipper    = new \ZipArchive();
         $archive   = $zipper->open($zipFile);
@@ -370,7 +414,7 @@ class ThemeHelper
             throw new \Exception($this->getExtractError($archive));
         } else {
             $containsConfig    = false;
-            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff'];
+            $allowedExtensions = ['', 'json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'tiff', 'ico', 'icns', 'eot', 'woff', 'svg'];
             $allowedFiles      = [];
             for ($i = 0; $i < $zipper->numFiles; ++$i) {
                 $entry     = $zipper->getNameIndex($i);

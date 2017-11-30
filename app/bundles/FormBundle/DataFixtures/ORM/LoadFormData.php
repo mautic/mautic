@@ -44,8 +44,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $factory      = $this->container->get('mautic.factory');
-        $model        = $factory->getModel('form.form');
+        $model        = $this->container->get('mautic.form.model.form');
         $repo         = $model->getRepository();
         $forms        = CsvHelper::csv_to_array(__DIR__.'/fakeformdata.csv');
         $formEntities = [];
@@ -73,7 +72,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
 
         //import fields
         $fields = CsvHelper::csv_to_array(__DIR__.'/fakefielddata.csv');
-        $repo   = $factory->getModel('form.field')->getRepository();
+        $repo   = $this->container->get('mautic.form.model.field')->getRepository();
         foreach ($fields as $count => $rows) {
             $field = new Field();
             foreach ($rows as $col => $val) {
@@ -97,7 +96,7 @@ class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, C
 
         //import actions
         $actions = CsvHelper::csv_to_array(__DIR__.'/fakeactiondata.csv');
-        $repo    = $factory->getModel('form.action')->getRepository();
+        $repo    = $this->container->get('mautic.form.model.action')->getRepository();
         foreach ($actions as $count => $rows) {
             $action = new Action();
             foreach ($rows as $col => $val) {

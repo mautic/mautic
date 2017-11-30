@@ -33,10 +33,12 @@ $view['slots']->set('headerTitle', $header);
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['name']); ?>
                                 <?php echo $view['form']->row($form['heading']); ?>
+                                <?php echo $view['form']->row($form['message']); ?>
                                 <?php echo $view['form']->row($form['url']); ?>
+                                <?php echo $view['form']->row($form['button']); ?>
                             </div>
                             <div class="col-md-6">
-                                <?php echo $view['form']->row($form['message']); ?>
+                                <?php include 'preview.html.php'; ?>
                             </div>
                         </div>
                     </div>
@@ -48,11 +50,18 @@ $view['slots']->set('headerTitle', $header);
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['language']); ?>
+            <hr />
+            <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+            <br />
+            <?php
+            foreach ($form['utmTags'] as $i => $utmTag):
+                echo $view['form']->row($utmTag);
+            endforeach;
+            ?>
             <div class="hide">
                 <?php echo $view['form']->row($form['isPublished']); ?>
                 <?php echo $view['form']->row($form['publishUp']); ?>
                 <?php echo $view['form']->row($form['publishDown']); ?>
-
                 <?php echo $view['form']->rest($form); ?>
             </div>
         </div>

@@ -27,13 +27,13 @@ class UserApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('user.user');
         $this->entityClass      = 'Mautic\UserBundle\Entity\User';
         $this->entityNameOne    = 'user';
         $this->entityNameMulti  = 'users';
-        $this->permissionBase   = 'user:users';
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
+
+        parent::initialize($event);
     }
 
     /**
@@ -49,22 +49,6 @@ class UserApiController extends CommonApiController
         $view        = $this->view($currentUser, Codes::HTTP_OK);
 
         return $this->handleView($view);
-    }
-
-    /**
-     * Deletes a user.
-     *
-     * @param int $id User ID
-     *
-     * @return Response
-     */
-    public function deleteEntityAction($id)
-    {
-        if (!$this->get('mautic.security')->isGranted('user:users:delete')) {
-            return $this->accessDenied();
-        }
-
-        return parent::deleteEntityAction($id);
     }
 
     /**
@@ -147,6 +131,25 @@ class UserApiController extends CommonApiController
         }
 
         return $this->processForm($entity, $parameters, $method);
+    }
+
+    public function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    {
+        switch ($action) {
+            case 'new':
+                $submittedPassword = null;
+                if (isset($parameters['plainPassword'])) {
+                    if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
+                        $submittedPassword = $parameters['plainPassword']['password'];
+                    } else {
+                        $submittedPassword = $parameters['plainPassword'];
+                    }
+                }
+
+                $encoder = $this->get('security.encoder_factory')->getEncoder($entity);
+                $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword, true));
+                break;
+        }
     }
 
     /**

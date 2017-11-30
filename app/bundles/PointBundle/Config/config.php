@@ -34,21 +34,35 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getpoints' => [
-                'path'       => '/points',
-                'controller' => 'MauticPointBundle:Api\PointApi:getEntities',
+            'mautic_api_pointactionsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'points',
+                'path'            => '/points',
+                'controller'      => 'MauticPointBundle:Api\PointApi',
             ],
-            'mautic_api_getpoint' => [
-                'path'       => '/points/{id}',
-                'controller' => 'MauticPointBundle:Api\PointApi:getEntity',
+            'mautic_api_getpointactiontypes' => [
+                'path'       => '/points/actions/types',
+                'controller' => 'MauticPointBundle:Api\PointApi:getPointActionTypes',
             ],
-            'mautic_api_gettriggers' => [
-                'path'       => '/points/triggers',
-                'controller' => 'MauticPointBundle:Api\TriggerApi:getEntities',
+            'mautic_api_pointtriggersstandard' => [
+                'standard_entity' => true,
+                'name'            => 'triggers',
+                'path'            => '/points/triggers',
+                'controller'      => 'MauticPointBundle:Api\TriggerApi',
             ],
-            'mautic_api_gettrigger' => [
-                'path'       => '/points/triggers/{id}',
-                'controller' => 'MauticPointBundle:Api\TriggerApi:getEntity',
+            'mautic_api_getpointtriggereventtypes' => [
+                'path'       => '/points/triggers/events/types',
+                'controller' => 'MauticPointBundle:Api\TriggerApi:getPointTriggerEventTypes',
+            ],
+            'mautic_api_pointtriggerdeleteevents' => [
+                'path'       => '/points/triggers/{triggerId}/events/delete',
+                'controller' => 'MauticPointBundle:Api\TriggerApi:deletePointTriggerEvents',
+                'method'     => 'DELETE',
+            ],
+            'mautic_api_adjustcontactpoints' => [
+                'path'       => '/contacts/{leadId}/points/{operator}/{delta}',
+                'controller' => 'MauticPointBundle:Api\PointApi:adjustPoints',
+                'method'     => 'POST',
             ],
         ],
     ],
@@ -104,6 +118,12 @@ return [
                 'class'     => 'Mautic\PointBundle\EventListener\DashboardSubscriber',
                 'arguments' => [
                     'mautic.point.model.point',
+                ],
+            ],
+            'mautic.point.stats.subscriber' => [
+                'class'     => \Mautic\PointBundle\EventListener\StatsSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

@@ -32,4 +32,21 @@ class IntegrationRepository extends CommonRepository
 
         return $results;
     }
+
+    /**
+     * Get core (no plugin) integrations.
+     */
+    public function getCoreIntegrations()
+    {
+        $services = $this->createQueryBuilder('i')
+            ->getQuery()
+            ->getResult();
+
+        $results = [];
+        foreach ($services as $s) {
+            $results[$s->getName()] = $s;
+        }
+
+        return $results;
+    }
 }

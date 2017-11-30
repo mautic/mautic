@@ -60,6 +60,12 @@ $container->loadFromExtension('monolog', [
     ],
 ]);
 
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'cache'       => '%mautic.tmp_path%/%kernel.environment%/twig',
+    'auto_reload' => true,
+]);
+
 // Allow overriding config without a requiring a full bundle or hacks
 if (file_exists(__DIR__.'/config_override.php')) {
     $loader->import('config_override.php');

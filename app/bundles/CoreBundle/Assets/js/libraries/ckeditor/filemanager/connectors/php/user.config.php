@@ -28,6 +28,9 @@ try {
     require_once __DIR__.'/../../../../../../../../../autoload.php';
     require_once __DIR__.'/../../../../../../../../../bootstrap.php.cache';
     require_once __DIR__.'/../../../../../../../../../AppKernel.php';
+
+    \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
+
     $kernel = new AppKernel('prod', false);
     $kernel->boot();
     $container = $kernel->getContainer();

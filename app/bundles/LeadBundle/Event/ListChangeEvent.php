@@ -26,8 +26,11 @@ class ListChangeEvent extends Event
     private $added;
 
     /**
-     * @param Lead $lead
-     * @param List $list
+     * ListChangeEvent constructor.
+     *
+     * @param          $leads
+     * @param LeadList $list
+     * @param bool     $added
      */
     public function __construct($leads, LeadList $list, $added = true)
     {
@@ -61,7 +64,7 @@ class ListChangeEvent extends Event
     }
 
     /**
-     * @return LeadList|List
+     * @return LeadList
      */
     public function getList()
     {

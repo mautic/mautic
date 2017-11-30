@@ -26,7 +26,7 @@ class LeadNoteRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         $q = $this
             ->createQueryBuilder('n')
@@ -82,12 +82,12 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -99,33 +99,42 @@ class LeadNoteRepository extends CommonRepository
     }
 
     /**
-     * @param QueryBuilder $q
-     * @param              $filter
+     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
+     * @param                                                              $filter
      *
      * @return array
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
-        $command         = $filter->command;
-        $string          = $filter->string;
-        $unique          = $this->generateRandomParameterName();
-        $returnParameter = true; //returning a parameter that is not used will lead to a Doctrine error
-        $expr            = false;
+        $command                 = $filter->command;
+        $string                  = $filter->string;
+        $unique                  = $this->generateRandomParameterName();
+        $returnParameter         = false; //returning a parameter that is not used will lead to a Doctrine error
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
 
         switch ($command) {
             case $this->translator->trans('mautic.lead.note.searchcommand.type'):
+            case $this->translator->trans('mautic.lead.note.searchcommand.type', [], null, 'en_US'):
                 switch ($string) {
                     case $this->translator->trans('mautic.lead.note.searchcommand.general'):
-                        $filter->string = 'general';
+                    case $this->translator->trans('mautic.lead.note.searchcommand.general', [], null, 'en_US'):
+                        $filter->string  = 'general';
+                        $returnParameter = true;
                         break;
                     case $this->translator->trans('mautic.lead.note.searchcommand.call'):
-                        $filter->string = 'call';
+                    case $this->translator->trans('mautic.lead.note.searchcommand.call', [], null, 'en_US'):
+                        $filter->string  = 'call';
+                        $returnParameter = true;
                         break;
                     case $this->translator->trans('mautic.lead.note.searchcommand.email'):
-                        $filter->string = 'email';
+                    case $this->translator->trans('mautic.lead.note.searchcommand.email', [], null, 'en_US'):
+                        $filter->string  = 'email';
+                        $returnParameter = true;
                         break;
                     case $this->translator->trans('mautic.lead.note.searchcommand.meeting'):
-                        $filter->string = 'meeting';
+                    case $this->translator->trans('mautic.lead.note.searchcommand.meeting', [], null, 'en_US'):
+                        $filter->string  = 'meeting';
+                        $returnParameter = true;
                         break;
                 }
                 $expr           = $q->expr()->eq('n.type', ":$unique");
@@ -133,14 +142,18 @@ class LeadNoteRepository extends CommonRepository
                 break;
         }
 
-        $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
         }
 
+        if ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = ["$unique" => $string];
+        }
+
         return [
             $expr,
-            ($returnParameter) ? ["$unique" => $string] : [],
+            $parameters,
         ];
     }
 
@@ -149,7 +162,7 @@ class LeadNoteRepository extends CommonRepository
      */
     public function getSearchCommands()
     {
-        return [
+        $commands = [
             'mautic.lead.note.searchcommand.type' => [
                 'mautic.lead.note.searchcommand.general',
                 'mautic.lead.note.searchcommand.call',
@@ -157,6 +170,8 @@ class LeadNoteRepository extends CommonRepository
                 'mautic.lead.note.searchcommand.meeting',
             ],
         ];
+
+        return array_merge($commands, parent::getSearchCommands());
     }
 
     /**

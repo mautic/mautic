@@ -12,8 +12,11 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
+use Mautic\WebhookBundle\EventListener\WebhookModelTrait;
 use Mautic\WebhookBundle\WebhookEvents;
 
 /**
@@ -21,6 +24,8 @@ use Mautic\WebhookBundle\WebhookEvents;
  */
 class WebhookSubscriber extends CommonSubscriber
 {
+    use WebhookModelTrait;
+
     /**
      * @return array
      */
@@ -28,6 +33,9 @@ class WebhookSubscriber extends CommonSubscriber
     {
         return [
             WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
+            LeadEvents::LEAD_POST_SAVE      => ['onLeadNewUpdate', 0],
+            LeadEvents::LEAD_POINTS_CHANGE  => ['onLeadPointChange', 0],
+            LeadEvents::LEAD_POST_DELETE    => ['onLeadDelete', 0],
         ];
     }
 
@@ -73,5 +81,79 @@ class WebhookSubscriber extends CommonSubscriber
 
         // add the deleted checkbox
         $event->addEvent(LeadEvents::LEAD_POST_DELETE, $leadDeleted);
+    }
+
+    /**
+     * @param LeadEvent $event
+     */
+    public function onLeadNewUpdate(LeadEvent $event)
+    {
+        $lead = $event->getLead();
+        if ($lead->isAnonymous()) {
+            // Ignore this contact
+            return;
+        }
+
+        $changes = $lead->getChanges(true);
+        $this->webhookModel->queueWebhooksByType(
+        // Consider this a new contact if it was just identified, otherwise consider it updated
+            !empty($changes['dateIdentified']) ? LeadEvents::LEAD_POST_SAVE.'_new' : LeadEvents::LEAD_POST_SAVE.'_update',
+            [
+                'lead'    => $event->getLead(),
+                'contact' => $event->getLead(),
+            ],
+            [
+                'leadDetails',
+                'userList',
+                'publishDetails',
+                'ipAddress',
+            ]
+        );
+    }
+
+    /**
+     * @param PointsChangeEvent $event
+     */
+    public function onLeadPointChange(PointsChangeEvent $event)
+    {
+        $this->webhookModel->queueWebhooksByType(
+            LeadEvents::LEAD_POINTS_CHANGE,
+            [
+                'lead'    => $event->getLead(),
+                'contact' => $event->getLead(),
+                'points'  => [
+                    'old_points' => $event->getOldPoints(),
+                    'new_points' => $event->getNewPoints(),
+                ],
+            ],
+            [
+                'leadDetails',
+                'userList',
+                'publishDetails',
+                'ipAddress',
+            ]
+        );
+    }
+
+    /**
+     * @param LeadEvent $event
+     */
+    public function onLeadDelete(LeadEvent $event)
+    {
+        $lead = $event->getLead();
+        $this->webhookModel->queueWebhooksByType(
+            LeadEvents::LEAD_POST_DELETE,
+            [
+                'id'      => $lead->deletedId,
+                'lead'    => $lead,
+                'contact' => $lead,
+            ],
+            [
+                'leadDetails',
+                'userList',
+                'publishDetails',
+                'ipAddress',
+            ]
+        );
     }
 }

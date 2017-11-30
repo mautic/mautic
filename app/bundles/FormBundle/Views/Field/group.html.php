@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use \Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 $containerType     = "{$type}grp";
 $defaultInputClass = "{$containerType}-{$type}";

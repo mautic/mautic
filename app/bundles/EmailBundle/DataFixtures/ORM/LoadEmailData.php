@@ -42,10 +42,9 @@ class LoadEmailData extends AbstractFixture implements OrderedFixtureInterface, 
      */
     public function load(ObjectManager $manager)
     {
-        $factory = $this->container->get('mautic.factory');
-        $model   = $factory->getModel('email');
-        $repo    = $model->getRepository();
-        $emails  = CsvHelper::csv_to_array(__DIR__.'/fakeemaildata.csv');
+        $model  = $this->container->get('mautic.email.model.email');
+        $repo   = $model->getRepository();
+        $emails = CsvHelper::csv_to_array(__DIR__.'/fakeemaildata.csv');
 
         foreach ($emails as $count => $rows) {
             $email = new Email();

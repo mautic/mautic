@@ -27,6 +27,21 @@ class SlotButtonType extends SlotType
     {
         parent::buildForm($builder, $options);
 
+        $builder->add(
+            'border-radius',
+            'number',
+            [
+                'label'      => 'mautic.core.button.border.radius',
+                'label_attr' => ['class' => 'control-label'],
+                'required'   => false,
+                'attr'       => [
+                    'class'           => 'form-control',
+                    'data-slot-param' => 'border-radius',
+                    'postaddon_text'  => 'px',
+                ],
+            ]
+        );
+
         $builder->add('link-text', 'text', [
             'label'      => 'mautic.core.button.text',
             'label_attr' => ['class' => 'control-label'],

@@ -1,44 +1,34 @@
 //PageBundle
-Mautic.pageOnLoad = function (container) {
+Mautic.pageOnLoad = function (container, response) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'page.page');
     }
 
     if (mQuery(container + ' #page_template').length) {
         Mautic.toggleBuilderButton(mQuery('#page_template').val() == '');
-    }
 
-    //Handle autohide of "Redirect URL" field if "Redirect Type" is none
-    if (mQuery(container + ' select[name="page[redirectType]"]').length) {
-        //Auto-hide on page loading
-        Mautic.autoHideRedirectUrl(container);
-
-        //Auto-hide on select changing
-        mQuery(container + ' select[name="page[redirectType]"]').chosen().change(function(){
+        //Handle autohide of "Redirect URL" field if "Redirect Type" is none
+        if (mQuery(container + ' select[name="page[redirectType]"]').length) {
+            //Auto-hide on page loading
             Mautic.autoHideRedirectUrl(container);
-        });
+
+            //Auto-hide on select changing
+            mQuery(container + ' select[name="page[redirectType]"]').chosen().change(function(){
+                Mautic.autoHideRedirectUrl(container);
+            });
+        }
+
+        // Preload tokens for code mode builder
+        Mautic.getTokens(Mautic.getBuilderTokensMethod(), function(){});
+        Mautic.initSelectTheme(mQuery('#page_template'));
     }
 
-    var textarea = mQuery('#page_customHtml');
-
-    mQuery(document).on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    mQuery('a[href="#source-container"]').on('shown.bs.tab', function (e) {
-        textarea.froalaEditor('html.set', textarea.val());
-    });
-
-    mQuery('.btn-builder').on('click', function (e) {
-        textarea.froalaEditor('popups.hideAll');
-    });
-
-    Mautic.intiSelectTheme(mQuery('#page_template'));
+    // Open the builder directly when saved from the builder
+    if (response && response.inBuilder) {
+        Mautic.launchBuilder('page');
+        Mautic.processBuilderErrors(response);
+    }
 };
-
-Mautic.pageOnUnload = function (id) {
-    mQuery('#page_customHtml').froalaEditor('popups.hideAll');
-}
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {
     if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {

@@ -1,3 +1,5 @@
+@import "../app/less/variables";
+
 //Froala
 @import "froala/froala_editor";
 //@import "froala/froala_style";
@@ -22,37 +24,28 @@
 //Other
 @import "other/at";
 
-/* BUILDER CSS */
-div[data-slot-handle] {
-    cursor: move!important;
-    bottom: -1px;
-    content: '';
-    left: -15px;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    right: -15px;
-    top: -1px;
-    border: 1px solid #4e5e9e;
+.fr-popup {
+    z-index: 9999 !important;
 }
 
+/* BUILDER CSS */
 div[data-slot-focus] {
-    cursor: move!important;
+    top: -1px;
+    right: -1px;
     bottom: -1px;
+    left: -1px;
     content: '';
-    left: -15px;
     margin: 0;
     padding: 0;
     position: absolute;
-    right: -15px;
-    top: -1px;
-    border: 1px solid #4e5e9e;
+    border: 1px solid @mautic-primary;
+    z-index: 1;
 }
 
 div[data-section-focus] {
     content: '';
     position: absolute;
-    border: 1px solid #fdb933;
+    border: 1px solid @mautic-secondary;
 }
 
 div[data-section-focus="top"] {
@@ -79,17 +72,59 @@ div[data-section-focus="left"] {
     left: 0px;
 }
 
+div[data-section-focus="clone"] {
+  width: 25px;
+  height: 25px;
+  bottom: 62px;
+  left: 10px;
+  background: #4e5e9e;
+  color: #fff;
+  text-align: center;
+  border: 0;
+  line-height: 25px;
+}
+
+div[data-section-focus="handle"] {
+  width: 25px;
+  height: 25px;
+  bottom: 10px;
+  left: 10px;
+  background: #4e5e9e;
+  color: #fff;
+  text-align: center;
+  border: 0;
+  line-height: 25px;
+}
+
+div[data-section-focus="delete"] {
+  width: 25px;
+  height: 25px;
+  bottom: 36px;
+  left: 10px;
+  background: #4e5e9e;
+  color: #fff;
+  text-align: center;
+  border: 0;
+  line-height: 25px;
+}
+
 div[data-slot-toolbar] {
     position: absolute;
-    right: -10px;
-    top: -12px;
+    top: -24px;
+    left: -1px;
+    right: -1px;
+    height: 25px;
+    width: 100%;
     z-index: 10;
     cursor: pointer;
-    cursor: hand;
+    cursor: move;
+    background-color: @mautic-primary;
+    border-left: 1px solid @mautic-primary;
+    border-right: 1px solid @mautic-primary;
+    padding-top:2px;
 }
 
 div[data-slot-toolbar] .btn {
-    border-radius: 10px;
     width: 20px;
     height: 20px;
     padding: 0;
@@ -99,7 +134,6 @@ div[data-slot-toolbar] .btn {
     text-align: center;
     vertical-align: middle;
     cursor: pointer;
-    background-image: none;
     border: 1px solid transparent;
     white-space: nowrap;
     line-height: 1.3856;
@@ -109,29 +143,37 @@ div[data-slot-toolbar] .btn {
     user-select: none;
     font-size: 11px;
     line-height: 1.456;
+    float: right;
+    margin-right: 2px;
+    color: #fff;
 }
 
 div[data-slot-toolbar] .btn .fa {
     padding-top: 4px;
 }
 
-div[data-slot-toolbar] .btn-danger {
-    color: #ffffff;
-    background-color: #f86b4f;
-    border-color: #fff;
+div[data-slot], [data-section-wrapper] {
+    position: relative;
+    font-size: initial;
+    line-height: initial;
 }
 
-div[data-slot], [data-section-wrapper] {
+div[data-slot^="image"] {
+    padding-top: 1px; // prevent z-index of image from hiding the bottom border of a slot with focus above it
+    padding-bottom: 1px;
+}
+
+div[data-slot^="image"] img {
+    z-index: 2;
     position: relative;
 }
 
-div[data-slot="image"] img {
-    z-index: 1;
+div[data-slot].ui-sortable-helper {
+    border: 1px solid @mautic-primary;
 }
 
 .slot-placeholder {
-    border-top: 1px solid #4e5e9e;
-    margin-top: -1px;
+    border: 2px dotted @mautic-primary;
 }
 
 [data-slot="text"] {
@@ -139,7 +181,7 @@ div[data-slot="image"] img {
         padding: initial;
 
         .fr-toolbar {
-            border-top: 2px solid #4e5e9e;
+            border-top: 2px solid @mautic-primary;
             position: absolute;
             left: -15px;
             bottom: initial !important;
@@ -174,10 +216,27 @@ div[data-slot="image"] img {
     }
 }
 
-.slot-type-handle.btn {
+.slot-type-handle.btn, .section-type-handle.btn {
     float: left;
-    width: 106px;
+    width: 111px;
     margin: 2px;
+    height: 75px;
+    padding-left:5px;
+    padding-right:5px;
+    text-align:center;
+    word-wrap: break-word;
+}
+
+.slot-type-handle.ui-draggable-dragging, .section-type-handle.ui-draggable-dragging{
+    color: #5d6c7c;
+    background-color: #f5f5f5;
+    border-color: #d3d3d3;
+    padding: 10px 16px;
+    font-size: 16px;
+    line-height: 1.25;
+    border-radius: 4px;
+    margin: 2px;
+    text-align: center;
 }
 
 .theme-list {
@@ -187,4 +246,11 @@ div[data-slot="image"] img {
     .select-theme-link {
         margin-top: 5px;
     }
+    .select-theme-selected {
+        margin-top:5px;
+    }
+}
+
+[data-slot="dynamicContent"] {
+    z-index:50;
 }

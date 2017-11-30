@@ -1,0 +1,186 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 4,
+      "company_id": 1770970,
+      "owner_id": {
+        "id": 2558281,
+        "name": "Test User",
+        "email": "test123@test.com",
+        "has_pic": true,
+        "pic_hash": "a40046cb532f0202bec118a3b0eb6fb8",
+        "active_flag": true,
+        "value": 2558281
+      },
+      "org_id": {
+        "name": "Organization",
+        "people_count": 1,
+        "owner_id": 2558281,
+        "address": "Wrocław, Poland",
+        "cc_email": "test@test.com",
+        "value": 1
+      },
+      "name": "Daniel Danielski",
+      "first_name": "Daniel",
+      "last_name": "Danielski",
+      "open_deals_count": 0,
+      "related_open_deals_count": 0,
+      "closed_deals_count": 0,
+      "related_closed_deals_count": 0,
+      "participant_open_deals_count": 0,
+      "participant_closed_deals_count": 0,
+      "email_messages_count": 0,
+      "activities_count": 0,
+      "done_activities_count": 0,
+      "undone_activities_count": 0,
+      "reference_activities_count": 0,
+      "files_count": 0,
+      "notes_count": 0,
+      "followers_count": 1,
+      "won_deals_count": 0,
+      "related_won_deals_count": 0,
+      "lost_deals_count": 0,
+      "related_lost_deals_count": 0,
+      "active_flag": true,
+      "phone": [
+        {
+          "label": "work",
+          "value": "123123123",
+          "primary": true
+        }
+      ],
+      "email": [
+        {
+          "label": "work",
+          "value": "test@test.pl",
+          "primary": true
+        }
+      ],
+      "first_char": "z",
+      "update_time": "2017-05-22 12:25:09",
+      "add_time": "2017-05-22 12:16:11",
+      "visible_to": "3",
+      "picture_id": null,
+      "next_activity_date": null,
+      "next_activity_time": null,
+      "next_activity_id": null,
+      "last_activity_id": null,
+      "last_activity_date": null,
+      "last_incoming_mail_time": null,
+      "last_outgoing_mail_time": null,
+      "org_name": "Organization",
+      "owner_name": "Mateusz",
+      "cc_email": "test@test.com"
+    },
+    {
+      "id": 5,
+      "company_id": 1770970,
+      "owner_id": {
+        "id": 2558281,
+        "name": "Test User",
+        "email": "test123@test.com",
+        "has_pic": true,
+        "pic_hash": "a40046cb532f0202bec118a3b0eb6fb8",
+        "active_flag": true,
+        "value": 2558281
+      },
+      "org_id": {
+        "name": "abc",
+        "people_count": 1,
+        "owner_id": 2558281,
+        "address": "Wrocław, Poland",
+        "cc_email": "test@test.com",
+        "value": 2
+      },
+      "name": "Abc User",
+      "first_name": "Abc",
+      "last_name": "User",
+      "open_deals_count": 0,
+      "related_open_deals_count": 0,
+      "closed_deals_count": 0,
+      "related_closed_deals_count": 0,
+      "participant_open_deals_count": 0,
+      "participant_closed_deals_count": 0,
+      "email_messages_count": 0,
+      "activities_count": 0,
+      "done_activities_count": 0,
+      "undone_activities_count": 0,
+      "reference_activities_count": 0,
+      "files_count": 0,
+      "notes_count": 0,
+      "followers_count": 1,
+      "won_deals_count": 0,
+      "related_won_deals_count": 0,
+      "lost_deals_count": 0,
+      "related_lost_deals_count": 0,
+      "active_flag": true,
+      "phone": [
+        {
+          "label": "work",
+          "value": "123123123",
+          "primary": true
+        }
+      ],
+      "email": [
+        {
+          "label": "work",
+          "value": "mat@mat.pl",
+          "primary": true
+        }
+      ],
+      "first_char": "a",
+      "update_time": "2017-05-22 12:46:38",
+      "add_time": "2017-05-22 12:18:51",
+      "visible_to": "3",
+      "picture_id": null,
+      "next_activity_date": null,
+      "next_activity_time": null,
+      "next_activity_id": null,
+      "last_activity_id": null,
+      "last_activity_date": null,
+      "last_incoming_mail_time": null,
+      "last_outgoing_mail_time": null,
+      "org_name": "abc",
+      "owner_name": "Test User",
+      "cc_email": "test@test.com"
+    }
+  ],
+  "additional_data": {
+    "pagination": {
+      "start": 0,
+      "limit": 100,
+      "more_items_in_collection": false
+    }
+  },
+  "related_objects": {
+    "organization": {
+      "1": {
+        "id": 1,
+        "name": "Organization",
+        "people_count": 1,
+        "owner_id": 2558281,
+        "address": "Wrocław, Poland",
+        "cc_email": "test@test.com"
+      },
+      "2": {
+        "id": 2,
+        "name": "abc",
+        "people_count": 1,
+        "owner_id": 2558281,
+        "address": "Wrocław, Poland",
+        "cc_email": "test@test.com"
+      }
+    },
+    "user": {
+      "2558281": {
+        "id": 2558281,
+        "name": "Test User",
+        "email": "test123@test.com",
+        "has_pic": true,
+        "pic_hash": "a40046cb532f0202bec118a3b0eb6fb8",
+        "active_flag": true
+      }
+    }
+  }
+}

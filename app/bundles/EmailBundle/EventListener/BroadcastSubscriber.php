@@ -12,8 +12,8 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event\ChannelBroadcastEvent;
+use Mautic\ChannelBundle\ChannelEvents;
+use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -57,7 +57,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            CoreEvents::CHANNEL_BROADCAST => ['onBroadcast', 0],
+            ChannelEvents::CHANNEL_BROADCAST => ['onBroadcast', 0],
         ];
     }
 

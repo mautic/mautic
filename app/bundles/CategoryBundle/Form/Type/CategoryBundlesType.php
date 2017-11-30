@@ -13,41 +13,37 @@ namespace Mautic\CategoryBundle\Form\Type;
 
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class CategoryBundlesType.
  */
 class CategoryBundlesType extends AbstractType
 {
-    private $translator;
-
-    private $canViewOther;
+    private $dispatcher;
 
     /**
-     * @param MauticFactory $factory
+     * CategoryBundlesType constructor.
+     *
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
-        $this->translator = $factory->getTranslator();
-        $this->dispatcher = $factory->getDispatcher();
+        $this->dispatcher = $dispatcher;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $dispatcher = $this->dispatcher;
-
         $resolver->setDefaults([
-            'choices' => function (Options $options) use ($dispatcher) {
-                if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
-                    $event = new CategoryTypesEvent();
-                    $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
+            'choices' => function (Options $options) {
+                if ($this->dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
+                    $event = $this->dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, new CategoryTypesEvent());
                     $types = $event->getCategoryTypes();
                 } else {
                     $types = [];

@@ -61,26 +61,9 @@ if (!empty($fields['core']['email']['value'])) {
         ],
         'btnText'   => $view['translator']->trans('mautic.lead.email.send_email'),
         'iconClass' => 'fa fa-send',
+        'primary'   => true,
     ];
 }
-//View Lead List button
-$buttons[] = [
-    'attr' => [
-        'data-toggle' => 'ajaxmodal',
-        'data-target' => '#MauticSharedModal',
-        'data-header' => $view['translator']->trans(
-            'mautic.lead.lead.header.lists',
-            ['%name%' => $lead->getPrimaryIdentifier()]
-        ),
-        'data-footer' => 'false',
-        'href'        => $view['router']->path(
-            'mautic_contact_action',
-            ['objectId' => $lead->getId(), 'objectAction' => 'list']
-        ),
-    ],
-    'btnText'   => $view['translator']->trans('mautic.lead.lead.lists'),
-    'iconClass' => 'fa fa-pie-chart',
-];
 
 //View Contact Frequency button
 
@@ -304,6 +287,22 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
+                <li class="">
+                    <a href="#integration-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="IntegrationCount">
+                        <?php echo count($integrations); ?>
+                    </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.integration'); ?>
+                    </a>
+                </li>
+                <li class="">
+                    <a href="#auditlog-container" role="tab" data-toggle="tab">
+                    <span class="label label-primary mr-sm" id="AuditLogCount">
+                        <?php echo $auditlog['total']; ?>
+                    </span>
+                        <?php echo $view['translator']->trans('mautic.lead.lead.tab.auditlog'); ?>
+                    </a>
+                </li>
                 <?php if ($places): ?>
                     <li class="">
                         <a href="#place-container" role="tab" data-toggle="tab" id="load-lead-map">
@@ -314,6 +313,8 @@ $view['slots']->set(
                         </a>
                     </li>
                 <?php endif; ?>
+                
+                <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
             </ul>
             <!--/ tabs controls -->
         </div>
@@ -354,6 +355,35 @@ $view['slots']->set(
             <?php endif; ?>
             <!--/ #social-container -->
 
+            <!-- #integration-container -->
+            <div class="tab-pane fade bdr-w-0" id="integration-container">
+                <?php echo $view->render(
+                    'MauticLeadBundle:Integration:index.html.php',
+                    [
+                        'lead'         => $lead,
+                        'integrations' => $integrations,
+                    ]
+                ); ?>
+            </div>
+            <!--/ #integration-container -->
+
+            <!-- #auditlog-container -->
+            <div class="tab-pane fade bdr-w-0" id="auditlog-container">
+                <?php echo $view->render(
+                    'MauticLeadBundle:Auditlog:list.html.php',
+                    [
+                        'events' => $auditlog,
+                        'lead'   => $lead,
+                        'tmpl'   => 'index',
+                    ]
+                ); ?>
+            </div>
+            <!--/ #auditlog-container -->
+
+            <!-- custom content -->
+            <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
+            <!-- end: custom content -->
+            
             <!-- #place-container -->
             <?php if ($places): ?>
                 <div class="tab-pane fade bdr-w-0" id="place-container">
@@ -488,6 +518,13 @@ $view['slots']->set(
                 <div class="panel-body pt-sm">
                     <ul class="media-list media-list-feed">
                         <?php foreach ($upcomingEvents as $event) : ?>
+                        <?php
+                            $metadata = unserialize($event['metadata']);
+                            $errors   = false;
+                            if (!empty($metadata['errors'])):
+                                $errors = (is_array($metadata['errors'])) ? implode('<br />', $metadata['errors']) : $metadata['errors'];
+                            endif;
+                        ?>
                             <li class="media">
                                 <div class="media-object pull-left mt-xs">
                                     <span class="figure"></span>
@@ -501,7 +538,10 @@ $view['slots']->set(
                                         'mautic.lead.lead.upcoming.event.triggered.at',
                                         ['%event%' => $event['event_name'], '%link%' => $link]
                                     ); ?>
-                                    <p class="fs-12 dark-sm"><?php echo $view['date']->toFull($event['trigger_date']); ?></p>
+                                    <?php if (!empty($errors)): ?>
+                                    <i class="fa fa-warning text-danger" data-toggle="tooltip" title="<?php echo $errors; ?>"></i>
+                                    <?php endif; ?>
+                                    <p class="fs-12 dark-sm timeline-campaign-event-date-<?php echo $event['event_id']; ?>"><?php echo $view['date']->toFull($event['trigger_date'], 'utc'); ?></p>
                                 </div>
                             </li>
                         <?php endforeach; ?>
@@ -517,12 +557,12 @@ $view['slots']->set(
             <?php endforeach; ?>
             <div class="clearfix"></div>
         </div>
-        <div class="pa-sm">
+        <div class="pa-sm panel-companies">
             <div class="panel-title">  <?php echo $view['translator']->trans(
                     'mautic.lead.lead.companies'); ?></div>
             <?php foreach ($companies as $key => $company): ?>
-                <h5 class="pull-left mt-xs mr-xs"><span class="label <?php if ($key == 0): ?>label-primary <?php else: ?>label-success<?php endif?>" >
-                        <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;"><?php echo $company['companyname']; ?></a>
+                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success" >
+                       <i id="company-<?php echo $company['id']; ?>" class="fa fa-check <?php if ($company['is_primary'] == 1): ?>primary<?php endif?>" onclick="Mautic.setAsPrimaryCompany(<?php echo $company['id']?>, <?php echo $lead->getId()?>);" title="<?php echo $view['translator']->trans('mautic.lead.company.set.primary'); ?>"></i> <a href="<?php echo $view['router']->path('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $company['id']]); ?>" style="color: white;"><?php echo $company['companyname']; ?></a>
                     </span>
                 </h5>
             <?php endforeach; ?>

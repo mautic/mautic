@@ -72,13 +72,8 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onBuilderBuild(BuilderEvent $event)
     {
-        if ($event->tokenSectionsRequested()) {
-            $this->addTokenSections($event);
-        }
-
         if ($event->tokensRequested($this->assetToken)) {
             $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
-
             $event->addTokensFromHelper($tokenHelper, $this->assetToken, 'title', 'id', false, true);
         }
     }
@@ -100,25 +95,16 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onPageDisplay(PageDisplayEvent $event)
     {
-        $page   = $event->getPage();
-        $leadId = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead()->getId() : null;
-        $tokens = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
-
+        $page    = $event->getPage();
+        $lead    = ($this->security->isAnonymous()) ? $this->leadModel->getCurrentLead() : null;
+        $leadId  = ($lead) ? $lead->getId() : null;
+        $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
+
         if (!empty($tokens)) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
         }
         $event->setContent($content);
-    }
-
-    /**
-     * @param $event
-     */
-    private function addTokenSections($event)
-    {
-        //add email tokens
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'asset');
-        $event->addTokenSection('asset.emailtokens', 'mautic.asset.assets', $tokenHelper->getTokenContent(), -255);
     }
 
     /**

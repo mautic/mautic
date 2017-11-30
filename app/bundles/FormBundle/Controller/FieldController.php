@@ -45,6 +45,8 @@ class FieldController extends CommonFormController
             ];
         }
 
+        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
         //ajax only for form fields
         if (!$fieldType ||
             !$this->request->isXmlHttpRequest() ||
@@ -152,6 +154,8 @@ class FieldController extends CommonFormController
                     'id'            => $keyId,
                     'formId'        => $formId,
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'     => true,
                 ]
             );
         }
@@ -249,7 +253,10 @@ class FieldController extends CommonFormController
                 }
             }
 
-            $viewParams = ['type' => $fieldType];
+            $viewParams       = ['type' => $fieldType];
+            $customComponents = $this->getModel('form.form')->getCustomComponents();
+            $customParams     = (isset($customComponents['fields'][$fieldType])) ? $customComponents['fields'][$fieldType] : false;
+
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {
@@ -274,11 +281,7 @@ class FieldController extends CommonFormController
             ];
 
             $passthroughVars['fieldId'] = $objectId;
-            if (!empty($customParams)) {
-                $template = $customParams['template'];
-            } else {
-                $template = 'MauticFormBundle:Field:'.$fieldType.'.html.php';
-            }
+            $template                   = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
 
             //prevent undefined errors
             $entity    = new Field();
@@ -294,6 +297,8 @@ class FieldController extends CommonFormController
                     'id'            => $objectId,
                     'formId'        => $formId,
                     'contactFields' => $this->getModel('lead.field')->getFieldListWithProperties(),
+                    'companyFields' => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'inBuilder'     => true,
                 ]
             );
 
@@ -346,7 +351,8 @@ class FieldController extends CommonFormController
             $usedLeadFields = $session->get('mautic.form.'.$formId.'.fields.leadfields');
 
             // Allow to select the lead field from the delete field again
-            if (!empty($formField['leadField']) && ($unusedLeadField = array_search($formField['leadField'], $usedLeadFields)) !== false) {
+            $unusedLeadField = array_search($formField['leadField'], $usedLeadFields);
+            if (!empty($formField['leadField']) && false !== $unusedLeadField) {
                 unset($usedLeadFields[$unusedLeadField]);
                 $session->set('mautic.form.'.$formId.'.fields.leadfields', $usedLeadFields);
             }

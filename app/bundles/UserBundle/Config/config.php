@@ -46,6 +46,13 @@ return [
                 'path'       => '/sso_login_check/{integration}',
                 'controller' => 'MauticUserBundle:Security:ssoLoginCheck',
             ],
+            'lightsaml_sp.login' => [
+                'path'       => '/saml/login',
+                'controller' => 'LightSamlSpBundle:Default:login',
+            ],
+            'lightsaml_sp.login_check' => [
+                'path' => '/saml/login_check',
+            ],
             'mautic_user_index' => [
                 'path'       => '/users/{page}',
                 'controller' => 'MauticUserBundle:User:index',
@@ -67,14 +74,13 @@ return [
                 'controller' => 'MauticUserBundle:Profile:index',
             ],
         ],
+
         'api' => [
-            'mautic_api_getusers' => [
-                'path'       => '/users',
-                'controller' => 'MauticUserBundle:Api\UserApi:getEntities',
-            ],
-            'mautic_api_getuser' => [
-                'path'       => '/users/{id}',
-                'controller' => 'MauticUserBundle:Api\UserApi:getEntity',
+            'mautic_api_usersstandard' => [
+                'standard_entity' => true,
+                'name'            => 'users',
+                'path'            => '/users',
+                'controller'      => 'MauticUserBundle:Api\UserApi',
             ],
             'mautic_api_getself' => [
                 'path'       => '/users/self',
@@ -89,13 +95,11 @@ return [
                 'path'       => '/users/list/roles',
                 'controller' => 'MauticUserBundle:Api\UserApi:getRoles',
             ],
-            'mautic_api_getroles' => [
-                'path'       => '/roles',
-                'controller' => 'MauticUserBundle:Api\RoleApi:getEntities',
-            ],
-            'mautic_api_getrole' => [
-                'path'       => '/roles/{id}',
-                'controller' => 'MauticUserBundle:Api\RoleApi:getEntity',
+            'mautic_api_rolesstandard' => [
+                'standard_entity' => true,
+                'name'            => 'roles',
+                'path'            => '/roles',
+                'controller'      => 'MauticUserBundle:Api\RoleApi',
             ],
         ],
         'public' => [
@@ -106,6 +110,14 @@ return [
             'mautic_user_passwordresetconfirm' => [
                 'path'       => '/passwordresetconfirm',
                 'controller' => 'MauticUserBundle:Public:passwordResetConfirm',
+            ],
+            'lightsaml_sp.metadata' => [
+                'path'       => '/saml/metadata.xml',
+                'controller' => 'LightSamlSpBundle:Default:metadata',
+            ],
+            'lightsaml_sp.discovery' => [
+                'path'       => '/saml/discovery',
+                'controller' => 'LightSamlSpBundle:Default:discovery',
             ],
         ],
     ],
@@ -125,6 +137,12 @@ return [
                     'mautic.user.model.user',
                     'mautic.user.model.role',
                 ],
+            ],
+            'mautic.user.config.subscriber' => [
+                'class' => 'Mautic\UserBundle\EventListener\ConfigSubscriber',
+            ],
+            'mautic.user.route.subscriber' => [
+                'class' => 'Mautic\UserBundle\EventListener\RouteSubscriber',
             ],
         ],
         'forms' => [
@@ -168,6 +186,14 @@ return [
                 'class'     => 'Mautic\UserBundle\Form\Type\RoleListType',
                 'arguments' => 'mautic.user.model.role',
                 'alias'     => 'role_list',
+            ],
+            'mautic.form.type.userconfig' => [
+                'class'     => 'Mautic\UserBundle\Form\Type\ConfigType',
+                'alias'     => 'userconfig',
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'translator',
+                ],
             ],
         ],
         'other' => [
@@ -231,6 +257,7 @@ return [
                     'monolog.logger',
                     'event_dispatcher',
                     '', // providerKey
+                    'mautic.permission.repository',
                 ],
                 'public' => false,
             ],
@@ -249,6 +276,23 @@ return [
                     'mautic.helper.user',
                 ],
             ],
+            'mautic.security.saml.id_store' => [
+                'class'     => 'Mautic\UserBundle\Security\Store\IdStore',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'lightsaml.system.time_provider',
+                ],
+            ],
+            'mautic.security.saml.user_creator' => [
+                'class'     => 'Mautic\UserBundle\Security\User\UserCreator',
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'lightsaml_sp.username_mapper.simple',
+                    'mautic.user.model.user',
+                    'security.encoder_factory',
+                    '%mautic.saml_idp_default_role%',
+                ],
+            ],
         ],
         'models' => [
             'mautic.user.model.role' => [
@@ -261,5 +305,17 @@ return [
                 ],
             ],
         ],
+    ],
+    'parameters' => [
+        'saml_idp_metadata'            => '',
+        'saml_idp_entity_id'           => '',
+        'saml_idp_own_certificate'     => '',
+        'saml_idp_own_private_key'     => '',
+        'saml_idp_own_password'        => '',
+        'saml_idp_email_attribute'     => '',
+        'saml_idp_username_attribute'  => '',
+        'saml_idp_firstname_attribute' => '',
+        'saml_idp_lastname_attribute'  => '',
+        'saml_idp_default_role'        => '',
     ],
 ];

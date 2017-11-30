@@ -45,7 +45,9 @@ class EventHelper
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel = $factory->getModel('lead');
-        $lead      = $leadModel->getCurrentLead();
+        if (!$lead = $leadModel->getCurrentLead()) {
+            return;
+        }
 
         $queryReferer = [];
 
@@ -70,7 +72,7 @@ class EventHelper
         if (key_exists('utm_content', $query)) {
             $utmValues->setUtmCampaign($query['utm_content']);
         } elseif (key_exists('utm_content', $queryReferer)) {
-            $utmValues->setUtmConent($queryReferer['utm_content']);
+            $utmValues->setUtmContent($queryReferer['utm_content']);
         }
 
         if (key_exists('utm_medium', $query)) {

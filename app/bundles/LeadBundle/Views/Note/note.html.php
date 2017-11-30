@@ -48,7 +48,7 @@ switch ($type) {
             <div class="media-body col-xs-11 pa-10">
                 <div class="pull-right btn-group">
                     <?php if ($permissions['edit']): ?>
-                        <a class="btn btn-default btn-xs" href="<?php echo $this->container->get('router')->generate('mautic_contactnote_action', ['leadId' => $lead->getId(), 'objectAction' => 'edit', 'objectId' => $id]); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.edit'); ?>"><i class="fa fa-pencil"></i></a>
+                        <a class="btn btn-default btn-xs" href="<?php echo $view['router']->generate('mautic_contactnote_action', ['leadId' => $lead->getId(), 'objectAction' => 'edit', 'objectId' => $id]); ?>" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="<?php echo $view['translator']->trans('mautic.lead.note.header.edit'); ?>"><i class="fa fa-pencil"></i></a>
                     <?php endif; ?>
                      <?php if ($permissions['delete']): ?>
                          <a class="btn btn-default btn-xs"

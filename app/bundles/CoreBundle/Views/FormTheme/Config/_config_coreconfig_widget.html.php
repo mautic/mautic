@@ -57,37 +57,6 @@ $template  = '<div class="col-md-6">{content}</div>';
 </div>
 <?php endif; ?>
 
-<?php // Email specific settings moved to EmailBundle to prevent confusion due to tab names?>
-
-<?php if (count(array_intersect($fieldKeys, ['cookie_path']))): ?>
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.cookie'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'cookie_path', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'cookie_domain', $template); ?>
-        </div>
-
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'cookie_secure', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'cookie_httponly', $template); ?>
-        </div>
-
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'rememberme_key', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'rememberme_lifetime', $template); ?>
-        </div>
-
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'rememberme_path', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'rememberme_domain', $template); ?>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
 <?php if (count(array_intersect($fieldKeys, ['cors_restrict_domains']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
@@ -102,7 +71,7 @@ $template  = '<div class="col-md-6">{content}</div>';
 </div>
 <?php endif; ?>
 
-<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'transifex_username', 'do_not_track_ips']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'transifex_username', 'do_not_track_ips', 'do_not_track_bots']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.misc'); ?></h3>
@@ -130,10 +99,15 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
         </div>
 
-        <?php if (isset($fields['do_not_track_ips'])): ?>
+        <?php if (isset($fields['do_not_track_ips']) || isset($fields['do_not_track_bots'])): ?>
         <hr class="text-muted" />
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+            <?php if (isset($fields['do_not_track_ips'])): ?>
+                    <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
+            <?php endif; ?>
+            <?php if (isset($fields['do_not_track_bots'])): ?>
+                    <?php echo $view['form']->rowIfExists($fields, 'do_not_track_bots', $template); ?>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
 
@@ -149,6 +123,13 @@ $template  = '<div class="col-md-6">{content}</div>';
         <hr class="text-muted" />
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'link_shortener_url', $template); ?>
+        </div>
+        <?php endif; ?>
+        
+        <?php if (isset($fields['max_entity_lock_time'])): ?>
+        <hr class="text-muted" />
+        <div class="row">
+            <?php echo $view['form']->rowIfExists($fields, 'max_entity_lock_time', $template); ?>
         </div>
         <?php endif; ?>
     </div>

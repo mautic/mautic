@@ -8,6 +8,10 @@
     position: relative;
 }
 
+.form-field-wrapper img {
+    max-width: 100%;
+}
+
 #mauticforms_fields .mauticform-row, #mauticforms_actions .mauticform-row {
     padding: 10px;
 }
@@ -43,6 +47,10 @@
     box-shadow: 0px 0px 0px #fff inset;
     padding: 0.5em 0.5em;
     width: 50%;
+}
+
+#mauticforms_fields .chosen-container-single .chosen-search input[type="text"] {
+    width:100%;
 }
 
 .mauticform-row {
@@ -86,4 +94,7 @@ textarea.form-html {
 #mauticforms_fields input[type="datetime-local"],
 #mauticforms_fields input[type="month"] {
     line-height: inherit;
+}
+#mauticforms_fields input.mauticform-radiogrp-radio {
+    width: auto;
 }

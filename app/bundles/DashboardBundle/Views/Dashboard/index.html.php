@@ -79,7 +79,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 <?php else: ?>
     <div class="well well col-md-6 col-md-offset-3 mt-md">
         <div class="row">
-            <div class="col-xs-3 text-center">
+            <div class="mautibot-image col-xs-3 text-center">
                 <img class="img-responsive" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="<?php echo $view['mautibot']->getImage('wave'); ?>" />
             </div>
             <div class="col-xs-9">

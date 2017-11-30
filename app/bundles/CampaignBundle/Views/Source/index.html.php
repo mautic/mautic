@@ -17,7 +17,7 @@
     </div>
 <?php if (empty($update)): ?>
     <div class="campaign-event-buttons hide">
-        <a data-toggle="ajaxmodal" data-target="#CampaignEventModal" href="<?php echo $view['router']->path('mautic_campaignsource_action', ['objectAction' => 'edit', 'objectId' => $campaignId, 'sourceType' => $sourceType]); ?>" class="btn btn-primary btn-xs btn-edit">
+        <a data-toggle="ajaxmodal" data-prevent-dismiss="true" data-target="#CampaignEventModal" href="<?php echo $view['router']->path('mautic_campaignsource_action', ['objectAction' => 'edit', 'objectId' => $campaignId, 'sourceType' => $sourceType]); ?>" class="btn btn-primary btn-xs btn-edit">
             <i class="fa fa-pencil"></i>
         </a>
         <a data-toggle="ajax" data-target="CampaignEvent_<?php echo $sourceType; ?>" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php echo $view['router']->path('mautic_campaignsource_action', ['objectAction' => 'delete', 'objectId' => $campaignId, 'sourceType' => $sourceType]); ?>"  class="btn btn-delete btn-danger btn-xs">

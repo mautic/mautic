@@ -23,16 +23,16 @@ class LeadListEvent extends CommonEvent
      * @param LeadList $list
      * @param bool     $isNew
      */
-    public function __construct(LeadList &$list, $isNew = false)
+    public function __construct(LeadList $list, $isNew = false)
     {
-        $this->entity = &$list;
+        $this->entity = $list;
         $this->isNew  = $isNew;
     }
 
     /**
      * Returns the List entity.
      *
-     * @return List
+     * @return LeadList
      */
     public function getList()
     {

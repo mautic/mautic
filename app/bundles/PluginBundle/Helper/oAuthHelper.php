@@ -35,11 +35,13 @@ class oAuthHelper
 
     private $request;
 
-    public function __construct(AbstractIntegration $integration, Request $request, $settings = [])
+    public function __construct(AbstractIntegration $integration, Request $request = null, $settings = [])
     {
+        $clientId                = $integration->getClientIdKey();
+        $clientSecret            = $integration->getClientSecretKey();
         $keys                    = $integration->getDecryptedApiKeys();
-        $this->clientId          = $keys[$integration->getClientIdKey()];
-        $this->clientSecret      = $keys[$integration->getClientSecretKey()];
+        $this->clientId          = isset($keys[$clientId]) ? $keys[$clientId] : null;
+        $this->clientSecret      = isset($keys[$clientSecret]) ? $keys[$clientSecret] : null;
         $authToken               = $integration->getAuthTokenKey();
         $this->accessToken       = (isset($keys[$authToken])) ? $keys[$authToken] : '';
         $this->accessTokenSecret = (isset($settings['token_secret'])) ? $settings['token_secret'] : '';
@@ -60,7 +62,7 @@ class oAuthHelper
         //Get standard OAuth headers
         $headers = $this->getOauthHeaders();
 
-        if (!empty($this->settings['include_verifier']) && $this->request->query->has('oauth_verifier')) {
+        if (!empty($this->settings['include_verifier']) && $this->request && $this->request->query->has('oauth_verifier')) {
             $headers['oauth_verifier'] = $this->request->query->get('oauth_verifier');
         }
 

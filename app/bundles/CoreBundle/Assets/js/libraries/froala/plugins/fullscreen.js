@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.FE.PLUGINS.fullscreen = function (editor) {
     var old_scroll;
@@ -50,8 +50,9 @@
     var $placeholder;
     var height;
     var max_height;
+    var z_index;
     function _on () {
-      old_scroll = $(editor.o_win).scrollTop();
+      old_scroll = editor.helpers.scrollTop();
       editor.$box.toggleClass('fr-fullscreen');
       $('body').toggleClass('fr-fullscreen');
       $placeholder = $('<div style="display: none;"></div>');
@@ -67,8 +68,10 @@
 
       height = editor.opts.height;
       max_height = editor.opts.heightMax;
+      z_index = editor.opts.zIndex;
 
       editor.opts.height = editor.o_win.innerHeight - (editor.opts.toolbarInline ? 0 : editor.$tb.outerHeight());
+      editor.opts.zIndex = 9990;
       editor.opts.heightMax = null;
       editor.size.refresh();
 
@@ -100,6 +103,7 @@
 
       editor.opts.height = height;
       editor.opts.heightMax = max_height;
+      editor.opts.zIndex = z_index;
       editor.size.refresh();
 
       $(editor.o_win).scrollTop(old_scroll)
@@ -156,8 +160,8 @@
     function refresh ($btn) {
       var active = isActive();
 
-      $btn.toggleClass('fr-active', active);
-      $btn.find('> *').replaceWith(!active ? editor.icon.create('fullscreen') : editor.icon.create('fullscreenCompress'));
+      $btn.toggleClass('fr-active', active).attr('aria-pressed', active);
+      $btn.find('> *:not(.fr-sr-only)').replaceWith(!active ? editor.icon.create('fullscreen') : editor.icon.create('fullscreenCompress'));
     }
 
     function _init () {
@@ -188,7 +192,9 @@
     title: 'Fullscreen',
     undo: false,
     focus: false,
+    accessibilityFocus: true,
     forcedRefresh: true,
+    toggle: true,
     callback: function () {
       this.fullscreen.toggle();
     },

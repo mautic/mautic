@@ -9,17 +9,21 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="tab-pane dynamic-content-filter bdr-w-0<?php echo $form->vars['name'] === '0' ? ' active' : ' fade' ?>" id="<?php echo $form->vars['id'] ?>">
+<div class="tab-pane dynamic-content-filter bdr-w-0" id="<?php echo $form->vars['id'] ?>">
     <div class="row form-group">
         <div class="col-xs-10">
             <?php echo $view['form']->label($form['content']); ?>
         </div>
         <div class="col-xs-2">
-            <a href="javascript: void(0);" class="remove-item remove-filter btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
+            <?php if ('emailform_dynamicContent_0_filters_0' !== $id) : ?>
+            <a class="remove-item remove-filter btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
+            <?php endif ?>
         </div>
     </div>
     <div class="row form-group">
-        <?php echo $view['form']->widget($form['content']); ?>
+        <div class="col-xs-12">
+            <?php echo $view['form']->widget($form['content']); ?>
+        </div>
     </div>
     <div class="row">
         <div class="col-xs-7">
@@ -38,12 +42,12 @@
                             <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                 <?php foreach ($field as $value => $params):
                                     $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                    $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseListStringIntoArray($list);
+                                    $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list, true, ('boolean' === $params['properties']['type']));
                                     $list      = json_encode($choices);
                                     $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                     $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                     ?>
-                                    <option value="<?php echo $value; ?>" data-mautic="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>" class="segment-filter fa <?php echo $icon; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
+                                    <option value="<?php echo $value; ?>" data-mautic="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators='<?php echo $operators; ?>' class="segment-filter fa <?php echo $icon; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
                                 <?php endforeach; ?>
                             </optgroup>
                         <?php endforeach; ?>

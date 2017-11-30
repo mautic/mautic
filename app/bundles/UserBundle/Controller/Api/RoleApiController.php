@@ -24,36 +24,27 @@ class RoleApiController extends CommonApiController
      */
     public function initialize(FilterControllerEvent $event)
     {
-        parent::initialize($event);
         $this->model            = $this->getModel('user.role');
         $this->entityClass      = 'Mautic\UserBundle\Entity\Role';
         $this->entityNameOne    = 'role';
         $this->entityNameMulti  = 'roles';
-        $this->permissionBase   = 'user:roles';
         $this->serializerGroups = ['roleDetails', 'publishDetails'];
+
+        parent::initialize($event);
     }
 
     /**
-     * Obtains a list of roles.
+     * {@inheritdoc}
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param \Mautic\LeadBundle\Entity\Lead &$entity
+     * @param                                $parameters
+     * @param                                $form
+     * @param string                         $action
      */
-    public function getEntitiesAction()
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        return parent::getEntitiesAction();
-    }
-
-    /**
-     * Obtains a specific role.
-     *
-     * @param int $id Role ID
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    public function getEntityAction($id)
-    {
-        return parent::getEntityAction($id);
+        if (isset($parameters['rawPermissions'])) {
+            $this->model->setRolePermissions($entity, $parameters['rawPermissions']);
+        }
     }
 }

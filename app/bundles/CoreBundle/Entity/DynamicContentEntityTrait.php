@@ -16,12 +16,14 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 trait DynamicContentEntityTrait
 {
     /**
+     * Keep the default content set outside of $dynamicContent so that it can be used if $dynamicContent is emptied.
+     *
      * @var array
      */
-    private $dynamicContent = [
+    public static $defaultDynamicContent = [
         [
-            'tokenName' => null,
-            'content'   => null,
+            'tokenName' => 'Dynamic Content 1',
+            'content'   => 'Default Dynamic Content',
             'filters'   => [
                 [
                     'content' => null,
@@ -42,6 +44,11 @@ trait DynamicContentEntityTrait
     ];
 
     /**
+     * @var array
+     */
+    private $dynamicContent = [];
+
+    /**
      * @param ClassMetadataBuilder $builder
      */
     protected static function addDynamicContentMetadata(ClassMetadataBuilder $builder)
@@ -57,14 +64,30 @@ trait DynamicContentEntityTrait
      */
     public function getDynamicContent()
     {
-        return $this->dynamicContent;
+        return (empty($this->dynamicContent)) ? $this->getDefaultDynamicContent() : $this->dynamicContent;
     }
 
     /**
-     * @param array $dynamicContent
+     * @param $dynamicContent
+     *
+     * @return $this
      */
     public function setDynamicContent($dynamicContent)
     {
+        if (empty($dynamicContent)) {
+            $dynamicContent = $this->getDefaultDynamicContent();
+        }
+
         $this->dynamicContent = $dynamicContent;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefaultDynamicContent()
+    {
+        return self::$defaultDynamicContent;
     }
 }

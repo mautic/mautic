@@ -58,12 +58,6 @@ class PageSubscriber extends CommonSubscriber
      */
     public function onPageBuild(PageBuilderEvent $event)
     {
-        $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
-
-        if ($event->tokenSectionsRequested()) {
-            $event->addTokenSection('form.pagetokens', 'mautic.form.forms', $tokenHelper->getTokenContent());
-        }
-
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $formSubmissions = [
@@ -75,6 +69,7 @@ class PageSubscriber extends CommonSubscriber
         }
 
         if ($event->tokensRequested($this->formRegex)) {
+            $tokenHelper = new BuilderTokenHelper($this->factory, 'form');
             $event->addTokensFromHelper($tokenHelper, $this->formRegex, 'name', 'id', true);
         }
     }
@@ -111,10 +106,6 @@ class PageSubscriber extends CommonSubscriber
                     $formHtml  = preg_replace('#</form>#', $pageInput.'</form>', $formHtml);
 
                     //pouplate get parameters
-                    //priority populate value order by: query string (parameters) -> with lead
-                    if (!$form->getInKioskMode()) {
-                        $this->formModel->populateValuesWithLead($form, $formHtml);
-                    }
                     $this->formModel->populateValuesWithGetParameters($form, $formHtml);
 
                     $content = preg_replace('#{form='.$id.'}#', $formHtml, $content);

@@ -32,32 +32,10 @@ $view['slots']->set(
     <?php echo $view->render(
         'MauticCoreBundle:Helper:list_toolbar.html.php',
         [
-            'searchValue'     => $searchValue,
-            'searchHelp'      => 'mautic.form.form.help.searchcommands',
-            'searchId'        => 'form-search',
-            'action'          => $currentRoute,
-            'routeBase'       => 'form',
-            'templateButtons' => [
-                'delete' => $permissions['form:forms:deleteown'] || $permissions['form:forms:deleteother'],
-            ],
-            'preCustomButtons' => [
-                [
-                    'confirm' => [
-                        'message'       => $view['translator']->trans('mautic.form.confirm_batch_rebuild'),
-                        'confirmText'   => $view['translator']->trans('mautic.form.rebuild'),
-                        'confirmAction' => $view['router']->path(
-                            'mautic_form_action',
-                            array_merge(['objectAction' => 'batchRebuildHtml'])
-                        ),
-                        'tooltip'         => $view['translator']->trans('mautic.form.rebuild.batch_tooltip'),
-                        'iconClass'       => 'fa fa-fw fa-refresh',
-                        'btnText'         => false,
-                        'btnClass'        => 'btn btn-sm btn-default',
-                        'precheck'        => 'batchActionPrecheck',
-                        'confirmCallback' => 'executeBatchAction',
-                    ],
-                ],
-            ],
+            'searchValue' => $searchValue,
+            'searchHelp'  => 'mautic.form.form.help.searchcommands',
+            'searchId'    => 'form-search',
+            'action'      => $currentRoute,
         ]
     ); ?>
 

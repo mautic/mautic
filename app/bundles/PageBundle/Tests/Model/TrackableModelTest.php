@@ -13,6 +13,7 @@ namespace Mautic\CoreBundle\Test;
 
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
+use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TrackableModelTest extends WebTestCase
@@ -20,11 +21,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that content is detected as HTML
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testHtmlIsDetectedInContent()
     {
@@ -39,6 +40,10 @@ class TrackableModelTest extends WebTestCase
 
         $mockModel->expects($this->once())
             ->method('getEntitiesFromUrls')
+            ->willReturn([]);
+
+        $mockModel->expects($this->once())
+            ->method('getDoNotTrackList')
             ->willReturn([]);
 
         $mockModel->expects($this->once())
@@ -65,11 +70,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that content is detected as plain text
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromText
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromText
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testPlainTextIsDetectedInContent()
     {
@@ -81,6 +86,10 @@ class TrackableModelTest extends WebTestCase
             ->setConstructorArgs([$mockRedirectModel])
             ->setMethods(['getDoNotTrackList', 'getEntitiesFromUrls', 'createTrackingTokens',  'extractTrackablesFromText'])
             ->getMock();
+
+        $mockModel->expects($this->once())
+            ->method('getDoNotTrackList')
+            ->willReturn([]);
 
         $mockModel->expects($this->once())
             ->method('getEntitiesFromUrls')
@@ -110,11 +119,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a standard link with a standard query is parsed correctly
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testStandardLinkWithStandardQuery()
     {
@@ -144,11 +153,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a standard link without a query parses correctly
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testStandardLinkWithoutQuery()
     {
@@ -178,11 +187,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a standard link with a tokenized query parses correctly
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testStandardLinkWithTokenizedQuery()
     {
@@ -210,9 +219,9 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a token used in place of a URL is not parsed
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testTokenizedHostIsIgnored()
     {
@@ -232,11 +241,80 @@ class TrackableModelTest extends WebTestCase
     }
 
     /**
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testTokenizedHostWithSchemeIsIgnored()
+    {
+        $url   = '{contactfield=foo}';
+        $model = $this->getModel($url, '{contactfield=foo}');
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [
+                '{contactfield=foo}' => '',
+            ],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables, $content);
+    }
+
+    /**
+     * @testdox Test that a token used in place of a URL is not parsed
+     *
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testTokenizedHostWithQueryIsIgnored()
+    {
+        $url   = 'http://{contactfield=foo}.com?foo=bar';
+        $model = $this->getModel($url, 'http://{contactfield=foo}.com?foo=bar');
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [
+                '{contactfield=foo}' => '',
+            ],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables, $content);
+    }
+
+    /**
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     */
+    public function testTokenizedHostWithTokenizedQueryIsIgnored()
+    {
+        $url   = 'http://{contactfield=foo}.com?foo={contactfield=bar}';
+        $model = $this->getModel($url, 'http://{contactfield=foo}.com?foo={contactfield=bar}');
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            $this->generateContent($url, 'html'),
+            [
+                '{contactfield=foo}' => '',
+                '{contactfield=bar}' => '',
+            ],
+            'email',
+            1
+        );
+
+        $this->assertCount(0, $trackables, $content);
+    }
+
+    /**
      * @testdox Test that tokens that are supposed to be ignored are
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testIgnoredTokensAreNotConverted()
     {
@@ -259,9 +337,9 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that tokens that are supposed to be ignored are
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testUnsupportedTokensAreNotConverted()
     {
@@ -283,9 +361,9 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a URL injected into the do not track list is not converted
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testIgnoredUrlDoesNotCrash()
     {
@@ -305,12 +383,12 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a token used in place of a URL is not parsed
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::validateTokenIsTrackable
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
      */
     public function testTokenAsHostIsConvertedToTrackableToken()
     {
@@ -332,11 +410,11 @@ class TrackableModelTest extends WebTestCase
     /**
      * @testdox Test that a URLs with same base or correctly replaced
      *
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
-     * @covers Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
-     * @covers Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
-     * @covers Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareContentWithTrackableTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::parseContentForTrackables
+     * @covers \Mautic\PageBundle\Model\TrackableModel::extractTrackablesFromHtml
+     * @covers \Mautic\PageBundle\Model\TrackableModel::createTrackingTokens
+     * @covers \Mautic\PageBundle\Model\TrackableModel::prepareUrlForTracking
      */
     public function testUrlsWithSameBaseAreReplacedCorrectly()
     {
@@ -361,11 +439,29 @@ class TrackableModelTest extends WebTestCase
     }
 
     /**
+     * @testdox Test that css images are not converted if there are no links
+     */
+    public function testCssUrlsAreNotConvertedIfThereAreNoLinks()
+    {
+        $url   = 'https://foo-bar.com?foo=bar';
+        $model = $this->getModel($url);
+
+        list($content, $trackables) = $model->parseContentForTrackables(
+            '<style> .mf-modal { background-image: url(\'https://www.mautic.org/wp-content/uploads/2014/08/iTunesArtwork.png\'); } </style>',
+            [],
+            'email',
+            1
+        );
+
+        $this->assertEmpty($trackables);
+    }
+
+    /**
      * @param       $urls
      * @param null  $tokenUrls
      * @param array $doNotTrack
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return TrackableModel
      */
     protected function getModel($urls, $tokenUrls = null, $doNotTrack = [])
     {
@@ -377,6 +473,19 @@ class TrackableModelTest extends WebTestCase
         } elseif (!is_array($tokenUrls)) {
             $tokenUrls = [$tokenUrls];
         }
+
+        // Add default DoNotTrack
+        $doNotTrack = array_merge(
+            $doNotTrack,
+            [
+                '{webview_url}',
+                '{unsubscribe_url}',
+                '{trackable=(.*?)}',
+                // Ignore lead fields as URL hosts for tracking since each is unique
+                '[^=]{leadfield=(.*?)}',
+                '[^=]{contactfield=(.*?)}',
+            ]
+        );
 
         $mockRedirectModel = $this->getMockBuilder('Mautic\PageBundle\Model\RedirectModel')
             ->disableOriginalConstructor()

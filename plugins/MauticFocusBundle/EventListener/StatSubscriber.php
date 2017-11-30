@@ -63,7 +63,7 @@ class StatSubscriber extends CommonSubscriber
             $focus    = $this->model->getEntity($sourceId);
 
             if ($focus && $focus->isPublished()) {
-                $this->model->addStat($focus, Stat::TYPE_CLICK, $hit);
+                $this->model->addStat($focus, Stat::TYPE_CLICK, $hit, $hit->getLead());
             }
         }
     }
@@ -85,7 +85,7 @@ class StatSubscriber extends CommonSubscriber
                 // Make sure the form is still applicable
                 $form = $event->getSubmission()->getForm();
                 if ((int) $form->getId() === (int) $focus->getForm()) {
-                    $this->model->addStat($focus, Stat::TYPE_FORM, $event->getSubmission());
+                    $this->model->addStat($focus, Stat::TYPE_FORM, $event->getSubmission(), $event->getLead());
                 }
             }
         }

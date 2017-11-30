@@ -32,32 +32,100 @@
     }
 }(function ($) {
 
-  'use strict';
+    'use strict';
 
-  $.FE.PLUGINS.token = function (editor) {
+    $.extend($.FE.DEFAULTS, {
+        tokenSelection: false,
+        tokenDefaultSelection: 'Token'
+    });
 
-    function apply () {
-      editor.html.insert(' {');
-      editor.$el.keyup();
-    }
+    $.FE.PLUGINS.token = function (editor) {
 
-    return {
-      apply: apply
-    }
-  }
+        function apply (val) {
+            editor.html.insert(val);
+        }
 
-  // Register the token command.
-  $.FE.RegisterCommand('token', {
-    title: 'Insert token',
-    callback: function (cmd) {
-      this.token.apply();
-    },
-    plugin: 'token'
-  })
+        function _init() {
+            var method = location.href.match(/(email|dwc)/i)? 'email:getBuilderTokens' : 'page:getBuilderTokens';
+            Mautic.getTokens(method, function(tokens) {
+                mQuery.each(tokens, function(k,v){
+                    if (k.match(/assetlink=/i) && v.match(/a:/)){
+                        delete tokens[k];
+                        var nv = v.replace('a:', '');
+                        k = '<a title=\'Asset Link\' href=\'' + k + '\'>' + nv + '</a>';
+                        tokens[k] = nv;
+                    } else if (k.match(/pagelink=/i) && v.match(/a:/)){
+                        delete tokens[k];
+                        nv = v.replace('a:', '');
+                        k = '<a title=\'Page Link\' href=\'' + k + '\'>' + nv + '</a>';
+                        tokens[k] = nv;
+                    } else if (k.match(/dwc=/i)){
+                        var tn = k.substr(5, k.length - 6);
+                        tokens[k] = v + ' (' + tn + ')';
+                    } else if (k.match(/contactfield=company/i) && !v.match(/company/i)){
+                        tokens[k] = 'Company ' + v;
+                    }
+                });
+                var k, keys = [];
+                for (k in tokens) {
+                    if (tokens.hasOwnProperty(k)) {
+                        keys.push(k);
+                    }
+                }
+                keys.sort();
+                var options = [];
+                for (var i = 0; i < keys.length; i++) {
+                    var val = keys[i];
+                    var str = ' <div class=\'badge-wrapper\'><span class=\'badge\'>_BADGE_</span></div>';
+                    var badge = (val.match(/page link/i))?
+                        str.replace(/_BADGE_/, 'page') :
+                            (val.match(/asset link/i))?
+                                str.replace(/_BADGE_/, 'asset') :
+                                    (val.match(/form=/i))?
+                                        str.replace(/_BADGE_/,'form') :
+                                            (val.match(/focus=/i))?
+                                                str.replace(/_BADGE_/,'focus') :
+                                                    (val.match(/dynamiccontent=/i))?
+                                                        str.replace(/_BADGE_/,'dynamic') :
+                                                            (val.match(/dwc=/i))?
+                                                                str.replace(/_BADGE_/,'dwc') : '';
+                    var title = tokens[val];
+                    if (title.length>24) title = title.substr(0, 24) + '...';
+                    var newOption = '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="token" data-param1="' + val + '" title="' + title + '">' + title + badge + '</a></li>';
+                    options.push(newOption);
+                }
 
-  // Add the token icon.
-  $.FE.DefineIcon('token', {
-    NAME: 'tag'
-  });
+                mQuery('button[data-cmd="token"]').next().find('ul').html(options.join(''));
+            });
+        }
+
+        return  {
+            _init: _init,
+            apply: apply
+        }
+    };
+
+    // Register the token command.
+    $.FE.RegisterCommand('token', {
+        type: 'dropdown',
+        forcedRefresh: true,
+        displaySelection: function (editor) {
+            return editor.opts.tokenSelection;
+        },
+        defaultSelection: function (editor) {
+            return editor.opts.tokenDefaultSelection;
+        },
+        displaySelectionWidth: 120,
+        title: 'Insert token',
+        callback: function (cmd, val) {
+            this.token.apply(val);
+        },
+        plugin: 'token'
+    });
+
+    // Add the token icon.
+    $.FE.DefineIcon('token', {
+        NAME: 'tag'
+    });
 
 }));

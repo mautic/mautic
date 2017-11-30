@@ -14,7 +14,9 @@ namespace Mautic\FormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 
 /**
  * Class Submission.
@@ -127,6 +129,19 @@ class Submission
                     'results',
                 ]
             )
+            ->setGroupPrefix('submissionEvent')
+            ->addProperties(
+                [
+                    'id',
+                    'ipAddress',
+                    'form',
+                    'trackingId',
+                    'dateSubmitted',
+                    'referer',
+                    'page',
+                    'results',
+                ]
+            )
             ->build();
     }
 
@@ -219,7 +234,7 @@ class Submission
      *
      * @return Submission
      */
-    public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress = null)
+    public function setIpAddress(IpAddress $ipAddress = null)
     {
         $this->ipAddress = $ipAddress;
 
@@ -256,6 +271,8 @@ class Submission
     public function setResults($results)
     {
         $this->results = $results;
+
+        return $this;
     }
 
     /**
@@ -265,7 +282,7 @@ class Submission
      *
      * @return Submission
      */
-    public function setPage(\Mautic\PageBundle\Entity\Page $page = null)
+    public function setPage(Page $page = null)
     {
         $this->page = $page;
 
@@ -291,11 +308,15 @@ class Submission
     }
 
     /**
-     * @param mixed $lead
+     * @param Lead|null $lead
+     *
+     * @return $this
      */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead = null)
     {
         $this->lead = $lead;
+
+        return $this;
     }
 
     /**
@@ -307,10 +328,41 @@ class Submission
     }
 
     /**
-     * @param mixed $trackingId
+     * @param $trackingId
+     *
+     * @return $this
      */
     public function setTrackingId($trackingId)
     {
         $this->trackingId = $trackingId;
+
+        return  $this;
+    }
+
+    /**
+     * This method is used by standard entity algorithms to check if the current
+     * user has permission to view/edit/delete this item. Provide the form creator for it.
+     *
+     * @return mixed
+     */
+    public function getCreatedBy()
+    {
+        return $this->getForm()->getCreatedBy();
+    }
+
+    /**
+     * @param string $alias
+     *
+     * @return Field|null
+     */
+    public function getFieldByAlias($alias)
+    {
+        foreach ($this->getForm()->getFields() as $field) {
+            if ($field->getAlias() === $alias) {
+                return $field;
+            }
+        }
+
+        return null;
     }
 }

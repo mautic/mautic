@@ -43,8 +43,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
-        $factory  = $this->container->get('mautic.factory');
-        $leadRepo = $factory->getModel('lead.lead')->getRepository();
+        $leadRepo = $this->container->get('mautic.lead.model.lead')->getRepository();
         $today    = new \DateTime();
 
         $leads = CsvHelper::csv_to_array(__DIR__.'/fakeleaddata.csv');
@@ -53,7 +52,7 @@ class LoadLeadData extends AbstractFixture implements OrderedFixtureInterface, C
             $lead = new Lead();
             $lead->setDateAdded($today);
             $ipAddress = new IpAddress();
-            $ipAddress->setIpAddress($l['ip'], $factory->getSystemParameters());
+            $ipAddress->setIpAddress($l['ip'], $this->container->get('mautic.helper.core_parameters')->getParameter('parameters'));
             $this->setReference('ipAddress-'.$key, $ipAddress);
             unset($l['ip']);
             $lead->addIpAddress($ipAddress);

@@ -1,5 +1,5 @@
 
-.builder {
+.builder, .builder-slot {
   position: relative;
 
   [data-token] {
@@ -37,37 +37,118 @@
 }
 
 .builder-panel {
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   right: 0;
-  width: 300px;
+  width: 525px;
   height: 100%;
   padding: 15px;
   background-color: #d5d4d4;
   overflow-y: auto;
 }
 
-.builder-panel .btn-close-builder {
-  width: 100%;
-}
-
 .builder-content {
   position: fixed;
   left: 0;
   top: 0;
-  right: 300px;
+  right: 525px;
   height: 100%;
+}
+
+.code-mode {
+  .builder-panel {
+    width: 50%;
+    position: fixed;
+  }
+  .builder-content {
+    width: 50%;
+  }
 }
 
 .builder-panel .panel a.btn {
   white-space: normal;
 }
 
+/********** SLOT ************/
+
+.builder-active-slot {
+  background-color: #fff;
+  z-index: 1030;
+}
+
+.builder-panel-slot {
+  width: 50%;
+  padding: 15px;
+  background-color: #d5d4d4;
+  overflow-y: auto;
+}
+
+.builder-content-slot {
+  left: 50%;
+  width: 50%;
+}
+
+.code-mode {
+  .builder-panel-slot {
+    width: 50%;
+  }
+  .builder-content-slot {
+    width: 50%;
+  }
+}
+
+.builder-panel-slot .panel a.btn {
+  white-space: normal;
+}
+
+/************* END SLOT ******************/
+
 .ui-draggable-iframeFix {
   z-index: 9999 !important;
 }
 
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+
+.CodeMirror-hints {
+  position: absolute;
+  z-index: 9999 !important;
+  overflow: hidden;
+  list-style: none;
+
+  margin: 0;
+  padding: 2px;
+
+  -webkit-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  -moz-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  border-radius: 3px;
+  border: 1px solid silver;
+
+  background: white;
+  font-size: 90%;
+  font-family: monospace;
+
+  max-height: 20em;
+  overflow-y: auto;
+}
+
+.CodeMirror-hint {
+  margin: 0;
+  padding: 0 4px;
+  border-radius: 2px;
+  white-space: pre;
+  color: black;
+  cursor: pointer;
+}
+
+li.CodeMirror-hint-active {
+  background: #08f;
+  color: white;
+}
 
 @media (max-width: 767px) {
   .builder {

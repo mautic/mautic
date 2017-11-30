@@ -11,13 +11,13 @@
 ?>
 
 <?php if (!empty($showMore)): ?>
-    <a href="<?php echo $this->container->get('router')->generate('mautic_pointtrigger_index', ['search' => $searchString]); ?>" data-toggle="ajax">
+    <a href="<?php echo $view['router']->generate('mautic_pointtrigger_index', ['search' => $searchString]); ?>" data-toggle="ajax">
         <span><?php echo $view['translator']->trans('mautic.core.search.more', ['%count%' => $remaining]); ?></span>
     </a>
 </div>
 <?php else: ?>
 <?php if ($canEdit): ?>
-<a href="<?php echo $this->container->get('router')->generate('mautic_pointtrigger_index', ['objectAction' => 'edit', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
+<a href="<?php echo $view['router']->generate('mautic_pointtrigger_index', ['objectAction' => 'edit', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
     <?php echo $item->getName(); ?>
 </a>
 <?php else: ?>

@@ -587,7 +587,6 @@ class AjaxController extends CommonController
             $cookieHelper = $this->factory->getHelper('cookie');
             $cookieHelper->deleteCookie('mautic_update');
         } else {
-
             // A way to keep the upgrade from failing if the session is lost after
             // the cache is cleared by upgrade.php
             /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
@@ -689,7 +688,7 @@ class AjaxController extends CommonController
 
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
-        $model->clearNotification($id);
+        $model->clearNotification($id, 200);
 
         return $this->sendJsonResponse(['success' => 1]);
     }

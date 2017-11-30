@@ -23,15 +23,19 @@ if (!empty($id)) {
 $view['slots']->set('headerTitle', $header);
 
 $templates = [
-    'countries' => 'country-template',
-    'regions'   => 'region-template',
-    'timezones' => 'timezone-template',
-    'select'    => 'select-template',
-    'lists'     => 'leadlist-template',
-    'emails'    => 'lead_email_received-template',
-    'tags'      => 'tags-template',
-    'stage'     => 'stage-template',
-    'locales'   => 'locale-template',
+    'countries'      => 'country-template',
+    'regions'        => 'region-template',
+    'timezones'      => 'timezone-template',
+    'select'         => 'select-template',
+    'lists'          => 'leadlist-template',
+    'deviceTypes'    => 'device_type-template',
+    'deviceBrands'   => 'device_brand-template',
+    'deviceOs'       => 'device_os-template',
+    'emails'         => 'lead_email_received-template',
+    'tags'           => 'tags-template',
+    'stage'          => 'stage-template',
+    'locales'        => 'locale-template',
+    'globalcategory' => 'globalcategory-template',
 ];
 
 $mainErrors   = ($view['form']->containsErrors($form, ['filters'])) ? 'class="text-danger"' : '';
@@ -52,7 +56,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             <?php endif; ?>
                         </a>
                     </li>
-                    <li>
+                    <li data-toggle="tooltip" title="" data-placement="top" data-original-title="<?php echo $view['translator']->trans('mautic.lead.lead.segment.add.help'); ?>">
                         <a href="#filters" role="tab" data-toggle="tab"<?php echo $filterErrors; ?>>
                             <?php echo $view['translator']->trans('mautic.core.filters'); ?>
                             <?php if ($filterErrors): ?>
@@ -81,24 +85,32 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="filters">
                         <div class="form-group">
-                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->row($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
+                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
                                 <select class="chosen form-control" id="available_filters">
                                     <option value=""></option>
                                     <?php
                                     foreach ($fields as $object => $field):
                                         $header = $object;
-                                        $icon   = ($object == 'company') ? 'fa-building' : 'fa-user';
+                                        $icon   = ($object == 'company') ? 'building' : 'user';
                                     ?>
                                     <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
                                         <?php foreach ($field as $value => $params):
                                             $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
-                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list);
-                                            $object    = $object;
+                                            $choices   = \Mautic\LeadBundle\Helper\FormFieldHelper::parseList($list, true, ('boolean' === $params['properties']['type']));
                                             $list      = json_encode($choices);
                                             $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                             $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                             ?>
-                                            <option value="<?php echo $value; ?>" id="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>" class="segment-filter fa <?php echo $icon; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
+                                            <option value="<?php echo $value; ?>"
+                                                    id="available_<?php echo $value; ?>"
+                                                    data-field-object="<?php echo $object; ?>"
+                                                    data-field-type="<?php echo $params['properties']['type']; ?>"
+                                                    data-field-list="<?php echo $view->escape($list); ?>"
+                                                    data-field-callback="<?php echo $callback; ?>"
+                                                    data-field-operators="<?php echo $operators; ?>"
+                                                    class="segment-filter <?php echo $icon; ?>">
+                                                    <?php echo $view['translator']->trans($params['label']); ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </optgroup>
                                     <?php endforeach; ?>

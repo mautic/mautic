@@ -12,10 +12,6 @@
 return [
     'routes' => [
         'main' => [
-            'mautic_asset_buildertoken_index' => [
-                'path'       => '/asset/buildertokens/{page}',
-                'controller' => 'MauticAssetBundle:SubscribedEvents\BuilderToken:index',
-            ],
             'mautic_asset_index' => [
                 'path'       => '/assets/{page}',
                 'controller' => 'MauticAssetBundle:Asset:index',
@@ -30,13 +26,11 @@ return [
             ],
         ],
         'api' => [
-            'mautic_api_getassets' => [
-                'path'       => '/assets',
-                'controller' => 'MauticAssetBundle:Api\AssetApi:getEntities',
-            ],
-            'mautic_api_getasset' => [
-                'path'       => '/assets/{id}',
-                'controller' => 'MauticAssetBundle:Api\AssetApi:getEntity',
+            'mautic_api_assetsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'assets',
+                'path'            => '/assets',
+                'controller'      => 'MauticAssetBundle:Api\AssetApi',
             ],
         ],
         'public' => [
@@ -92,7 +86,10 @@ return [
                 ],
             ],
             'mautic.asset.reportbundle.subscriber' => [
-                'class' => 'Mautic\AssetBundle\EventListener\ReportSubscriber',
+                'class'     => \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.company_report_data',
+                ],
             ],
             'mautic.asset.builder.subscriber' => [
                 'class'     => 'Mautic\AssetBundle\EventListener\BuilderSubscriber',
@@ -122,12 +119,18 @@ return [
                     'mautic.asset.model.asset',
                 ],
             ],
-            'oneup_uploader.pre_upload' => [
-                'class'     => 'Mautic\AssetBundle\EventListener\UploadSubscriber',
+            'mautic.asset.stats.subscriber' => [
+                'class'     => \Mautic\AssetBundle\EventListener\StatsSubscriber::class,
                 'arguments' => [
-                    'translator',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            'oneup_uploader.pre_upload' => [
+                'class'     => \Mautic\AssetBundle\EventListener\UploadSubscriber::class,
+                'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.asset.model.asset',
+                    'mautic.core.validator.file_upload',
                 ],
             ],
             'mautic.asset.dashboard.subscriber' => [

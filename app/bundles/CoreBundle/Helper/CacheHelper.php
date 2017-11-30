@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -22,26 +21,26 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class CacheHelper
 {
-    protected $factory;
-
     protected $cacheDir;
-
-    protected $env;
 
     protected $configFile;
 
     protected $containerFile;
 
+    protected $container;
+
     /**
-     * @param MauticFactory $factory
+     * CacheHelper constructor.
+     *
+     * @param \AppKernel $kernel
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(\AppKernel $kernel)
     {
-        $this->factory       = $factory;
-        $this->cacheDir      = $factory->getSystemPath('cache', true);
-        $this->env           = $factory->getEnvironment();
-        $this->configFile    = $this->factory->getLocalConfigFile(false);
-        $this->containerFile = $this->factory->getKernel()->getContainerFile();
+        $this->kernel        = $kernel;
+        $this->container     = $kernel->getContainer();
+        $this->cacheDir      = $this->container->get('mautic.helper.paths')->getSystemPath('cache', true);
+        $this->configFile    = $kernel->getLocalConfigFile(false);
+        $this->containerFile = $kernel->getContainerFile();
     }
 
     /**
@@ -60,14 +59,14 @@ class CacheHelper
         //attempt to squash command output
         ob_start();
 
-        $args = ['console', 'cache:clear', '--env='.$this->env];
+        $args = ['console', 'cache:clear', '--env='.MAUTIC_ENV];
 
-        if ($this->env == 'prod') {
+        if (MAUTIC_ENV == 'prod') {
             $args[] = '--no-debug';
         }
 
         $input       = new ArgvInput($args);
-        $application = new Application($this->factory->getKernel());
+        $application = new Application($this->kernel);
         $application->setAutoExit(false);
         $output = new NullOutput();
         $application->run($input, $output);
@@ -99,9 +98,8 @@ class CacheHelper
     {
         $this->clearSessionItems();
 
-        $containerFile = $this->factory->getKernel()->getContainerFile();
-        if (file_exists($containerFile)) {
-            unlink($containerFile);
+        if (file_exists($this->containerFile)) {
+            unlink($this->containerFile);
         }
 
         $this->clearOpcaches($configSave);
@@ -131,8 +129,8 @@ class CacheHelper
     public function clearRoutingCache()
     {
         $unlink = [
-            $this->factory->getKernel()->getContainer()->getParameter('router.options.generator.cache_class'),
-            $this->factory->getKernel()->getContainer()->getParameter('router.options.matcher.cache_class'),
+            $this->kernel->getContainer()->getParameter('router.options.generator.cache_class'),
+            $this->kernel->getContainer()->getParameter('router.options.matcher.cache_class'),
         ];
 
         foreach ($unlink as $file) {
@@ -148,7 +146,7 @@ class CacheHelper
     protected function clearSessionItems()
     {
         // Clear the menu items and icons so they can be rebuilt
-        $session = $this->factory->getSession();
+        $session = $this->kernel->getContainer()->get('session');
         $session->remove('mautic.menu.items');
         $session->remove('mautic.menu.icons');
     }

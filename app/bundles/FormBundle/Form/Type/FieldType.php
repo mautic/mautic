@@ -98,6 +98,15 @@ class FieldType extends AbstractType
                     // Allow html
                     $cleanMasks['properties'] = 'html';
                     break;
+                case 'freehtml':
+                    $addHelpMessage      = $addDefaultValue      = $addIsRequired      = $addLeadFieldList      = $addSaveResult      = $addBehaviorFields      = false;
+                    $labelText           = 'mautic.form.field.form.header';
+                    $showLabelText       = 'mautic.form.field.form.showheader';
+                    $inputAttributesText = 'mautic.form.field.form.freehtml_attributes';
+                    $labelAttributesText = 'mautic.form.field.form.header_attributes';
+                    // Allow html
+                    $cleanMasks['properties'] = 'html';
+                    break;
                 case 'button':
                     $addHelpMessage = $addShowLabel = $addDefaultValue = $addLabelAttributes = $addIsRequired = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
@@ -110,15 +119,15 @@ class FieldType extends AbstractType
                 case 'pagebreak':
                     $addShowLabel = $allowCustomAlias = $addHelpMessage = $addIsRequired = $addDefaultValue = $addLeadFieldList = $addSaveResult = $addBehaviorFields = false;
                     break;
-                case 'email':
-                    $addBehaviorFields = false;
-                    break;
                 case 'select':
                     $cleanMasks['properties']['list']['list']['label'] = 'strict_html';
                     break;
                 case 'checkboxgrp':
                 case 'radiogrp':
                     $cleanMasks['properties']['optionlist']['list']['label'] = 'strict_html';
+                    break;
+                case 'file':
+                    $addShowLabel = $addDefaultValue = $addLeadFieldList = $addBehaviorFields = false;
                     break;
             }
         }
@@ -359,8 +368,11 @@ class FieldType extends AbstractType
                 [
                     'choices'     => $options['leadFields'],
                     'choice_attr' => function ($val, $key, $index) use ($options) {
-                        if (!empty($options['leadFieldProperties'][$val]) && (in_array($options['leadFieldProperties'][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$val]['properties']['optionlist']))) {
-                            return ['data-list-type' => 1];
+                        $objects = ['lead', 'company'];
+                        foreach ($objects as $object) {
+                            if (!empty($options['leadFieldProperties'][$object][$val]) && (in_array($options['leadFieldProperties'][$object][$val]['type'], FormFieldHelper::getListTypes()) || !empty($options['leadFieldProperties'][$object][$val]['properties']['list']) || !empty($options['leadFieldProperties'][$object][$val]['properties']['optionlist']))) {
+                                return ['data-list-type' => 1];
+                            }
                         }
 
                         return [];
@@ -449,6 +461,18 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
+                case 'freehtml':
+                    $builder->add(
+                        'properties',
+                        'formfield_html',
+                        [
+                            'required' => false,
+                            'label'    => false,
+                            'editor'   => true,
+                            'data'     => $propertiesData,
+                        ]
+                    );
+                    break;
                 case 'date':
                 case 'email':
                 case 'number':
@@ -484,6 +508,15 @@ class FieldType extends AbstractType
                         ]
                     );
                     break;
+                case 'file':
+                    $builder->add(
+                        'properties',
+                        FormFieldFileType::class,
+                        [
+                            'label' => false,
+                            'data'  => $propertiesData,
+                        ]
+                    );
             }
         }
 

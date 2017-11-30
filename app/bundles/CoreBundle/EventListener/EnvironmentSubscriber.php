@@ -67,12 +67,6 @@ class EnvironmentSubscriber extends CommonSubscriber
 
         // Set date/time
         date_default_timezone_set($request->getSession()->get('_timezone', $this->params['default_timezone']));
-
-        // Set a cookie with session name for filemanager
-        $sessionName = $request->cookies->get('mautic_session_name');
-        if ($sessionName != session_name()) {
-            $this->cookieHelper->setCookie('mautic_session_name', session_name(), null);
-        }
     }
 
     /**

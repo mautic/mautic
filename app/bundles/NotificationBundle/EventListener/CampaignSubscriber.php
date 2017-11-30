@@ -16,13 +16,15 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\NotificationBundle\Api\AbstractNotificationApi;
 use Mautic\NotificationBundle\Event\NotificationSendEvent;
+use Mautic\NotificationBundle\Form\Type\MobileNotificationSendType;
+use Mautic\NotificationBundle\Form\Type\NotificationSendType;
 use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
 
 /**
  * Class CampaignSubscriber.
@@ -45,28 +47,28 @@ class CampaignSubscriber extends CommonSubscriber
     protected $notificationApi;
 
     /**
-     * @var CoreParametersHelper
+     * @var IntegrationHelper
      */
-    protected $coreParametersHelper;
+    protected $integrationHelper;
 
     /**
      * CampaignSubscriber constructor.
      *
-     * @param CoreParametersHelper    $coreParametersHelper
+     * @param IntegrationHelper       $integrationHelper
      * @param LeadModel               $leadModel
      * @param NotificationModel       $notificationModel
      * @param AbstractNotificationApi $notificationApi
      */
     public function __construct(
-        CoreParametersHelper $coreParametersHelper,
+        IntegrationHelper $integrationHelper,
         LeadModel $leadModel,
         NotificationModel $notificationModel,
         AbstractNotificationApi $notificationApi
     ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->leadModel            = $leadModel;
-        $this->notificationModel    = $notificationModel;
-        $this->notificationApi      = $notificationApi;
+        $this->integrationHelper = $integrationHelper;
+        $this->leadModel         = $leadModel;
+        $this->notificationModel = $notificationModel;
+        $this->notificationApi   = $notificationApi;
     }
 
     /**
@@ -85,24 +87,52 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
-        if ($this->coreParametersHelper->getParameter('notification_enabled')) {
+        $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
+
+        if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
+            return;
+        }
+
+        $features = $integration->getSupportedFeatures();
+        $settings = $integration->getIntegrationSettings();
+
+        if (in_array('mobile', $features)) {
             $event->addAction(
-                'notification.send_notification',
+                'notification.send_mobile_notification',
                 [
-                    'label'            => 'mautic.notification.campaign.send_notification',
-                    'description'      => 'mautic.notification.campaign.send_notification.tooltip',
+                    'label'            => 'mautic.notification.campaign.send_mobile_notification',
+                    'description'      => 'mautic.notification.campaign.send_mobile_notification.tooltip',
                     'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
-                    'formType'         => 'notificationsend_list',
+                    'formType'         => MobileNotificationSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                     'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
                     'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                    'channel'          => 'mobile_notification',
+                    'channelIdField'   => 'mobile_notification',
                 ]
             );
         }
+
+        $event->addAction(
+            'notification.send_notification',
+            [
+                'label'            => 'mautic.notification.campaign.send_notification',
+                'description'      => 'mautic.notification.campaign.send_notification.tooltip',
+                'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'formType'         => NotificationSendType::class,
+                'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
+                'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
+                'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                'channel'          => 'notification',
+                'channelIdField'   => 'notification',
+            ]
+        );
     }
 
     /**
      * @param CampaignExecutionEvent $event
+     *
+     * @return CampaignExecutionEvent
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
@@ -110,20 +140,6 @@ class CampaignSubscriber extends CommonSubscriber
 
         if ($this->leadModel->isContactable($lead, 'notification') !== DoNotContact::IS_CONTACTABLE) {
             return $event->setFailed('mautic.notification.campaign.failed.not_contactable');
-        }
-
-        // If lead has subscribed on multiple devices, get all of them.
-        /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
-        $pushIDs = $lead->getPushIDs();
-
-        $playerID = [];
-
-        foreach ($pushIDs as $pushID) {
-            $playerID[] = $pushID->getPushID();
-        }
-
-        if (empty($playerID)) {
-            return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
         }
 
         $notificationId = (int) $event->getConfig()['notification'];
@@ -135,16 +151,42 @@ class CampaignSubscriber extends CommonSubscriber
             return $event->setFailed('mautic.notification.campaign.failed.missing_entity');
         }
 
+        // If lead has subscribed on multiple devices, get all of them.
+        /** @var \Mautic\NotificationBundle\Entity\PushID[] $pushIDs */
+        $pushIDs = $lead->getPushIDs();
+
+        $playerID = [];
+
+        foreach ($pushIDs as $pushID) {
+            // Skip non-mobile PushIDs if this is a mobile event
+            if ($event->checkContext('notification.send_mobile_notification') && $pushID->isMobile() == false) {
+                continue;
+            }
+
+            // Skip mobile PushIDs if this is a non-mobile event
+            if ($event->checkContext('notification.send_notification') && $pushID->isMobile() == true) {
+                continue;
+            }
+
+            $playerID[] = $pushID->getPushID();
+        }
+
+        if (empty($playerID)) {
+            return $event->setFailed('mautic.notification.campaign.failed.not_subscribed');
+        }
+
         if ($url = $notification->getUrl()) {
             $url = $this->notificationApi->convertToTrackedUrl(
                 $url,
                 [
                     'notification' => $notification->getId(),
                     'lead'         => $lead->getId(),
-                ]
+                ],
+                $notification
             );
         }
 
+        /** @var TokenReplacementEvent $tokenEvent */
         $tokenEvent = $this->dispatcher->dispatch(
             NotificationEvents::TOKEN_REPLACEMENT,
             new TokenReplacementEvent(
@@ -154,16 +196,21 @@ class CampaignSubscriber extends CommonSubscriber
             )
         );
 
+        /** @var NotificationSendEvent $sendEvent */
         $sendEvent = $this->dispatcher->dispatch(
             NotificationEvents::NOTIFICATION_ON_SEND,
             new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
         );
 
+        // prevent rewrite notification entity
+        $sendNotification = clone $notification;
+        $sendNotification->setUrl($url);
+        $sendNotification->setMessage($sendEvent->getMessage());
+        $sendNotification->setHeading($sendEvent->getHeading());
+
         $response = $this->notificationApi->sendNotification(
             $playerID,
-            $sendEvent->getMessage(),
-            $sendEvent->getHeading(),
-            $url
+            $sendNotification
         );
 
         $event->setChannel('notification', $notification->getId());
@@ -181,8 +228,8 @@ class CampaignSubscriber extends CommonSubscriber
             'type'    => 'mautic.notification.notification',
             'id'      => $notification->getId(),
             'name'    => $notification->getName(),
-            'heading' => $event->getHeading(),
-            'content' => $event->getMessage(),
+            'heading' => $sendEvent->getHeading(),
+            'content' => $sendEvent->getMessage(),
         ];
 
         $event->setResult($result);

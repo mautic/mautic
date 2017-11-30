@@ -126,7 +126,7 @@ class UtmTag
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->setGroupPrefix('tmutmtag')
+        $metadata->setGroupPrefix('utmtags')
             ->addListProperties(
                 [
                     'id',
@@ -157,13 +157,13 @@ class UtmTag
     }
 
     /**
-     * Set dateHit.
+     * Set date added.
      *
      * @param \DateTime $dateHit
      *
-     * @return Hit
+     * @return UtmTag
      */
-    public function setDateAdded($date)
+    public function setDateAdded(\DateTime $date)
     {
         $this->dateAdded = $date;
 
@@ -171,7 +171,7 @@ class UtmTag
     }
 
     /**
-     * Get dateHit.
+     * Get date added.
      *
      * @return \DateTime
      */
@@ -191,7 +191,7 @@ class UtmTag
     /**
      * @param Lead $lead
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setLead(Lead $lead)
     {
@@ -211,7 +211,7 @@ class UtmTag
     /**
      * @param array $query
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setQuery($query)
     {
@@ -225,7 +225,7 @@ class UtmTag
      *
      * @param string $referer
      *
-     * @return Action
+     * @return UtmTag
      */
     public function setReferer($referer)
     {
@@ -249,7 +249,7 @@ class UtmTag
      *
      * @param string $remoteHost
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setRemoteHost($remoteHost)
     {
@@ -273,7 +273,7 @@ class UtmTag
      *
      * @param string $url
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setUrl($url)
     {
@@ -297,7 +297,7 @@ class UtmTag
      *
      * @param string $userAgent
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setUserAgent($userAgent)
     {
@@ -317,7 +317,7 @@ class UtmTag
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getUtmCampaign()
     {
@@ -325,9 +325,9 @@ class UtmTag
     }
 
     /**
-     * @param array $query
+     * @param string $utmCampaign
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setUtmCampaign($utmCampaign)
     {
@@ -337,7 +337,7 @@ class UtmTag
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getUtmContent()
     {
@@ -345,11 +345,11 @@ class UtmTag
     }
 
     /**
-     * @param array $query
+     * @param string $utmContent
      *
-     * @return Hit
+     * @return UtmTag
      */
-    public function setUtmConent($utmContent)
+    public function setUtmContent($utmContent)
     {
         $this->utmContent = $utmContent;
 
@@ -357,7 +357,7 @@ class UtmTag
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getUtmMedium()
     {
@@ -365,9 +365,9 @@ class UtmTag
     }
 
     /**
-     * @param array $query
+     * @param string $utmMedium
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setUtmMedium($utmMedium)
     {
@@ -377,7 +377,7 @@ class UtmTag
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getUtmSource()
     {
@@ -385,9 +385,9 @@ class UtmTag
     }
 
     /**
-     * @param array $query
+     * @param string $utmSource
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setUtmSource($utmSource)
     {
@@ -397,7 +397,7 @@ class UtmTag
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getUtmTerm()
     {
@@ -405,14 +405,36 @@ class UtmTag
     }
 
     /**
-     * @param array $query
+     * @param string $utmTerm
      *
-     * @return Hit
+     * @return UtmTag
      */
     public function setUtmTerm($utmTerm)
     {
         $this->utmTerm = $utmTerm;
 
         return $this;
+    }
+
+    /**
+     * Available fields and it's setters.
+     *
+     * @return array
+     */
+    public function getFieldSetterList()
+    {
+        return [
+            'utm_campaign' => 'setUtmCampaign',
+            'utm_source'   => 'setUtmSource',
+            'utm_medium'   => 'setUtmMedium',
+            'utm_content'  => 'setUtmContent',
+            'utm_term'     => 'setUtmTerm',
+            'user_agent'   => 'setUserAgent',
+            'url'          => 'setUrl',
+            'referer'      => 'setReferer',
+            'query'        => 'setQuery',
+            'remote_host'  => 'setRemoteHost',
+            'date_added'   => 'setDateAdded',
+        ];
     }
 }

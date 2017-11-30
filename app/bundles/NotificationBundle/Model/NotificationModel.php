@@ -14,6 +14,7 @@ namespace Mautic\NotificationBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
@@ -28,7 +29,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
  * Class NotificationModel
  * {@inheritdoc}
  */
-class NotificationModel extends FormModel
+class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
      * @var TrackableModel
@@ -128,7 +129,9 @@ class NotificationModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('notification', $entity, $options);
+        $type = strpos($action, 'mobile_') !== false ? 'mobile_notification' : 'notification';
+
+        return $formFactory->create($type, $entity, $options);
     }
 
     /**
@@ -153,14 +156,16 @@ class NotificationModel extends FormModel
      * @param Notification $notification
      * @param Lead         $lead
      * @param string       $source
+     * @param int          $sourceId
      */
-    public function createStatEntry(Notification $notification, Lead $lead, $source = null)
+    public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null)
     {
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
         $stat->setLead($lead);
         $stat->setNotification($notification);
         $stat->setSource($source);
+        $stat->setSourceId($sourceId);
 
         $this->getStatRepository()->saveEntity($stat);
     }
@@ -301,5 +306,57 @@ class NotificationModel extends FormModel
     public function getNotificationClickStats($notificationId)
     {
         return $this->pageTrackableModel->getTrackableList('notification', $notificationId);
+    }
+
+    /**
+     * @param        $type
+     * @param string $filter
+     * @param int    $limit
+     * @param int    $start
+     * @param array  $options
+     *
+     * @return array
+     */
+    public function getLookupResults($type, $filter = '', $limit = 10, $start = 0, $options = [])
+    {
+        $results = [];
+        switch ($type) {
+            case 'notification':
+                $entities = $this->getRepository()->getNotificationList(
+                    $filter,
+                    $limit,
+                    $start,
+                    $this->security->isGranted($this->getPermissionBase().':viewother'),
+                    isset($options['notification_type']) ? $options['notification_type'] : null
+                );
+
+                foreach ($entities as $entity) {
+                    $results[$entity['language']][$entity['id']] = $entity['name'];
+                }
+
+                //sort by language
+                ksort($results);
+
+                break;
+            case 'mobile_notification':
+                $entities = $this->getRepository()->getMobileNotificationList(
+                    $filter,
+                    $limit,
+                    $start,
+                    $this->security->isGranted($this->getPermissionBase().':viewother'),
+                    isset($options['notification_type']) ? $options['notification_type'] : null
+                );
+
+                foreach ($entities as $entity) {
+                    $results[$entity['language']][$entity['id']] = $entity['name'];
+                }
+
+                //sort by language
+                ksort($results);
+
+                break;
+        }
+
+        return $results;
     }
 }

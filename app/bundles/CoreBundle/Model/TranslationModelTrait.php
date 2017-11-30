@@ -36,6 +36,8 @@ trait TranslationModelTrait
     {
         list($translationParent, $translationChildren) = $entity->getTranslations();
 
+        $leadPreference = $chosenLanguage = null;
+
         if (count($translationChildren)) {
             if ($translationParent) {
                 $translationChildren = $translationParent->getTranslationChildren();
@@ -92,9 +94,8 @@ trait TranslationModelTrait
                 }
             }
 
-            $matchFound     = false;
-            $preferredCore  = false;
-            $chosenLanguage = null;
+            $matchFound    = false;
+            $preferredCore = false;
             foreach ($languageList as $language) {
                 $core = $this->getTranslationLocaleCore($language);
                 if (isset($translationList[$core])) {
@@ -123,7 +124,7 @@ trait TranslationModelTrait
         }
 
         // Save the preferred language to the lead's profile
-        if (!$leadPreference && $chosenLanguage && $lead instanceof Lead) {
+        if (!$leadPreference && !empty($chosenLanguage) && $lead instanceof Lead) {
             $lead->addUpdatedField('preferred_locale', $chosenLanguage);
         }
 

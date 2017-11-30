@@ -9,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren()) {
-
     /* Top menu level start */
     if ($item->isRoot()) {
         echo '<ul class="nav mt-10" data-toggle="menu">'."\n";
@@ -71,8 +70,8 @@ if ($item->hasChildren() && $options['depth'] !== 0 && $item->getDisplayChildren
 
         /* Submenu items start */
         if ($showChildren) {
-            $options['depth']         = ($options['depth']) ? $options['depth']-- : '';
-            $options['matchingDepth'] = ($options['matchingDepth']) ? $options['matchingDepth']-- : '';
+            $options['depth']         = ($options['depth']) ? $options['depth']-- : null;
+            $options['matchingDepth'] = ($options['matchingDepth']) ? $options['matchingDepth']-- : null;
 
             $levelClass = $isAncestor ? 'nav-submenu collapse in' : 'nav-submenu collapse';
 

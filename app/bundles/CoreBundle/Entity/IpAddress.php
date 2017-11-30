@@ -73,14 +73,20 @@ class IpAddress
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
-        $metadata->addProperties(
+        $metadata->setGroupPrefix('ipAddress')
+            ->addListProperties(
+                [
+                    ['ipAddress', 'ip'],
+                ]
+            )
+            ->addProperties(
                 [
                     'id',
                     'ipAddress',
                     'ipDetails',
                 ]
             )
-            ->addGroup('ipAddress')
+            ->addGroup('ipAddress', true)
             ->build();
     }
 

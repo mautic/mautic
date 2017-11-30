@@ -10,7 +10,7 @@ if (isset($attr['onchange'])) {
 } else {
     $attr['onchange'] = $onchange;
 }
-$attr['style'] = 'width: 100%; height: 100%; top: 0; left: 0; margin-top: 0;';
+$attr['style'] = 'width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;';
 
 ?>
 <div class="btn-group btn-block" data-toggle="buttons">

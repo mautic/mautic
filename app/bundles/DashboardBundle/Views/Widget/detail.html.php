@@ -20,7 +20,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-right">
                 <li>
-                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $widget->getId()]); ?>"
+                    <a  href="<?php echo $view['router']->generate('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $widget->getId()]); ?>"
                         data-toggle="ajaxmodal"
                         data-target="#MauticSharedModal"
                         data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.edit'); ?>">
@@ -40,7 +40,7 @@
                 </li>
                 <li role="separator" class="divider"></li>
                 <li>
-                    <a  href="<?php echo $this->container->get('router')->generate('mautic_dashboard_action', ['objectAction' => 'delete', 'objectId' => $widget->getId()]); ?>"
+                    <a  href="<?php echo $view['router']->generate('mautic_dashboard_action', ['objectAction' => 'delete', 'objectId' => $widget->getId()]); ?>"
                         data-header="<?php echo $view['translator']->trans('mautic.dashboard.widget.header.delete'); ?>"
                         class="remove-widget">
                         <i class="fa fa-remove"></i> Remove

@@ -52,6 +52,11 @@
     margin-left:20px;
 }
 
+
+.selected-filters .glue-select {
+    margin-top:2px;
+}
+
 .selected-filters .panel {
     margin-bottom:0;
     margin-top:20px;
@@ -197,7 +202,7 @@ ul.tag-cloud li {
     max-height: 200px;
 }
 .frequency{
-    width: 45px;
+    width: 45px!important;
 
 }
 .fa-user:before, .fa-building:before{
@@ -205,4 +210,42 @@ ul.tag-cloud li {
 }
 .inline-spacer {
     text-transform: capitalize;
+}
+.contact{
+    display: inline !important;
+}
+.frequency-table, .frequency-table td{
+    border-bottom: none!important;
+    border-top: none!important;
+}
+
+.frequency-values {
+    padding-left: 10px;
+    padding-top: 27px;
+    padding-bottom: 15px;
+}
+.frequency-select {
+    width:145px !important;
+    float: right;
+    padding-right: 5px;
+}
+.frequency-label {
+    padding: 8px;
+ }
+.frequency-date {
+    width: 100px;
+    float:left;
+}
+.panel-companies .primary {
+    color: #fdb933;
+}
+.building::before {
+    content: "\f1ad";
+    font-family: "FontAwesome";
+    padding-right: 3px;
+}
+.user::before {
+    content: "\f007";
+    font-family: "FontAwesome";
+    padding-right: 3px;
 }

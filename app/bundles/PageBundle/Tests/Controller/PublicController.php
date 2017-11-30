@@ -11,12 +11,15 @@
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\DependencyInjection\Container;
@@ -142,6 +145,12 @@ class PublicController extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $ipHelper = $this->getMockBuilder(IpLookupHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $ipHelper->method('getIpAddress')
+            ->will($this->returnValue(new IpAddress()));
+
         $assetHelper = $this->getMockBuilder(AssetsHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -165,6 +174,8 @@ class PublicController extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($pageEntityA));
         $pageModel->method('hitPage')
             ->will($this->returnValue(true));
+        $pageModel->method('generateHit')
+            ->will($this->returnValue(new Hit()));
 
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
@@ -189,6 +200,7 @@ class PublicController extends \PHPUnit_Framework_TestCase
                     [
                         ['mautic.helper.cookie', Container::EXCEPTION_ON_INVALID_REFERENCE, $cookieHelper],
                         ['templating.helper.assets', Container::EXCEPTION_ON_INVALID_REFERENCE, $assetHelper],
+                        ['mautic.helper.ip_lookup', Container::EXCEPTION_ON_INVALID_REFERENCE, $ipHelper],
                         ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $mauticSecurity],
                         ['mautic.helper.template.analytics', Container::EXCEPTION_ON_INVALID_REFERENCE, $analyticsHelper],
                         ['mautic.page.model.page', Container::EXCEPTION_ON_INVALID_REFERENCE, $pageModel],

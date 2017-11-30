@@ -122,7 +122,7 @@ class Plugin extends CommonEntity
      *
      * @param string $name
      *
-     * @return Addon
+     * @return Plugin
      */
     public function setName($name)
     {
@@ -146,7 +146,7 @@ class Plugin extends CommonEntity
      *
      * @param string $bundle
      *
-     * @return Addon
+     * @return Plugin
      */
     public function setBundle($bundle)
     {

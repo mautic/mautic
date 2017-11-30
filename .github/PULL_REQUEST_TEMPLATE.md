@@ -4,6 +4,7 @@
 | --- | ---
 | Bug fix? | 
 | New feature? | 
+| Automated tests included? |
 | Related user documentation PR URL | 
 | Related developer documentation PR URL | 
 | Issues addressed (#s or URLs) | 
@@ -15,13 +16,12 @@
 [//]: # ( Required: )
 #### Description:
 
-
-#### Steps to test this PR:
+[//]: # ( As applicable: )
+#### Steps to reproduce the bug:
 1. 
 2. 
 
-[//]: # ( As applicable: )
-#### Steps to reproduce the bug:
+#### Steps to test this PR:
 1. 
 2. 
 

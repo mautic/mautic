@@ -12,9 +12,7 @@
         <?php foreach ($items as $item): ?>
             <?php /** @var \Mautic\LeadBundle\Entity\Lead $item */ ?>
             <?php $fields = $item->getFields(); ?>
-            <tr<?php if (!empty($highlight)) {
-    echo ' class="warning"';
-} ?>>
+            <tr<?php if (!empty($highlight)): echo ' class="warning"'; endif; ?>>
                 <td>
                     <?php
                     $hasEditAccess = $security->hasEntityAccess(
@@ -68,7 +66,7 @@
                 </td>
                 <td>
                     <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $item->getId()]); ?>" data-toggle="ajax">
-                        <?php if (in_array($item->getId(), $noContactList)) : ?>
+                        <?php if (in_array($item->getId(), array_keys($noContactList)))  : ?>
                             <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                         <?php endif; ?>
                         <div><?php echo ($item->isAnonymous()) ? $view['translator']->trans($item->getPrimaryIdentifier()) : $item->getPrimaryIdentifier(); ?></div>

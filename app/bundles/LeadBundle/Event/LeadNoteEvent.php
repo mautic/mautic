@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 
 /**
@@ -23,9 +24,9 @@ class LeadNoteEvent extends CommonEvent
      * @param LeadNote $note
      * @param bool     $isNew
      */
-    public function __construct(LeadNote &$note, $isNew = false)
+    public function __construct(LeadNote $note, $isNew = false)
     {
-        $this->entity = &$note;
+        $this->entity = $note;
         $this->isNew  = $isNew;
     }
 
@@ -44,7 +45,7 @@ class LeadNoteEvent extends CommonEvent
      *
      * @param LeadNote $note
      */
-    public function setLeadNote(getNote $note)
+    public function setLeadNote(LeadNote $note)
     {
         $this->entity = $note;
     }

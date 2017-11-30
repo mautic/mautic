@@ -42,7 +42,7 @@ class FormButtonsType extends AbstractType
         if (!empty($options['cancel_text'])) {
             $builder->add(
                 'cancel',
-                'submit',
+                $options['cancel_type'],
                 [
                     'label' => $options['cancel_text'],
                     'attr'  => array_merge(
@@ -60,7 +60,7 @@ class FormButtonsType extends AbstractType
         if (!empty($options['save_text'])) {
             $builder->add(
                 'save',
-                'submit',
+                $options['save_type'],
                 [
                     'label' => $options['save_text'],
                     'attr'  => array_merge(
@@ -78,7 +78,7 @@ class FormButtonsType extends AbstractType
         if (!empty($options['apply_text'])) {
             $builder->add(
                 'apply',
-                'submit',
+                $options['apply_type'],
                 [
                     'label' => $options['apply_text'],
                     'attr'  => array_merge(
@@ -117,16 +117,19 @@ class FormButtonsType extends AbstractType
             'apply_class'        => 'btn btn-default btn-apply',
             'apply_onclick'      => false,
             'apply_attr'         => [],
+            'apply_type'         => 'submit',
             'save_text'          => 'mautic.core.form.saveandclose',
             'save_icon'          => 'fa fa-save',
             'save_class'         => 'btn btn-default btn-save',
             'save_onclick'       => false,
             'save_attr'          => [],
+            'save_type'          => 'submit',
             'cancel_text'        => 'mautic.core.form.cancel',
             'cancel_icon'        => 'fa fa-times text-danger',
             'cancel_class'       => 'btn btn-default btn-cancel',
             'cancel_onclick'     => false,
             'cancel_attr'        => [],
+            'cancel_type'        => 'submit',
             'mapped'             => false,
             'label'              => false,
             'required'           => false,

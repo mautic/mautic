@@ -13,6 +13,7 @@ namespace Mautic\PointBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
  * Class TriggerEventModel.
@@ -49,5 +50,23 @@ class TriggerEventModel extends CommonFormModel
         }
 
         return parent::getEntity($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws MethodNotAllowedHttpException
+     */
+    public function createForm($entity, $formFactory, $action = null, $options = [])
+    {
+        if (!$entity instanceof TriggerEvent) {
+            throw new MethodNotAllowedHttpException(['Trigger']);
+        }
+
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create('pointtriggerevent', $entity, $options);
     }
 }

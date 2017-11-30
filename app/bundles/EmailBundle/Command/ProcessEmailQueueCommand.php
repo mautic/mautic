@@ -11,9 +11,9 @@
 
 namespace Mautic\EmailBundle\Command;
 
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,7 +23,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * CLI command to process the e-mail queue.
  */
-class ProcessEmailQueueCommand extends ContainerAwareCommand
+class ProcessEmailQueueCommand extends ModeratedCommand
 {
     /**
      * {@inheritdoc}
@@ -44,6 +44,8 @@ The <info>%command.name%</info> command is used to process the application's e-m
 <info>php %command.full_name%</info>
 EOT
         );
+
+        parent::configure();
     }
 
     /**
@@ -59,13 +61,15 @@ EOT
         $skipClear = $input->getOption('do-not-clear');
         $quiet     = $input->getOption('quiet');
         $timeout   = $input->getOption('clear-timeout');
-
-        $factory   = $container->get('mautic.factory');
-        $queueMode = $factory->getParameter('mailer_spool_type');
+        $queueMode = $container->get('mautic.helper.core_parameters')->getParameter('mailer_spool_type');
 
         if ($queueMode != 'file') {
             $output->writeln('Mautic is not set to queue email.');
 
+            return 0;
+        }
+
+        if (!$this->checkRunStatus($input, $output)) {
             return 0;
         }
 
@@ -167,6 +171,8 @@ EOT
         }
         $input      = new ArrayInput($commandArgs);
         $returnCode = $command->run($input, $output);
+
+        $this->completeRun();
 
         if ($returnCode !== 0) {
             return $returnCode;

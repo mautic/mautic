@@ -87,10 +87,11 @@ class TrackableModel extends AbstractCommonModel
      * @param Trackable  $trackable
      * @param array      $clickthrough
      * @param bool|false $shortenUrl   If true, use the configured shortener service to shorten the URLs
+     * @param array      $utmTags
      *
      * @return string
      */
-    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], $shortenUrl = false)
+    public function generateTrackableUrl(Trackable $trackable, $clickthrough = [], $shortenUrl = false, $utmTags = [])
     {
         if (!isset($clickthrough['channel'])) {
             $clickthrough['channel'] = [$trackable->getChannel() => $trackable->getChannelId()];
@@ -98,7 +99,7 @@ class TrackableModel extends AbstractCommonModel
 
         $redirect = $trackable->getRedirect();
 
-        return $this->getRedirectModel()->generateRedirectUrl($redirect, $clickthrough, $shortenUrl);
+        return $this->getRedirectModel()->generateRedirectUrl($redirect, $clickthrough, $shortenUrl, $utmTags);
     }
 
     /**
@@ -268,7 +269,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         foreach ($content as &$text) {
-            if (preg_match('/<a(.*?) href/i', $text)) {
+            if (preg_match('/<[^<]+>/', $text) !== 0) {
                 // Parse as HTML
                 $trackableUrls = array_merge(
                     $trackableUrls,
@@ -295,13 +296,13 @@ class TrackableModel extends AbstractCommonModel
 
             // Replace URLs in content with tokens
             foreach ($content as &$text) {
-                $type = (preg_match('/<a(.*?) href/i', $text)) ? 'html' : 'text';
+                $type = (preg_match('/<(.*?) href/i', $text)) ? 'html' : 'text';
                 $text = $this->prepareContentWithTrackableTokens($text, $type);
             }
         } elseif (!empty($this->contentReplacements['first_pass'])) {
             // Replace URLs in content with tokens
             foreach ($content as &$text) {
-                $type = (preg_match('/<a(.*?) href/i', $text)) ? 'html' : 'text';
+                $type = (preg_match('/<(.*?) href/i', $text)) ? 'html' : 'text';
                 $text = $this->prepareContentWithTrackableTokens($text, $type);
             }
         }
@@ -360,8 +361,8 @@ class TrackableModel extends AbstractCommonModel
             // For HTML, replace only the links; leaving the link text (if a URL) intact
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 $content = preg_replace(
-                    '/<a(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
-                    '<a$1 href=$2'.$replace.'$3$2$4>',
+                    '/<(.*?) href=(["\'])'.preg_quote($search, '/').'(.*?)\\2(.*?)>/i',
+                    '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
             }
@@ -569,7 +570,7 @@ class TrackableModel extends AbstractCommonModel
     {
         // Ensure it's not in the do not track list
         foreach ($this->doNotTrack as $notTrackable) {
-            if (preg_match('/'.preg_quote($notTrackable, '/').'/', $url)) {
+            if (preg_match('~'.$notTrackable.'~', $url)) {
                 return true;
             }
         }
@@ -707,7 +708,6 @@ class TrackableModel extends AbstractCommonModel
     protected function getEntitiesFromUrls($trackableUrls, $channel, $channelId)
     {
         if (!empty($channel) && !empty($channelId)) {
-
             // Track as channel aware
             return $this->getTrackablesByUrls($trackableUrls, $channel, $channelId);
         }

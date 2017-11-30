@@ -27,6 +27,9 @@ body {
     font-size: 18px;
 }
 
+.panel {
+    font-size: 0.9em;
+}
 
 h1 {
     margin: 10px 0;

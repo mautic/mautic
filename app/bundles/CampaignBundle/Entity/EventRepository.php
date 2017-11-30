@@ -23,16 +23,28 @@ class EventRepository extends CommonRepository
      *
      * @param array $args
      *
-     * @return Paginator
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
-        $q = $this
+        $select = 'e';
+        $q      = $this
             ->createQueryBuilder('e')
-            ->select('e, ec, ep')
-            ->join('e.campaign', 'c')
-            ->leftJoin('e.children', 'ec')
-            ->leftJoin('e.parent', 'ep');
+            ->join('e.campaign', 'c');
+
+        if (!empty($args['campaign_id'])) {
+            $q->andWhere(
+                $q->expr()->eq('IDENTITY(e.campaign)', (int) $args['campaign_id'])
+            );
+        }
+
+        if (empty($args['ignore_children'])) {
+            $select .= ', ec, ep';
+            $q->leftJoin('e.children', 'ec')
+                ->leftJoin('e.parent', 'ep');
+        }
+
+        $q->select($select);
 
         $args['qb'] = $q;
 
@@ -118,10 +130,11 @@ class EventRepository extends CommonRepository
      *
      * @param      $parentId
      * @param null $decisionPath
+     * @param null $eventType
      *
      * @return array
      */
-    public function getEventsByParent($parentId, $decisionPath = null)
+    public function getEventsByParent($parentId, $decisionPath = null, $eventType = null)
     {
         $q = $this->getEntityManager()->createQueryBuilder();
 
@@ -131,11 +144,18 @@ class EventRepository extends CommonRepository
                 $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
             );
 
-        if ($decisionPath != null) {
+        if (null !== $decisionPath) {
             $q->andWhere(
                 $q->expr()->eq('e.decisionPath', ':decisionPath')
             )
                 ->setParameter('decisionPath', $decisionPath);
+        }
+
+        if (null !== $eventType) {
+            $q->andWhere(
+                $q->expr()->eq('e.eventType', ':eventType')
+            )
+              ->setParameter('eventType', $eventType);
         }
 
         return $q->getQuery()->getArrayResult();
@@ -265,7 +285,7 @@ class EventRepository extends CommonRepository
             ->setParameter('true', true, 'boolean');
 
         if ($count) {
-            $q->select('COUNT(IDENTITY(o)) as event_count');
+            $q->select('COUNT(o) as event_count');
 
             $results = $results = $q->getQuery()->getArrayResult();
             $count   = $results[0]['event_count'];
@@ -273,7 +293,7 @@ class EventRepository extends CommonRepository
             return $count;
         }
 
-        $q->select('o')
+        $q->select('o, IDENTITY(o.lead) as lead_id, IDENTITY(o.event) AS event_id')
             ->orderBy('o.triggerDate', 'DESC');
 
         if ($limit) {
@@ -284,13 +304,13 @@ class EventRepository extends CommonRepository
         $results = $q->getQuery()->getArrayResult();
 
         // Organize by lead
-        $leads = [];
+        $logs = [];
         foreach ($results as $e) {
-            $leads[$e['lead_id']][$e['event_id']] = $e;
+            $logs[$e['lead_id']][$e['event_id']] = array_merge($e[0], ['lead_id' => $e['lead_id'], 'event_id' => $e['event_id']]);
         }
         unset($results);
 
-        return $leads;
+        return $logs;
     }
 
     /**
@@ -486,7 +506,7 @@ class EventRepository extends CommonRepository
     /**
      * Null event parents in preparation for deleting events from a campaign.
      *
-     * @param $campaignId
+     * @param $events
      */
     public function nullEventRelationships($events)
     {
@@ -498,5 +518,89 @@ class EventRepository extends CommonRepository
                 $qb->expr()->in('parent_id', $events)
             )
             ->execute();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return 'e';
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    public function getSearchCommands()
+    {
+        return $this->getStandardSearchCommands();
+    }
+
+    /**
+     * @param        $channel
+     * @param null   $campaignId
+     * @param string $eventType
+     */
+    public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')
+    {
+        $q = $this->getEntityManager()->createQueryBuilder();
+
+        $q->select('e')
+            ->from('MauticCampaignBundle:Event', 'e', 'e.id');
+
+        $expr = $q->expr()->andX();
+        if ($campaignId) {
+            $expr->add(
+                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
+            );
+
+            $q->orderBy('e.order');
+        }
+
+        $expr->add(
+            $q->expr()->eq('e.channel', ':channel')
+        );
+        $q->setParameter('channel', $channel);
+
+        if ($eventType) {
+            $expr->add(
+                $q->expr()->eq('e.eventType', ':eventType')
+            );
+            $q->setParameter('eventType', $eventType);
+        }
+
+        $q->where($expr);
+
+        $results = $q->getQuery()->getResult();
+
+        return $results;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    protected function addCatchAllWhereClause($q, $filter)
+    {
+        return $this->addStandardCatchAllWhereClause(
+            $q,
+            $filter,
+            [
+                $this->getTableAlias().'.name',
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * For the API
+     */
+    protected function addSearchCommandWhereClause($q, $filter)
+    {
+        return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
 }

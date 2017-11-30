@@ -143,9 +143,9 @@ abstract class AbstractChart
 
         // If today, adjust dateTo to be end of today if unit is not time based or to the current hour if it is
         $now = new \DateTime();
-        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && $this->isTimeUnit) {
+        if ($now->format('Y-m-d') == $this->dateTo->format('Y-m-d') && !$this->isTimeUnit) {
             $this->dateTo = $now;
-        } else {
+        } elseif (!$this->isTimeUnit) {
             $this->dateTo->setTime(23, 59, 59);
         }
 
@@ -171,6 +171,14 @@ abstract class AbstractChart
     public function countAmountFromDateRange()
     {
         switch ($this->unit) {
+            case 's':
+                $amount = ($this->dateTo->diff($this->dateFrom)->format('%s'));
+                ++$amount;
+                break;
+            case 'i':
+                $amount = ($this->dateTo->diff($this->dateFrom)->format('%i'));
+                ++$amount;
+                break;
             case 'd':
                 $amount = ($this->dateTo->diff($this->dateFrom)->format('%a') + 1);
                 break;
@@ -214,19 +222,28 @@ abstract class AbstractChart
      */
     public function getTimeUnitFromDateRange($dateFrom, $dateTo)
     {
-        $diff = $dateTo->diff($dateFrom)->format('%a');
-        $unit = 'd';
+        $dayDiff = $dateTo->diff($dateFrom)->format('%a');
+        $unit    = 'd';
 
-        if ($diff <= 1) {
+        if ($dayDiff <= 1) {
             $unit = 'H';
+
+            $minuteDiff = $dateTo->diff($dateFrom)->format('%i');
+            if ($minuteDiff <= 60) {
+                $unit = 'i';
+            }
+            $secondDiff = $dateTo->diff($dateFrom)->format('%s');
+            if ($minuteDiff < 1 && $secondDiff <= 60) {
+                $unit = 's';
+            }
         }
-        if ($diff > 31) {
+        if ($dayDiff > 31) {
             $unit = 'W';
         }
-        if ($diff > 100) {
+        if ($dayDiff > 100) {
             $unit = 'm';
         }
-        if ($diff > 1000) {
+        if ($dayDiff > 1000) {
             $unit = 'Y';
         }
 

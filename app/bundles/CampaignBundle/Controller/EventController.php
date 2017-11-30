@@ -43,10 +43,11 @@ class EventController extends CommonFormController
             $campaignId = $this->request->query->get('campaignId');
             $anchorName = $this->request->query->get('anchor', '');
             $event      = [
-                'type'       => $type,
-                'eventType'  => $eventType,
-                'campaignId' => $campaignId,
-                'anchor'     => $anchorName,
+                'type'            => $type,
+                'eventType'       => $eventType,
+                'campaignId'      => $campaignId,
+                'anchor'          => $anchorName,
+                'anchorEventType' => $this->request->query->get('anchorEventType', ''),
             ];
         }
 
@@ -225,7 +226,8 @@ class EventController extends CommonFormController
         $event          = (array_key_exists($objectId, $modifiedEvents)) ? $modifiedEvents[$objectId] : null;
 
         if ($method == 'POST') {
-            $event['anchor'] = $this->request->request->get('campaignevent[anchor]', '', true);
+            $event['anchor']          = $this->request->request->get('campaignevent[anchor]', '', true);
+            $event['anchorEventType'] = $this->request->request->get('campaignevent[anchorEventType]', '', true);
         } else {
             if (!isset($event['anchor'])) {
                 // Used to generate label
@@ -235,6 +237,11 @@ class EventController extends CommonFormController
             if ($this->request->query->has('anchor')) {
                 // Override the anchor
                 $event['anchor'] = $this->request->get('anchor');
+            }
+
+            if ($this->request->query->has('anchorEventType')) {
+                // Override the anchorEventType
+                $event['anchorEventType'] = $this->request->get('anchorEventType');
             }
         }
 
@@ -322,7 +329,6 @@ class EventController extends CommonFormController
 
             if ($closeModal) {
                 if ($success) {
-
                     //prevent undefined errors
                     $entity = new Event();
                     $blank  = $entity->convertToArray();
@@ -430,8 +436,17 @@ class EventController extends CommonFormController
 
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
-                $deletedEvents[] = $objectId;
-                $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
+                //If event is new don't add to deleted list
+                if (strpos($objectId, 'new') === false) {
+                    $deletedEvents[] = $objectId;
+                    $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
+                }
+
+                //Always remove from modified list if deleted
+                if (isset($modifiedEvents[$objectId])) {
+                    unset($modifiedEvents[$objectId]);
+                    $session->set('mautic.campaign.'.$campaignId.'.events.modified', $modifiedEvents);
+                }
             }
 
             $dataArray = [

@@ -12,20 +12,20 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
-use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class LeadController extends FormController
 {
-    use LeadDetailsTrait;
+    use LeadDetailsTrait, FrequencyRuleTrait;
 
     /**
      * @param int $page
@@ -44,6 +44,8 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
+                'lead:imports:view',
+                'lead:imports:create',
             ],
             'RETURN_ARRAY'
         );
@@ -94,16 +96,15 @@ class LeadController extends FormController
             $filter['force'] .= " $mine";
         }
 
-        $results = $model->getEntities(
-            [
-                'start'          => $start,
-                'limit'          => $limit,
-                'filter'         => $filter,
-                'orderBy'        => $orderBy,
-                'orderByDir'     => $orderByDir,
-                'withTotalCount' => true,
-            ]
-        );
+        $results = $model->getEntities([
+            'start'          => $start,
+            'limit'          => $limit,
+            'filter'         => $filter,
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'withTotalCount' => true,
+        ]);
+
         $count = $results['count'];
         unset($results['count']);
 
@@ -184,10 +185,9 @@ class LeadController extends FormController
                     'currentList'      => $list,
                     'security'         => $this->get('mautic.security'),
                     'inSingleList'     => $inSingleList,
-                    'noContactList'    => $emailRepo->getDoNotEmailList(),
+                    'noContactList'    => $emailRepo->getDoNotEmailList(array_keys($leads)),
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
-                    'showCheckbox'     => true,
                 ],
                 'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
                 'passthroughVars' => [
@@ -199,8 +199,8 @@ class LeadController extends FormController
         );
     }
 
-    /*
-     * Quick form controller route and view
+    /**
+     * @return JsonResponse|Response
      */
     public function quickAddAction()
     {
@@ -325,8 +325,10 @@ class LeadController extends FormController
         $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $companyModel  = $this->getModel('lead.company');
+        /* @var \Mautic\LeadBundle\Model\CompanyModel $model */
+
+        $companyModel = $this->getModel('lead.company');
+
         $companiesRepo = $companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
@@ -347,7 +349,8 @@ class LeadController extends FormController
 
         // We need the EmailRepository to check if a lead is flagged as do not contact
         /** @var \Mautic\EmailBundle\Entity\EmailRepository $emailRepo */
-        $emailRepo = $this->getModel('email')->getRepository();
+        $emailRepo       = $this->getModel('email')->getRepository();
+        $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
         return $this->delegateView(
             [
@@ -364,6 +367,8 @@ class LeadController extends FormController
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
                     'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
+                    'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
+                    'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => $emailRepo->checkDoNotEmail($fields['core']['email']['value']),
                     'leadNotes'         => $this->forward(
                         'MauticLeadBundle:Note:index',
@@ -408,25 +413,7 @@ class LeadController extends FormController
         $page = $this->get('session')->get('mautic.lead.page', 1);
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
-        $fields = $this->getModel('lead.field')->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'f.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true,
-                        ],
-                        [
-                            'column' => 'f.object',
-                            'expr'   => 'like',
-                            'value'  => 'lead',
-                        ],
-                    ],
-                ],
-                'hydration_mode' => 'HYDRATE_ARRAY',
-            ]
-        );
+        $fields = $this->getModel('lead.field')->getPublishedFieldArrays('lead');
 
         $form = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
@@ -610,26 +597,8 @@ class LeadController extends FormController
         }
 
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $fields = $this->getModel('lead.field')->getEntities(
-            [
-                'filter' => [
-                    'force' => [
-                        [
-                            'column' => 'f.isPublished',
-                            'expr'   => 'eq',
-                            'value'  => true,
-                        ],
-                        [
-                            'column' => 'f.object',
-                            'expr'   => 'like',
-                            'value'  => 'lead',
-                        ],
-                    ],
-                ],
-                'hydration_mode' => 'HYDRATE_ARRAY',
-            ]
-        );
-        $form = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
+        $fields = $this->getModel('lead.field')->getPublishedFieldArrays('lead');
+        $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
         if (!$ignorePost && $this->request->getMethod() == 'POST') {
@@ -640,7 +609,7 @@ class LeadController extends FormController
 
                     //pull the data from the form in order to apply the form's formatting
                     foreach ($form as $f) {
-                        if ('companies' !== $f->getName()) {
+                        if (('companies' !== $f->getName()) && ('company' !== $f->getName())) {
                             $data[$f->getName()] = $f->getData();
                         }
                     }
@@ -953,59 +922,50 @@ class LeadController extends FormController
         /** @var LeadModel $model */
         $model = $this->getModel('lead');
         $lead  = $model->getEntity($objectId);
-        $data  = [];
-        if ($lead != null && $this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
-            $frequencyRules = $model->getFrequencyRule($lead);
 
-            foreach ($frequencyRules as $frequencyRule) {
-                $data['channels'][]       = $frequencyRule['channel'];
-                $data['frequency_number'] = $frequencyRule['frequency_number'];
-                $data['frequency_time']   = $frequencyRule['frequency_time'];
-            }
+        if ($lead === null
+            || !$this->get('mautic.security')->hasEntityAccess(
+                'lead:leads:editown',
+                'lead:leads:editother',
+                $lead->getPermissionUser()
+            )
+        ) {
+            return $this->accessDenied();
+        }
 
-            $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()]);
+        $viewParameters = [
+            'objectId'     => $lead->getId(),
+            'objectAction' => 'view',
+        ];
 
-            $form = $this->get('form.factory')->create(
-                'lead_contact_frequency_rules',
-                [],
+        $form = $this->getFrequencyRuleForm(
+            $lead,
+            $viewParameters,
+            $data,
+            false,
+            $this->generateUrl('mautic_contact_action', ['objectAction' => 'contactFrequency', 'objectId' => $lead->getId()])
+        );
+
+        if (true === $form) {
+            return $this->postActionRedirect(
                 [
-                    'action' => $action,
-                    'data'   => $data,
+                    'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'MauticLeadBundle:Lead:view',
+                    'passthroughVars' => [
+                        'closeModal' => 1,
+                    ],
                 ]
             );
-            if ($this->request->getMethod() == 'POST') {
-                if (!$this->isFormCancelled($form)) {
-                    if ($valid = $this->isFormValid($form)) {
-                        $formdata = $form->getData();
-                        $model->setFrequencyRules($lead, $formdata['channels'], $formdata['frequency_time'], $formdata['frequency_number']);
-                    }
-                }
+        }
 
-                if ($valid) {
-                    $viewParameters = [
-                        'objectId'     => $lead->getId(),
-                        'objectAction' => 'view',
-                    ];
+        $tmpl = $this->request->get('tmpl', 'index');
 
-                    return $this->postActionRedirect(
-                        [
-                            'returnUrl'       => $this->generateUrl('mautic_contact_action', $viewParameters),
-                            'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticLeadBundle:Lead:view',
-                            'passthroughVars' => [
-                                'closeModal' => 1,
-                            ],
-                        ]
-                    );
-                }
-            }
-            $tmpl = $this->request->get('tmpl', 'index');
-
-            return $this->delegateView(
-                [
-                    'viewParameters' => [
+        return $this->delegateView(
+            [
+                'viewParameters' => array_merge(
+                    [
                         'tmpl'         => $tmpl,
-                        'action'       => $action,
                         'form'         => $form->createView(),
                         'currentRoute' => $this->generateUrl(
                             'mautic_contact_action',
@@ -1014,15 +974,17 @@ class LeadController extends FormController
                                 'objectId'     => $lead->getId(),
                             ]
                         ),
+                        'lead' => $lead,
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
-                    'passthroughVars' => [
-                        'route'  => false,
-                        'target' => ($tmpl == 'update') ? '.lead-frequency-options' : null,
-                    ],
-                ]
-            );
-        }
+                    $viewParameters
+                ),
+                'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
+                'passthroughVars' => [
+                    'route'  => false,
+                    'target' => ($tmpl == 'update') ? '.lead-frequency-options' : null,
+                ],
+            ]
+        );
     }
 
     /**
@@ -1207,6 +1169,7 @@ class LeadController extends FormController
             ]
         );
     }
+
     /**
      * Add/remove lead from a company.
      *
@@ -1295,397 +1258,6 @@ class LeadController extends FormController
     }
 
     /**
-     * @param int  $objectId
-     * @param bool $ignorePost
-     *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function importAction($objectId = 0, $ignorePost = false)
-    {
-        //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
-        ini_set('auto_detect_line_endings', true);
-
-        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-        $model   = $this->getModel('lead');
-        $session = $this->get('session');
-
-        if (!$this->get('mautic.security')->isGranted('lead:leads:create')) {
-            return $this->accessDenied();
-        }
-
-        // Move the file to cache and rename it
-        $forceStop = $this->request->get('cancel', false);
-        $step      = ($forceStop) ? 1 : $session->get('mautic.lead.import.step', 1);
-        $cacheDir  = $this->get('mautic.helper.paths')->getSystemPath('cache', true);
-        $username  = $this->get('mautic.helper.user')->getUser()->getUsername();
-        $fileName  = $username.'_leadimport.csv';
-        $fullPath  = $cacheDir.'/'.$fileName;
-        $complete  = false;
-        if (!file_exists($fullPath)) {
-            // Force step one if the file doesn't exist
-            $step = 1;
-            $session->set('mautic.lead.import.step', 1);
-        }
-
-        $progress = $session->get('mautic.lead.import.progress', [0, 0]);
-        $stats    = $session->get('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0, 'failures' => []]);
-        $action   = $this->generateUrl('mautic_contact_action', ['objectAction' => 'import']);
-
-        switch ($step) {
-            case 1:
-                // Upload file
-
-                if ($forceStop) {
-                    $this->resetImport($fullPath);
-                }
-
-                $session->set('mautic.lead.import.headers', []);
-                $form = $this->get('form.factory')->create('lead_import', [], ['action' => $action]);
-                break;
-            case 2:
-                // Match fields
-
-                /** @var \Mautic\LeadBundle\Model\FieldModel $pluginModel */
-                $fieldModel = $this->getModel('lead.field');
-
-                $leadFields   = $fieldModel->getFieldList(false, false);
-                $importFields = $session->get('mautic.lead.import.importfields', []);
-
-                $form = $this->get('form.factory')->create(
-                    'lead_field_import',
-                    [],
-                    [
-                        'action'        => $action,
-                        'lead_fields'   => $leadFields,
-                        'import_fields' => $importFields,
-                    ]
-                );
-
-                break;
-            case 3:
-                // Just show the progress form
-                $session->set('mautic.lead.import.step', 4);
-                break;
-
-            case 4:
-                ignore_user_abort(true);
-
-                $inProgress = $session->get('mautic.lead.import.inprogress', false);
-                $checks     = $session->get('mautic.lead.import.progresschecks', 1);
-                if (true || !$inProgress || $checks > 5) {
-                    $session->set('mautic.lead.import.inprogress', true);
-                    $session->set('mautic.lead.import.progresschecks', 1);
-
-                    // Batch process
-                    $defaultOwner = $session->get('mautic.lead.import.defaultowner', null);
-                    $defaultList  = $session->get('mautic.lead.import.defaultlist', null);
-                    $defaultTags  = $session->get('mautic.lead.import.defaulttags', null);
-                    $headers      = $session->get('mautic.lead.import.headers', []);
-                    $importFields = $session->get('mautic.lead.import.fields', []);
-
-                    $file = new \SplFileObject($fullPath);
-                    if ($file !== false) {
-                        $lineNumber = $progress[0];
-
-                        if ($lineNumber > 0) {
-                            $file->seek($lineNumber);
-                        }
-
-                        $config    = $session->get('mautic.lead.import.config');
-                        $batchSize = $config['batchlimit'];
-
-                        while ($batchSize && !$file->eof()) {
-                            $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
-                            array_walk($data, create_function('&$val', '$val = trim($val);'));
-
-                            if ($lineNumber === 0) {
-                                ++$lineNumber;
-                                continue;
-                            }
-
-                            ++$lineNumber;
-
-                            // Increase progress count
-                            ++$progress[0];
-
-                            // Decrease batch count
-                            --$batchSize;
-
-                            if (is_array($data) && $dataCount = count($data)) {
-                                // Ensure the number of headers are equal with data
-                                $headerCount = count($headers);
-
-                                if ($headerCount !== $dataCount) {
-                                    $diffCount = ($headerCount - $dataCount);
-
-                                    if ($diffCount < 0) {
-                                        ++$stats['ignored'];
-                                        $stats['failures'][$lineNumber] = $this->get('translator')->trans(
-                                            'mautic.lead.import.error.header_mismatch'
-                                        );
-
-                                        continue;
-                                    }
-                                    // Fill in the data with empty string
-                                    $fill = array_fill($dataCount, $diffCount, '');
-                                    $data = $data + $fill;
-                                }
-
-                                $data = array_combine($headers, $data);
-                                try {
-                                    $prevent = false;
-                                    foreach ($data as $key => $value) {
-                                        if ($value != '') {
-                                            $prevent = true;
-                                            break;
-                                        }
-                                    }
-                                    if ($prevent) {
-                                        $merged = $model->importLead($importFields, $data, $defaultOwner, $defaultList, $defaultTags);
-                                        if ($merged) {
-                                            ++$stats['merged'];
-                                        } else {
-                                            ++$stats['created'];
-                                        }
-                                    } else {
-                                        ++$stats['ignored'];
-                                        $stats['failures'][$lineNumber] = $this->get('translator')->trans(
-                                            'mautic.lead.import.error.line_empty'
-                                        );
-                                    }
-                                } catch (\Exception $e) {
-                                    // Email validation likely failed
-                                    ++$stats['ignored'];
-                                    $stats['failures'][$lineNumber] = $e->getMessage();
-                                }
-                            } else {
-                                ++$stats['ignored'];
-                                $stats['failures'][$lineNumber] = $this->get('translator')->trans('mautic.lead.import.error.line_empty');
-                            }
-                        }
-
-                        $session->set('mautic.lead.import.stats', $stats);
-                    }
-
-                    // Close the file
-                    $file = null;
-
-                    // Clear in progress
-                    if ($progress[0] >= $progress[1]) {
-                        $progress[0] = $progress[1];
-                        $this->resetImport($fullPath);
-                        $complete = true;
-                    } else {
-                        $complete = false;
-                        $session->set('mautic.lead.import.inprogress', false);
-                        $session->set('mautic.lead.import.progress', $progress);
-                    }
-
-                    break;
-                } else {
-                    ++$checks;
-                    $session->set('mautic.lead.import.progresschecks', $checks);
-                }
-        }
-
-        ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
-            if (isset($form) && !$cancelled = $this->isFormCancelled($form)) {
-                $valid = $this->isFormValid($form);
-                switch ($step) {
-                    case 1:
-                        if ($valid) {
-                            if (file_exists($fullPath)) {
-                                unlink($fullPath);
-                            }
-
-                            $fileData = $form['file']->getData();
-                            if (!empty($fileData)) {
-                                $errorMessage    = null;
-                                $errorParameters = [];
-                                try {
-                                    $fileData->move($cacheDir, $fileName);
-
-                                    $file = new \SplFileObject($fullPath);
-
-                                    $config = $form->getData();
-                                    unset($config['file']);
-                                    unset($config['start']);
-
-                                    foreach ($config as $key => &$c) {
-                                        $c = htmlspecialchars_decode($c);
-
-                                        if ($key == 'batchlimit') {
-                                            $c = (int) $c;
-                                        }
-                                    }
-
-                                    $session->set('mautic.lead.import.config', $config);
-
-                                    if ($file !== false) {
-                                        // Get the headers for matching
-                                        $headers = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
-
-                                        // Get the number of lines so we can track progress
-                                        $file->seek(PHP_INT_MAX);
-                                        $linecount = $file->key();
-
-                                        if (!empty($headers) && is_array($headers)) {
-                                            array_walk($headers, create_function('&$val', '$val = trim($val);'));
-                                            $session->set('mautic.lead.import.headers', $headers);
-                                            sort($headers);
-                                            $headers = array_combine($headers, $headers);
-                                            $session->set('mautic.lead.import.step', 2);
-                                            $session->set('mautic.lead.import.importfields', $headers);
-                                            $session->set('mautic.lead.import.progress', [0, $linecount]);
-
-                                            return $this->importAction(0, true);
-                                        }
-                                    }
-                                } catch (FileException $e) {
-                                    if (strpos($e->getMessage(), 'upload_max_filesize') !== false) {
-                                        $errorMessage    = 'mautic.lead.import.filetoolarge';
-                                        $errorParameters = [
-                                            '%upload_max_filesize%' => ini_get('upload_max_filesize'),
-                                        ];
-                                    } else {
-                                        $errorMessage = 'mautic.lead.import.filenotreadable';
-                                    }
-                                } catch (\Exception $e) {
-                                    $errorMessage = 'mautic.lead.import.filenotreadable';
-                                } finally {
-                                    if (!is_null($errorMessage)) {
-                                        $form->addError(
-                                            new FormError(
-                                                $this->get('translator')->trans($errorMessage, $errorParameters, 'validators')
-                                            )
-                                        );
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case 2:
-                        // Save matched fields
-                        $matchedFields = $form->getData();
-
-                        if (empty($matchedFields)) {
-                            $this->resetImport($fullPath);
-
-                            return $this->importAction(0, true);
-                        }
-
-                        $owner = $matchedFields['owner'];
-                        unset($matchedFields['owner']);
-
-                        $list = $matchedFields['list'];
-                        unset($matchedFields['list']);
-
-                        $tagCollection = $matchedFields['tags'];
-                        $tags          = [];
-                        foreach ($tagCollection as $tag) {
-                            $tags[] = $tag->getTag();
-                        }
-                        unset($matchedFields['tags']);
-
-                        foreach ($matchedFields as $k => $f) {
-                            if (empty($f)) {
-                                unset($matchedFields[$k]);
-                            } else {
-                                $matchedFields[$k] = trim($matchedFields[$k]);
-                            }
-                        }
-
-                        if (empty($matchedFields)) {
-                            $form->addError(
-                                new FormError(
-                                    $this->get('translator')->trans('mautic.lead.import.matchfields', [], 'validators')
-                                )
-                            );
-                        } else {
-                            $defaultOwner = ($owner) ? $owner->getId() : null;
-                            $session->set('mautic.lead.import.fields', $matchedFields);
-                            $session->set('mautic.lead.import.defaultowner', $defaultOwner);
-                            $session->set('mautic.lead.import.defaultlist', $list);
-                            $session->set('mautic.lead.import.defaulttags', $tags);
-                            $session->set('mautic.lead.import.step', 3);
-
-                            return $this->importAction(0, true);
-                        }
-                        break;
-
-                    default:
-                        // Done or something wrong
-
-                        $this->resetImport($fullPath);
-
-                        break;
-                }
-            } else {
-                $this->resetImport($fullPath);
-
-                return $this->importAction(0, true);
-            }
-        }
-
-        if ($step === 1 || $step === 2) {
-            $contentTemplate = 'MauticLeadBundle:Import:form.html.php';
-            $viewParameters  = ['form' => $form->createView()];
-        } else {
-            $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
-            $viewParameters  = [
-                'progress' => $progress,
-                'stats'    => $stats,
-                'complete' => $complete,
-            ];
-        }
-
-        if (!$complete && $this->request->query->has('importbatch')) {
-            // Ajax request to batch process so just return ajax response unless complete
-
-            return new JsonResponse(['success' => 1, 'ignore_wdt' => 1]);
-        } else {
-            return $this->delegateView(
-                [
-                    'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $contentTemplate,
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_contact_index',
-                        'mauticContent' => 'leadImport',
-                        'route'         => $this->generateUrl(
-                            'mautic_contact_action',
-                            [
-                                'objectAction' => 'import',
-                            ]
-                        ),
-                        'step'     => $step,
-                        'progress' => $progress,
-                    ],
-                ]
-            );
-        }
-    }
-
-    /**
-     * @param $filepath
-     */
-    private function resetImport($filepath)
-    {
-        $session = $this->get('session');
-        $session->set('mautic.lead.import.stats', ['merged' => 0, 'created' => 0, 'ignored' => 0]);
-        $session->set('mautic.lead.import.headers', []);
-        $session->set('mautic.lead.import.step', 1);
-        $session->set('mautic.lead.import.progress', [0, 0]);
-        $session->set('mautic.lead.import.fields', []);
-        $session->set('mautic.lead.import.defaultowner', null);
-        $session->set('mautic.lead.import.defaultlist', null);
-        $session->set('mautic.lead.import.inprogress', false);
-        $session->set('mautic.lead.import.importfields', []);
-
-        unlink($filepath);
-    }
-
-    /**
      * @param int $objectId
      *
      * @return JsonResponse
@@ -1752,11 +1324,10 @@ class LeadController extends FormController
 
                         $mailer->setFrom(
                             $email['from'],
-                            empty($email['fromname']) ? '' : $email['fromname']
+                            empty($email['fromname']) ? null : $email['fromname']
                         );
 
                         // Set Content
-                        BuilderTokenHelper::replaceVisualPlaceholdersWithTokens($email['body']);
                         $mailer->setBody($email['body']);
                         $mailer->parsePlainText($email['body']);
 
@@ -2283,21 +1854,20 @@ class LeadController extends FormController
     }
 
     /**
-     * Bulk edit lead's companies.
+     * Bulk edit lead owner.
      *
      * @param int $objectId
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function batchCompaniesAction($objectId = 0)
+    public function batchOwnersAction($objectId = 0)
     {
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $companyModel = $this->getModel('lead.company');
         if ($this->request->getMethod() == 'POST') {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
-            $model    = $this->getModel('lead');
-            $data     = $this->request->request->get('lead_batch', [], true);
-            $ids      = json_decode($data['ids'], true);
+            $model = $this->getModel('lead');
+            $data  = $this->request->request->get('lead_batch_owner', [], true);
+            $ids   = json_decode($data['ids'], true);
+
             $entities = [];
             if (is_array($ids)) {
                 $entities = $model->getEntities(
@@ -2315,16 +1885,15 @@ class LeadController extends FormController
                     ]
                 );
             }
-
             $count = 0;
             foreach ($entities as $lead) {
-                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getCreatedBy())) {
+                if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     ++$count;
-                    if (!empty($data['add'])) {
-                        $companyModel->addLeadToCompany($data['add'], $lead);
-                    }
-                    if (!empty($data['remove'])) {
-                        $companyModel->removeLeadFromCompany($data['remove'], $lead);
+
+                    if (!empty($data['addowner'])) {
+                        $userModel = $this->getModel('user');
+                        $user      = $userModel->getEntity((int) $data['addowner']);
+                        $lead->setOwner($user);
                     }
                 }
             }
@@ -2345,17 +1914,16 @@ class LeadController extends FormController
                 ]
             );
         } else {
-            // Get a list of lists
-            $companies = $companyModel->getUserCompanies();
-            $items     = [];
-            foreach ($companies as $company) {
-                $items[$company['id']] = $company['companyname'];
+            $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
+            $items = [];
+            foreach ($users as $user) {
+                $items[$user['id']] = $user['firstName'].' '.$user['lastName'];
             }
 
             $route = $this->generateUrl(
                 'mautic_contact_action',
                 [
-                    'objectAction' => 'batchCompanies',
+                    'objectAction' => 'batchOwners',
                 ]
             );
 
@@ -2363,7 +1931,7 @@ class LeadController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'lead_batch',
+                            'lead_batch_owner',
                             [],
                             [
                                 'items'  => $items,
@@ -2380,5 +1948,82 @@ class LeadController extends FormController
                 ]
             );
         }
+    }
+
+    /**
+     * Bulk export contacts.
+     *
+     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function batchExportAction()
+    {
+        //set some permissions
+        $permissions = $this->get('mautic.security')->isGranted(
+            [
+                'lead:leads:viewown',
+                'lead:leads:viewother',
+                'lead:leads:create',
+                'lead:leads:editown',
+                'lead:leads:editother',
+                'lead:leads:deleteown',
+                'lead:leads:deleteother',
+            ],
+            'RETURN_ARRAY'
+        );
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $model */
+        $model      = $this->getModel('lead');
+        $session    = $this->get('session');
+        $search     = $session->get('mautic.lead.filter', '');
+        $orderBy    = $session->get('mautic.lead.orderby', 'l.last_active');
+        $orderByDir = $session->get('mautic.lead.orderbydir', 'DESC');
+        $ids        = $this->request->get('ids');
+
+        $filter     = ['string' => $search, 'force' => ''];
+        $translator = $this->get('translator');
+        $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
+        $mine       = $translator->trans('mautic.core.searchcommand.ismine');
+        $indexMode  = $session->get('mautic.lead.indexmode', 'list');
+        $dataType   = $this->request->get('filetype', 'csv');
+
+        if (!empty($ids)) {
+            $filter['force'] = [
+                [
+                    'column' => 'l.id',
+                    'expr'   => 'in',
+                    'value'  => json_decode($ids, true),
+                ],
+            ];
+        } else {
+            if ($indexMode != 'list' || ($indexMode == 'list' && strpos($search, $anonymous) === false)) {
+                //remove anonymous leads unless requested to prevent clutter
+                $filter['force'] .= " !$anonymous";
+            }
+
+            if (!$permissions['lead:leads:viewother']) {
+                $filter['force'] .= " $mine";
+            }
+        }
+
+        $args = [
+            'start'          => 0,
+            'limit'          => 200,
+            'filter'         => $filter,
+            'orderBy'        => $orderBy,
+            'orderByDir'     => $orderByDir,
+            'withTotalCount' => true,
+        ];
+
+        $resultsCallback = function ($contact) {
+            return $contact->getProfileFields();
+        };
+
+        $iterator = new IteratorExportDataModel($model, $args, $resultsCallback);
+
+        return $this->exportResultsAs($iterator, $dataType, 'contacts');
     }
 }

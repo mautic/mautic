@@ -11,12 +11,19 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
+
 class CommonEntity
 {
     /**
      * @var array
      */
     protected $changes = [];
+
+    /**
+     * @var array
+     */
+    protected $pastChanges = [];
 
     /**
      * Wrapper function for isProperty methods.
@@ -56,7 +63,7 @@ class CommonEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
+        $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ($prop == 'category') {
             $currentId = ($current) ? $current->getId() : '';
@@ -64,8 +71,40 @@ class CommonEntity
             if ($currentId != $newId) {
                 $this->addChange($prop, [$currentId, $newId]);
             }
-        } elseif ($current != $val) {
-            $this->addChange($prop, [$current, $val]);
+        } elseif ($current !== $val) {
+            if ($current instanceof Collection || $val instanceof Collection) {
+                if (!isset($this->changes[$prop])) {
+                    $this->changes[$prop] = [
+                        'added'   => [],
+                        'removed' => [],
+                    ];
+                }
+
+                if (is_object($val)) {
+                    // Entity is getting added to the collection
+                    $this->changes['added'][] = method_exists($val, 'getId') ? $val->getId() : (string) $val;
+                } else {
+                    // Entity is getting removed from the collection
+                    $this->changes['removed'][] = $val;
+                }
+            } else {
+                if ($current instanceof \DateTime) {
+                    $current = $current->format('c');
+                } elseif (is_object($current)) {
+                    $current = (method_exists($current, 'getId')) ? $current->getId() : (string) $current;
+                } elseif (('' === $current && null === $val) || (null === $current && '' === $val)) {
+                    // Ingore empty conversion (but allow 0 to '' or null)
+                    return;
+                }
+
+                if ($val instanceof \DateTime) {
+                    $val = $val->format('c');
+                } elseif (is_object($val)) {
+                    $val = (method_exists($val, 'getId')) ? $val->getId() : (string) $val;
+                }
+
+                $this->addChange($prop, [$current, $val]);
+            }
         }
     }
 
@@ -75,7 +114,7 @@ class CommonEntity
      */
     protected function addChange($key, $value)
     {
-        if (isset($this->changes[$key]) && is_array($this->changes[$key])) {
+        if (isset($this->changes[$key]) && is_array($this->changes[$key]) && [0, 1] !== array_keys($this->changes[$key])) {
             $this->changes[$key] = array_merge($this->changes[$key], $value);
         } else {
             $this->changes[$key] = $value;
@@ -85,8 +124,12 @@ class CommonEntity
     /**
      * @return array
      */
-    public function getChanges()
+    public function getChanges($includePast = false)
     {
+        if ($includePast && empty($this->changes) && !empty($this->pastChanges)) {
+            return $this->pastChanges;
+        }
+
         return $this->changes;
     }
 
@@ -95,6 +138,15 @@ class CommonEntity
      */
     public function resetChanges()
     {
-        $this->changes = [];
+        $this->pastChanges = $this->changes;
+        $this->changes     = [];
+    }
+
+    /**
+     * @param array $changes
+     */
+    public function setChanges(array $changes)
+    {
+        $this->changes = $changes;
     }
 }

@@ -13,6 +13,7 @@ namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Class Stat.
@@ -50,6 +51,11 @@ class Stat
     private $dateAdded;
 
     /**
+     * @var
+     */
+    private $lead;
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -73,6 +79,8 @@ class Stat
         $builder->addNamedField('typeId', 'integer', 'type_id', true);
 
         $builder->addNamedField('dateAdded', 'datetime', 'date_added');
+
+        $builder->addLead(true, 'SET NULL');
     }
 
     /**
@@ -159,6 +167,26 @@ class Stat
     public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
+
+        return $this;
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param Lead $lead
+     *
+     * @return Stat
+     */
+    public function setLead(Lead $lead)
+    {
+        $this->lead = $lead;
 
         return $this;
     }

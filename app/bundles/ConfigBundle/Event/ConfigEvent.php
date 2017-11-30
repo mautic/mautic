@@ -12,6 +12,7 @@
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
@@ -38,6 +39,11 @@ class ConfigEvent extends CommonEvent
      * @var array
      */
     private $errors = [];
+
+    /**
+     * @var array
+     */
+    private $fieldErrors = [];
 
     /**
      * @param array        $config
@@ -122,9 +128,24 @@ class ConfigEvent extends CommonEvent
      * @param string $message     (untranslated)
      * @param array  $messageVars for translation
      */
-    public function setError($message, $messageVars = [])
+    public function setError($message, $messageVars = [], $key = null, $field = null)
     {
+        if (!empty($key) && !empty($field)) {
+            if (!isset($this->errors[$key])) {
+                $this->fieldErrors[$key] = [];
+            }
+
+            $this->fieldErrors[$key][$field] = [
+                $message,
+                $messageVars,
+            ];
+
+            return $this;
+        }
+
         $this->errors[$message] = $messageVars;
+
+        return $this;
     }
 
     /**
@@ -135,5 +156,37 @@ class ConfigEvent extends CommonEvent
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldErrors()
+    {
+        return $this->fieldErrors;
+    }
+
+    /**
+     * @param UploadedFile $file
+     *
+     * @return string
+     */
+    public function getFileContent(UploadedFile $file)
+    {
+        $tmpFile = $file->getRealPath();
+        $content = trim(file_get_contents($tmpFile));
+        @unlink($tmpFile);
+
+        return $content;
+    }
+
+    /**
+     * @param $content
+     *
+     * @return string
+     */
+    public function encodeFileContents($content)
+    {
+        return base64_encode($content);
     }
 }

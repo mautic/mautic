@@ -28,6 +28,21 @@ class IntegrationConfigType extends AbstractType
         if ($options['integration'] != null) {
             $options['integration']->appendToForm($builder, $options['data'], 'integration');
         }
+
+        if (!empty($options['campaigns'])) {
+            $builder->add(
+                'campaigns',
+                'choice',
+                [
+                    'choices' => $options['campaigns'],
+                    'attr'    => [
+                        'class' => 'form-control', 'onchange' => 'Mautic.getIntegrationCampaignStatus(this);', ],
+                    'label'       => 'mautic.plugin.integration.campaigns',
+                    'empty_value' => 'mautic.plugin.config.campaign.member.chooseone',
+                    'required'    => false,
+                ]
+            );
+        }
     }
 
     /**
@@ -37,7 +52,8 @@ class IntegrationConfigType extends AbstractType
     {
         $resolver->setRequired(['integration']);
         $resolver->setDefaults([
-            'label' => false,
+            'label'     => false,
+            'campaigns' => [],
         ]);
     }
 

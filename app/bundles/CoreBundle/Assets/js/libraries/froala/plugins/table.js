@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
     'table.insert': '[_BUTTONS_][_ROWS_COLUMNS_]',
@@ -111,7 +111,7 @@
         var $popup = editor.popups.get('table.edit');
         if (!$popup) $popup = _initEditPopup();
 
-        editor.popups.setContainer('table.edit', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('table.edit', editor.$sc);
         var offset = _selectionOffset(map);
         var left = (offset.left + offset.right) / 2;
         var top = offset.bottom;
@@ -127,9 +127,12 @@
           editor.$el.removeClass('fr-no-selection');
           editor.edit.on();
 
-          editor.selection.setAtEnd(editor.$el.find('.fr-selected-cell:last').get(0));
-          editor.selection.restore();
           editor.button.bulkRefresh();
+
+          // Place selection in last selected table cell.
+          editor.selection.setAtEnd(editor.$el.find('.fr-selected-cell:last').get(0));
+          editor.$el.focus()
+          editor.selection.restore();
         }
       }
     }
@@ -144,7 +147,7 @@
         var $popup = editor.popups.get('table.colors');
         if (!$popup) $popup = _initColorsPopup();
 
-        editor.popups.setContainer('table.colors', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('table.colors', editor.$sc);
         var offset = _selectionOffset(map);
         var left = (offset.left + offset.right) / 2;
         var top = offset.bottom;
@@ -194,34 +197,45 @@
 
       // Initialize insert table grid events.
       editor.events.$on($popup, 'mouseenter', '.fr-table-size .fr-select-table-size .fr-table-cell', function (e) {
-        var $table_cell = $(e.currentTarget);
-        var row = $table_cell.data('row');
-        var col = $table_cell.data('col');
-        var $select_size = $table_cell.parent();
-
-        // Update size in title.
-        $select_size.siblings('.fr-table-size-info').html(row + ' &times; ' + col);
-
-        // Remove hover class from all cells.
-        $select_size.find('> span').removeClass('hover');
-
-        // Add hover class only to the correct cells.
-        for (var i = 1; i <= editor.opts.tableInsertMaxSize; i++) {
-          for (var j = 0; j <= editor.opts.tableInsertMaxSize; j++) {
-            var $cell = $select_size.find('> span[data-row="' + i + '"][data-col="' + j + '"]');
-
-            if (i <= row && j <= col) {
-              $cell.addClass('hover');
-            } else if ((i <= row + 1 || (i <= 2 && !editor.helpers.isMobile()))) {
-              $cell.css('display', 'inline-block');
-            } else if (i > 2 && !editor.helpers.isMobile()) {
-              $cell.css('display', 'none');
-            }
-          }
-        }
+        _hoverCell($(e.currentTarget));
       }, true);
 
+      _addAccessibility($popup);
+
       return $popup;
+    }
+
+    /*
+     * Hover table cell.
+     */
+    function _hoverCell ($table_cell) {
+      var row = $table_cell.data('row');
+      var col = $table_cell.data('col');
+      var $select_size = $table_cell.parent();
+
+      // Update size in title.
+      $select_size.siblings('.fr-table-size-info').html(row + ' &times; ' + col);
+
+      // Remove hover and fr-active-item class from all cells.
+      $select_size.find('> span').removeClass('hover fr-active-item');
+
+      // Add hover class only to the correct cells.
+      for (var i = 1; i <= editor.opts.tableInsertMaxSize; i++) {
+        for (var j = 0; j <= editor.opts.tableInsertMaxSize; j++) {
+          var $cell = $select_size.find('> span[data-row="' + i + '"][data-col="' + j + '"]');
+
+          if (i <= row && j <= col) {
+            $cell.addClass('hover');
+          } else if ((i <= row + 1 || (i <= 2 && !editor.helpers.isMobile()))) {
+            $cell.css('display', 'inline-block');
+          } else if (i > 2 && !editor.helpers.isMobile()) {
+            $cell.css('display', 'none');
+          }
+        }
+      }
+
+      // Mark table cell as the active item.
+      $table_cell.addClass('fr-active-item');
     }
 
     /*
@@ -245,7 +259,7 @@
             cls += ' hover';
           }
 
-          rows_columns += '<span class="fr-command ' + cls + '" data-cmd="tableInsert" data-row="' + i + '" data-col="' + j + '" data-param1="' + i + '" data-param2="' + j + '" style="display: ' + display + ';"><span></span></span>';
+          rows_columns += '<span class="fr-command ' + cls + '" tabIndex="-1" data-cmd="tableInsert" data-row="' + i + '" data-col="' + j + '" data-param1="' + i + '" data-param2="' + j + '" style="display: ' + display + ';" role="button"><span></span><span class="fr-sr-only">' + i + ' &times; ' + j + '&nbsp;&nbsp;&nbsp;</span></span>';
         }
         rows_columns += '<div class="new-line"></div>';
       }
@@ -253,6 +267,87 @@
       rows_columns += '</div></div>';
 
       return rows_columns;
+    }
+
+    /*
+     * Register keyboard events.
+     */
+    function _addAccessibility ($popup) {
+      // Hover cell when table.insert cells are focused.
+      editor.events.$on($popup, 'focus', '[tabIndex]', function (e) {
+        var $focused_el = $(e.currentTarget);
+        _hoverCell($focused_el);
+      });
+
+      // Register popup event.
+      editor.events.on('popup.tab', function (e) {
+        var $focused_item = $(e.currentTarget);
+        // Skip if popup is not visible or focus is elsewere.
+        if (!editor.popups.isVisible('table.insert') || !$focused_item.is('span, a')) {
+          return true;
+        }
+
+        var key_code = e.which;
+        var status;
+
+        if ($.FE.KEYCODE.ARROW_UP == key_code || $.FE.KEYCODE.ARROW_DOWN == key_code || $.FE.KEYCODE.ARROW_LEFT == key_code || $.FE.KEYCODE.ARROW_RIGHT == key_code) {
+          if ($focused_item.is('span.fr-table-cell')) {
+
+            // Get all current cells.
+            var $cells = $focused_item.parent().find('span.fr-table-cell');
+
+            // Get focused item position.
+            var index = $cells.index($focused_item);
+
+            // Get cell matrix dimensions.
+            var columns = editor.opts.tableInsertMaxSize;
+
+            // Get focused item coordinates.
+            var column = index % columns;
+            var line = Math.floor(index / columns);
+
+            // Calculate next coordinates. Go to the other opposite site of the matrix if there is no next adjacent element.
+            if ($.FE.KEYCODE.ARROW_UP == key_code) {
+              line = Math.max(0, line - 1);
+            }
+            else if ($.FE.KEYCODE.ARROW_DOWN == key_code) {
+              line = Math.min(editor.opts.tableInsertMaxSize - 1, line + 1);
+            }
+            else if ($.FE.KEYCODE.ARROW_LEFT == key_code) {
+              column = Math.max(0, column - 1);
+            }
+            else if ($.FE.KEYCODE.ARROW_RIGHT == key_code) {
+              column = Math.min(editor.opts.tableInsertMaxSize - 1, column + 1);
+            }
+
+            // Get the next element based on the new coordinates.
+            var nextIndex = line * columns + column;
+            var $el = $($cells.get(nextIndex));
+
+            // Hover cell
+            _hoverCell($el);
+            // Focus.
+            editor.events.disableBlur();
+            $el.focus();
+
+            status = false;
+          }
+        }
+        // ENTER or SPACE.
+        else if ($.FE.KEYCODE.ENTER == key_code) {
+
+          editor.button.exec($focused_item);
+          status = false;
+        }
+
+        // Prevent propagation.
+        if (status === false) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        return status;
+      }, true);
     }
 
     /**
@@ -309,6 +404,8 @@
         }
       });
 
+      _addColorsAccessibility($popup);
+
       return $popup;
     }
 
@@ -326,17 +423,99 @@
         }
 
         if (editor.opts.tableColors[i] != 'REMOVE') {
-          colors_html += '<span class="fr-command" style="background: ' + editor.opts.tableColors[i] + ';" data-cmd="tableCellBackgroundColor" data-param1="' + editor.opts.tableColors[i] + '"></span>';
+          colors_html += '<span class="fr-command" style="background: ' + editor.opts.tableColors[i] + ';" tabIndex="-1" role="button" data-cmd="tableCellBackgroundColor" data-param1="' + editor.opts.tableColors[i] + '"><span class="fr-sr-only">' + editor.language.translate('Color') + ' ' + editor.opts.tableColors[i] + '&nbsp;&nbsp;&nbsp;</span></span>';
         }
 
         else {
-          colors_html += '<span class="fr-command" data-cmd="tableCellBackgroundColor" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '"><i class="fa fa-eraser"></i></span>';
+          colors_html += '<span class="fr-command" data-cmd="tableCellBackgroundColor" tabIndex="-1" role="button" data-param1="REMOVE" title="' + editor.language.translate('Clear Formatting') + '"><i class="fa fa-eraser"></i><span class="fr-sr-only">' + editor.language.translate('Clear Formatting') + '</span></span>';
         }
       }
 
       colors_html += '</div>';
 
       return colors_html;
+    }
+
+    /*
+     * Register keyboard events for colors.
+     */
+    function _addColorsAccessibility ($popup) {
+      // Register popup event.
+      editor.events.on('popup.tab', function (e) {
+        var $focused_item = $(e.currentTarget);
+
+        // Skip if popup is not visible or focus is elsewere.
+        if (!editor.popups.isVisible('table.colors') || !$focused_item.is('span')) {
+          return true;
+        }
+        var key_code = e.which;
+        var status = true;
+
+        // Tabbing.
+        if ($.FE.KEYCODE.TAB == key_code) {
+          var $tb = $popup.find('.fr-buttons');
+          // Focus back the popup's toolbar if exists.
+          status = !editor.accessibility.focusToolbar($tb, (e.shiftKey ? true : false));
+        }
+        // Arrows.
+        else if ($.FE.KEYCODE.ARROW_UP == key_code || $.FE.KEYCODE.ARROW_DOWN == key_code || $.FE.KEYCODE.ARROW_LEFT == key_code || $.FE.KEYCODE.ARROW_RIGHT == key_code) {
+          // Get all current colors.
+          var $colors = $focused_item.parent().find('span.fr-command');
+
+          // Get focused item position.
+          var index = $colors.index($focused_item);
+
+          // Get color matrix dimensions.
+          var columns = editor.opts.colorsStep;
+          var lines = Math.floor($colors.length / columns);
+
+          // Get focused item coordinates.
+          var column = index % columns;
+          var line = Math.floor(index / columns);
+
+          var nextIndex = line * columns + column;
+          var dimension = lines * columns;
+
+          // Calculate next index. Go to the other opposite site of the matrix if there is no next adjacent element.
+          // Up/Down: Traverse matrix lines.
+          // Left/Right: Traverse the matrix as it is a vector.
+          if ($.FE.KEYCODE.ARROW_UP == key_code) {
+            nextIndex = (((nextIndex - columns) % dimension) + dimension) % dimension; // Javascript negative modulo bug.
+          }
+          else if ($.FE.KEYCODE.ARROW_DOWN == key_code) {
+            nextIndex = (nextIndex + columns) % dimension;
+          }
+          else if ($.FE.KEYCODE.ARROW_LEFT == key_code) {
+            nextIndex = (((nextIndex - 1) % dimension) + dimension) % dimension; // Javascript negative modulo bug.
+          }
+          else if ($.FE.KEYCODE.ARROW_RIGHT == key_code) {
+            nextIndex = (nextIndex + 1) % dimension;
+          }
+
+          // Get the next element based on the new index.
+          var $el = $($colors.get(nextIndex));
+
+          // Focus.
+          editor.events.disableBlur();
+          $el.focus();
+
+          status = false;
+        }
+        // ENTER or SPACE.
+        else if ($.FE.KEYCODE.ENTER == key_code) {
+
+          editor.button.exec($focused_item);
+          status = false;
+        }
+
+        // Prevent propagation.
+        if (status === false) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+
+        return status;
+      }, true);
     }
 
     /*
@@ -347,10 +526,10 @@
       var $cell = editor.$el.find('.fr-selected-cell:first');
 
       // Remove current color selection.
-      $popup.find('.fr-selected-color').removeClass('fr-selected-color');
+      $popup.find('.fr-selected-color').removeClass('fr-selected-color fr-active-item');
 
       // Find the selected color.
-      $popup.find('span[data-param1="' + editor.helpers.RGBToHex($cell.css('background-color')) + '"]').addClass('fr-selected-color');
+      $popup.find('span[data-param1="' + editor.helpers.RGBToHex($cell.css('background-color')) + '"]').addClass('fr-selected-color fr-active-item');
     }
 
     /*
@@ -1515,12 +1694,19 @@
           }
         });
       }
+
+      // Remove keyboard selection handlers.
+      if (editor.el.querySelector('.fr-cell-fixed')) {
+        editor.el.querySelector('.fr-cell-fixed').classList.remove('fr-cell-fixed');
+        editor.el.querySelector('.fr-cell-handler').classList.remove('fr-cell-handler');
+      }
     }
 
     /*
      * Clear selection to prevent Firefox cell selection.
      */
     function _clearSelection () {
+      // Timeout is needed when selecting cells using shift.
       setTimeout(function () {
         editor.selection.clear();
 
@@ -1537,29 +1723,35 @@
      * Get current selected cells coordintates.
      */
     function _currentSelection (map) {
-      var min_i = map.length;
-      var max_i = 0;
-      var min_j = map[0].length;
-      var max_j = 0;
-      var i;
       var cells = editor.$el.find('.fr-selected-cell');
 
-      for (i = 0; i < cells.length; i++) {
-        var cellOrigin = _cellOrigin(cells[i], map);
-        var cellEnd = _cellEnds(cellOrigin.row, cellOrigin.col, map);
+      if (cells.length > 0) {
+        var min_i = map.length;
+        var max_i = 0;
+        var min_j = map[0].length;
+        var max_j = 0;
+        var i;
 
-        min_i = Math.min(cellOrigin.row, min_i);
-        max_i = Math.max(cellEnd.row, max_i);
-        min_j = Math.min(cellOrigin.col, min_j);
-        max_j = Math.max(cellEnd.col, max_j);
+        for (i = 0; i < cells.length; i++) {
+          var cellOrigin = _cellOrigin(cells[i], map);
+          var cellEnd = _cellEnds(cellOrigin.row, cellOrigin.col, map);
+
+          min_i = Math.min(cellOrigin.row, min_i);
+          max_i = Math.max(cellEnd.row, max_i);
+          min_j = Math.min(cellOrigin.col, min_j);
+          max_j = Math.max(cellEnd.col, max_j);
+        }
+
+        return {
+          min_i: min_i,
+          max_i: max_i,
+          min_j: min_j,
+          max_j: max_j
+        };
       }
-
-      return {
-        min_i: min_i,
-        max_i: max_i,
-        min_j: min_j,
-        max_j: max_j
-      };
+      else {
+        return null;
+      }
     }
 
     /*
@@ -1671,7 +1863,9 @@
     }
 
     /*
-     * Select table cells
+     * Select table cells.
+     * firstCell is either the top left corner or the fr-cell-fixed corner of the selection.
+     * lastCell is either the bottom right corner ot the fr-cell-handler of the selection.
      */
     function _selectCells (firstCell, lastCell) {
       // If the first and last cells are the same then just select it.
@@ -1684,7 +1878,7 @@
 
         $(firstCell).addClass('fr-selected-cell');
 
-      // Select multiple celss.
+      // Select multiple cells.
       } else {
         // Prevent Firefox cell selection.
         _clearSelection();
@@ -1708,6 +1902,10 @@
                                                   map);
         // Remove previous selection.
         _removeSelection();
+
+        // We always need to set the selection handler classes as user may use keyboard to select at anytime.
+        firstCell.classList.add('fr-cell-fixed');
+        lastCell.classList.add('fr-cell-handler');
 
         // Select all cells between the first and last cell.
         for (var i = limits.min_i; i <= limits.max_i; i++) {
@@ -1927,12 +2125,156 @@
     }
 
     /*
+     * Move cursor in a nested table.
+     */
+    function _moveInNestedTable (cell, direction) {
+      var table = cell;
+
+      // Get parent table (editor might be initialized inside cell).
+      while (table && table.tagName != 'TABLE' && table.parentNode != editor.el) {
+        table = table.parentNode;
+      }
+
+      if (table && table.tagName == 'TABLE') {
+        var new_map = _tableMap($(table));
+
+        // Move up in the parent table.
+        if (direction == 'up') _moveUp(_cellOrigin(cell, new_map), table, new_map);
+        else if (direction == 'down') _moveDown(_cellOrigin(cell, new_map), table, new_map);
+      }
+    }
+
+    /*
+     * Move cursor up or down outside table.
+     */
+    function _moveWithArrows (origin, table, map, direction) {
+      var up = table;
+      var sibling;
+
+      // Look up in DOM for the previous or next element.
+      while (up != editor.el) {
+        // Nested table.
+        if (up.tagName == 'TD' || up.tagName == 'TH') {
+          break;
+        }
+
+        // The table has a sibling element.
+        if (direction == 'up') sibling = up.previousElementSibling;
+        else if (direction == 'down') sibling = up.nextElementSibling;
+
+        if (sibling) {
+          break;
+        }
+
+        // Table might be in a block tag.
+        up = up.parentNode;
+      }
+
+      // We have another table (nested).
+      if (up.tagName == 'TD' || up.tagName == 'TH') {
+        _moveInNestedTable(up, direction);
+      }
+
+      // Table has a sibling.
+      else if (sibling) {
+        if (direction == 'up') editor.selection.setAtEnd(sibling);
+        if (direction == 'down') editor.selection.setAtStart(sibling);
+      }
+    }
+
+    /*
+     * Move cursor up while in table cell.
+     */
+    function _moveUp (origin, table, map) {
+      // Not the first line.
+      if (origin.row > 0) {
+        editor.selection.setAtEnd(map[origin.row - 1][origin.col])
+      }
+
+      // First line.
+      else {
+        _moveWithArrows(origin, table, map, 'up');
+      }
+    }
+
+    /*
+     * Move cursor down while in table cell.
+     */
+    function _moveDown (origin, table, map) {
+      // Cell might have rowspan.
+      var row = parseInt(map[origin.row][origin.col].getAttribute('rowspan'), 10) || 1;
+
+      // Not the last line.
+      if (origin.row < map.length - row) {
+        editor.selection.setAtStart(map[origin.row + row][origin.col]);
+      }
+
+      // Last line.
+      else {
+        _moveWithArrows(origin, table, map, 'down');
+      }
+    }
+
+    /*
      * Using the arrow keys to move the cursor through the table will not select cells.
      */
-    function _usingArrows (e) {
-      if (e.which == 37 || e.which == 38 || e.which == 39 || e.which == 40) {
-        if (selectedCells().length > 0) {
-          _stopEdit();
+    function _navigateWithArrows (e) {
+      var key_code = e.which;
+
+      // Get current selection.
+      var sel = editor.selection.blocks();
+
+      if (sel.length) {
+        sel = sel[0];
+
+        // Selection should be in a table cell.
+        if (sel.tagName == 'TD' || sel.tagName == 'TH') {
+          var table = sel;
+
+          // Get parent table (editor might be initialized inside cell).
+          while (table && table.tagName != 'TABLE' && table.parentNode != editor.el) {
+            table = table.parentNode;
+          }
+
+          if (table && table.tagName == 'TABLE') {
+            if ($.FE.KEYCODE.ARROW_LEFT == key_code || $.FE.KEYCODE.ARROW_UP == key_code || $.FE.KEYCODE.ARROW_RIGHT == key_code || $.FE.KEYCODE.ARROW_DOWN == key_code) {
+              if (selectedCells().length > 0) {
+                _stopEdit();
+              }
+
+              // Up and down in Webkit.
+              if (editor.browser.webkit && ($.FE.KEYCODE.ARROW_UP == key_code || $.FE.KEYCODE.ARROW_DOWN == key_code)) {
+                var node = editor.selection.ranges(0).startContainer;
+
+                if (node.nodeType == Node.TEXT_NODE && (($.FE.KEYCODE.ARROW_UP == key_code && node.previousSibling) || ($.FE.KEYCODE.ARROW_DOWN == key_code && node.nextSibling))) {
+                  return;
+                }
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Table map.
+                var map = _tableMap($(table));
+
+                // Current cell map coordinates.
+                var origin = _cellOrigin(sel, map);
+
+                // Arrow up
+                if ($.FE.KEYCODE.ARROW_UP == key_code) {
+                  _moveUp(origin, table, map);
+                }
+
+                // Arrow down
+                else if ($.FE.KEYCODE.ARROW_DOWN == key_code) {
+                  _moveDown(origin, table, map);
+                }
+
+                // Update cursor position.
+                editor.selection.restore();
+                return false;
+              }
+            }
+          }
         }
       }
     }
@@ -1956,6 +2298,9 @@
 
         // Resize table only using left click.
         if (e.which == 1) {
+          // Save selection so that we can put cursor back at the end.
+          editor.selection.save();
+
           resizingFlag = true;
 
           $resizer.addClass('fr-moving');
@@ -2072,20 +2417,34 @@
           var max_right;
 
           if (editor.opts.direction != 'rtl') {
-            // Mouse is near the cells's left margin (skip left table border).
-            if (tag_origin.col > 0 && e.pageX - tag_left <= editor.opts.tableResizerOffset) {
+            // Mouse is near the cells's left margin.
+            if (e.pageX - tag_left <= editor.opts.tableResizerOffset) {
               // Table resizer's left position.
               resizer_left = tag_left;
 
-              // Left limit.
-              max_left = tag_left - _columnWidth(tag_origin.col - 1, map) + editor.opts.tableResizingLimit;
+              // Resize cells.
+              if (tag_origin.col > 0) {
+                // Left limit.
+                max_left = tag_left - _columnWidth(tag_origin.col - 1, map) + editor.opts.tableResizingLimit;
 
-              // Right limit.
-              max_right = tag_left + _columnWidth(tag_origin.col, map) - editor.opts.tableResizingLimit;
+                // Right limit.
+                max_right = tag_left + _columnWidth(tag_origin.col, map) - editor.opts.tableResizingLimit;
 
-              // Columns to resize.
-              first = tag_origin.col - 1;
-              second = tag_origin.col;
+                // Columns to resize.
+                first = tag_origin.col - 1;
+                second = tag_origin.col;
+              }
+
+              // Resize table.
+              else {
+                // Columns to resize.
+                first = null;
+                second = 0;
+
+                // Resizer limits.
+                max_left = $table.offset().left - 1 - parseInt($table.css('margin-left'), 10);
+                max_right = $table.offset().left - 1 + $table.width() - map[0].length * editor.opts.tableResizingLimit;
+              }
             }
 
             // Mouse is near the cell's right margin.
@@ -2121,20 +2480,33 @@
 
           // RTL
           else {
-            // Mouse is near the cell's right margin (skip right table border).
-            if (tag_origin.col > 0 && tag_right - e.pageX <= editor.opts.tableResizerOffset) {
+            // Mouse is near the cell's right margin.
+            if (tag_right - e.pageX <= editor.opts.tableResizerOffset) {
               // Table resizer's left position.
               resizer_left = tag_right;
 
-              // Left limit.
-              max_left = tag_right - _columnWidth(tag_origin.col, map) + editor.opts.tableResizingLimit;
+              // Resize cells.
+              if (tag_origin.col > 0) {
+                // Left limit.
+                max_left = tag_right - _columnWidth(tag_origin.col, map) + editor.opts.tableResizingLimit;
 
-              // Right limit.
-              max_right = tag_right + _columnWidth(tag_origin.col - 1, map) - editor.opts.tableResizingLimit;
+                // Right limit.
+                max_right = tag_right + _columnWidth(tag_origin.col - 1, map) - editor.opts.tableResizingLimit;
 
-              // Columns to resize.
-              first = tag_origin.col;
-              second = tag_origin.col - 1;
+                // Columns to resize.
+                first = tag_origin.col;
+                second = tag_origin.col - 1;
+              }
+
+              // Resize table.
+              else {
+                first = null;
+                second = 0;
+
+                // Resizer limits.
+                max_left = $table.offset().left + map[0].length * editor.opts.tableResizingLimit;
+                max_right = $table_parent.offset().left - 1 + $table_parent.width() + parseFloat($table_parent.css('padding-left'));
+              }
             }
 
             // Mouse is near the cell's left margin.
@@ -2158,12 +2530,12 @@
               // Resize table.
               else {
                 // Columns to resize.
-                first = null;
-                second = tag_end.col;
+                first = tag_end.col;
+                second = null;
 
                 // Resizer limits.
                 max_left = $table_parent.offset().left + parseFloat($table_parent.css('padding-left'));
-                max_right = $table_parent.offset().left - 1 + $table_parent.width() + parseFloat($table_parent.css('padding-left')) - map[0].length * editor.opts.tableResizingLimit;
+                max_right = $table.offset().left - 1 + $table.width() - map[0].length * editor.opts.tableResizingLimit;
               }
             }
           }
@@ -2184,8 +2556,8 @@
           var top = resizer_top - editor.win.pageYOffset;
 
           if (editor.opts.iframe) {
-            left += editor.$iframe.offset().left - $(editor.o_win).scrollLeft();
-            top += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+            left += editor.$iframe.offset().left - editor.helpers.scrollLeft();
+            top += editor.$iframe.offset().top - editor.helpers.scrollTop();
 
             max_left += editor.$iframe.offset().left;
             max_right += editor.$iframe.offset().left;
@@ -2245,8 +2617,8 @@
       var top = 0;
 
       if (editor.opts.iframe) {
-        left += editor.$iframe.offset().left - $(editor.o_win).scrollLeft();
-        top += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+        left += editor.$iframe.offset().left - editor.helpers.scrollLeft();
+        top += editor.$iframe.offset().top - editor.helpers.scrollTop();
       }
 
       // Check where the column should be inserted.
@@ -2298,8 +2670,8 @@
       var left = 0;
       var top = 0;
       if (editor.opts.iframe) {
-        left += editor.$iframe.offset().left - $(editor.o_win).scrollLeft();
-        top += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+        left += editor.$iframe.offset().left - editor.helpers.scrollLeft();
+        top += editor.$iframe.offset().top - editor.helpers.scrollTop();
       }
 
       // Check where the row should be inserted.
@@ -2357,7 +2729,7 @@
             // We found a tag bellow.
             if (tag_below && ((tag_below.tagName == 'TH' || tag_below.tagName == 'TD' || tag_below.tagName == 'TABLE') && ($(tag_below).parents('.fr-wrapper').length || editor.opts.iframe))) {
               // Show the insert column helper button.
-              _showInsertColHelper (e, tag_below.closest('table'));
+              _showInsertColHelper (e, $(tag_below).closest('table'));
               return true;
             }
 
@@ -2370,7 +2742,7 @@
             // We found a tag at the right.
             if (tag_right && ((tag_right.tagName == 'TH' || tag_right.tagName == 'TD' || tag_right.tagName == 'TABLE') && ($(tag_right).parents('.fr-wrapper').length || editor.opts.iframe))) {
               // Show the insert row helper button.
-              _showInsertRowHelper (e, tag_right.closest('table'));
+              _showInsertRowHelper (e, $(tag_right).closest('table'));
               return true;
             }
           }
@@ -2412,7 +2784,7 @@
         var top = $table.offset().top - editor.win.pageYOffset;
 
         if (editor.opts.iframe) {
-          top += editor.$iframe.offset().top - $(editor.o_win).scrollTop();
+          top += editor.$iframe.offset().top - editor.helpers.scrollTop();
         }
 
         $resizer.css('top', top);
@@ -2483,16 +2855,28 @@
         else {
           var $table_parent = $table.parent();
           var table_percentage = table_width / $table_parent.width() * 100;
+          var left_margin = (parseInt($table.css('margin-left'), 10) || 0) / $table_parent.width() * 100;
+          var right_margin = (parseInt($table.css('margin-right'), 10) || 0) / $table_parent.width() * 100;
           var width;
 
-          if (first == null) {
-            width = (table_width - release_position + initial_positon) / table_width * table_percentage;
-          } else {
+          // Right border RTL or LTR.
+          if ((editor.opts.direction == 'rtl' && second === 0) || (editor.opts.direction != 'rtl' && second !== 0)) {
             width = (table_width + release_position - initial_positon) / table_width * table_percentage;
+            $table.css('margin-right', 'calc(100% - ' + Math.round(width).toFixed(4) + '% - ' + Math.round(left_margin).toFixed(4) + '%)');
           }
 
+          // Left border RTL or LTR.
+          else if ((editor.opts.direction == 'rtl' && second !== 0) || (editor.opts.direction != 'rtl' && second === 0)) {
+            width = (table_width - release_position + initial_positon) / table_width * table_percentage;
+            $table.css('margin-left', 'calc(100% - ' + Math.round(width).toFixed(4) + '% - ' + Math.round(right_margin).toFixed(4) + '%)');
+          }
+
+          // Update table width.
           $table.css('width', Math.round(width).toFixed(4) + '%');
         }
+
+        editor.selection.restore();
+        editor.undo.saveStep();
       }
 
       // Clear resizer data.
@@ -2501,8 +2885,6 @@
       $resizer.removeData('first');
       $resizer.removeData('second');
       $resizer.removeData('table');
-
-      editor.undo.saveStep();
     }
 
     /*
@@ -2603,7 +2985,7 @@
     function _useTab (e) {
       var key_code = e.which;
 
-      if (key_code == $.FE.KEYCODE.TAB && editor.opts.tabSpaces === 0) {
+      if (key_code == $.FE.KEYCODE.TAB) {
         // Get starting cell.
         var $cell;
 
@@ -2676,6 +3058,9 @@
 
           // Update cursor position.
           editor.selection.restore();
+
+          // Prevent event propagation.
+          return false;
         }
       }
     }
@@ -2686,7 +3071,7 @@
     function _initInsertHelper () {
       // Append insert helper HTML to editor wrapper.
       if (!editor.shared.$ti_helper) {
-        editor.shared.$ti_helper = $('<div class="fr-insert-helper"><a class="fr-floating-btn" role="button" tabindex="-1" title="' + editor.language.translate('Insert') + '"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M22,16.75 L16.75,16.75 L16.75,22 L15.25,22.000 L15.25,16.75 L10,16.75 L10,15.25 L15.25,15.25 L15.25,10 L16.75,10 L16.75,15.25 L22,15.25 L22,16.75 Z"/></svg></a></div>');
+        editor.shared.$ti_helper = $('<div class="fr-insert-helper"><a class="fr-floating-btn" role="button" tabIndex="-1" title="' + editor.language.translate('Insert') + '"><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M22,16.75 L16.75,16.75 L16.75,22 L15.25,22.000 L15.25,16.75 L10,16.75 L10,15.25 L15.25,15.25 L15.25,10 L16.75,10 L16.75,15.25 L22,15.25 L22,16.75 Z"/></svg></a></div>');
 
         // Click on insert helper.
         editor.events.bindClick(editor.shared.$ti_helper, 'a', function () {
@@ -2776,7 +3161,7 @@
      * Return selected cells.
      */
     function selectedCells () {
-      return editor.$el.get(0).querySelectorAll('.fr-selected-cell');
+      return editor.el.querySelectorAll('.fr-selected-cell');
     }
 
     /**
@@ -2786,7 +3171,7 @@
       var cells = selectedCells();
       if (cells.length) {
         var cell = cells[0];
-        while (cell && cell.tagName != 'TABLE' && cell.parentNode != editor.$el.get(0)) {
+        while (cell && cell.tagName != 'TABLE' && cell.parentNode != editor.el) {
           cell = cell.parentNode;
         }
 
@@ -2795,6 +3180,93 @@
       }
 
       return $([]);
+    }
+
+    /**
+     * Select table cell with alt + space.
+     */
+    function _selectCellWithKeyboard (e) {
+      // Alt+space was hit. Try to select cell.
+      if (e.altKey && e.which == $.FE.KEYCODE.SPACE) {
+        var cell;
+        var el = editor.selection.element();
+
+        // Get cell where cursor is.
+        if (el.tagName == 'TD' || el.tagName == 'TH') {
+          cell = el;
+        }
+        else if ($(el).closest('td').length > 0) {
+          cell = $(el).closest('td').get(0);
+        }
+        else if ($(el).closest('th').length > 0) {
+          cell = $(el).closest('th').get(0);
+        }
+
+        // Select this cell.
+        if (cell) {
+          e.preventDefault();
+          _selectCells(cell, cell);
+          _showEditPopup();
+          return false;
+        }
+      }
+    }
+
+    /**
+     * Select table cells using arrows.
+     */
+    function _selectCellsWithKeyboard (e) {
+      var selection = selectedCells();
+
+      // There are some selected cells.
+      if (selection.length > 0) {
+        var map = _tableMap();
+        var key_code = e.which;
+        var fixedCell;
+        var handlerCell;
+
+        // Only one cell is selected.
+        if (selection.length == 1) {
+          fixedCell = selection[0];
+          handlerCell = fixedCell;
+        }
+
+        else {
+          fixedCell = editor.el.querySelector('.fr-cell-fixed');
+          handlerCell = editor.el.querySelector('.fr-cell-handler');
+        }
+
+        var handlerOrigin = _cellOrigin(handlerCell, map);
+
+        // Select column at the right.
+        if ($.FE.KEYCODE.ARROW_RIGHT == key_code) {
+          if (handlerOrigin.col < map[0].length - 1) {
+            _selectCells(fixedCell, map[handlerOrigin.row][handlerOrigin.col + 1]);
+            return false;
+          }
+        }
+        // Select row below.
+        else if ($.FE.KEYCODE.ARROW_DOWN == key_code) {
+          if (handlerOrigin.row < map.length - 1) {
+            _selectCells(fixedCell, map[handlerOrigin.row + 1][handlerOrigin.col]);
+            return false;
+          }
+        }
+        // Select column at the left.
+        else if ($.FE.KEYCODE.ARROW_LEFT == key_code) {
+          if (handlerOrigin.col > 0) {
+            _selectCells(fixedCell, map[handlerOrigin.row][handlerOrigin.col - 1]);
+            return false;
+          }
+        }
+        // Select row above.
+        else if ($.FE.KEYCODE.ARROW_UP == key_code) {
+          if (handlerOrigin.row > 0) {
+            _selectCells(fixedCell, map[handlerOrigin.row - 1][handlerOrigin.col]);
+            return false;
+          }
+        }
+      }
     }
 
     /*
@@ -2845,9 +3317,6 @@
           editor.events.$on($(editor.o_win), 'mouseup', _mouseUp);
         }
 
-        // Moving cursor with arrow keys.
-        editor.events.$on(editor.$el, 'keydown', _usingArrows);
-
         // Check tags under the mouse to see if the resizer needs to be shown.
         editor.events.$on(editor.$win, 'mousemove', _mouseMove);
 
@@ -2874,8 +3343,34 @@
           _removeSelection();
         });
 
+        editor.events.on('toolbar.esc', function () {
+          if (selectedCells().length > 0) {
+            editor.events.disableBlur();
+            editor.events.focus();
+            return false;
+          }
+        }, true);
+
+        // Selecting cells with keyboard or moving cursor with arrow keys.
+        editor.events.$on(editor.$el, 'keydown', function (e) {
+          if (e.shiftKey) {
+            if (_selectCellsWithKeyboard(e) === false) {
+              // Timeout needed due to clearSelection timeout.
+              setTimeout(function () {
+                _showEditPopup();
+              }, 0);
+            }
+          }
+          else {
+            _navigateWithArrows(e);
+          }
+        });
+
         // Prevent backspace from doing browser back.
         editor.events.on('keydown', function (e) {
+          // Tab in cell.
+          if (_useTab(e) === false) return false;
+
           var selected_cells = selectedCells();
 
           if (selected_cells.length > 0) {
@@ -2911,14 +3406,20 @@
             }
 
             // Prevent typing if cells are selected. (Allow browser refresh using keyboard)
-            if (selected_cells.length > 1 && !editor.keys.ctrlKey(e)) {
+            if (selected_cells.length > 1 && e.which != $.FE.KEYCODE.F10 && !editor.keys.isBrowserAction(e)) {
               e.preventDefault();
               selected_cells = [];
               return false;
             }
           }
 
-          selected_cells = [];
+          // We may want to select a cell with keyboard.
+          else {
+            // Garbage collector.
+            selected_cells = [];
+
+            if (_selectCellWithKeyboard(e) === false) return false;
+          }
         }, true);
 
         // Clean selected cells.
@@ -2930,15 +3431,9 @@
           }
         });
 
-        editor.events.on('html.get', function (html) {
-          html = html.replace(/<(td|th)((?:[\w\W]*?)) class=""((?:[\w\W]*?))>((?:[\w\W]*?))<\/(td|th)>/g, '<$1$2$3>$4</$5>');
-
-          return html;
-        });
-
         editor.events.on('html.afterGet', function () {
           for (var i = 0; i < c_selected_cells.length; i++) {
-            c_selected_cells[i].className = (c_selected_cells[i].className ? c_selected_cells[i].className + ' ' : '') + 'fr-selected-cell';
+            c_selected_cells[i].className = (c_selected_cells[i].className ? c_selected_cells[i].className.trim() + ' ' : '') + 'fr-selected-cell';
           }
           c_selected_cells = [];
         });
@@ -2946,9 +3441,6 @@
         _initInsertPopup(true);
         _initEditPopup(true);
       }
-
-      // Tab in cell
-      editor.events.on('keydown', _useTab, true);
 
       editor.events.on('destroy', _destroy);
     }
@@ -2992,7 +3484,7 @@
         this.table.showInsertPopup();
       }
       else {
-        if (this.$el.find('.fr-marker')) {
+        if (this.$el.find('.fr-marker').length) {
           this.events.disableBlur();
           this.selection.restore();
         }
@@ -3014,6 +3506,7 @@
   $.FE.RegisterCommand('tableHeader', {
     title: 'Table Header',
     focus: false,
+    toggle: true,
     callback: function () {
       var $btn = this.popups.get('table.edit').find('.fr-command[data-cmd="tableHeader"]');
 
@@ -3033,12 +3526,12 @@
       if ($table.length > 0) {
         // If table doesn't have a header.
         if ($table.find('th').length === 0) {
-          $btn.removeClass('fr-active');
+          $btn.removeClass('fr-active').attr('aria-pressed', false);
         }
 
         // Header button is active if table has header.
         else {
-          $btn.addClass('fr-active');
+          $btn.addClass('fr-active').attr('aria-pressed', true);
         }
       }
     }
@@ -3056,11 +3549,11 @@
       'delete': 'Delete row'
     },
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  $.FE.COMMANDS.tableRows.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command" data-cmd="tableRows" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="tableRows" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -3088,11 +3581,11 @@
       'delete': 'Delete column'
     },
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  $.FE.COMMANDS.tableColumns.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command" data-cmd="tableColumns" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="tableColumns" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -3120,11 +3613,11 @@
       'horizontal-split': 'Horizontal split'
     },
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  $.FE.COMMANDS.tableCells.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command" data-cmd="tableCells" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="tableCells" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -3146,16 +3639,16 @@
     refreshOnShow: function ($btn, $dropdown) {
       // More than one cell selected.
       if (this.$el.find('.fr-selected-cell').length > 1) {
-        $dropdown.find('a[data-param1="vertical-split"]').addClass('fr-disabled');
-        $dropdown.find('a[data-param1="horizontal-split"]').addClass('fr-disabled');
-        $dropdown.find('a[data-param1="merge"]').removeClass('fr-disabled');
+        $dropdown.find('a[data-param1="vertical-split"]').addClass('fr-disabled').attr('aria-disabled', true);
+        $dropdown.find('a[data-param1="horizontal-split"]').addClass('fr-disabled').attr('aria-disabled', true);
+        $dropdown.find('a[data-param1="merge"]').removeClass('fr-disabled').attr('aria-disabled', false);
       }
 
       // Only one selected cell.
       else {
-        $dropdown.find('a[data-param1="merge"]').addClass('fr-disabled');
-        $dropdown.find('a[data-param1="vertical-split"]').removeClass('fr-disabled');
-        $dropdown.find('a[data-param1="horizontal-split"]').removeClass('fr-disabled');
+        $dropdown.find('a[data-param1="merge"]').addClass('fr-disabled').attr('aria-disabled', true);
+        $dropdown.find('a[data-param1="vertical-split"]').removeClass('fr-disabled').attr('aria-disabled', false);
+        $dropdown.find('a[data-param1="horizontal-split"]').removeClass('fr-disabled').attr('aria-disabled', false);
       }
     }
   });
@@ -3177,11 +3670,11 @@
     type: 'dropdown',
     focus: false,
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  this.opts.tableStyles;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command" data-cmd="tableStyle" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="tableStyle" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -3197,7 +3690,8 @@
       if ($table) {
         $dropdown.find('.fr-command').each (function () {
           var cls = $(this).data('param1');
-          $(this).toggleClass('fr-active', $table.hasClass(cls));
+          var active = $table.hasClass(cls);
+          $(this).toggleClass('fr-active', active).attr('aria-selected', active);
         })
       }
     }
@@ -3208,6 +3702,7 @@
   $.FE.RegisterCommand('tableCellBackground', {
     title: 'Cell Background',
     focus: false,
+    popup: true,
     callback: function () {
       this.table.showColorsPopup();
     }
@@ -3256,11 +3751,11 @@
       Bottom: 'Align Bottom'
     },
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  $.FE.COMMANDS.tableCellVerticalAlign.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command" data-cmd="tableCellVerticalAlign" data-param1="' + val.toLowerCase() + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(val) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="tableCellVerticalAlign" data-param1="' + val.toLowerCase() + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(val) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -3271,7 +3766,7 @@
       this.table.verticalAlign(val);
     },
     refreshOnShow: function ($btn, $dropdown) {
-      $dropdown.find('.fr-command[data-param1="' + this.$el.find('.fr-selected-cell').css('vertical-align') + '"]').addClass('fr-active');
+      $dropdown.find('.fr-command[data-param1="' + this.$el.find('.fr-selected-cell').css('vertical-align') + '"]').addClass('fr-active').attr('aria-selected', true);
     }
   });
 
@@ -3292,11 +3787,11 @@
       justify: 'Align Justify'
     },
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  $.FE.COMMANDS.tableCellHorizontalAlign.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command fr-title" data-cmd="tableCellHorizontalAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command fr-title" tabIndex="-1" role="option" data-cmd="tableCellHorizontalAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '<span class="fr-sr-only">' + this.language.translate(options[val]) + '</span></a></li>';
         }
       }
       c += '</ul>';
@@ -3314,7 +3809,7 @@
       }
     },
     refreshOnShow: function ($btn, $dropdown) {
-      $dropdown.find('.fr-command[data-param1="' + this.helpers.getAlignment(this.$el.find('.fr-selected-cell:first')) + '"]').addClass('fr-active');
+      $dropdown.find('.fr-command[data-param1="' + this.helpers.getAlignment(this.$el.find('.fr-selected-cell:first')) + '"]').addClass('fr-active').attr('aria-selected', true);
     }
   });
 
@@ -3325,11 +3820,11 @@
     type: 'dropdown',
     focus: false,
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  this.opts.tableCellStyles;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command" data-cmd="tableCellStyle" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command" tabIndex="-1" role="option" data-cmd="tableCellStyle" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.language.translate(options[val]) + '</a></li>';
         }
       }
       c += '</ul>';
@@ -3345,7 +3840,8 @@
       if ($cell) {
         $dropdown.find('.fr-command').each (function () {
           var cls = $(this).data('param1');
-          $(this).toggleClass('fr-active', $cell.hasClass(cls));
+          var active = $cell.hasClass(cls);
+          $(this).toggleClass('fr-active', active).attr('aria-selected', active);
         })
       }
     }

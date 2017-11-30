@@ -26,6 +26,11 @@ use Symfony\Component\HttpFoundation\Response;
 class PublicController extends CommonFormController
 {
     /**
+     * @var array
+     */
+    private $tokens = [];
+
+    /**
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function submitAction()
@@ -324,6 +329,7 @@ class PublicController extends CommonFormController
      */
     public function previewAction($id = 0)
     {
+        /** @var FormModel $model */
         $objectId          = (empty($id)) ? InputHelper::int($this->request->get('id')) : $id;
         $css               = InputHelper::string($this->request->get('css'));
         $model             = $this->getModel('form.form');
@@ -332,7 +338,7 @@ class PublicController extends CommonFormController
         $template          = null;
 
         if ($form === null || !$form->isPublished()) {
-            $this->notFound();
+            return $this->notFound();
         } else {
             $html = $model->getContent($form);
 
@@ -446,14 +452,18 @@ class PublicController extends CommonFormController
      */
     private function replacePostSubmitTokens($string, SubmissionEvent $submissionEvent)
     {
-        static $tokens = [];
-        if (empty($tokens)) {
-            $tokens = array_merge(
-                $submissionEvent->getTokens(),
-                TokenHelper::findLeadTokens($string, $submissionEvent->getLead()->getProfileFields())
-            );
+        if (empty($this->tokens)) {
+            if ($lead = $submissionEvent->getLead()) {
+                $this->tokens = array_merge(
+                    $submissionEvent->getTokens(),
+                    TokenHelper::findLeadTokens(
+                        $string,
+                        $lead->getProfileFields()
+                    )
+                );
+            }
         }
 
-        return str_replace(array_keys($tokens), array_values($tokens), $string);
+        return str_replace(array_keys($this->tokens), array_values($this->tokens), $string);
     }
 }

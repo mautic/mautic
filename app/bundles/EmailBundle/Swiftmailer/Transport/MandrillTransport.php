@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class MandrillTransport.
  */
-class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceCallbackTransport
+class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTransportInterface
 {
     /**
      * {@inheritdoc}
@@ -212,7 +212,9 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         unset($message['recipients']);
 
         // Set the merge vars
-        $message['merge_vars'] = $rcptMergeVars;
+        if (!empty($rcptMergeVars)) {
+            $message['merge_vars'] = $rcptMergeVars;
+        }
 
         // Set the rest of $metadata as recipient_metadata
         $message['recipient_metadata'] = $rcptMetadata;
@@ -223,10 +225,17 @@ class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceC
         }
         unset($message['replyTo']);
 
+        $key = $this->getApiKey();
+
+        if (empty($key)) {
+            // BC support @deprecated - remove in 3.0
+            $key = $this->getPassword();
+        }
+
         // Package it up
         $payload = json_encode(
             [
-                'key'     => $this->getPassword(),
+                'key'     => $key,
                 'message' => $message,
             ]
         );

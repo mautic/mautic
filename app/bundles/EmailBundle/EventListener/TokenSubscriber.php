@@ -23,6 +23,8 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class TokenSubscriber extends CommonSubscriber
 {
+    use MatchFilterForLeadTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -50,12 +52,17 @@ class TokenSubscriber extends CommonSubscriber
             $event->setPlainText($plainText);
         }
 
-        $lead                  = $event->getLead();
-        $email                 = $event->getEmail();
-        $dynamicContentAsArray = $email instanceof Email ? $email->getDynamicContent() : null;
-
-        if (!empty($dynamicContentAsArray)) {
-            $tokenEvent = new TokenReplacementEvent(null, $lead, ['lead' => null, 'dynamicContent' => $dynamicContentAsArray]);
+        $email = $event->getEmail();
+        if ($dynamicContentAsArray = $email instanceof Email ? $email->getDynamicContent() : null) {
+            $lead       = $event->getLead();
+            $tokens     = $event->getTokens();
+            $tokenEvent = new TokenReplacementEvent(
+                null, $lead, [
+                    'tokens'         => $tokens,
+                    'lead'           => null,
+                    'dynamicContent' => $dynamicContentAsArray,
+                ]
+            );
             $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
             $event->addTokens($tokenEvent->getTokens());
         }
@@ -73,6 +80,7 @@ class TokenSubscriber extends CommonSubscriber
         }
 
         $lead      = $event->getLead();
+        $tokens    = $clickthrough['tokens'];
         $tokenData = $clickthrough['dynamicContent'];
 
         if ($lead instanceof Lead) {
@@ -80,8 +88,8 @@ class TokenSubscriber extends CommonSubscriber
         }
 
         foreach ($tokenData as $data) {
-            $defaultContent = $data['content'];
-            $filterContent  = null;
+            // Default content
+            $filterContent = $data['content'];
 
             foreach ($data['filters'] as $filter) {
                 if ($this->matchFilterForLead($filter['filters'], $lead)) {
@@ -89,100 +97,21 @@ class TokenSubscriber extends CommonSubscriber
                 }
             }
 
-            $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $filterContent ?: $defaultContent);
+            // Replace lead tokens in dynamic content (but no recurrence on dynamic content to avoid infinite loop)
+            $emailSendEvent = new EmailSendEvent(
+                null,
+                [
+                    'content' => $filterContent,
+                    'email'   => null,
+                    'idHash'  => null,
+                    'tokens'  => $tokens,
+                    'lead'    => $lead,
+                ]
+            );
+            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
+            $untokenizedContent = $emailSendEvent->getContent(true);
+
+            $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
-    }
-
-    /**
-     * @param array $filter
-     * @param array $lead
-     *
-     * @return bool
-     */
-    private function matchFilterForLead(array $filter, array $lead)
-    {
-        $groups   = [];
-        $groupNum = 0;
-
-        foreach ($filter as $key => $data) {
-            $isCompanyField = (strpos($data['field'], 'company') === 0 && $data['field'] !== 'company');
-            $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
-
-            if (!array_key_exists($data['field'], $lead) && !$isCompanyField) {
-                continue;
-            }
-
-            /*
-             * Split the filters into groups based on the glue.
-             * The first filter and any filters whose glue is
-             * "or" will start a new group.
-             */
-            if ($groupNum === 0 || $data['glue'] === 'or') {
-                ++$groupNum;
-                $groups[$groupNum] = null;
-            }
-
-            /*
-             * If the group has been marked as false, there
-             * is no need to continue checking the others
-             * in the group.
-             */
-            if ($groups[$groupNum] === false) {
-                continue;
-            }
-
-            $leadVal   = $isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']];
-            $filterVal = $data['filter'];
-
-            if (!is_array($filterVal) && in_array($data['type'], ['number', 'boolean'])) {
-                $filterVal = $data['type'] === 'number' ? (float) $filterVal : (bool) $filterVal;
-            }
-
-            if (in_array($data['operator'], ['like', '!like'])) {
-                $leadVal   = (string) $leadVal;
-                $filterVal = (string) $filterVal;
-            }
-
-            switch ($data['operator']) {
-                case '=':
-                    $groups[$groupNum] = $leadVal === $filterVal;
-                    break;
-                case '!=':
-                    $groups[$groupNum] = $leadVal !== $filterVal;
-                    break;
-                case 'gt':
-                    $groups[$groupNum] = $leadVal > $filterVal;
-                    break;
-                case 'gte':
-                    $groups[$groupNum] = $leadVal >= $filterVal;
-                    break;
-                case 'lt':
-                    $groups[$groupNum] = $leadVal < $filterVal;
-                    break;
-                case 'lte':
-                    $groups[$groupNum] = $leadVal <= $filterVal;
-                    break;
-                case 'empty':
-                    $groups[$groupNum] = empty($leadVal);
-                    break;
-                case '!empty':
-                    $groups[$groupNum] = !empty($leadVal);
-                    break;
-                case 'like':
-                    $groups[$groupNum] = strpos($leadVal, $filterVal) !== false;
-                    break;
-                case '!like':
-                    $groups[$groupNum] = strpos($leadVal, $filterVal) === false;
-                    break;
-                case 'in':
-                    $groups[$groupNum] = in_array($leadVal, $filterVal) !== false;
-                    break;
-                case '!in':
-                    $groups[$groupNum] = in_array($leadVal, $filterVal) === false;
-                    break;
-            }
-        }
-
-        return in_array(true, $groups);
     }
 }

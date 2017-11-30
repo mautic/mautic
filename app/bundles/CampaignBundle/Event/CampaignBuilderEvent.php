@@ -43,6 +43,13 @@ class CampaignBuilderEvent extends Event
     private $translator;
 
     /**
+     * Holds info if some property has been already sorted or not.
+     *
+     * @var array
+     */
+    private $sortCache = [];
+
+    /**
      * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
      */
     public function __construct($translator)
@@ -56,14 +63,18 @@ class CampaignBuilderEvent extends Event
      * @param string $key      a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
      * @param array  $decision can contain the following keys:
      *                         $decision = [
-     *                         'label'              => (required) what to display in the list
-     *                         'eventName'          => (required) The event name to fire when this event is triggered.
-     *                         'description'        => (optional) short description of event
-     *                         'formType'           => (optional) name of the form type SERVICE for the action
-     *                         'formTypeOptions'    => (optional) array of options to pass to the formType service
-     *                         'formTheme'          => (optional) form theme
-     *                         'associatedActions'  => (optional) Array of action types to limit what this decision can be associated with
-     *                         'anchorRestrictions' => (optional) Array of event anchors this event should not be allowed to connect to
+     *                         'label'                   => (required) what to display in the list
+     *                         'eventName'               => (required) The event name to fire when this event is triggered.
+     *                         'description'             => (optional) short description of event
+     *                         'formType'                => (optional) name of the form type SERVICE for the action
+     *                         'formTypeOptions'         => (optional) array of options to pass to the formType service
+     *                         'formTheme'               => (optional) form theme
+     *                         'connectionRestrictions'  => (optional) Array of events to restrict this event to. Implicit events
+     *                         [
+     *                         'anchor' => [], // array of anchors this event should _not_ be allowed to connect to in the format of eventType.anchorName, e.g. decision.no
+     *                         'source' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to connect into this event
+     *                         'target' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to flow from this event
+     *                         ]
      *                         ]
      */
     public function addDecision($key, array $decision)
@@ -80,7 +91,7 @@ class CampaignBuilderEvent extends Event
         );
 
         $decision['label']       = $this->translator->trans($decision['label']);
-        $decision['description'] = (isset($action['description'])) ? $this->translator->trans($decision['description']) : '';
+        $decision['description'] = (isset($decision['description'])) ? $this->translator->trans($decision['description']) : '';
 
         $this->decisions[$key] = $decision;
     }
@@ -92,22 +103,7 @@ class CampaignBuilderEvent extends Event
      */
     public function getDecisions()
     {
-        static $sorted = false;
-
-        if (empty($sorted)) {
-            uasort(
-                $this->decisions,
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
-            );
-            $sorted = true;
-        }
-
-        return $this->decisions;
+        return $this->sort('decisions');
     }
 
     /**
@@ -134,16 +130,22 @@ class CampaignBuilderEvent extends Event
     /**
      * Add an lead condition to the list of available conditions.
      *
-     * @param string $key       a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
-     * @param array  $condition can contain the following keys:
-     *                          $condition = [
-     *                          'label'           => (required) what to display in the list
-     *                          'eventName'       => (required) The event name to fire when this event is triggered.
-     *                          'description'     => (optional) short description of event
-     *                          'formType'        => (optional) name of the form type SERVICE for the action
-     *                          'formTypeOptions' => (optional) array of options to pass to the formType service
-     *                          'formTheme'       => (optional) form theme
-     *                          ]
+     * @param string $key   a unique identifier; it is recommended that it be namespaced i.e. lead.mytrigger
+     * @param array  $event can contain the following keys:
+     *                      $condition = [
+     *                      'label'                   => (required) what to display in the list
+     *                      'eventName'               => (required) The event name to fire when this event is triggered.
+     *                      'description'             => (optional) short description of event
+     *                      'formType'                => (optional) name of the form type SERVICE for the action
+     *                      'formTypeOptions'         => (optional) array of options to pass to the formType service
+     *                      'formTheme'               => (optional) form theme
+     *                      'connectionRestrictions'  => (optional) Array of events to restrict this event to. Implicit events
+     *                      [
+     *                      'anchor' => [], // array of anchors this event should _not_ be allowed to connect to in the format of eventType.anchorName, e.g. decision.no
+     *                      'source' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to connect into this event
+     *                      'target' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to flow from this event
+     *                      ]
+     *                      ]
      */
     public function addCondition($key, array $event)
     {
@@ -171,22 +173,7 @@ class CampaignBuilderEvent extends Event
      */
     public function getConditions()
     {
-        static $sorted = false;
-
-        if (empty($sorted)) {
-            uasort(
-                $this->conditions,
-                function ($a, $b) {
-                    return strnatcasecmp(
-                        $a['label'],
-                        $b['label']
-                    );
-                }
-            );
-            $sorted = true;
-        }
-
-        return $this->conditions;
+        return $this->sort('conditions');
     }
 
     /**
@@ -223,8 +210,12 @@ class CampaignBuilderEvent extends Event
      *                       'formTypeOptions'     => (optional) array of options to pass to the formType service
      *                       'formTheme'           => (optional) form theme
      *                       'timelineTemplate'    => (optional) custom template for the lead timeline
-     *                       'associatedDecisions' => (optional) Array of decision types to limit what this action can be associated with
-     *                       'anchorRestrictions'  => (optional) Array of event anchors this event should not be allowed to connect to
+     *                       'connectionRestrictions'  => (optional) Array of events to restrict this event to. Implicit events
+     *                       [
+     *                       'anchor' => [], // array of anchors this event should _not_ be allowed to connect to in the format of eventType.anchorName, e.g. decision.no
+     *                       'source' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to connect into this event
+     *                       'target' => ['action' => [], 'decision' => [], 'condition' => []], // array of event keys allowed to flow from this event
+     *                       ]
      *                       ]
      */
     public function addAction($key, array $action)
@@ -254,11 +245,21 @@ class CampaignBuilderEvent extends Event
      */
     public function getActions()
     {
-        static $sorted = false;
+        return $this->sort('actions');
+    }
 
-        if (empty($sorted)) {
+    /**
+     * Sort internal actions, decisions and conditions arrays.
+     *
+     * @param string $property name
+     *
+     * @return array
+     */
+    protected function sort($property)
+    {
+        if (empty($this->sortCache[$property])) {
             uasort(
-                $this->actions,
+                $this->{$property},
                 function ($a, $b) {
                     return strnatcasecmp(
                         $a['label'],
@@ -266,9 +267,9 @@ class CampaignBuilderEvent extends Event
                     );
                 }
             );
-            $sorted = true;
+            $this->sortCache[$property] = true;
         }
 
-        return $this->actions;
+        return $this->{$property};
     }
 }

@@ -64,6 +64,16 @@ class Notification extends FormEntity
     private $message;
 
     /**
+     * @var string
+     */
+    private $button;
+
+    /**
+     * @var array
+     */
+    private $utmTags = [];
+
+    /**
      * @var \DateTime
      */
     private $publishUp;
@@ -102,6 +112,16 @@ class Notification extends FormEntity
      * @var string
      */
     private $notificationType = 'template';
+
+    /**
+     * @var bool
+     */
+    private $mobile = false;
+
+    /**
+     * @var array
+     */
+    private $mobileSettings;
 
     public function __clone()
     {
@@ -156,6 +176,15 @@ class Notification extends FormEntity
         $builder->createField('message', 'text')
             ->build();
 
+        $builder->createField('button', 'text')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTags', 'array')
+            ->columnName('utm_tags')
+            ->nullable()
+            ->build();
+
         $builder->createField('notificationType', 'text')
             ->columnName('notification_type')
             ->nullable()
@@ -187,6 +216,10 @@ class Notification extends FormEntity
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
+
+        $builder->createField('mobile', 'boolean')->build();
+
+        $builder->createField('mobileSettings', 'array')->build();
     }
 
     /**
@@ -252,10 +285,12 @@ class Notification extends FormEntity
                     'url',
                     'language',
                     'category',
+                    'button',
                 ]
             )
             ->addProperties(
                 [
+                    'utmTags',
                     'publishUp',
                     'publishDown',
                     'readCount',
@@ -374,6 +409,23 @@ class Notification extends FormEntity
     /**
      * @return string
      */
+    public function getButton()
+    {
+        return $this->button;
+    }
+
+    /**
+     * @param string $heading
+     */
+    public function setButton($button)
+    {
+        $this->isChanged('button', $button);
+        $this->button = $button;
+    }
+
+    /**
+     * @return string
+     */
     public function getMessage()
     {
         return $this->message;
@@ -386,6 +438,25 @@ class Notification extends FormEntity
     {
         $this->isChanged('message', $message);
         $this->message = $message;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUtmTags()
+    {
+        return $this->utmTags;
+    }
+
+    /**
+     * @param array $utmTags
+     */
+    public function setUtmTags($utmTags)
+    {
+        $this->isChanged('utmTags', $utmTags);
+        $this->utmTags = $utmTags;
+
+        return $this;
     }
 
     /**
@@ -563,5 +634,45 @@ class Notification extends FormEntity
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @param bool $mobile
+     *
+     * @return $this
+     */
+    public function setMobile($mobile)
+    {
+        $this->mobile = $mobile;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMobileSettings()
+    {
+        return $this->mobileSettings;
+    }
+
+    /**
+     * @param array $mobileSettings
+     *
+     * @return $this
+     */
+    public function setMobileSettings(array $mobileSettings)
+    {
+        $this->mobileSettings = $mobileSettings;
+
+        return $this;
     }
 }

@@ -110,6 +110,7 @@
 	height: 100px;
 	margin: -50px 0 0 -50px;
 	background: url(../images/mejs/bigplay.png) no-repeat;
+	z-index: 999999;
 }
 
 .no-svg .mejs-overlay-button {

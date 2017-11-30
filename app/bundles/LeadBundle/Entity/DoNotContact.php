@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 /**
@@ -102,7 +103,101 @@ class DoNotContact
     }
 
     /**
-     * @return mixed
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('doNotContact')
+            ->addListProperties(
+                [
+                    'id',
+                    'dateAdded',
+                    'reason',
+                    'comments',
+                    'channel',
+                    'channelId',
+                ]
+            )
+            ->addProperties(
+                [
+                    'lead',
+                ]
+            )
+            ->build();
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLead()
+    {
+        return $this->lead;
+    }
+
+    /**
+     * @param Lead $lead
+     *
+     * @return DoNotContact
+     */
+    public function setLead(Lead $lead)
+    {
+        $this->lead = $lead;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getDateAdded()
+    {
+        return $this->dateAdded;
+    }
+
+    /**
+     * @param \DateTime $dateAdded
+     *
+     * @return DoNotContact
+     */
+    public function setDateAdded(\DateTime $dateAdded)
+    {
+        $this->dateAdded = $dateAdded;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReason()
+    {
+        return $this->reason;
+    }
+
+    /**
+     * @param int $reason
+     *
+     * @return DoNotContact
+     */
+    public function setReason($reason)
+    {
+        $this->reason = $reason;
+
+        return $this;
+    }
+
+    /**
+     * @return string
      */
     public function getComments()
     {
@@ -110,11 +205,15 @@ class DoNotContact
     }
 
     /**
-     * @param mixed $comments
+     * @param string $comments
+     *
+     * @return DoNotContact
      */
     public function setComments($comments)
     {
         $this->comments = $comments;
+
+        return $this;
     }
 
     /**
@@ -127,10 +226,14 @@ class DoNotContact
 
     /**
      * @param string $channel
+     *
+     * @return DoNotContact
      */
     public function setChannel($channel)
     {
         $this->channel = $channel;
+
+        return $this;
     }
 
     /**
@@ -149,61 +252,7 @@ class DoNotContact
     public function setChannelId($channelId)
     {
         $this->channelId = $channelId;
-    }
 
-    /**
-     * @return mixed
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return Lead
-     */
-    public function getLead()
-    {
-        return $this->lead;
-    }
-
-    /**
-     * @param Lead $lead
-     */
-    public function setLead(Lead $lead)
-    {
-        $this->lead = $lead;
-    }
-
-    /**
-     * @return int
-     */
-    public function getReason()
-    {
-        return $this->reason;
-    }
-
-    /**
-     * @param int $reason
-     */
-    public function setReason($reason)
-    {
-        $this->reason = $reason;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getDateAdded()
-    {
-        return $this->dateAdded;
-    }
-
-    /**
-     * @param mixed $dateAdded
-     */
-    public function setDateAdded($dateAdded)
-    {
-        $this->dateAdded = $dateAdded;
+        return $this;
     }
 }

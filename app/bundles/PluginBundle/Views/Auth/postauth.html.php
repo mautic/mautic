@@ -10,26 +10,33 @@
  */
 $view->extend('MauticCoreBundle:Default:slim.html.php');
 $view['slots']->set('mauticContent', 'social');
+
 $data = json_encode($data);
 $js   = <<<JS
 function postFormHandler() {
     var opener = window.opener;
-    if(opener && typeof opener.postAuthCallback == 'function') {
-            opener.postAuthCallback({$data});
-    }else {
+    if (opener && typeof opener.postAuthCallback == 'function') {
+        opener.postAuthCallback({$data});
+    } else {
         Mautic.refreshIntegrationForm();
     }
     window.close()
-
 }
+JS;
+
+if (!empty($message) && 'success' === $alert):
+    $js .= <<<'JS'
+    
 (function() {
    postFormHandler();
 })();
 JS;
+endif;
 ?>
 <script>
     <?php echo $js; ?>
 </script>
+
 <?php if (!empty($message)): ?>
     <div class="alert alert-<?php echo $alert; ?>">
         <?php echo $message; ?>

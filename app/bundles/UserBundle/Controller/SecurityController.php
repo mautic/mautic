@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Security\Core\Exception as Exception;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\SecurityContext;
 
 /**
  * Class DefaultController.
@@ -79,7 +78,7 @@ class SecurityController extends CommonController
         $session = $this->request->getSession();
 
         // get the login error if there is one
-        if ($this->request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
+        if ($this->request->attributes->has(Security::AUTHENTICATION_ERROR)) {
             $error = $this->request->attributes->get(Security::AUTHENTICATION_ERROR);
         } else {
             $error = $session->get(Security::AUTHENTICATION_ERROR);
@@ -91,8 +90,10 @@ class SecurityController extends CommonController
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
-            } else {
+            } elseif ($error instanceof \Exception) {
                 $msg = $error->getMessage();
+            } else {
+                $msg = $error;
             }
 
             $this->addFlash($msg, [], 'error', null, false);
@@ -100,8 +101,7 @@ class SecurityController extends CommonController
         $this->request->query->set('tmpl', 'login');
 
         // Get a list of SSO integrations
-        /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->factory->getHelper('integration');
+        $integrationHelper = $this->get('mautic.helper.integration');
         $integrations      = $integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
 
         return $this->delegateView([

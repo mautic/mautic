@@ -75,4 +75,23 @@ class FormEventHelper
             $leadModel->removeFromLists($lead, $removeFrom);
         }
     }
+
+    /**
+     * @param $action
+     * @param $factory
+     */
+    public static function scoreContactsCompanies($action, $factory)
+    {
+        $properties = $action->getProperties();
+
+        /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
+        $leadModel = $factory->getModel('lead');
+        if ($lead = $leadModel->getCurrentLead()) {
+            $score = $properties['score'];
+
+            if (!empty($score)) {
+                $leadModel->scoreContactsCompany($lead, $score);
+            }
+        }
+    }
 }

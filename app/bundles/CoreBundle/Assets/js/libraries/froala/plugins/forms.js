@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
     'forms.edit': '[_BUTTONS_]',
@@ -154,7 +154,7 @@
 
       editor.popups.refresh('forms.edit');
 
-      editor.popups.setContainer('forms.edit', $(editor.opts.scrollableContainer));
+      editor.popups.setContainer('forms.edit', editor.$sc);
       var left = $input.offset().left + $input.outerWidth() / 2;
       var top = $input.offset().top + $input.outerHeight();
 
@@ -238,7 +238,7 @@
           editor.popups.refresh('forms.update');
         }
 
-        editor.popups.setContainer('forms.update', $(editor.opts.scrollableContainer));
+        editor.popups.setContainer('forms.update', editor.$sc);
         var left = $input.offset().left + $input.outerWidth() / 2;
         var top = $input.offset().top + $input.outerHeight();
 
@@ -352,7 +352,7 @@
       var options =  this.opts.formStyles;
       for (var cls in options) {
         if (options.hasOwnProperty(cls)) {
-          c += '<li><a class="fr-command" data-cmd="inputStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
+          c += '<li><a class="fr-command" tabIndex="-1" data-cmd="inputStyle" data-param1="' + cls + '">' + this.language.translate(options[cls]) + '</a></li>';
         }
       }
       c += '</ul>';

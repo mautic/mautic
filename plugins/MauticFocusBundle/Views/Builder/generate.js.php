@@ -12,10 +12,14 @@ $style          = $focus['style'];
 $props          = $focus['properties'];
 $useScrollEvent = in_array($props['when'], ['scroll_slight', 'scroll_middle', 'scroll_bottom']);
 $useUnloadEvent = ($props['when'] == 'leave');
-$useTimeout     = (!$useUnloadEvent && !$useScrollEvent && $props['when'] != 'immediately');
-
+$useTimeout     = (int) $props['timeout'];
+if ($props['when'] == '5seconds') {
+    $useTimeout = 5;
+} elseif ($props['when'] == 'minute') {
+    $useTimeout = 60;
+}
 if ($useTimeout) {
-    $timeout = ($props['when'] == '5seconds') ? 5000 : 60000;
+    $timeout = $useTimeout * 1000;
 }
 
 $debug          = ($app->getEnvironment() == 'dev') ? 'true' : 'false';
@@ -34,6 +38,7 @@ $cssContent = $view->render(
     'MauticFocusBundle:Builder:style.less.php',
     [
         'preview' => $preview,
+        'focus'   => $focus,
     ]
 );
 $cssContent = $view->escape($cssContent, 'js');
@@ -65,7 +70,6 @@ switch ($style) {
         break;
 }
 ?>
-
 (function (window) {
     if (typeof window.MauticFocusParentHeadStyleInserted == 'undefined') {
         window.MauticFocusParentHeadStyleInserted = false;
@@ -101,12 +105,24 @@ switch ($style) {
                 <?php else: ?>
                 var closer = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>-close');
                 var aTag = closer[0].getElementsByTagName('a');
+                var container = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>');
+
+                container.onclick = function(e) {
+                    if (e) { e.stopPropagation(); }
+                    else { window.event.cancelBubble = true; }
+                };
+                document.onclick = function() {
+                    aTag[0].click();
+                };
+
                 aTag[0].addEventListener('click', function (event) {
                     // Prevent multiple engagements for link clicks on exit intent
                     Focus.modalsDismissed["<?php echo $focus['id']; ?>"] = true;
 
                     // Remove iframe
-                    Focus.iframe.parentNode.removeChild(Focus.iframe);
+                    if (Focus.iframe.parentNode) {
+                        Focus.iframe.parentNode.removeChild(Focus.iframe);
+                    }
 
                     var overlays = document.getElementsByClassName('mf-modal-overlay-<?php echo $focus['id']; ?>');
                     if (overlays.length) {
@@ -197,21 +213,37 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('scroll event registered');
 
-                window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
-
-                <?php elseif ($useTimeout): ?>
+                <?php if ($useTimeout): ?>
                 if (Focus.debug)
                     console.log('timeout event registered');
 
                 setTimeout(function () {
-                    Focus.engageVisitor();
+                    window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
                 }, <?php echo $timeout; ?>);
+
+                <?php else: ?>
+
+                window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
+
+                <?php endif; ?>
+
                 <?php elseif ($useUnloadEvent): ?>
                 if (Focus.debug)
                     console.log('show when visitor leaves');
 
-                // Use mouseleave event on <html> or else the div will not show
+                <?php if ($useTimeout): ?>
+                if (Focus.debug)
+                    console.log('timeout event registered');
+
+                setTimeout(function () {
+                    document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+                }, <?php echo $timeout; ?>);
+
+                <?php else: ?>
+
                 document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+
+                <?php endif; ?>
 
                 // Add a listener to every link
                 <?php if ($linkActivation): ?>
@@ -236,8 +268,22 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('show immediately');
 
+                <?php if ($useTimeout): ?>
+                if (Focus.debug)
+                    console.log('timeout event registered');
+
+                setTimeout(function () {
+                    // Give a slight delay to allow browser to process style injection into header
+                    Focus.engageVisitor();
+                }, <?php echo $timeout; ?>);
+
+                <?php else: ?>
+
                 // Give a slight delay to allow browser to process style injection into header
                 Focus.engageVisitor();
+
+                <?php endif; ?>
+
                 <?php endif; ?>
             },
 
@@ -386,25 +432,31 @@ switch ($style) {
 
                 // Inject content into iframe
                 Focus.iframeDoc.open();
-                <?php
-                $content = $view->render(
-                    'MauticFocusBundle:Builder:content.html.php',
-                    [
-                        'focus'    => $focus,
-                        'form'     => $form,
-                        'clickUrl' => $clickUrl,
-                    ]
-                );
-
-                if (empty($ignoreMinify)) {
-                    $content = \Minify_HTML::minify($content);
-                }
-
-                $content = $view->escape($content, 'js');
-                ?>
-
-                Focus.iframeDoc.write("<?php echo $content; ?>");
+                Focus.iframeDoc.write("{focus_content}");
                 Focus.iframeDoc.close();
+
+                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
+
+                Focus.iframe.onload = function() {
+                    if (Focus.debug)
+                        console.log('iframe loaded for '+Focus.iframe.getAttribute('src'));
+
+                    // Resize iframe
+                    if (Focus.enableIframeResizer()) {
+                        // Give iframe chance to resize
+                        setTimeout(function () {
+                            if (animate) {
+                                Focus.addClass(Focus.iframe, "mf-animate");
+                            }
+                            Focus.addClass(Focus.iframe, "mf-loaded");
+                        }, 35);
+                    } else {
+                        if (animate) {
+                            Focus.addClass(Focus.iframe, "mf-animate");
+                        }
+                        Focus.addClass(Focus.iframe, "mf-loaded");
+                    }
+                }
 
                 // Set body margin to 0
                 Focus.iframeDoc.getElementsByTagName('body')[0].style.margin = 0;
@@ -413,6 +465,7 @@ switch ($style) {
                 var move = Focus.iframeDoc.getElementsByClassName('mf-move-to-parent');
                 for (var i = 0; i < move.length; i++) {
                     var bodyFirstChild = document.body.firstChild;
+                    Focus.addClass(move[i], 'mf-moved-<?php echo $focus['id']; ?>');
                     bodyFirstChild.parentNode.insertBefore(move[i], Focus.iframe);
                 }
 
@@ -421,6 +474,7 @@ switch ($style) {
                 for (var i = 0; i < copy.length; i++) {
                     var bodyFirstChild = document.body.firstChild;
                     var clone = copy[i].cloneNode(true);
+                    Focus.addClass(clone, 'mf-moved-<?php echo $focus['id']; ?>');
                     bodyFirstChild.parentNode.insertBefore(clone, Focus.iframe);
                 }
 
@@ -434,23 +488,6 @@ switch ($style) {
                 // Register events
                 Focus.registerClickEvents();
 
-                // Resize iframe
-                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
-                if (Focus.enableIframeResizer()) {
-                    // Give iframe chance to resize
-                    setTimeout(function () {
-                        if (animate) {
-                            Focus.addClass(Focus.iframe, "mf-animate");
-                        }
-                        Focus.addClass(Focus.iframe, "mf-loaded");
-                    }, 35);
-                } else {
-                    if (animate) {
-                        Focus.addClass(Focus.iframe, "mf-animate");
-                    }
-                    Focus.addClass(Focus.iframe, "mf-loaded");
-                }
-
                 <?php if ($props['when'] == 'leave'): ?>
                 // Ensure user can leave
                 document.documentElement.removeEventListener('mouseleave', Focus.engageVisitor);
@@ -461,7 +498,7 @@ switch ($style) {
                     console.log('mautic_focus_<?php echo $focus['id']; ?> cookie set for ' + now);
 
                 Focus.cookies.removeItem('mautic_focus_<?php echo $focus['id']; ?>');
-                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity);
+                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity, '/');
 
                 <?php if ($style == 'bar'): ?>
                 var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');
@@ -481,6 +518,10 @@ switch ($style) {
 
             // Enable iframe resizer
             enableIframeResizer: function () {
+                if (typeof Focus.iframeResizerEnabled !== 'undefined') {
+                    return true;
+                }
+
                 <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>
                 Focus.iframeHeight = 0;
                 Focus.iframeWidth = 0;
@@ -492,13 +533,12 @@ switch ($style) {
                         useHeight += 10;
                         useHeight = useHeight + 'px';
 
-
                         if (Focus.debug) {
                             console.log('window inner height = ' + window.innerHeight);
                             console.log('iframe offset height = ' + Focus.iframeFocus.offsetHeight);
                             console.log('iframe height set to ' + useHeight)
                         }
-                        ;
+
                         Focus.iframe.style.height = useHeight;
                         Focus.iframeHeight = useHeight;
                     }
@@ -507,10 +547,10 @@ switch ($style) {
                     if (Focus.iframeWidth !== Focus.iframe.style.width) {
                         if (Focus.debug) {
                             console.log('window inner width = ' + window.innerWidth);
-                            console.log('iframe offset width = ' + Focus.iframeFocus.offsetWidth);
+                            console.log('iframe offset width = ' +  Focus.iframeFocus.offsetWidth);
                         }
 
-                        if (window.innerWidth < Focus.iframeFocus.offsetWidth) {
+                        if (window.innerWidth <  Focus.iframeFocus.offsetWidth) {
                             // Responsive iframe
                             Focus.addClass(Focus.iframeFocus, 'mf-responsive');
                             Focus.addClass(Focus.iframe, 'mf-responsive');
@@ -520,8 +560,8 @@ switch ($style) {
                                 console.log('iframe set to responsive width: ');
 
                         } else {
-                            Focus.iframe.style.width = Focus.iframeFocus.offsetWidth + 'px';
-                            Focus.iframe.width = Focus.iframeFocus.offsetWidth + 'px';
+                            Focus.iframe.style.width =  Focus.iframeFocus.offsetWidth + 'px';
+                            Focus.iframe.width =  Focus.iframeFocus.offsetWidth + 'px';
                             Focus.removeClass(Focus.iframeFocus, 'mf-responsive');
                             Focus.removeClass(Focus.iframe, 'mf-responsive');
 
@@ -534,6 +574,8 @@ switch ($style) {
                     <?php endif; ?>
                 }, 35);
 
+                Focus.iframeResizerEnabled = true;
+
                 return true;
                 <?php endif; ?>
 
@@ -542,6 +584,10 @@ switch ($style) {
 
             // Disable iframe resizer
             disableIFrameResizer: function () {
+                if (typeof Focus.iframeResizerEnabled !== 'undefined') {
+                    delete(Focus.iframeResizerEnabled);
+                }
+
                 <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>
                 clearInterval(Focus.iframeResizeInterval);
                 <?php endif; ?>

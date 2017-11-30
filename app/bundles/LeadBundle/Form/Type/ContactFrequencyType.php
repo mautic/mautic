@@ -11,106 +11,210 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Entity\FrequencyRule;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class MergeType.
  */
 class ContactFrequencyType extends AbstractType
 {
+    protected $coreParametersHelper;
+
+    /**
+     * ContactFrequencyType constructor.
+     *
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'channels',
-            'choice',
-            [
-                'choices' => [
-                    'sms'   => 'mautic.sms.sms',
-                    'email' => 'mautic.email.email',
-                ],
-                'label'       => 'mautic.lead.contact.channels',
-                'label_attr'  => ['class' => 'control-label'],
-                'multiple'    => true,
-                'empty_value' => '',
-                'attr'        => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.lead.merge.select.modal.tooltip',
-                ],
-                'required' => false,
-            ]
-        );
+        $showContactFrequency         = $this->coreParametersHelper->getParameter('show_contact_frequency');
+        $showContactPauseDates        = $this->coreParametersHelper->getParameter('show_contact_pause_dates');
+        $showContactPreferredChannels = $this->coreParametersHelper->getParameter('show_contact_preferred_channels');
+        $showContactCategories        = $this->coreParametersHelper->getParameter('show_contact_categories');
+        $showContactSegments          = $this->coreParametersHelper->getParameter('show_contact_segments');
 
-        $formModifier = function (FormEvent $event) {
-            $form = $event->getForm();
-            $data = $event->getData();
-
-            $constraints = [];
-            if (!empty($data['channels'])) {
-                $constraints = [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
-                    ),
-                ];
-            }
-
-            $form->add(
-                'frequency_number',
-                'number',
-                [
-                    'precision'  => 0,
-                    'label'      => 'mautic.lead.list.frequency.number',
-                    'label_attr' => ['class' => 'control-label'],
-                    'required'   => true,
-                    'attr'       => [
-                        'class' => 'form-control frequency',
-                    ],
-                    'constraints' => $constraints,
-                    'required'    => false,
-                ]
-            );
-
-            $form->add(
-                'frequency_time',
+        if (isset($options['channels']) && $options['channels']) {
+            $builder->add(
+                'subscribed_channels',
                 'choice',
                 [
-                    'choices' => [
-                        'DAY'   => 'day',
-                        'WEEK'  => 'week',
-                        'MONTH' => 'month',
-                    ],
-                    'label'      => 'mautic.lead.list.frequency.times',
+                    'choices'           => $options['channels'],
+                    'choices_as_values' => true,
+                    'expanded'          => true,
+                    'label_attr'        => ['class' => 'control-label'],
+                    'attr'              => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
+                    'multiple'          => true,
+                    'label'             => false,
+                    'required'          => false,
+                ]
+            );
+
+            if (!$options['public_view'] || $showContactPreferredChannels) {
+                $builder->add(
+                    'preferred_channel',
+                    'choice',
+                    [
+                        'choices'           => $options['channels'],
+                        'choices_as_values' => true,
+                        'expanded'          => false,
+                        'multiple'          => false,
+                        'label'             => 'mautic.lead.list.frequency.preferred.channel',
+                        'label_attr'        => ['class' => 'control-label'],
+                        'empty_value'       => false,
+                        'required'          => false,
+                        'attr'              => [
+                            'class'   => 'form-control',
+                            'tooltip' => 'mautic.lead.list.frequency.preferred.channel',
+                        ],
+                    ]
+                );
+            }
+
+            if (!$options['public_view'] || $showContactFrequency || $showContactPauseDates) {
+                foreach ($options['channels'] as $channel) {
+                    $attr = (isset($options['data']['subscribed_channels']) && !in_array($channel, $options['data']['subscribed_channels']))
+                        ? ['disabled' => 'disabled'] : [];
+
+                    $builder->add(
+                        'frequency_number_'.$channel,
+                        'number',
+                        [
+                            'precision'  => 0,
+                            'label'      => 'mautic.lead.list.frequency.number',
+                            'label_attr' => ['class' => 'text-muted fw-n label1'],
+                            'attr'       => array_merge(
+                                $attr,
+                                [
+                                    'class' => 'frequency form-control',
+                                ]
+                            ),
+                            'required' => false,
+                        ]
+                    );
+
+                    $builder->add(
+                        'frequency_time_'.$channel,
+                        'choice',
+                        [
+                            'choices' => [
+                                FrequencyRule::TIME_DAY   => 'mautic.core.time.days',
+                                FrequencyRule::TIME_WEEK  => 'mautic.core.time.weeks',
+                                FrequencyRule::TIME_MONTH => 'mautic.core.time.months',
+                            ],
+                            'label'      => 'mautic.lead.list.frequency.times',
+                            'label_attr' => ['class' => 'text-muted fw-n frequency-label label2'],
+                            'multiple'   => false,
+                            'required'   => false,
+                            'attr'       => array_merge(
+                                $attr,
+                                [
+                                    'class' => 'form-control',
+                                ]
+                            ),
+                        ]
+                    );
+
+                    if ($options['public_view'] == false) {
+                        $attributes = array_merge(
+                            $attr,
+                            [
+                                'data-toggle' => 'date',
+                                'class'       => 'frequency-date form-control',
+                            ]
+                        );
+                        $type = 'datetime';
+                    } else {
+                        $attributes = array_merge(
+                            $attr,
+                            [
+                                'class' => 'form-control',
+                            ]
+                        );
+                        $type = 'date';
+                    }
+                    if (!$options['public_view'] || $showContactPauseDates) {
+                        $builder->add(
+                            'contact_pause_start_date_'.$channel,
+                            $type,
+                            [
+                                'widget'     => 'single_text',
+                                'label'      => false, //'mautic.lead.frequency.contact.start.date',
+                                'label_attr' => ['class' => 'text-muted fw-n label3'],
+                                'attr'       => $attributes,
+                                'format'     => 'yyyy-MM-dd',
+                                'required'   => false,
+                            ]
+                        );
+                        $builder->add(
+                            'contact_pause_end_date_'.$channel,
+                            $type,
+                            [
+                                'widget'     => 'single_text',
+                                'label'      => 'mautic.lead.frequency.contact.end.date',
+                                'label_attr' => ['class' => 'frequency-label text-muted fw-n label4'],
+                                'attr'       => $attributes,
+                                'format'     => 'yyyy-MM-dd',
+                                'required'   => false,
+                            ]
+                        );
+                    }
+                }
+            }
+        }
+
+        if (!$options['public_view']) {
+            $builder->add(
+                'lead_lists',
+                'leadlist_choices',
+                [
+                    'label'      => 'mautic.lead.form.list',
                     'label_attr' => ['class' => 'control-label'],
-                    'multiple'   => false,
-                    'attr'       => [
-                        'class' => 'form-control',
-                    ],
-                    'constraints' => $constraints,
+                    'multiple'   => true,
+                    'expanded'   => $options['public_view'],
+                    'required'   => false,
+                ]
+            );
+        } elseif ($showContactSegments) {
+            $builder->add(
+                'lead_lists',
+                'leadlist_choices',
+                [
+                    'global_only' => true,
+                    'label'       => 'mautic.lead.form.list',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'multiple'    => true,
+                    'expanded'    => $options['public_view'],
                     'required'    => false,
                 ]
             );
-        };
+        }
 
-        // Before submit
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            $formModifier
-        );
-
-        // After submit
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            $formModifier
-        );
+        if (!$options['public_view'] || $showContactCategories) {
+            $builder->add(
+                'global_categories',
+                'leadcategory_choices',
+                [
+                    'label'      => 'mautic.lead.form.categories',
+                    'label_attr' => ['class' => 'control-label'],
+                    'multiple'   => true,
+                    'expanded'   => $options['public_view'],
+                    'required'   => false,
+                ]
+            );
+        }
 
         $builder->add(
             'buttons',
@@ -128,6 +232,19 @@ class ContactFrequencyType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired(['channels']);
+        $resolver->setDefaults(
+            [
+                'public_view' => false,
+            ]
+        );
     }
 
     /**

@@ -21,17 +21,11 @@ class MenuHelper
      * @param $items
      * @param $bundleName
      * @param $security
+     *
+     * @deprecated - to be removed in 3.0; no longer used
      */
     public static function addCategoryMenuItems(&$items, $bundleName, CorePermissions $security)
     {
-        if (!$security->isGranted($bundleName.':categories:view')) {
-            return;
-        }
-
-        $items['mautic.category.menu.index'] = [
-            'route'           => 'mautic_category_index',
-            'id'              => "mautic_{$bundleName}category_index",
-            'routeParameters' => ['bundle' => $bundleName],
-        ];
+        @trigger_error('Individual category menu items are no longer used.', E_USER_DEPRECATED);
     }
 }

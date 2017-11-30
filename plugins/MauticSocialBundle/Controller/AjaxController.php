@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AjaxController extends CommonAjaxController
 {
+    use AjaxLookupControllerTrait;
+
     /**
      * @param Request $request
      *

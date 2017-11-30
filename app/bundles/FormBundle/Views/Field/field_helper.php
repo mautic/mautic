@@ -161,6 +161,14 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
         }
     }
 
+    if ($field['leadField'] && !empty($contactFields[$field['leadField']]['type']) && in_array($contactFields[$field['leadField']]['type'], ['datetime', 'date'])) {
+        $tempLeadFieldType = $contactFields[$field['leadField']]['type'];
+        foreach ($parseList as $key => $aTemp) {
+            if ($date = ($tempLeadFieldType == 'datetime' ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
+                $parseList[$key]['label'] = $date;
+            }
+        }
+    }
     $list           = \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList, false, $ignoreNumericalKeys);
     $firstListValue = reset($list);
 }

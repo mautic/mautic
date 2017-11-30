@@ -57,10 +57,12 @@ class CampaignSubscriber extends CommonSubscriber
     public function onCampaignBuild(CampaignBuilderEvent $event)
     {
         $trigger = [
-            'label'       => 'mautic.asset.campaign.event.download',
-            'description' => 'mautic.asset.campaign.event.download_descr',
-            'eventName'   => AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-            'formType'    => 'campaignevent_assetdownload',
+            'label'          => 'mautic.asset.campaign.event.download',
+            'description'    => 'mautic.asset.campaign.event.download_descr',
+            'eventName'      => AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+            'formType'       => 'campaignevent_assetdownload',
+            'channel'        => 'asset',
+            'channelIdField' => 'assets',
         ];
 
         $event->addDecision('asset.download', $trigger);

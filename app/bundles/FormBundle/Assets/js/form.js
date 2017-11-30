@@ -3,18 +3,50 @@ Mautic.formOnLoad = function (container) {
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
+    var bodyOverflow = {};
+
+    mQuery('select.form-builder-new-component').change(function (e) {
+        mQuery(this).find('option:selected');
+        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+        // Reset the dropdown
+        mQuery(this).val('');
+        mQuery(this).trigger('chosen:updated');
+    });
+
 
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
         mQuery('#mauticforms_fields').sortable({
             items: '.panel',
             cancel: '',
-            stop: function(i) {
+            helper: function(e, ui) {
+                ui.children().each(function() {
+                    mQuery(this).width(mQuery(this).width());
+                });
+
+                // Fix body overflow that messes sortable up
+                bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+                bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+                mQuery('body').css({
+                    overflowX: 'visible',
+                    overflowY: 'visible'
+                });
+
+                return ui;
+            },
+            scroll: true,
+            axis: 'y',
+            containment: '#mauticforms_fields .drop-here',
+            stop: function(e, ui) {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
+                mQuery(ui.item).attr('style', '');
+
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=form:reorderFields",
                     data: mQuery('#mauticforms_fields').sortable("serialize", {attribute: 'data-sortable-id'}) + "&formId=" + mQuery('#mauticform_sessionId').val()
-                })
+                });
             }
         });
 
@@ -26,7 +58,29 @@ Mautic.formOnLoad = function (container) {
         mQuery('#mauticforms_actions').sortable({
             items: '.panel',
             cancel: '',
-            stop: function(i) {
+            helper: function(e, ui) {
+                ui.children().each(function() {
+                    mQuery(this).width(mQuery(this).width());
+                });
+
+                // Fix body overflow that messes sortable up
+                bodyOverflow.overflowX = mQuery('body').css('overflow-x');
+                bodyOverflow.overflowY = mQuery('body').css('overflow-y');
+                mQuery('body').css({
+                    overflowX: 'visible',
+                    overflowY: 'visible'
+                });
+
+                return ui;
+            },
+            scroll: true,
+            axis: 'y',
+            containment: '#mauticforms_actions .drop-here',
+            stop: function(e, ui) {
+                // Restore original overflow
+                mQuery('body').css(bodyOverflow);
+                mQuery(ui.item).attr('style', '');
+
                 mQuery.ajax({
                     type: "POST",
                     url: mauticAjaxUrl + "?action=form:reorderActions",
@@ -145,7 +199,6 @@ Mautic.formFieldOnLoad = function (container, response) {
         //initialize ajax'd modals
         mQuery(fieldContainer).find("[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
             event.preventDefault();
-            console.log(this);
             Mautic.ajaxifyModal(this, event);
         });
 
@@ -252,12 +305,14 @@ Mautic.onPostSubmitActionChange = function(value) {
 
 Mautic.selectFormType = function(formType) {
     if (formType == 'standalone') {
-        mQuery('.action-standalone-only').removeClass('hide');
+        mQuery('option.action-standalone-only').removeClass('hide');
         mQuery('.page-header h3').text(mauticLang.newStandaloneForm);
     } else {
-        mQuery('.action-standalone-only').addClass('hide');
+        mQuery('option.action-standalone-only').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newCampaignForm);
     }
+
+    mQuery('.available-actions select').trigger('chosen:updated');
 
     mQuery('#mauticform_formType').val(formType);
 

@@ -70,6 +70,7 @@ $extraMenu = $view['menu']->render('extra');
     <div class="scroll-content slimscroll">
         <!-- start: navigation -->
         <nav class="nav-sidebar">
+            <?php echo $view['content']->getCustomContent('menu.above', $mauticTemplateVars); ?>
             <?php echo $view['menu']->render('main'); ?>
 
             <!-- start: left nav -->

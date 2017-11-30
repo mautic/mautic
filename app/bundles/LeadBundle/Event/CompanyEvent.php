@@ -20,13 +20,20 @@ use Mautic\LeadBundle\Entity\Company;
 class CompanyEvent extends CommonEvent
 {
     /**
+     * @var int
+     */
+    protected $score;
+
+    /**
      * @param Company $company
      * @param bool    $isNew
+     * @param int     $score
      */
-    public function __construct(Company $company, $isNew = false)
+    public function __construct(Company $company, $isNew = false, $score = 0)
     {
         $this->entity = $company;
         $this->isNew  = $isNew;
+        $this->score  = $score;
     }
 
     /**
@@ -47,5 +54,15 @@ class CompanyEvent extends CommonEvent
     public function setCompany(Company $company)
     {
         $this->entity = $company;
+    }
+
+    public function changeScore($score)
+    {
+        $this->score = $score;
+    }
+
+    public function getScore()
+    {
+        return $this->score;
     }
 }

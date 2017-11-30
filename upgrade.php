@@ -12,7 +12,7 @@ ini_set('display_errors', 'Off');
 date_default_timezone_set('UTC');
 
 define('MAUTIC_MINIMUM_PHP', '5.6.19');
-define('MAUTIC_MAXIMUM_PHP', '7.0.999');
+define('MAUTIC_MAXIMUM_PHP', '7.1.999');
 
 // Are we running the minimum version?
 if (version_compare(PHP_VERSION, MAUTIC_MINIMUM_PHP, 'lt')) {
@@ -51,6 +51,25 @@ if (isset($localParameters['cache_path'])) {
     $cacheDir = MAUTIC_APP_ROOT.'/cache/prod';
 }
 define('MAUTIC_CACHE_DIR', $cacheDir);
+
+/*
+ * Updating to 2.8.1: Check to see if we have a mautic_session_name
+ * and use that to populate the actual session name that will be
+ * generated after a successful update.
+ */
+if (isset($_COOKIE['mautic_session_name'])) {
+    $sessionValue = $_COOKIE[$_COOKIE['mautic_session_name']];
+
+    include MAUTIC_APP_ROOT.'/config/paths.php';
+    $localConfigPath = str_replace('%kernel.root_dir%', MAUTIC_APP_ROOT, $paths['local_config']);
+
+    $newSessionName = md5(md5($localConfigPath).$localParameters['secret_key']);
+
+    setcookie($newSessionName, $sessionValue, 0, '/', '', false, true);
+
+    unset($_COOKIE['mautic_session_name']);
+    setcookie('mautic_session_name', null, -1);
+}
 
 // Fetch the update state out of the request if applicable
 $state = json_decode(base64_decode(getVar('updateState', 'W10=')), true);

@@ -9,7 +9,6 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'campaign');
 
 $header = ($entity->getId()) ?
     $view['translator']->trans('mautic.campaign.menu.edit',
@@ -59,4 +58,7 @@ $view['slots']->set('headerTitle', $header);
     'campaignSources' => $campaignSources,
     'eventSettings'   => $eventSettings,
     'canvasSettings'  => $entity->getCanvasSettings(),
-]); ?>
+]);
+
+?>
+

@@ -434,7 +434,16 @@ class DashboardController extends FormController
                 if ($this->isFormValid($form)) {
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
-                        $fileData->move($directories['user'], $fileData->getClientOriginalName());
+                        $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
+                        if ($extension === 'json') {
+                            $fileData->move($directories['user'], $fileData->getClientOriginalName());
+                        } else {
+                            $form->addError(
+                                new FormError(
+                                    $this->translator->trans('mautic.core.not.allowed.file.extension', ['%extension%' => $extension], 'validators')
+                                )
+                            );
+                        }
                     } else {
                         $form->addError(
                             new FormError(

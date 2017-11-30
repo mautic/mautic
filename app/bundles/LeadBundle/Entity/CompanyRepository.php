@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -30,14 +32,15 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     public function getEntity($id = 0)
     {
         try {
-            /** @var Lead $entity */
-            $entity = $this
-                ->createQueryBuilder('comp')
-                ->select('comp')
-                ->where('comp.id = :companyId')
-                ->setParameter('companyId', $id)
-                ->getQuery()
-                ->getSingleResult();
+            $q = $this->createQueryBuilder($this->getTableAlias());
+            if (is_array($id)) {
+                $this->buildSelectClause($q, $id);
+                $companyId = (int) $id['id'];
+            } else {
+                $companyId = $id;
+            }
+            $q->andWhere($this->getTableAlias().'.id = '.(int) $companyId);
+            $entity = $q->getQuery()->getSingleResult();
         } catch (\Exception $e) {
             $entity = null;
         }
@@ -57,7 +60,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array
      */
-    public function getEntities($args = [])
+    public function getEntities(array $args = [])
     {
         return $this->getEntitiesWithCustomFields('company', $args);
     }
@@ -108,12 +111,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry')
+        $q->select('comp.id, comp.companyname, comp.companycity, comp.companycountry, cl.is_primary')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
             ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id')
             ->where('cl.lead_id = :leadId')
             ->setParameter('leadId', $leadId)
-            ->orderBy('cl.date_added', 'DESC');
+            ->orderBy('cl.is_primary', 'DESC');
 
         if ($companyId) {
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
@@ -121,20 +124,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $results = $q->execute()->fetchAll();
 
         return $results;
-    }
-
-    /**
-     * Function to remove non custom field columns from an arrayed lead row.
-     *
-     * @param array $r
-     */
-    protected function removeNonFieldColumns(&$r)
-    {
-        $baseCols = $this->getBaseColumns('Mautic\\LeadBundle\\Entity\\Company', true);
-        foreach ($baseCols as $c) {
-            unset($r[$c]);
-        }
-        unset($r['owner_id']);
     }
 
     /**
@@ -148,7 +137,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addCatchAllWhereClause(&$q, $filter)
+    protected function addCatchAllWhereClause($q, $filter)
     {
         return $this->addStandardCatchAllWhereClause(
             $q,
@@ -163,7 +152,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * {@inheritdoc}
      */
-    protected function addSearchCommandWhereClause(&$q, $filter)
+    protected function addSearchCommandWhereClause($q, $filter)
     {
         return $this->addStandardSearchCommandWhereClause($q, $filter);
     }
@@ -314,8 +303,12 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      */
     public function getCompaniesForContacts(array $contacts)
     {
+        if (!$contacts) {
+            return [];
+        }
+
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->select('c.*, l.lead_id')
+        $qb->select('c.*, l.lead_id, l.is_primary')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
             ->where(
@@ -325,7 +318,6 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             )
             ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
-
         $companies = $qb->execute()->fetchAll();
 
         // Group companies per contact
@@ -339,5 +331,109 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         return $contactCompanies;
+    }
+
+    /**
+     * Get companies grouped by column.
+     *
+     * @param QueryBuilder $query
+     *
+     * @return array
+     *
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getCompaniesByGroup($query, $column)
+    {
+        $query->select('count(comp.id) as companies, '.$column)
+            ->addGroupBy($column)
+            ->andWhere(
+                $query->expr()->andX(
+                    $query->expr()->isNotNull($column),
+                    $query->expr()->neq($column, $query->expr()->literal(''))
+                )
+            );
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * @param     $query
+     * @param int $limit
+     * @param int $offset
+     *
+     * @return mixed
+     */
+    public function getMostCompanies($query, $limit = 10, $offset = 0)
+    {
+        $query->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        $results = $query->execute()->fetchAll();
+
+        return $results;
+    }
+
+    /**
+     * @param CompositeExpression|null $expr
+     * @param array                    $parameters
+     * @param null                     $labelColumn
+     * @param string                   $valueColumn
+     *
+     * @return array
+     */
+    public function getAjaxSimpleList(CompositeExpression $expr = null, array $parameters = [], $labelColumn = null, $valueColumn = 'id')
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $alias = $prefix = $this->getTableAlias();
+        if (!empty($prefix)) {
+            $prefix .= '.';
+        }
+
+        $tableName = $this->_em->getClassMetadata($this->getEntityName())->getTableName();
+
+        $class      = '\\'.$this->getClassName();
+        $reflection = new \ReflectionClass(new $class());
+
+        // Get the label column if necessary
+        if ($labelColumn == null) {
+            if ($reflection->hasMethod('getTitle')) {
+                $labelColumn = 'title';
+            } else {
+                $labelColumn = 'name';
+            }
+        }
+
+        $q->select($prefix.$valueColumn.' as value,
+        case
+        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
+        when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
+        when (comp.companycity is not null) then concat(comp.companycity, " <small>", comp.companycity, "</small>")
+        else comp.companyname
+        end
+        as label')
+            ->from($tableName, $alias)
+            ->orderBy($prefix.$labelColumn);
+
+        if ($expr !== null && $expr->count()) {
+            $q->where($expr);
+        }
+
+        if (!empty($parameters)) {
+            $q->setParameters($parameters);
+        }
+
+        // Published only
+        if ($reflection->hasMethod('getIsPublished')) {
+            $q->andWhere(
+                $q->expr()->eq($prefix.'is_published', ':true')
+            )
+                ->setParameter('true', true, 'boolean');
+        }
+
+        return $q->execute()->fetchAll();
     }
 }

@@ -25,15 +25,15 @@ class DynamicContentController extends FormController
     {
         return (array) $this->get('mautic.security')->isGranted(
             [
-                'dynamicContent:dynamicContents:viewown',
-                'dynamicContent:dynamicContents:viewother',
-                'dynamicContent:dynamicContents:create',
-                'dynamicContent:dynamicContents:editown',
-                'dynamicContent:dynamicContents:editother',
-                'dynamicContent:dynamicContents:deleteown',
-                'dynamicContent:dynamicContents:deleteother',
-                'dynamicContent:dynamicContents:publishown',
-                'dynamicContent:dynamicContents:publishother',
+                'dynamiccontent:dynamiccontents:viewown',
+                'dynamiccontent:dynamiccontents:viewother',
+                'dynamiccontent:dynamiccontents:create',
+                'dynamiccontent:dynamiccontents:editown',
+                'dynamiccontent:dynamiccontents:editother',
+                'dynamiccontent:dynamiccontents:deleteown',
+                'dynamiccontent:dynamiccontents:deleteother',
+                'dynamiccontent:dynamiccontents:publishown',
+                'dynamiccontent:dynamiccontents:publishother',
             ],
             'RETURN_ARRAY'
         );
@@ -48,7 +48,7 @@ class DynamicContentController extends FormController
 
         $permissions = $this->getPermissions();
 
-        if (!$permissions['dynamicContent:dynamicContents:viewown'] && !$permissions['dynamicContent:dynamicContents:viewother']) {
+        if (!$permissions['dynamiccontent:dynamiccontents:viewown'] && !$permissions['dynamiccontent:dynamiccontents:viewother']) {
             return $this->accessDenied();
         }
 
@@ -66,9 +66,14 @@ class DynamicContentController extends FormController
         // fetch
         $search = $this->request->get('search', $this->get('session')->get('mautic.dynamicContent.filter', ''));
         $this->get('session')->set('mautic.dynamicContent.filter', $search);
-        //do not list variants in the main list
-        $filter['force'][] = ['column' => 'e.variantParent', 'expr' => 'isNull'];
-        $filter['force'][] = ['column' => 'e.translationParent', 'expr' => 'isNull'];
+
+        $filter = [
+            'string' => $search,
+            'force'  => [
+                ['column' => 'e.variantParent', 'expr' => 'isNull'],
+                ['column' => 'e.translationParent', 'expr' => 'isNull'],
+            ],
+        ];
 
         $orderBy    = $this->get('session')->get('mautic.dynamicContent.orderby', 'e.name');
         $orderByDir = $this->get('session')->get('mautic.dynamicContent.orderbydir', 'DESC');
@@ -118,7 +123,7 @@ class DynamicContentController extends FormController
      */
     public function newAction($entity = null)
     {
-        if (!$this->accessGranted('dynamicContent:dynamicContents:viewown')) {
+        if (!$this->accessGranted('dynamiccontent:dynamiccontents:viewown')) {
             return $this->accessDenied();
         }
 
@@ -216,7 +221,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php'),
+                    'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php', 'MauticDynamicContentBundle:FormTheme\Filter'),
                 ],
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.php',
                 'passthroughVars' => $passthrough,
@@ -265,7 +270,7 @@ class DynamicContentController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(true, 'dynamicContent:dynamicContents:editother', $entity->getCreatedBy())) {
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -320,7 +325,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'          => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php'),
+                    'form'          => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php', 'MauticDynamicContentBundle:FormTheme\Filter'),
                     'currentListId' => $objectId,
                 ],
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.php',
@@ -373,8 +378,8 @@ class DynamicContentController extends FormController
                 ]
             );
         } elseif (!$security->hasEntityAccess(
-            'dynamicContent:dynamicContents:viewown',
-            'dynamicContent:dynamicContents:viewother',
+            'dynamiccontent:dynamiccontents:viewown',
+            'dynamiccontent:dynamiccontents:viewother',
             $entity->getCreatedBy()
         )
         ) {
@@ -414,6 +419,7 @@ class DynamicContentController extends FormController
                     'entity'       => $entity,
                     'permissions'  => $this->getPermissions(),
                     'logs'         => $logs,
+                    'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'translations' => [
                         'parent'   => $translationParent,
                         'children' => $translationChildren,
@@ -439,10 +445,10 @@ class DynamicContentController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->get('mautic.security')->isGranted('dynamicContent:dynamicContents:create')
+            if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')
                 || !$this->get('mautic.security')->hasEntityAccess(
-                    'dynamicContent:dynamicContents:viewown',
-                    'dynamicContent:dynamicContents:viewother',
+                    'dynamiccontent:dynamiccontents:viewown',
+                    'dynamiccontent:dynamiccontents:viewother',
                     $entity->getCreatedBy()
                 )
             ) {
@@ -489,8 +495,8 @@ class DynamicContentController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
-                'dynamicContent:dynamicContents:deleteown',
-                'dynamicContent:dynamicContents:deleteother',
+                'dynamiccontent:dynamiccontents:deleteown',
+                'dynamiccontent:dynamiccontents:deleteother',
                 $entity->getCreatedBy()
             )
             ) {
@@ -552,8 +558,8 @@ class DynamicContentController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->get('mautic.security')->hasEntityAccess(
-                    'dynamicContent:dynamicContents:viewown',
-                    'dynamicContent:dynamicContents:viewother',
+                    'dynamiccontent:dynamiccontents:viewown',
+                    'dynamiccontent:dynamiccontents:viewother',
                     $entity->getCreatedBy()
                 )
                 ) {

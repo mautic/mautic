@@ -78,6 +78,11 @@ class FormEntity extends CommonEntity
     protected $changes = [];
 
     /**
+     * @var bool
+     */
+    protected $new = false;
+
+    /**
      * @var
      */
     public $deletedId;
@@ -146,10 +151,15 @@ class FormEntity extends CommonEntity
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('publish')
-            ->addProperties(
+            ->addListProperties(
                 [
                     'isPublished',
                     'dateAdded',
+                    'dateModified',
+                ]
+            )
+            ->addProperties(
+                [
                     'createdBy',
                     'createdByUser',
                     'dateModified',
@@ -233,6 +243,7 @@ class FormEntity extends CommonEntity
      */
     public function setDateModified($dateModified)
     {
+        $this->isChanged('dateModified', $dateModified);
         $this->dateModified = $dateModified;
 
         return $this;
@@ -296,7 +307,7 @@ class FormEntity extends CommonEntity
     /**
      * Get createdBy.
      *
-     * @return User
+     * @return int
      */
     public function getCreatedBy()
     {
@@ -430,9 +441,21 @@ class FormEntity extends CommonEntity
      */
     public function isNew()
     {
+        if ($this->new) {
+            return true;
+        }
+
         $id = $this->getId();
 
         return (empty($id)) ? true : false;
+    }
+
+    /**
+     * Set this entity as new in case it has to be saved prior to the events.
+     */
+    public function setNew()
+    {
+        $this->new = true;
     }
 
     /**
@@ -461,25 +484,37 @@ class FormEntity extends CommonEntity
 
     /**
      * @param mixed $createdByUser
+     *
+     * @return $this
      */
     public function setCreatedByUser($createdByUser)
     {
         $this->createdByUser = $createdByUser;
+
+        return $this;
     }
 
     /**
      * @param mixed $modifiedByUser
+     *
+     * @return $this
      */
     public function setModifiedByUser($modifiedByUser)
     {
         $this->modifiedByUser = $modifiedByUser;
+
+        return $this;
     }
 
     /**
      * @param mixed $checkedOutByUser
+     *
+     * @return $this
      */
     public function setCheckedOutByUser($checkedOutByUser)
     {
         $this->checkedOutByUser = $checkedOutByUser;
+
+        return $this;
     }
 }

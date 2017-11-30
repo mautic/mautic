@@ -11,6 +11,10 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
+use Mautic\LeadBundle\Model\FieldModel;
+
 trait CustomFieldEntityTrait
 {
     /**
@@ -35,6 +39,40 @@ trait CustomFieldEntityTrait
     public function __get($name)
     {
         return $this->getFieldValue(strtolower($name));
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     *
+     * @return $this
+     */
+    public function __set($name, $value)
+    {
+        return $this->addUpdatedField(strtolower($name), $value);
+    }
+
+    /**
+     * @param string $name
+     * @param        $arguments
+     *
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        $isSetter = strpos($name, 'set') === 0;
+        $isGetter = strpos($name, 'get') === 0;
+
+        if (($isSetter && array_key_exists(0, $arguments)) || $isGetter) {
+            $fieldRequested = mb_strtolower(mb_substr($name, 3));
+            $fields         = $this->getProfileFields();
+
+            if (array_key_exists($fieldRequested, $fields)) {
+                return ($isSetter) ? $this->addUpdatedField($fieldRequested, $arguments[0]) : $this->getFieldValue($fieldRequested);
+            }
+        }
+
+        return parent::__call($name, $arguments);
     }
 
     /**
@@ -70,21 +108,51 @@ trait CustomFieldEntityTrait
      * @param        $alias
      * @param        $value
      * @param string $oldValue
+     *
+     * @return $this
      */
-    public function addUpdatedField($alias, $value, $oldValue = '')
+    public function addUpdatedField($alias, $value, $oldValue = null)
     {
-        if (method_exists($this, 'isAnonymous') && $this->wasAnonymous == null) {
-            $this->wasAnonymous = $this->isAnonymous();
+        $property = (defined('self::FIELD_ALIAS')) ? str_replace(self::FIELD_ALIAS, '', $alias) : $alias;
+        $field    = $this->getField($alias);
+        $setter   = 'set'.ucfirst($property);
+
+        if (property_exists($this, $property) && method_exists($this, $setter)) {
+            // Fixed custom field so use the setter but don't get caught in a loop such as a custom field called "notes"
+            $this->$setter($value);
         }
 
-        $value = trim($value);
-        if ($value == '') {
-            // Ensure value is null for consistency
-            $value = null;
+        if (null == $oldValue) {
+            $oldValue = $this->getFieldValue($alias);
+        } elseif ($field) {
+            $oldValue = CustomFieldHelper::fixValueType($field['type'], $oldValue);
         }
 
-        $this->addChange('fields', [$alias => [$oldValue, $value]]);
-        $this->updatedFields[$alias] = $value;
+        if (is_string($value)) {
+            $value = trim($value);
+            if ('' === $value) {
+                // Ensure value is null for consistency
+                $value = null;
+
+                if ('' === $oldValue) {
+                    $oldValue = null;
+                }
+            }
+        } elseif (is_array($value)) {
+            // Flatten the array
+            $value = implode('|', $value);
+        }
+
+        if ($field) {
+            $value = CustomFieldHelper::fixValueType($field['type'], $value);
+        }
+
+        if ($oldValue !== $value && !(('' === $oldValue && null === $value) || (null === $oldValue && '' === $value))) {
+            $this->addChange('fields', [$alias => [$oldValue, $value]]);
+            $this->updatedFields[$alias] = $value;
+        }
+
+        return $this;
     }
 
     /**
@@ -98,27 +166,44 @@ trait CustomFieldEntityTrait
     }
 
     /**
-     * Get company field value.
+     * Get field value.
      *
-     * @param      $field
-     * @param null $group
+     * @param string $field
+     * @param string $group
      *
-     * @return bool
+     * @return mixed
      */
     public function getFieldValue($field, $group = null)
     {
-        if (isset($this->updatedFields[$field])) {
+        if (array_key_exists($field, $this->updatedFields)) {
             return $this->updatedFields[$field];
         }
 
-        if (!empty($group) && isset($this->fields[$group][$field])) {
-            return $this->fields[$group][$field]['value'];
+        if ($field = $this->getField($field, $group)) {
+            return CustomFieldHelper::fixValueType($field['type'], $field['value']);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get field details.
+     *
+     * @param string $key
+     * @param string $group
+     *
+     * @return array|false
+     */
+    public function getField($key, $group = null)
+    {
+        if ($group && isset($this->fields[$group][$key])) {
+            return $this->fields[$group][$key];
         }
 
         foreach ($this->fields as $group => $groupFields) {
             foreach ($groupFields as $name => $details) {
-                if ($name == $field) {
-                    return $details['value'];
+                if ($name == $key) {
+                    return $details;
                 }
             }
         }
@@ -150,6 +235,30 @@ trait CustomFieldEntityTrait
             // The fields are already flattened
 
             return $this->fields;
+        }
+    }
+
+    /**
+     * @param ClassMetadataBuilder $builder
+     * @param array                $fields
+     * @param array                $customFieldDefinitions
+     */
+    protected static function loadFixedFieldMetadata(ClassMetadataBuilder $builder, array $fields, array $customFieldDefinitions)
+    {
+        foreach ($fields as $fieldProperty) {
+            $field = (defined('self::FIELD_ALIAS')) ? self::FIELD_ALIAS.$fieldProperty : $fieldProperty;
+
+            $type = 'text';
+            if (isset($customFieldDefinitions[$field]) && !empty($customFieldDefinitions[$field]['type'])) {
+                $type = $customFieldDefinitions[$field]['type'];
+            }
+
+            $builder->addNamedField(
+                $fieldProperty,
+                FieldModel::getSchemaDefinition($field, $type, !empty($customFieldDefinitions[$field]['unique']))['type'],
+                $field,
+                true
+            );
         }
     }
 }

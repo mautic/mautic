@@ -53,23 +53,25 @@ $buildBundles = function ($namespace, $bundle) use ($container, $paths, $root, &
                 // Just check first file for the loadMetadata function
                 $reflectionClass = new \ReflectionClass('\\'.$baseNamespace.'\\Entity\\'.(!empty($subFolder) ? $subFolder.'\\' : '').basename($file->getFilename(), '.php'));
 
-                // Register API metadata
-                if ($reflectionClass->hasMethod('loadApiMetadata')) {
-                    $serializerMappings[$bundle] = [
-                        'namespace_prefix' => $baseNamespace.'\\Entity',
-                        'path'             => "@$bundle/Entity",
-                    ];
-                }
+                if (!$reflectionClass->implementsInterface(\Mautic\CoreBundle\Entity\DeprecatedInterface::class)) {
+                    // Register API metadata
+                    if ($reflectionClass->hasMethod('loadApiMetadata')) {
+                        $serializerMappings[$bundle] = [
+                            'namespace_prefix' => $baseNamespace.'\\Entity',
+                            'path'             => "@$bundle/Entity",
+                        ];
+                    }
 
-                // Register entities
-                if ($reflectionClass->hasMethod('loadMetadata')) {
-                    $ormMappings[$bundle] = [
-                        'dir'       => 'Entity',
-                        'type'      => 'staticphp',
-                        'prefix'    => $baseNamespace.'\\Entity',
-                        'mapping'   => true,
-                        'is_bundle' => true,
-                    ];
+                    // Register entities
+                    if ($reflectionClass->hasMethod('loadMetadata')) {
+                        $ormMappings[$bundle] = [
+                            'dir'       => 'Entity',
+                            'type'      => 'staticphp',
+                            'prefix'    => $baseNamespace.'\\Entity',
+                            'mapping'   => true,
+                            'is_bundle' => true,
+                        ];
+                    }
                 }
             }
         }
@@ -145,20 +147,19 @@ unset($setBundles, $setPluginBundles);
 $container->setParameter('mautic.ip_lookup_services', $ipLookupServices);
 
 // Load parameters
-$loader->import('parameters.php');
+include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
 
 // Set template engines
 $engines = ['php', 'twig'];
 
+// Decide on secure cookie based on site_url setting
+$secureCookie = $container->hasParameter('mautic.site_url') && substr(ltrim($container->getParameter('mautic.site_url')), 0, 5) === 'https';
+
 // Generate session name
-if (isset($_COOKIE['mautic_session_name'])) {
-    // Attempt to keep from losing sessions if cache is cleared through UI
-    $sessionName = $_COOKIE['mautic_session_name'];
-} else {
-    $key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
-    $sessionName = md5(md5($paths['local_config']).$key);
-}
+// Cannot use $parameters here directly because that fails spectaculary if parameters_local file exists
+$key         = $container->hasParameter('mautic.secret_key') ? $container->getParameter('mautic.secret_key') : uniqid();
+$sessionName = md5(md5($paths['local_config']).$key);
 
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
@@ -187,8 +188,9 @@ $container->loadFromExtension('framework', [
     'trusted_hosts'   => '%mautic.trusted_hosts%',
     'trusted_proxies' => '%mautic.trusted_proxies%',
     'session'         => [ //handler_id set to null will use default session handler from php.ini
-        'handler_id' => null,
-        'name'       => $sessionName,
+        'handler_id'    => null,
+        'name'          => $sessionName,
+        'cookie_secure' => $secureCookie,
     ],
     'fragments'            => null,
     'http_method_override' => true,
@@ -197,6 +199,8 @@ $container->loadFromExtension('framework', [
         'static_method' => array('loadValidatorMetadata')
     )*/
 ]);
+
+$container->setParameter('mautic.famework.csrf_protection', true);
 
 //Doctrine Configuration
 $dbalSettings = [
@@ -332,6 +336,11 @@ $container->loadFromExtension('jms_serializer', [
         'cache'          => 'none',
         'auto_detection' => false,
         'directories'    => $serializerMappings,
+    ],
+    'visitors' => [
+        'json' => [
+            'options' => JSON_PRETTY_PRINT,
+        ],
     ],
 ]);
 

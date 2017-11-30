@@ -23,12 +23,9 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     <?php echo $view->render('MauticCoreBundle:Helper:list_toolbar.html.php', [
-        'searchValue'     => $searchValue,
-        'searchHelp'      => 'mautic.api.client.help.searchcommands',
-        'action'          => $currentRoute,
-        'routeBase'       => 'client',
-        'templateButtons' => [],
-        'filters'         => $filters,
+        'searchValue' => $searchValue,
+        'searchHelp'  => 'mautic.api.client.help.searchcommands',
+        'filters'     => $filters,
     ]); ?>
     <div class="page-list">
         <?php $view['slots']->output('_content'); ?>

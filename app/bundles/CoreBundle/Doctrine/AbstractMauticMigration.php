@@ -191,4 +191,30 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
 
         return substr(strtoupper($type.'_'.$hash), 0, 63);
     }
+
+    /**
+     * Generate index and foreign constraint.
+     *
+     * @param       $table
+     * @param array $columnNames
+     *
+     * @return array [idx, fk]
+     */
+    protected function generateKeys($table, array $columnNames)
+    {
+        return [
+            $this->generatePropertyName($table, 'idx', $columnNames),
+            $this->generatePropertyName($table, 'fk', $columnNames),
+        ];
+    }
+
+    /**
+     * Use this when you're doing a migration that
+     * purposely does not have any SQL statements,
+     * such as when moving data using the query builder.
+     */
+    protected function suppressNoSQLStatementError()
+    {
+        $this->addSql('SELECT "This migration did not generate select statements." AS purpose');
+    }
 }

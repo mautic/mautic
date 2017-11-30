@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -32,24 +32,32 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.extend($.FE.POPUP_TEMPLATES, {
-    'video.insert': '[_BUTTONS_][_BY_URL_LAYER_][_EMBED_LAYER_]',
+    'video.insert': '[_BUTTONS_][_BY_URL_LAYER_][_EMBED_LAYER_][_UPLOAD_LAYER_][_PROGRESS_BAR_]',
     'video.edit': '[_BUTTONS_]',
     'video.size': '[_BUTTONS_][_SIZE_LAYER_]'
   })
 
   $.extend($.FE.DEFAULTS, {
-    videoInsertButtons: ['videoBack', '|', 'videoByURL', 'videoEmbed'],
-    videoEditButtons: ['videoDisplay', 'videoAlign', 'videoSize', 'videoRemove'],
+    videoAllowedTypes: ['mp4', 'webm', 'ogg'],
+    videoDefaultAlign: 'center',
+    videoDefaultDisplay: 'block',
+    videoDefaultWidth: 600,
+    videoEditButtons: ['videoReplace', 'videoRemove', '|', 'videoDisplay', 'videoAlign', 'videoSize'],
+    videoInsertButtons: ['videoBack', '|', 'videoByURL', 'videoEmbed', 'videoUpload'],
+    videoMaxSize: 50 * 1024 * 1024,
+    videoMove: true,
     videoResize: true,
     videoSizeButtons: ['videoBack', '|'],
     videoSplitHTML: false,
     videoTextNear: true,
-    videoDefaultAlign: 'center',
-    videoDefaultDisplay: 'block',
-    videoMove: true
+    videoUploadMethod: 'POST',
+    videoUploadParam: 'file',
+    videoUploadParams: {},
+    videoUploadToS3: false,
+    videoUploadURL: 'https://i.froala.com/upload'
   });
 
   $.FE.VIDEO_PROVIDERS = [
@@ -93,8 +101,25 @@
     var $video_resizer;
     var $current_video;
 
+    var BAD_LINK = 1;
+    var MISSING_LINK = 2;
+    var ERROR_DURING_UPLOAD = 3;
+    var BAD_RESPONSE = 4;
+    var MAX_SIZE_EXCEEDED = 5;
+    var BAD_FILE_TYPE = 6;
+    var NO_CORS_IE = 7;
+
+    var error_messages = {};
+    error_messages[BAD_LINK] = 'Video cannot be loaded from the passed link.',
+    error_messages[MISSING_LINK] = 'No link in upload response.',
+    error_messages[ERROR_DURING_UPLOAD] = 'Error during file upload.',
+    error_messages[BAD_RESPONSE] = 'Parsing response failed.',
+    error_messages[MAX_SIZE_EXCEEDED] = 'File is too large.',
+    error_messages[BAD_FILE_TYPE] = 'Video file type is invalid.',
+    error_messages[NO_CORS_IE] = 'Files can be uploaded only to same domain in IE 8 and IE 9.'
+
     /**
-     * Refresh the image insert popup.
+     * Refresh the video insert popup.
      */
     function _refreshInsertPopup () {
       var $popup = editor.popups.get('video.insert');
@@ -103,6 +128,9 @@
       $url_input.val('').trigger('change');
 
       var $embed_area = $popup.find('.fr-video-embed-layer textarea');
+      $embed_area.val('').trigger('change');
+
+      $embed_area = $popup.find('.fr-video-upload-layer input');
       $embed_area.val('').trigger('change');
     }
 
@@ -115,6 +143,7 @@
       var $popup = editor.popups.get('video.insert');
       if (!$popup) $popup = _initInsertPopup();
 
+      hideProgressBar();
       if (!$popup.hasClass('fr-active')) {
         editor.popups.refresh('video.insert');
         editor.popups.setContainer('video.insert', editor.$tb);
@@ -126,30 +155,33 @@
     }
 
     /**
-     * Show the image edit popup.
+     * Show the video edit popup.
      */
     function _showEditPopup () {
       var $popup = editor.popups.get('video.edit');
       if (!$popup) $popup = _initEditPopup();
 
-      editor.popups.setContainer('video.edit', $(editor.opts.scrollableContainer));
-      editor.popups.refresh('video.edit');
+      if ($popup) {
+        editor.popups.setContainer('video.edit', editor.$sc);
+        editor.popups.refresh('video.edit');
 
-      var $video_obj = $current_video.find('iframe, embed, video');
-      var left = $video_obj.offset().left + $video_obj.outerWidth() / 2;
-      var top = $video_obj.offset().top + $video_obj.outerHeight();
+        var $video_obj = $current_video.find('iframe, embed, video');
+        var left = $video_obj.offset().left + $video_obj.outerWidth() / 2;
+        var top = $video_obj.offset().top + $video_obj.outerHeight();
 
-      editor.popups.show('video.edit', left, top, $video_obj.outerHeight());
+        editor.popups.show('video.edit', left, top, $video_obj.outerHeight());
+      }
     }
 
     function _initInsertPopup (delayed) {
       if (delayed) {
         editor.popups.onRefresh('video.insert', _refreshInsertPopup);
+        editor.popups.onHide('image.insert', _hideInsertPopup);
 
         return true;
       }
 
-      // Image buttons.
+      // Video buttons.
       var video_buttons = '';
       if (editor.opts.videoInsertButtons.length > 1) {
         video_buttons = '<div class="fr-buttons">' + editor.button.buildList(editor.opts.videoInsertButtons) + '</div>';
@@ -158,29 +190,43 @@
       // Video by url layer.
       var by_url_layer = '';
       if (editor.opts.videoInsertButtons.indexOf('videoByURL') >= 0) {
-        by_url_layer = '<div class="fr-video-by-url-layer fr-layer fr-active" id="fr-video-by-url-layer-' + editor.id + '"><div class="fr-input-line"><input type="text" placeholder="http://" tabIndex="1"></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoInsertByURL" tabIndex="2">' + editor.language.translate('Insert') + '</button></div></div>'
+        by_url_layer = '<div class="fr-video-by-url-layer fr-layer fr-active" id="fr-video-by-url-layer-' + editor.id + '"><div class="fr-input-line"><input id="fr-video-by-url-layer-text-' + editor.id + '" type="text" placeholder="http://" tabIndex="1" aria-required="true"></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoInsertByURL" tabIndex="2" role="button">' + editor.language.translate('Insert') + '</button></div></div>'
       }
 
       // Video embed layer.
       var embed_layer = '';
       if (editor.opts.videoInsertButtons.indexOf('videoEmbed') >= 0) {
-        embed_layer = '<div class="fr-video-embed-layer fr-layer" id="fr-video-embed-layer-' + editor.id + '"><div class="fr-input-line"><textarea type="text" placeholder="' + editor.language.translate('Embedded Code') + '" tabIndex="1" rows="5"></textarea></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoInsertEmbed" tabIndex="2">' + editor.language.translate('Insert') + '</button></div></div>'
+        embed_layer = '<div class="fr-video-embed-layer fr-layer" id="fr-video-embed-layer-' + editor.id + '"><div class="fr-input-line"><textarea id="fr-video-embed-layer-text' + editor.id + '" type="text" placeholder="' + editor.language.translate('Embedded Code') + '" tabIndex="1" aria-required="true" rows="5"></textarea></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoInsertEmbed" tabIndex="2" role="button">' + editor.language.translate('Insert') + '</button></div></div>'
       }
+
+      // Video upload layer.
+      var upload_layer = '';
+      if (editor.opts.videoInsertButtons.indexOf('videoUpload') >= 0) {
+        upload_layer = '<div class="fr-video-upload-layer fr-layer" id="fr-video-upload-layer-' + editor.id + '"><strong>' + editor.language.translate('Drop video') + '</strong><br>(' + editor.language.translate('or click') + ')<div class="fr-form"><input type="file" accept="video/' + editor.opts.videoAllowedTypes.join(', video/').toLowerCase() + '" tabIndex="-1" aria-labelledby="fr-video-upload-layer-' + editor.id + '" role="button"></div></div>'
+      }
+
+      // Progress bar.
+      var progress_bar_layer = '<div class="fr-video-progress-bar-layer fr-layer"><h3 tabIndex="-1" class="fr-message">Uploading</h3><div class="fr-loader"><span class="fr-progress"></span></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-dismiss" data-cmd="videoDismissError" tabIndex="2" role="button">OK</button></div></div>';
+
 
       var template = {
         buttons: video_buttons,
         by_url_layer: by_url_layer,
-        embed_layer: embed_layer
+        embed_layer: embed_layer,
+        upload_layer: upload_layer,
+        progress_bar: progress_bar_layer
       }
 
       // Set the template in the popup.
       var $popup = editor.popups.create('video.insert', template);
 
+      _bindInsertEvents($popup);
+
       return $popup;
     }
 
     /**
-     * Show the image upload layer.
+     * Show the video upload layer.
      */
     function showLayer (name) {
       var $popup = editor.popups.get('video.insert');
@@ -206,8 +252,8 @@
       // Show the new layer.
       $popup.find('.fr-layer').removeClass('fr-active');
       $popup.find('.fr-' + name + '-layer').addClass('fr-active');
-
       editor.popups.show('video.insert', left, top, 0);
+      editor.accessibility.focusPopup($popup);
     }
 
     /**
@@ -216,7 +262,7 @@
     function refreshByURLButton ($btn) {
       var $popup = editor.popups.get('video.insert');
       if ($popup.find('.fr-video-by-url-layer').hasClass('fr-active')) {
-        $btn.addClass('fr-active');
+        $btn.addClass('fr-active').attr('aria-pressed', true);
       }
     }
 
@@ -226,7 +272,17 @@
     function refreshEmbedButton ($btn) {
       var $popup = editor.popups.get('video.insert');
       if ($popup.find('.fr-video-embed-layer').hasClass('fr-active')) {
-        $btn.addClass('fr-active');
+        $btn.addClass('fr-active').attr('aria-pressed', true);
+      }
+    }
+
+    /**
+     * Refresh the insert upload button.
+     */
+    function refreshUploadButton ($btn) {
+      var $popup = editor.popups.get('video.insert');
+      if ($popup.find('.fr-video-upload-layer').hasClass('fr-active')) {
+        $btn.addClass('fr-active').attr('aria-pressed', true);
       }
     }
 
@@ -238,16 +294,225 @@
       editor.events.focus(true);
       editor.selection.restore();
 
-      editor.html.insert('<span contenteditable="false" draggable="true" class="fr-jiv fr-video fr-dv' + (editor.opts.videoDefaultDisplay[0]) + (editor.opts.videoDefaultAlign != 'center' ? ' fr-fv' + editor.opts.videoDefaultAlign[0] : '') + '">' + embedded_code + '</span>', false, editor.opts.videoSplitHTML);
+      // Flag to tell if the video is replaced.
+      var replaced = false;
+
+      // If current video found we have to replace it.
+      if ($current_video) {
+
+        // Remove the old video.
+        remove();
+
+        // Mark that the video is replaced.
+        replaced = true;
+      }
+
+      editor.html.insert('<span contenteditable="false" draggable="true" class="fr-jiv fr-video">' + embedded_code + '</span>', false, editor.opts.videoSplitHTML);
 
       editor.popups.hide('video.insert');
 
       var $video = editor.$el.find('.fr-jiv');
       $video.removeClass('fr-jiv');
 
+      _setStyle($video, editor.opts.videoDefaultDisplay, editor.opts.videoDefaultAlign);
+
       $video.toggleClass('fr-draggable', editor.opts.videoMove);
 
-      editor.events.trigger('video.inserted', [$video]);
+      editor.events.trigger(replaced ? 'video.replaced' : 'video.inserted', [$video]);
+    }
+
+    function _loadedCallback () {
+      var $video = $(this);
+
+      editor.popups.hide('video.insert');
+
+      $video.removeClass('fr-uploading');
+
+      // Select the image.
+      if ($video.parent().next().is('br')) {
+        $video.parent().next().remove();
+      }
+
+      _editVideo($video.parent());
+
+      editor.events.trigger('video.loaded', [$video.parent()]);
+    }
+
+    /**
+     * Insert html video into the editor.
+     */
+
+    function insertHtmlVideo (link, sanitize, data, $existing_video, response) {
+      editor.edit.off();
+      _setProgressMessage('Loading video');
+
+      if (sanitize) link = editor.helpers.sanitizeURL(link);
+
+      var video = document.createElement('video');
+
+      video.oncanplay = function () {
+        var $video;
+        var attr;
+
+        if ($existing_video) {
+          if (!editor.undo.canDo() && !$existing_video.find('video').hasClass('fr-uploading')) editor.undo.saveStep();
+
+          var old_src = $existing_video.find('video').data('fr-old-src');
+
+          var replaced = $existing_video.data('fr-replaced');
+          $existing_video.data('fr-replaced', false);
+
+          if (editor.$wp) {
+            // Clone existing video.
+            $video = $existing_video.clone();
+            $video.find('video').removeData('fr-old-src').removeClass('fr-uploading');
+
+            // Remove load event.
+            $video.find('video').off('canplay');
+
+            // Set new SRC.
+            if (old_src) $existing_video.find('video').attr('src', old_src);
+
+            // Replace existing video with its clone.
+            $existing_video.replaceWith($video);
+          } else {
+            $video = $existing_video;
+          }
+
+          // Remove old data.
+          var atts = $video.find('video').get(0).attributes;
+          for (var i = 0; i < atts.length; i++) {
+            var att = atts[i];
+            if (att.nodeName.indexOf('data-') === 0) {
+              $video.find('video').removeAttr(att.nodeName);
+            }
+          }
+
+          // Set new data.
+          if (typeof data != 'undefined') {
+            for (attr in data) {
+              if (data.hasOwnProperty(attr)) {
+                if (attr != 'link') {
+                  $video.find('video').attr('data-' + attr, data[attr]);
+                }
+              }
+            }
+          }
+
+          $video.find('video').on('canplay', _loadedCallback);
+          $video.find('video').attr('src', link);
+          editor.edit.on();
+          _syncVideos();
+          editor.undo.saveStep();
+
+          // Cursor will not appear if we don't make blur.
+          editor.$el.blur();
+
+          editor.events.trigger(replaced ? 'video.replaced' : 'video.inserted', [$video, response]);
+        }
+      }
+
+      video.onerror = function () {
+        _throwError(BAD_LINK);
+      }
+
+      showProgressBar('Loading video');
+
+      video.src = link;
+    }
+
+    /**
+     * Show progress bar.
+     */
+
+    function showProgressBar (no_message) {
+      var $popup = editor.popups.get('video.insert');
+      if (!$popup) $popup = _initInsertPopup();
+
+      $popup.find('.fr-layer.fr-active').removeClass('fr-active').addClass('fr-pactive');
+      $popup.find('.fr-video-progress-bar-layer').addClass('fr-active');
+      $popup.find('.fr-buttons').hide();
+
+      if ($current_video) {
+        var $current_video_obj = $current_video.find('video');
+        editor.popups.setContainer('video.insert', editor.$sc);
+        var left = $current_video_obj.offset().left + $current_video_obj.width() / 2;
+        var top = $current_video_obj.offset().top + $current_video_obj.height();
+
+        editor.popups.show('video.insert', left, top, $current_video_obj.outerHeight());
+      }
+
+      if (typeof no_message == 'undefined') {
+        _setProgressMessage('Uploading', 0);
+      }
+    }
+
+    /**
+     * Hide progress bar.
+     */
+    function hideProgressBar (dismiss) {
+      var $popup = editor.popups.get('video.insert');
+      if ($popup) {
+        $popup.find('.fr-layer.fr-pactive').addClass('fr-active').removeClass('fr-pactive');
+        $popup.find('.fr-video-progress-bar-layer').removeClass('fr-active');
+        $popup.find('.fr-buttons').show();
+
+        // Dismiss error message.
+        if (dismiss || editor.$el.find('video.fr-error').length) {
+          editor.events.focus();
+
+          if (editor.$el.find('video.fr-error').length) {
+            editor.$el.find('video.fr-error').parent().remove();
+            editor.undo.saveStep();
+            editor.undo.run();
+            editor.undo.dropRedo();
+          }
+          if (!editor.$wp && $current_video) {
+            var $video = $current_video;
+            _exitEdit(true);
+            editor.selection.setAfter($video.find('video').get(0));
+            editor.selection.restore();
+          }
+          editor.popups.hide('video.insert');
+        }
+      }
+    }
+
+    /**
+     * Set a progress message.
+     */
+
+    function _setProgressMessage (message, progress) {
+      var $popup = editor.popups.get('video.insert');
+
+      if ($popup) {
+        var $layer = $popup.find('.fr-video-progress-bar-layer');
+        $layer.find('h3').text(message + (progress ? ' ' + progress + '%' : ''));
+
+        $layer.removeClass('fr-error');
+
+        if (progress) {
+          $layer.find('div').removeClass('fr-indeterminate');
+          $layer.find('div > span').css('width', progress + '%');
+        } else {
+          $layer.find('div').addClass('fr-indeterminate');
+        }
+      }
+    }
+
+    /**
+     * Show error message to the user.
+     */
+
+    function _showErrorMessage (message) {
+      showProgressBar();
+      var $popup = editor.popups.get('video.insert');
+      var $layer = $popup.find('.fr-video-progress-bar-layer');
+      $layer.addClass('fr-error');
+      var $message_header = $layer.find('h3');
+      $message_header.text(message);
+      editor.events.disableBlur();
+      $message_header.focus();
     }
 
     /**
@@ -294,6 +559,172 @@
       else {
         insert(code);
       }
+    }
+
+    function _editVideo ($video) {
+      _edit.call($video.get(0));
+    }
+
+    /**
+     * Parse video response.
+     */
+
+    function _parseResponse (response) {
+      try {
+        if (editor.events.trigger('video.uploaded', [response], true) === false) {
+          editor.edit.on();
+          return false;
+        }
+
+        var resp = $.parseJSON(response);
+        if (resp.link) {
+          return resp;
+        } else {
+          // No link in upload request.
+          _throwError(MISSING_LINK, response);
+          return false;
+        }
+      } catch (ex) {
+        // Bad response.
+        _throwError(BAD_RESPONSE, response);
+        return false;
+      }
+    }
+
+    /**
+     * Parse video response.
+     */
+
+    function _parseXMLResponse (response) {
+      try {
+        var link = $(response).find('Location').text();
+        var key = $(response).find('Key').text();
+
+        if (editor.events.trigger('video.uploadedToS3', [link, key, response], true) === false) {
+          editor.edit.on();
+          return false;
+        }
+
+        return link;
+      } catch (ex) {
+        // Bad response.
+        _throwError(BAD_RESPONSE, response);
+        return false;
+      }
+    }
+
+    /**
+     * Video was uploaded to the server and we have a response.
+     */
+
+    function _videoUploaded ($video) {
+      _setProgressMessage('Loading video');
+
+      var status = this.status;
+      var response = this.response;
+      var responseXML = this.responseXML;
+      var responseText = this.responseText;
+
+      try {
+        if (editor.opts.videoUploadToS3) {
+          if (status == 201) {
+            var link = _parseXMLResponse(responseXML);
+            if (link) {
+              insertHtmlVideo(link, false, [], $video, response || responseXML);
+            }
+          } else {
+            _throwError(BAD_RESPONSE, response || responseXML);
+          }
+        } else {
+          if (status >= 200 && status < 300) {
+            var resp = _parseResponse(responseText);
+            if (resp) {
+              insertHtmlVideo(resp.link, false, resp, $video, response || responseText);
+            }
+          } else {
+            _throwError(ERROR_DURING_UPLOAD, response || responseText);
+          }
+        }
+      } catch (ex) {
+        // Bad response.
+        _throwError(BAD_RESPONSE, response || responseText);
+      }
+    }
+
+    /**
+     * Video upload error.
+     */
+
+    function _videoUploadError () {
+      _throwError(BAD_RESPONSE, this.response || this.responseText || this.responseXML);
+    }
+
+    /**
+     * Video upload progress.
+     */
+
+    function _videoUploadProgress (e) {
+      if (e.lengthComputable) {
+        var complete = (e.loaded / e.total * 100 | 0);
+        _setProgressMessage('Uploading', complete);
+      }
+    }
+
+    /**
+     * Video upload aborted.
+     */
+    function _videoUploadAborted () {
+      editor.edit.on();
+      hideProgressBar(true);
+    }
+
+    function _addVideo (link, data, loadCallback) {
+      // Build video data string.
+      var data_str = '';
+      var attr;
+      if (data && typeof data != 'undefined') {
+        for (attr in data) {
+          if (data.hasOwnProperty(attr)) {
+            if (attr != 'link') {
+              data_str += ' data-' + attr + '="' + data[attr] + '"';
+            }
+          }
+        }
+      }
+
+      var width = editor.opts.videoDefaultWidth;
+      if (width && width != 'auto') {
+        width = width + 'px';
+      }
+
+      // Create video object and set the load event.
+      var $video = $('<span contenteditable="false" draggable="true" class="fr-video fr-dv' + (editor.opts.videoDefaultDisplay[0]) + (editor.opts.videoDefaultAlign != 'center' ? ' fr-fv' + editor.opts.videoDefaultAlign[0] : '') + '"><video src="' + link + '" ' + data_str + (width ? ' style="width: ' + width + ';"' : '') + '" controls>' + editor.language.translate('Your browser does not support HTML5 video.') + '</video></span>');
+      $video.toggleClass('fr-draggable', editor.opts.videoMove);
+
+      $video.find('video').on('canplay', loadCallback);
+
+      // Make sure we have focus.
+      // Call the event.
+      editor.edit.on();
+      editor.events.focus(true);
+      editor.selection.restore();
+
+      editor.undo.saveStep();
+
+      // Insert marker and then replace it with the video.
+      if (editor.opts.videoSplitHTML) {
+        editor.markers.split();
+      } else {
+        editor.markers.insert();
+      }
+
+      var $marker = editor.$el.find('.fr-marker');
+      $marker.replaceWith($video);
+
+      editor.html.wrap();
+      editor.selection.clear();
+
+      return $video;
     }
 
     /**
@@ -396,6 +827,18 @@
       return '<div class="fr-handler fr-h' + pos + '"></div>';
     }
 
+    function _resizeVideo (e, initPageX, direction, step) {
+      e.pageX = initPageX;
+      e.pageY = initPageX;
+      _handlerMousedown.call(this, e);
+      e.pageX = e.pageX + direction * Math.floor(Math.pow(1.1, step));
+      e.pageY = e.pageY + direction * Math.floor(Math.pow(1.1, step));
+      _handlerMousemove.call(this, e);
+      _handlerMouseup.call(this, e);
+
+      return ++step;
+    }
+
     /**
      * Init video resizer.
      */
@@ -459,7 +902,80 @@
         editor.events.$on($(doc.defaultView || doc.parentWindow), editor._mouseup, _handlerMouseup);
 
         editor.events.$on($overlay, 'mouseleave', _handlerMouseup);
+
+
+        // Accessibility.
+
+        // Used for keys holing.
+        var step = 1;
+        var prevKey = null;
+        var prevTimestamp = 0;
+
+        // Keydown event.
+        editor.events.on('keydown', function (e) {
+          if ($current_video) {
+            var ctrlKey = navigator.userAgent.indexOf('Mac OS X') != -1 ? e.metaKey : e.ctrlKey;
+            var keycode = e.which;
+
+            if (keycode !== prevKey || e.timeStamp - prevTimestamp > 200) {
+              step = 1; // Reset step. Known browser issue: Keyup does not trigger when ctrl is pressed.
+            }
+
+            // Increase video size.
+            if ((keycode == $.FE.KEYCODE.EQUALS || (editor.browser.mozilla && keycode == $.FE.KEYCODE.FF_EQUALS)) && ctrlKey && !e.altKey) {
+              step = _resizeVideo.call(this, e, 1, 1, step);
+            }
+            // Decrease video size.
+            else if ((keycode == $.FE.KEYCODE.HYPHEN || (editor.browser.mozilla && keycode == $.FE.KEYCODE.FF_HYPHEN)) && ctrlKey && !e.altKey) {
+              step = _resizeVideo.call(this, e, 2, -1, step);
+            }
+
+            // Save key code.
+            prevKey = keycode;
+
+            // Save timestamp.
+            prevTimestamp = e.timeStamp;
+          }
+        });
+
+        // Reset the step on key up event.
+        editor.events.on('keyup', function () {
+          step = 1;
+        });
       }
+    }
+
+    /**
+     * Keep videos in sync when content changed.
+     */
+    var videos;
+
+    function _syncVideos () {
+      // Get current videos.
+      var c_videos = Array.prototype.slice.call(editor.el.querySelectorAll('video'));
+
+      // Current videos src.
+      var video_srcs = [];
+      var i;
+      for (i = 0; i < c_videos.length; i++) {
+        video_srcs.push(c_videos[i].getAttribute('src'));
+
+        $(c_videos[i]).toggleClass('fr-draggable', editor.opts.videoMove);
+        if (c_videos[i].getAttribute('class') === '') c_videos[i].removeAttribute('class');
+        if (c_videos[i].getAttribute('style') === '') c_videos[i].removeAttribute('style');
+      }
+
+      // Loop previous videos and check their src.
+      if (videos) {
+        for (i = 0; i < videos.length; i++) {
+          if (video_srcs.indexOf(videos[i].getAttribute('src')) < 0) {
+            editor.events.trigger('video.removed', [$(videos[i])]);
+          }
+        }
+      }
+
+      // Current videos are the old ones.
+      videos = c_videos;
     }
 
     /**
@@ -468,7 +984,7 @@
     function _repositionResizer () {
       if (!$video_resizer) _initResizer();
 
-      (editor.$wp || $(editor.opts.scrollableContainer)).append($video_resizer);
+      (editor.$wp || editor.$sc).append($video_resizer);
       $video_resizer.data('instance', editor);
 
       var $video_obj = $current_video.find('iframe, embed, video');
@@ -478,7 +994,7 @@
         .css('left', (editor.opts.iframe ? $video_obj.offset().left - 1 : $video_obj.offset().left - editor.$wp.offset().left - 1) + editor.$wp.scrollLeft())
         .css('width', $video_obj.outerWidth())
         .css('height', $video_obj.height())
-        .addClass('fr-active')
+        .addClass('fr-active');
     }
 
     /**
@@ -490,8 +1006,11 @@
         return true;
       }
 
-      e.preventDefault();
-      e.stopPropagation();
+      if (e && editor.edit.isDisabled()) {
+        e.stopPropagation();
+        e.preventDefault();
+        return false;
+      }
 
       if (editor.edit.isDisabled()) {
         return false;
@@ -520,6 +1039,7 @@
         editor.size.syncIframe();
       }
 
+      _selectVideo()
       _repositionResizer();
       _showEditPopup();
 
@@ -559,6 +1079,220 @@
     }
 
     /**
+     * Start the uploading process.
+     */
+    function _startUpload (xhr, form_data, video) {
+      function _sendRequest () {
+        var $video = $(this);
+
+        $video.off('canplay');
+
+        $video.addClass('fr-uploading');
+
+        if ($video.parent().next().is('br')) {
+          $video.parent().next().remove();
+        }
+
+        editor.placeholder.refresh();
+
+        // Select the video.
+        if (!$video.parent().is($current_video)) _editVideo($video.parent());
+
+        _repositionResizer();
+        showProgressBar();
+
+        editor.edit.off();
+
+        // Set upload events.
+        xhr.onload = function () {
+          _videoUploaded.call(xhr, $video.parent());
+        };
+        xhr.onerror = _videoUploadError;
+        xhr.upload.onprogress = _videoUploadProgress;
+        xhr.onabort = _videoUploadAborted;
+
+        // Set abort event.
+        $video.off('abortUpload').on('abortUpload', function () {
+          if (xhr.readyState != 4) {
+            xhr.abort();
+          }
+        });
+
+        // Send data.
+        xhr.send(form_data);
+      }
+
+      var reader = new FileReader();
+      var $video;
+      reader.addEventListener('load', function () {
+        var link = reader.result;
+
+        // Convert video to local blob.
+        var binary = atob(reader.result.split(',')[1]);
+        var array = [];
+        for (var i = 0; i < binary.length; i++) {
+          array.push(binary.charCodeAt(i));
+        }
+
+        // Get local video link.
+        link = window.URL.createObjectURL(new Blob([new Uint8Array(array)], {
+          type: 'video/mp4'
+        }));
+
+        // No video.
+        if (!$current_video) {
+          $video = _addVideo(link, null, _sendRequest);
+        } else {
+
+          // Flag to tell if the video is replaced.
+          $current_video.data('fr-replaced', true);
+
+          var $current_video_obj = $current_video.find('video');
+
+          // Current video has video tag.
+          if ($current_video_obj.length) {
+            $current_video_obj.on('canplay', _sendRequest);
+            editor.edit.on();
+            editor.undo.saveStep();
+            $current_video_obj.data('fr-old-src', $current_video_obj.attr('src'));
+            $current_video_obj.attr('src', link);
+          }
+          // Iframe, embed ot other video type.
+          else {
+            remove();
+            $video = _addVideo(link, null, _sendRequest);
+          }
+        }
+      }, false);
+
+      reader.readAsDataURL(video);
+    }
+
+    /**
+     * Do video upload.
+     */
+    function upload (videos) {
+      // Make sure we have what to upload.
+      if (typeof videos != 'undefined' && videos.length > 0) {
+        // Check if we should cancel the video upload.
+        if (editor.events.trigger('video.beforeUpload', [videos]) === false) {
+          return false;
+        }
+
+        var video = videos[0];
+
+        // Check video max size.
+        if (video.size > editor.opts.videoMaxSize) {
+          _throwError(MAX_SIZE_EXCEEDED);
+          return false;
+        }
+
+        // Check video types.
+        if (editor.opts.videoAllowedTypes.indexOf(video.type.replace(/video\//g, '')) < 0) {
+          _throwError(BAD_FILE_TYPE);
+          return false;
+        }
+
+        // Create form Data.
+        var form_data;
+        if (editor.drag_support.formdata) {
+          form_data = editor.drag_support.formdata ? new FormData() : null;
+        }
+
+        // Prepare form data for request.
+        if (form_data) {
+          var key;
+
+          // Upload to S3.
+          if (editor.opts.videoUploadToS3 !== false) {
+            form_data.append('key', editor.opts.videoUploadToS3.keyStart + (new Date()).getTime() + '-' + (video.name || 'untitled'));
+            form_data.append('success_action_status', '201');
+            form_data.append('X-Requested-With', 'xhr');
+            form_data.append('Content-Type', video.type);
+
+            for (key in editor.opts.videoUploadToS3.params) {
+              if (editor.opts.videoUploadToS3.params.hasOwnProperty(key)) {
+                form_data.append(key, editor.opts.videoUploadToS3.params[key]);
+              }
+            }
+          }
+
+          // Add upload params.
+          for (key in editor.opts.videoUploadParams) {
+            if (editor.opts.videoUploadParams.hasOwnProperty(key)) {
+              form_data.append(key, editor.opts.videoUploadParams[key]);
+            }
+          }
+
+          // Set the video in the request.
+          form_data.append(editor.opts.videoUploadParam, video);
+
+          // Create XHR request.
+          var url = editor.opts.videoUploadURL;
+          if (editor.opts.videoUploadToS3) {
+            if (editor.opts.videoUploadToS3.uploadURL) {
+              url = editor.opts.videoUploadToS3.uploadURL;
+            }
+            else {
+              url = 'https://' + editor.opts.videoUploadToS3.region + '.amazonaws.com/' + editor.opts.videoUploadToS3.bucket;
+            }
+          }
+          var xhr = editor.core.getXHR(url, editor.opts.videoUploadMethod);
+
+          _startUpload(xhr, form_data, video);
+        }
+      }
+    }
+
+    /**
+     * Video drop inside the upload zone.
+     */
+
+    function _bindInsertEvents ($popup) {
+      // Drag over the dropable area.
+      editor.events.$on($popup, 'dragover dragenter', '.fr-video-upload-layer', function () {
+        $(this).addClass('fr-drop');
+        return false;
+      });
+
+      // Drag end.
+      editor.events.$on($popup, 'dragleave dragend', '.fr-video-upload-layer', function () {
+        $(this).removeClass('fr-drop');
+        return false;
+      });
+
+      // Drop.
+      editor.events.$on($popup, 'drop', '.fr-upload-upload-layer', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        $(this).removeClass('fr-drop');
+
+        var dt = e.originalEvent.dataTransfer;
+        if (dt && dt.files) {
+          var inst = $popup.data('instance') || editor;
+          inst.events.disableBlur();
+          inst.video.upload(dt.files);
+          inst.events.enableBlur();
+        }
+      });
+
+      editor.events.$on($popup, 'change', '.fr-video-upload-layer input[type="file"]', function () {
+        if (this.files) {
+          var inst = $popup.data('instance') || editor;
+          inst.events.disableBlur();
+          $popup.find('input:focus').blur();
+          inst.events.enableBlur();
+          inst.video.upload(this.files);
+        }
+        // Else IE 9 case.
+
+        // Chrome fix.
+        $(this).val('');
+      });
+    }
+
+    /**
      * Init the video events.
      */
     function _initEvents () {
@@ -578,30 +1312,51 @@
     }
 
     /**
+     * Throw a video error.
+     */
+
+    function _throwError (code, response) {
+      editor.edit.on();
+      if ($current_video) $current_video.find('video').addClass('fr-error');
+      _showErrorMessage(editor.language.translate('Something went wrong. Please try again.'));
+
+      editor.events.trigger('video.error', [{
+          code: code,
+          message: error_messages[code]
+        },
+        response
+      ]);
+    }
+
+    /**
      * Init the video edit popup.
      */
     function _initEditPopup () {
-      // Image buttons.
+      // Video buttons.
       var video_buttons = '';
-      if (editor.opts.videoEditButtons.length >= 1) {
+      if (editor.opts.videoEditButtons.length > 0) {
         video_buttons += '<div class="fr-buttons">';
         video_buttons += editor.button.buildList(editor.opts.videoEditButtons);
         video_buttons += '</div>';
-      }
 
-      var template = {
-        buttons: video_buttons
-      }
-
-      var $popup = editor.popups.create('video.edit', template);
-
-      editor.events.$on(editor.$wp, 'scroll.video-edit', function () {
-        if ($current_video && editor.popups.isVisible('video.edit')) {
-          _showEditPopup();
+        var template = {
+          buttons: video_buttons
         }
-      });
 
-      return $popup;
+        var $popup = editor.popups.create('video.edit', template);
+
+        editor.events.$on(editor.$wp, 'scroll.video-edit', function () {
+          if ($current_video && editor.popups.isVisible('video.edit')) {
+
+            editor.events.disableBlur();
+            _editVideo($current_video);
+          }
+        });
+
+        return $popup;
+      }
+
+      return false;
     }
 
     /**
@@ -623,8 +1378,9 @@
       var $popup = editor.popups.get('video.size');
       if (!$popup) $popup = _initSizePopup();
 
+      hideProgressBar();
       editor.popups.refresh('video.size');
-      editor.popups.setContainer('video.size', $(editor.opts.scrollableContainer));
+      editor.popups.setContainer('video.size', editor.$sc);
       var $video_obj = $current_video.find('iframe, embed, video')
       var left = $video_obj.offset().left + $video_obj.width() / 2;
       var top = $video_obj.offset().top + $video_obj.height();
@@ -633,7 +1389,7 @@
     }
 
     /**
-     * Init the image upload popup.
+     * Init the video upload popup.
      */
     function _initSizePopup (delayed) {
       if (delayed) {
@@ -642,13 +1398,13 @@
         return true;
       }
 
-      // Image buttons.
+      // Video buttons.
       var video_buttons = '';
       video_buttons = '<div class="fr-buttons">' + editor.button.buildList(editor.opts.videoSizeButtons) + '</div>';
 
       // Size layer.
       var size_layer = '';
-      size_layer = '<div class="fr-video-size-layer fr-layer fr-active" id="fr-video-size-layer-' + editor.id + '"><div class="fr-video-group"><div class="fr-input-line"><input type="text" name="width" placeholder="' + editor.language.translate('Width') + '" tabIndex="1"></div><div class="fr-input-line"><input type="text" name="height" placeholder="' + editor.language.translate('Height') + '" tabIndex="1"></div></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoSetSize" tabIndex="2">' + editor.language.translate('Update') + '</button></div></div>';
+      size_layer = '<div class="fr-video-size-layer fr-layer fr-active" id="fr-video-size-layer-' + editor.id + '"><div class="fr-video-group"><div class="fr-input-line"><input id="fr-video-size-layer-width-' + editor.id + '" type="text" name="width" placeholder="' + editor.language.translate('Width') + '" tabIndex="1"></div><div class="fr-input-line"><input id="fr-video-size-layer-height-' + editor.id + '" type="text" name="height" placeholder="' + editor.language.translate('Height') + '" tabIndex="1"></div></div><div class="fr-action-buttons"><button type="button" class="fr-command fr-submit" data-cmd="videoSetSize" tabIndex="2" role="button">' + editor.language.translate('Update') + '</button></div></div>';
 
       var template = {
         buttons: video_buttons,
@@ -660,7 +1416,9 @@
 
       editor.events.$on(editor.$wp, 'scroll', function () {
         if ($current_video && editor.popups.isVisible('video.size')) {
-          showSizePopup();
+
+          editor.events.disableBlur();
+          _editVideo($current_video);
         }
       });
 
@@ -668,15 +1426,74 @@
     }
 
     /**
-     * Align image.
+     * Get video alignment.
+     */
+    function getAlign ($video) {
+      if (typeof $video == 'undefined') $video = $current_video;
+
+      if ($video) {
+        // Video has left class.
+        if ($video.hasClass('fr-fvl')) {
+          return 'left';
+        }
+        // Video has right class.
+        else if ($video.hasClass('fr-fvr')) {
+          return 'right';
+        }
+        // Video has display class set.
+        else if ($video.hasClass('fr-dvb') || $video.hasClass('fr-dvi')) {
+          return 'center';
+        }
+        else {
+          // Video has display block.
+          if ($video.css('display') == 'block') {
+            // Margin left is 0.
+            // Margin right is auto.
+            if ($video.css('text-algin') == 'left') {
+              return 'left';
+            }
+
+            // Margin left is auto.
+            // Margin right is 0.
+            else if ($video.css('text-align') == 'right') {
+              return 'right';
+            }
+          }
+
+          // Display inline.
+          else {
+            // Float left.
+            if ($video.css('float') == 'left') {
+              return 'left';
+            }
+
+            // Float right.
+            else if ($video.css('float') == 'right') {
+              return 'right';
+            }
+          }
+        }
+      }
+
+      return 'center';
+    }
+
+    /**
+     * Align video.
      */
     function align (val) {
       $current_video.removeClass('fr-fvr fr-fvl');
-      if (val == 'left') {
-        $current_video.addClass('fr-fvl');
+
+      // Easy case. Use classes.
+      if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
+        if (val == 'left') {
+          $current_video.addClass('fr-fvl');
+        } else if (val == 'right') {
+          $current_video.addClass('fr-fvr');
+        }
       }
-      else if (val == 'right') {
-        $current_video.addClass('fr-fvr');
+      else {
+        _setStyle($current_video, getDisplay(), val);
       }
 
       _repositionResizer();
@@ -689,42 +1506,66 @@
     function refreshAlign ($btn) {
       if (!$current_video) return false;
 
-      if ($current_video.hasClass('fr-fvl')) {
-        $btn.find('> *:first').replaceWith(editor.icon.create('align-left'));
-      }
-      else if ($current_video.hasClass('fr-fvr')) {
-        $btn.find('> *:first').replaceWith(editor.icon.create('align-right'));
-      }
-      else {
-        $btn.find('> *:first').replaceWith(editor.icon.create('align-justify'));
-      }
+      $btn.find('> *:first').replaceWith(editor.icon.create('video-align-' + getAlign()));
     }
 
     /**
      * Refresh the align option from the dropdown.
      */
     function refreshAlignOnShow ($btn, $dropdown) {
-      var alignment = 'justify';
-      if ($current_video.hasClass('fr-fvl')) {
-        alignment = 'left';
+      if ($current_video) {
+        $dropdown.find('.fr-command[data-param1="' + getAlign() + '"]').addClass('fr-active').attr('aria-selected', true);
       }
-      else if ($current_video.hasClass('fr-fvr')) {
-        alignment = 'right';
-      }
-
-      $dropdown.find('.fr-command[data-param1="' + alignment + '"]').addClass('fr-active');
     }
 
     /**
-     * Align image.
+     * Get video display.
+     */
+    function getDisplay ($video) {
+      if (typeof $video == 'undefined') $video = $current_video;
+
+      // Set float to none.
+      var flt = $video.css('float');
+      $video.css('float', 'none');
+
+      // Video has display block.
+      if ($video.css('display') == 'block') {
+        // Set float to the initial value.
+        $video.css('float', '');
+        if ($video.css('float') != flt) $video.css('float', flt);
+
+        return 'block';
+      }
+
+      // Display inline.
+      else {
+        // Set float.
+        $video.css('float', '');
+        if ($video.css('float') != flt) $video.css('float', flt);
+
+        return 'inline';
+      }
+
+      return 'inline';
+    }
+
+
+    /**
+     * Set video display.
      */
     function display (val) {
       $current_video.removeClass('fr-dvi fr-dvb');
-      if (val == 'inline') {
-        $current_video.addClass('fr-dvi');
+
+      // Easy case. Use classes.
+      if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
+        if (val == 'inline') {
+          $current_video.addClass('fr-dvi');
+        } else if (val == 'block') {
+          $current_video.addClass('fr-dvb');
+        }
       }
-      else if (val == 'block') {
-        $current_video.addClass('fr-dvb');
+      else {
+        _setStyle($current_video, val, getAlign());
       }
 
       _repositionResizer();
@@ -732,15 +1573,32 @@
     }
 
     /**
-     * Refresh the image display selected option.
+     * Refresh the video display selected option.
      */
     function refreshDisplayOnShow ($btn, $dropdown) {
-      var d = 'block';
-      if ($current_video.hasClass('fr-dvi')) {
-        d = 'inline';
+      if ($current_video) {
+        $dropdown.find('.fr-command[data-param1="' + getDisplay() + '"]').addClass('fr-active').attr('aria-selected', true);
+      }
+    }
+
+    /**
+     * Show the replace popup.
+     */
+
+    function replace () {
+      var $popup = editor.popups.get('video.insert');
+      if (!$popup) $popup = _initInsertPopup();
+
+      if (!editor.popups.isVisible('video.insert')) {
+        hideProgressBar();
+        editor.popups.refresh('video.insert');
+        editor.popups.setContainer('video.insert', editor.$sc);
       }
 
-      $dropdown.find('.fr-command[data-param1="' + d + '"]').addClass('fr-active');
+      var left = $current_video.offset().left + $current_video.width() / 2;
+      var top = $current_video.offset().top + $current_video.height();
+
+      editor.popups.show('video.insert', left, top, $current_video.outerHeight());
     }
 
     /**
@@ -765,47 +1623,85 @@
     }
 
     /**
+     * Hide image upload popup.
+     */
+
+    function _hideInsertPopup () {
+      hideProgressBar();
+    }
+
+    function _setStyle ($video, _display, _align) {
+      if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
+        $video.removeClass('fr-fvl fr-fvr fr-dvb fr-dvi');
+        $video.addClass('fr-fv' + _align[0] + ' fr-dv' + _display[0]);
+      }
+      else {
+        if (_display == 'inline') {
+          $video.css({
+            display: 'inline-block'
+          })
+
+          if (_align == 'center') {
+            $video.css({
+              'float': 'none'
+            })
+          }
+          else if (_align == 'left') {
+            $video.css({
+              'float': 'left'
+            })
+          }
+          else {
+            $video.css({
+              'float': 'right'
+            })
+          }
+        }
+        else {
+          $video.css({
+            display: 'block',
+            clear: 'both'
+          })
+
+          if (_align == 'left') {
+            $video.css({
+              textAlign: 'left'
+            })
+          }
+          else if (_align == 'right') {
+            $video.css({
+              textAlign: 'right'
+            })
+          }
+          else {
+            $video.css({
+              textAlign: 'center'
+            })
+          }
+        }
+      }
+    }
+
+    /**
      * Convert style to classes.
      */
     function _convertStyleToClasses ($video) {
       if (!$video.hasClass('fr-dvi') && !$video.hasClass('fr-dvb')) {
-        var flt = $video.css('float');
-        $video.css('float', 'none');
-        if ($video.css('display') == 'block') {
-          $video.css('float', flt);
-          if (parseInt($video.css('margin-left'), 10) === 0 && ($video.attr('style') || '').indexOf('margin-right: auto') >= 0) {
-            $video.addClass('fr-fvl');
-          }
-          else if (parseInt($video.css('margin-right'), 10) === 0 && ($video.attr('style') || '').indexOf('margin-left: auto') >= 0) {
-            $video.addClass('fr-fvr');
-          }
-
-          $video.addClass('fr-dvb');
-        }
-        else {
-          $video.css('float', flt);
-          if ($video.css('float') == 'left') {
-            $video.addClass('fr-fvl');
-          }
-          else if ($video.css('float') == 'right') {
-            $video.addClass('fr-fvr');
-          }
-
-          $video.addClass('fr-dvi');
-        }
-
-        $video.css('margin', '');
-        $video.css('float', '');
-        $video.css('display', '');
-        $video.css('z-index', '');
-        $video.css('position', '');
-        $video.css('overflow', '');
-        $video.css('vertical-align', '');
+        $video.addClass('fr-fi' + getAlign($video)[0]);
+        $video.addClass('fr-di' + getDisplay($video)[0]);
       }
+    }
 
-      if (!editor.opts.videoTextNear) {
-        $video.removeClass('fr-dvi').addClass('fr-dvb');
-      }
+    /**
+     * Convert classes to style.
+     */
+    function _convertClassesToStyle ($video) {
+      var d = $video.hasClass('fr-dvb') ? 'block' : $video.hasClass('fr-dvi') ? 'inline' : null;
+      var a = $video.hasClass('fr-fvl') ? 'left' : $video.hasClass('fr-fvr') ? 'right' : getAlign($video);
+
+      _setStyle($video, d, a);
+
+      $video.removeClass('fr-dvb fr-dvi fr-fvr fr-fvl');
     }
 
     /**
@@ -836,9 +1732,21 @@
         return $(this).parents('object').length === 0 ? this : $(this).parents('object').get(0);
       }).wrap('<span class="fr-video" contenteditable="false"></span>');
 
-      var videos = editor.$el.find('span.fr-video');
+      var videos = editor.$el.find('span.fr-video, video');
+
       for (var i = 0; i < videos.length; i++) {
-        _convertStyleToClasses($(videos[i]));
+        var $video = $(videos[i]);
+
+        if (!editor.opts.htmlUntouched && editor.opts.useClasses) {
+          _convertStyleToClasses($video);
+
+          if (!editor.opts.videoTextNear) {
+            $video.removeClass('fr-dvi').addClass('fr-dvb');
+          }
+        }
+        else if (!editor.opts.htmlUntouched && !editor.opts.useClasses) {
+          _convertClassesToStyle($video);
+        }
       }
 
       videos.toggleClass('fr-draggable', editor.opts.videoMove);
@@ -879,8 +1787,24 @@
           return false;
         }
 
-        if ($current_video && !editor.keys.ctrlKey(e)) {
+        if ($current_video && key_code != $.FE.KEYCODE.F10 && !editor.keys.isBrowserAction(e)) {
           e.preventDefault();
+          return false;
+        }
+      }, true);
+
+      // ESC from accessibility.
+      editor.events.on('toolbar.esc', function () {
+        if ($current_video) {
+          editor.events.disableBlur();
+          editor.events.focus();
+          return false;
+        }
+      }, true);
+
+      // focusEditor from accessibility.
+      editor.events.on('toolbar.focusEditor', function () {
+        if ($current_video) {
           return false;
         }
       }, true);
@@ -895,10 +1819,24 @@
     }
 
     /**
+     * Place selection around current video.
+     */
+    function _selectVideo () {
+      if ($current_video) {
+        editor.selection.clear();
+        var range = editor.doc.createRange();
+        range.selectNode($current_video.get(0));
+        var selection = editor.selection.get();
+        selection.addRange(range);
+      }
+    }
+
+    /**
      * Get back to the video main popup.
      */
     function back () {
       if ($current_video) {
+        editor.events.disableBlur();
         $current_video.trigger('click');
       }
       else {
@@ -924,7 +1862,7 @@
         if ($video_obj.get(0).style.width) $video_obj.removeAttr('width');
         if ($video_obj.get(0).style.height) $video_obj.removeAttr('height');
 
-        $popup.find('input').blur();
+        $popup.find('input:focus').blur();
         setTimeout(function () {
           $current_video.trigger('click');
         }, editor.helpers.isAndroid() ? 50 : 0);
@@ -941,6 +1879,8 @@
       showLayer: showLayer,
       refreshByURLButton: refreshByURLButton,
       refreshEmbedButton: refreshEmbedButton,
+      refreshUploadButton: refreshUploadButton,
+      upload: upload,
       insertByURL: insertByURL,
       insertEmbed: insertEmbed,
       insert: insert,
@@ -950,7 +1890,9 @@
       display: display,
       refreshDisplayOnShow: refreshDisplayOnShow,
       remove: remove,
+      hideProgressBar: hideProgressBar,
       showSizePopup: showSizePopup,
+      replace: replace,
       back: back,
       setSize: setSize,
       get: get
@@ -969,7 +1911,7 @@
         this.video.showInsertPopup();
       }
       else {
-        if (this.$el.find('.fr-marker')) {
+        if (this.$el.find('.fr-marker').length) {
           this.events.disableBlur();
           this.selection.restore();
         }
@@ -984,12 +1926,13 @@
     NAME: 'video-camera'
   });
 
-  // Image by URL button inside the insert image popup.
+  // Video by URL button inside the insert video popup.
   $.FE.DefineIcon('videoByURL', { NAME: 'link' });
   $.FE.RegisterCommand('videoByURL', {
     title: 'By URL',
     undo: false,
     focus: false,
+    toggle: true,
     callback: function () {
       this.video.showLayer('video-by-url');
     },
@@ -998,17 +1941,33 @@
     }
   })
 
-  // Image by URL button inside the insert image popup.
+  // Video embed button inside the insert video popup.
   $.FE.DefineIcon('videoEmbed', { NAME: 'code' });
   $.FE.RegisterCommand('videoEmbed', {
     title: 'Embedded Code',
     undo: false,
     focus: false,
+    toggle: true,
     callback: function () {
       this.video.showLayer('video-embed');
     },
     refresh: function ($btn) {
       this.video.refreshEmbedButton($btn);
+    }
+  })
+
+  // Video upload button inside the insert video popup.
+  $.FE.DefineIcon('videoUpload', { NAME: 'upload' });
+  $.FE.RegisterCommand('videoUpload', {
+    title: 'Upload Video',
+    undo: false,
+    focus: false,
+    toggle: true,
+    callback: function () {
+      this.video.showLayer('video-upload');
+    },
+    refresh: function ($btn) {
+      this.video.refreshUploadButton($btn);
     }
   })
 
@@ -1028,7 +1987,7 @@
     }
   })
 
-  // Image display.
+  // Video display.
   $.FE.DefineIcon('videoDisplay', { NAME: 'star' })
   $.FE.RegisterCommand('videoDisplay', {
     title: 'Display',
@@ -1048,22 +2007,28 @@
     }
   })
 
-  // Image align.
+  // Video align.
+  $.FE.DefineIcon('video-align', { NAME: 'align-left' });
+  $.FE.DefineIcon('video-align-left', { NAME: 'align-left' });
+  $.FE.DefineIcon('video-align-right', { NAME: 'align-right' });
+  $.FE.DefineIcon('video-align-center', { NAME: 'align-justify' });
+
+  // Video align.
   $.FE.DefineIcon('videoAlign', { NAME: 'align-center' })
   $.FE.RegisterCommand('videoAlign', {
     type: 'dropdown',
     title: 'Align',
     options: {
       left: 'Align Left',
-      justify: 'None',
+      center: 'None',
       right: 'Align Right'
     },
     html: function () {
-      var c = '<ul class="fr-dropdown-list">';
+      var c = '<ul class="fr-dropdown-list" role="presentation">';
       var options =  $.FE.COMMANDS.videoAlign.options;
       for (var val in options) {
         if (options.hasOwnProperty(val)) {
-          c += '<li><a class="fr-command fr-title" data-cmd="videoAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('align-' + val) + '</a></li>';
+          c += '<li role="presentation"><a class="fr-command fr-title" tabIndex="-1" role="option" data-cmd="videoAlign" data-param1="' + val + '" title="' + this.language.translate(options[val]) + '">' + this.icon.create('video-align-' + val) + '<span class="fr-sr-only">' + this.language.translate(options[val]) + '</span></a></li>';
         }
       }
       c += '</ul>';
@@ -1081,6 +2046,21 @@
     }
   })
 
+  // Video replace.
+  $.FE.DefineIcon('videoReplace', {
+    NAME: 'exchange'
+  })
+  $.FE.RegisterCommand('videoReplace', {
+    title: 'Replace',
+    undo: false,
+    focus: false,
+    popup: true,
+    refreshAfterCallback: false,
+    callback: function () {
+      this.video.replace();
+    }
+  })
+
   // Video remove.
   $.FE.DefineIcon('videoRemove', { NAME: 'trash' })
   $.FE.RegisterCommand('videoRemove', {
@@ -1095,6 +2075,7 @@
   $.FE.RegisterCommand('videoSize', {
     undo: false,
     focus: false,
+    popup: true,
     title: 'Change Size',
     callback: function () {
       this.video.showSizePopup();
@@ -1124,9 +2105,19 @@
     }
   });
 
+  $.FE.RegisterCommand('videoDismissError', {
+    title: 'OK',
+    undo: false,
+    callback: function () {
+      this.video.hideProgressBar(true);
+    }
+  })
+
   $.FE.RegisterCommand('videoSetSize', {
     undo: true,
     focus: false,
+    title: 'Update',
+    refreshAfterCallback: false,
     callback: function () {
       this.video.setSize();
     }

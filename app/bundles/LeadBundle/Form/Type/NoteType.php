@@ -11,32 +11,23 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
-// use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 /**
  * Class NoteType.
  */
 class NoteType extends AbstractType
 {
-    private $translator;
-    private $em;
     private $dateHelper;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function __construct()
     {
-        $this->translator = $factory->getTranslator();
-        $this->em         = $factory->getEntityManager();
-        $this->dateHelper = $factory->getDate();
+        $this->dateHelper = new DateTimeHelper();
     }
 
     /**

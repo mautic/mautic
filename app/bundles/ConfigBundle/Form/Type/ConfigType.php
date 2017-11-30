@@ -11,12 +11,12 @@
 
 namespace Mautic\ConfigBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ConfigType.
@@ -24,16 +24,18 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ConfigType extends AbstractType
 {
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var RestrictionHelper
      */
-    private $translator;
+    private $restrictionHelper;
 
     /**
-     * @param MauticFactory $factory
+     * ConfigType constructor.
+     *
+     * @param RestrictionHelper $restrictionHelper
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(RestrictionHelper $restrictionHelper)
     {
-        $this->translator = $factory->getTranslator();
+        $this->restrictionHelper = $restrictionHelper;
     }
 
     /**
@@ -42,43 +44,38 @@ class ConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['data'] as $config) {
-            if (isset($config['formAlias']) && isset($config['parameters'])) {
-                $builder->add($config['formAlias'], $config['formAlias'], [
-                    'data' => $config['parameters'],
-                ]);
+            if (isset($config['formAlias']) && !empty($config['parameters'])) {
+                $checkThese = array_intersect(array_keys($config['parameters']), $options['fileFields']);
+                foreach ($checkThese as $checkMe) {
+                    // Unset base64 encoded values
+                    unset($config['parameters'][$checkMe]);
+                }
+                $builder->add(
+                    $config['formAlias'],
+                    $config['formAlias'],
+                    [
+                        'data' => $config['parameters'],
+                    ]
+                );
             }
         }
 
-        $translator = $this->translator;
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options, $translator) {
-            $form = $event->getForm();
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            function (FormEvent $event) use ($options) {
+                $form = $event->getForm();
 
-            foreach ($form as $config => $configForm) {
-                foreach ($configForm as $key => $child) {
-                    if (in_array($key, $options['doNotChange'])) {
-                        if ($options['doNotChangeDisplayMode'] == 'mask') {
-                            $fieldOptions = $child->getConfig()->getOptions();
-
-                            $configForm->add($key, 'text', [
-                                'label'    => $fieldOptions['label'],
-                                'required' => false,
-                                'mapped'   => false,
-                                'disabled' => true,
-                                'attr'     => [
-                                    'placeholder' => $translator->trans('mautic.config.restricted'),
-                                    'class'       => 'form-control',
-                                ],
-                                'label_attr' => ['class' => 'control-label'],
-                            ]);
-                        } elseif ($options['doNotChangeDisplayMode'] == 'remove') {
-                            $configForm->remove($key);
-                        }
+                foreach ($form as $config => $configForm) {
+                    foreach ($configForm as $child) {
+                        $this->restrictionHelper->applyRestrictions($child, $configForm);
                     }
                 }
             }
-        });
+        );
 
-        $builder->add('buttons', 'form_buttons',
+        $builder->add(
+            'buttons',
+            'form_buttons',
             [
                 'apply_onclick' => 'Mautic.activateBackdrop()',
                 'save_onclick'  => 'Mautic.activateBackdrop()',
@@ -99,15 +96,14 @@ class ConfigType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired([
-            'doNotChange',
-            'doNotChangeDisplayMode',
-        ]);
+        $resolver->setDefaults(
+            [
+                'fileFields' => [],
+            ]
+        );
     }
 }

@@ -26,8 +26,11 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function reorderFieldsAction(Request $request, $name = 'fields')
+    protected function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
     {
+        if ('form' === $name) {
+            $name = 'fields';
+        }
         $dataArray   = ['success' => 0];
         $sessionId   = InputHelper::clean($request->request->get('formId'));
         $sessionName = 'mautic.form.'.$sessionId.'.'.$name.'.modified';
@@ -75,7 +78,22 @@ class AjaxController extends CommonAjaxController
                 $options    = [];
 
                 if (!empty($properties['list']['list'])) {
-                    $options = $properties['list']['list'];
+                    //If the field is a SELECT field then the data gets stored in [list][list]
+                    $optionList = $properties['list']['list'];
+                } elseif (!empty($properties['optionlist']['list'])) {
+                    //If the field is a radio or a checkbox then it will be stored in [optionlist][list]
+                    $optionList = $properties['optionlist']['list'];
+                }
+                if (!empty($optionList)) {
+                    foreach ($optionList as $listItem) {
+                        if (is_array($listItem) && isset($listItem['value']) && isset($listItem['label'])) {
+                            //The select box needs values to be [value] => label format so make sure we have that style then put it in
+                            $options[$listItem['value']] = $listItem['label'];
+                        } elseif (!is_array($listItem)) {
+                            //Keeping for BC
+                            $options[] = $listItem;
+                        }
+                    }
                 }
 
                 $fields[] = [

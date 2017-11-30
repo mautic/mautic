@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-use \Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 $formName = '_'.strtolower(
         InputHelper::alphanum(
@@ -20,7 +20,11 @@ $formName = '_'.strtolower(
 $jsFormName = ltrim($formName, '_');
 $fields     = $form->getFields();
 $required   = [];
+?>
 
+<!-- START FOCUS FORM -->
+
+<?php
 if (empty($preview)):
     echo $view->render('MauticFormBundle:Builder:script.html.php', ['form' => $form, 'formName' => $formName]); ?>
 
@@ -40,8 +44,8 @@ if (empty($preview)):
             var headline = document.getElementsByClassName('mf-headline');
             if (headline.length) {
                 headline[0].style.display = "none";
-
             }
+
             var tagline = document.getElementsByClassName('mf-tagline');
             if (tagline.length) {
                 tagline[0].style.display = "none";
@@ -101,57 +105,25 @@ if (empty($preview)):
 
                     return true;
                 }
+
+                return false;
             }
         }
     </script>
-
-    <div id="mauticform_wrapper<?php echo $formName ?>" class="mauticform_wrapper">
-        <form autocomplete="false" role="form" method="post" action="<?php echo $view['router']->url(
-            'mautic_form_postresults',
-            ['formId' => $form->getId()],
-            true
-        ); ?>" id="mauticform<?php echo $formName ?>" data-mautic-form="<?php echo $jsFormName; ?>">
-            <div class="mauticform-error" id="mauticform<?php echo $formName ?>_error"></div>
-            <div class="mauticform-message" id="mauticform<?php echo $formName ?>_message"></div>
-            <div class="mauticform-innerform">
-                <?php
-                endif;
-
-                /** @var \Mautic\FormBundle\Entity\Field $f */
-                foreach ($fields as $f):
-                    if ($f->isCustom()):
-                        $params   = $f->getCustomParameters();
-                        $template = $params['template'];
-                    else:
-                        $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
-                    endif;
-
-                    // Hide the label and make it a placeholder instead
-                    $placeholder = '';
-                    if ($f->getType() != 'radiogrp' && $f->getType() != 'checkboxgrp' && $f->showLabel()) {
-                        $f->setShowLabel(false);
-
-                        // Show a placeholder instead
-                        $properties = $f->getProperties();
-                        if (array_key_exists('placeholder', $properties) && empty($properties['placeholder'])) {
-                            $properties['placeholder'] = $f->getLabel();
-                            $f->setProperties($properties);
-                        }
-                    }
-
-                    echo $view->render($template, ['field' => $f->convertToArray(), 'id' => $f->getAlias()]);
-                endforeach;
-
-                if (empty($preview)):
-                ?>
-
-                <input type="hidden" name="mauticform[formId]" id="mauticform<?php echo $formName ?>_id" value="<?php echo $form->getId(); ?>"/>
-                <input type="hidden" name="mauticform[return]" id="mauticform<?php echo $formName ?>_return" value=""/>
-                <input type="hidden" name="mauticform[formName]" id="mauticform<?php echo $formName ?>_name" value="<?php echo $jsFormName; ?>"/>
-
-                <input type="hidden" name="mauticform[focusId]" id="mauticform<?php echo $formName ?>_focus_id" value="<?php echo $focusId; ?>"/>
-
-            </div>
-        </form>
-    </div>
 <?php endif; ?>
+
+<?php
+$formExtra = <<<EXTRA
+<input type="hidden" name="mauticform[focusId]" id="mauticform<?php echo $formName ?>_focus_id" value="$focusId"/>
+EXTRA;
+
+echo $view->render('MauticFormBundle:Builder:form.html.php', [
+        'form'      => $form,
+        'formExtra' => $formExtra,
+        'action'    => ($preview) ? '#' : null,
+        'suffix'    => '_focus',
+    ]
+);
+?>
+
+<!-- END FOCUS FORM -->

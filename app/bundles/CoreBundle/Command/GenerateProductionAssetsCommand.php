@@ -51,9 +51,17 @@ EOT
 
         // Minify Mautic Form SDK
         file_put_contents(
-            $pathsHelper->getSystemPath('assets', true).'/js/mautic-form.js',
+            $pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js',
             \Minify::combine([$pathsHelper->getSystemPath('assets', true).'/js/mautic-form-src.js'])
         );
+        // Fix the MauticSDK loader
+        file_put_contents(
+            $pathsHelper->getSystemPath('assets', true).'/js/mautic-form.js',
+            str_replace("'mautic-form-src.js'", "'mautic-form.js'",
+                file_get_contents($pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js'))
+        );
+        // Remove temp file.
+        unlink($pathsHelper->getSystemPath('assets', true).'/js/mautic-form-tmp.js');
 
         /** @var \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator */
         $translator = $container->get('translator');

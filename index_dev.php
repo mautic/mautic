@@ -11,7 +11,6 @@ define('MAUTIC_ROOT_DIR', __DIR__);
 date_default_timezone_set('UTC');
 
 use Mautic\Middleware\MiddlewareBuilder;
-use Symfony\Component\Debug\Debug;
 
 $loader = require_once __DIR__.'/vendor/autoload.php';
 
@@ -21,7 +20,7 @@ $loader = require_once __DIR__.'/vendor/autoload.php';
  */
 //umask(0000);
 
-Debug::enable();
+\Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('dev');
 
 $kernel = new AppKernel('dev', true);
 $kernel->loadClassCache();

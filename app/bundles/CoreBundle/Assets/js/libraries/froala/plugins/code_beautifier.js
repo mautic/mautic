@@ -1,7 +1,7 @@
 /*!
- * froala_editor v2.3.4 (https://www.froala.com/wysiwyg-editor)
+ * froala_editor v2.4.2 (https://www.froala.com/wysiwyg-editor)
  * License https://froala.com/wysiwyg-editor/terms/
- * Copyright 2014-2016 Froala Labs
+ * Copyright 2014-2017 Froala Labs
  */
 
 (function (factory) {
@@ -32,7 +32,7 @@
     }
 }(function ($) {
 
-  'use strict';
+  
 
   $.FE.PLUGINS.codeBeautifier = function () {
     /**
@@ -1361,7 +1361,7 @@
     }
 
     function js_beautify(js_source_text, options) {
-        "use strict";
+        
         var beautifier = new Beautifier(js_source_text, options);
         return beautifier.beautify();
     }
@@ -1377,7 +1377,7 @@
         };
 
     function Beautifier(js_source_text, options) {
-        "use strict";
+        
         var output
         var tokens = [], token_pos;
         var Tokenizer;

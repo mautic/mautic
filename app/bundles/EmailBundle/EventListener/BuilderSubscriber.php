@@ -12,7 +12,9 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -91,12 +93,6 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        if ($event->tokenSectionsRequested()) {
-            //add email tokens
-            $content = $this->templating->render('MauticEmailBundle:SubscribedEvents\EmailToken:token.html.php');
-            $event->addTokenSection('email.emailtokens', 'mautic.email.builder.index', $content);
-        }
-
         if ($event->abTestWinnerCriteriaRequested()) {
             //add AB Test Winner Criteria
             $openRate = [
@@ -142,35 +138,103 @@ class BuilderSubscriber extends CommonSubscriber
         if ($event->slotTypesRequested()) {
             $event->addSlotType(
                 'text',
-                'Text',
+                $this->translator->trans('mautic.core.slot.label.text'),
                 'font',
                 'MauticCoreBundle:Slots:text.html.php',
-                'slot',
+                SlotTextType::class,
                 1000
             );
             $event->addSlotType(
                 'image',
-                'Image',
+                $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
                 'MauticCoreBundle:Slots:image.html.php',
-                'slot',
+                'slot_image',
                 900
             );
             $event->addSlotType(
+                'imagecard',
+                $this->translator->trans('mautic.core.slot.label.imagecard'),
+                'id-card-o',
+                'MauticCoreBundle:Slots:imagecard.html.php',
+                'slot_imagecard',
+                870
+            );
+            $event->addSlotType(
+                'imagecaption',
+                $this->translator->trans('mautic.core.slot.label.imagecaption'),
+                'image',
+                'MauticCoreBundle:Slots:imagecaption.html.php',
+                'slot_imagecaption',
+                850
+            );
+            $event->addSlotType(
                 'button',
-                'Button',
+                $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
                 'MauticCoreBundle:Slots:button.html.php',
                 'slot_button',
                 800
             );
             $event->addSlotType(
+                'socialfollow',
+                $this->translator->trans('mautic.core.slot.label.socialfollow'),
+                'twitter',
+                'MauticCoreBundle:Slots:socialfollow.html.php',
+                'slot_socialfollow',
+                600
+            );
+            $event->addSlotType(
+                'codemode',
+                $this->translator->trans('mautic.core.slot.label.codemode'),
+                'code',
+                'MauticCoreBundle:Slots:codemode.html.php',
+                'slot_codemode',
+                500
+            );
+            $event->addSlotType(
                 'separator',
-                'Separator',
+                $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
                 'MauticCoreBundle:Slots:separator.html.php',
-                'slot',
-                700
+                'slot_separator',
+                400
+            );
+
+            $event->addSlotType(
+                'dynamicContent',
+                $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
+                'tag',
+                'MauticCoreBundle:Slots:dynamiccontent.html.php',
+                'slot_dynamiccontent',
+                300
+            );
+        }
+
+        if ($event->sectionsRequested()) {
+            $event->addSection(
+                'one-column',
+                $this->translator->trans('mautic.core.slot.label.onecolumn'),
+                'file-text-o',
+                'MauticCoreBundle:Sections:one-column.html.php',
+                null,
+                1000
+            );
+            $event->addSection(
+                'two-column',
+                $this->translator->trans('mautic.core.slot.label.twocolumns'),
+                'columns',
+                'MauticCoreBundle:Sections:two-column.html.php',
+                null,
+                900
+            );
+            $event->addSection(
+                'three-column',
+                $this->translator->trans('mautic.core.slot.label.threecolumns'),
+                'th',
+                'MauticCoreBundle:Sections:three-column.html.php',
+                null,
+                800
             );
         }
     }
@@ -194,7 +258,7 @@ class BuilderSubscriber extends CommonSubscriber
             $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
         }
         $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]), $unsubscribeText);
-        $event->addToken('{unsubscribe_text}', $unsubscribeText);
+        $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
 
         $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]));
 
@@ -203,7 +267,7 @@ class BuilderSubscriber extends CommonSubscriber
             $webviewText = $this->translator->trans('mautic.email.webview.text', ['%link%' => '|URL|']);
         }
         $webviewText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_webview', ['idHash' => $idHash]), $webviewText);
-        $event->addToken('{webview_text}', $webviewText);
+        $event->addToken('{webview_text}', EmojiHelper::toHtml($webviewText));
 
         // Show public email preview if the lead is not known to prevent 404
         if (empty($lead['id']) && $email) {
@@ -214,19 +278,10 @@ class BuilderSubscriber extends CommonSubscriber
 
         $signatureText = $this->coreParametersHelper->getParameter('default_signature_text');
         $fromName      = $this->coreParametersHelper->getParameter('mailer_from_name');
-
-        if (!empty($lead['owner_id'])) {
-            $owner = $this->factory->getModel('lead')->getRepository()->getLeadOwner($lead['owner_id']);
-            if ($owner && !empty($owner['signature'])) {
-                $fromName      = $owner['first_name'].' '.$owner['last_name'];
-                $signatureText = $owner['signature'];
-            }
-        }
-
         $signatureText = str_replace('|FROM_NAME|', $fromName, nl2br($signatureText));
-        $event->addToken('{signature}', $signatureText);
+        $event->addToken('{signature}', EmojiHelper::toHtml($signatureText));
 
-        $event->addToken('{subject}', $event->getSubject());
+        $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
     }
 
     /**
@@ -236,15 +291,18 @@ class BuilderSubscriber extends CommonSubscriber
      */
     public function convertUrlsToTokens(EmailSendEvent $event)
     {
-        if ($event->isInternalSend()) {
-            // Don't convert for previews, example emails, etc
-
+        if ($event->isInternalSend() || $this->coreParametersHelper->getParameter('disable_trackable_urls')) {
+            // Don't convert urls
             return;
         }
 
         $email   = $event->getEmail();
         $emailId = ($email) ? $email->getId() : null;
+        if (!$email instanceof Email) {
+            $email = $this->emailModel->getEntity($emailId);
+        }
 
+        $utmTags      = $email->getUtmTags();
         $clickthrough = $event->generateClickthrough();
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
@@ -255,9 +313,9 @@ class BuilderSubscriber extends CommonSubscriber
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
                 ?
-                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough)
+                $this->pageTrackableModel->generateTrackableUrl($trackable, $clickthrough, false, $utmTags)
                 :
-                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough);
+                $this->pageRedirectModel->generateRedirectUrl($trackable, $clickthrough, false, $utmTags);
 
             $event->addToken($token, $url);
         }

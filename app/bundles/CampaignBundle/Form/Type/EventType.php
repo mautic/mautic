@@ -12,6 +12,7 @@
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
+use Mautic\CoreBundle\Form\Type\PropertiesTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,6 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EventType extends AbstractType
 {
+    use PropertiesTrait;
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -57,7 +60,9 @@ class EventType extends AbstractType
                 'date'      => 'mautic.campaign.form.type.date',
             ];
 
-            if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['eventType']) {
+            if ('no' == $options['data']['anchor'] && 'condition' != $options['data']['anchorEventType']
+                && 'condition' != $options['data']['eventType']
+            ) {
                 $label .= '_inaction';
 
                 unset($choices['immediate']);
@@ -82,6 +87,7 @@ class EventType extends AbstractType
                     'required'    => false,
                     'attr'        => [
                         'onchange' => 'Mautic.campaignToggleTimeframes();',
+                        'tooltip'  => 'mautic.campaign.form.type.help',
                     ],
                     'data' => $triggerMode,
                 ]
@@ -143,22 +149,19 @@ class EventType extends AbstractType
         }
 
         if (!empty($options['settings']['formType'])) {
-            $properties      = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
-            $formTypeOptions = [
-                'label' => false,
-                'data'  => $properties,
-            ];
-            if (isset($options['settings']['formTypeCleanMasks'])) {
-                $masks['properties'] = $options['settings']['formTypeCleanMasks'];
-            }
-            if (!empty($options['settings']['formTypeOptions'])) {
-                $formTypeOptions = array_merge($formTypeOptions, $options['settings']['formTypeOptions']);
-            }
-            $builder->add('properties', $options['settings']['formType'], $formTypeOptions);
+            $this->addPropertiesType($builder, $options, $masks);
         }
 
         $builder->add('type', 'hidden');
         $builder->add('eventType', 'hidden');
+        $builder->add(
+            'anchorEventType',
+            'hidden',
+            [
+                'mapped' => false,
+                'data'   => (isset($options['data']['anchorEventType'])) ? $options['data']['anchorEventType'] : '',
+            ]
+        );
 
         $builder->add(
             'canvasSettings',
@@ -168,7 +171,7 @@ class EventType extends AbstractType
             ]
         );
 
-        $update = !empty($properties);
+        $update = !empty($options['data']['properties']);
         if (!empty($update)) {
             $btnValue = 'mautic.core.form.update';
             $btnIcon  = 'fa fa-pencil';

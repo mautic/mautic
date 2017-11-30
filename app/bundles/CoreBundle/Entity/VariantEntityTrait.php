@@ -256,8 +256,9 @@ trait VariantEntityTrait
     /**
      * Get an array of all IDs for parent/child variants and associated translations if applicable.
      *
-     * @param VariantEntityInterface $entity
-     * @param bool                   $publishedOnly
+     * @param bool $publishedOnly
+     *
+     * @return array
      */
     public function getRelatedEntityIds($publishedOnly = false)
     {
