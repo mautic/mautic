@@ -113,6 +113,7 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
      */
     public function getMaxBatchLimit()
     {
+        //Sengrid allows to include max 1000 email address into 1 batch
         return 1000;
     }
 
@@ -127,7 +128,9 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        return count($message->getTo());
+        //Sengrid counts all email address (to, cc and bcc)
+        //https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/errors.html#message.personalizations
+        return count($message->getTo()) + count($message->getCc()) + count($message->getBcc()) + $toBeAdded;
     }
 
     /**
