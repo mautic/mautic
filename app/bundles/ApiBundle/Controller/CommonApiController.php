@@ -405,6 +405,10 @@ class CommonApiController extends FOSRestController implements MauticController
             $args['filter']['where'] = $where;
         }
 
+        if ($order = $this->getOrderFromRequest()) {
+            $args['filter']['order'] = $order;
+        }
+
         $results = $this->model->getEntities($args);
 
         list($entities, $totalCount) = $this->prepareEntitiesForView($results);
@@ -433,6 +437,16 @@ class CommonApiController extends FOSRestController implements MauticController
         $this->sanitizeWhereClauseArrayFromRequest($where);
 
         return $where;
+    }
+
+    /**
+     * Sanitizes and returns an array of ORDER statements from the request.
+     *
+     * @return array
+     */
+    protected function getOrderFromRequest()
+    {
+        return InputHelper::cleanArray($this->request->get('order', []));
     }
 
     /**
