@@ -8,9 +8,9 @@ use Psr\Http\Message\ResponseInterface;
 
 class PipedriveApi extends CrmApi
 {
-    const ORGANIZATIONS_API_ENDPOINT = 'organizations';
-    const PERSONS_API_ENDPOINT       = 'persons';
-    const USERS_API_ENDPOINT             = 'users';
+    const ORGANIZATIONS_API_ENDPOINT         = 'organizations';
+    const PERSONS_API_ENDPOINT               = 'persons';
+    const USERS_API_ENDPOINT                 = 'users';
     /**
      * @var TransportInterface
      */
@@ -111,6 +111,7 @@ class PipedriveApi extends CrmApi
 
     /**
      * @param  $email
+     *
      * @return array
      */
     public function findByEmail($email)
@@ -119,7 +120,7 @@ class PipedriveApi extends CrmApi
 
         $params = [
             'query' => array_merge($this->getAuthQuery(), [
-                'term' => $email,
+                'term'            => $email,
                 'search_by_email' => true,
             ]),
         ];
@@ -128,7 +129,6 @@ class PipedriveApi extends CrmApi
 
         return $this->getResponseData($response);
     }
-
 
     /**
      * @return array
@@ -163,6 +163,7 @@ class PipedriveApi extends CrmApi
 
         return $this->getResponseData($response);
     }
+
     /**
      * @param ResponseInterface $response
      *
