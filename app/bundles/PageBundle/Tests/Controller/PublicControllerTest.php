@@ -27,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 
-class PublicController extends \PHPUnit_Framework_TestCase
+class PublicControllerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Test that the appropriate variant is displayed based on hit counts and variant weights.
