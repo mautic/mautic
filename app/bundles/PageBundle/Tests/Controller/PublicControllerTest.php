@@ -12,6 +12,7 @@
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -174,8 +175,6 @@ class PublicControllerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($pageEntityA));
         $pageModel->method('hitPage')
             ->will($this->returnValue(true));
-        $pageModel->method('generateHit')
-            ->will($this->returnValue(new Hit()));
 
         $leadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
@@ -188,6 +187,19 @@ class PublicControllerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $dispatcher = new EventDispatcher();
+
+        $modelFactory = $this->getMockBuilder(ModelFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $modelFactory->method('getModel')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['page', $pageModel],
+                        ['lead', $leadModel],
+                    ]
+                )
+            );
 
         $container = $this->getMockBuilder(Container::class)
             ->disableOriginalConstructor()
@@ -207,6 +219,7 @@ class PublicControllerTest extends \PHPUnit_Framework_TestCase
                         ['mautic.lead.model.lead', Container::EXCEPTION_ON_INVALID_REFERENCE, $leadModel],
                         ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $router],
                         ['event_dispatcher', Container::EXCEPTION_ON_INVALID_REFERENCE, $dispatcher],
+                        ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $modelFactory],
                     ]
                 )
             );
