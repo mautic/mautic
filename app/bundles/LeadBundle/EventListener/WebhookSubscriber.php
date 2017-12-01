@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -32,10 +33,11 @@ class WebhookSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            WebhookEvents::WEBHOOK_ON_BUILD => ['onWebhookBuild', 0],
-            LeadEvents::LEAD_POST_SAVE      => ['onLeadNewUpdate', 0],
-            LeadEvents::LEAD_POINTS_CHANGE  => ['onLeadPointChange', 0],
-            LeadEvents::LEAD_POST_DELETE    => ['onLeadDelete', 0],
+            WebhookEvents::WEBHOOK_ON_BUILD          => ['onWebhookBuild', 0],
+            LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
+            LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
+            LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
+            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED => ['onChannelSubscriptionChange', 0],
         ];
     }
 
@@ -47,40 +49,49 @@ class WebhookSubscriber extends CommonSubscriber
     public function onWebhookBuild(WebhookBuilderEvent $event)
     {
         // add checkbox to the webhook form for new leads
-        $newLead = [
-            'label'       => 'mautic.lead.webhook.event.lead.new',
-            'description' => 'mautic.lead.webhook.event.lead.new_desc',
-        ];
-
-        // add it to the list
-        $event->addEvent(LeadEvents::LEAD_POST_SAVE.'_new', $newLead);
+        $event->addEvent(
+            LeadEvents::LEAD_POST_SAVE.'_new',
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.new',
+                'description' => 'mautic.lead.webhook.event.lead.new_desc',
+            ]
+        );
 
         // checkbox for lead updates
-        $updatedLead = [
-            'label'       => 'mautic.lead.webhook.event.lead.update',
-            'description' => 'mautic.lead.webhook.event.lead.update_desc',
-        ];
-
-        // add it to the list
-        $event->addEvent(LeadEvents::LEAD_POST_SAVE.'_update', $updatedLead);
+        $event->addEvent(
+            LeadEvents::LEAD_POST_SAVE.'_update',
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.update',
+                'description' => 'mautic.lead.webhook.event.lead.update_desc',
+            ]
+        );
 
         // add a checkbox for points
-        $leadPoints = [
-            'label'       => 'mautic.lead.webhook.event.lead.points',
-            'description' => 'mautic.lead.webhook.event.lead.points_desc',
-        ];
-
-        // add the points
-        $event->addEvent(LeadEvents::LEAD_POINTS_CHANGE, $leadPoints);
+        $event->addEvent(
+            LeadEvents::LEAD_POINTS_CHANGE,
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.points',
+                'description' => 'mautic.lead.webhook.event.lead.points_desc',
+            ]
+        );
 
         // lead deleted checkbox label & desc
-        $leadDeleted = [
-            'label'       => 'mautic.lead.webhook.event.lead.deleted',
-            'description' => 'mautic.lead.webhook.event.lead.deleted_desc',
-        ];
+        $event->addEvent(
+            LeadEvents::LEAD_POST_DELETE,
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.deleted',
+                'description' => 'mautic.lead.webhook.event.lead.deleted_desc',
+            ]
+        );
 
-        // add the deleted checkbox
-        $event->addEvent(LeadEvents::LEAD_POST_DELETE, $leadDeleted);
+        // add a checkbox for do not contact changes
+        $event->addEvent(
+            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED,
+            [
+                'label'       => 'mautic.lead.webhook.event.lead.dnc',
+                'description' => 'mautic.lead.webhook.event.lead.dnc_desc',
+            ]
+        );
     }
 
     /**
@@ -153,6 +164,25 @@ class WebhookSubscriber extends CommonSubscriber
                 'userList',
                 'publishDetails',
                 'ipAddress',
+            ]
+        );
+    }
+
+    /**
+     * @param ChannelSubscriptionChange $event
+     */
+    public function onChannelSubscriptionChange(ChannelSubscriptionChange $event)
+    {
+        $this->webhookModel->queueWebhooksByType(
+            LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED,
+            [
+                'contact'    => $event->getLead(),
+                'channel'    => $event->getChannel(),
+                'old_status' => $event->getOldStatusVerb(),
+                'new_status' => $event->getNewStatusVerb(),
+            ],
+            [
+                'leadList',
             ]
         );
     }
