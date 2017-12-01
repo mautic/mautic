@@ -187,22 +187,18 @@ class EmailRepository extends CommonRepository
     {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $dncQb->select('null')
+        $dncQb->select('dnc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $dncQb->expr()->andX(
-                    $dncQb->expr()->eq('dnc.lead_id', 'l.id'),
-                    $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
-                )
+                $dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email'))
             );
 
         // Do not include contacts where the message is pending in the message queue
         $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $mqQb->select('null')
+        $mqQb->select('mq.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq');
 
         $messageExpr = $mqQb->expr()->andX(
-            $mqQb->expr()->eq('mq.lead_id', 'l.id'),
             $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('email')),
             $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT))
         );
@@ -212,29 +208,20 @@ class EmailRepository extends CommonRepository
             ->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
 
-        $statExpr = $statQb->expr()->andX(
-            $statQb->expr()->eq('stat.lead_id', 'l.id')
-        );
-
         if ($variantIds) {
             if (!in_array($emailId, $variantIds)) {
                 $variantIds[] = (int) $emailId;
             }
-            $statExpr->add(
-                $statQb->expr()->in('stat.email_id', $variantIds)
-            );
+            $statQb->where($statQb->expr()->in('stat.email_id', $variantIds));
             $messageExpr->add(
                 $mqQb->expr()->in('mq.channel_id', $variantIds)
             );
         } else {
-            $statExpr->add(
-                $statQb->expr()->eq('stat.email_id', (int) $emailId)
-            );
+            $statQb->where($statQb->expr()->eq('stat.email_id', (int) $emailId));
             $messageExpr->add(
                 $mqQb->expr()->eq('mq.channel_id', (int) $emailId)
             );
         }
-        $statQb->where($statExpr);
         $mqQb->where($messageExpr);
 
         // Only include those who belong to the associated lead lists
@@ -289,9 +276,9 @@ class EmailRepository extends CommonRepository
             $q->innerJoin('l', sprintf('(%s)', $listQb->getSQL()), 'in_list', 'l.id = in_list.lead_id');
         }
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->andWhere(sprintf('NOT EXISTS (%s)', $dncQb->getSQL()))
-            ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
-            ->andWhere(sprintf('NOT EXISTS (%s)', $mqQb->getSQL()))
+            ->andWhere(sprintf('l.id NOT IN (%s)', $dncQb->getSQL()))
+            ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
+            ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
             ->setParameter('false', false, 'boolean');
 
         // Has an email
