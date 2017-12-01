@@ -205,7 +205,7 @@ class EmailRepository extends CommonRepository
 
         // Do not include leads that have already been emailed
         $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('null')
+            ->select('stat.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
 
         if ($variantIds) {
