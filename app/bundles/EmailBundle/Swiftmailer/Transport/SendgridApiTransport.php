@@ -11,11 +11,13 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
+use Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback;
 use Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade;
 use Swift_Events_EventListener;
 use Swift_Mime_Message;
+use Symfony\Component\HttpFoundation\Request;
 
-class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
+class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
     /**
      * @var SendGridApiFacade
@@ -32,9 +34,15 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
      */
     private $started = false;
 
-    public function __construct(SendGridApiFacade $sendGridApiFacade)
+    /**
+     * @var SendGridApiCallback
+     */
+    private $sendGridApiCallback;
+
+    public function __construct(SendGridApiFacade $sendGridApiFacade, SendGridApiCallback $sendGridApiCallback)
     {
-        $this->sendGridApiFacade = $sendGridApiFacade;
+        $this->sendGridApiFacade   = $sendGridApiFacade;
+        $this->sendGridApiCallback = $sendGridApiCallback;
     }
 
     /**
@@ -141,5 +149,25 @@ class SendgridApiTransport implements \Swift_Transport, TokenTransportInterface
     public function getMetadata()
     {
         throw new \Exception('Not implemented');
+    }
+
+    /**
+     * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
+     *
+     * @return mixed
+     */
+    public function getCallbackPath()
+    {
+        return 'sendgrid_api';
+    }
+
+    /**
+     * Processes the response.
+     *
+     * @param Request $request
+     */
+    public function processCallbackRequest(Request $request)
+    {
+        $this->sendGridApiCallback->processCallbackRequest($request);
     }
 }

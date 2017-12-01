@@ -77,6 +77,7 @@ return [
             'mautic_mailer_transport_callback' => [
                 'path'       => '/mailer/{transport}/callback',
                 'controller' => 'MauticEmailBundle:Public:mailerCallback',
+                'method'     => ['GET', 'POST'],
             ],
             'mautic_email_preview' => [
                 'path'       => '/email/preview/{objectId}',
@@ -372,6 +373,7 @@ return [
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
                     'mautic.transport.sendgrid_api.facade',
+                    'mautic.transport.sendgrid_api.calback',
                 ],
             ],
             'mautic.transport.sendgrid_api.facade' => [
@@ -398,6 +400,12 @@ return [
                 'class'     => \SendGrid::class,
                 'arguments' => [
                     '%mautic.mailer_api_key%',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.calback' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback::class,
+                'arguments' => [
+                    'mautic.email.model.transport_callback',
                 ],
             ],
             'mautic.transport.elasticemail' => [
