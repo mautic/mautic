@@ -547,8 +547,15 @@ class ReportSubscriber extends CommonSubscriber
                         ->having(
                             'count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) > 0'
                         )
+                        ->leftJoin(
+                            'e',
+                            MAUTIC_TABLE_PREFIX.'lead_donotcontact',
+                            'dnc',
+                            'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
+                        )
                         ->groupBy('e.id, e.subject')
                         ->orderBy('unsubscribed', 'DESC');
+
                     $limit                  = 10;
                     $offset                 = 0;
                     $items                  = $statRepo->getMostEmails($queryBuilder, $limit, $offset);
@@ -566,6 +573,12 @@ class ReportSubscriber extends CommonSubscriber
                     )
                         ->having(
                             'count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) > 0'
+                        )
+                        ->leftJoin(
+                            'e',
+                            MAUTIC_TABLE_PREFIX.'lead_donotcontact',
+                            'dnc',
+                            'e.id = dnc.channel_id AND dnc.channel=\'email\' AND es.lead_id = dnc.lead_id'
                         )
                         ->groupBy('e.id, e.subject')
                         ->orderBy('bounced', 'DESC');
