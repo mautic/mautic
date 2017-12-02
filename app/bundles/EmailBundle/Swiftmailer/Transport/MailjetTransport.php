@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class MailjetlTransport.
  */
-class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransportInterface
+class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
 {
     private $sandboxMode;
 

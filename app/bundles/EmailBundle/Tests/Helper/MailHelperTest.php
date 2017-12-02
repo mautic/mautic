@@ -17,6 +17,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
+use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -250,6 +251,35 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
         // Validate that the message object only has the contacts for the last "from" group to ensure we aren't sending duplicates
         $this->assertEquals(['contact3@somewhere.com' => null], $mailer->message->getTo());
+    }
+
+    public function testBatchIsEnabledWithBcTokenInterface()
+    {
+        $mockFactory = $this->getMockFactory();
+
+        $transport   = new BcInterfaceTokenTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
+
+        $mailer->setSubject('Hello');
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        $this->assertEmpty($mailer->getErrors()['failures']);
+
+        $fromAddresses = $transport->getFromAddresses();
+        $metadatas     = $transport->getMetadatas();
+
+        $this->assertEquals(3, count($fromAddresses));
+        $this->assertEquals(3, count($metadatas));
     }
 
     public function testGlobalFromThatAllFromAddressesAreTheSame()
