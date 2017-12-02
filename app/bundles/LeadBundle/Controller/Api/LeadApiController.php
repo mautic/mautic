@@ -54,7 +54,7 @@ class LeadApiController extends CommonApiController
      */
     public function newEntityAction()
     {
-        $existingLeads = $this->getExistingLeads();
+        $existingLeads = $this->model->getExistingLeads();
         if (!empty($existingLeads)) {
             $this->request->setMethod('PATCH');
 
@@ -69,7 +69,7 @@ class LeadApiController extends CommonApiController
      */
     public function editEntityAction($id)
     {
-        $existingLeads = $this->getExistingLeads();
+        $existingLeads = $this->model->getExistingLeads();
         if (isset($existingLeads[0]) && $existingLeads[0] instanceof Lead) {
             $entity = $this->model->getEntity($id);
             if ($entity instanceof Lead && $existingLeads[0]->getId() != $entity->getId()) {
@@ -78,33 +78,6 @@ class LeadApiController extends CommonApiController
         }
 
         return parent::editEntityAction($id);
-    }
-
-    /**
-     * Get existing duplicated contacts based on unique fields and the request data.
-     *
-     * @return array
-     */
-    protected function getExistingLeads()
-    {
-        // Check for an email to see if the lead already exists
-        $parameters          = $this->request->request->all();
-        $uniqueLeadFields    = $this->getModel('lead.field')->getUniqueIdentiferFields();
-        $uniqueLeadFieldData = [];
-
-        foreach ($parameters as $k => $v) {
-            if (array_key_exists($k, $uniqueLeadFields) && !empty($v)) {
-                $uniqueLeadFieldData[$k] = $v;
-            }
-        }
-
-        if (count($uniqueLeadFieldData)) {
-            return $this->get('doctrine.orm.entity_manager')->getRepository(
-                'MauticLeadBundle:Lead'
-            )->getLeadsByUniqueFields($uniqueLeadFieldData, null, 1);
-        }
-
-        return [];
     }
 
     /**

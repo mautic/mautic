@@ -1024,6 +1024,31 @@ class LeadModel extends FormModel
     }
 
     /**
+     * Get existing duplicated contacts based on unique fields and the request data.
+     *
+     * @return array
+     */
+    public function getExistingLeads()
+    {
+        // Check for an email to see if the lead already exists
+        $parameters          = $this->request->request->all();
+        $uniqueLeadFields    = $this->getUniqueIdentiferFields();
+        $uniqueLeadFieldData = [];
+
+        foreach ($parameters as $k => $v) {
+            if (array_key_exists($k, $uniqueLeadFields) && !empty($v)) {
+                $uniqueLeadFieldData[$k] = $v;
+            }
+        }
+
+        if (count($uniqueLeadFieldData)) {
+            return $this->getRepository()->getLeadsByUniqueFields($uniqueLeadFieldData, null, 1);
+        }
+
+        return [];
+    }
+
+    /**
      * @param array     $queryFields
      * @param Lead|null $lead
      * @param bool      $returnWithQueryFields
