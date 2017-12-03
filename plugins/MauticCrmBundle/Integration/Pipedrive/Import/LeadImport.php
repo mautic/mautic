@@ -6,13 +6,26 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadImport extends AbstractImport
 {
-    public function __construct(EntityManager $em)
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * LeadImport constructor.
+     *
+     * @param EntityManager $em
+     * @param LeadModel     $leadModel
+     */
+    public function __construct(EntityManager $em, LeadModel $leadModel)
     {
         parent::__construct($em);
+        $this->leadModel = $leadModel;
     }
 
     public function create(array $data = [])
@@ -22,16 +35,16 @@ class LeadImport extends AbstractImport
         if ($integrationEntity) {
             throw new \Exception('Lead already have integration', Response::HTTP_CONFLICT);
         }
-
         $data         = $this->convertPipedriveData($data);
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
 
-        $lead = new Lead();
-
+        if (!$lead =  $this->leadModel->getExistingLead($dataToUpdate)) {
+            $lead = new Lead();
+        }
         foreach ($dataToUpdate as $field => $value) {
             $lead->addUpdatedField($field, $value);
         }
-
+        echo 'test';
         if (isset($data['owner_id'])) {
             $this->addOwnerToLead($data['owner_id'], $lead);
         }
@@ -66,6 +79,13 @@ class LeadImport extends AbstractImport
         $lead         = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
         $data         = $this->convertPipedriveData($data);
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
+
+        $lastSyncDate      = $integrationEntity->getLastSyncDate();
+        $leadDateModified  = $lead->getDateModified();
+
+        if ($lastSyncDate >= $leadDateModified) {
+            return false;
+        } //Do not push lead if it was already synched
 
         foreach ($dataToUpdate as $field => $value) {
             $lead->addUpdatedField($field, $value);

@@ -125,6 +125,7 @@ return [
                 'class'     => 'MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\LeadImport',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic_integration.pipedrive.export.company' => [

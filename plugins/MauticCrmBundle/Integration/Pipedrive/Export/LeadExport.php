@@ -12,13 +12,29 @@ class LeadExport extends AbstractPipedrive
 {
     public function create(Lead $lead)
     {
+        // stop for anynomouse
+        if ($lead->isAnonymous()) {
+            return false;
+        }
+
         $mappedData        = $this->getMappedLeadData($lead);
         $leadId            = $lead->getId();
-        $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
 
+        /** @var IntegrationEntity $integrationEntity */
+        $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
         if ($integrationEntity) {
-            return $this->update($lead);
-        } // user has integration with Pipedrive
+            return false;
+        } elseif (!empty($lead->getEmail())) {
+            // try find Pipedrive contact, create new entity but not new pipedrive contact, then update
+            $personData = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
+            if (!empty($personData)) {
+                $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $personData[0]['id'], $leadId);
+                $this->em->persist($integrationEntity);
+                $this->em->flush();
+
+                return $this->update($lead);
+            }
+        }
 
         try {
             $createdLeadData   = $this->getIntegration()->getApiHelper()->createLead($mappedData, $lead);
@@ -39,16 +55,6 @@ class LeadExport extends AbstractPipedrive
     {
         $leadId            = $lead->getId();
         $integrationEntity = $this->getLeadIntegrationEntity(['internalEntityId' => $leadId]);
-
-        // find contact and create new entity
-        if (!$integrationEntity && !empty($lead->getEmail())) {
-            $personData = $this->getIntegration()->getApiHelper()->findByEmail($lead->getEmail());
-            if (!empty($personData)) {
-                $integrationEntity = $this->createIntegrationLeadEntity(new \DateTime(), $personData['id'], $leadId);
-                $this->em->persist($integrationEntity);
-                $this->em->flush();
-            }
-        }
 
         if (!$integrationEntity) {
             // create new contact

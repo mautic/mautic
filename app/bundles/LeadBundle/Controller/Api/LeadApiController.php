@@ -54,11 +54,10 @@ class LeadApiController extends CommonApiController
      */
     public function newEntityAction()
     {
-        $existingLeads = $this->model->getExistingLeads();
-        if (!empty($existingLeads)) {
+        if ($existingLead = $this->model->getExistingLead($this->request->request->all())) {
             $this->request->setMethod('PATCH');
 
-            return parent::editEntityAction($existingLeads[0]->getId());
+            return parent::editEntityAction($existingLead->getId());
         }
 
         return parent::newEntityAction();
@@ -69,12 +68,9 @@ class LeadApiController extends CommonApiController
      */
     public function editEntityAction($id)
     {
-        $existingLeads = $this->model->getExistingLeads();
-        if (isset($existingLeads[0]) && $existingLeads[0] instanceof Lead) {
+        if ($existingLead = $this->model->getExistingLead($this->request->request->all(), $id)) {
             $entity = $this->model->getEntity($id);
-            if ($entity instanceof Lead && $existingLeads[0]->getId() != $entity->getId()) {
-                $this->model->mergeLeads($existingLeads[0], $entity, false);
-            }
+            $this->model->mergeLeads($existingLead, $entity, false);
         }
 
         return parent::editEntityAction($id);
