@@ -44,7 +44,6 @@ class LeadImport extends AbstractImport
         foreach ($dataToUpdate as $field => $value) {
             $lead->addUpdatedField($field, $value);
         }
-        echo 'test';
         if (isset($data['owner_id'])) {
             $this->addOwnerToLead($data['owner_id'], $lead);
         }
@@ -85,7 +84,7 @@ class LeadImport extends AbstractImport
 
         if ($lastSyncDate >= $leadDateModified) {
             return false;
-        } //Do not push lead if it was already synched
+        } //Do not push lead if contact was modified in Mautic, and we don't wanna mofify it
 
         foreach ($dataToUpdate as $field => $value) {
             $lead->addUpdatedField($field, $value);
