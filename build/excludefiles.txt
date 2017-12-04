@@ -17,6 +17,7 @@ codeception.yml
 modified_files.txt
 package.json
 README.md
+tests/*
 upgrade.php
 vendor/babdev/*
 vendor/liip/*
