@@ -17,9 +17,9 @@ use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadRequestException;
 class SendGridApiFacade
 {
     /**
-     * @var \SendGrid
+     * @var SendGridWrapper
      */
-    private $sendGrid;
+    private $sendGridWrapper;
 
     /**
      * @var SendGridApiMessage
@@ -31,9 +31,12 @@ class SendGridApiFacade
      */
     private $sendGridApiResponse;
 
-    public function __construct(\SendGrid $sendGrid, SendGridApiMessage $sendGridApiMessage, SendGridApiResponse $sendGridApiResponse)
-    {
-        $this->sendGrid            = $sendGrid;
+    public function __construct(
+        SendGridWrapper $sendGridWrapper,
+        SendGridApiMessage $sendGridApiMessage,
+        SendGridApiResponse $sendGridApiResponse
+    ) {
+        $this->sendGridWrapper     = $sendGridWrapper;
         $this->sendGridApiMessage  = $sendGridApiMessage;
         $this->sendGridApiResponse = $sendGridApiResponse;
     }
@@ -47,7 +50,7 @@ class SendGridApiFacade
     {
         $mail = $this->sendGridApiMessage->getMessage($message);
 
-        $response = $this->sendGrid->client->mail()->send()->post($mail);
+        $response = $this->sendGridWrapper->send($mail);
 
         try {
             $this->sendGridApiResponse->checkResponse($response);

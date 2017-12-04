@@ -379,7 +379,7 @@ return [
             'mautic.transport.sendgrid_api.facade' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade::class,
                 'arguments' => [
-                    'mautic.transport.sendgrid_api.sendgrid',
+                    'mautic.transport.sendgrid_api.sendgrid_wrapper',
                     'mautic.transport.sendgrid_api.message',
                     'mautic.transport.sendgrid_api.response',
                 ],
@@ -394,6 +394,12 @@ return [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse::class,
                 'arguments' => [
                     'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.sendgrid_wrapper' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridWrapper::class,
+                'arguments' => [
+                    'mautic.transport.sendgrid_api.sendgrid',
                 ],
             ],
             'mautic.transport.sendgrid_api.sendgrid' => [

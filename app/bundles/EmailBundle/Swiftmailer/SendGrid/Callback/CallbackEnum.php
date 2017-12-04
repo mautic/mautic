@@ -22,6 +22,8 @@ class CallbackEnum
     const GROUP_UNSUBSCRIBE = 'group_unsubscribe';
 
     /**
+     * @see https://sendgrid.com/docs/API_Reference/Webhooks/event.html#-Event-Types
+     *
      * @param string $event
      *
      * @return bool
