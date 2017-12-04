@@ -9,6 +9,11 @@ composer.lock
 deleted_files.txt
 Gruntfile.js
 index_dev.php
+.env.dist
+.php_cs
+.travis.yml
+Gruntfile.js
+codeception.yml
 modified_files.txt
 package.json
 README.md
