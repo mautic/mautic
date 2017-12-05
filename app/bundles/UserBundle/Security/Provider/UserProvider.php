@@ -149,6 +149,7 @@ class UserProvider implements UserProviderInterface
      * @param bool|true $createIfNotExists
      *
      * @return User
+     *
      * @throws BadCredentialsException
      */
     public function saveUser(User $user, $createIfNotExists = true)
