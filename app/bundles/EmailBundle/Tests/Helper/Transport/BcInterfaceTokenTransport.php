@@ -11,15 +11,18 @@
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
 
-use Mautic\EmailBundle\Swiftmailer\Transport\AbstractTokenArrayTransport;
+use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
+use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
+use Swift_Events_EventListener;
 
-class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Transport
+class BcInterfaceTokenTransport implements InterfaceTokenTransport, \Swift_Transport
 {
     private $fromAddresses = [];
     private $metadatas     = [];
     private $validate      = false;
     private $maxRecipients;
     private $numberToFail;
+    private $message;
 
     /**
      * BatchTransport constructor.
@@ -42,20 +45,6 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
         $this->message         = $message;
         $this->fromAddresses[] = key($message->getFrom());
         $this->metadatas[]     = $this->getMetadata();
-
-        $messageArray = $this->messageToArray();
-
-        if ($this->validate && $this->numberToFail) {
-            --$this->numberToFail;
-
-            if (empty($messageArray['subject'])) {
-                $this->throwException('Subject empty');
-            }
-
-            if (empty($messageArray['recipients']['to'])) {
-                $this->throwException('To empty');
-            }
-        }
 
         return true;
     }
@@ -96,5 +85,36 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     public function getMetadatas()
     {
         return $this->metadatas;
+    }
+
+    public function getMetadata()
+    {
+        return ($this->message instanceof MauticMessage) ? $this->message->getMetadata() : [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStarted()
+    {
+        return true;
+    }
+
+    public function stop()
+    {
+        // ignore
+    }
+
+    /**
+     * @param Swift_Events_EventListener $plugin
+     */
+    public function registerPlugin(Swift_Events_EventListener $plugin)
+    {
+        // ignore
+    }
+
+    public function start()
+    {
+        // ignore
     }
 }

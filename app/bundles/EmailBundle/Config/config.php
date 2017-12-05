@@ -120,7 +120,7 @@ return [
                 'class'     => \Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber::class,
                 'arguments' => [
                     'mautic.message.processor.unsubscribe',
-                    'mautic.message.processor.FeedbackLoop',
+                    'mautic.message.processor.feedbackloop',
                 ],
             ],
             'mautic.email.monitored.unsubscribe.replier' => [
@@ -430,7 +430,7 @@ return [
                     'monolog.logger.mautic',
                 ],
             ],
-            'mautic.message.processor.FeedbackLoop' => [
+            'mautic.message.processor.feedbackloop' => [
                 'class'     => \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop::class,
                 'arguments' => [
                     'mautic.message.search.contact',
@@ -509,7 +509,6 @@ return [
                     'mautic.helper.mailbox',
                     'event_dispatcher',
                     'translator',
-
                 ],
             ],
         ],
@@ -566,7 +565,6 @@ return [
                 'encryption' => '/ssl',
                 'user'       => null,
                 'password'   => null,
-
             ],
             'EmailBundle_bounces' => [
                 'address'           => null,

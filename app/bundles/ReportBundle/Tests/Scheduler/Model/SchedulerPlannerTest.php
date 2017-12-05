@@ -62,7 +62,7 @@ class SchedulerPlannerTest extends \PHPUnit_Framework_TestCase
         $dateOfNextSchedule = new \DateTime();
 
         $dateBuilder->expects($this->once())
-            ->method('getNexEvent')
+            ->method('getNextEvent')
             ->with($report)
             ->willReturn($dateOfNextSchedule);
 
@@ -117,7 +117,7 @@ class SchedulerPlannerTest extends \PHPUnit_Framework_TestCase
             ->with();
 
         $dateBuilder->expects($this->once())
-            ->method('getNexEvent')
+            ->method('getNextEvent')
             ->with($report)
             ->willThrowException(new NoScheduleException());
 
@@ -153,7 +153,7 @@ class SchedulerPlannerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(null);
 
         $dateBuilder->expects($this->once())
-            ->method('getNexEvent')
+            ->method('getNextEvent')
             ->with($report)
             ->willThrowException(new NoScheduleException());
 

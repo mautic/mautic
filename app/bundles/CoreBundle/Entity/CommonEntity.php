@@ -63,7 +63,7 @@ class CommonEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
+        $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->$getter();
         if ($prop == 'category') {
             $currentId = ($current) ? $current->getId() : '';

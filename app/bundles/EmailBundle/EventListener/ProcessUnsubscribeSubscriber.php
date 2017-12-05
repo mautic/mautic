@@ -43,7 +43,6 @@ class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
             EmailEvents::MONITORED_EMAIL_CONFIG => ['onEmailConfig', 0],
             EmailEvents::EMAIL_PARSE            => ['onEmailParse', 0],
             EmailEvents::EMAIL_ON_SEND          => ['onEmailSend', 0],
-
         ];
     }
 
