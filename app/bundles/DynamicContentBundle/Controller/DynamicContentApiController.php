@@ -35,6 +35,7 @@ class DynamicContentApiController extends CommonController
             throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
         }
     }
+
     public function getAction($objectAlias)
     {
         $lead    = $this->getModel('lead')->getCurrentLead();

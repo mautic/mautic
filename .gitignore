@@ -2,6 +2,7 @@
 !.gitignore
 !.htaccess
 !.gitkeep
+.php_cs.cache
 /.env
 /composer.phar
 

@@ -11,10 +11,9 @@
 
 namespace Mautic\EmailBundle\Command;
 
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\ParseEmailEvent;
-use Mautic\EmailBundle\MonitoredEmail\Mailbox;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\EmailBundle\MonitoredEmail\Fetcher;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,8 +21,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI command to check for messages.
  */
-class ProcessFetchEmailCommand extends ContainerAwareCommand
+class ProcessFetchEmailCommand extends Command
 {
+    /**
+     * @var CoreParametersHelper
+     */
+    private $parametersHelper;
+
+    /**
+     * @var Fetcher
+     */
+    private $fetcher;
+
+    /**
+     * ProcessFetchEmailCommand constructor.
+     *
+     * @param CoreParametersHelper $parametersHelper
+     * @param Fetcher              $fetcher
+     */
+    public function __construct(CoreParametersHelper $parametersHelper, Fetcher $fetcher)
+    {
+        parent::__construct();
+
+        $this->parametersHelper = $parametersHelper;
+        $this->fetcher          = $fetcher;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -48,107 +71,23 @@ EOT
     }
 
     /**
-     * {@inheritdoc}
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container  = $this->getContainer();
-        $dispatcher = $container->get('event_dispatcher');
-        $translator = $container->get('translator');
-        $limit      = $input->getOption('message-limit');
-        $mailboxes  = $container->get('mautic.helper.core_parameters')->getParameter('monitored_email');
+        $limit     = $input->getOption('message-limit');
+        $mailboxes = $this->parametersHelper->getParameter('monitored_email');
         unset($mailboxes['general']);
         $mailboxes = array_keys($mailboxes);
 
-        /** @var \Mautic\EmailBundle\MonitoredEmail\Mailbox $imapHelper */
-        $imapHelper = $container->get('mautic.helper.mailbox');
+        $this->fetcher->setMailboxes($mailboxes)
+            ->fetch($limit);
 
-        // Get a list of criteria and group by it
-        $event             = $dispatcher->dispatch(EmailEvents::EMAIL_PRE_FETCH, new ParseEmailEvent());
-        $criteriaRequested = $event->getCriteriaRequests();
-
-        // Group mailboxes/folders so that we aren't fetching multiple times
-        $searchMailboxes = [];
-
-        foreach ($mailboxes as $name) {
-            // Switch mailbox to get information
-            $config = $imapHelper->getMailboxSettings($name);
-            if (empty($config['host']) || empty($config['folder'])) {
-                // Not configured so continue
-                continue;
-            }
-
-            // Default is unread emails
-            $criteria = Mailbox::CRITERIA_UNSEEN;
-
-            // Check if a listener injected a criteria request
-            if (isset($criteriaRequested[$name])) {
-                $criteria = $criteriaRequested[$name];
-            }
-
-            if (!isset($searchMailboxes[$criteria])) {
-                $searchMailboxes[$criteria] = [];
-            }
-
-            $searchMailboxes[$criteria][$config['imap_path'].'_'.$config['user']][] = $name;
-        }
-
-        $counter = 0;
-        foreach ($searchMailboxes as $criteria => $mailboxes) {
-            foreach ($mailboxes as $imapPath => $folders) {
-                try {
-                    // Get mail and parse into Message objects
-                    $messages = [];
-
-                    $imapHelper->switchMailbox($folders[0]);
-                    $mailIds = $imapHelper->fetchUnread();
-
-                    $processed = 0;
-                    if (count($mailIds)) {
-                        foreach ($mailIds as $id) {
-                            $messages[] = $imapHelper->getMail($id);
-                            ++$counter;
-                            ++$processed;
-
-                            if ($limit && $counter >= $limit) {
-                                break;
-                            }
-                        }
-
-                        $event->setMessages($messages)
-                            ->setKeys($folders);
-                        $dispatcher->dispatch(EmailEvents::EMAIL_PARSE, $event);
-
-                        $output->writeln(
-                            $translator->transChoice(
-                                'mautic.email.fetch.processed',
-                                $processed,
-                                ['%processed%' => $processed, '%imapPath%' => $imapPath, '%criteria%' => $criteria]
-                            )
-                        );
-
-                        if ($limit && $counter >= $limit) {
-                            break;
-                        }
-                    } else {
-                        $output->writeln(
-                            $translator->transChoice(
-                                'mautic.email.fetch.processed',
-                                $processed,
-                                ['%processed%' => $processed, '%imapPath%' => $imapPath, '%criteria%' => $criteria]
-                            )
-                        );
-                    }
-                } catch (\Exception $e) {
-                    $output->writeln($e->getMessage());
-                }
-
-                unset($mailIds, $messages);
-            }
-        }
-
-        if (empty($searchMailboxes)) {
-            $output->writeln('No mailboxes are configured.');
+        foreach ($this->fetcher->getLog() as $log) {
+            $output->writeln($log);
         }
 
         return 0;

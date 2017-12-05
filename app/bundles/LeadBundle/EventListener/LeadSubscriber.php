@@ -620,7 +620,6 @@ class LeadSubscriber extends CommonSubscriber
         $event->addToCounter($eventTypeKey, $imports);
 
         if (!$event->isEngagementCount()) {
-
             // Add the logs to the event array
             foreach ($imports['results'] as $import) {
                 if (is_string($import['properties'])) {

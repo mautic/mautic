@@ -344,7 +344,6 @@ class WebhookModel extends FormModel
 
             // throw an error exception if we don't get a 200 back
             if ($response->code >= 300 && $response->code < 200) {
-
                 // The reciever of the webhook is telling us to stop bothering him with our requests by code 410
                 if ($response->code == 410) {
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
@@ -372,7 +371,6 @@ class WebhookModel extends FormModel
         // Run this on command as well as immediate send because if switched from queue to immediate
         // it can have some rows in the queue which will be send in every webhook forever
         if (!empty($this->webhookQueueIdList)) {
-
             /** @var \Mautic\WebhookBundle\Entity\WebhookQueueRepository $webhookQueueRepo */
             $webhookQueueRepo = $this->getQueueRepository();
 
@@ -527,7 +525,6 @@ class WebhookModel extends FormModel
         /* @var WebhookQueue $queue */
         foreach ($queuesArray as $queues) {
             foreach ($queues as $queue) {
-
                 /** @var \Mautic\WebhookBundle\Entity\Event $event */
                 $event = $queue->getEvent();
                 $type  = $event->getEventType();

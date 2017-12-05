@@ -17,6 +17,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Tests\Helper\Transport\BatchTransport;
+use Mautic\EmailBundle\Tests\Helper\Transport\BcInterfaceTokenTransport;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -252,6 +253,35 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['contact3@somewhere.com' => null], $mailer->message->getTo());
     }
 
+    public function testBatchIsEnabledWithBcTokenInterface()
+    {
+        $mockFactory = $this->getMockFactory();
+
+        $transport   = new BcInterfaceTokenTransport();
+        $swiftMailer = new \Swift_Mailer($transport);
+
+        $mailer = new MailHelper($mockFactory, $swiftMailer, ['nobody@nowhere.com' => 'No Body']);
+        $mailer->enableQueue();
+
+        $mailer->setSubject('Hello');
+
+        foreach ($this->contacts as $contact) {
+            $mailer->addTo($contact['email']);
+            $mailer->setLead($contact);
+            $mailer->queue();
+        }
+
+        $mailer->flushQueue([]);
+
+        $this->assertEmpty($mailer->getErrors()['failures']);
+
+        $fromAddresses = $transport->getFromAddresses();
+        $metadatas     = $transport->getMetadatas();
+
+        $this->assertEquals(3, count($fromAddresses));
+        $this->assertEquals(3, count($metadatas));
+    }
+
     public function testGlobalFromThatAllFromAddressesAreTheSame()
     {
         $mockFactory = $this->getMockFactory();
@@ -327,64 +357,120 @@ class MailHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateEmailWithoutTld()
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('john@doe');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(\Swift_RfcComplianceException::class);
+        $helper::validateEmail('john@doe');
     }
 
     public function testValidateEmailWithSpaceInIt()
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(\Swift_RfcComplianceException::class);
+        $helper::validateEmail('jo hn@doe.email');
     }
 
     public function testValidateEmailWithCaretInIt()
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo^hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(\Swift_RfcComplianceException::class);
+        $helper::validateEmail('jo^hn@doe.email');
     }
 
     public function testValidateEmailWithApostropheInIt()
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo\'hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(\Swift_RfcComplianceException::class);
+        $helper::validateEmail('jo\'hn@doe.email');
     }
 
     public function testValidateEmailWithSemicolonInIt()
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo;hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(\Swift_RfcComplianceException::class);
+        $helper::validateEmail('jo;hn@doe.email');
     }
 
     public function testValidateEmailWithAmpersandInIt()
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo&hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(\Swift_RfcComplianceException::class);
+        $helper::validateEmail('jo&hn@doe.email');
     }
 
     public function testValidateEmailWithStarInIt()
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo*hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(\Swift_RfcComplianceException::class);
+        $helper::validateEmail('jo*hn@doe.email');
     }
 
     public function testValidateEmailWithPercentInIt()
     {
-        $heper = $this->mockEmptyMailHelper();
-        $this->setExpectedException(\Swift_RfcComplianceException::class);
-        $heper::validateEmail('jo%hn@doe.email');
+        $helper = $this->mockEmptyMailHelper();
+        $this->expectException(\Swift_RfcComplianceException::class);
+        $helper::validateEmail('jo%hn@doe.email');
     }
 
-    protected function mockEmptyMailHelper()
+    public function testQueueModeIsReset()
+    {
+        $contacts   = $this->contacts;
+        $contacts[] = [
+            'id'        => 5,
+            'email'     => 'contact5@somewhere.com',
+            'firstname' => 'Contact',
+            'lastname'  => '5',
+            'owner_id'  => 1,
+        ];
+
+        $helper = $this->mockEmptyMailHelper(false);
+
+        $helper->enableQueue();
+
+        $helper->addTo($contacts[0]['email']);
+        $helper->addTo($contacts[1]['email']);
+        $helper->addTo($contacts[2]['email']);
+        $helper->addTo($contacts[3]['email']);
+
+        $exceptionCaught = true;
+        try {
+            $helper->addTo($contacts[4]['email']);
+            $exceptionCaught = false;
+        } catch (BatchQueueMaxException $exception) {
+        }
+
+        if (!$exceptionCaught) {
+            $this->fail('BatchQueueMaxException should have been thrown');
+        }
+
+        // Reset which should now reset qeue mode so that each to address is accepted
+        $helper->reset();
+
+        try {
+            foreach ($contacts as $contact) {
+                $helper->addTo($contact['email']);
+            }
+        } catch (BatchQueueMaxException $exception) {
+            $this->fail('Queue mode was not reset');
+        }
+
+        $to = $helper->message->getTo();
+
+        $this->assertEquals(
+            [
+                'contact1@somewhere.com' => null,
+                'contact2@somewhere.com' => null,
+                'contact3@somewhere.com' => null,
+                'contact4@somewhere.com' => null,
+                'contact5@somewhere.com' => null,
+            ],
+            $to
+        );
+    }
+
+    protected function mockEmptyMailHelper($useSmtp = true)
     {
         $mockFactory = $this->getMockFactory();
-        $transport   = new SmtpTransport();
+        $transport   = ($useSmtp) ? new SmtpTransport() : new BatchTransport();
         $swiftMailer = new \Swift_Mailer($transport);
 
         return new MailHelper($mockFactory, $swiftMailer);

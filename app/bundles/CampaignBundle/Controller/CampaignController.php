@@ -487,7 +487,7 @@ class CampaignController extends AbstractStandardFormController
         if (!empty($currentFilters)) {
             $listIds = $catIds = [];
             foreach ($currentFilters as $type => $typeFilters) {
-                $listFilters['filters'] ['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
+                $listFilters['filters']['groups']['mautic.campaign.leadsource.'.$type]['values'] = $typeFilters;
 
                 foreach ($typeFilters as $fltr) {
                     if ($type == 'list') {
@@ -718,7 +718,6 @@ class CampaignController extends AbstractStandardFormController
                         'campaignEvents'  => $this->campaignEvents,
                         'campaignSources' => $this->campaignSources,
                         'deletedEvents'   => $this->deletedEvents,
-
                     ]
                 );
                 break;
