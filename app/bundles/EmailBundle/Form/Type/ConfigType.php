@@ -38,6 +38,7 @@ class ConfigType extends AbstractType
      * ConfigType constructor.
      *
      * @param TranslatorInterface $translator
+     * @param TransportType       $transportType
      */
     public function __construct(TranslatorInterface $translator, TransportType $transportType)
     {
