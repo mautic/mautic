@@ -431,6 +431,5 @@ return [
     'parameters' => [
         'form_upload_dir'        => '%kernel.root_dir%/../media/files/form',
         'blacklisted_extensions' => ['php', 'sh'],
-        'immediately'            => false,
     ],
 ];
