@@ -149,10 +149,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
 
         foreach ($webinars as $webinar) {
             if (isset($webinar['id'])) {
-                $formattedWebinars[] = [
-                    'value' => $webinar['id'],
-                    'label' => $webinar['title'],
-                ];
+                $formattedWebinars[$webinar['id']] = $webinar['title'];
             }
         }
 
