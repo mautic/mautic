@@ -384,10 +384,28 @@ return [
                     'mautic.transport.sendgrid_api.response',
                 ],
             ],
+            'mautic.transport.sendgrid_api.mail.base' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase::class,
+                'arguments' => [
+                    'mautic.helper.plain_text_message',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.mail.personalization' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization::class,
+            ],
+            'mautic.transport.sendgrid_api.mail.metadata' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata::class,
+            ],
+            'mautic.transport.sendgrid_api.mail.attachment' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment::class,
+            ],
             'mautic.transport.sendgrid_api.message' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage::class,
                 'arguments' => [
-                    'mautic.helper.plain_text_message',
+                    'mautic.transport.sendgrid_api.mail.base',
+                    'mautic.transport.sendgrid_api.mail.personalization',
+                    'mautic.transport.sendgrid_api.mail.metadata',
+                    'mautic.transport.sendgrid_api.mail.attachment',
                 ],
             ],
             'mautic.transport.sendgrid_api.response' => [
