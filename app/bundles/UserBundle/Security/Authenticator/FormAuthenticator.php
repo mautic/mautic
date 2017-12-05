@@ -74,6 +74,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      * @param                       $providerKey
      *
      * @return PluginToken
+     *
      * @throws AuthenticationException
      * @throws BadCredentialsException
      */
