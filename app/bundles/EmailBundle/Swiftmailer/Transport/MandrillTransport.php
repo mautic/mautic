@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class MandrillTransport.
  */
-class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTransportInterface
+class MandrillTransport extends AbstractTokenHttpTransport implements InterfaceCallbackTransport
 {
     /**
      * {@inheritdoc}

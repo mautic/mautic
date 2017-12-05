@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class ElasticEmailTransport.
  */
-class ElasticemailTransport extends \Swift_SmtpTransport implements CallbackTransportInterface
+class ElasticemailTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
 {
     private $httpClient;
 
