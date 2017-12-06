@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Callback;
+namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid;
 
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadLoginException;
 use Mautic\EmailBundle\Swiftmailer\Exception\SendGridBadRequestException;
