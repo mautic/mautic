@@ -19,11 +19,11 @@ class PlainTextMassageHelper
     /**
      * Extract plain text from message.
      *
-     * @param \Swift_Message $message
+     * @param \Swift_Mime_Message $message
      *
      * @return string
      */
-    public static function getPlainTextFromMessage(\Swift_Message $message)
+    public static function getPlainTextFromMessage(\Swift_Mime_Message $message)
     {
         $children = (array) $message->getChildren();
 
@@ -35,5 +35,17 @@ class PlainTextMassageHelper
         }
 
         return '';
+    }
+
+    /**
+     * Extract plain text from message.
+     *
+     * @param \Swift_Mime_Message $message
+     *
+     * @return string
+     */
+    public function getPlainTextFromMessageNotStatic(\Swift_Mime_Message $message)
+    {
+        return self::getPlainTextFromMessage($message);
     }
 }

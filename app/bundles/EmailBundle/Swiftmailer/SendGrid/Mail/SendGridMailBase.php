@@ -35,10 +35,11 @@ class SendGridMailBase
      */
     public function getSendGridMail(\Swift_Mime_Message $message)
     {
-        $from        = new Email(current($message->getFrom()), key($message->getFrom()));
+        $froms       = $message->getFrom();
+        $from        = new Email(current($froms), key($froms));
         $subject     = $message->getSubject();
         $contentHtml = new Content('text/html', $message->getBody());
-        $contentText = new Content('text/plain', $this->plainTextMassageHelper->getPlainTextFromMessage($message));
+        $contentText = new Content('text/plain', $this->plainTextMassageHelper->getPlainTextFromMessageNotStatic($message));
 
         // Sendgrid class requires to pass an TO email even if we do not have any general one
         // Pass a dummy email and clear it in the next 2 lines
