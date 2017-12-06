@@ -29,6 +29,10 @@ class SendGridMailPersonalization
         }
 
         $metadata = $message->getMetadata();
+        $ccEmail  = $message->getCc();
+        if ($ccEmail) {
+            $cc = new Email(current($ccEmail), key($ccEmail));
+        }
         foreach ($message->getTo() as $recipientEmail => $recipientName) {
             if (empty($metadata[$recipientEmail])) {
                 //Recipient is not in metadata = we do not have tokens for this email.
@@ -37,6 +41,11 @@ class SendGridMailPersonalization
             $personalization = new Personalization();
             $to              = new Email($recipientName, $recipientEmail);
             $personalization->addTo($to);
+
+            if (isset($cc)) {
+                $clone = clone $cc;
+                $personalization->addCc($clone);
+            }
 
             foreach ($metadata[$recipientEmail]['tokens'] as $token => $value) {
                 $personalization->addSubstitution($token, $value);
