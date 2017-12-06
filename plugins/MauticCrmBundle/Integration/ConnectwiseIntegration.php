@@ -434,12 +434,16 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             'communicationItems'     => [
                 'type'     => 'array',
                 'required' => false,
-                'items'    => ['name' => ['type' => 'name'], 'value' => 'value', 'keys' => ['Email', 'Direct', 'Fax', 'Cell']],
+                'items'    => [
+                    'name'  => ['type' => 'name'],
+                    'value' => 'value',
+                    'keys'  => ['Email', 'Direct', 'Fax', 'Cell'],
+                ],
             ],
-            'Direct' => ['type' => 'string', 'required' => false, 'configOnly' => true],
-            'Cell'   => ['type' => 'string', 'required' => false, 'configOnly' => true],
-            'Email'  => ['type' => 'string', 'required' => true, 'configOnly' => true],
-            'Fax'    => ['type' => 'string', 'required' => false, 'configOnly' => true],
+            'Direct'                 => ['type' => 'string', 'required' => false, 'configOnly' => true],
+            'Cell'                   => ['type' => 'string', 'required' => false, 'configOnly' => true],
+            'Email'                  => ['type' => 'string', 'required' => true, 'configOnly' => true],
+            'Fax'                    => ['type' => 'string', 'required' => false, 'configOnly' => true],
         ];
     }
 
@@ -689,7 +693,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $leadFields = array_diff_key($leadFields, array_flip($fieldsToUpdateInCW));
         $leadFields = $this->getBlankFieldsToUpdate($leadFields, $cwContactExists, $objectFields, $config);
-        //check for blank fields to update here
         $mappedData = $this->populateLeadData(
             $lead,
             [
@@ -718,10 +721,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);
-            $leadId = $lead->getId();
         } else {
             $fields = $lead;
-            $leadId = $lead['id'];
         }
 
         $leadFields = $config['leadFields'];
