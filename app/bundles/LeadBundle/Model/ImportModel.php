@@ -304,17 +304,19 @@ class ImportModel extends FormModel
             return false;
         }
 
-        $lineNumber  = $progress->getDone();
-        $headers     = $import->getHeaders();
-        $headerCount = count($headers);
-        $config      = $import->getParserConfig();
-        $counter     = 0;
+        $lastImportedLine = $import->getLastLineImported();
+        $headers          = $import->getHeaders();
+        $headerCount      = count($headers);
+        $config           = $import->getParserConfig();
+        $counter          = 0;
 
-        $this->logDebug('The import is starting on line '.$lineNumber, $import);
-
-        if ($lineNumber > 0) {
-            $file->seek($lineNumber);
+        if ($lastImportedLine > 0) {
+            // Seek is zero-based line numbering and
+            $file->seek($lastImportedLine - 1);
         }
+
+        $lineNumber = $lastImportedLine + 1;
+        $this->logDebug('The import is starting on line '.$lineNumber, $import);
 
         $batchSize = $config['batchlimit'];
 
@@ -325,9 +327,10 @@ class ImportModel extends FormModel
 
         while ($batchSize && !$file->eof()) {
             $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+            $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
-            if ($lineNumber === 0) {
+            if ($lineNumber === 1) {
                 ++$lineNumber;
                 continue;
             }
@@ -419,7 +422,6 @@ class ImportModel extends FormModel
             if ($limit && $counter >= $limit) {
                 $import->setStatus($import::DELAYED);
                 $this->saveEntity($import);
-
                 break;
             }
         }

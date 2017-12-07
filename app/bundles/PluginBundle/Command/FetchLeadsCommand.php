@@ -124,6 +124,8 @@ class FetchLeadsCommand extends ContainerAwareCommand
             $params['fetchAll'] = $fetchAll;
             $params['output']   = $output;
 
+            $integrationObject->setCommandParameters($params);
+
             // set this constant to ensure that all contacts have the same date modified time and date synced time to prevent a pull/push loop
             define('MAUTIC_DATE_MODIFIED_OVERRIDE', time());
 

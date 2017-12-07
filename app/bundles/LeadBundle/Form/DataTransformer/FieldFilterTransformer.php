@@ -29,6 +29,7 @@ class FieldFilterTransformer implements DataTransformerInterface
             $string = $translator->trans($string);
         }
     }
+
     /**
      * From DB format to form format.
      *

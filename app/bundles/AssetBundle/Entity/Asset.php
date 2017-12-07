@@ -693,7 +693,6 @@ class Asset extends FormEntity
     public function preUpload()
     {
         if (null !== $this->getFile()) {
-
             // set the asset title as original file name if title is missing
             if (null === $this->getTitle()) {
                 $this->setTitle($this->file->getClientOriginalName());
@@ -716,7 +715,6 @@ class Asset extends FormEntity
     {
         // the file property can be empty if the field is not required
         if (null === $this->getFile()) {
-
             // check for the remote and set type data
             if ($this->isRemote()) {
                 $this->setFileInfoFromFile();

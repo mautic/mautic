@@ -70,7 +70,6 @@ class TrackingPixelSendType extends AbstractType
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.tracking.form.category.tooltip',
-
                 ],
                 'required'    => true,
                 'constraints' => [
