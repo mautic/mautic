@@ -38,19 +38,19 @@ if (!$isEmbedded) {
                 'customButtons'   => (isset($customButtons)) ? $customButtons : [],
                 'templateButtons' => [
                     'edit' => $view['security']->hasEntityAccess(
-                        $permissions['dynamiccontent:dynamiccontents:editown'],
-                        $permissions['dynamiccontent:dynamiccontents:editother'],
+                        $permissions['dynamicContent:dynamiccontents:editown'],
+                        $permissions['dynamicContent:dynamiccontents:editother'],
                         $entity->getCreatedBy()
                     ),
-                    'clone'  => $permissions['dynamiccontent:dynamiccontents:create'],
+                    'clone'  => $permissions['dynamicContent:dynamiccontents:create'],
                     'delete' => $view['security']->hasEntityAccess(
-                        $permissions['dynamiccontent:dynamiccontents:deleteown'],
-                        $permissions['dynamiccontent:dynamiccontents:deleteother'],
+                        $permissions['dynamicContent:dynamiccontents:deleteown'],
+                        $permissions['dynamicContent:dynamiccontents:deleteother'],
                         $entity->getCreatedBy()
                     ),
                     'close' => $view['security']->hasEntityAccess(
-                        $permissions['dynamiccontent:dynamiccontents:viewown'],
-                        $permissions['dynamiccontent:dynamiccontents:viewother'],
+                        $permissions['dynamicContent:dynamiccontents:viewown'],
+                        $permissions['dynamicContent:dynamiccontents:viewother'],
                         $entity->getCreatedBy()
                     ),
                 ],

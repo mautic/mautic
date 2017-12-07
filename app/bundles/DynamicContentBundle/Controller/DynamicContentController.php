@@ -25,15 +25,15 @@ class DynamicContentController extends FormController
     {
         return (array) $this->get('mautic.security')->isGranted(
             [
-                'dynamiccontent:dynamiccontents:viewown',
-                'dynamiccontent:dynamiccontents:viewother',
-                'dynamiccontent:dynamiccontents:create',
-                'dynamiccontent:dynamiccontents:editown',
-                'dynamiccontent:dynamiccontents:editother',
-                'dynamiccontent:dynamiccontents:deleteown',
-                'dynamiccontent:dynamiccontents:deleteother',
-                'dynamiccontent:dynamiccontents:publishown',
-                'dynamiccontent:dynamiccontents:publishother',
+                'dynamicContent:dynamiccontents:viewown',
+                'dynamicContent:dynamiccontents:viewother',
+                'dynamicContent:dynamiccontents:create',
+                'dynamicContent:dynamiccontents:editown',
+                'dynamicContent:dynamiccontents:editother',
+                'dynamicContent:dynamiccontents:deleteown',
+                'dynamicContent:dynamiccontents:deleteother',
+                'dynamicContent:dynamiccontents:publishown',
+                'dynamicContent:dynamiccontents:publishother',
             ],
             'RETURN_ARRAY'
         );
@@ -48,7 +48,7 @@ class DynamicContentController extends FormController
 
         $permissions = $this->getPermissions();
 
-        if (!$permissions['dynamiccontent:dynamiccontents:viewown'] && !$permissions['dynamiccontent:dynamiccontents:viewother']) {
+        if (!$permissions['dynamicContent:dynamiccontents:viewown'] && !$permissions['dynamicContent:dynamiccontents:viewother']) {
             return $this->accessDenied();
         }
 
@@ -123,7 +123,7 @@ class DynamicContentController extends FormController
      */
     public function newAction($entity = null)
     {
-        if (!$this->accessGranted('dynamiccontent:dynamiccontents:viewown')) {
+        if (!$this->accessGranted('dynamicContent:dynamiccontents:viewown')) {
             return $this->accessDenied();
         }
 
@@ -270,7 +270,7 @@ class DynamicContentController extends FormController
                     ]
                 )
             );
-        } elseif (!$this->get('mautic.security')->hasEntityAccess(true, 'dynamiccontent:dynamiccontents:editother', $entity->getCreatedBy())) {
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(true, 'dynamicContent:dynamiccontents:editother', $entity->getCreatedBy())) {
             return $this->accessDenied();
         } elseif ($model->isLocked($entity)) {
             //deny access if the entity is locked
@@ -378,8 +378,8 @@ class DynamicContentController extends FormController
                 ]
             );
         } elseif (!$security->hasEntityAccess(
-            'dynamiccontent:dynamiccontents:viewown',
-            'dynamiccontent:dynamiccontents:viewother',
+            'dynamicContent:dynamiccontents:viewown',
+            'dynamicContent:dynamiccontents:viewother',
             $entity->getCreatedBy()
         )
         ) {
@@ -445,10 +445,10 @@ class DynamicContentController extends FormController
         $entity = $model->getEntity($objectId);
 
         if ($entity != null) {
-            if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')
+            if (!$this->get('mautic.security')->isGranted('dynamicContent:dynamiccontents:create')
                 || !$this->get('mautic.security')->hasEntityAccess(
-                    'dynamiccontent:dynamiccontents:viewown',
-                    'dynamiccontent:dynamiccontents:viewother',
+                    'dynamicContent:dynamiccontents:viewown',
+                    'dynamicContent:dynamiccontents:viewother',
                     $entity->getCreatedBy()
                 )
             ) {

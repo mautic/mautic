@@ -15,7 +15,7 @@ return [
             'items' => [
                 'mautic.dynamicContent.dynamicContent' => [
                     'route'    => 'mautic_dynamicContent_index',
-                    'access'   => ['dynamiccontent:dynamiccontents:viewown', 'dynamiccontent:dynamiccontents:viewother'],
+                    'access'   => ['dynamicContent:dynamiccontents:viewown', 'dynamicContent:dynamiccontents:viewother'],
                     'parent'   => 'mautic.core.components',
                     'priority' => 90,
                 ],
@@ -46,7 +46,7 @@ return [
         'api' => [
             'mautic_api_dynamicContent_standard' => [
                 'standard_entity' => true,
-                'name'            => 'dynamicContents',
+                'name'            => 'dynamiccontents',
                 'path'            => '/dynamiccontents',
                 'controller'      => 'MauticDynamicContentBundle:Api\DynamicContentApi',
             ],
@@ -138,6 +138,7 @@ return [
             'mautic.dynamicContent.model.dynamicContent' => [
                 'class'     => 'Mautic\DynamicContentBundle\Model\DynamicContentModel',
                 'arguments' => [
+
                 ],
             ],
         ],

@@ -42,7 +42,8 @@ class BuilderTokenHelper
     {
         $this->factory            = $factory;
         $this->modelName          = $modelName;
-        $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$modelName}s";
+        $lowerModelName           = strtolower($modelName);
+        $this->viewPermissionBase = (!empty($viewPermissionBase)) ? $viewPermissionBase : "$modelName:{$lowerModelName}s";
         $this->bundleName         = (!empty($bundleName)) ? $bundleName : 'Mautic'.ucfirst($modelName).'Bundle';
         $this->langVar            = (!empty($langVar)) ? $langVar : $modelName;
 

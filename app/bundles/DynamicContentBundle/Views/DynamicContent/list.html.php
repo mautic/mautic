@@ -27,8 +27,8 @@ if ($tmpl == 'index') {
                         'target'          => '#dwcTable',
                         'routeBase'       => 'dynamicContent',
                         'templateButtons' => [
-                            'delete' => $permissions['dynamiccontent:dynamiccontents:deleteown']
-                                || $permissions['dynamiccontent:dynamiccontents:deleteother'],
+                            'delete' => $permissions['dynamicContent:dynamiccontents:deleteown']
+                                || $permissions['dynamicContent:dynamiccontents:deleteother'],
                         ],
                     ]
                 );
@@ -87,14 +87,14 @@ if ($tmpl == 'index') {
                                 'item'            => $item,
                                 'templateButtons' => [
                                     'edit' => $view['security']->hasEntityAccess(
-                                        $permissions['dynamiccontent:dynamiccontents:editown'],
-                                        $permissions['dynamiccontent:dynamiccontents:editother'],
+                                        $permissions['dynamicContent:dynamiccontents:editown'],
+                                        $permissions['dynamicContent:dynamiccontents:editother'],
                                         $item->getCreatedBy()
                                     ),
-                                    'clone'  => $permissions['dynamiccontent:dynamiccontents:create'],
+                                    'clone'  => $permissions['dynamicContent:dynamiccontents:create'],
                                     'delete' => $view['security']->hasEntityAccess(
-                                        $permissions['dynamiccontent:dynamiccontents:deleteown'],
-                                        $permissions['dynamiccontent:dynamiccontents:deleteother'],
+                                        $permissions['dynamicContent:dynamiccontents:deleteown'],
+                                        $permissions['dynamicContent:dynamiccontents:deleteother'],
                                         $item->getCreatedBy()
                                     ),
                                 ],
