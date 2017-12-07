@@ -11,13 +11,10 @@
 
 namespace MauticPlugin\MauticRecombeeBundle\Helper;
 
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticSocialBundle\Entity\Lead;
 use Recombee\RecommApi\Client;
 use Recombee\RecommApi\Exceptions as Ex;
 use Recombee\RecommApi\Requests as Reqs;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 const NUM                   = 50;
 const PROBABILITY_PURCHASED = 0.2;
@@ -33,37 +30,14 @@ class RecombeeHelper
     protected $integrationHelper;
 
     /**
-     * @var RequestStack
-     */
-    protected $request;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
      * @var Client
      */
     private $client;
 
-    /**
-     * @var array
-     */
-    private $components = ['CartAddition', 'Purchase', 'Rating', 'Bookmark', 'DetailView'];
-
-    /**
-     * @var array
-     */
-    private $actions = ['Add', 'Delete'];
-
-    public function __construct(IntegrationHelper $integrationHelper, RequestStack $requestStack, LeadModel $leadModel)
+    public function __construct(IntegrationHelper $integrationHelper)
     {
         $this->integrationHelper = $integrationHelper;
-        $this->request           = $requestStack;
-        $this->leadModel         = $leadModel;
-
-        $integration = $this->integrationHelper->getIntegrationObject('Recombee');
+        $integration             = $this->integrationHelper->getIntegrationObject('Recombee');
         if (!$integration || $integration->getIntegrationSettings()->getIsPublished() === false) {
             return;
         }
@@ -76,65 +50,6 @@ class RecombeeHelper
                 $database, $secret_key
             );
         }
-    }
-
-    public function setLeadData($data)
-    {
-        $key = reset(array_keys($data));
-
-        switch ($key) {
-            case 'mautic.lead_post_save_new':
-            case 'mautic.lead_post_save_update':
-            case 'mautic.lead_points_change':
-                $action = 'Add';
-                $this->request->setMethod('POST');
-                break;
-            case 'mautic.lead_post_delete':
-                $action = 'Delete';
-                $this->request->setMethod('DELETE');
-                break;
-        }
-    }
-
-    /**
-     * @param $component
-     * @param $leadId
-     * @param $action
-     * @param $idemId
-     * @param bool  $cascadeCreate
-     * @param array $params
-     *
-     * @return bool
-     */
-    public function setLeadAction($component, $leadId, $action, $idemId, $params = [])
-    {
-        if (!in_array($component, $this->components) || !in_array($action, $this->actions)) {
-            return false;
-        }
-
-        $lead = $this->leadModel->getEntity($leadId);
-        if (!$lead instanceof Lead || !$lead->getId()) {
-            return false;
-        }
-
-        // change method from POST to DELETE
-        if ($action == 'add') {
-            $this->request->setMethod('POST');
-        } elseif ($action == 'delete') {
-            $this->request->setMethod('DELETE');
-        } elseif ($action == 'merge') {
-            $this->request->setMethod('PUT');
-        }
-
-        try {
-            $class = 'Recombee\\RecommApi\\Requests\\'.$action.$component;
-            $this->recombeeHelper->getClient()->send(new $class($leadId, $idemId, $params));
-
-            return true;
-        } catch (Ex\ApiException $e) {
-        }
-
-        return false;
     }
 
     public function testItemData()
