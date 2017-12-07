@@ -1,7 +1,10 @@
 /* PluginBundle */
 Mautic.matchedFields = function (index, object, integration) {
-    var compoundMauticFields = ['mauticContactTimelineLink', 'mauticContactIsContactableByEmail'];
+    var compoundMauticFields = ['mauticContactTimelineLink'];
 
+    if (mQuery('#integration_details_featureSettings_updateDncByDate_0').is(':checked')) {
+        compoundMauticFields.push('mauticContactIsContactableByEmail');
+    }
     var integrationField = mQuery('#integration_details_featureSettings_'+object+'Fields_i_' + index).attr('data-value');
     var mauticField = mQuery('#integration_details_featureSettings_'+object+'Fields_m_' + index + ' option:selected').val();
 
@@ -297,7 +300,6 @@ Mautic.getIntegrationCampaigns = function (el, settings) {
     Mautic.ajaxActionRequest('plugin:getIntegrationCampaigns', data,
         function (response) {
             if (response.success) {
-                console.log(response.html);
                 mQuery('.integration-campaigns').html(response.html);
                 Mautic.onPageLoad('.integration-campaigns', response);
             }

@@ -164,7 +164,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    protected function configureBuilder(array $options)
+    private function configureBuilder(array $options)
     {
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
         /** @var ReportGeneratorEvent $event */
@@ -443,7 +443,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'boolean':
                                 if ((int) $filter['value'] > 1) {
                                     // Ignore the "reset" value of "2"
-                                    break;
+                                    continue 2;
                                 }
 
                                 $queryBuilder->setParameter($paramName, $filter['value'], 'boolean');

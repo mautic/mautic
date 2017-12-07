@@ -329,7 +329,6 @@ class EventController extends CommonFormController
 
             if ($closeModal) {
                 if ($success) {
-
                     //prevent undefined errors
                     $entity = new Event();
                     $blank  = $entity->convertToArray();
@@ -437,7 +436,6 @@ class EventController extends CommonFormController
 
             // Add the field to the delete list
             if (!in_array($objectId, $deletedEvents)) {
-
                 //If event is new don't add to deleted list
                 if (strpos($objectId, 'new') === false) {
                     $deletedEvents[] = $objectId;

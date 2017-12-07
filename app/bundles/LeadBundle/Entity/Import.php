@@ -764,6 +764,24 @@ class Import extends FormEntity
     }
 
     /**
+     * @param $line
+     *
+     * @return Import
+     */
+    public function setLastLineImported($line)
+    {
+        $this->properties['line'] = (int) $line;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastLineImported()
+    {
+        return isset($this->properties['line']) ? $this->properties['line'] : 0;
+    }
+
+    /**
      * @return array
      */
     public function getMatchedFields()
@@ -772,7 +790,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @param string $properties
+     * @param array $properties
      *
      * @return Import
      */
@@ -880,7 +898,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getProperties()
     {
