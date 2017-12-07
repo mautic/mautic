@@ -1,3 +1,7 @@
+## Reporting Security Vulnerabilities
+
+If you think that you have found a security vulnerability, please email security@mautic.com with as much detail as possible. The core team will review the vulnerability and if found applicable, will create the patch in a private repository. The vulnerability will be disclosed once the patch has been included into a release. 
+
 ## Contributing Code
 
 Development is open and available to any member of the Mautic community. All fixes and improvements are done through pull requests to the code. This code is open source and publicly available. 

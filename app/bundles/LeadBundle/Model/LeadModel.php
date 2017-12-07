@@ -12,6 +12,7 @@
 namespace Mautic\LeadBundle\Model;
 
 use DeviceDetector\DeviceDetector;
+use Doctrine\ORM\NonUniqueResultException;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -1815,11 +1816,13 @@ class LeadModel extends FormModel
         unset($fieldData['doNotEmail']);
 
         if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
-            $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']], $data[$fields['ownerusername']]);
-            if ($newOwner) {
+            try {
+                $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']]);
                 $lead->setOwner($newOwner);
                 //reset default import owner if exists owner for contact
                 $owner = null;
+            } catch (NonUniqueResultException $exception) {
+                // user not found
             }
         }
         unset($fieldData['ownerusername']);
