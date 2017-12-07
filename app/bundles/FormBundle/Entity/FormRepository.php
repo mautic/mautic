@@ -105,6 +105,7 @@ class FormRepository extends CommonRepository
         $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
+
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('f.isPublished', ":$unique"),

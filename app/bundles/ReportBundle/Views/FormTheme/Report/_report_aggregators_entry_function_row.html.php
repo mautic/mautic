@@ -5,6 +5,7 @@
     ?>
             <option value="<?php echo $function->value; ?>"<?php echo ($function->value == $form->vars['data']) ? ' selected' : '' ?>><?php echo $function->label; ?></option>
             <?php
+
 } ?>
     </select>
 </div>

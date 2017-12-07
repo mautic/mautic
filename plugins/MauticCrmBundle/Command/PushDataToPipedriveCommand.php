@@ -16,7 +16,6 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
      * @var SymfonyStyle
      */
     private $io;
-
     /**
      * {@inheritdoc}
      */

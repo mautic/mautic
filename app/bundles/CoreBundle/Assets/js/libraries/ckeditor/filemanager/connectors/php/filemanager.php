@@ -1,5 +1,4 @@
 <?php
-
 // only for debug
 // error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
 // ini_set('display_errors', '1');
@@ -33,6 +32,7 @@ if (!isset($_GET)) {
 } else {
     if (isset($_GET['mode']) && $_GET['mode'] != '') {
         switch ($_GET['mode']) {
+
             default:
 
                 $fm->error($fm->lang('MODE_ERROR'));
@@ -106,6 +106,7 @@ if (!isset($_GET)) {
         }
     } elseif (isset($_POST['mode']) && $_POST['mode'] != '') {
         switch ($_POST['mode']) {
+
             default:
 
                 $fm->error($fm->lang('MODE_ERROR'));

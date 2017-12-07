@@ -12,7 +12,6 @@
 namespace Mautic\LeadBundle\Model;
 
 use DeviceDetector\DeviceDetector;
-use Doctrine\ORM\NonUniqueResultException;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -28,7 +27,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -55,7 +53,6 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -146,11 +143,6 @@ class LeadModel extends FormModel
     protected $coreParametersHelper;
 
     /**
-     * @var UserProvider
-     */
-    protected $userProvider;
-
-    /**
      * @var
      */
     protected $leadTrackingId;
@@ -164,11 +156,6 @@ class LeadModel extends FormModel
      * @var array
      */
     protected $availableLeadFields = [];
-
-    /**
-     * @var EmailValidator
-     */
-    protected $emailValidator;
 
     /**
      * LeadModel constructor.
@@ -186,7 +173,6 @@ class LeadModel extends FormModel
      * @param ChannelListHelper    $channelListHelper
      * @param                      $trackByIp
      * @param CoreParametersHelper $coreParametersHelper
-     * @param UserProvider         $userProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -201,9 +187,7 @@ class LeadModel extends FormModel
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
         $trackByIp,
-        CoreParametersHelper $coreParametersHelper,
-        EmailValidator $emailValidator,
-        UserProvider $userProvider
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->request              = $requestStack->getCurrentRequest();
         $this->cookieHelper         = $cookieHelper;
@@ -218,8 +202,6 @@ class LeadModel extends FormModel
         $this->channelListHelper    = $channelListHelper;
         $this->trackByIp            = $trackByIp;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->emailValidator       = $emailValidator;
-        $this->userProvider         = $userProvider;
     }
 
     /**
@@ -232,7 +214,6 @@ class LeadModel extends FormModel
         static $repoSetup;
 
         $repo = $this->em->getRepository('MauticLeadBundle:Lead');
-        $repo->setDispatcher($this->dispatcher);
 
         if (!$repoSetup) {
             $repoSetup = true;
@@ -528,14 +509,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Clear all Lead entities.
-     */
-    public function clearEntities()
-    {
-        $this->getRepository()->clear();
-    }
-
-    /**
      * Populates custom field values for updating the lead. Also retrieves social media data.
      *
      * @param Lead       $lead
@@ -666,6 +639,7 @@ class LeadModel extends FormModel
                             if (!empty($socialFeatureSettings[$service]['leadFields'])
                                 && in_array($field['alias'], $socialFeatureSettings[$service]['leadFields'])
                             ) {
+
                                 //check to see if the data is available
                                 $key = array_search($field['alias'], $socialFeatureSettings[$service]['leadFields']);
                                 if (isset($details['profile'][$key])) {
@@ -1035,16 +1009,13 @@ class LeadModel extends FormModel
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
         if (null == $this->availableLeadFields) {
-            $filter = ['isPublished' => true];
-
-            if ($onlyPubliclyUpdateable) {
-                $filter['isPubliclyUpdatable'] = true;
-            }
-
             $this->availableLeadFields = $this->leadFieldModel->getFieldList(
                 false,
                 false,
-                $filter
+                [
+                    'isPublished'         => true,
+                    'isPubliclyUpdatable' => $onlyPubliclyUpdateable,
+                ]
             );
         }
 
@@ -1275,7 +1246,6 @@ class LeadModel extends FormModel
     {
         $this->leadListModel->removeLead($lead, $lists, $manuallyRemoved);
     }
-
     /**
      * Add lead to Stage.
      *
@@ -1427,6 +1397,145 @@ class LeadModel extends FormModel
 
         //return the merged lead
         return $mergeWith;
+    }
+
+    /**
+     * @param Lead   $lead
+     * @param string $channel
+     *
+     * @return int
+     *
+     * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
+     *                                             sure to always compare the return value against
+     *                                             the class constants of DoNotContact
+     */
+    public function isContactable(Lead $lead, $channel)
+    {
+        if (is_array($channel)) {
+            $channel = key($channel);
+        }
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
+        $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
+
+        // If the lead has no entries in the DNC table, we're good to go
+        if (empty($dncEntries)) {
+            return DoNotContact::IS_CONTACTABLE;
+        }
+
+        foreach ($dncEntries as $dnc) {
+            if ($dnc->getReason() !== DoNotContact::IS_CONTACTABLE) {
+                return $dnc->getReason();
+            }
+        }
+
+        return DoNotContact::IS_CONTACTABLE;
+    }
+
+    /**
+     * Remove a Lead's DNC entry based on channel.
+     *
+     * @param Lead      $lead
+     * @param string    $channel
+     * @param bool|true $persist
+     *
+     * @return bool
+     */
+    public function removeDncForLead(Lead $lead, $channel, $persist = true)
+    {
+        /** @var DoNotContact $dnc */
+        foreach ($lead->getDoNotContact() as $dnc) {
+            if ($dnc->getChannel() === $channel) {
+                $lead->removeDoNotContactEntry($dnc);
+
+                if ($persist) {
+                    $this->saveEntity($lead);
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Create a DNC entry for a lead.
+     *
+     * @param Lead         $lead
+     * @param string|array $channel            If an array with an ID, use the structure ['email' => 123]
+     * @param string       $comments
+     * @param int          $reason             Must be a class constant from the DoNotContact class
+     * @param bool         $persist
+     * @param bool         $checkCurrentStatus
+     *
+     * @return bool|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
+     *                           and has the specified reason, nothing is done and this returns false
+     */
+    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true)
+    {
+        // if !$checkCurrentStatus, assume is contactable due to already being valided
+        $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DoNotContact::IS_CONTACTABLE;
+
+        // If they don't have a DNC entry yet
+        if ($isContactable === DoNotContact::IS_CONTACTABLE) {
+            $dnc = new DoNotContact();
+
+            if (is_array($channel)) {
+                $channelId = reset($channel);
+                $channel   = key($channel);
+
+                $dnc->setChannelId((int) $channelId);
+            }
+
+            $dnc->setChannel($channel);
+            $dnc->setReason($reason);
+            $dnc->setLead($lead);
+            $dnc->setDateAdded(new \DateTime());
+            $dnc->setComments($comments);
+
+            $lead->addDoNotContactEntry($dnc);
+
+            if ($persist) {
+                // Use model saveEntity to trigger events for DNC change
+                $this->saveEntity($lead);
+            }
+
+            return $dnc;
+        }
+        // Or if the given reason is different than the stated reason
+        elseif ($isContactable !== $reason) {
+            /** @var DoNotContact $dnc */
+            foreach ($lead->getDoNotContact() as $dnc) {
+                // Only update if the contact did not unsubscribe themselves
+                if ($dnc->getChannel() === $channel && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
+                    // Remove the outdated entry
+                    $lead->removeDoNotContactEntry($dnc);
+
+                    // Update the DNC entry
+                    $dnc->setChannel($channel);
+                    $dnc->setReason($reason);
+                    $dnc->setLead($lead);
+                    $dnc->setDateAdded(new \DateTime());
+                    $dnc->setComments($comments);
+
+                    // Re-add the entry to the lead
+                    $lead->addDoNotContactEntry($dnc);
+
+                    if ($persist) {
+                        // Use model saveEntity to trigger events for DNC change
+                        $this->saveEntity($lead);
+                    }
+
+                    return $dnc;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1815,18 +1924,6 @@ class LeadModel extends FormModel
         }
         unset($fieldData['doNotEmail']);
 
-        if (!empty($fields['ownerusername']) && !empty($data[$fields['ownerusername']])) {
-            try {
-                $newOwner = $this->userProvider->loadUserByUsername($data[$fields['ownerusername']]);
-                $lead->setOwner($newOwner);
-                //reset default import owner if exists owner for contact
-                $owner = null;
-            } catch (NonUniqueResultException $exception) {
-                // user not found
-            }
-        }
-        unset($fieldData['ownerusername']);
-
         if ($owner !== null) {
             $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
         }
@@ -1873,17 +1970,10 @@ class LeadModel extends FormModel
                     $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
                 }
 
-                if ('email' === $leadField['type'] && !empty($fieldData[$leadField['alias']])) {
-                    try {
-                        $this->emailValidator->validate($fieldData[$leadField['alias']], false);
-                    } catch (\Exception $exception) {
-                        $fieldErrors[] = $leadField['alias'].': '.$exception->getMessage();
-                    }
-                }
-
                 // Skip if the value is in the CSV row
                 continue;
             } elseif ($leadField['defaultValue']) {
+
                 // Fill in the default value if any
                 $fieldData[$leadField['alias']] = ('multiselect' === $leadField['type']) ? [$leadField['defaultValue']] : $leadField['defaultValue'];
             }
@@ -1956,9 +2046,10 @@ class LeadModel extends FormModel
                         $this->em->getReference('MauticLeadBundle:Tag', $tag)
                     );
                 } else {
-                    $lead->addTag(
-                        $this->getTagRepository()->getTagByNameOrCreateNewOne($tag)
-                    );
+                    // New tag
+                    $newTag = new Tag();
+                    $newTag->setTag(InputHelper::clean($tag));
+                    $lead->addTag($newTag);
                 }
             }
             $leadModified = true;
@@ -1996,8 +2087,8 @@ class LeadModel extends FormModel
     public function addUTMTags(Lead $lead, $params)
     {
         // known "synonym" fields expected
-        $synonyms = ['useragent' => 'user_agent',
-                    'remotehost' => 'remote_host', ];
+        $synonyms = ['useragent'  => 'user_agent',
+                     'remotehost' => 'remote_host', ];
 
         // convert 'query' option to an array if necessary
         if (isset($params['query']) && !is_array($params['query'])) {
@@ -2142,7 +2233,8 @@ class LeadModel extends FormModel
                 $tagToBeAdded = null;
 
                 if (!array_key_exists($tag, $foundTags)) {
-                    $tagToBeAdded = new Tag($tag);
+                    $tagToBeAdded = new Tag();
+                    $tagToBeAdded->setTag($tag);
                 } elseif (!$leadTags->contains($foundTags[$tag])) {
                     $tagToBeAdded = $foundTags[$tag];
                 }
@@ -2518,19 +2610,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @return array
-     */
-    public function getEngagementTypes()
-    {
-        $event = new LeadTimelineEvent();
-        $event->fetchTypesOnly();
-
-        $this->dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
-
-        return $event->getEventTypes();
-    }
-
-    /**
      * Get engagement counts by time unit.
      *
      * @param Lead            $lead
@@ -2550,7 +2629,6 @@ class LeadModel extends FormModel
 
         return $event->getEventCounter();
     }
-
     /**
      * @param Lead $lead
      * @param      $company
@@ -2737,165 +2815,12 @@ class LeadModel extends FormModel
         return $success;
     }
 
-    /**
-     * @param Lead $lead
-     * @param      $ownerId
-     */
     public function updateLeadOwner(Lead $lead, $ownerId)
     {
         $owner = $this->em->getReference(User::class, $ownerId);
         $lead->setOwner($owner);
 
         parent::saveEntity($lead);
-    }
-
-    /**
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
-     *
-     * @param Lead   $lead
-     * @param string $channel
-     *
-     * @return int
-     *
-     * @see \Mautic\LeadBundle\Entity\DoNotContact This method can return boolean false, so be
-     *                                             sure to always compare the return value against
-     *                                             the class constants of DoNotContact
-     */
-    public function isContactable(Lead $lead, $channel)
-    {
-        if (is_array($channel)) {
-            $channel = key($channel);
-        }
-
-        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
-
-        /** @var \Mautic\LeadBundle\Entity\DoNotContact[] $entries */
-        $dncEntries = $dncRepo->getEntriesByLeadAndChannel($lead, $channel);
-
-        // If the lead has no entries in the DNC table, we're good to go
-        if (empty($dncEntries)) {
-            return DoNotContact::IS_CONTACTABLE;
-        }
-
-        foreach ($dncEntries as $dnc) {
-            if ($dnc->getReason() !== DoNotContact::IS_CONTACTABLE) {
-                return $dnc->getReason();
-            }
-        }
-
-        return DoNotContact::IS_CONTACTABLE;
-    }
-
-    /**
-     * Remove a Lead's DNC entry based on channel.
-     *
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
-     *
-     * @param Lead      $lead
-     * @param string    $channel
-     * @param bool|true $persist
-     *
-     * @return bool
-     */
-    public function removeDncForLead(Lead $lead, $channel, $persist = true)
-    {
-        /** @var DoNotContact $dnc */
-        foreach ($lead->getDoNotContact() as $dnc) {
-            if ($dnc->getChannel() === $channel) {
-                $lead->removeDoNotContactEntry($dnc);
-
-                if ($persist) {
-                    $this->saveEntity($lead);
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Create a DNC entry for a lead.
-     *
-     * @deprecated 2.12.0 to be removed in 3.0; use Mautic\LeadBundle\Model\DoNotContact instead
-     *
-     * @param Lead         $lead
-     * @param string|array $channel            If an array with an ID, use the structure ['email' => 123]
-     * @param string       $comments
-     * @param int          $reason             Must be a class constant from the DoNotContact class
-     * @param bool         $persist
-     * @param bool         $checkCurrentStatus
-     * @param bool         $override
-     *
-     * @return bool|DoNotContact If a DNC entry is added or updated, returns the DoNotContact object. If a DNC is already present
-     *                           and has the specified reason, nothing is done and this returns false
-     */
-    public function addDncForLead(Lead $lead, $channel, $comments = '', $reason = DoNotContact::BOUNCED, $persist = true, $checkCurrentStatus = true, $override = false)
-    {
-        // if !$checkCurrentStatus, assume is contactable due to already being valided
-        $isContactable = ($checkCurrentStatus) ? $this->isContactable($lead, $channel) : DoNotContact::IS_CONTACTABLE;
-
-        // If they don't have a DNC entry yet
-        if ($isContactable === DoNotContact::IS_CONTACTABLE) {
-            $dnc = new DoNotContact();
-
-            if (is_array($channel)) {
-                $channelId = reset($channel);
-                $channel   = key($channel);
-
-                $dnc->setChannelId((int) $channelId);
-            }
-
-            $dnc->setChannel($channel);
-            $dnc->setReason($reason);
-            $dnc->setLead($lead);
-            $dnc->setDateAdded(new \DateTime());
-            $dnc->setComments($comments);
-
-            $lead->addDoNotContactEntry($dnc);
-
-            if ($persist) {
-                // Use model saveEntity to trigger events for DNC change
-                $this->saveEntity($lead);
-            }
-
-            return $dnc;
-        }
-        // Or if the given reason is different than the stated reason
-        elseif ($isContactable !== $reason) {
-            /** @var DoNotContact $dnc */
-            foreach ($lead->getDoNotContact() as $dnc) {
-                // Only update if the contact did not unsubscribe themselves
-                if (!$override && $dnc->getReason() !== DoNotContact::UNSUBSCRIBED) {
-                    $override = true;
-                }
-                if ($dnc->getChannel() === $channel && $override) {
-                    // Remove the outdated entry
-                    $lead->removeDoNotContactEntry($dnc);
-
-                    // Update the DNC entry
-                    $dnc->setChannel($channel);
-                    $dnc->setReason($reason);
-                    $dnc->setLead($lead);
-                    $dnc->setDateAdded(new \DateTime());
-                    $dnc->setComments($comments);
-
-                    // Re-add the entry to the lead
-                    $lead->addDoNotContactEntry($dnc);
-
-                    if ($persist) {
-                        // Use model saveEntity to trigger events for DNC change
-                        $this->saveEntity($lead);
-                    }
-
-                    return $dnc;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**

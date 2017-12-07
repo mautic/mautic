@@ -132,3 +132,4 @@ $view['slots']->set(
         </div>
     </div>
 <?php
+

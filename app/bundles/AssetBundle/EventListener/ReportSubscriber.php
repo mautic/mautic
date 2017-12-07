@@ -11,10 +11,8 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -25,19 +23,6 @@ use Mautic\ReportBundle\ReportEvents;
  */
 class ReportSubscriber extends CommonSubscriber
 {
-    const CONTEXT_ASSET          = 'assets';
-    const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    public function __construct(CompanyReportData $companyReportData)
-    {
-        $this->companyReportData = $companyReportData;
-    }
-
     /**
      * @return array
      */
@@ -57,101 +42,95 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if (!$event->checkContext([self::CONTEXT_ASSET, self::CONTEXT_ASSET_DOWNLOAD])) {
-            return;
-        }
-
-        // Assets
-        $prefix  = 'a.';
-        $columns = [
-            $prefix.'download_count' => [
-                'label' => 'mautic.asset.report.download_count',
-                'type'  => 'int',
-            ],
-            $prefix.'unique_download_count' => [
-                'label' => 'mautic.asset.report.unique_download_count',
-                'type'  => 'int',
-            ],
-            $prefix.'alias' => [
-                'label' => 'mautic.core.alias',
-                'type'  => 'string',
-            ],
-            $prefix.'lang' => [
-                'label' => 'mautic.core.language',
-                'type'  => 'string',
-            ],
-            $prefix.'title' => [
-                'label' => 'mautic.core.title',
-                'type'  => 'string',
-            ],
-        ];
-
-        $columns = array_merge(
-            $columns,
-            $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'),
-            $event->getCategoryColumns()
-        );
-
-        $event->addTable(
-            self::CONTEXT_ASSET,
-            [
-                'display_name' => 'mautic.asset.assets',
-                'columns'      => $columns,
-            ]
-        );
-
-        if ($event->checkContext([self::CONTEXT_ASSET_DOWNLOAD])) {
-            // Downloads
-            $downloadPrefix  = 'ad.';
-            $downloadColumns = [
-                $downloadPrefix.'date_download' => [
-                    'label'          => 'mautic.asset.report.download.date_download',
-                    'type'           => 'datetime',
-                    'groupByFormula' => 'DATE('.$downloadPrefix.'date_download)',
-                ],
-                $downloadPrefix.'code' => [
-                    'label' => 'mautic.asset.report.download.code',
-                    'type'  => 'string',
-                ],
-                $downloadPrefix.'referer' => [
-                    'label' => 'mautic.core.referer',
-                    'type'  => 'string',
-                ],
-                $downloadPrefix.'source' => [
-                    'label' => 'mautic.report.field.source',
-                    'type'  => 'string',
-                ],
-                $downloadPrefix.'source_id' => [
-                    'label' => 'mautic.report.field.source_id',
+        if ($event->checkContext(['assets', 'asset.downloads'])) {
+            // Assets
+            $prefix  = 'a.';
+            $columns = [
+                $prefix.'download_count' => [
+                    'label' => 'mautic.asset.report.download_count',
                     'type'  => 'int',
+                ],
+                $prefix.'unique_download_count' => [
+                    'label' => 'mautic.asset.report.unique_download_count',
+                    'type'  => 'int',
+                ],
+                $prefix.'alias' => [
+                    'label' => 'mautic.core.alias',
+                    'type'  => 'string',
+                ],
+                $prefix.'lang' => [
+                    'label' => 'mautic.core.language',
+                    'type'  => 'string',
+                ],
+                $prefix.'title' => [
+                    'label' => 'mautic.core.title',
+                    'type'  => 'string',
                 ],
             ];
 
-            $companyColumns = $this->companyReportData->getCompanyData();
-
-            $event->addTable(
-                self::CONTEXT_ASSET_DOWNLOAD,
-                [
-                    'display_name' => 'mautic.asset.report.downloads.table',
-                    'columns'      => array_merge(
-                        $columns,
-                        $downloadColumns,
-                        $event->getCampaignByChannelColumns(),
-                        $event->getLeadColumns(),
-                        $event->getIpColumn(),
-                        $companyColumns
-                    ),
-                    'filters' => $companyColumns,
-                ],
-                self::CONTEXT_ASSET
+            $columns = array_merge(
+                $columns,
+                $event->getStandardColumns($prefix, ['name'], 'mautic_asset_action'),
+                $event->getCategoryColumns(),
+                $event->getCampaignByChannelColumns()
             );
 
-            // Add Graphs
-            $context = self::CONTEXT_ASSET_DOWNLOAD;
-            $event->addGraph($context, 'line', 'mautic.asset.graph.line.downloads');
-            $event->addGraph($context, 'table', 'mautic.asset.table.most.downloaded');
-            $event->addGraph($context, 'table', 'mautic.asset.table.top.referrers');
-            $event->addGraph($context, 'pie', 'mautic.asset.graph.pie.statuses', ['translate' => false]);
+            $event->addTable(
+                'assets',
+                [
+                    'display_name' => 'mautic.asset.assets',
+                    'columns'      => $columns,
+                ]
+            );
+
+            if ($event->checkContext(['asset.downloads'])) {
+                // Downloads
+                $downloadPrefix  = 'ad.';
+                $downloadColumns = [
+                    $downloadPrefix.'date_download' => [
+                        'label'          => 'mautic.asset.report.download.date_download',
+                        'type'           => 'datetime',
+                        'groupByFormula' => 'DATE('.$downloadPrefix.'date_download)',
+                    ],
+                    $downloadPrefix.'code' => [
+                        'label' => 'mautic.asset.report.download.code',
+                        'type'  => 'string',
+                    ],
+                    $downloadPrefix.'referer' => [
+                        'label' => 'mautic.core.referer',
+                        'type'  => 'string',
+                    ],
+                    $downloadPrefix.'source' => [
+                        'label' => 'mautic.report.field.source',
+                        'type'  => 'string',
+                    ],
+                    $downloadPrefix.'source_id' => [
+                        'label' => 'mautic.report.field.source_id',
+                        'type'  => 'int',
+                    ],
+                ];
+
+                $event->addTable(
+                    'asset.downloads',
+                    [
+                        'display_name' => 'mautic.asset.report.downloads.table',
+                        'columns'      => array_merge(
+                            $columns,
+                            $downloadColumns,
+                            $event->getLeadColumns(),
+                            $event->getIpColumn()
+                        ),
+                    ],
+                    'assets'
+                );
+
+                // Add Graphs
+                $context = 'asset.downloads';
+                $event->addGraph($context, 'line', 'mautic.asset.graph.line.downloads');
+                $event->addGraph($context, 'table', 'mautic.asset.table.most.downloaded');
+                $event->addGraph($context, 'table', 'mautic.asset.table.top.referrers');
+                $event->addGraph($context, 'pie', 'mautic.asset.graph.pie.statuses', ['translate' => false]);
+            }
         }
     }
 
@@ -162,16 +141,13 @@ class ReportSubscriber extends CommonSubscriber
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        if (!$event->checkContext([self::CONTEXT_ASSET, self::CONTEXT_ASSET_DOWNLOAD])) {
-            return;
-        }
-
+        $context      = $event->getContext();
         $queryBuilder = $event->getQueryBuilder();
 
-        if ($event->checkContext(self::CONTEXT_ASSET)) {
+        if ($context == 'assets') {
             $queryBuilder->from(MAUTIC_TABLE_PREFIX.'assets', 'a');
             $event->addCategoryLeftJoin($queryBuilder, 'a');
-        } elseif ($event->checkContext(self::CONTEXT_ASSET_DOWNLOAD)) {
+        } elseif ($context == 'asset.downloads') {
             $event->applyDateFilters($queryBuilder, 'date_download', 'ad');
 
             $queryBuilder->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'ad')
@@ -180,10 +156,6 @@ class ReportSubscriber extends CommonSubscriber
             $event->addLeadLeftJoin($queryBuilder, 'ad');
             $event->addIpAddressLeftJoin($queryBuilder, 'ad');
             $event->addCampaignByChannelJoin($queryBuilder, 'a', 'asset');
-
-            if ($this->companyReportData->eventHasCompanyColumns($event)) {
-                $event->addCompanyLeftJoin($queryBuilder);
-            }
         }
 
         $event->setQueryBuilder($queryBuilder);
@@ -197,13 +169,13 @@ class ReportSubscriber extends CommonSubscriber
     public function onReportGraphGenerate(ReportGraphEvent $event)
     {
         // Context check, we only want to fire for Lead reports
-        if (!$event->checkContext(self::CONTEXT_ASSET_DOWNLOAD)) {
+        if (!$event->checkContext('asset.downloads')) {
             return;
         }
 
         $graphs       = $event->getRequestedGraphs();
         $qb           = $event->getQueryBuilder();
-        $downloadRepo = $this->em->getRepository(Download::class);
+        $downloadRepo = $this->em->getRepository('MauticAssetBundle:Download');
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);

@@ -54,11 +54,17 @@ class MonitoringModel extends FormModel
      *
      * @param $id
      *
-     * @return null|Monitoring
+     * @return null|object
      */
     public function getEntity($id = null)
     {
-        return $id ? parent::getEntity($id) : new Monitoring();
+        if ($id === null) {
+            $entity = new Monitoring();
+        } else {
+            $entity = parent::getEntity($id);
+        }
+
+        return $entity;
     }
 
     /**

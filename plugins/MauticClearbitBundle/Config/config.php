@@ -71,6 +71,7 @@ return [
             'mautic.integration.clearbit' => [
                 'class'     => \MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration::class,
                 'arguments' => [
+
                 ],
             ],
         ],

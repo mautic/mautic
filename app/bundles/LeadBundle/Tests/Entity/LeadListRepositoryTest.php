@@ -342,12 +342,13 @@ class LeadListRepositoryTest extends \PHPUnit_Framework_TestCase
                     $mockType = $this->getMockBuilder(TextType::class)
                         ->disableOriginalConstructor()
                         ->getMock();
-                    switch (true) {
-                        case strpos($table, 'companies') !== false:
+                    switch ($table) {
+                        case 'leads':
+                            $name = 'email';
+                            break;
+                        case 'companies':
                             $name = 'company_email';
                             break;
-                        default:
-                            $name = 'email';
                     }
 
                     $column = new Column($name, $mockType);

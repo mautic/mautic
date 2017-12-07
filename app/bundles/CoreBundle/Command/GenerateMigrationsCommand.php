@@ -39,7 +39,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  *
- * @see     www.doctrine-project.org
+ * @link    www.doctrine-project.org
  * @since   2.0
  *
  * @author  Jonathan Wage <jonwage@gmail.com>

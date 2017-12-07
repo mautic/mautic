@@ -266,28 +266,7 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'            => 'form-control',
-                        'tooltip'          => 'mautic.email.form.unsubscribeform.tooltip',
-                        'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
-                    ],
-                    'required'    => false,
-                    'multiple'    => false,
-                    'empty_value' => '',
-                ]
-            )
-                ->addModelTransformer($transformer)
-        );
-
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page', 'id');
-        $builder->add(
-            $builder->create(
-                'preferenceCenter',
-                'preference_center_list',
-                [
-                    'label'      => 'mautic.email.form.preference_center',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'            => 'form-control',
-                        'tooltip'          => 'mautic.email.form.preference_center.tooltip',
+                        'tootlip'          => 'mautic.email.form.unsubscribeform.tooltip',
                         'data-placeholder' => $this->translator->trans('mautic.core.form.chooseone'),
                     ],
                     'required'    => false,

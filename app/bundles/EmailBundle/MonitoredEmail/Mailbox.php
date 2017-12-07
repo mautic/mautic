@@ -121,11 +121,6 @@ class Mailbox
     const CRITERIA_TO = 'TO';
 
     /**
-     *  Get messages since a specific UID. Eg. UID 2:* will return all messages with UID 2 and above (IMAP includes the given UID).
-     */
-    const CRITERIA_UID = 'UID';
-
-    /**
      *  Match mails that have not been answered.
      */
     const CRITERIA_UNANSWERED = 'UNANSWERED';
@@ -850,7 +845,7 @@ class Mailbox
      * @param      $mailId
      * @param bool $markAsSeen
      *
-     * @return Message
+     * @return Mail
      */
     public function getMail($mailId, $markAsSeen = true)
     {
@@ -892,18 +887,6 @@ class Mailbox
                     $this->serverEncoding
                 ) : null;
             }
-        }
-
-        if (isset($headObject->in_reply_to)) {
-            $mail->inReplyTo = $headObject->in_reply_to;
-        }
-
-        if (isset($headObject->return_path)) {
-            $mail->returnPath = $headObject->return_path;
-        }
-
-        if (isset($headObject->references)) {
-            $mail->references = explode("\n", $headObject->references);
         }
 
         $mailStructure = imap_fetchstructure($this->getImapStream(), $mailId, FT_UID);

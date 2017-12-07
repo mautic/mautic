@@ -31,7 +31,6 @@ class UpdateLeadActionType extends AbstractType
     {
         $this->factory = $factory;
     }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options

@@ -65,8 +65,14 @@ class LeadListFilteringEvent extends CommonEvent
      * @param QueryBuilder  $queryBuilder
      * @param EntityManager $entityManager
      */
-    public function __construct($details, $leadId, $alias, $func, QueryBuilder $queryBuilder, EntityManager $entityManager)
-    {
+    public function __construct(
+        $details,
+        $leadId,
+        $alias,
+        $func,
+        QueryBuilder $queryBuilder,
+        EntityManager $entityManager
+    ) {
         $this->details         = $details;
         $this->leadId          = $leadId;
         $this->alias           = $alias;
@@ -126,7 +132,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @param bool $status
+     * @param bool
      */
     public function setFilteringStatus($status)
     {
@@ -134,7 +140,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @param string $query
+     * @param string
      */
     public function setSubQuery($query)
     {
@@ -144,7 +150,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @return bool
+     * @return array
      */
     public function isFilteringDone()
     {
@@ -157,13 +163,5 @@ class LeadListFilteringEvent extends CommonEvent
     public function getSubQuery()
     {
         return $this->subQuery;
-    }
-
-    /**
-     * @param array $details
-     */
-    public function setDetails($details)
-    {
-        $this->details = $details;
     }
 }

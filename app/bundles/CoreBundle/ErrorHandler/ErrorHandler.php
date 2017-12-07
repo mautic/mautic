@@ -10,6 +10,7 @@
  */
 
 namespace Mautic\CoreBundle\ErrorHandler {
+
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
@@ -576,6 +577,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 }
 
 namespace {
+
     use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 
     if (!function_exists('debugIt')) {

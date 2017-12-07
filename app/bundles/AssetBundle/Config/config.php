@@ -86,10 +86,7 @@ return [
                 ],
             ],
             'mautic.asset.reportbundle.subscriber' => [
-                'class'     => \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.model.company_report_data',
-                ],
+                'class' => 'Mautic\AssetBundle\EventListener\ReportSubscriber',
             ],
             'mautic.asset.builder.subscriber' => [
                 'class'     => 'Mautic\AssetBundle\EventListener\BuilderSubscriber',
@@ -126,11 +123,11 @@ return [
                 ],
             ],
             'oneup_uploader.pre_upload' => [
-                'class'     => \Mautic\AssetBundle\EventListener\UploadSubscriber::class,
+                'class'     => 'Mautic\AssetBundle\EventListener\UploadSubscriber',
                 'arguments' => [
+                    'translator',
                     'mautic.helper.core_parameters',
                     'mautic.asset.model.asset',
-                    'mautic.core.validator.file_upload',
                 ],
             ],
             'mautic.asset.dashboard.subscriber' => [

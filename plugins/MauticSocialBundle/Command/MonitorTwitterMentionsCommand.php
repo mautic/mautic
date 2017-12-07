@@ -11,13 +11,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
-
 class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
 {
-    /**
-     * Configure the command, set name and options.
-     */
     protected function configure()
     {
         $this->setName('social:monitor:twitter:mentions')
@@ -26,27 +21,34 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
         parent::configure();
     }
 
-    /**
-     * Search for tweets by mention.
-     *
-     * @param Monitoring $monitor
-     *
-     * @return bool|array False if missing the twitter handle, otherwise the array response from Twitter
+    /*
+     * Search for tweets by mention
      */
-    protected function getTweets($monitor)
+    public function getTweets($monitor)
     {
+        // monitor params
         $params = $monitor->getProperties();
-        $stats  = $monitor->getStats();
+
+        // stats
+        $stats = $monitor->getStats();
 
         if (!array_key_exists('handle', $params)) {
-            $this->output->writeln('No twitter handle was found!');
-
-            return false;
+            $this->output->writeln('no handle was found!');
+            exit();
         }
 
-        $mentionsUrl  = $this->twitter->getApiUrl('search/tweets');
+        // build mentions url
+        $mentionsUrl = $this->twitter->getApiUrl('search/tweets');
+
+        $query = $this->buildTwitterSearchQuery(
+            [
+                '@'.$params['handle'],
+            ]
+        );
+
+        // @todo set up count to be configurable
         $requestQuery = [
-            'q'     => '@'.$params['handle'],
+            'q'     => $query,
             'count' => $this->queryCount,
         ];
 
@@ -55,7 +57,9 @@ class MonitorTwitterMentionsCommand extends MonitorTwitterBaseCommand
             $requestQuery['since_id'] = $stats['max_id_str'];
         }
 
-        return $this->twitter->makeRequest($mentionsUrl, $requestQuery);
+        $results = $this->twitter->makeRequest($mentionsUrl, $requestQuery);
+
+        return $results;
     }
 
     public function getNetworkName()

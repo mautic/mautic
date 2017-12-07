@@ -58,7 +58,4 @@ $view['slots']->set('headerTitle', $header);
     'campaignSources' => $campaignSources,
     'eventSettings'   => $eventSettings,
     'canvasSettings'  => $entity->getCanvasSettings(),
-]);
-
-?>
-
+]); ?>

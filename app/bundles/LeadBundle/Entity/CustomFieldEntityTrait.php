@@ -171,11 +171,11 @@ trait CustomFieldEntityTrait
      * @param string $field
      * @param string $group
      *
-     * @return mixed
+     * @return array|false
      */
     public function getFieldValue($field, $group = null)
     {
-        if (array_key_exists($field, $this->updatedFields)) {
+        if (isset($this->updatedFields[$field])) {
             return $this->updatedFields[$field];
         }
 
@@ -183,7 +183,7 @@ trait CustomFieldEntityTrait
             return CustomFieldHelper::fixValueType($field['type'], $field['value']);
         }
 
-        return null;
+        return false;
     }
 
     /**

@@ -54,7 +54,6 @@ class DynamicContentSendType extends AbstractType
                     'tooltip'  => 'mautic.dynamicContent.choose.dynamicContents',
                     'onchange' => 'Mautic.disabledDynamicContentAction()',
                 ],
-                'where'       => 'e.isCampaignBased = 1', // do not show dwc with filters
                 'multiple'    => false,
                 'required'    => true,
                 'constraints' => [

@@ -349,20 +349,4 @@ class Submission
     {
         return $this->getForm()->getCreatedBy();
     }
-
-    /**
-     * @param string $alias
-     *
-     * @return Field|null
-     */
-    public function getFieldByAlias($alias)
-    {
-        foreach ($this->getForm()->getFields() as $field) {
-            if ($field->getAlias() === $alias) {
-                return $field;
-            }
-        }
-
-        return null;
-    }
 }

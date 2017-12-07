@@ -34,6 +34,7 @@ return [
             ],
         ],
         'public' => [
+
         ],
     ],
 
@@ -47,10 +48,13 @@ return [
             ],
         ],
         'admin' => [
+
         ],
         'profile' => [
+
         ],
         'extra' => [
+
         ],
     ],
 
@@ -74,15 +78,10 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
-            'mautic.channel.channelbundle.lead.subscriber' => [
-                'class' => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
-            ],
             'mautic.channel.reportbundle.subscriber' => [
-                'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.model.company_report_data',
-                ],
+                'class' => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
             ],
+
         ],
         'forms' => [
             \Mautic\ChannelBundle\Form\Type\MessageType::class => [
@@ -134,5 +133,6 @@ return [
     ],
 
     'parameters' => [
+
     ],
 ];

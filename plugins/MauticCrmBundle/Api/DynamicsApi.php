@@ -224,7 +224,7 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @see https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
+     * @link https://stackoverflow.com/questions/5483851/manually-parse-raw-http-data-with-php
      *
      * @param Response $response
      *

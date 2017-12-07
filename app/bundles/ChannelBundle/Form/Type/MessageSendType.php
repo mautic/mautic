@@ -48,6 +48,7 @@ class MessageSendType extends AbstractType
             'marketingMessage',
             'message_list',
             [
+
                 'label'       => 'mautic.channel.send.selectmessages',
                 'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,

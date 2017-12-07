@@ -708,6 +708,7 @@ class TrackableModel extends AbstractCommonModel
     protected function getEntitiesFromUrls($trackableUrls, $channel, $channelId)
     {
         if (!empty($channel) && !empty($channelId)) {
+
             // Track as channel aware
             return $this->getTrackablesByUrls($trackableUrls, $channel, $channelId);
         }

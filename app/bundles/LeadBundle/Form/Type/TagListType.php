@@ -11,24 +11,24 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TagListType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var
      */
-    private $translator;
+    private $factory;
 
     /**
-     * @param TranslatorInterface $translator
+     * @param MauticFactory $factory
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(MauticFactory $factory)
     {
-        $this->translator = $translator;
+        $this->factory = $factory;
     }
 
     /**
@@ -47,8 +47,8 @@ class TagListType extends AbstractType
             'lead_tag',
             [
                 'attr' => [
-                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.updateLeadTags(this)',
                 ],

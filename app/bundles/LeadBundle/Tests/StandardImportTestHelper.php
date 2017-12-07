@@ -11,23 +11,19 @@
 
 namespace Mautic\LeadBundle\Tests;
 
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class StandardImportTestHelper extends CommonMocks
 {
-    protected $eventEntities = [];
     protected static $csvPath;
-    protected static $largeCsvPath;
-
     protected static $initialList = [
         ['email', 'firstname', 'lastname'],
         ['john@doe.email', 'John', 'Doe'],
@@ -49,20 +45,8 @@ abstract class StandardImportTestHelper extends CommonMocks
         }
 
         fclose($file);
+
         self::$csvPath = $tmpFile;
-
-        $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_import_large_test_');
-        $file    = fopen($tmpFile, 'w');
-        fputcsv($file, ['email', 'firstname', 'lastname']);
-        $counter = 510;
-        while ($counter) {
-            fputcsv($file, [uniqid().'@gmail.com', uniqid(), uniqid()]);
-
-            --$counter;
-        }
-
-        fclose($file);
-        self::$largeCsvPath = $tmpFile;
     }
 
     public static function tearDownAfterClass()
@@ -72,13 +56,6 @@ abstract class StandardImportTestHelper extends CommonMocks
         }
 
         parent::tearDownAfterClass();
-    }
-
-    public function setup()
-    {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
-
-        $this->eventEntities = [];
     }
 
     protected function initImportEntity(array $methods = null)
@@ -121,8 +98,6 @@ abstract class StandardImportTestHelper extends CommonMocks
         $importRepository = $this->getMockBuilder(ImportRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $importRepository->method('getValue')
-            ->willReturn(true);
 
         $entityManager->expects($this->any())
             ->method('getRepository')
@@ -160,13 +135,6 @@ abstract class StandardImportTestHelper extends CommonMocks
         $importModel = new ImportModel($pathsHelper, $leadModel, $notificationModel, $coreParametersHelper, $companyModel);
         $importModel->setEntityManager($entityManager);
         $importModel->setTranslator($translator);
-
-        $userHelper = $this->getMockBuilder(UserHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $importModel->setUserHelper($userHelper);
-
-        $importModel->setDispatcher(new EventDispatcher());
 
         return $importModel;
     }

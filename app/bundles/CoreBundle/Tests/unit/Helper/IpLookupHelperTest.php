@@ -26,11 +26,8 @@ class IpLookupHelperTest extends \PHPUnit_Framework_TestCase
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-    }
 
-    public function setUp()
-    {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'prod');
     }
 
     /**

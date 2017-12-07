@@ -14,9 +14,6 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Interface InterfaceCallbackTransport.
- */
 interface InterfaceCallbackTransport
 {
     /**

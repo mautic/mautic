@@ -108,6 +108,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     }
                 }
             }
+
             $event->setTemplate('MauticReportBundle:SubscribedEvents\Dashboard:widget.html.php');
             $event->stopPropagation();
         }

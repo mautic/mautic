@@ -41,7 +41,6 @@ class DynamicContentListType extends AbstractType
                         'options' => [
                             'top_level'  => $options['top_level'],
                             'ignore_ids' => $options['ignore_ids'],
-                            'where'      => $options['where'],
                         ],
                     ];
                 },
@@ -49,7 +48,6 @@ class DynamicContentListType extends AbstractType
                     $query = [
                         'top_level'  => $options['top_level'],
                         'ignore_ids' => $options['ignore_ids'],
-                        'where'      => $options['where'],
                     ];
 
                     return 'dynamicContent:getLookupChoiceList&'.http_build_query($query);
@@ -58,7 +56,6 @@ class DynamicContentListType extends AbstractType
                 'required'   => false,
                 'top_level'  => 'translation',
                 'ignore_ids' => [],
-                'where'      => '',
             ]
         );
     }

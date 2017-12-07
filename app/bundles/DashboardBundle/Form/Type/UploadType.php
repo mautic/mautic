@@ -49,7 +49,6 @@ class UploadType extends AbstractType
             $builder->setAction($options['action']);
         }
     }
-
     /**
      * @return string
      */

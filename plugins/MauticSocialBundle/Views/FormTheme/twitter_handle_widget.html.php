@@ -17,11 +17,4 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="row">
-            <div class="form-group col-xs-12">
-                <?php echo $view['form']->row($form['checknames']); ?>
-            </div>
-        </div>
-    </div>
 </div>

@@ -11,23 +11,23 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ModifyLeadTagsType extends AbstractType
 {
     /**
-     * @var TranslatorInterface
+     * @var
      */
-    private $translator;
+    private $factory;
 
     /**
-     * @param TranslatorInterface $factory
+     * @param MauticFactory $factory
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(MauticFactory $factory)
     {
-        $this->translator = $translator;
+        $this->factory = $factory;
     }
 
     /**
@@ -42,8 +42,8 @@ class ModifyLeadTagsType extends AbstractType
             [
                 'label' => 'mautic.lead.tags.add',
                 'attr'  => [
-                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
                 ],
@@ -58,8 +58,8 @@ class ModifyLeadTagsType extends AbstractType
             [
                 'label' => 'mautic.lead.tags.remove',
                 'attr'  => [
-                    'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
-                    'data-no-results-text' => $this->translator->trans('mautic.lead.tags.enter_to_create'),
+                    'data-placeholder'     => $this->factory->getTranslator()->trans('mautic.lead.tags.select_or_create'),
+                    'data-no-results-text' => $this->factory->getTranslator()->trans('mautic.lead.tags.enter_to_create'),
                     'data-allow-add'       => 'true',
                     'onchange'             => 'Mautic.createLeadTag(this)',
                 ],

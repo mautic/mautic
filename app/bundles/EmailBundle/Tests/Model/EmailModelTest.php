@@ -24,14 +24,12 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
@@ -113,15 +111,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $emailEntity->method('isVariant')
             ->will($this->returnValue(true));
-
-        $mailHelper->method('createEmailStat')
-            ->will($this->returnCallback(function () use ($emailEntity) {
-                $stat = new Stat();
-                $stat->setEmail($emailEntity);
-
-                return $stat;
-            }
-        ));
 
         $variantA = $this->getMockBuilder(Email::class)
             ->disableOriginalConstructor()
@@ -218,12 +207,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
-        $dncModel = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $sendToContactModel = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -233,8 +216,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $sendToContactModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -349,15 +331,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $emailEntity->method('isVariant')
             ->will($this->returnValue(true));
 
-        $mailHelper->method('createEmailStat')
-            ->will($this->returnCallback(function () use ($emailEntity) {
-                $stat = new Stat();
-                $stat->setEmail($emailEntity);
-
-                return $stat;
-            }
-            ));
-
         $variantA = $this->getMockBuilder(Email::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -453,12 +426,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
-        $dncModel = $this->getMockBuilder(DoNotContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $sendToContactModel = new SendEmailToContact($mailHelper, $statRepository, $dncModel, $translator);
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -468,8 +435,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $sendToContactModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -615,10 +581,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
-        $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -628,8 +590,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $sendToContactModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -755,10 +716,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->method('getRepository')
             ->willReturn($companyRepository);
 
-        $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -768,8 +725,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $sendToContactModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -873,10 +829,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $companyModel->expects($this->exactly(0))
             ->method('getRepository');
 
-        $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -886,8 +838,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $sendToContactModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);
@@ -1009,10 +960,6 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
         $messageModel->setUserHelper($userHelper);
         $messageModel->setDispatcher($dispatcher);
 
-        $sendToContactModel = $this->getMockBuilder(SendEmailToContact::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $emailModel = new \Mautic\EmailBundle\Model\EmailModel(
             $ipLookupHelper,
             $themeHelper,
@@ -1022,8 +969,7 @@ class EmailModelTest extends \PHPUnit_Framework_TestCase
             $companyModel,
             $trackableModel,
             $userModel,
-            $messageModel,
-            $sendToContactModel
+            $messageModel
         );
 
         $emailModel->setTranslator($translator);

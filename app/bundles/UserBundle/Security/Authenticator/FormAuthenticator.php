@@ -73,10 +73,7 @@ class FormAuthenticator implements SimpleFormAuthenticatorInterface
      * @param UserProviderInterface $userProvider
      * @param                       $providerKey
      *
-     * @return PluginToken
-     *
-     * @throws AuthenticationException
-     * @throws BadCredentialsException
+     * @return UsernamePasswordToken
      */
     public function authenticateToken(TokenInterface $token, UserProviderInterface $userProvider, $providerKey)
     {

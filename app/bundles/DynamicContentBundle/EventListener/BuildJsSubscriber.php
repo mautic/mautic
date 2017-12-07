@@ -80,17 +80,10 @@ class BuildJsSubscriber extends CommonSubscriber
         };
             }
 MauticJS.replaceDynamicContent = function () {
-    var dynamicContentSlots = document.querySelectorAll('.mautic-slot, [data-slot="dwc"]');
+    var dynamicContentSlots = document.querySelectorAll('.mautic-slot');
     if (dynamicContentSlots.length) {
         MauticJS.iterateCollection(dynamicContentSlots)(function(node, i) {
-            var slotName = node.dataset['slotName'];
-            if ('undefined' === typeof slotName) {
-                slotName = node.dataset['paramSlotName'];
-            }
-            if ('undefined' === typeof slotName) {
-                node.innerHTML = '';
-                return;
-            }
+            var slotName = node.dataset.slotName;
             var url = '{$dwcUrl}'.replace('slotNamePlaceholder', slotName);
             MauticJS.makeCORSRequest('GET', url, {}, function(response, xhr) {
                 if (response.length) {

@@ -16,7 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 /**
  * Class AbstractBatchTransport.
  */
-abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implements TokenTransportInterface
+abstract class AbstractTokenSmtpTransport extends \Swift_SmtpTransport implements InterfaceTokenTransport
 {
     /**
      * @var \Swift_Mime_Message

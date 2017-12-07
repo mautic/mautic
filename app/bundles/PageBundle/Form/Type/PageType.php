@@ -124,15 +124,6 @@ class PageType extends AbstractType
         $builder->add('isPublished', 'yesno_button_group');
 
         $builder->add(
-            'isPreferenceCenter',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.preference_center',
-                'data'  => $options['data']->isPreferenceCenter() ? $options['data']->isPreferenceCenter() : false,
-            ]
-        );
-
-        $builder->add(
             'publishUp',
             'datetime',
             [

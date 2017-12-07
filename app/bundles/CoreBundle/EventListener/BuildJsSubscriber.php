@@ -171,14 +171,13 @@ MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callback
         }
     };
    
-    if (typeof xhr.setRequestHeader !== "undefined"){
-        if (method.toUpperCase() === 'POST') {
-            xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-        }
-    
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.withCredentials = true;
+    if (method.toUpperCase() === 'POST') {
+        xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
     }
+
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.withCredentials = true;
+ 
     xhr.send(query);
 };
 

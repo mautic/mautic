@@ -73,7 +73,6 @@ class OneSignalApi extends AbstractNotificationApi
         $data = [];
 
         $buttonId = $notification->getHeading();
-        $title    = $notification->getHeading();
         $url      = $notification->getUrl();
         $button   = $notification->getButton();
         $message  = $notification->getMessage();
@@ -94,9 +93,9 @@ class OneSignalApi extends AbstractNotificationApi
             if (!is_array($title)) {
                 $title = ['en' => $title];
             }
-        }
 
-        $data['headings'] = $title;
+            $data['headings'] = $title;
+        }
 
         if ($url) {
             $data['url'] = $url;

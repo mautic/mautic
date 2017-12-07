@@ -15,7 +15,6 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
      * @var SymfonyStyle
      */
     private $io;
-
     /**
      * {@inheritdoc}
      */

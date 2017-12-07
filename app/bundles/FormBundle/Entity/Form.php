@@ -556,7 +556,7 @@ class Form extends FormEntity
     /**
      * Get fields.
      *
-     * @return \Doctrine\Common\Collections\Collection|Field[]
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getFields()
     {
@@ -634,7 +634,7 @@ class Form extends FormEntity
     /**
      * Get submissions.
      *
-     * @return \Doctrine\Common\Collections\Collection|Submission[]
+     * @return \Doctrine\Common\Collections\Collection
      */
     public function getSubmissions()
     {
