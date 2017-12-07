@@ -12,7 +12,7 @@ namespace MauticPlugin\MauticWebinarBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Integration\IntegrationObject;
-use Proxies\__CG__\Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyLead;
 
 /**
  * Class ConnectwiseIntegration.
