@@ -12,6 +12,7 @@ namespace MauticPlugin\MauticWebinarBundle\Integration;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Integration\IntegrationObject;
+use Proxies\__CG__\Mautic\LeadBundle\Entity\CompanyLead;
 
 /**
  * Class ConnectwiseIntegration.
@@ -134,8 +135,8 @@ class WebikeoIntegration extends WebinarAbstractIntegration
 
     /**
      * @param array $filters
+     * @param bool  $forSegment
      *
-     * @param bool $forSegment
      * @return array
      */
     public function getWebinars($filters = [], $forSegment = false)
@@ -322,22 +323,21 @@ class WebikeoIntegration extends WebinarAbstractIntegration
             $webinarObject = new IntegrationObject('Contact', 'lead');
 
             if (is_array($data)) {
-                $id            = $data['id'];
-                $formattedData = $this->matchUpData($data['user']);
-                $entity        = $this->getMauticLead($formattedData, true);
-
+                $id                    = $data['id'];
+                $formattedData         = $this->matchUpData($data['user']);
+                $entity                = $this->getMauticLead($formattedData, true);
                 if ($entity) {
                     $integrationEntities[] = $this->saveSyncedData($entity, $webinarObject, $id);
-                    $this->em->detach($entity);
-                    unset($entity);
                     ++$executed;
                 }
+                $this->em->clear(Lead::class);
+                $this->em->clear(CompanyLead::class);
             }
         }
         if ($integrationEntities) {
             $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-            $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
         }
+        $this->em->clear(IntegrationEntity::class);
 
         return $executed;
     }
