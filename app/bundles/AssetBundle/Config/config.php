@@ -191,13 +191,14 @@ return [
         ],
         'models' => [
             'mautic.asset.model.asset' => [
-                'class'     => 'Mautic\AssetBundle\Model\AssetModel',
+                'class'     => \Mautic\AssetBundle\Model\AssetModel::class,
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.category.model.category',
                     'request_stack',
                     'mautic.helper.ip_lookup',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.service.contact_tracking_service',
                 ],
             ],
         ],

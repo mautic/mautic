@@ -75,6 +75,9 @@ class LeadDevice
      */
     private $deviceFingerprint;
 
+    /** @var string */
+    private $trackingCode;
+
     /**
      * @var \DateTime
      */
@@ -144,6 +147,11 @@ class LeadDevice
 
         $builder->createField('deviceFingerprint', 'string')
             ->columnName('device_fingerprint')
+            ->nullable()
+            ->build();
+
+        $builder->createField('trackingCode', 'string')
+            ->columnName('tracking_code')
             ->nullable()
             ->build();
     }
@@ -366,6 +374,26 @@ class LeadDevice
     public function setDeviceFingerprint($deviceFingerprint)
     {
         $this->deviceFingerprint = $deviceFingerprint;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTrackingCode()
+    {
+        return $this->trackingCode;
+    }
+
+    /**
+     * @param string $trackingCode
+     *
+     * @return self
+     */
+    public function setTrackingCode($trackingCode)
+    {
+        $this->trackingCode = $trackingCode;
+
+        return $this;
     }
 
     /**

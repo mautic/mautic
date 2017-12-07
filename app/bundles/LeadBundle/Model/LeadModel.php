@@ -53,6 +53,7 @@ use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
@@ -71,6 +72,7 @@ class LeadModel extends FormModel
 {
     use DefaultValueTrait, OperatorListTrait, RequestTrait;
 
+    /** @var Lead */
     private $currentLead       = null;
     private $systemCurrentLead = null;
 
@@ -171,23 +173,27 @@ class LeadModel extends FormModel
      */
     protected $emailValidator;
 
+    /** @var ContactTrackingServiceInterface */
+    private $contactTrackingService;
+
     /**
      * LeadModel constructor.
      *
-     * @param RequestStack         $requestStack
-     * @param CookieHelper         $cookieHelper
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param PathsHelper          $pathsHelper
-     * @param IntegrationHelper    $integrationHelper
-     * @param FieldModel           $leadFieldModel
-     * @param ListModel            $leadListModel
-     * @param FormFactory          $formFactory
-     * @param CompanyModel         $companyModel
-     * @param CategoryModel        $categoryModel
-     * @param ChannelListHelper    $channelListHelper
-     * @param                      $trackByIp
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param UserProvider         $userProvider
+     * @param RequestStack                    $requestStack
+     * @param CookieHelper                    $cookieHelper
+     * @param IpLookupHelper                  $ipLookupHelper
+     * @param PathsHelper                     $pathsHelper
+     * @param IntegrationHelper               $integrationHelper
+     * @param FieldModel                      $leadFieldModel
+     * @param ListModel                       $leadListModel
+     * @param FormFactory                     $formFactory
+     * @param CompanyModel                    $companyModel
+     * @param CategoryModel                   $categoryModel
+     * @param ChannelListHelper               $channelListHelper
+     * @param                                 $trackByIp
+     * @param CoreParametersHelper            $coreParametersHelper
+     * @param UserProvider                    $userProvider
+     * @param ContactTrackingServiceInterface $contactTrackingService
      */
     public function __construct(
         RequestStack $requestStack,
@@ -204,23 +210,25 @@ class LeadModel extends FormModel
         $trackByIp,
         CoreParametersHelper $coreParametersHelper,
         EmailValidator $emailValidator,
-        UserProvider $userProvider
+        UserProvider $userProvider,
+        ContactTrackingServiceInterface $contactTrackingService
     ) {
-        $this->request              = $requestStack->getCurrentRequest();
-        $this->cookieHelper         = $cookieHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->pathsHelper          = $pathsHelper;
-        $this->integrationHelper    = $integrationHelper;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->leadListModel        = $leadListModel;
-        $this->companyModel         = $companyModel;
-        $this->formFactory          = $formFactory;
-        $this->categoryModel        = $categoryModel;
-        $this->channelListHelper    = $channelListHelper;
-        $this->trackByIp            = $trackByIp;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->emailValidator       = $emailValidator;
-        $this->userProvider         = $userProvider;
+        $this->request                = $requestStack->getCurrentRequest();
+        $this->cookieHelper           = $cookieHelper;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->pathsHelper            = $pathsHelper;
+        $this->integrationHelper      = $integrationHelper;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->leadListModel          = $leadListModel;
+        $this->companyModel           = $companyModel;
+        $this->formFactory            = $formFactory;
+        $this->categoryModel          = $categoryModel;
+        $this->channelListHelper      = $channelListHelper;
+        $this->trackByIp              = $trackByIp;
+        $this->coreParametersHelper   = $coreParametersHelper;
+        $this->emailValidator         = $emailValidator;
+        $this->userProvider           = $userProvider;
+        $this->contactTrackingService = $contactTrackingService;
     }
 
     /**
@@ -856,7 +864,11 @@ class LeadModel extends FormModel
      */
     public function getCurrentLead($returnTracking = false)
     {
-        $isUser = (!$this->security->isAnonymous());
+        if ($returnTracking) {
+            @trigger_error('Parameter $returnTracking is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
+        }
+        $wasTrackedBefore = $this->contactTrackingService->isTracked();
+        $isUser           = (!$this->security->isAnonymous());
         if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
             $this->logger->addDebug('LEAD: System lead is being used');
             if (!$isUser && null === $this->systemCurrentLead) {
@@ -872,26 +884,16 @@ class LeadModel extends FormModel
             $this->logger->addDebug('LEAD: Tracking session for '.$this->request->getMethod().' '.$this->request->getRequestUri());
         }
 
-        list($trackingId, $generated) = $this->getTrackingCookie();
-        $this->logger->addDebug("LEAD: Tracking ID for this contact is {$trackingId} (".(int) $generated.')');
-
         if (empty($this->currentLead)) {
-            $ip = $this->ipLookupHelper->getIpAddress();
-            if ($this->request && !$leadId = $this->request->cookies->get($trackingId)) {
-                $leadId = ('GET' == $this->request->getMethod())
-                    ?
-                    $this->request->query->get('mtc_id')
-                    :
-                    $this->request->request->get('mtc_id');
-            }
-
-            // if no trackingId cookie set the lead is not tracked yet so create a new one
-            if (empty($leadId)) {
+            $ip   = $this->ipLookupHelper->getIpAddress();
+            $lead = $this->contactTrackingService->getTrackedLead();
+            if ($lead !== null) {
+                $this->logger->addDebug("LEAD: Existing lead found with ID# {$lead->getId()}.");
+            } else { // if no trackingId cookie set the lead is not tracked yet so create a new one
                 if (!$ip->isTrackable()) {
                     // Don't save leads that are from a non-trackable IP by default
                     $lead = $this->createNewContact($ip, false);
                 } else {
-                    $lead = null;
                     if ($this->trackByIp) {
                         // Try looking up the contact by it's IP address
                         $leads = $this->getLeadsByIp($ip->getIpAddress());
@@ -907,22 +909,17 @@ class LeadModel extends FormModel
                         $lead = $this->createNewContact($ip);
                     }
                 }
-            } else {
-                $lead = $this->getEntity($leadId);
-
-                if ($lead === null) {
-                    // Check if this contact was merged into another
-
-                    $lead = $this->createNewContact($ip);
-                } else {
-                    $this->logger->addDebug("LEAD: Existing lead found with ID# $leadId.");
-                }
             }
-
             $this->currentLead = $lead;
             if ($leadId = $lead->getId()) {
-                $this->setLeadCookie($leadId);
+                $this->contactTrackingService->track($lead);
             }
+        }
+        $isTrackedNow = $this->contactTrackingService->isTracked();
+        $generated    = ($wasTrackedBefore === false && $isTrackedNow === true);
+        $trackingId   = $this->contactTrackingService->getTrackedIdentifier();
+        if ($trackingId !== null) {
+            $this->logger->addDebug("LEAD: Tracking ID for this contact is {$trackingId}");
         }
 
         // Log last active
@@ -978,18 +975,10 @@ class LeadModel extends FormModel
         }
 
         // First determine if this request is already tracked as a specific lead
-        list($trackingId, $generated) = $this->getTrackingCookie();
-
-        if (!$leadId = $this->request->cookies->get($trackingId)) {
-            $leadId = ('GET' == $this->request->getMethod())
-                ?
-                $this->request->query->get('mtc_id')
-                :
-                $this->request->request->get('mtc_id');
-        }
-
-        if ($leadId && $lead = $this->getEntity($leadId)) {
-            $this->logger->addDebug("LEAD: Contact ID# {$leadId} tracked through tracking ID ($trackingId}.");
+        $lead = $this->contactTrackingService->getTrackedLead();
+        if ($lead !== null) {
+            $trackingId = $this->contactTrackingService->track($lead);
+            $this->logger->addDebug("LEAD: Contact ID# {$lead->getId()} tracked through tracking ID ($trackingId}.");
         }
 
         // Search for lead by fingerprint
@@ -1123,16 +1112,14 @@ class LeadModel extends FormModel
 
         if ($lead->getId()) {
             // Update tracking cookies if the lead is different
-            if ($oldLead && $oldLead->getId() != $lead->getId()) {
-                list($newTrackingId, $oldTrackingId) = $this->getTrackingCookie(true);
+            if ($oldLead !== null && $oldLead->getId() != $lead->getId()) {
+                $oldTrackingId = $this->contactTrackingService->getTrackedIdentifier();
+                $newTrackingId = $this->contactTrackingService->track($lead, true);
                 $this->logger->addDebug(
                     "LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}"
                 );
 
-                //set the tracking cookies
-                $this->setLeadCookie($lead->getId());
-
-                if ($oldTrackingId && $oldLead) {
+                if ($oldTrackingId !== null) {
                     if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
                         $event = new LeadChangeEvent($oldLead, $oldTrackingId, $lead, $newTrackingId);
                         $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
@@ -1140,7 +1127,7 @@ class LeadModel extends FormModel
                 }
             } elseif (!$oldLead) {
                 // New lead, set the tracking cookie
-                $this->setLeadCookie($lead->getId());
+                $this->contactTrackingService->track($lead);
             }
         }
     }
@@ -1191,76 +1178,6 @@ class LeadModel extends FormModel
         $repo = $this->em->getRepository('MauticLeadBundle:CompanyLead');
 
         return $repo->getCompaniesByLeadId($lead->getId());
-    }
-
-    /**
-     * Get or generate the tracking ID for the current session.
-     *
-     * @param bool|false $forceRegeneration
-     *
-     * @return array
-     */
-    public function getTrackingCookie($forceRegeneration = false)
-    {
-        if (!$this->request) {
-            return [null, false];
-        }
-
-        if ($forceRegeneration) {
-            $this->leadTrackingCookieGenerated = true;
-
-            $oldTrackingId        = $this->request->cookies->get('mautic_session_id');
-            $this->leadTrackingId = hash('sha1', uniqid(mt_rand()));
-
-            //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
-
-            return [$this->leadTrackingId, $oldTrackingId];
-        }
-
-        if (empty($this->leadTrackingId)) {
-            //check for the tracking cookie or sid from query
-            if ($this->request && !$this->leadTrackingId = $this->request->cookies->get('mautic_session_id')) {
-                $this->leadTrackingId = ('GET' == $this->request->getMethod())
-                    ?
-                    $this->request->query->get('mtc_sid')
-                    :
-                    $this->request->request->get('mtc_sid');
-            }
-            $this->leadTrackingCookieGenerated = false;
-            if (empty($this->leadTrackingId)) {
-                $this->leadTrackingId              = hash('sha1', uniqid(mt_rand()));
-                $this->leadTrackingCookieGenerated = true;
-            }
-
-            //create a tracking cookie with a expire of two years
-            $this->cookieHelper->setCookie('mautic_session_id', $this->leadTrackingId, 31536000);
-        }
-
-        return [$this->leadTrackingId, $this->leadTrackingCookieGenerated];
-    }
-
-    /**
-     * Sets the leadId for the current session.
-     *
-     * @param $leadId
-     */
-    public function setLeadCookie($leadId)
-    {
-        if (!$this->request) {
-            return;
-        }
-
-        // Remove the old if set
-        $oldTrackingId                = $this->request->cookies->get('mautic_session_id');
-        list($trackingId, $generated) = $this->getTrackingCookie();
-
-        if ($generated && $oldTrackingId) {
-            $this->cookieHelper->setCookie($oldTrackingId, null, -3600);
-        }
-
-        // Create a cookie with a expire of two years
-        $this->cookieHelper->setCookie($trackingId, $leadId, 31536000);
     }
 
     /**

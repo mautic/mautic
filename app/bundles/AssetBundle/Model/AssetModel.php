@@ -27,6 +27,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -61,22 +62,33 @@ class AssetModel extends FormModel
      */
     protected $maxAssetSize;
 
-    /***
+    /** @var ContactTrackingServiceInterface */
+    private $contactTrackingService;
+
+    /**
      * AssetModel constructor.
      *
-     * @param LeadModel $leadModel
-     * @param CategoryModel $categoryModel
-     * @param RequestStack $requestStack
-     * @param IpLookupHelper $ipLookupHelper
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param LeadModel                       $leadModel
+     * @param CategoryModel                   $categoryModel
+     * @param RequestStack                    $requestStack
+     * @param IpLookupHelper                  $ipLookupHelper
+     * @param CoreParametersHelper            $coreParametersHelper
+     * @param ContactTrackingServiceInterface $contactTrackingService
      */
-    public function __construct(LeadModel $leadModel, CategoryModel $categoryModel, RequestStack $requestStack, IpLookupHelper $ipLookupHelper, CoreParametersHelper $coreParametersHelper)
-    {
-        $this->leadModel      = $leadModel;
-        $this->categoryModel  = $categoryModel;
-        $this->request        = $requestStack->getCurrentRequest();
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->maxAssetSize   = $coreParametersHelper->getParameter('mautic.max_size');
+    public function __construct(
+        LeadModel $leadModel,
+        CategoryModel $categoryModel,
+        RequestStack $requestStack,
+        IpLookupHelper $ipLookupHelper,
+        CoreParametersHelper $coreParametersHelper,
+        ContactTrackingServiceInterface $contactTrackingService
+    ) {
+        $this->leadModel              = $leadModel;
+        $this->categoryModel          = $categoryModel;
+        $this->request                = $requestStack->getCurrentRequest();
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->contactTrackingService = $contactTrackingService;
+        $this->maxAssetSize           = $coreParametersHelper->getParameter('mautic.max_size');
     }
 
     /**
@@ -151,8 +163,8 @@ class AssetModel extends FormModel
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
                     if ($lead !== null) {
-                        $this->leadModel->setLeadCookie($clickthrough['lead']);
-                        list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
+                        $trackingNewlyGenerated                    = !$this->contactTrackingService->isTracked();
+                        $trackingId                                = $this->contactTrackingService->track($lead, false);
                         $leadClickthrough                          = true;
 
                         $this->leadModel->setCurrentLead($lead);
@@ -182,7 +194,9 @@ class AssetModel extends FormModel
             }
 
             if (empty($leadClickthrough)) {
-                list($lead, $trackingId, $trackingNewlyGenerated) = $this->leadModel->getCurrentLead(true);
+                $trackingNewlyGenerated = !$this->contactTrackingService->isTracked();
+                $lead                   = $this->leadModel->getCurrentLead();
+                $trackingId             = $this->contactTrackingService->getTrackedIdentifier();
             }
 
             $download->setLead($lead);
@@ -220,7 +234,8 @@ class AssetModel extends FormModel
             } elseif ($this->security->isAnonymous() && !defined('IN_MAUTIC_CONSOLE')) {
                 // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
                 // system forced download such as an email
-                list($trackingId, $trackingNewlyGenerated) = $this->leadModel->getTrackingCookie();
+                $trackingNewlyGenerated = !$this->contactTrackingService->isTracked();
+                $trackingId             = $this->contactTrackingService->track($lead, false);
             }
         }
 

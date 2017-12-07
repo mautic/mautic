@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
@@ -31,6 +32,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PublicController extends CommonFormController
 {
+    /** @var ContactTrackingServiceInterface */
+    private $contactTrackingService;
+
+    /**
+     * PublicController constructor.
+     *
+     * @param ContactTrackingServiceInterface $contactTrackingService
+     */
+    public function __construct(ContactTrackingServiceInterface $contactTrackingService)
+    {
+        $this->contactTrackingService = $contactTrackingService;
+    }
+
     /**
      * @param         $slug
      * @param Request $request
@@ -389,7 +403,8 @@ class PublicController extends CommonFormController
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
-        list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+        $lead       = $leadModel->getCurrentLead();
+        $trackingId = $this->contactTrackingService->getTrackedIdentifier();
 
         /** @var TrackingHelper $trackingHelper */
         $trackingHelper = $this->get('mautic.page.helper.tracking');
@@ -571,7 +586,8 @@ class PublicController extends CommonFormController
             /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
 
-            list($lead, $trackingId, $generated) = $leadModel->getCurrentLead(true);
+            $lead                                = $leadModel->getCurrentLead();
+            $trackingId                          = $this->contactTrackingService->getTrackedIdentifier();
             $data                                = [
                 'id'  => ($lead) ? $lead->getId() : null,
                 'sid' => $trackingId,

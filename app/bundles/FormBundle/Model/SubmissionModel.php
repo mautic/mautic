@@ -41,6 +41,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,18 +114,22 @@ class SubmissionModel extends CommonFormModel
      */
     private $formUploader;
 
+    /** @var ContactTrackingServiceInterface */
+    private $contactTrackingService;
+
     /**
-     * @param IpLookupHelper       $ipLookupHelper
-     * @param TemplatingHelper     $templatingHelper
-     * @param FormModel            $formModel
-     * @param PageModel            $pageModel
-     * @param LeadModel            $leadModel
-     * @param CampaignModel        $campaignModel
-     * @param LeadFieldModel       $leadFieldModel
-     * @param CompanyModel         $companyModel
-     * @param FormFieldHelper      $fieldHelper
-     * @param UploadFieldValidator $uploadFieldValidator
-     * @param FormUploader         $formUploader
+     * @param IpLookupHelper                  $ipLookupHelper
+     * @param TemplatingHelper                $templatingHelper
+     * @param FormModel                       $formModel
+     * @param PageModel                       $pageModel
+     * @param LeadModel                       $leadModel
+     * @param CampaignModel                   $campaignModel
+     * @param LeadFieldModel                  $leadFieldModel
+     * @param CompanyModel                    $companyModel
+     * @param FormFieldHelper                 $fieldHelper
+     * @param UploadFieldValidator            $uploadFieldValidator
+     * @param FormUploader                    $formUploader
+     * @param ContactTrackingServiceInterface $contactTrackingService
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -137,19 +142,21 @@ class SubmissionModel extends CommonFormModel
         CompanyModel $companyModel,
         FormFieldHelper $fieldHelper,
         UploadFieldValidator $uploadFieldValidator,
-        FormUploader $formUploader
+        FormUploader $formUploader,
+        ContactTrackingServiceInterface $contactTrackingService
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->templatingHelper     = $templatingHelper;
-        $this->formModel            = $formModel;
-        $this->pageModel            = $pageModel;
-        $this->leadModel            = $leadModel;
-        $this->campaignModel        = $campaignModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->companyModel         = $companyModel;
-        $this->fieldHelper          = $fieldHelper;
-        $this->uploadFieldValidator = $uploadFieldValidator;
-        $this->formUploader         = $formUploader;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->templatingHelper       = $templatingHelper;
+        $this->formModel              = $formModel;
+        $this->pageModel              = $pageModel;
+        $this->leadModel              = $leadModel;
+        $this->campaignModel          = $campaignModel;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->companyModel           = $companyModel;
+        $this->fieldHelper            = $fieldHelper;
+        $this->uploadFieldValidator   = $uploadFieldValidator;
+        $this->formUploader           = $formUploader;
+        $this->contactTrackingService = $contactTrackingService;
     }
 
     /**
@@ -361,8 +368,8 @@ class SubmissionModel extends CommonFormModel
 
         // Get updated lead if applicable with tracking ID
         /** @var Lead $lead */
-        list($lead, $trackingId, $generated) = $this->leadModel->getCurrentLead(true);
-
+        $lead       = $this->leadModel->getCurrentLead();
+        $trackingId = $this->contactTrackingService->getTrackedIdentifier();
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
             ->setLead($lead);

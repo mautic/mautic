@@ -264,7 +264,7 @@ return [
         ],
         'models' => [
             'mautic.page.model.page' => [
-                'class'     => 'Mautic\PageBundle\Model\PageModel',
+                'class'     => \Mautic\PageBundle\Model\PageModel::class,
                 'arguments' => [
                     'mautic.helper.cookie',
                     'mautic.helper.ip_lookup',
@@ -273,6 +273,7 @@ return [
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
                     'mautic.queue.service',
+                    'mautic.lead.service.contact_tracking_service',
                     'mautic.lead.model.company',
                 ],
                 'methodCalls' => [

@@ -13,8 +13,8 @@ namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 class AnalyticsHelper extends Helper
@@ -34,18 +34,27 @@ class AnalyticsHelper extends Helper
      */
     private $leadModel;
 
+    /** @var ContactTrackingServiceInterface */
+    private $contactTrackingService;
+
     /**
      * AnalyticsHelper constructor.
      *
-     * @param CoreParametersHelper $parametersHelper
-     * @param CookieHelper         $cookieHelper
-     * @param LeadModel            $leadModel
+     * @param CoreParametersHelper            $parametersHelper
+     * @param CookieHelper                    $cookieHelper
+     * @param LeadModel                       $leadModel
+     * @param ContactTrackingServiceInterface $contactTrackingService
      */
-    public function __construct(CoreParametersHelper $parametersHelper, CookieHelper $cookieHelper, LeadModel $leadModel)
-    {
-        $this->code         = htmlspecialchars_decode($parametersHelper->getParameter('google_analytics', ''));
-        $this->cookieHelper = $cookieHelper;
-        $this->leadModel    = $leadModel;
+    public function __construct(
+        CoreParametersHelper $parametersHelper,
+        CookieHelper $cookieHelper,
+        LeadModel $leadModel,
+        ContactTrackingServiceInterface $contactTrackingService
+    ) {
+        $this->code                   = htmlspecialchars_decode($parametersHelper->getParameter('google_analytics', ''));
+        $this->cookieHelper           = $cookieHelper;
+        $this->leadModel              = $leadModel;
+        $this->contactTrackingService = $contactTrackingService;
     }
 
     /**
@@ -53,9 +62,9 @@ class AnalyticsHelper extends Helper
      */
     public function getCode()
     {
-        list($lead, $trackingId, $ignored) = $this->leadModel->getCurrentLead(true);
-
-        if ($lead instanceof Lead) {
+        $lead       = $this->leadModel->getCurrentLead();
+        $trackingId = $this->contactTrackingService->getTrackedIdentifier();
+        if ($lead !== null) {
             $this->cookieHelper->setCookie('mtc_id', $lead->getId(), null);
             $this->cookieHelper->setCookie('mtc_sid', $trackingId, null);
         } else {

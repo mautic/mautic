@@ -157,4 +157,45 @@ class LeadDeviceRepository extends CommonRepository
 
         return $device ? $device : null;
     }
+
+    /**
+     * @param string $trackingCode
+     *
+     * @return LeadDevice|null
+     */
+    public function getByTrackingCode($trackingCode)
+    {
+        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq->select('es.id as id, es.lead_id as lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+
+        $sq->where(
+            $sq->expr()->eq('es.tracking_code', ':trackingCode')
+        )
+            ->setParameter('trackingCode', $trackingCode);
+
+        //get the first match
+        $device = $sq->execute()->fetch();
+
+        return $device ? $device : null;
+    }
+
+    /**
+     * @param int $leadId
+     *
+     * @return LeadDevice[]
+     */
+    public function getByLeadId($leadId)
+    {
+        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq->select('es.id as id, es.lead_id as lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+
+        $sq->where(
+            $sq->expr()->eq('es.lead_id', ':leadId')
+        )
+            ->setParameter('leadId', $leadId);
+
+        return $sq->execute()->fetchAll();
+    }
 }

@@ -430,12 +430,13 @@ return [
                 'alias'     => 'gravatar',
             ],
             'mautic.helper.template.analytics' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\AnalyticsHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\AnalyticsHelper::class,
                 'alias'     => 'analytics',
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.helper.cookie',
                     'mautic.lead.model.lead',
+                    'mautic.lead.service.contact_tracking_service',
                 ],
             ],
             'mautic.helper.template.mautibot' => [

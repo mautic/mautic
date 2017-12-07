@@ -738,7 +738,7 @@ return [
         ],
         'models' => [
             'mautic.lead.model.lead' => [
-                'class'     => 'Mautic\LeadBundle\Model\LeadModel',
+                'class'     => \Mautic\LeadBundle\Model\LeadModel::class,
                 'arguments' => [
                     'request_stack',
                     'mautic.helper.cookie',
@@ -755,6 +755,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.validator.email',
                     'mautic.user.provider',
+                    'mautic.lead.service.contact_tracking_service',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -817,6 +818,14 @@ return [
                 'arguments' => [
                     'mautic.lead.model.lead',
                     'mautic.lead.repository.dnc',
+                ],
+            ],
+            'mautic.lead.service.contact_tracking_service' => [
+                'class'     => \Mautic\LeadBundle\Model\Service\ContactTrackingService::class,
+                'arguments' => [
+                    'mautic.helper.cookie',
+                    'mautic.lead.repository.lead',
+                    'request_stack',
                 ],
             ],
         ],
