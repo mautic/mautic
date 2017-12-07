@@ -66,7 +66,7 @@ class LeadListSubscriber extends CommonSubscriber
                 continue;
             }
             if (method_exists($integration, 'getSubscribersForSegmentProcessing')) {
-                $webinars = $integration->getWebinars();
+                $webinars = $integration->getWebinars([], true);
                 if ($webinars) {
                     $integrationName = $integration->getName();
                     array_walk(

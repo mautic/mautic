@@ -137,7 +137,7 @@ class WebikeoIntegration extends WebinarAbstractIntegration
      *
      * @return array
      */
-    public function getWebinars($filters = [])
+    public function getWebinars($filters = [], $forSegment = false)
     {
         if (empty($filters)) {
             $filters = ['fromDate' => date('Y-m-d H:i:s')];
@@ -148,8 +148,13 @@ class WebikeoIntegration extends WebinarAbstractIntegration
         $webinars          = $webinars['_embedded']['webinar'];
 
         foreach ($webinars as $webinar) {
-            if (isset($webinar['id'])) {
+            if (isset($webinar['id']) and !$forSegment) {
                 $formattedWebinars[$webinar['id']] = $webinar['title'];
+            } else {
+                $formattedWebinars[] = [
+                    'value' => $webinar['id'],
+                    'label' => $webinar['title'],
+                ];
             }
         }
 
