@@ -104,6 +104,7 @@ class Version20170323111702 extends AbstractMauticMigration
             ->setMaxResults($batch);
 
         while ($results = $qb->execute()->fetchAll()) {
+
             // Start a transaction
             $this->connection->beginTransaction();
 
@@ -154,6 +155,7 @@ class Version20170323111702 extends AbstractMauticMigration
             ->setMaxResults($batch);
 
         while ($results = $qb->execute()->fetchAll()) {
+
             // Start a transaction
             $this->connection->beginTransaction();
 

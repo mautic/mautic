@@ -351,7 +351,7 @@ trait CustomFieldRepositoryTrait
      *
      * @return array [$fields, $fixedFields]
      */
-    public function getCustomFieldList($object)
+    protected function getCustomFieldList($object)
     {
         if (empty($this->customFieldList)) {
             //Get the list of custom fields

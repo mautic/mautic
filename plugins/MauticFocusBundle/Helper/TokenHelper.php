@@ -30,7 +30,6 @@ class TokenHelper
      * @var RouterInterface
      */
     protected $router;
-
     /**
      * TokenHelper constructor.
      *

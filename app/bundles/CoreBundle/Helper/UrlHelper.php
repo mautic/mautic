@@ -113,16 +113,9 @@ class UrlHelper
             return $base.$rel;
         }
 
-        /* after parse base URL and convert to local variables:
+        /* parse base URL and convert to local variables:
            $scheme, $host, $path */
-        $urlPartsArray = parse_url($base);
-
-        // We should have a valid URL by this point. If not, just return the original value
-        if ($urlPartsArray === false) {
-            return $rel;
-        }
-
-        extract($urlPartsArray);
+        extract(parse_url($base));
 
         /* remove non-directory element from path */
         $path = preg_replace('#/[^/]*$#', '', $path);

@@ -131,6 +131,7 @@ class LeadSubscriber extends CommonSubscriber
                                     ],
                                     'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.php',
                                     'contactId'       => $citrixEvent['lead_id'],
+
                                 ]
                             );
                         }

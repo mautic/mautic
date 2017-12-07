@@ -48,7 +48,6 @@ class LeadImportFieldType extends AbstractType
             'points'         => 'mautic.lead.import.label.points',
             'stage'          => 'mautic.lead.import.label.stage',
             'doNotEmail'     => 'mautic.lead.import.label.doNotEmail',
-            'ownerusername'  => 'mautic.lead.import.label.ownerusername',
         ];
 
         $importChoiceFields = [

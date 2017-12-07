@@ -139,6 +139,7 @@ class ProfileController extends FormController
                             ]
                         );
                         break;
+
                 }
             }
         }

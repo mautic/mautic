@@ -115,11 +115,6 @@ class LeadTimelineEvent extends Event
     protected $siteDomain;
 
     /**
-     * @var bool
-     */
-    protected $fetchTypesOnly = false;
-
-    /**
      * @var array
      */
     protected $serializerGroups = [
@@ -162,11 +157,11 @@ class LeadTimelineEvent extends Event
         $this->siteDomain  = $siteDomain;
 
         if (!empty($filters['dateFrom'])) {
-            $this->dateFrom = ($filters['dateFrom'] instanceof \DateTime) ? $filters['dateFrom'] : new \DateTime($filters['dateFrom']);
+            $this->dateFrom = new \DateTime($filters['dateFrom']);
         }
 
         if (!empty($filters['dateTo'])) {
-            $this->dateTo = ($filters['dateTo'] instanceof \DateTime) ? $filters['dateTo'] : new \DateTime($filters['dateTo']);
+            $this->dateTo = new \DateTime($filters['dateTo']);
         }
     }
 
@@ -228,9 +223,11 @@ class LeadTimelineEvent extends Event
 
                 // Ensure a full URL
                 if ($this->siteDomain && isset($data['eventLabel']) && is_array($data['eventLabel']) && isset($data['eventLabel']['href'])) {
-                    // If this does not have a http, then assume a Mautic URL
-                    if (strpos($data['eventLabel']['href'], '://') === false) {
-                        $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
+                    if (!empty($data['eventLabel']['isExternal'])) {
+                        // If this does not have a http, then assume a Mautic URL
+                        if (strpos($data['eventLabel']['href'], '://') === false) {
+                            $data['eventLabel']['href'] = $this->siteDomain.$data['eventLabel']['href'];
+                        }
                     }
                 }
             }
@@ -424,10 +421,6 @@ class LeadTimelineEvent extends Event
      */
     public function isApplicable($eventType, $inclusive = false)
     {
-        if ($this->fetchTypesOnly) {
-            return false;
-        }
-
         if (in_array($eventType, $this->filters['excludeEvents'])) {
             return false;
         }
@@ -598,14 +591,6 @@ class LeadTimelineEvent extends Event
     public function getSerializerGroups()
     {
         return $this->serializerGroups;
-    }
-
-    /**
-     * Will cause isApplicable to return false for all in order to just compile a list of event types.
-     */
-    public function fetchTypesOnly()
-    {
-        $this->fetchTypesOnly = true;
     }
 
     /**

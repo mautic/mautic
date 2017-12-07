@@ -89,6 +89,7 @@ foreach ($properties as $property):
                     'label'    => $view['translator']->trans((isset($updateButtonText) ? $updateButtonText : 'mautic.core.form.update')),
                     'attr'     => $addAttr,
                 ],
+
             ],
         ]
     );

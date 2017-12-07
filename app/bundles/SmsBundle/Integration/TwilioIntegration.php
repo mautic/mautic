@@ -67,7 +67,6 @@ class TwilioIntegration extends AbstractIntegration
             'requires_authorization' => false,
         ];
     }
-
     /**
      * {@inheritdoc}
      *

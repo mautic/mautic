@@ -11,28 +11,18 @@
 
 namespace Mautic\CoreBundle\Tests\Templating\Helper;
 
-use Mautic\CoreBundle\Helper\AppVersion;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class FormatterHelperTest extends \PHPUnit_Framework_TestCase
 {
     public function testStrictHtmlFormatIsRemovingScriptTags()
     {
-        $appVersion = $this->getMockBuilder(AppVersion::class)
+        $factoryMock = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $dateHelper = $this->getMockBuilder(DateHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $helper = new FormatterHelper($appVersion, $dateHelper, $translator);
+        $helper = new FormatterHelper($factoryMock);
 
         $sample = '<a href="/index_dev.php/s/webhooks/view/31" data-toggle="ajax">test</a> has been stopped because the response HTTP code was 410, which means the reciever doesn\'t want us to send more requests.<script>console.log(\'script is running\');</script><SCRIPT>console.log(\'CAPITAL script is running\');</SCRIPT>';
 
@@ -41,37 +31,5 @@ class FormatterHelperTest extends \PHPUnit_Framework_TestCase
         $result = $helper->_($sample, 'html');
 
         $this->assertEquals($expected, $result);
-    }
-
-    public function testBooleanFormat()
-    {
-        $appVersion = $this->getMockBuilder(AppVersion::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dateHelper = $this->getMockBuilder(DateHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator->expects($this->at(0))
-            ->method('trans')
-            ->with('mautic.core.yes')
-            ->willReturn('yes');
-        $translator->expects($this->at(1))
-            ->method('trans')
-            ->with('mautic.core.no')
-            ->willReturn('no');
-
-        $helper = new FormatterHelper($appVersion, $dateHelper, $translator);
-
-        $result = $helper->_(1, 'bool');
-        $this->assertEquals('yes', $result);
-
-        $result = $helper->_(0, 'bool');
-        $this->assertEquals('no', $result);
     }
 }

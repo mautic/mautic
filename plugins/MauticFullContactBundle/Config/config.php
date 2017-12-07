@@ -71,6 +71,7 @@ return [
             'mautic.integration.fullcontact' => [
                 'class'     => \MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class,
                 'arguments' => [
+
                 ],
             ],
         ],

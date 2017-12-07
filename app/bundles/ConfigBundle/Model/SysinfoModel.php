@@ -13,12 +13,12 @@ namespace Mautic\ConfigBundle\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 
 /**
  * Class SysinfoModel.
  */
-class SysinfoModel
+class SysinfoModel extends AbstractCommonModel
 {
     protected $phpInfo;
     protected $folders;
@@ -34,22 +34,15 @@ class SysinfoModel
     protected $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * SysinfoModel constructor.
      *
      * @param PathsHelper          $pathsHelper
      * @param CoreParametersHelper $coreParametersHelper
-     * @param TranslatorInterface  $translator
      */
-    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
+    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         $this->pathsHelper          = $pathsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->translator           = $translator;
     }
 
     /**
@@ -131,7 +124,7 @@ class SysinfoModel
      *
      * @param int $lines
      *
-     * @return string
+     * @return array|null
      */
     public function getLogTail($lines = 10)
     {
@@ -157,6 +150,7 @@ class SysinfoModel
     {
         $f      = fopen($filename, 'rb');
         $output = '';
+        $chunk  = '';
 
         fseek($f, -1, SEEK_END);
 

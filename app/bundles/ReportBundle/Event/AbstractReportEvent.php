@@ -11,7 +11,6 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\EventDispatcher\Event;
 
 class AbstractReportEvent extends Event

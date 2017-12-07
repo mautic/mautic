@@ -31,7 +31,6 @@ class LoginEvent extends Event
     {
         $this->user = $user;
     }
-
     /**
      * @return \Mautic\UserBundle\Entity\User|null
      */

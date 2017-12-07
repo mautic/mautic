@@ -114,12 +114,12 @@ class Monitoring extends FormEntity
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('title', new Assert\NotBlank(
-            ['message' => 'mautic.core.title.required']
-        ));
+                ['message' => 'mautic.core.title.required']
+            ));
 
         $metadata->addPropertyConstraint('networkType', new Assert\NotBlank(
-            ['message' => 'mautic.social.network.type']
-        ));
+                ['message' => 'mautic.social.network.type']
+            ));
     }
 
     /**
@@ -383,16 +383,11 @@ class Monitoring extends FormEntity
     {
         $property = $this->getProperties();
 
-        if (!array_key_exists('checknames', $property)) {
-            $property['checknames'] = 0;
-        }
-
         // clean up property array for the twitter handle
         if ($this->getNetworkType() == 'twitter_handle') {
             $this->setProperties(
                 [
-                    'handle'     => $property['handle'],
-                    'checknames' => $property['checknames'],
+                    'handle' => $property['handle'],
                 ]
             );
         }
@@ -401,8 +396,7 @@ class Monitoring extends FormEntity
         if ($this->getNetworkType() == 'twitter_hashtag') {
             $this->setProperties(
                 [
-                    'hashtag'    => $property['hashtag'],
-                    'checknames' => $property['checknames'],
+                    'hashtag' => $property['hashtag'],
                 ]
             );
         }

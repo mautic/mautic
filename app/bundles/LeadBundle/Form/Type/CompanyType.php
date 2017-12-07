@@ -95,6 +95,7 @@ class CompanyType extends AbstractType
                 'precision'  => 0,
                 'required'   => false,
             ]
+
         );
 
         if (!empty($options['update_select'])) {

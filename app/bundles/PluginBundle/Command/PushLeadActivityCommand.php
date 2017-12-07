@@ -11,7 +11,6 @@
 
 namespace Mautic\PluginBundle\Command;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -91,7 +90,6 @@ class PushLeadActivityCommand extends ContainerAwareCommand
             /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
             $integrationHelper = $factory->getHelper('integration');
 
-            /** @var AbstractIntegration $integrationObject */
             $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
             if ($integrationObject !== null && method_exists($integrationObject, 'pushLeadActivity')) {

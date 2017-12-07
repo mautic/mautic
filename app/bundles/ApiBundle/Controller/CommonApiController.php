@@ -517,18 +517,6 @@ class CommonApiController extends FOSRestController implements MauticController
     }
 
     /**
-     * Creates new entity from provided params.
-     *
-     * @param array $params
-     *
-     * @return object
-     */
-    public function getNewEntity(array $params)
-    {
-        return $this->model->getEntity();
-    }
-
-    /**
      * Create a batch of new entities.
      *
      * @return array|Response
@@ -552,7 +540,7 @@ class CommonApiController extends FOSRestController implements MauticController
         $entities          = [];
         $errors            = [];
         foreach ($parameters as $key => $params) {
-            $entity = $this->getNewEntity($params);
+            $entity = $this->model->getEntity();
             $this->processBatchForm($key, $entity, $params, 'POST', $errors, $entities);
         }
 
@@ -574,12 +562,13 @@ class CommonApiController extends FOSRestController implements MauticController
      */
     public function newEntityAction()
     {
-        $parameters = $this->request->request->all();
-        $entity     = $this->getNewEntity($parameters);
+        $entity = $this->model->getEntity();
 
         if (!$this->checkEntityAccess($entity, 'create')) {
             return $this->accessDenied();
         }
+
+        $parameters = $this->request->request->all();
 
         return $this->processForm($entity, $parameters, 'POST');
     }

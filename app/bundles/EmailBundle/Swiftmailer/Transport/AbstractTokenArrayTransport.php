@@ -18,7 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 /**
  * Class AbstractTokenArrayTransport.
  */
-abstract class AbstractTokenArrayTransport implements TokenTransportInterface
+abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 {
     /**
      * @var \Swift_Message

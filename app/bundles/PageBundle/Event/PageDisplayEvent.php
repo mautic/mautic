@@ -30,22 +30,15 @@ class PageDisplayEvent extends Event
     private $page;
 
     /**
-     * @var array
-     */
-    private $params;
-
-    /**
      * PageDisplayEvent constructor.
      *
-     * @param $content
-     * @param Page  $page
-     * @param array $params
+     * @param      $content
+     * @param Page $page
      */
-    public function __construct($content, Page $page, array $params = [])
+    public function __construct($content, Page $page)
     {
         $this->page    = $page;
         $this->content = $content;
-        $this->params  = $params;
     }
 
     /**
@@ -76,25 +69,5 @@ class PageDisplayEvent extends Event
     public function setContent($content)
     {
         $this->content = $content;
-    }
-
-    /**
-     * Get params.
-     *
-     * @return array
-     */
-    public function getParams()
-    {
-        return $this->params;
-    }
-
-    /**
-     * Set params.
-     *
-     * @param array $params
-     */
-    public function setParams($params)
-    {
-        $this->params = $params;
     }
 }

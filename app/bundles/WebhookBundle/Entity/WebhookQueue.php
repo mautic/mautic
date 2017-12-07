@@ -39,7 +39,6 @@ class WebhookQueue
      * @var Event
      **/
     private $event;
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -69,7 +68,6 @@ class WebhookQueue
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
     }
-
     /**
      * Get id.
      *
@@ -79,7 +77,6 @@ class WebhookQueue
     {
         return $this->id;
     }
-
     /**
      * @return mixed
      */
@@ -87,7 +84,6 @@ class WebhookQueue
     {
         return $this->webhook;
     }
-
     /**
      * @param mixed $webhook
      */
@@ -97,7 +93,6 @@ class WebhookQueue
 
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -105,7 +100,6 @@ class WebhookQueue
     {
         return $this->dateAdded;
     }
-
     /**
      * @param mixed $dateAdded
      */
@@ -115,7 +109,6 @@ class WebhookQueue
 
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -123,7 +116,6 @@ class WebhookQueue
     {
         return $this->payload;
     }
-
     /**
      * @param mixed $payload
      */
@@ -133,7 +125,6 @@ class WebhookQueue
 
         return $this;
     }
-
     /**
      * @return mixed
      */
@@ -141,7 +132,6 @@ class WebhookQueue
     {
         return $this->event;
     }
-
     /**
      * @param mixed $event
      */

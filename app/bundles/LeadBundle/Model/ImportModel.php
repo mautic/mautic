@@ -304,19 +304,17 @@ class ImportModel extends FormModel
             return false;
         }
 
-        $lastImportedLine = $import->getLastLineImported();
-        $headers          = $import->getHeaders();
-        $headerCount      = count($headers);
-        $config           = $import->getParserConfig();
-        $counter          = 0;
+        $lineNumber  = $progress->getDone();
+        $headers     = $import->getHeaders();
+        $headerCount = count($headers);
+        $config      = $import->getParserConfig();
+        $counter     = 0;
 
-        if ($lastImportedLine > 0) {
-            // Seek is zero-based line numbering and
-            $file->seek($lastImportedLine - 1);
-        }
-
-        $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
+
+        if ($lineNumber > 0) {
+            $file->seek($lineNumber);
+        }
 
         $batchSize = $config['batchlimit'];
 
@@ -327,10 +325,9 @@ class ImportModel extends FormModel
 
         while ($batchSize && !$file->eof()) {
             $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
-            $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
-            if ($lineNumber === 1) {
+            if ($lineNumber === 0) {
                 ++$lineNumber;
                 continue;
             }
@@ -353,10 +350,6 @@ class ImportModel extends FormModel
 
             if (!$errorMessage) {
                 $data = $this->trimArrayValues($data);
-                if (!array_filter($data)) {
-                    continue;
-                }
-
                 $data = array_combine($headers, $data);
 
                 try {
@@ -422,6 +415,7 @@ class ImportModel extends FormModel
             if ($limit && $counter >= $limit) {
                 $import->setStatus($import::DELAYED);
                 $this->saveEntity($import);
+
                 break;
             }
         }

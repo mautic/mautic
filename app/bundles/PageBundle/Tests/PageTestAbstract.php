@@ -17,13 +17,13 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\DeviceModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -69,6 +69,11 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $deviceModel = $this
+            ->getMockBuilder(DeviceModel::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $redirectModel = $this->getRedirectModel();
 
         $trackableModel = $this
@@ -102,18 +107,6 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $queueService = $this
-            ->getMockBuilder(QueueService::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $queueService->expects($this
-            ->any())
-            ->method('isQueueEnabled')
-            ->will(
-                $this->returnValue(false)
-            );
-
         $entityManager->expects($this
             ->any())
             ->method('getRepository')
@@ -132,7 +125,7 @@ class PageTestAbstract extends WebTestCase
             $leadFieldModel,
             $redirectModel,
             $trackableModel,
-            $queueService
+            $deviceModel
         );
 
         $pageModel->setDispatcher($dispatcher);

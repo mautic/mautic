@@ -175,6 +175,7 @@ class PublicController extends FormController
                     }
                 }
             } else {
+
                 /******************  COMPANY STUFF  *********************/
 
                 if ('company' === $this->request->request->get('type', [], true)) {

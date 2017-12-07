@@ -11,9 +11,8 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Mautic\LeadBundle\Entity\Tag;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,24 +21,24 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class TagType extends AbstractType
 {
     /**
-     * @var EntityManager
+     * @var
      */
-    private $em;
+    private $factory;
 
     /**
-     * @param EntityManager $em
+     * @param MauticFactory $factory
      */
-    public function __construct(EntityManager $em)
+    public function __construct(MauticFactory $factory)
     {
-        $this->em = $em;
+        $this->factory = $factory;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($options['add_transformer']) {
             $transformer = new TagEntityModelTransformer(
-                $this->em,
-                Tag::class,
+                $this->factory->getEntityManager(),
+                'MauticLeadBundle:Tag',
                 'id',
                 ($options['multiple'])
             );
@@ -58,7 +57,8 @@ class TagType extends AbstractType
                 'label'         => 'mautic.lead.tags',
                 'class'         => 'MauticLeadBundle:Tag',
                 'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')->orderBy('t.tag', 'ASC');
+                    return $er->createQueryBuilder('t')
+                        ->orderBy('t.tag', 'ASC');
                 },
                 'property'        => 'tag',
                 'multiple'        => true,

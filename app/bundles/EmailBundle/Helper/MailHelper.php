@@ -20,7 +20,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
-use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
+use Mautic\EmailBundle\Swiftmailer\Transport\InterfaceTokenTransport;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
@@ -242,11 +242,6 @@ class MailHelper
     private $contentHash;
 
     /**
-     * @var array
-     */
-    private $copies = [];
-
-    /**
      * @param MauticFactory $factory
      * @param               $mailer
      * @param null          $from
@@ -268,7 +263,7 @@ class MailHelper
         $this->returnPath = $factory->getParameter('mailer_return_path');
 
         // Check if batching is supported by the transport
-        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof TokenTransportInterface) {
+        if ($this->factory->getParameter('mailer_spool_type') == 'memory' && $this->transport instanceof InterfaceTokenTransport) {
             $this->tokenizationEnabled = true;
         }
 
@@ -355,7 +350,7 @@ class MailHelper
         } // from is set in flushQueue
 
         // Set system return path if applicable
-        if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
+        if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail($this->idHash))) {
             $this->message->setReturnPath($bounceEmail);
         } elseif (!empty($this->returnPath)) {
             $this->message->setReturnPath($this->returnPath);
@@ -383,7 +378,7 @@ class MailHelper
             if (!empty($this->body['content']) || empty($this->plainText)) {
                 $this->message->setBody($this->body['content'], $this->body['contentType'], $this->body['charset']);
             }
-            $this->setMessagePlainText();
+            $this->setMessagePlainText($isQueueFlush);
 
             if (!$isQueueFlush) {
                 // Replace token content
@@ -460,14 +455,14 @@ class MailHelper
                 // Clear the log so that previous output is not associated with new errors
                 $this->logger->clear();
             } catch (\Exception $e) {
+                $this->logError($e, 'send');
+
                 // Exception encountered when sending so all recipients are considered failures
                 $this->errors['failures'] = array_merge(
                     array_keys((array) $this->message->getTo()),
                     array_keys((array) $this->message->getCc()),
                     array_keys((array) $this->message->getBcc())
                 );
-
-                $this->logError($e, 'send');
             }
         }
 
@@ -501,6 +496,7 @@ class MailHelper
     public function queue($dispatchSendEvent = false, $returnMode = self::QUEUE_RESET_TO)
     {
         if ($this->tokenizationEnabled) {
+
             // Dispatch event to get custom tokens from listeners
             if ($dispatchSendEvent) {
                 $this->dispatchSendEvent();
@@ -596,66 +592,73 @@ class MailHelper
      */
     public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'], $useOwnerAsMailer = true)
     {
-        // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
-        $flushed = empty($this->fatal);
-        if ($this->tokenizationEnabled && count($this->metadata) && $flushed) {
-            $errors             = $this->errors;
-            $errors['failures'] = [];
-            $flushed            = false;
+        if ($this->tokenizationEnabled) {
+            if (count($this->metadata) && empty($this->fatal)) {
+                $errors             = $this->errors;
+                $errors['failures'] = [];
+                $result             = true;
 
-            foreach ($this->metadata as $fromKey => $metadatum) {
-                // Whatever is in the message "to" should be ignored as we will send to the contacts grouped by from addresses
-                // This prevents mailers such as sparkpost from sending duplicates to contacts
-                $this->message->setTo([]);
+                foreach ($this->metadata as $fromKey => $metadatum) {
+                    // Whatever is in the message "to" should be ignored as we will send to the contacts grouped by from addresses
+                    // This prevents mailers such as sparkpost from sending duplicates to contacts
+                    $this->message->setTo([]);
 
-                $this->errors = [];
+                    $this->errors = [];
 
-                if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
-                    $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
-                } else {
-                    $this->setFrom($this->from, null, null);
-                }
-
-                foreach ($metadatum['contacts'] as $email => $contact) {
-                    $this->message->addMetadata($email, $contact);
-
-                    // Add asset stats if applicable
-                    if (!empty($contact['leadId'])) {
-                        $this->queueAssetDownloadEntry($email, $contact);
+                    if (!$this->useGlobalFrom && $useOwnerAsMailer && 'default' !== $fromKey) {
+                        $this->setFrom($metadatum['from']['email'], $metadatum['from']['first_name'].' '.$metadatum['from']['last_name'], null);
+                    } else {
+                        $this->setFrom($this->from, null, null);
                     }
 
-                    $this->message->addTo($email, $contact['name']);
+                    foreach ($metadatum['contacts'] as $email => $contact) {
+                        $this->message->addMetadata($email, $contact);
+
+                        // Add asset stats if applicable
+                        if (!empty($contact['leadId'])) {
+                            $this->queueAssetDownloadEntry($email, $contact);
+                        }
+
+                        $this->message->addTo($email, $contact['name']);
+                    }
+
+                    if (!$this->send(false, true)) {
+                        $result = false;
+                    }
+
+                    // Merge errors
+                    if (isset($this->errors['failures'])) {
+                        $errors['failures'] = array_merge($errors['failures'], $this->errors['failures']);
+                        unset($this->errors['failures']);
+                    }
+
+                    if (!empty($this->errors)) {
+                        $errors = array_merge($errors, $this->errors);
+                    }
+
+                    // Clear metadata for the previous recipients
+                    $this->message->clearMetadata();
                 }
 
-                $flushed = $this->send(false, true);
+                $this->errors = $errors;
 
-                // Merge errors
-                if (isset($this->errors['failures'])) {
-                    $errors['failures'] = array_merge($errors['failures'], $this->errors['failures']);
-                    unset($this->errors['failures']);
+                // Clear queued to recipients
+                $this->queuedRecipients = [];
+                $this->metadata         = [];
+
+                foreach ($resetEmailTypes as $type) {
+                    $type = ucfirst($type);
+                    $this->message->{'set'.$type}([]);
                 }
 
-                if (!empty($this->errors)) {
-                    $errors = array_merge($errors, $this->errors);
-                }
-
-                // Clear metadata for the previous recipients
-                $this->message->clearMetadata();
+                return $result;
             }
 
-            $this->errors = $errors;
-
-            // Clear queued to recipients
-            $this->queuedRecipients = [];
-            $this->metadata         = [];
+            return false;
         }
 
-        foreach ($resetEmailTypes as $type) {
-            $type = ucfirst($type);
-            $this->message->{'set'.$type}([]);
-        }
-
-        return $flushed;
+        // Batching was not enabled and thus sent with queue()
+        return true;
     }
 
     /**
@@ -665,40 +668,33 @@ class MailHelper
      */
     public function reset($cleanSlate = true)
     {
-        $this->eventTokens      = [];
-        $this->queuedRecipients = [];
-        $this->errors           = [];
-        $this->lead             = null;
-        $this->idHash           = null;
-        $this->contentHash      = null;
-        $this->internalSend     = false;
-        $this->fatal            = false;
-        $this->idHashState      = true;
-        $this->useGlobalFrom    = false;
+        unset($this->lead, $this->idHash, $this->eventTokens, $this->queuedRecipients, $this->errors);
+
+        $this->eventTokens   = $this->queuedRecipients   = $this->errors   = [];
+        $this->lead          = $this->idHash          = $this->contentHash          = null;
+        $this->internalSend  = $this->fatal  = false;
+        $this->idHashState   = true;
+        $this->useGlobalFrom = false;
 
         $this->logger->clear();
 
         if ($cleanSlate) {
             $this->appendTrackingPixel = false;
-            $this->queueEnabled        = false;
-            $this->from                = $this->systemFrom;
-            $this->headers             = [];
-            $this->source              = [];
-            $this->assets              = [];
-            $this->globalTokens        = [];
-            $this->assets              = [];
-            $this->attachedAssets      = [];
-            $this->email               = null;
-            $this->copies              = [];
-            $this->message             = $this->getMessageInstance();
-            $this->subject             = '';
-            $this->plainText           = '';
-            $this->plainTextSet        = false;
-            $this->body                = [
+
+            unset($this->headers, $this->email, $this->source, $this->assets, $this->globalTokens, $this->message, $this->subject, $this->body, $this->plainText, $this->assets, $this->attachedAssets);
+            $this->from    = $this->systemFrom;
+            $this->headers = $this->source = $this->assets = $this->globalTokens = $this->assets = $this->attachedAssets = [];
+            $this->email   = null;
+            $this->subject = $this->plainText = '';
+            $this->body    = [
                 'content'     => '',
                 'contentType' => 'text/html',
                 'charset'     => null,
             ];
+
+            $this->plainTextSet = false;
+
+            $this->message = $this->getMessageInstance();
         }
     }
 
@@ -1099,8 +1095,8 @@ class MailHelper
     /**
      * Set CC address(es).
      *
-     * @param mixed  $addresses
-     * @param string $name
+     * @param mixed $addresses
+     * @param sting $name
      *
      * @return bool
      */
@@ -1273,6 +1269,31 @@ class MailHelper
             $this->message->setFrom($fromEmail, $fromName);
         } catch (\Exception $e) {
             $this->logError($e, 'from');
+        }
+    }
+
+    /**
+     * Validates a given address to ensure RFC 2822, 3.6.2 specs.
+     *
+     * @param $address
+     *
+     * @throws \Swift_RfcComplianceException
+     */
+    public static function validateEmail($address)
+    {
+        $invalidChar = strpbrk($address, '\'^&*%');
+
+        if ($invalidChar !== false) {
+            throw new \Swift_RfcComplianceException(
+                'Email address ['.$address.
+                '] contains this invalid character: '.substr($invalidChar, 0, 1)
+            );
+        }
+
+        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+            throw new \Swift_RfcComplianceException(
+                'Email address ['.$address.'] is invalid'
+            );
         }
     }
 
@@ -1649,10 +1670,6 @@ class MailHelper
 
         if ($context) {
             $error .= " ($context)";
-
-            if ('send' === $context) {
-                $error .= '; '.implode(', ', $this->errors['failures']);
-            }
         }
 
         $this->errors[] = $errorMessage;
@@ -1686,7 +1703,6 @@ class MailHelper
     public function clearErrors()
     {
         $this->errors = [];
-        $this->fatal  = false;
     }
 
     /**
@@ -1823,6 +1839,8 @@ class MailHelper
      */
     public function createEmailStat($persist = true, $emailAddress = null, $listId = null)
     {
+        static $copies = [];
+
         //create a stat
         $stat = new Stat();
         $stat->setDateSent(new \DateTime());
@@ -1864,7 +1882,7 @@ class MailHelper
 
         // Save a copy of the email - use email ID if available simply to prevent from having to rehash over and over
         $id = (null !== $this->email) ? $this->email->getId() : md5($this->subject.$this->body['content']);
-        if (!isset($this->copies[$id])) {
+        if (!isset($copies[$id])) {
             $hash = (strlen($id) !== 32) ? md5($this->subject.$this->body['content']) : $id;
 
             $copy        = $emailModel->getCopyRepository()->findByHash($hash);
@@ -1879,12 +1897,12 @@ class MailHelper
             }
 
             if ($copy || $copyCreated) {
-                $this->copies[$id] = $hash;
+                $copies[$id] = $hash;
             }
         }
 
-        if (isset($this->copies[$id])) {
-            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $this->copies[$id]));
+        if (isset($copies[$id])) {
+            $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $copies[$id]));
         }
 
         if ($persist) {
@@ -1929,8 +1947,8 @@ class MailHelper
             // Append the bounce notation
             list($email, $domain) = explode('@', $settings['address']);
             $email .= '+bounce';
-            if ($idHash || $this->idHash) {
-                $email .= '_'.($idHash ?: $this->idHash);
+            if ($idHash) {
+                $email .= '_'.$this->idHash;
             }
             $monitoredEmail = $email.'@'.$domain;
         }
@@ -1953,8 +1971,8 @@ class MailHelper
             // Append the bounce notation
             list($email, $domain) = explode('@', $settings['address']);
             $email .= '+unsubscribe';
-            if ($idHash || $this->idHash) {
-                $email .= '_'.($idHash ?: $this->idHash);
+            if ($idHash) {
+                $email .= '_'.$this->idHash;
             }
             $monitoredEmail = $email.'@'.$domain;
         }
@@ -2066,32 +2084,5 @@ class MailHelper
             : EmojiHelper::toHtml(
                 str_replace('|FROM_NAME|', $owner['first_name'].' '.$owner['last_name'], nl2br($owner['signature']))
             );
-    }
-
-    /**
-     * Validates a given address to ensure RFC 2822, 3.6.2 specs.
-     *
-     * @deprecated 2.11.0 to be removed in 3.0; use Mautic\EmailBundle\Helper\EmailValidator
-     *
-     * @param $address
-     *
-     * @throws \Swift_RfcComplianceException
-     */
-    public static function validateEmail($address)
-    {
-        $invalidChar = strpbrk($address, '\'^&*%');
-
-        if ($invalidChar !== false) {
-            throw new \Swift_RfcComplianceException(
-                'Email address ['.$address.
-                '] contains this invalid character: '.substr($invalidChar, 0, 1)
-            );
-        }
-
-        if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
-            throw new \Swift_RfcComplianceException(
-                'Email address ['.$address.'] is invalid'
-            );
-        }
     }
 }

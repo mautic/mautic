@@ -415,6 +415,7 @@ class AssetsHelper
                         }
                         $headOutput .= "\n$output";
                         break;
+
                 }
             }
             if ($scriptOpen) {
@@ -679,7 +680,7 @@ class AssetsHelper
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {

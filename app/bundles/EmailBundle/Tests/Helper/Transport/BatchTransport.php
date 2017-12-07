@@ -1,12 +1,10 @@
 <?php
 
 /*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ * Created by PhpStorm.
+ * User: alan
+ * Date: 9/14/16
+ * Time: 5:42 PM.
  */
 
 namespace Mautic\EmailBundle\Tests\Helper\Transport;
@@ -18,19 +16,15 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
     private $fromAddresses = [];
     private $metadatas     = [];
     private $validate      = false;
-    private $maxRecipients;
-    private $numberToFail;
 
     /**
      * BatchTransport constructor.
      *
      * @param bool $validate
      */
-    public function __construct($validate = false, $maxRecipients = 4, $numberToFail = 1)
+    public function __construct($validate = false)
     {
-        $this->validate      = $validate;
-        $this->maxRecipients = $maxRecipients;
-        $this->numberToFail  = (int) $numberToFail;
+        $this->validate = true;
     }
 
     /**
@@ -45,9 +39,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
 
         $messageArray = $this->messageToArray();
 
-        if ($this->validate && $this->numberToFail) {
-            --$this->numberToFail;
-
+        if ($this->validate) {
             if (empty($messageArray['subject'])) {
                 $this->throwException('Subject empty');
             }
@@ -65,7 +57,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function getMaxBatchLimit()
     {
-        return $this->maxRecipients;
+        return 4;
     }
 
     /**
@@ -77,9 +69,7 @@ class BatchTransport extends AbstractTokenArrayTransport implements \Swift_Trans
      */
     public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to')
     {
-        $toCount = count($message->getTo());
-
-        return ('to' === $type) ? $toCount + $toBeAdded : $toCount;
+        return count($message->getTo()) + $toBeAdded;
     }
 
     /**

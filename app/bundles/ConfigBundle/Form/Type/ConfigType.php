@@ -11,12 +11,13 @@
 
 namespace Mautic\ConfigBundle\Form\Type;
 
-use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Class ConfigType.
@@ -24,18 +25,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ConfigType extends AbstractType
 {
     /**
-     * @var RestrictionHelper
+     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
      */
-    private $restrictionHelper;
+    private $translator;
 
     /**
      * ConfigType constructor.
      *
-     * @param RestrictionHelper $restrictionHelper
+     * @param TranslatorInterface $translator
      */
-    public function __construct(RestrictionHelper $restrictionHelper)
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->restrictionHelper = $restrictionHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -60,14 +61,37 @@ class ConfigType extends AbstractType
             }
         }
 
+        $translator = $this->translator;
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($options) {
+            function (FormEvent $event) use ($options, $translator) {
                 $form = $event->getForm();
 
                 foreach ($form as $config => $configForm) {
-                    foreach ($configForm as $child) {
-                        $this->restrictionHelper->applyRestrictions($child, $configForm);
+                    foreach ($configForm as $key => $child) {
+                        if (in_array($key, $options['doNotChange'])) {
+                            if ($options['doNotChangeDisplayMode'] == 'mask') {
+                                $fieldOptions = $child->getConfig()->getOptions();
+
+                                $configForm->add(
+                                    $key,
+                                    'text',
+                                    [
+                                        'label'    => $fieldOptions['label'],
+                                        'required' => false,
+                                        'mapped'   => false,
+                                        'disabled' => true,
+                                        'attr'     => [
+                                            'placeholder' => $translator->trans('mautic.config.restricted'),
+                                            'class'       => 'form-control',
+                                        ],
+                                        'label_attr' => ['class' => 'control-label'],
+                                    ]
+                                );
+                            } elseif ($options['doNotChangeDisplayMode'] == 'remove') {
+                                $configForm->remove($key);
+                            }
+                        }
                     }
                 }
             }
@@ -96,10 +120,19 @@ class ConfigType extends AbstractType
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritdoc}
+     *
+     * @param OptionsResolverInterface $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setRequired(
+            [
+                'doNotChange',
+                'doNotChangeDisplayMode',
+            ]
+        );
+
         $resolver->setDefaults(
             [
                 'fileFields' => [],

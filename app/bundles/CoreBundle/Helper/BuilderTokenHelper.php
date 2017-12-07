@@ -11,7 +11,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Factory\MauticFactory;
 

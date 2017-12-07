@@ -31,14 +31,15 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
                 'password'   => 'topsecret',
             ],
             'EmailBundle_bounces' => [
-                'address'           => null,
-                'host'              => null,
+                'address'           => '',
+                'host'              => '',
                 'port'              => '993',
                 'encryption'        => '/ssl',
-                'user'              => null,
-                'password'          => null,
-                'override_settings' => 0,
+                'user'              => '',
+                'password'          => '',
+                'override_settings' => '',
                 'folder'            => 'Bounces',
+                'ssl'               => '1',
             ],
         ];
 
@@ -85,6 +86,7 @@ class MailboxTest extends \PHPUnit_Framework_TestCase
                 'password'          => 'topsecret',
                 'override_settings' => true,
                 'folder'            => 'INBOX',
+                'ssl'               => '1',
             ],
         ];
 

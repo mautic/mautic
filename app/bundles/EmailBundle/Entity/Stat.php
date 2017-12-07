@@ -11,7 +11,6 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -124,16 +123,6 @@ class Stat
     private $openDetails = [];
 
     /**
-     * @var ArrayCollection|EmailReply[]
-     */
-    private $replies;
-
-    public function __construct()
-    {
-        $this->replies = new ArrayCollection();
-    }
-
-    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -223,12 +212,6 @@ class Stat
         $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
-
-        $builder->createOneToMany('replies', EmailReply::class)
-            ->mappedBy('stat')
-            ->fetchExtraLazy()
-            ->cascadeAll()
-            ->build();
     }
 
     /**
@@ -635,21 +618,5 @@ class Stat
         $this->storedCopy = $storedCopy;
 
         return $this;
-    }
-
-    /**
-     * @return ArrayCollection|EmailReply[]
-     */
-    public function getReplies()
-    {
-        return $this->replies;
-    }
-
-    /**
-     * @param EmailReply $reply
-     */
-    public function addReply(EmailReply $reply)
-    {
-        $this->replies[] = $reply;
     }
 }

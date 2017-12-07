@@ -19,6 +19,7 @@ return [
             'mautic.integration.outlook' => [
                 'class'     => \MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration::class,
                 'arguments' => [
+
                 ],
             ],
         ],

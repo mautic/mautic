@@ -43,7 +43,6 @@ class WebhookSubscriber extends CommonSubscriber
         $this->ipLookupHelper = $ipLookupHelper;
         $this->auditLogModel  = $auditLogModel;
     }
-
     /**
      * {@inheritdoc}
      */

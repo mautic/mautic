@@ -14,7 +14,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 /**
  * Class AbstractTokenHttpTransport.
  */
-abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface
+abstract class AbstractTokenHttpTransport extends AbstractTokenArrayTransport implements \Swift_Transport, InterfaceTokenTransport
 {
     /**
      * @var

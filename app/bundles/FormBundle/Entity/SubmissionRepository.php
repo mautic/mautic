@@ -172,10 +172,6 @@ class SubmissionRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @param int $id
-     *
-     * @return null|Submission
      */
     public function getEntity($id = 0)
     {

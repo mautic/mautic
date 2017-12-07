@@ -14,13 +14,6 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 use Joomla\Http\Exception\UnexpectedResponseException;
 use Joomla\Http\Http;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
-use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
-use Mautic\EmailBundle\MonitoredEmail\Message;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BouncedEmail;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -28,16 +21,8 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Class AmazonTransport.
  */
-class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport, BounceProcessorInterface, UnsubscriptionProcessorInterface
+class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
 {
-    /**
-     * From address for SNS email.
-     */
-    const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
-
-    /**
-     * @var Http
-     */
     private $httpClient;
 
     /**
@@ -53,7 +38,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
      *
-     * @return string
+     * @return mixed
      */
     public function getCallbackPath()
     {
@@ -66,7 +51,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
      * @param Request       $request
      * @param MauticFactory $factory
      *
-     * @return array
+     * @return mixed
      */
     public function handleCallbackResponse(Request $request, MauticFactory $factory)
     {
@@ -92,6 +77,7 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
      */
     public function processJsonPayload(array $payload, $logger, $translator)
     {
+
         // Data structure that Mautic expects to be returned from this callback
         $rows = [
             DoNotContact::BOUNCED => [
@@ -169,63 +155,5 @@ class AmazonTransport extends \Swift_SmtpTransport implements InterfaceCallbackT
         }
 
         return $rows;
-    }
-
-    /**
-     * @param Message $message
-     *
-     * @throws BounceNotFound
-     */
-    public function processBounce(Message $message)
-    {
-        if (self::SNS_ADDRESS !== $message->fromAddress) {
-            throw new BounceNotFound();
-        }
-
-        $message = $this->getSnsPayload($message->textPlain);
-        if ('Bounce' !== $message['notificationType']) {
-            throw new BounceNotFound();
-        }
-
-        $bounce = new BouncedEmail();
-        $bounce->setContactEmail($message['bounce']['bouncedRecipients'][0]['emailAddress'])
-            ->setBounceAddress($message['mail']['source'])
-            ->setType(Type::UNKNOWN)
-            ->setRuleCategory(Category::UNKNOWN)
-            ->setRuleNumber('0013')
-            ->setIsFinal(true);
-
-        return $bounce;
-    }
-
-    /**
-     * @param Message $message
-     *
-     * @return UnsubscribedEmail
-     *
-     * @throws UnsubscriptionNotFound
-     */
-    public function processUnsubscription(Message $message)
-    {
-        if (self::SNS_ADDRESS !== $message->fromAddress) {
-            throw new UnsubscriptionNotFound();
-        }
-
-        $message = $this->getSnsPayload($message->textPlain);
-        if ('Complaint' !== $message['notificationType']) {
-            throw new UnsubscriptionNotFound();
-        }
-
-        return new UnsubscribedEmail($message['complaint']['complainedRecipients'][0]['emailAddress'], $message['mail']['source']);
-    }
-
-    /**
-     * @param string $body
-     *
-     * @return array
-     */
-    protected function getSnsPayload($body)
-    {
-        return json_decode(strtok($body, "\n"), true);
     }
 }

@@ -121,6 +121,7 @@ class SugarcrmApi extends CrmApi
             $sugarLeadRecords = $this->integration->getSugarLeadId($lead);
         }
         if ($tokenData['version'] == '6') {
+
             //if not found then go ahead and make an API call to find all the records with that email
             if (isset($fields['email1']) && empty($sugarLeadRecords)) {
                 $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
@@ -160,6 +161,7 @@ class SugarcrmApi extends CrmApi
 
             //$createdLeadData[] = $this->request('set_entry', $parameters, 'POST');
         } else {
+
             //if not found then go ahead and make an API call to find all the records with that email
             if (isset($fields['email1']) && empty($sugarLeadRecords)) {
                 $sLeads           = $this->getLeads(['email' => $fields['email1'], 'offset' => 0, 'max_results' => 1000], 'Leads');
@@ -376,6 +378,7 @@ class SugarcrmApi extends CrmApi
             }
 
             if ($tokenData['version'] == '6') {
+
                 //Send sugar relationsips
                 if (!empty($resp)) {
                     $nbLeads = 0;
@@ -578,7 +581,7 @@ class SugarcrmApi extends CrmApi
             default:
                 $mixedFields = array_filter($availableFields['leadFields']);
                 $fields      = [];
-                $object      = ($object == 'Contacts') ? 'Contacts' : 'Leads';
+                $object      = ($object == 'Contact') ? 'Contacts' : 'Leads';
                 foreach ($mixedFields as $sugarField => $mField) {
                     if (strpos($sugarField, '__'.$object) !== false) {
                         $fields[] = str_replace('__'.$object, '', $sugarField);
@@ -632,6 +635,7 @@ class SugarcrmApi extends CrmApi
                      'offset'                   => $query['offset'],
                     'select_fields'             => $fields,
                     'link_name_to_fields_array' => [/* TO BE MODIFIED */
+
                         [
                             'name'  => 'email_addresses',
                             'value' => [
@@ -640,6 +644,7 @@ class SugarcrmApi extends CrmApi
                                 'primary_address',
                             ],
                         ],
+
                     ],
                     'max_results' => $query['max_results'],
                     'deleted'     => 0,

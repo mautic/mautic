@@ -24,7 +24,6 @@ class MessageQueue
     const STATUS_RESCHEDULED = 'rescheduled';
     const STATUS_PENDING     = 'pending';
     const STATUS_SENT        = 'sent';
-    const STATUS_CANCELLED   = 'cancelled';
 
     const PRIORITY_NORMAL = 2;
     const PRIORITY_HIGH   = 1;

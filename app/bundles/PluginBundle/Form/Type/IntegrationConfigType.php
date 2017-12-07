@@ -41,6 +41,7 @@ class IntegrationConfigType extends AbstractType
                     'empty_value' => 'mautic.plugin.config.campaign.member.chooseone',
                     'required'    => false,
                 ]
+
             );
         }
     }
