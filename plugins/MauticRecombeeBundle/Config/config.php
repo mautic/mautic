@@ -6,11 +6,6 @@ return [
     'author'      => 'kuzmany.biz',
     'version'     => '1.0.0',
     'services'    => [
-        'events' => [
-            'plugin.skeleton.whyMe.subscriber' => [
-                'class' => 'MauticPlugin\MauticRecombeeBundle\EventListener\WhyMeSubscriber',
-            ],
-        ],
         'other' => [
             'mautic.recombee.helper' => [
                 'class'     => 'MauticPlugin\MauticRecombeeBundle\Helper\RecombeeHelper',
