@@ -261,7 +261,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $cwFields = [];
 
         foreach ($fields as $fieldName => $field) {
-            if ($field['type'] == 'string' || $field['type'] == 'boolean' || $field['type'] == 'ref') {
+            if (in_array($field['type'], ['string', 'boolean', 'ref'])) {
                 $cwFields[$fieldName] = [
                     'type'     => $field['type'],
                     'label'    => ucfirst($fieldName),
@@ -705,6 +705,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 'communicationItems' => $communicationItems,
             ]
         );
+
+        // @todo map company reference
+        unset($mappedData['company']);
 
         return $mappedData;
     }
