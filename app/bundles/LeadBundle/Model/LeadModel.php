@@ -31,6 +31,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
+use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
@@ -508,6 +509,7 @@ class LeadModel extends FormModel
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
         }
+
         $this->em->clear(CompanyChangeLog::class);
     }
 
@@ -2673,6 +2675,7 @@ class LeadModel extends FormModel
 
         $companyLeads = $this->companyModel->getCompanyLeadRepository()->getEntitiesByLead($lead);
 
+        /** @var CompanyLead $companyLead */
         foreach ($companyLeads as $companyLead) {
             $company = $companyLead->getCompany();
 
@@ -2703,6 +2706,9 @@ class LeadModel extends FormModel
             $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
             $this->companyModel->getCompanyLeadRepository()->saveEntities($companyArray, false);
         }
+
+        // Clear CompanyLead entities from Doctrine memory
+        $this->em->clear(CompanyLead::class);
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }
