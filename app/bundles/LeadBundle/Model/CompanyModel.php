@@ -366,9 +366,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $this->getCompanyLeadRepository()->saveEntities($persistCompany);
         }
 
-        // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
-
         if (!empty($companyName)) {
             $currentCompanyName = $lead->getCompany();
             if ($currentCompanyName !== $companyName) {
@@ -387,7 +384,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             }
         }
 
-        //unset($lead, $persistCompany, $companies);
+        // Clear CompanyLead entities from Doctrine memory
+        $this->em->clear(CompanyLead::class);
 
         return $contactAdded;
     }
