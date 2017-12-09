@@ -12,7 +12,13 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 
+/**
+ * Class ConnectwiseApi.
+ *
+ * @property ConnectwiseIntegration $integration
+ */
 class ConnectwiseApi extends CrmApi
 {
     /**
@@ -26,15 +32,16 @@ class ConnectwiseApi extends CrmApi
      */
     protected function request($endpoint, $parameters = [], $method = 'GET')
     {
-        if (isset($this->keys['password'])) {
-            $parameters['password'] = $this->keys['password'];
-            $parameters['username'] = $this->keys['username'];
-        }
         $apiUrl = $this->integration->getApiUrl();
 
         $url = sprintf('%s/%s', $apiUrl, $endpoint);
 
-        $response = $this->integration->makeRequest($url, $parameters, $method, ['encode_parameters' => 'json', 'cw-app-id' => $this->integration->getCompanyCookieKey()]);
+        $response = $this->integration->makeRequest(
+            $url,
+            $parameters,
+            $method,
+            ['encode_parameters' => 'json', 'cw-app-id' => $this->integration->getCompanyCookieKey()]
+        );
 
         $errors = [];
         if (is_array($response)) {
@@ -59,103 +66,162 @@ class ConnectwiseApi extends CrmApi
         return $response;
     }
 
-    public function getCompanies($params)
-    {
-        $lastUpdated = [];
-        if (isset($params['start'])) {
-            $lastUpdated = ['conditions' => 'lastUpdated > ['.$params['start'].']'];
-        }
-
-        return $this->request('company/companies', $lastUpdated);
-    }
-
     /**
+     * @param array $params
+     * @param int   $page
+     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getContacts($params)
+    public function getCompanies(array $params, $page = 1)
     {
-        $conditions = [];
+        $query = [
+            'page'     => $page,
+            'pageSize' => ConnectwiseIntegration::PAGESIZE,
+        ];
 
         if (isset($params['start'])) {
-            $conditions = ['conditions' => 'lastUpdated > ['.$params['start'].']'];
+            $query['conditions'] = 'lastUpdated > ['.$params['start'].']';
         }
+
+        return $this->request('company/companies', $query);
+    }
+
+    /**
+     * @param array $params
+     * @param int   $page
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getContacts(array $params, $page = 1)
+    {
+        $query = [
+            'page'     => $page,
+            'pageSize' => ConnectwiseIntegration::PAGESIZE,
+        ];
+
+        if (isset($params['start'])) {
+            $query['conditions'] = 'lastUpdated > ['.$params['start'].']';
+        }
+
         if (isset($params['Email'])) {
-            $conditions = ['childconditions' => 'communicationItems/value = "'.$params['Email'].'" AND communicationItems/communicationType="Email"'];
+            $query['childconditions'] = 'communicationItems/value = "'.$params['Email'].'" AND communicationItems/communicationType="Email"';
         }
 
         if (isset($params['Ids'])) {
-            $conditions = ['conditions' => 'id in ('.$params['Ids'].')'];
+            $query['conditions'] = 'id in ('.$params['Ids'].')';
         }
 
-        return $this->request('company/contacts', $conditions);
+        return $this->request('company/contacts', $query);
     }
 
     /**
-     * @return mixed|string
-     *
-     * @throws ApiErrorException
-     */
-    public function createContact($params)
-    {
-        return $this->request('company/contacts', $params, 'POST');
-    }
-
-    /**
-     * @return mixed|string
-     *
-     * @throws ApiErrorException
-     */
-    public function updateContact($params, $id)
-    {
-        return $this->request('company/contacts/'.$id, $params, 'PATCH');
-    }
-
-    /**
-     * @return mixed|string
-     *
-     * @throws ApiErrorException
-     */
-    public function getCampaigns()
-    {
-        return $this->request('marketing/groups');
-    }
-
-    /**
-     * @param $campaignId
-     * @param $params
-     *
-     * @return mixed|string
-     *
-     * @throws ApiErrorException
-     */
-    public function getCampaignMembers($campaignId)
-    {
-        return $this->request('marketing/groups/'.$campaignId.'/contacts');
-    }
-
-    /**
-     * https://{connectwiseSite}/v4_6_release/apis/3.0/sales/activities/types.
-     *
      * @param array $params
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getActivityTypes($params = [])
+    public function createContact(array $params)
     {
-        return $this->request('sales/activities/types');
+        return $this->request('company/contacts', $params, 'POST');
     }
 
+    /**
+     * @param array $params
+     * @param       $id
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function updateContact(array $params, $id)
+    {
+        return $this->request('company/contacts/'.$id, $params, 'PATCH');
+    }
+
+    /**
+     * @return array
+     *
+     * @throws ApiErrorException
+     */
+    public function getCampaigns()
+    {
+        return $this->fetchAllRecords('marketing/groups');
+    }
+
+    /**
+     * @param     $campaignId
+     * @param int $page
+     *
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
+     */
+    public function getCampaignMembers($campaignId, $page = 1)
+    {
+        return $this->request('marketing/groups/'.$campaignId.'/contacts', ['page' => $page]);
+    }
+
+    /**
+     * https://{connectwiseSite}/v4_6_release/apis/3.0/sales/activities/types.
+     *
+     * @return array
+     *
+     * @throws ApiErrorException
+     */
+    public function getActivityTypes()
+    {
+        return $this->fetchAllRecords('sales/activities/types');
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return array
+     *
+     * @throws ApiErrorException
+     */
     public function postActivity($params = [])
     {
         return $this->request('sales/activities', $params, 'POST');
     }
 
-    public function getMembers($params = [])
+    /**
+     * @return array
+     *
+     * @throws ApiErrorException
+     */
+    public function getMembers()
     {
-        return $this->request('system/members');
+        return $this->fetchAllRecords('system/members');
+    }
+
+    /**
+     * @param $endpoint
+     *
+     * @return array
+     *
+     * @throws ApiErrorException
+     */
+    public function fetchAllRecords($endpoint)
+    {
+        $page        = 1;
+        $pageSize    = ConnectwiseIntegration::PAGESIZE;
+        $allRecords  = [];
+        while ($pagedRecords = $this->request($endpoint, ['page' => $page, 'pageSize' => $pageSize])) {
+            $allRecords = array_merge($allRecords, $pagedRecords);
+            ++$page;
+
+            if (count($pagedRecords) < $pageSize) {
+                // Received less than page size so we know there are no more records to fetch
+                break;
+            }
+        }
+
+        return $allRecords;
     }
 }
