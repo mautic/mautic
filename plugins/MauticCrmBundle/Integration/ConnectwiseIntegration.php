@@ -479,50 +479,52 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getRecords($params, $object)
     {
+        if (!$this->isAuthorized()) {
+            return 0;
+        }
+
         $page                = 1;
         $executed            = 0;
         $integrationEntities = [];
         try {
-            if ($this->isAuthorized()) {
-                while ($records = ($object == 'Contact')
-                    ? $this->getApiHelper()->getContacts($params, $page)
-                    : $this->getApiHelper()->getCompanies($params, $page)) {
-                    $mauticReferenceObject = ($object == 'Contact') ? 'lead' : 'company';
-                    foreach ($records as $record) {
-                        if (is_array($record)) {
-                            $id            = $record['id'];
-                            $formattedData = $this->amendLeadDataBeforeMauticPopulate($record, $object);
-                            $entity        = ($object == 'Contact')
-                                ? $this->getMauticLead($formattedData)
-                                : $this->getMauticCompany(
-                                    $formattedData,
-                                    'company'
-                                );
-                            if ($entity) {
-                                $integrationEntities[] = $this->saveSyncedData($entity, $object, $mauticReferenceObject, $id);
-                                $this->em->detach($entity);
-                                unset($entity);
-                                ++$executed;
-                            }
+            while ($records = ($object == 'Contact')
+                ? $this->getApiHelper()->getContacts($params, $page)
+                : $this->getApiHelper()->getCompanies($params, $page)) {
+                $mauticReferenceObject = ($object == 'Contact') ? 'lead' : 'company';
+                foreach ($records as $record) {
+                    if (is_array($record)) {
+                        $id            = $record['id'];
+                        $formattedData = $this->amendLeadDataBeforeMauticPopulate($record, $object);
+                        $entity        = ($object == 'Contact')
+                            ? $this->getMauticLead($formattedData)
+                            : $this->getMauticCompany(
+                                $formattedData,
+                                'company'
+                            );
+                        if ($entity) {
+                            $integrationEntities[] = $this->saveSyncedData($entity, $object, $mauticReferenceObject, $id);
+                            $this->em->detach($entity);
+                            unset($entity);
+                            ++$executed;
                         }
                     }
-
-                    if ($integrationEntities) {
-                        $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-                        $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
-                    }
-
-                    // No use checking the next page if there are less records than the requested page size
-
-                    if (count($records) < self::PAGESIZE) {
-                        break;
-                    }
-
-                    ++$page;
                 }
 
-                return $executed;
+                if ($integrationEntities) {
+                    $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+                    $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+                }
+
+                // No use checking the next page if there are less records than the requested page size
+
+                if (count($records) < self::PAGESIZE) {
+                    break;
+                }
+
+                ++$page;
             }
+
+            return $executed;
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
         }
@@ -903,56 +905,56 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param $campaignId
-     * @param $settings
      *
      * @return bool
-     *
-     * @throws \Exception
      */
-    public function getCampaignMembers($campaignId, $settings)
+    public function getCampaignMembers($campaignId)
     {
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-
-        $campaignsMembersResults = [];
-        $allCampaignMembers      = [];
-
-        try {
-            $campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId);
-        } catch (\Exception $e) {
-            $this->logIntegrationError($e);
-            if (!$silenceExceptions) {
-                throw $e;
-            }
-        }
-
-        if (empty($campaignsMembersResults)) {
+        if (!$this->isAuthorized()) {
             return false;
         }
 
-        $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
-        $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
+        try {
+            $page = 1;
+            while ($campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId, $page)) {
+                $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
+                $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
+                $contacts             = (array) $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $recordList);
 
-        $contacts = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $recordList);
+                $existingContactsIds = array_map(
+                    function ($contact) {
+                        return ($contact['integration_entity'] == 'Contact') ? $contact['integration_entity_id'] : [];
+                    },
+                    $contacts
+                );
 
-        $existingContactsIds = array_map(
-            function ($contact) {
-                return ($contact['integration_entity'] == 'Contact') ? $contact['integration_entity_id'] : [];
-            },
-            $contacts
-        );
+                $contactsToFetch = array_diff_key($recordList, $existingContactsIds);
 
-        $contactsToFetch = array_diff_key($recordList, $existingContactsIds);
+                if (!empty($contactsToFetch)) {
+                    $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
+                    $params['Ids']         = $listOfContactsToFetch;
 
-        if (!empty($contactsToFetch)) {
-            $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
-            $params['Ids']         = $listOfContactsToFetch;
+                    $this->getLeads($params);
 
-            $this->getLeads($params);
+                    $saveCampaignMembers = array_merge($existingContactsIds, array_keys($contactsToFetch));
 
-            $allCampaignMembers = array_merge($existingContactsIds, array_keys($contactsToFetch));
+                    $this->saveCampaignMembers($saveCampaignMembers, $campaignMemberObject, $campaignId);
+                }
+
+                if (count($campaignsMembersResults) < self::PAGESIZE) {
+                    // No use continuing as we have less results than page size
+                    break;
+                }
+
+                ++$page;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            $this->logIntegrationError($e);
         }
 
-        $this->saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId);
+        return false;
     }
 
     /**

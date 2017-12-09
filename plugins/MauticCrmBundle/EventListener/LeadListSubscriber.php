@@ -133,7 +133,7 @@ class LeadListSubscriber extends CommonSubscriber
                     }
 
                     if (method_exists($integrationObject, 'getCampaignMembers')) {
-                        if ($integrationObject->getCampaignMembers($campaignId, [])) {
+                        if ($integrationObject->getCampaignMembers($campaignId)) {
                             $success = true;
                         }
                     }

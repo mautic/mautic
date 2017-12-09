@@ -54,4 +54,11 @@ trait DataGeneratorTrait
 
         return $fakeData;
     }
+
+    protected function reset()
+    {
+        $this->id               = 0;
+        $this->page             = 1;
+        $this->generatedRecords = [];
+    }
 }

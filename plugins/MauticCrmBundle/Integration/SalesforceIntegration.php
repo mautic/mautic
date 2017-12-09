@@ -1336,23 +1336,19 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param $campaignId
-     * @param $settings
      *
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId, $settings)
+    public function getCampaignMembers($campaignId)
     {
-        $silenceExceptions = true;
         $persistEntities   = $contactList   = $leadList   = $existingLeads   = $existingContacts   = [];
 
         try {
             $campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId);
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
-            if (!$silenceExceptions) {
-                throw $e;
-            }
         }
+
         //prepare contacts to import to mautic contacts to delete from mautic
         if (isset($campaignsMembersResults['records']) && !empty($campaignsMembersResults['records'])) {
             foreach ($campaignsMembersResults['records'] as $campaignMember) {

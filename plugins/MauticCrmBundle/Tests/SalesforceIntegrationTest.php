@@ -440,7 +440,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $sf->getCampaignMembers(1, []);
+        $sf->getCampaignMembers(1);
     }
 
     public function testGetCampaignMemberStatus()
