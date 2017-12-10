@@ -95,6 +95,17 @@ class CampaignSubscriber extends CommonSubscriber
             ],
         ];
         $event->addAction('focus.show', $action);
+
+
+        $event->addDecision(
+            'focus.open',
+            [
+                'label'                  => 'mautic.focus.campaign.event.focus.on.open',
+                'description'            => 'mautic.focus.campaign.event.focus.on.open_descr',
+                'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'formType'               => 'focusshow_list',
+            ]
+        );
     }
 
     /**

@@ -341,6 +341,8 @@ class FocusModel extends FormModel
             ->setLead($lead);
 
         $this->getStatRepository()->saveEntity($stat);
+
+        return $stat;
     }
 
     /**
