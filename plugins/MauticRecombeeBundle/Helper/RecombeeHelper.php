@@ -24,6 +24,9 @@ const PROBABILITY_PURCHASED = 0.2;
  */
 class RecombeeHelper
 {
+
+
+
     /**
      * @var IntegrationHelper
      */
@@ -52,6 +55,20 @@ class RecombeeHelper
         }
     }
 
+    public function pushLead(array $lead){
+
+        if(empty($lead['id'])){
+            return 'no lead';
+        }
+
+        try {
+       $ret =     $this->getClient()->send(new Reqs\SetUserValues($lead['id'], $lead, ['cascadeCreate' => true]));
+            return print_r($ret, true);
+        } catch (Ex\ApiException $e) {
+            return $e->getMessage();
+        }
+    }
+
     public function testItemData()
     {
         try {
@@ -60,6 +77,8 @@ class RecombeeHelper
             die($e->getMessage());
         }
     }
+
+
 
     public function importTestData()
     {
