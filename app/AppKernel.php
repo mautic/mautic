@@ -90,6 +90,7 @@ class AppKernel extends Kernel
             $uri = $request->getRequestUri();
             if (strpos($uri, 'installer') === false) {
                 $base = $request->getBaseUrl();
+                $prefix = '';
                 //check to see if the .htaccess file exists or if not running under apache
                 if ((strpos(strtolower($_SERVER['SERVER_SOFTWARE']), 'apache') === false
                     || !file_exists(__DIR__.'../.htaccess')
@@ -98,10 +99,10 @@ class AppKernel extends Kernel
                         'index'
                     ) === false)
                 ) {
-                    $base .= '/index.php';
+                    $prefix .= '/index.php';
                 }
 
-                return new RedirectResponse($base.'/installer');
+                return new RedirectResponse($request->getUriForPath($prefix.'/installer'));
             }
         }
 
