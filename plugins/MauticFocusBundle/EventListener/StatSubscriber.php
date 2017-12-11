@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Aws\S3\Enum\Event;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
