@@ -293,7 +293,7 @@ class AssetModel extends FormModel
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($download);
-            $this->em->flush($download);
+            $this->em->flush();
         } catch (\Exception $e) {
             if (MAUTIC_ENV === 'dev') {
                 throw $e;
