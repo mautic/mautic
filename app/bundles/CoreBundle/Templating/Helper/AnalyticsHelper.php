@@ -67,6 +67,7 @@ class AnalyticsHelper extends Helper
         if ($trackedDevice !== null && $trackedDevice->getLead() !== null) {
             $this->cookieHelper->setCookie('mtc_id', $trackedDevice->getLead()->getId(), null);
             $this->cookieHelper->setCookie('mtc_sid', $trackedDevice->getTrackingId(), null);
+            $this->cookieHelper->setCookie('mautic_device_id', $trackedDevice->getTrackingId(), null);
         } else {
             $this->cookieHelper->deleteCookie('mtc_id');
             $this->cookieHelper->deleteCookie('mtc_sid');
