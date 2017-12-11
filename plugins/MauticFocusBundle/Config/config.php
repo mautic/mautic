@@ -134,6 +134,10 @@ return [
                 'arguments' => 'mautic.focus.model.focus',
                 'alias'     => 'focus_list',
             ],
+            'mautic.focus.form.type.focus_open_decision' => [
+                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusOpenDecisionType',
+                'alias'     => 'focus_open_decision',
+            ],
         ],
         'models' => [
             'mautic.focus.model.focus' => [

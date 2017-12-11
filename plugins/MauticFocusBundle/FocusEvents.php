@@ -74,6 +74,16 @@ final class FocusEvents
     const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.focus.on_campaign_trigger_action';
 
     /**
+     * The mautic.focus.on_campaign_trigger_decision event is fired when the campaign decision is executed.
+     *
+     * The event listener receives a
+     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     *
+     * @var string
+     */
+    const ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.focus.on_campaign_trigger_decision';
+
+    /**
      * The mautic.focus.on_open event is dispatched when an focus is opened.
      *
      * The event listener receives a

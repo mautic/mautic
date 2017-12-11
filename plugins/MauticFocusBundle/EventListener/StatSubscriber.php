@@ -19,6 +19,7 @@ use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use Mautic\CampaignBundle\Model\EventModel;
+use MauticPlugin\MauticFocusBundle\FocusEvents;
 
 /**
  * Class StatSubscriber.

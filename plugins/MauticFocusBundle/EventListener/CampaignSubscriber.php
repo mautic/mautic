@@ -68,6 +68,7 @@ class CampaignSubscriber extends CommonSubscriber
         return [
             CampaignEvents::CAMPAIGN_ON_BUILD       => ['onCampaignBuild', 0],
             FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction', 0],
+            FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
         ];
     }
 
@@ -103,7 +104,8 @@ class CampaignSubscriber extends CommonSubscriber
                 'label'                  => 'mautic.focus.campaign.event.focus.on.open',
                 'description'            => 'mautic.focus.campaign.event.focus.on.open_descr',
                 'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-                'formType'               => 'focusshow_list',
+                'formType'               => 'focus_open_decision',
+                'formTypeOptions'        => ['update_select' => 'campaignevent_properties_focus'],
             ]
         );
     }
@@ -112,6 +114,22 @@ class CampaignSubscriber extends CommonSubscriber
      * @param CampaignExecutionEvent $event
      */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    {
+        $focusId = (int) $event->getConfig()['focus'];
+        if (!$focusId) {
+            return $event->setResult(false);
+        }
+        $values                 = [];
+        $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], true)];
+        $this->trackingHelper->updateSession($values);
+
+        return $event->setResult(true);
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
         $focusId = (int) $event->getConfig()['focus'];
         if (!$focusId) {
