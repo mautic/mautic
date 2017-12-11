@@ -273,7 +273,7 @@ return [
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
                     'mautic.queue.service',
-                    'mautic.lead.service.contact_tracking_service',
+                    'mautic.lead.service.device_tracking_service',
                     'mautic.lead.model.company',
                 ],
                 'methodCalls' => [

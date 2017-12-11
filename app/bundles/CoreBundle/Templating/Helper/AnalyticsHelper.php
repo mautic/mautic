@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 class AnalyticsHelper extends Helper
@@ -34,27 +34,27 @@ class AnalyticsHelper extends Helper
      */
     private $leadModel;
 
-    /** @var ContactTrackingServiceInterface */
-    private $contactTrackingService;
+    /** @var DeviceTrackingServiceInterface */
+    private $deviceTrackingService;
 
     /**
      * AnalyticsHelper constructor.
      *
-     * @param CoreParametersHelper            $parametersHelper
-     * @param CookieHelper                    $cookieHelper
-     * @param LeadModel                       $leadModel
-     * @param ContactTrackingServiceInterface $contactTrackingService
+     * @param CoreParametersHelper           $parametersHelper
+     * @param CookieHelper                   $cookieHelper
+     * @param LeadModel                      $leadModel
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
         CoreParametersHelper $parametersHelper,
         CookieHelper $cookieHelper,
         LeadModel $leadModel,
-        ContactTrackingServiceInterface $contactTrackingService
+        DeviceTrackingServiceInterface $deviceTrackingService
     ) {
         $this->code                   = htmlspecialchars_decode($parametersHelper->getParameter('google_analytics', ''));
         $this->cookieHelper           = $cookieHelper;
         $this->leadModel              = $leadModel;
-        $this->contactTrackingService = $contactTrackingService;
+        $this->deviceTrackingService  = $deviceTrackingService;
     }
 
     /**
@@ -62,11 +62,11 @@ class AnalyticsHelper extends Helper
      */
     public function getCode()
     {
-        $lead       = $this->leadModel->getCurrentLead();
-        $trackingId = $this->contactTrackingService->getTrackedIdentifier();
-        if ($lead !== null) {
-            $this->cookieHelper->setCookie('mtc_id', $lead->getId(), null);
-            $this->cookieHelper->setCookie('mtc_sid', $trackingId, null);
+        $lead          = $this->leadModel->getCurrentLead(); // Deprecation for create LeadDevice
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        if ($trackedDevice !== null && $trackedDevice->getLead() !== null) {
+            $this->cookieHelper->setCookie('mtc_id', $trackedDevice->getLead()->getId(), null);
+            $this->cookieHelper->setCookie('mtc_sid', $trackedDevice->getTrackingId(), null);
         } else {
             $this->cookieHelper->deleteCookie('mtc_id');
             $this->cookieHelper->deleteCookie('mtc_sid');

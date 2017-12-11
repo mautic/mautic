@@ -13,10 +13,9 @@ namespace Mautic\PageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
@@ -32,17 +31,18 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class PublicController extends CommonFormController
 {
-    /** @var ContactTrackingServiceInterface */
-    private $contactTrackingService;
+    /** @var DeviceTrackingServiceInterface */
+    private $deviceTrackingService;
 
     /**
      * PublicController constructor.
      *
-     * @param ContactTrackingServiceInterface $contactTrackingService
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
-    public function __construct(ContactTrackingServiceInterface $contactTrackingService)
-    {
-        $this->contactTrackingService = $contactTrackingService;
+    public function __construct(
+        DeviceTrackingServiceInterface $deviceTrackingService
+    ) {
+        $this->deviceTrackingService = $deviceTrackingService;
     }
 
     /**
@@ -403,8 +403,9 @@ class PublicController extends CommonFormController
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
 
-        $lead       = $leadModel->getCurrentLead();
-        $trackingId = $this->contactTrackingService->getTrackedIdentifier();
+        $lead          = $leadModel->getCurrentLead();
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
 
         /** @var TrackingHelper $trackingHelper */
         $trackingHelper = $this->get('mautic.page.helper.tracking');
@@ -412,10 +413,11 @@ class PublicController extends CommonFormController
 
         return new JsonResponse(
             [
-                'success' => 1,
-                'id'      => ($lead) ? $lead->getId() : null,
-                'sid'     => $trackingId,
-                'events'  => $sessionValue,
+                'success'   => 1,
+                'id'        => ($lead) ? $lead->getId() : null,
+                'sid'       => $trackingId,
+                'device_id' => $trackingId,
+                'events'    => $sessionValue,
             ]
         );
     }
@@ -587,10 +589,12 @@ class PublicController extends CommonFormController
             $leadModel = $this->getModel('lead');
 
             $lead                                = $leadModel->getCurrentLead();
-            $trackingId                          = $this->contactTrackingService->getTrackedIdentifier();
+            $trackedDevice                       = $this->deviceTrackingService->getTrackedDevice();
+            $trackingId                          = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
             $data                                = [
-                'id'  => ($lead) ? $lead->getId() : null,
-                'sid' => $trackingId,
+                'id'        => ($lead) ? $lead->getId() : null,
+                'sid'       => $trackingId,
+                'device_id' => $trackingId,
             ];
         }
 

@@ -54,6 +54,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
@@ -176,6 +177,9 @@ class LeadModel extends FormModel
     /** @var ContactTrackingServiceInterface */
     private $contactTrackingService;
 
+    /** @var DeviceTrackingServiceInterface */
+    private $deviceTrackingService;
+
     /**
      * LeadModel constructor.
      *
@@ -194,6 +198,7 @@ class LeadModel extends FormModel
      * @param CoreParametersHelper            $coreParametersHelper
      * @param UserProvider                    $userProvider
      * @param ContactTrackingServiceInterface $contactTrackingService
+     * @param DeviceTrackingServiceInterface  $deviceTrackingService
      */
     public function __construct(
         RequestStack $requestStack,
@@ -211,7 +216,8 @@ class LeadModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         EmailValidator $emailValidator,
         UserProvider $userProvider,
-        ContactTrackingServiceInterface $contactTrackingService
+        ContactTrackingServiceInterface $contactTrackingService,
+        DeviceTrackingServiceInterface $deviceTrackingService
     ) {
         $this->request                = $requestStack->getCurrentRequest();
         $this->cookieHelper           = $cookieHelper;
@@ -229,6 +235,7 @@ class LeadModel extends FormModel
         $this->emailValidator         = $emailValidator;
         $this->userProvider           = $userProvider;
         $this->contactTrackingService = $contactTrackingService;
+        $this->deviceTrackingService  = $deviceTrackingService;
     }
 
     /**
@@ -867,7 +874,7 @@ class LeadModel extends FormModel
         if ($returnTracking) {
             @trigger_error('Parameter $returnTracking is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
         }
-        $wasTrackedBefore = $this->contactTrackingService->isTracked();
+        $wasTrackedBefore = $this->deviceTrackingService->isTracked();
         $isUser           = (!$this->security->isAnonymous());
         if ($isUser || $this->systemCurrentLead || defined('IN_MAUTIC_CONSOLE')) {
             $this->logger->addDebug('LEAD: System lead is being used');
@@ -912,14 +919,16 @@ class LeadModel extends FormModel
             }
             $this->currentLead = $lead;
             if ($leadId = $lead->getId()) {
-                $this->contactTrackingService->track($lead);
+                $this->deviceTrackingService->trackCurrent(false, $lead);
             }
         }
-        $isTrackedNow = $this->contactTrackingService->isTracked();
-        $generated    = ($wasTrackedBefore === false && $isTrackedNow === true);
-        $trackingId   = $this->contactTrackingService->getTrackedIdentifier();
-        if ($trackingId !== null) {
-            $this->logger->addDebug("LEAD: Tracking ID for this contact is {$trackingId}");
+        $isTrackedNow    = $this->deviceTrackingService->isTracked();
+        $generated       = ($wasTrackedBefore === false && $isTrackedNow === true);
+        $trackedDevice   = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId      = null;
+        if ($trackedDevice !== null) {
+            $trackingId = $trackedDevice->getTrackingId();
+            $this->logger->addDebug("LEAD: Tracking ID for this device is {$trackingId}");
         }
 
         // Log last active
@@ -977,20 +986,12 @@ class LeadModel extends FormModel
         // First determine if this request is already tracked as a specific lead
         $lead = $this->contactTrackingService->getTrackedLead();
         if ($lead !== null) {
-            $trackingId = $this->contactTrackingService->track($lead);
-            $this->logger->addDebug("LEAD: Contact ID# {$lead->getId()} tracked through tracking ID ($trackingId}.");
-        }
-
-        // Search for lead by fingerprint
-        if (empty($lead) && !empty($queryFields['fingerprint']) && $trackByFingerprint) {
-            $deviceRepo = $this->getDeviceRepository();
-            $device     = $deviceRepo->getDeviceByFingerprint($queryFields['fingerprint']);
-            if ($device) {
-                $lead = $this->getEntity($device['lead_id']);
+            $device = $this->deviceTrackingService->trackCurrent(false, $lead);
+            if ($device !== null) {
+                $trackingId = $device->getTrackingId();
+                $this->logger->addDebug("LEAD: Contact ID# {$lead->getId()} tracked through tracking ID ($trackingId}.");
             }
-        }
-
-        if (empty($lead)) {
+        } else {
             // No lead found so generate one
             $lead = $this->getCurrentLead();
         }
@@ -1113,8 +1114,14 @@ class LeadModel extends FormModel
         if ($lead->getId()) {
             // Update tracking cookies if the lead is different
             if ($oldLead !== null && $oldLead->getId() != $lead->getId()) {
-                $oldTrackingId = $this->contactTrackingService->getTrackedIdentifier();
-                $newTrackingId = $this->contactTrackingService->track($lead, true);
+                $oldTrackedDevice = $this->deviceTrackingService->getTrackedDevice();
+                if ($oldTrackedDevice !== null) {
+                    $oldTrackingId = $oldTrackedDevice->getTrackingId();
+                } else {
+                    $oldTrackingId = $this->contactTrackingService->getTrackedIdentifier();
+                }
+                $newTrackedDevice = $this->deviceTrackingService->trackCurrent(true, $lead);
+                $newTrackingId    = ($newTrackedDevice === null ? null : $newTrackedDevice->getTrackingId());
                 $this->logger->addDebug(
                     "LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}"
                 );
@@ -1127,7 +1134,7 @@ class LeadModel extends FormModel
                 }
             } elseif (!$oldLead) {
                 // New lead, set the tracking cookie
-                $this->contactTrackingService->track($lead);
+                $this->deviceTrackingService->trackCurrent(false, $lead);
             }
         }
     }

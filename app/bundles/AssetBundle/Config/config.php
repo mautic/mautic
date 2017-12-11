@@ -198,7 +198,7 @@ return [
                     'request_stack',
                     'mautic.helper.ip_lookup',
                     'mautic.helper.core_parameters',
-                    'mautic.lead.service.contact_tracking_service',
+                    'mautic.lead.service.device_tracking_service',
                 ],
             ],
         ],

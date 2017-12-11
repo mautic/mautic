@@ -724,6 +724,13 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.repository.lead_device' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\LeadBundle\Entity\LeadDevice::class,
+                ],
+            ],
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
@@ -756,6 +763,7 @@ return [
                     'mautic.validator.email',
                     'mautic.user.provider',
                     'mautic.lead.service.contact_tracking_service',
+                    'mautic.lead.service.device_tracking_service',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -824,7 +832,17 @@ return [
                 'class'     => \Mautic\LeadBundle\Model\Service\ContactTrackingService::class,
                 'arguments' => [
                     'mautic.helper.cookie',
+                    'mautic.lead.repository.lead_device',
                     'mautic.lead.repository.lead',
+                    'request_stack',
+                ],
+            ],
+            'mautic.lead.service.device_tracking_service' => [
+                'class'     => \Mautic\LeadBundle\Model\Service\DeviceTrackingService::class,
+                'arguments' => [
+                    'mautic.helper.cookie',
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.repository.lead_device',
                     'request_stack',
                 ],
             ],

@@ -27,7 +27,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -62,18 +62,18 @@ class AssetModel extends FormModel
      */
     protected $maxAssetSize;
 
-    /** @var ContactTrackingServiceInterface */
-    private $contactTrackingService;
+    /** @var DeviceTrackingServiceInterface */
+    private $deviceTrackingService;
 
     /**
      * AssetModel constructor.
      *
-     * @param LeadModel                       $leadModel
-     * @param CategoryModel                   $categoryModel
-     * @param RequestStack                    $requestStack
-     * @param IpLookupHelper                  $ipLookupHelper
-     * @param CoreParametersHelper            $coreParametersHelper
-     * @param ContactTrackingServiceInterface $contactTrackingService
+     * @param LeadModel                      $leadModel
+     * @param CategoryModel                  $categoryModel
+     * @param RequestStack                   $requestStack
+     * @param IpLookupHelper                 $ipLookupHelper
+     * @param CoreParametersHelper           $coreParametersHelper
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
         LeadModel $leadModel,
@@ -81,13 +81,13 @@ class AssetModel extends FormModel
         RequestStack $requestStack,
         IpLookupHelper $ipLookupHelper,
         CoreParametersHelper $coreParametersHelper,
-        ContactTrackingServiceInterface $contactTrackingService
+        DeviceTrackingServiceInterface $deviceTrackingService
     ) {
         $this->leadModel              = $leadModel;
         $this->categoryModel          = $categoryModel;
         $this->request                = $requestStack->getCurrentRequest();
         $this->ipLookupHelper         = $ipLookupHelper;
-        $this->contactTrackingService = $contactTrackingService;
+        $this->deviceTrackingService  = $deviceTrackingService;
         $this->maxAssetSize           = $coreParametersHelper->getParameter('mautic.max_size');
     }
 
@@ -163,8 +163,14 @@ class AssetModel extends FormModel
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
                     if ($lead !== null) {
-                        $trackingNewlyGenerated                    = !$this->contactTrackingService->isTracked();
-                        $trackingId                                = $this->contactTrackingService->track($lead, false);
+                        $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
+                        $trackedDevice                        = $this->deviceTrackingService->trackCurrent(false, $lead);
+                        $trackingId                           = null;
+                        $trackingNewlyGenerated               = false;
+                        if ($trackedDevice !== null) {
+                            $trackingId             = $trackedDevice->getTrackingId();
+                            $trackingNewlyGenerated = !$wasTrackedAlready;
+                        }
                         $leadClickthrough                          = true;
 
                         $this->leadModel->setCurrentLead($lead);
@@ -194,9 +200,15 @@ class AssetModel extends FormModel
             }
 
             if (empty($leadClickthrough)) {
-                $trackingNewlyGenerated = !$this->contactTrackingService->isTracked();
-                $lead                   = $this->leadModel->getCurrentLead();
-                $trackingId             = $this->contactTrackingService->getTrackedIdentifier();
+                $wasTrackedAlready         = $this->deviceTrackingService->isTracked();
+                $lead                      = $this->leadModel->getCurrentLead();
+                $trackedDevice             = $this->deviceTrackingService->getTrackedDevice();
+                $trackingId                = null;
+                $trackingNewlyGenerated    = false;
+                if ($trackedDevice !== null) {
+                    $trackingId             = $trackedDevice->getTrackingId();
+                    $trackingNewlyGenerated = !$wasTrackedAlready;
+                }
             }
 
             $download->setLead($lead);
@@ -234,8 +246,14 @@ class AssetModel extends FormModel
             } elseif ($this->security->isAnonymous() && !defined('IN_MAUTIC_CONSOLE')) {
                 // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
                 // system forced download such as an email
-                $trackingNewlyGenerated = !$this->contactTrackingService->isTracked();
-                $trackingId             = $this->contactTrackingService->track($lead, false);
+                $deviceWasTracked       = $this->deviceTrackingService->isTracked();
+                $trackedDevice          = $this->deviceTrackingService->trackCurrent(false, $lead);
+                $trackingId             = null;
+                $trackingNewlyGenerated = false;
+                if ($trackedDevice !== null) {
+                    $trackingId             = $trackedDevice->getTrackingId();
+                    $trackingNewlyGenerated = !$deviceWasTracked;
+                }
             }
         }
 

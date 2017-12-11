@@ -159,25 +159,28 @@ class LeadDeviceRepository extends CommonRepository
     }
 
     /**
-     * @param string $trackingCode
+     * @param string $trackingId
      *
      * @return LeadDevice|null
      */
-    public function getByTrackingCode($trackingCode)
+    public function getByTrackingId($trackingId)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.lead_id as lead_id')
+        $sq->select('es.id as id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
 
         $sq->where(
-            $sq->expr()->eq('es.tracking_code', ':trackingCode')
+            $sq->expr()->eq('es.tracking_id', ':trackingId')
         )
-            ->setParameter('trackingCode', $trackingCode);
+            ->setParameter('trackingId', $trackingId);
 
         //get the first match
         $device = $sq->execute()->fetch();
+        if ($device === null) {
+            return null;
+        }
 
-        return $device ? $device : null;
+        return $this->_em->getReference(LeadDevice::class, $device['id']);
     }
 
     /**
@@ -197,5 +200,28 @@ class LeadDeviceRepository extends CommonRepository
             ->setParameter('leadId', $leadId);
 
         return $sq->execute()->fetchAll();
+    }
+
+    /**
+     * Check if there is at least one device with filled tracking code assigned to Lead.
+     *
+     * @param Lead $lead
+     *
+     * @return bool
+     */
+    public function isAnyLeadDeviceTracked(Lead $lead)
+    {
+        $sq = $this->_em->getConnection()->createQueryBuilder();
+        $sq->select('es.id as id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+
+        $sq->where(
+            $sq->expr()->eq('es.lead_id', ':leadId')
+        )->setParameter('leadId', $lead->getId());
+        $sq->where(
+            $sq->expr()->neq('es.tracking_id', 'trackingId')
+        )->setParameter('trackingId', null);
+
+        return $sq->execute()->rowCount() !== 0;
     }
 }

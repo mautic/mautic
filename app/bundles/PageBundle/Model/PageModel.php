@@ -32,7 +32,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -105,26 +105,28 @@ class PageModel extends FormModel
      */
     protected $queueService;
 
-    /** @var ContactTrackingServiceInterface */
-    private $contactTrackingService;
+    /**
+     * @var DeviceTrackingServiceInterface
+     */
+    private $deviceTrackingService;
 
     /**
      * @var CompanyModel
      */
-    protected $companyModel;
+    private $companyModel;
 
     /**
      * PageModel constructor.
      *
-     * @param CookieHelper                    $cookieHelper
-     * @param IpLookupHelper                  $ipLookupHelper
-     * @param LeadModel                       $leadModel
-     * @param FieldModel                      $leadFieldModel
-     * @param RedirectModel                   $pageRedirectModel
-     * @param TrackableModel                  $pageTrackableModel
-     * @param QueueService                    $queueService
-     * @param ContactTrackingServiceInterface $contactTrackingService
-     * @param CompanyModel                    $companyModel
+     * @param CookieHelper                   $cookieHelper
+     * @param IpLookupHelper                 $ipLookupHelper
+     * @param LeadModel                      $leadModel
+     * @param FieldModel                     $leadFieldModel
+     * @param RedirectModel                  $pageRedirectModel
+     * @param TrackableModel                 $pageTrackableModel
+     * @param QueueService                   $queueService
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
+     * @param CompanyModel                   $companyModel
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -134,21 +136,20 @@ class PageModel extends FormModel
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel,
         QueueService $queueService,
-        ContactTrackingServiceInterface $contactTrackingService,
+        DeviceTrackingServiceInterface $deviceTrackingService,
         CompanyModel $companyModel
     )
     {
-        $this->cookieHelper           = $cookieHelper;
-        $this->ipLookupHelper         = $ipLookupHelper;
-        $this->leadModel              = $leadModel;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->pageRedirectModel      = $pageRedirectModel;
-        $this->pageTrackableModel     = $pageTrackableModel;
-        $this->dateTimeHelper         = new DateTimeHelper();
-        $this->queueService           = $queueService;
-        $this->contactTrackingService = $contactTrackingService;
-        $this->companyModel           = $companyModel;
-
+        $this->cookieHelper          = $cookieHelper;
+        $this->ipLookupHelper        = $ipLookupHelper;
+        $this->leadModel             = $leadModel;
+        $this->leadFieldModel        = $leadFieldModel;
+        $this->pageRedirectModel     = $pageRedirectModel;
+        $this->pageTrackableModel    = $pageTrackableModel;
+        $this->dateTimeHelper        = new DateTimeHelper();
+        $this->queueService          = $queueService;
+        $this->deviceTrackingService = $deviceTrackingService;
+        $this->companyModel          = $companyModel;
     }
 
     /**
@@ -506,8 +507,14 @@ class PageModel extends FormModel
         $this->leadModel->saveEntity($lead);
 
         $ipAddress                                 = $this->ipLookupHelper->getIpAddress();
-        $trackingNewlyGenerated                    = ($this->contactTrackingService->isTracked() === false);
-        $trackingId                                = $this->contactTrackingService->track($lead);
+        $deviceWasTracked                          = $this->deviceTrackingService->isTracked();
+        $trackedDevice                             = $this->deviceTrackingService->trackCurrent(false, $lead);
+        $trackingId                                = null;
+        $trackingNewlyGenerated                    = false;
+        if ($trackedDevice !== null) {
+            $trackingId             = $trackedDevice->getTrackingId();
+            $trackingNewlyGenerated = !$deviceWasTracked;
+        }
 
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());

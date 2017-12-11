@@ -436,7 +436,7 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.cookie',
                     'mautic.lead.model.lead',
-                    'mautic.lead.service.contact_tracking_service',
+                    'mautic.lead.service.device_tracking_service',
                 ],
             ],
             'mautic.helper.template.mautibot' => [

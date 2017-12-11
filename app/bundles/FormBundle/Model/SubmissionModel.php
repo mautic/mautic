@@ -41,7 +41,7 @@ use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -114,22 +114,22 @@ class SubmissionModel extends CommonFormModel
      */
     private $formUploader;
 
-    /** @var ContactTrackingServiceInterface */
-    private $contactTrackingService;
+    /** @var DeviceTrackingServiceInterface */
+    private $deviceTrackingService;
 
     /**
-     * @param IpLookupHelper                  $ipLookupHelper
-     * @param TemplatingHelper                $templatingHelper
-     * @param FormModel                       $formModel
-     * @param PageModel                       $pageModel
-     * @param LeadModel                       $leadModel
-     * @param CampaignModel                   $campaignModel
-     * @param LeadFieldModel                  $leadFieldModel
-     * @param CompanyModel                    $companyModel
-     * @param FormFieldHelper                 $fieldHelper
-     * @param UploadFieldValidator            $uploadFieldValidator
-     * @param FormUploader                    $formUploader
-     * @param ContactTrackingServiceInterface $contactTrackingService
+     * @param IpLookupHelper                 $ipLookupHelper
+     * @param TemplatingHelper               $templatingHelper
+     * @param FormModel                      $formModel
+     * @param PageModel                      $pageModel
+     * @param LeadModel                      $leadModel
+     * @param CampaignModel                  $campaignModel
+     * @param LeadFieldModel                 $leadFieldModel
+     * @param CompanyModel                   $companyModel
+     * @param FormFieldHelper                $fieldHelper
+     * @param UploadFieldValidator           $uploadFieldValidator
+     * @param FormUploader                   $formUploader
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -143,7 +143,7 @@ class SubmissionModel extends CommonFormModel
         FormFieldHelper $fieldHelper,
         UploadFieldValidator $uploadFieldValidator,
         FormUploader $formUploader,
-        ContactTrackingServiceInterface $contactTrackingService
+        DeviceTrackingServiceInterface $deviceTrackingService
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -156,7 +156,7 @@ class SubmissionModel extends CommonFormModel
         $this->fieldHelper            = $fieldHelper;
         $this->uploadFieldValidator   = $uploadFieldValidator;
         $this->formUploader           = $formUploader;
-        $this->contactTrackingService = $contactTrackingService;
+        $this->deviceTrackingService  = $deviceTrackingService;
     }
 
     /**
@@ -368,8 +368,9 @@ class SubmissionModel extends CommonFormModel
 
         // Get updated lead if applicable with tracking ID
         /** @var Lead $lead */
-        $lead       = $this->leadModel->getCurrentLead();
-        $trackingId = $this->contactTrackingService->getTrackedIdentifier();
+        $lead          = $this->leadModel->getCurrentLead();
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $trackingId    = ($trackedDevice === null ? null : $trackedDevice->getTrackingId());
         //set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
             ->setLead($lead);

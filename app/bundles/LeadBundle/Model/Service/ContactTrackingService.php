@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Model\Service;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -16,6 +17,9 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
     /** @var CookieHelper */
     private $cookieHelper;
 
+    /** @var LeadDeviceRepository */
+    private $leadDeviceRepository;
+
     /** @var LeadRepository */
     private $leadRepository;
 
@@ -25,26 +29,21 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
     /**
      * ContactTrackingService constructor.
      *
-     * @param CookieHelper   $cookieHelper
-     * @param LeadRepository $leadRepository
-     * @param RequestStack   $requestStack
+     * @param CookieHelper         $cookieHelper
+     * @param LeadDeviceRepository $leadDeviceRepository
+     * @param LeadRepository       $leadRepository
+     * @param RequestStack         $requestStack
      */
     public function __construct(
         CookieHelper $cookieHelper,
+        LeadDeviceRepository $leadDeviceRepository,
         LeadRepository $leadRepository,
         RequestStack $requestStack
     ) {
-        $this->cookieHelper   = $cookieHelper;
-        $this->leadRepository = $leadRepository;
-        $this->request        = $requestStack->getCurrentRequest();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTracked()
-    {
-        return $this->getTrackedIdentifier() !== null;
+        $this->cookieHelper         = $cookieHelper;
+        $this->leadDeviceRepository = $leadDeviceRepository;
+        $this->leadRepository       = $leadRepository;
+        $this->request              = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -68,7 +67,10 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
             return null;
         }
 
-        return $this->leadRepository->getEntity($leadId);
+        $lead                        = $this->leadRepository->getEntity($leadId);
+        $anotherDeviceAlreadyTracked = $this->leadDeviceRepository->isAnyLeadDeviceTracked($lead);
+
+        return $anotherDeviceAlreadyTracked ? null : $lead;
     }
 
     /**
@@ -81,27 +83,5 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         }
 
         return $this->request->cookies->get('mautic_session_id', null);
-    }
-
-    /**
-     * @param Lead $lead
-     * @param bool $replaceCurrent
-     *
-     * @return string
-     */
-    public function track(Lead $lead, $replaceCurrent = false)
-    {
-        $currentTrackingId = $this->getTrackedIdentifier();
-        if ($currentTrackingId !== null) {
-            if ($replaceCurrent === false) {
-                return $currentTrackingId;
-            }
-            $this->cookieHelper->setCookie($currentTrackingId, null, -3600);
-        }
-        $trackingId = hash('sha1', uniqid(mt_rand()));
-        $this->cookieHelper->setCookie('mautic_session_id', $trackingId, 31536000);
-        $this->cookieHelper->setCookie($trackingId, $lead->getId(), 31536000);
-
-        return $trackingId;
     }
 }
