@@ -526,7 +526,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
             return $executed;
         } catch (\Exception $e) {
-            $this->logIntegrationError($e);
+            if (404 !== $e->getCode()) {
+                $this->logIntegrationError($e);
+            }
         }
 
         return $executed;
@@ -951,7 +953,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
             return true;
         } catch (\Exception $e) {
-            $this->logIntegrationError($e);
+            if (404 !== $e->getCode()) {
+                $this->logIntegrationError($e);
+            }
         }
 
         return false;

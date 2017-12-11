@@ -44,12 +44,15 @@ class ConnectwiseApi extends CrmApi
         );
 
         $errors = [];
+        $code   = 0;
+
         if (is_array($response)) {
             foreach ($response as $key => $r) {
                 $key = preg_replace('/[\r\n]+/', '', $key);
                 switch ($key) {
                     case '<!DOCTYPE_html_PUBLIC_"-//W3C//DTD_XHTML_1_0_Strict//EN"_"http://www_w3_org/TR/xhtml1/DTD/xhtml1-strict_dtd"><html_xmlns':
                         $errors[] = '404 not found error';
+                        $code     = 404;
                         break;
                     case 'errors':
                         $errors[] = $response['message'];
@@ -60,7 +63,7 @@ class ConnectwiseApi extends CrmApi
             }
         }
         if (!empty($errors)) {
-            throw new ApiErrorException(implode(' ', $errors));
+            throw new ApiErrorException(implode(' ', $errors), $code);
         }
 
         return $response;
@@ -212,13 +215,20 @@ class ConnectwiseApi extends CrmApi
         $page        = 1;
         $pageSize    = ConnectwiseIntegration::PAGESIZE;
         $allRecords  = [];
-        while ($pagedRecords = $this->request($endpoint, ['page' => $page, 'pageSize' => $pageSize])) {
-            $allRecords = array_merge($allRecords, $pagedRecords);
-            ++$page;
+        try {
+            while ($pagedRecords = $this->request($endpoint, ['page' => $page, 'pageSize' => $pageSize])) {
+                $allRecords = array_merge($allRecords, $pagedRecords);
+                ++$page;
 
-            if (count($pagedRecords) < $pageSize) {
-                // Received less than page size so we know there are no more records to fetch
-                break;
+                if (count($pagedRecords) < $pageSize) {
+                    // Received less than page size so we know there are no more records to fetch
+                    break;
+                }
+            }
+        } catch (ApiErrorException $exception) {
+            if (404 !== $exception->getCode()) {
+                // Ignore 404 due to pagination
+                throw $exception;
             }
         }
 
