@@ -11,13 +11,14 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
-use Mautic\CampaignBundle\Model\EventModel;
+use MauticPlugin\MauticFocusBundle\Event\FocusOpenEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 
 /**
@@ -43,7 +44,7 @@ class StatSubscriber extends CommonSubscriber
      */
     public function __construct(FocusModel $model, EventModel $campaignEventModel)
     {
-        $this->model = $model;
+        $this->model              = $model;
         $this->campaignEventModel = $campaignEventModel;
     }
 
@@ -55,7 +56,7 @@ class StatSubscriber extends CommonSubscriber
         return [
             PageEvents::PAGE_ON_HIT    => ['onPageHit', 0],
             FormEvents::FORM_ON_SUBMIT => ['onFormSubmit', 0],
-            FocusEvents::FOCUS_ON_OPEN =>      ['focusOnOpen', 0],
+            FocusEvents::FOCUS_ON_OPEN => ['focusOnOpen', 0],
         ];
     }
 
@@ -107,7 +108,7 @@ class StatSubscriber extends CommonSubscriber
     {
         $focus = $event->getFocus();
         if ($focus !== null) {
-            $this->campaignEventModel->triggerEvent('focus.open', $focus, 'focus', $focus->getId());
+            $this->campaignEventModel->triggerEvent('focus.open', ['focus'=>$focus, 'stop'=>true], 'focus', $focus->getId());
         }
     }
 }
