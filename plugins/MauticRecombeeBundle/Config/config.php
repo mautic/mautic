@@ -2,7 +2,7 @@
 
 return [
     'name'        => 'Recombee',
-    'description' => 'Enables integrations with Recombee for products personalization',
+    'description' => 'Enable integration with Recombee  - personalize content using Recommender as a Service',
     'author'      => 'kuzmany.biz',
     'version'     => '1.0.0',
     'services'    => [
