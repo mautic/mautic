@@ -149,7 +149,7 @@ class CampaignSubscriber extends CommonSubscriber
         if (!$focusId) {
             return $event->setResult(false);
         }
-
+        // STOP sent campaignEventModel just if Focus Item is opened
         if (empty($eventDetails['stop']) && !empty($eventDetails['hit'])) {
             $hit = $eventDetails['hit'];
             // Limit to URLS
@@ -161,12 +161,13 @@ class CampaignSubscriber extends CommonSubscriber
                         $isUrl = true;
                     }
                 }
-
+                // page hit url doesn't match
                 if (!$isUrl) {
                     return $event->setResult(false);
                 }
             }
 
+            // Set Focus Item JS url to session
             $values                 = [];
             $values['focus_item'][] = [
                 'id' => $focusId,
@@ -176,6 +177,7 @@ class CampaignSubscriber extends CommonSubscriber
 
             return $event->setResult(false);
         } elseif (!empty($eventDetails['stop'])) {
+            // Decision return true If we trigger it on open event
             return $event->setResult(true);
         }
     }
