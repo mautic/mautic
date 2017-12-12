@@ -70,12 +70,13 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     }
 
     /**
-     * @param bool      $replaceExisting
-     * @param Lead|null $assignedLead
+     * @param DeviceDetector $deviceDetector
+     * @param bool           $replaceExisting
+     * @param Lead|null      $assignedLead
      *
-     * @return LeadDevice|null Returns null if tracking is not possible at current request
+     * @return LeadDevice
      */
-    public function trackCurrent($replaceExisting = false, Lead $assignedLead = null)
+    public function trackCurrent(DeviceDetector $deviceDetector, $replaceExisting = false, Lead $assignedLead = null)
     {
         if ($assignedLead !== null) {
             @trigger_error('Parameter $assignedLead is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
@@ -84,10 +85,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         if ($device !== null && $replaceExisting === false) {
             return $device;
         } elseif ($device === null) {
-            $device = $this->getDeviceFromRequest($assignedLead);
-            if ($device === null) {
-                return null;
-            }
+            $device = $this->getDeviceFromDetector($deviceDetector, $assignedLead);
         }
         $device->setTrackingId($this->getUniqueTrackingIdentifier());
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
@@ -116,17 +114,13 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     }
 
     /**
-     * @param Lead|null $assignedLead
+     * @param DeviceDetector $deviceDetector
+     * @param Lead|null      $assignedLead
      *
-     * @return LeadDevice|null Null if is not possible to create device from current request
+     * @return LeadDevice
      */
-    private function getDeviceFromRequest(Lead $assignedLead = null)
+    private function getDeviceFromDetector(DeviceDetector $deviceDetector, Lead $assignedLead = null)
     {
-        if ($this->request === null) {
-            return null;
-        }
-        $deviceDetector = new DeviceDetector($this->request->server->get('HTTP_USER_AGENT'));
-        $deviceDetector->parse();
         $device = new LeadDevice();
         $device->setClientInfo($deviceDetector->getClient());
         $device->setDevice($deviceDetector->getDeviceName());

@@ -26,7 +26,6 @@ use Mautic\CoreBundle\Model\TranslationModelTrait;
 use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -508,13 +507,11 @@ class PageModel extends FormModel
 
         $ipAddress                                 = $this->ipLookupHelper->getIpAddress();
         $deviceWasTracked                          = $this->deviceTrackingService->isTracked();
-        $trackedDevice                             = $this->deviceTrackingService->trackCurrent(false, $lead);
-        $trackingId                                = null;
-        $trackingNewlyGenerated                    = false;
-        if ($trackedDevice !== null) {
-            $trackingId             = $trackedDevice->getTrackingId();
-            $trackingNewlyGenerated = !$deviceWasTracked;
-        }
+        $deviceDetector                            = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+        $deviceDetector->parse();
+        $trackedDevice                             = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+        $trackingId                                = $trackedDevice->getTrackingId();
+        $trackingNewlyGenerated                    = !$deviceWasTracked;
 
         $hit = new Hit();
         $hit->setDateHit(new \Datetime());
@@ -767,45 +764,23 @@ class PageModel extends FormModel
             }
             $hit->setBrowserLanguages($languages);
         }
-
-        //device granularity
-        $dd = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
-        $dd->parse();
-
-        $deviceRepo = $this->leadModel->getDeviceRepository();
-        $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
-        if (empty($device)) {
-            $device = new LeadDevice();
-            $device->setClientInfo($dd->getClient());
-            $device->setDevice($dd->getDeviceName());
-            $device->setDeviceBrand($dd->getBrand());
-            $device->setDeviceModel($dd->getModel());
-            $device->setDeviceOs($dd->getOs());
-            $device->setDateAdded($hit->getDateHit());
-            $device->setLead($lead);
-        } else {
-            $fingerprint = $device['device_fingerprint'];
-            /** @var LeadDevice $device */
-            $device = $this->em->getReference(LeadDevice::class, $device['id']);
-            $device->setDeviceFingerprint($fingerprint);
-        }
-
-        // Append the fingerprint string to this device
-        if (!empty($query['fingerprint']) && $query['fingerprint'] != $device->getDeviceFingerprint()) {
-            // The device fingerprint has changed, or it was not set previously.
-            $device->setDeviceFingerprint($query['fingerprint']);
-        }
-
         $this->leadModel->saveEntity($lead);
+        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        if ($trackedDevice === null) {
+            $deviceDetector = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+            $deviceDetector->parse();
+            $trackedDevice = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+        }
+        if ($trackedDevice->getDeviceFingerprint() !== $query['fingerprint']) {
+            $trackedDevice->setDeviceFingerprint($query['fingerprint']);
+        }
 
-        $this->em->persist($device);
-        $this->em->flush($device);
-        $hit->setDeviceStat($device);
+        $hit->setDeviceStat($trackedDevice);
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
         try {
             $this->em->persist($hit);
-            $this->em->flush($hit);
+            $this->em->flush();
         } catch (\Exception $exception) {
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;

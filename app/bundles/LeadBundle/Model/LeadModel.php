@@ -918,8 +918,10 @@ class LeadModel extends FormModel
                 }
             }
             $this->currentLead = $lead;
-            if ($leadId = $lead->getId()) {
-                $this->deviceTrackingService->trackCurrent(false, $lead);
+            if ($leadId = $lead->getId() && $this->request !== null) {
+                $deviceDetector = new DeviceDetector($this->request->server->get('HTTP_USER_AGENT'));
+                $deviceDetector->parse();
+                $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
             }
         }
         $isTrackedNow    = $this->deviceTrackingService->isTracked();
@@ -985,12 +987,12 @@ class LeadModel extends FormModel
 
         // First determine if this request is already tracked as a specific lead
         $lead = $this->contactTrackingService->getTrackedLead();
-        if ($lead !== null) {
-            $device = $this->deviceTrackingService->trackCurrent(false, $lead);
-            if ($device !== null) {
-                $trackingId = $device->getTrackingId();
-                $this->logger->addDebug("LEAD: Contact ID# {$lead->getId()} tracked through tracking ID ($trackingId}.");
-            }
+        if ($lead !== null && $this->request !== null) {
+            $deviceDetector = new DeviceDetector($this->request->server->get('HTTP_USER_AGENT'));
+            $deviceDetector->parse();
+            $device     = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+            $trackingId = $device->getTrackingId();
+            $this->logger->addDebug("LEAD: Contact ID# {$lead->getId()} tracked through tracking ID ($trackingId}.");
         } else {
             // No lead found so generate one
             $lead = $this->getCurrentLead();
@@ -1111,7 +1113,9 @@ class LeadModel extends FormModel
         // Set last active
         $this->currentLead->setLastActive(new \DateTime());
 
-        if ($lead->getId()) {
+        if ($lead->getId() && $this->request !== null) {
+            $deviceDetector = new DeviceDetector($this->request->server->get('HTTP_USER_AGENT'));
+            $deviceDetector->parse();
             // Update tracking cookies if the lead is different
             if ($oldLead !== null && $oldLead->getId() != $lead->getId()) {
                 $oldTrackedDevice = $this->deviceTrackingService->getTrackedDevice();
@@ -1120,7 +1124,7 @@ class LeadModel extends FormModel
                 } else {
                     $oldTrackingId = $this->contactTrackingService->getTrackedIdentifier();
                 }
-                $newTrackedDevice = $this->deviceTrackingService->trackCurrent(true, $lead);
+                $newTrackedDevice = $this->deviceTrackingService->trackCurrent($deviceDetector, true, $lead);
                 $newTrackingId    = ($newTrackedDevice === null ? null : $newTrackedDevice->getTrackingId());
                 $this->logger->addDebug(
                     "LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}"
@@ -1134,7 +1138,7 @@ class LeadModel extends FormModel
                 }
             } elseif (!$oldLead) {
                 // New lead, set the tracking cookie
-                $this->deviceTrackingService->trackCurrent(false, $lead);
+                $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
             }
         }
     }
@@ -1982,24 +1986,11 @@ class LeadModel extends FormModel
 
         // create device
         if (key_exists('useragent', $params) && !empty($params['useragent'])) {
-            //device granularity
-            $dd = new DeviceDetector($params['useragent']);
-            $dd->parse();
-
-            $deviceRepo = $this->getDeviceRepository();
-            $device     = $deviceRepo->getDevice($lead, $dd->getDeviceName(), $dd->getBrand(), $dd->getModel());
-
-            // Only if it does not exist already
-            if (empty($device)) {
-                $device = new LeadDevice();
-                $device->setClientInfo($dd->getClient());
-                $device->setDevice($dd->getDeviceName());
-                $device->setDeviceBrand($dd->getBrand());
-                $device->setDeviceModel($dd->getModel());
-                $device->setDeviceOs($dd->getOs());
-                $device->setDateAdded($lastActive);
-                $device->setLead($lead);
-                $this->getDeviceRepository()->saveEntity($device);
+            $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+            if ($trackedDevice === null) {
+                $deviceDetector = new DeviceDetector($params['useragent']);
+                $deviceDetector->parse();
+                $trackedDevice = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
             }
         }
 

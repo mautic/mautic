@@ -11,6 +11,7 @@
 
 namespace Mautic\AssetBundle\Model;
 
+use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
@@ -164,13 +165,11 @@ class AssetModel extends FormModel
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
                     if ($lead !== null) {
                         $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
-                        $trackedDevice                        = $this->deviceTrackingService->trackCurrent(false, $lead);
-                        $trackingId                           = null;
-                        $trackingNewlyGenerated               = false;
-                        if ($trackedDevice !== null) {
-                            $trackingId             = $trackedDevice->getTrackingId();
-                            $trackingNewlyGenerated = !$wasTrackedAlready;
-                        }
+                        $deviceDetector                       = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+                        $deviceDetector->parse();
+                        $trackedDevice                             = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+                        $trackingId                                = $trackedDevice->getTrackingId();
+                        $trackingNewlyGenerated                    = !$wasTrackedAlready;
                         $leadClickthrough                          = true;
 
                         $this->leadModel->setCurrentLead($lead);
@@ -247,13 +246,11 @@ class AssetModel extends FormModel
                 // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
                 // system forced download such as an email
                 $deviceWasTracked       = $this->deviceTrackingService->isTracked();
-                $trackedDevice          = $this->deviceTrackingService->trackCurrent(false, $lead);
-                $trackingId             = null;
-                $trackingNewlyGenerated = false;
-                if ($trackedDevice !== null) {
-                    $trackingId             = $trackedDevice->getTrackingId();
-                    $trackingNewlyGenerated = !$deviceWasTracked;
-                }
+                $deviceDetector         = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+                $deviceDetector->parse();
+                $trackedDevice          = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+                $trackingId             = $trackedDevice->getTrackingId();
+                $trackingNewlyGenerated = !$deviceWasTracked;
             }
         }
 
