@@ -1,14 +1,20 @@
 <?php
 
+/*
+ * @copyright   2016 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace Mautic\LeadBundle\Model\Service\DeviceTrackingService;
 
-use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CookieHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
-use Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -71,8 +77,8 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     }
 
     /**
-     * @param LeadDevice     $device
-     * @param bool           $replaceExistingTracking
+     * @param LeadDevice $device
+     * @param bool       $replaceExistingTracking
      *
      * @return LeadDevice
      */
@@ -82,11 +88,12 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         if ($trackedDevice !== null && $replaceExistingTracking === false) {
             return $trackedDevice;
         }
-        if($device->getTrackingId() === null || $replaceExistingTracking === true) {
+        if ($device->getTrackingId() === null || $replaceExistingTracking === true) {
             $device->setTrackingId($this->getUniqueTrackingIdentifier());
         }
         $this->entityManager->persist($device);
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
+
         return $device;
     }
 
