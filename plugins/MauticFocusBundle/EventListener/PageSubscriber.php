@@ -11,10 +11,12 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\Routing\RouterInterface;
@@ -32,6 +34,11 @@ class PageSubscriber extends CommonSubscriber
     protected $model;
 
     /**
+     * @var EventModel
+     */
+    protected $campaignEventModel;
+
+    /**
      * @var RouterInterface
      */
     protected $router;
@@ -41,11 +48,13 @@ class PageSubscriber extends CommonSubscriber
      *
      * @param FocusModel      $model
      * @param RouterInterface $router
+     * @param EventModel      $eventModel
      */
-    public function __construct(FocusModel $model, RouterInterface $router)
+    public function __construct(FocusModel $model, RouterInterface $router, EventModel $campaignEventModel)
     {
-        $this->router = $router;
-        $this->model  = $model;
+        $this->router             = $router;
+        $this->model              = $model;
+        $this->campaignEventModel = $campaignEventModel;
     }
 
     /**
@@ -56,7 +65,23 @@ class PageSubscriber extends CommonSubscriber
         return [
             PageEvents::PAGE_ON_DISPLAY => ['onPageDisplay', 0],
             PageEvents::PAGE_ON_BUILD   => ['onPageBuild', 0],
+            PageEvents::PAGE_ON_HIT     => ['onPageHit', 0],
         ];
+    }
+
+    /**
+     * Trigger Page git for forux.
+     *
+     * @param PageHitEvent $event
+     */
+    public function onPageHit(PageHitEvent $event)
+    {
+        $hit      = $event->getHit();
+        $redirect = $hit->getRedirect();
+
+        if (!$hit->getRedirect() && !$hit->getEmail()) {
+            $this->campaignEventModel->triggerEvent('focus.open', ['hit' => $hit]);
+        }
     }
 
     /**
@@ -67,7 +92,8 @@ class PageSubscriber extends CommonSubscriber
     public function onPageBuild(PageBuilderEvent $event)
     {
         if ($event->tokensRequested($this->regex)) {
-            $tokenHelper = new BuilderTokenHelper($this->factory, 'focus', $this->model->getPermissionBase(), 'MauticFocusBundle', 'mautic.focus');
+            $tokenHelper = new BuilderTokenHelper($this->factory, 'focus', $this->model->getPermissionBase(),
+                'MauticFocusBundle', 'mautic.focus');
             $event->addTokensFromHelper($tokenHelper, $this->regex, 'name', 'id', true);
         }
     }

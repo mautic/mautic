@@ -64,6 +64,7 @@ return [
                 'arguments' => [
                     'mautic.focus.model.focus',
                     'router',
+                    'mautic.campaign.model.event',
                 ],
             ],
             'mautic.focus.subscriber.stat' => [
@@ -133,10 +134,6 @@ return [
                 'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusListType',
                 'arguments' => 'mautic.focus.model.focus',
                 'alias'     => 'focus_list',
-            ],
-            'mautic.focus.form.type.focus_open_decision' => [
-                'class'     => 'MauticPlugin\MauticFocusBundle\Form\Type\FocusOpenDecisionType',
-                'alias'     => 'focus_open_decision',
             ],
         ],
         'models' => [

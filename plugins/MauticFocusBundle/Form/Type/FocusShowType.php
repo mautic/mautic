@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -41,9 +42,22 @@ class FocusShowType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        if (!empty($options['update_select'])) {
+            $builder->add(
+                'urls',
+                SortableListType::class,
+                [
+                    'label'           => 'mautic.email.click.urls.contains',
+                    'option_required' => false,
+                    'with_labels'     => false,
+                    'required'        => false,
+                ]
+            );
+        }
+
         $builder->add(
             'focus',
-            'focus_list',
+            FocusListType::class,
             [
                 'label'      => 'mautic.focus.focusitem.selectitem',
                 'label_attr' => ['class' => 'control-label'],
@@ -120,7 +134,7 @@ class FocusShowType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefined(['update_select']);
+        $resolver->setDefined(['update_select', 'urls']);
     }
 
     /**

@@ -20,6 +20,7 @@ use Mautic\PageBundle\PageEvents;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusOpenEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 /**
  * Class StatSubscriber.
@@ -108,7 +109,8 @@ class StatSubscriber extends CommonSubscriber
     {
         $focus = $event->getFocus();
         if ($focus !== null) {
-            $this->campaignEventModel->triggerEvent('focus.open', ['focus'=>$focus, 'stop'=>true], 'focus', $focus->getId());
+            $this->campaignEventModel->triggerEvent('focus.open', ['focus' => $focus, 'stop' => true], 'focus',
+                $focus->getId());
         }
     }
 }

@@ -105,11 +105,15 @@ class CampaignSubscriber extends CommonSubscriber
         $event->addDecision(
             'focus.open',
             [
-                'label'           => 'mautic.focus.campaign.event.focus.on.open',
-                'description'     => 'mautic.focus.campaign.event.focus.on.open_descr',
-                'eventName'       => FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-                'formType'        => 'focus_open_decision',
-                'formTypeOptions' => ['update_select' => 'campaignevent_properties_focus'],
+                'label'                  => 'mautic.focus.campaign.event.focus.on.open',
+                'description'            => 'mautic.focus.campaign.event.focus.on.open_descr',
+                'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+                'formType'               => 'focusshow_list',
+                'formTheme'              => 'MauticFocusBundle:FormTheme\FocusShowList',
+                'formTypeOptions'        => [
+                    'update_select' => 'campaignevent_properties_focus',
+                    'urls'          => true,
+                ],
             ]
         );
     }
@@ -138,28 +142,23 @@ class CampaignSubscriber extends CommonSubscriber
      */
     public function onCampaignTriggerDecision(CampaignExecutionEvent $event)
     {
-        $eventDetails = $event->getEventDetails();
         $focusId      = (int) $event->getConfig()['focus'];
+        $eventDetails = $event->getEventDetails();
 
-        if (!empty($eventDetails['focus'])) {
-            /** @var Focus $focus */
-            $focus = $eventDetails['focus'];
-            if ($focus->getId() != $focusId) {
-                $focusId = false;
-            }
-        }
-        if (!$focusId || empty($eventDetails['focus'])) {
+        if (!$focusId) {
             return $event->setResult(false);
         }
 
-        $values                 = [];
-        $values['focus_item'][] = [
-            'id' => $focusId,
-            'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], true),
-        ];
-        $this->trackingHelper->updateSession($values);
+        if (empty($eventDetails['stop'])) {
+            $values                 = [];
+            $values['focus_item'][] = [
+                'id' => $focusId,
+                'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], true),
+            ];
+            $this->trackingHelper->updateSession($values);
 
-        if (!empty($eventDetails['stop'])) {
+            return $event->setResult(false);
+        } elseif (!empty($eventDetails['stop'])) {
             return $event->setResult(true);
         }
     }
