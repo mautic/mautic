@@ -763,6 +763,8 @@ return [
                     'mautic.validator.email',
                     'mautic.user.provider',
                     'mautic.lead.service.contact_tracking_service',
+                    'mautic.lead.service.device_creator_service',
+                    'mautic.lead.factory.device_detector_factory',
                     'mautic.lead.service.device_tracking_service',
                 ],
             ],
@@ -828,8 +830,11 @@ return [
                     'mautic.lead.repository.dnc',
                 ],
             ],
+            'mautic.lead.factory.device_detector_factory' => [
+                'class' => \Mautic\LeadBundle\Model\Factory\DeviceDetectorFactory\DeviceDetectorFactory::class,
+            ],
             'mautic.lead.service.contact_tracking_service' => [
-                'class'     => \Mautic\LeadBundle\Model\Service\ContactTrackingService::class,
+                'class'     => \Mautic\LeadBundle\Model\Service\ContactTrackingService\ContactTrackingService::class,
                 'arguments' => [
                     'mautic.helper.cookie',
                     'mautic.lead.repository.lead_device',
@@ -837,8 +842,11 @@ return [
                     'request_stack',
                 ],
             ],
+            'mautic.lead.service.device_creator_service' => [
+                'class' => \Mautic\LeadBundle\Model\Service\DeviceCreatorService\DeviceCreatorService::class,
+            ],
             'mautic.lead.service.device_tracking_service' => [
-                'class'     => \Mautic\LeadBundle\Model\Service\DeviceTrackingService::class,
+                'class'     => \Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingService::class,
                 'arguments' => [
                     'mautic.helper.cookie',
                     'doctrine.orm.entity_manager',

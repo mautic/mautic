@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\LeadBundle\Model\Service;
+namespace Mautic\LeadBundle\Model\Service\DeviceTrackingService;
 
 use DeviceDetector\DeviceDetector;
 use Mautic\LeadBundle\Entity\Lead;
@@ -22,11 +22,10 @@ interface DeviceTrackingServiceInterface
     public function getTrackedDevice();
 
     /**
-     * @param DeviceDetector $deviceDetector
-     * @param bool           $replaceExisting
-     * @param Lead|null      $assignedLead
+     * @param LeadDevice     $device
+     * @param bool           $replaceExistingTracking
      *
      * @return LeadDevice
      */
-    public function trackCurrent(DeviceDetector $deviceDetector, $replaceExisting = false, Lead $assignedLead = null);
+    public function trackCurrentDevice(LeadDevice $device, $replaceExistingTracking = false);
 }

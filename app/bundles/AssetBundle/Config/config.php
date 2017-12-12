@@ -198,6 +198,8 @@ return [
                     'request_stack',
                     'mautic.helper.ip_lookup',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.service.device_creator_service',
+                    'mautic.lead.factory.device_detector_factory',
                     'mautic.lead.service.device_tracking_service',
                 ],
             ],

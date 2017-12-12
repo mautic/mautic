@@ -53,8 +53,10 @@ use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Model\Service\ContactTrackingServiceInterface;
-use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use Mautic\LeadBundle\Model\Service\ContactTrackingService\ContactTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
@@ -177,6 +179,12 @@ class LeadModel extends FormModel
     /** @var ContactTrackingServiceInterface */
     private $contactTrackingService;
 
+    /** @var DeviceCreatorServiceInterface */
+    private $deviceCreatorService;
+
+    /** @var DeviceDetectorFactoryInterface */
+    private $deviceDetectorFactory;
+
     /** @var DeviceTrackingServiceInterface */
     private $deviceTrackingService;
 
@@ -198,6 +206,8 @@ class LeadModel extends FormModel
      * @param CoreParametersHelper            $coreParametersHelper
      * @param UserProvider                    $userProvider
      * @param ContactTrackingServiceInterface $contactTrackingService
+     * @param DeviceCreatorServiceInterface   $deviceCreatorService
+     * @param DeviceDetectorFactoryInterface  $deviceDetectorFactory
      * @param DeviceTrackingServiceInterface  $deviceTrackingService
      */
     public function __construct(
@@ -217,6 +227,8 @@ class LeadModel extends FormModel
         EmailValidator $emailValidator,
         UserProvider $userProvider,
         ContactTrackingServiceInterface $contactTrackingService,
+        DeviceCreatorServiceInterface $deviceCreatorService,
+        DeviceDetectorFactoryInterface $deviceDetectorFactory,
         DeviceTrackingServiceInterface $deviceTrackingService
     ) {
         $this->request                = $requestStack->getCurrentRequest();
@@ -235,6 +247,8 @@ class LeadModel extends FormModel
         $this->emailValidator         = $emailValidator;
         $this->userProvider           = $userProvider;
         $this->contactTrackingService = $contactTrackingService;
+        $this->deviceCreatorService   = $deviceCreatorService;
+        $this->deviceDetectorFactory  = $deviceDetectorFactory;
         $this->deviceTrackingService  = $deviceTrackingService;
     }
 
@@ -919,9 +933,10 @@ class LeadModel extends FormModel
             }
             $this->currentLead = $lead;
             if ($leadId = $lead->getId() && $this->request !== null) {
-                $deviceDetector = new DeviceDetector($this->request->server->get('HTTP_USER_AGENT'));
+                $deviceDetector = $this->deviceDetectorFactory->create($this->request->server->get('HTTP_USER_AGENT'));
                 $deviceDetector->parse();
-                $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+                $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+                $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
             }
         }
         $isTrackedNow    = $this->deviceTrackingService->isTracked();
@@ -988,10 +1003,11 @@ class LeadModel extends FormModel
         // First determine if this request is already tracked as a specific lead
         $lead = $this->contactTrackingService->getTrackedLead();
         if ($lead !== null && $this->request !== null) {
-            $deviceDetector = new DeviceDetector($this->request->server->get('HTTP_USER_AGENT'));
+            $deviceDetector = $this->deviceDetectorFactory->create($this->request->server->get('HTTP_USER_AGENT'));
             $deviceDetector->parse();
-            $device     = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
-            $trackingId = $device->getTrackingId();
+            $currentDevice     = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+            $trackedDevice     = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+            $trackingId        = $trackedDevice->getTrackingId();
             $this->logger->addDebug("LEAD: Contact ID# {$lead->getId()} tracked through tracking ID ($trackingId}.");
         } else {
             // No lead found so generate one
@@ -1114,8 +1130,9 @@ class LeadModel extends FormModel
         $this->currentLead->setLastActive(new \DateTime());
 
         if ($lead->getId() && $this->request !== null) {
-            $deviceDetector = new DeviceDetector($this->request->server->get('HTTP_USER_AGENT'));
+            $deviceDetector = $this->deviceDetectorFactory->create($this->request->server->get('HTTP_USER_AGENT'));
             $deviceDetector->parse();
+            $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
             // Update tracking cookies if the lead is different
             if ($oldLead !== null && $oldLead->getId() != $lead->getId()) {
                 $oldTrackedDevice = $this->deviceTrackingService->getTrackedDevice();
@@ -1124,7 +1141,7 @@ class LeadModel extends FormModel
                 } else {
                     $oldTrackingId = $this->contactTrackingService->getTrackedIdentifier();
                 }
-                $newTrackedDevice = $this->deviceTrackingService->trackCurrent($deviceDetector, true, $lead);
+                $newTrackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, true);
                 $newTrackingId    = ($newTrackedDevice === null ? null : $newTrackedDevice->getTrackingId());
                 $this->logger->addDebug(
                     "LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}"
@@ -1138,7 +1155,7 @@ class LeadModel extends FormModel
                 }
             } elseif (!$oldLead) {
                 // New lead, set the tracking cookie
-                $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+                $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
             }
         }
     }
@@ -1988,9 +2005,10 @@ class LeadModel extends FormModel
         if (key_exists('useragent', $params) && !empty($params['useragent'])) {
             $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
             if ($trackedDevice === null) {
-                $deviceDetector = new DeviceDetector($params['useragent']);
+                $deviceDetector = $this->deviceDetectorFactory->create($params['useragent']);
                 $deviceDetector->parse();
-                $trackedDevice = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+                $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+                $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
             }
         }
 

@@ -588,6 +588,8 @@ return [
                     'mautic.user.model.user',
                     'mautic.channel.model.queue',
                     'mautic.email.model.send_email_to_contacts',
+                    'mautic.lead.service.device_creator_service',
+                    'mautic.lead.factory.device_detector_factory',
                     'mautic.lead.service.device_tracking_service',
                 ],
             ],

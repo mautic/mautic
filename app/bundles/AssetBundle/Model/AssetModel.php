@@ -11,7 +11,6 @@
 
 namespace Mautic\AssetBundle\Model;
 
-use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\Asset;
@@ -27,8 +26,10 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -63,6 +64,12 @@ class AssetModel extends FormModel
      */
     protected $maxAssetSize;
 
+    /** @var DeviceCreatorServiceInterface */
+    private $deviceCreatorService;
+
+    /** @var DeviceDetectorFactoryInterface */
+    private $deviceDetectorFactory;
+
     /** @var DeviceTrackingServiceInterface */
     private $deviceTrackingService;
 
@@ -74,6 +81,8 @@ class AssetModel extends FormModel
      * @param RequestStack                   $requestStack
      * @param IpLookupHelper                 $ipLookupHelper
      * @param CoreParametersHelper           $coreParametersHelper
+     * @param DeviceCreatorServiceInterface  $deviceCreatorService
+     * @param DeviceDetectorFactoryInterface $deviceDetectorFactory
      * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
@@ -82,12 +91,16 @@ class AssetModel extends FormModel
         RequestStack $requestStack,
         IpLookupHelper $ipLookupHelper,
         CoreParametersHelper $coreParametersHelper,
+        DeviceCreatorServiceInterface $deviceCreatorService,
+        DeviceDetectorFactoryInterface $deviceDetectorFactory,
         DeviceTrackingServiceInterface $deviceTrackingService
     ) {
         $this->leadModel              = $leadModel;
         $this->categoryModel          = $categoryModel;
         $this->request                = $requestStack->getCurrentRequest();
         $this->ipLookupHelper         = $ipLookupHelper;
+        $this->deviceCreatorService   = $deviceCreatorService;
+        $this->deviceDetectorFactory  = $deviceDetectorFactory;
         $this->deviceTrackingService  = $deviceTrackingService;
         $this->maxAssetSize           = $coreParametersHelper->getParameter('mautic.max_size');
     }
@@ -165,9 +178,10 @@ class AssetModel extends FormModel
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
                     if ($lead !== null) {
                         $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
-                        $deviceDetector                       = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+                        $deviceDetector                       = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                         $deviceDetector->parse();
-                        $trackedDevice                             = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+                        $currentDevice                             = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+                        $trackedDevice                             = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
                         $trackingId                                = $trackedDevice->getTrackingId();
                         $trackingNewlyGenerated                    = !$wasTrackedAlready;
                         $leadClickthrough                          = true;
@@ -246,9 +260,10 @@ class AssetModel extends FormModel
                 // If the session is anonymous and not triggered via CLI, assume the lead did something to trigger the
                 // system forced download such as an email
                 $deviceWasTracked       = $this->deviceTrackingService->isTracked();
-                $deviceDetector         = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+                $deviceDetector         = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                 $deviceDetector->parse();
-                $trackedDevice          = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+                $currentDevice          = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+                $trackedDevice          = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
                 $trackingId             = $trackedDevice->getTrackingId();
                 $trackingNewlyGenerated = !$deviceWasTracked;
             }

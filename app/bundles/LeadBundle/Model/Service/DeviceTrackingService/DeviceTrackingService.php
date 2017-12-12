@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\LeadBundle\Model\Service;
+namespace Mautic\LeadBundle\Model\Service\DeviceTrackingService;
 
 use DeviceDetector\DeviceDetector;
 use Doctrine\ORM\EntityManager;
@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -70,26 +71,22 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     }
 
     /**
-     * @param DeviceDetector $deviceDetector
-     * @param bool           $replaceExisting
-     * @param Lead|null      $assignedLead
+     * @param LeadDevice     $device
+     * @param bool           $replaceExistingTracking
      *
      * @return LeadDevice
      */
-    public function trackCurrent(DeviceDetector $deviceDetector, $replaceExisting = false, Lead $assignedLead = null)
+    public function trackCurrentDevice(LeadDevice $device, $replaceExistingTracking = false)
     {
-        if ($assignedLead !== null) {
-            @trigger_error('Parameter $assignedLead is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
+        $trackedDevice = $this->getTrackedDevice();
+        if ($trackedDevice !== null && $replaceExistingTracking === false) {
+            return $trackedDevice;
         }
-        $device = $this->getTrackedDevice();
-        if ($device !== null && $replaceExisting === false) {
-            return $device;
-        } elseif ($device === null) {
-            $device = $this->getDeviceFromDetector($deviceDetector, $assignedLead);
+        if($device->getTrackingId() === null || $replaceExistingTracking === true) {
+            $device->setTrackingId($this->getUniqueTrackingIdentifier());
         }
-        $device->setTrackingId($this->getUniqueTrackingIdentifier());
+        $this->entityManager->persist($device);
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
-
         return $device;
     }
 
@@ -111,30 +108,6 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         }
 
         return $deviceTrackingId;
-    }
-
-    /**
-     * @param DeviceDetector $deviceDetector
-     * @param Lead|null      $assignedLead
-     *
-     * @return LeadDevice
-     */
-    private function getDeviceFromDetector(DeviceDetector $deviceDetector, Lead $assignedLead = null)
-    {
-        $device = new LeadDevice();
-        $device->setClientInfo($deviceDetector->getClient());
-        $device->setDevice($deviceDetector->getDeviceName());
-        $device->setDeviceBrand($deviceDetector->getBrand());
-        $device->setDeviceModel($deviceDetector->getModel());
-        $device->setDeviceOs($deviceDetector->getOs());
-        $device->setDateAdded(new \DateTime());
-        if ($assignedLead === null) {
-            $assignedLead = new Lead();
-        }
-        $device->setLead($assignedLead);
-        $this->entityManager->persist($device);
-
-        return $device;
     }
 
     /**

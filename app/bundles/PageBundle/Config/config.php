@@ -273,8 +273,10 @@ return [
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
                     'mautic.queue.service',
-                    'mautic.lead.service.device_tracking_service',
                     'mautic.lead.model.company',
+                    'mautic.lead.service.device_creator_service',
+                    'mautic.lead.factory.device_detector_factory',
+                    'mautic.lead.service.device_tracking_service',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [

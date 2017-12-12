@@ -14,7 +14,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 class AnalyticsHelper extends Helper

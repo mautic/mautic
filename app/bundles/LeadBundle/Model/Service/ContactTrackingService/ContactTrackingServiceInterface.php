@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\LeadBundle\Model\Service;
+namespace Mautic\LeadBundle\Model\Service\ContactTrackingService;
 
 use Mautic\LeadBundle\Entity\Lead;
 

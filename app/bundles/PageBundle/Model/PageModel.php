@@ -11,7 +11,6 @@
 
 namespace Mautic\PageBundle\Model;
 
-use DeviceDetector\DeviceDetector;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -27,11 +26,13 @@ use Mautic\CoreBundle\Model\VariantModelTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Model\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\Service\DeviceTrackingServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
+use Mautic\LeadBundle\Model\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -104,14 +105,16 @@ class PageModel extends FormModel
      */
     protected $queueService;
 
-    /**
-     * @var DeviceTrackingServiceInterface
-     */
+    /** @var DeviceCreatorServiceInterface */
+    private $deviceCreatorService;
+
+    /** @var DeviceDetectorFactoryInterface */
+    private $deviceDetectorFactory;
+
+    /** @var DeviceTrackingServiceInterface */
     private $deviceTrackingService;
 
-    /**
-     * @var CompanyModel
-     */
+    /** @var CompanyModel */
     private $companyModel;
 
     /**
@@ -124,8 +127,10 @@ class PageModel extends FormModel
      * @param RedirectModel                  $pageRedirectModel
      * @param TrackableModel                 $pageTrackableModel
      * @param QueueService                   $queueService
-     * @param DeviceTrackingServiceInterface $deviceTrackingService
      * @param CompanyModel                   $companyModel
+     * @param DeviceCreatorServiceInterface  $deviceCreatorService
+     * @param DeviceDetectorFactoryInterface $deviceDetectorFactory
+     * @param DeviceTrackingServiceInterface $deviceTrackingService
      */
     public function __construct(
         CookieHelper $cookieHelper,
@@ -135,20 +140,23 @@ class PageModel extends FormModel
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel,
         QueueService $queueService,
-        DeviceTrackingServiceInterface $deviceTrackingService,
-        CompanyModel $companyModel
-    )
-    {
-        $this->cookieHelper          = $cookieHelper;
-        $this->ipLookupHelper        = $ipLookupHelper;
-        $this->leadModel             = $leadModel;
-        $this->leadFieldModel        = $leadFieldModel;
-        $this->pageRedirectModel     = $pageRedirectModel;
-        $this->pageTrackableModel    = $pageTrackableModel;
-        $this->dateTimeHelper        = new DateTimeHelper();
-        $this->queueService          = $queueService;
-        $this->deviceTrackingService = $deviceTrackingService;
+        CompanyModel $companyModel,
+        DeviceCreatorServiceInterface $deviceCreatorService,
+        DeviceDetectorFactoryInterface $deviceDetectorFactory,
+        DeviceTrackingServiceInterface $deviceTrackingService
+    ) {
+        $this->cookieHelper           = $cookieHelper;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->leadModel              = $leadModel;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->pageRedirectModel      = $pageRedirectModel;
+        $this->pageTrackableModel     = $pageTrackableModel;
+        $this->dateTimeHelper         = new DateTimeHelper();
+        $this->queueService           = $queueService;
         $this->companyModel          = $companyModel;
+        $this->deviceCreatorService   = $deviceCreatorService;
+        $this->deviceDetectorFactory  = $deviceDetectorFactory;
+        $this->deviceTrackingService  = $deviceTrackingService;
     }
 
     /**
@@ -507,9 +515,10 @@ class PageModel extends FormModel
 
         $ipAddress                                 = $this->ipLookupHelper->getIpAddress();
         $deviceWasTracked                          = $this->deviceTrackingService->isTracked();
-        $deviceDetector                            = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+        $deviceDetector                            = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
         $deviceDetector->parse();
-        $trackedDevice                             = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+        $currentDevice                             = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+        $trackedDevice                             = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
         $trackingId                                = $trackedDevice->getTrackingId();
         $trackingNewlyGenerated                    = !$deviceWasTracked;
 
@@ -767,9 +776,10 @@ class PageModel extends FormModel
         $this->leadModel->saveEntity($lead);
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
         if ($trackedDevice === null) {
-            $deviceDetector = new DeviceDetector($request->server->get('HTTP_USER_AGENT'));
+            $deviceDetector = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
             $deviceDetector->parse();
-            $trackedDevice = $this->deviceTrackingService->trackCurrent($deviceDetector, false, $lead);
+            $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
+            $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
         }
         if ($trackedDevice->getDeviceFingerprint() !== $query['fingerprint']) {
             $trackedDevice->setDeviceFingerprint($query['fingerprint']);

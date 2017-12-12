@@ -1,11 +1,12 @@
 <?php
 
-namespace Mautic\LeadBundle\Model\Service;
+namespace Mautic\LeadBundle\Model\Service\ContactTrackingService;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\Service\ContactTrackingService\ContactTrackingServiceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
