@@ -263,13 +263,66 @@ class FocusModel extends FormModel
         );
 
         // Form has to be generated outside of the content or else the form src will be converted to clickables
+
+        // Determine pages
+        $fields = $form->getFields()->toArray();
+
+        // Ensure the correct order in case this is generated right after a form save with new fields
+        uasort($fields, function ($a, $b) {
+            if ($a->getOrder() === $b->getOrder()) {
+                return 0;
+            }
+
+            return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
+        });
+
+        $pages = ['open' => [], 'close' => []];
+
+        $openFieldId  =
+        $closeFieldId =
+        $previousId   =
+        $lastPage     = false;
+        $pageCount    = 1;
+
+        foreach ($fields as $fieldId => $field) {
+            if ('pagebreak' == $field->getType() && $openFieldId) {
+                // Open the page
+                $pages['open'][$openFieldId] = $pageCount;
+                $openFieldId                 = false;
+                $lastPage                    = $fieldId;
+
+                // Close the page at the next page break
+                if ($previousId) {
+                    $pages['close'][$previousId] = $pageCount;
+
+                    ++$pageCount;
+                }
+            } else {
+                if (!$openFieldId) {
+                    $openFieldId = $fieldId;
+                }
+            }
+
+            $previousId = $fieldId;
+        }
+
+        if (!empty($pages)) {
+            if ($openFieldId) {
+                $pages['open'][$openFieldId] = $pageCount;
+            }
+            if ($previousId !== $lastPage) {
+                $pages['close'][$previousId] = $pageCount;
+            }
+        }
+
         $formContent = (!empty($form)) ? $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:form.html.php',
             [
-                'form'    => $form,
-                'style'   => $focus['style'],
-                'focusId' => $focus['id'],
-                'preview' => $isPreview,
+                'form'      => $form,
+                'style'     => $focus['style'],
+                'focusId'   => $focus['id'],
+                'preview'   => $isPreview,
+                'formPages' => $pages,
             ]
         ) : '';
 
