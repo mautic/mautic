@@ -144,12 +144,29 @@ class CampaignSubscriber extends CommonSubscriber
     {
         $focusId      = (int) $event->getConfig()['focus'];
         $eventDetails = $event->getEventDetails();
+        $eventConfig  = $event->getConfig();
 
         if (!$focusId) {
             return $event->setResult(false);
         }
 
-        if (empty($eventDetails['stop'])) {
+        if (empty($eventDetails['stop']) && !empty($eventDetails['hit'])) {
+            $hit = $eventDetails['hit'];
+            // Limit to URLS
+            if (!empty($eventConfig['urls']['list'])) {
+                $limitToUrl = $eventConfig['urls']['list'];
+                $isUrl      = false;
+                foreach ($limitToUrl as $url) {
+                    if (preg_match('/'.$url.'/i', $hit->getUrl())) {
+                        $isUrl = true;
+                    }
+                }
+
+                if (!$isUrl) {
+                    return $event->setResult(false);
+                }
+            }
+
             $values                 = [];
             $values['focus_item'][] = [
                 'id' => $focusId,

@@ -42,7 +42,7 @@ class FocusShowType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if (!empty($options['update_select'])) {
+        if (!empty($options['urls'])) {
             $builder->add(
                 'urls',
                 SortableListType::class,

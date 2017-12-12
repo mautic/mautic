@@ -15,6 +15,13 @@ echo $view['assets']->includeScript('plugins/MauticFocusBundle/Assets/js/focus.j
 
 <div class="row">
     <div class="col-xs-12">
+
+        <?php if (!empty($form['urls'])): ?>
+        <?php echo $view['form']->row($form['urls']); ?>
+        <?php endif; ?>
+
+    </div>
+    <div class="col-xs-12">
         <?php echo $view['form']->row($form['focus']); ?>
     </div>
     <div class="col-xs-12 mt-lg">
