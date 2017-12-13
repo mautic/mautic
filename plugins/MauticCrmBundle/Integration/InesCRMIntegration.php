@@ -889,6 +889,28 @@ class InesCRMIntegration extends CrmAbstractIntegration
                 }
             },
             {
+                "concept": "client",
+                "inesKey": "Effectif",
+                "inesLabel": "Effectif",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                }
+            },
+            {
+                "concept": "client",
+                "inesKey": "CA",
+                "inesLabel": "Chiffre d'affaires M",
+                "isCustomField": false,
+                "isMappingRequired": false,
+                "autoMapping": false,
+                "excludeFromEcrasableConfig": false,
+                "mauticCustomFieldToCreate": {
+                }
+            },
+            {
                 "concept": "contact",
                 "inesKey": "PrimaryMailAddress",
                 "inesLabel": "Primary Email Address",
