@@ -657,6 +657,7 @@ class CampaignController extends AbstractStandardFormController
                     $event['percent']    =
                     $event['yesPercent'] =
                     $event['noPercent']  = 0;
+                    $event['leadCount']  = $leadCount;
 
                     if (isset($campaignLogCounts[$event['id']])) {
                         $event['logCount'] = array_sum($campaignLogCounts[$event['id']]);
