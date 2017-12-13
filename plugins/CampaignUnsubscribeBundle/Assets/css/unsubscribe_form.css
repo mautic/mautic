@@ -1,0 +1,23 @@
+h1,
+h2,
+h3 {
+  margin: 1.5rem 0;
+}
+.container {
+  max-width: 760px;
+  padding: 30px;
+  border-radius: 10px;
+  background-color: white;
+}
+fieldset {
+  margin: 10px 0;
+}
+header {
+  background-color: white;
+  height: 100px;
+  padding: 16px;
+}
+header .logo {
+  display: block;
+  max-height: 68px;
+}

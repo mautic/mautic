@@ -70,6 +70,7 @@
 !/plugins/MauticOutlookBundle
 !/plugins/MauticSocialBundle
 !/plugins/index.html
+!/plugins/CampaignUnsubscribeBundle
 
 /themes/*
 !/themes/aurora
