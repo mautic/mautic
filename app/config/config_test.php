@@ -33,14 +33,14 @@ $container->loadFromExtension('framework', [
         'collect' => false,
     ],
     'translator' => [
-        'enabled' => false,
+        'enabled' => true,
     ],
     'csrf_protection' => [
-        'enabled' => false,
+        'enabled' => true,
     ],
 ]);
 
-$container->setParameter('mautic.famework.csrf_protection', false);
+$container->setParameter('mautic.famework.csrf_protection', true);
 
 $container->register('mautic_integration.pipedrive.guzzle.client', Client::class);
 
