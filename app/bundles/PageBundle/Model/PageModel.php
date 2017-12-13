@@ -580,7 +580,10 @@ class PageModel extends FormModel
         $query = InputHelper::cleanArray($query);
 
         $hit->setQuery($query);
-        $hit->setUrl((isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri());
+        $url = (isset($query['page_url'])) ? $query['page_url'] : $request->getRequestUri();
+        // Delete the port 443 to the url
+        $url = str_replace(':443', '', $url);
+        $hit->setUrl($url);
         if (isset($query['page_referrer'])) {
             $hit->setReferer($query['page_referrer']);
         }
