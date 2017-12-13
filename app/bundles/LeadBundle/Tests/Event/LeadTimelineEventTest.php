@@ -11,6 +11,8 @@
 
 namespace Mautic\LeadBundle\Tests\Event;
 
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
+
 class LeadTimelineEventTest extends \PHPUnit_Framework_TestCase
 {
     /**
