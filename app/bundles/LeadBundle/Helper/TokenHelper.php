@@ -62,7 +62,16 @@ class TokenHelper
                         $alias = $match;
                     }
 
-                    $value             = (!empty($lead[$alias])) ? $lead[$alias] : $fallback;
+                    $value = (!empty($lead[$alias])) ? $lead[$alias] : $fallback;
+
+                    // Is it a datetime?
+                    if (($datetime = \DateTime::createFromFormat('Y-m-d H:i:s', $value)) !== false) {
+                        $value = $datetime->format('j/m/Y G:i');
+                    // Or just a date?
+                    } elseif (($datetime = \DateTime::createFromFormat('Y-m-d', $value)) !== false) {
+                        $value = $datetime->format('j/m/Y');
+                    }
+
                     $tokenList[$token] = ($urlencode) ? urlencode($value) : $value;
                 }
 
