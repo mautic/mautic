@@ -433,10 +433,21 @@ class LeadController extends FormController
                     }
 
                     $companies = [];
+
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
                     }
+
+                    $modelCompany = $this->getModel('lead.company');
+                    $companyItems = [];
+
+                    foreach ($companies as $compId) {
+                        $company        = $modelCompany->getEntity($compId);
+                        $companyItems[] = ['id' => $compId, 'name' => $company->getName()];
+                    }
+
+                    $data['companies'] = $companyItems;
 
                     $model->setFieldValues($lead, $data, true);
 
