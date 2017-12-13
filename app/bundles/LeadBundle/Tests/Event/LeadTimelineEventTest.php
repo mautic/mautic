@@ -43,6 +43,18 @@ class LeadTimelineEventTest extends \PHPUnit_Framework_TestCase
                 'icon'      => 'fa-tachometer',
                 'contactId' => 2,
             ],
+            [
+                'event'      => 'foobar',
+                'eventId'    => 'foobar123',
+                'eventLabel' => 'Foo Bar',
+                'eventType'  => 'foobar',
+                'timestamp'  => new \DateTime(),
+                'extra'      => [
+                    'something' => 'something else',
+                ],
+                'icon'      => 'fa-tachometer',
+                'contactId' => 2,
+            ],
         ];
 
         $event = new LeadTimelineEvent();
@@ -60,5 +72,8 @@ class LeadTimelineEventTest extends \PHPUnit_Framework_TestCase
         $id2 = hash('crc32', json_encode($payload[1]), false);
         $this->assertTrue(isset($events[1]['eventId']));
         $this->assertEquals('bar'.$id2, $events[1]['eventId']);
+
+        $this->assertTrue(isset($events[2]['eventId']));
+        $this->assertEquals('foobar123', $events[2]['eventId']);
     }
 }
