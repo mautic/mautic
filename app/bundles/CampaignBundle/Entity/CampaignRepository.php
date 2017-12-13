@@ -299,7 +299,45 @@ class CampaignRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        return $this->addStandardSearchCommandWhereClause($q, $filter);
+        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        if ($expr) {
+            return [$expr, $parameters];
+        }
+        $command         = $filter->command;
+        $unique          = $this->generateRandomParameterName();
+        $returnParameter = false;
+
+        switch ($command) {
+            case $this->translator->trans('mautic.core.searchcommand.ismine'):
+            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
+                $expr = $q->expr()->eq('c.createdBy', $this->currentUser->getId());
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
+            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('c.isPublished', ":$unique");
+                $forceParameters = [$unique => true];
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
+            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('c.isPublished', ":$unique");
+                $forceParameters = [$unique => false];
+                break;
+            case $this->translator->trans('mautic.core.searchcommand.name'):
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                $expr            = $q->expr()->like('c.name', ':'.$unique);
+                $returnParameter = true;
+                break;
+        }
+        if (!empty($forceParameters)) {
+            $parameters = $forceParameters;
+        } elseif ($returnParameter) {
+            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $parameters = ["$unique" => $string];
+        }
+        return [
+            $expr,
+            $parameters,
+        ];
     }
 
     /**
