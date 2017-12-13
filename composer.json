@@ -95,6 +95,7 @@
         "guzzlehttp/guzzle": "^6.2",
         "twilio/sdk": "^4.10",
         "debril/rss-atom-bundle": "~2.4.1",
+        "recombee/php-api-client": "^1.6.0",
 
         "stack/run": "^1.0",
         "stack/builder": "^1.0",
