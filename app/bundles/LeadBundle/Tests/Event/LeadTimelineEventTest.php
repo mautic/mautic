@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace Mautic\LeadBundle\Event;
+namespace Mautic\LeadBundle\Tests\Event;
 
 class LeadTimelineEventTest extends \PHPUnit_Framework_TestCase
 {
