@@ -1581,6 +1581,44 @@ class LeadListRepository extends CommonRepository
                     }
 
                     break;
+                case 'webinar_attended':
+                case 'webinar_not_attended':
+                case 'webinar_subscribed':
+                    $parameter2       = $this->generateRandomParameterName();
+                    $parameter3       = $this->generateRandomParameterName();
+                    $operand          = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';
+                    $ignoreAutoFilter = true;
+
+                    $subQb = $this->getEntityManager()->getConnection()
+                        ->createQueryBuilder()
+                        ->select('null')
+                        ->from(MAUTIC_TABLE_PREFIX.'integration_entity', $alias);
+                    switch ($func) {
+                        case 'eq':
+                        case 'neq':
+                            if ($listId) {
+                                $internalSegmentId                  = serialize(['segmentId' => $listId]);
+                                list($integrationName, $campaignId) = explode('::', $details['filter']);
+
+                                $parameters[$parameter]  = $campaignId;
+                                $parameters[$parameter2] = $integrationName;
+                                $parameters[$parameter3] = $internalSegmentId;
+                                $subQb->where(
+                                    $q->expr()->andX(
+                                        $q->expr()->eq($alias.'.integration', ":$parameter2"),
+                                        $q->expr()->eq($alias.'.integration_entity', "'WebinarSubscriber'"),
+                                        $q->expr()->eq($alias.'.integration_entity_id', ":$parameter"),
+                                        $q->expr()->eq($alias.'.internal_entity', "'lead'"),
+                                        $q->expr()->eq($alias.'.internal_entity_id', 'l.id'),
+                                        $q->expr()->eq($alias.'.internal', ":$parameter3")
+                                    )
+                                );
+                            }
+                            break;
+                    }
+                    $groupExpr->add(sprintf('%s (%s)', $operand, $subQb->getSQL()));
+                    break;
+
                 case 'integration_campaigns':
                     $parameter2       = $this->generateRandomParameterName();
                     $operand          = in_array($func, ['eq', 'neq']) ? 'EXISTS' : 'NOT EXISTS';

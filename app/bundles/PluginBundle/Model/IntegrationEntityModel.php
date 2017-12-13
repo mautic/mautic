@@ -34,10 +34,8 @@ class IntegrationEntityModel extends FormModel
         if (!$formattedRecords = $this->formatListOfContacts($recordList)) {
             return [];
         }
-
         $integrationEntityRepo = $this->getIntegrationEntityRepository();
-
-        $syncedRecords = $integrationEntityRepo->getIntegrationsEntityId(
+        $syncedRecords         = $integrationEntityRepo->getIntegrationsEntityId(
             $integrationName,
             $integrationObject->getType(),
             $integrationObject->getInternalType(),
