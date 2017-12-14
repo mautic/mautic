@@ -11,20 +11,18 @@
 
 namespace Mautic\CoreBundle\Tests\Entity;
 
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class CommonRepositoryTest extends MauticWebTestCase
+class CommonRepositoryTest extends MauticMysqlTestCase
 {
     /**
      * @testdox Test that is:mine does not throw an exception due to bad DQL
      */
     public function testIsMineSearchCommandDoesntCauseExceptionDueToBadDQL()
     {
-        $client = $this->getClient();
+        $this->client->request('GET', 's/contacts?search=is:mine');
 
-        $client->request('GET', 's/contacts?search=is:mine');
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('is:mine', $client->getResponse()->getContent());
+        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
+        $this->assertContains('is:mine', $this->client->getResponse()->getContent());
     }
 }
