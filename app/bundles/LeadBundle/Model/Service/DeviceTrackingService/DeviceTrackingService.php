@@ -35,6 +35,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     /** @var Request|null */
     private $request;
 
+    /** @var LeadDevice|null */
+    private $trackedDevice = null;
+
     /**
      * DeviceTrackingService constructor.
      *
@@ -68,6 +71,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     public function getTrackedDevice()
     {
+        if ($this->trackedDevice !== null) {
+            return $this->trackedDevice;
+        }
         $trackingId = $this->getTrackedIdentifier();
         if ($trackingId === null) {
             return null;
@@ -93,6 +99,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         }
         $this->entityManager->persist($device);
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
+        $this->trackedDevice = $device;
 
         return $device;
     }

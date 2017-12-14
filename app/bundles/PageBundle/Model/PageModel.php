@@ -478,6 +478,7 @@ class PageModel extends FormModel
      */
     public function hitPage($page, Request $request, $code = '200', Lead $lead = null, $query = [])
     {
+        $deviceWasTracked                          = $this->deviceTrackingService->isTracked();
         // Don't skew results with user hits
         if (!$this->security->isAnonymous()) {
             return;
@@ -514,7 +515,6 @@ class PageModel extends FormModel
         $this->leadModel->saveEntity($lead);
 
         $ipAddress                                 = $this->ipLookupHelper->getIpAddress();
-        $deviceWasTracked                          = $this->deviceTrackingService->isTracked();
         $deviceDetector                            = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
         $deviceDetector->parse();
         $currentDevice                             = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);

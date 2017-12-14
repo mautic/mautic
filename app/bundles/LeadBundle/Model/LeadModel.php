@@ -908,6 +908,12 @@ class LeadModel extends FormModel
         if (empty($this->currentLead)) {
             $ip   = $this->ipLookupHelper->getIpAddress();
             $lead = $this->contactTrackingService->getTrackedLead();
+            if ($lead === null) {
+                $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+                if ($trackedDevice !== null) {
+                    $lead = $trackedDevice->getLead();
+                }
+            }
             if ($lead !== null) {
                 $this->logger->addDebug("LEAD: Existing lead found with ID# {$lead->getId()}.");
             } else { // if no trackingId cookie set the lead is not tracked yet so create a new one
@@ -1000,20 +1006,7 @@ class LeadModel extends FormModel
             }
             $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
         }
-
-        // First determine if this request is already tracked as a specific lead
-        $lead = $this->contactTrackingService->getTrackedLead();
-        if ($lead !== null && $this->request !== null) {
-            $deviceDetector = $this->deviceDetectorFactory->create($this->request->server->get('HTTP_USER_AGENT'));
-            $deviceDetector->parse();
-            $currentDevice     = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
-            $trackedDevice     = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
-            $trackingId        = $trackedDevice->getTrackingId();
-            $this->logger->addDebug("LEAD: Contact ID# {$lead->getId()} tracked through tracking ID ($trackingId}.");
-        } else {
-            // No lead found so generate one
-            $lead = $this->getCurrentLead();
-        }
+        $lead = $this->getCurrentLead();
 
         list($lead, $inQuery) = $this->checkForDuplicateContact($queryFields, $lead, true, true);
 
