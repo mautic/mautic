@@ -15,8 +15,8 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusOpenEvent;
-use Symfony\Component\HttpFoundation\Response;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class class PublicController extends CommonController.
@@ -68,7 +68,6 @@ class PublicController extends CommonController
                     $this->dispatcher->dispatch(FocusEvents::FOCUS_ON_OPEN, $event);
                     unset($event);
                 }
-
             }
         }
 
