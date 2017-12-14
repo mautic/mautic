@@ -937,6 +937,7 @@ class LeadModel extends FormModel
                 $deviceDetector->parse();
                 $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
                 $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+                $this->em->flush($trackedDevice);
             }
         }
         $isTrackedNow    = $this->deviceTrackingService->isTracked();
@@ -1142,6 +1143,7 @@ class LeadModel extends FormModel
                     $oldTrackingId = $this->contactTrackingService->getTrackedIdentifier();
                 }
                 $newTrackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, true);
+                $this->em->flush($newTrackedDevice);
                 $newTrackingId    = ($newTrackedDevice === null ? null : $newTrackedDevice->getTrackingId());
                 $this->logger->addDebug(
                     "LEAD: Tracking code changed from $oldTrackingId for contact ID# {$oldLead->getId()} to $newTrackingId for contact ID# {$lead->getId()}"
@@ -1155,7 +1157,8 @@ class LeadModel extends FormModel
                 }
             } elseif (!$oldLead) {
                 // New lead, set the tracking cookie
-                $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+                $newTrackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+                $this->em->flush($newTrackedDevice);
             }
         }
     }
@@ -2009,6 +2012,7 @@ class LeadModel extends FormModel
                 $deviceDetector->parse();
                 $currentDevice = $this->deviceCreatorService->getCurrentFromDetector($deviceDetector, $lead);
                 $trackedDevice = $this->deviceTrackingService->trackCurrentDevice($currentDevice, false);
+                $this->em->flush($trackedDevice);
             }
         }
 

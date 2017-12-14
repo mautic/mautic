@@ -219,8 +219,8 @@ class LeadDeviceRepository extends CommonRepository
             $sq->expr()->eq('es.lead_id', ':leadId')
         )->setParameter('leadId', $lead->getId());
         $sq->where(
-            $sq->expr()->neq('es.tracking_id', 'trackingId')
-        )->setParameter('trackingId', null);
+            $sq->expr()->isNotNull('es.tracking_id')
+        );
 
         return $sq->execute()->rowCount() !== 0;
     }
