@@ -113,7 +113,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    protected function createUser($isAdmin = true, $email = 'admin@admin.com', $username = 'admin')
+    protected function createUser($isAdmin = true, $email = 'admin@pipedrive-admin.com', $username = 'pipedrive-admin')
     {
         $role = new Role();
         $role->setName('Test');
