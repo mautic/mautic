@@ -157,7 +157,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $limitToUrl = $eventConfig['urls']['list'];
                 $isUrl      = false;
                 foreach ($limitToUrl as $url) {
-                    if (preg_match('/'.$url.'/i', $hit->getUrl())) {
+                    if (preg_match('/'.preg_quote($url, '/').'/i', $hit->getUrl())) {
                         $isUrl = true;
                     }
                 }
