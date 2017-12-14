@@ -116,7 +116,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function restoreFromFile()
     {
         $connection = $this->container->get('doctrine.dbal.default_connection');
-        $command    = "export MYSQL_PWD={$connection->getPassword()}; mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} {$connection->getDatabase()} < {$this->sqlDumpFile} > /dev/null";
+        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()} -p{$connection->getPassword()} {$connection->getDatabase()} < {$this->sqlDumpFile} 2>&1 | grep -v \"Using a password\"";
         system($command);
     }
 }
