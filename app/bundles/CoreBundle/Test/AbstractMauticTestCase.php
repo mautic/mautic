@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
@@ -107,6 +109,8 @@ abstract class AbstractMauticTestCase extends WebTestCase
             ->method('setCookie');
 
         $this->container->set('mautic.helper.cookie', $cookieHelper);
+
+        $this->container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
     protected function applyMigrations()
