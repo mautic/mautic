@@ -166,17 +166,17 @@ class LeadDeviceRepository extends CommonRepository
     public function getByTrackingId($trackingId)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+        $sq->select('ld.id as id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'ld');
 
         $sq->where(
-            $sq->expr()->eq('es.tracking_id', ':trackingId')
+            $sq->expr()->eq('ld.tracking_id', ':trackingId')
         )
             ->setParameter('trackingId', $trackingId);
 
         //get the first match
         $device = $sq->execute()->fetch();
-        if ($device === null) {
+        if ($device === false) {
             return null;
         }
 
