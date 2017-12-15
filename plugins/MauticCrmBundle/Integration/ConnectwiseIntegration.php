@@ -921,7 +921,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             while ($campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId, $page)) {
                 $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
                 $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
-                $contacts             = (array) $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $recordList);
+                $contacts             = (array) $this->integrationEntityModel->getSyncedRecords(new IntegrationObject('Contact', 'lead'), $this->getName(), $recordList);
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
@@ -941,7 +941,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $saveCampaignMembers = array_merge($existingContactsIds, array_keys($contactsToFetch));
 
-                $this->saveCampaignMembers($saveCampaignMembers, $campaignMemberObject);
+                $this->saveCampaignMembers($saveCampaignMembers, $campaignMemberObject, $campaignId);
 
                 if (count($campaignsMembersResults) < self::PAGESIZE) {
                     // No use continuing as we have less results than page size
@@ -964,9 +964,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @param $allCampaignMembers
      * @param $campaignMemberObject
-     * @param $campaignId @deprecated to be removed in 3.0
+     * @param $campaignId
      */
-    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId = null)
+    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId)
     {
         if (empty($allCampaignMembers)) {
             return;
@@ -977,14 +977,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $contacts = $this->integrationEntityModel->getSyncedRecords($mauticObject, $this->getName(), $recordList);
         //first find existing campaign members.
-        foreach ($contacts as $campaignMember) {
-            $existingCampaignMember = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $campaignMember['integration_entity_id']);
+        foreach ($contacts as $contact) {
+            $existingCampaignMember = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $campaignId, $contact['internal_entity_id']);
             if (empty($existingCampaignMember)) {
                 $persistEntities[] = $this->createIntegrationEntity(
                     $campaignMemberObject->getType(),
-                    $campaignMember['integration_entity_id'],
+                    $campaignId,
                     $campaignMemberObject->getInternalType(),
-                    $campaignMember['internal_entity_id'],
+                    $contact['internal_entity_id'],
                     [],
                     false
                 );
