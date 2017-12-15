@@ -46,6 +46,21 @@ class CookieHelper
     }
 
     /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getCookie($key, $default = null)
+    {
+        if ($this->request === null) {
+            return null;
+        }
+
+        return $this->request->cookies->get($key, $default);
+    }
+
+    /**
      * @param      $name
      * @param      $value
      * @param int  $expire

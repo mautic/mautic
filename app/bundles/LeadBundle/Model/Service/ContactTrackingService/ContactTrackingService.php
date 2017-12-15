@@ -60,20 +60,19 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
      */
     public function getTrackedLead()
     {
+        if ($this->request === null) {
+            return null;
+        }
         $trackingId = $this->getTrackedIdentifier();
         if ($trackingId === null) {
             return null;
         }
-        $leadId = $this->request->cookies->get($trackingId, null);
+        $leadId = $this->cookieHelper->getCookie($trackingId, null);
         if ($leadId === null) {
-            $leadId = ('GET' == $this->request->getMethod())
-                ?
-                $this->request->query->get('mtc_id', null)
-                :
-                $this->request->request->get('mtc_id', null);
-        }
-        if ($leadId === null) {
-            return null;
+            $leadId = $this->request->get('mtc_id', null);
+            if ($leadId === null) {
+                return null;
+            }
         }
 
         $lead                        = $this->leadRepository->getEntity($leadId);
@@ -90,10 +89,6 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
      */
     public function getTrackedIdentifier()
     {
-        if ($this->request === null) {
-            return null;
-        }
-
-        return $this->request->cookies->get('mautic_session_id', null);
+        return $this->cookieHelper->getCookie('mautic_session_id', null);
     }
 }

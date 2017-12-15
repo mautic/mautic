@@ -763,6 +763,12 @@ return [
                     'mautic.helper.integration',
                 ],
             ],
+            'mautic.helper.hash' => [
+                'class' => \Mautic\CoreBundle\Helper\HashHelper\HashHelper::class,
+            ],
+            'mautic.helper.random' => [
+                'class' => \Mautic\CoreBundle\Helper\RandomHelper\RandomHelper::class,
+            ],
             'mautic.menu_renderer' => [
                 'class'     => 'Mautic\CoreBundle\Menu\MenuRenderer',
                 'arguments' => [

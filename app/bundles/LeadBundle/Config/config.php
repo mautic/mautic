@@ -851,6 +851,7 @@ return [
                     'mautic.helper.cookie',
                     'doctrine.orm.entity_manager',
                     'mautic.lead.repository.lead_device',
+                    'mautic.helper.random',
                     'request_stack',
                 ],
             ],

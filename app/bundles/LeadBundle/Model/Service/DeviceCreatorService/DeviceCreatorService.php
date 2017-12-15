@@ -40,6 +40,7 @@ final class DeviceCreatorService implements DeviceCreatorServiceInterface
         $device->setDateAdded(new \DateTime());
         if ($assignedLead === null) {
             $assignedLead = new Lead();
+            $assignedLead->setNewlyCreated(true);
         }
         $device->setLead($assignedLead);
 

@@ -11,8 +11,9 @@
 
 namespace Mautic\LeadBundle\Model\Service\DeviceTrackingService;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Symfony\Component\BrowserKit\Request;
@@ -26,36 +27,39 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     /** @var CookieHelper */
     private $cookieHelper;
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
     /** @var LeadDeviceRepository */
     private $leadDeviceRepository;
 
+    /** @var RandomHelperInterface */
+    private $randomHelper;
+
     /** @var Request|null */
     private $request;
-
-    /** @var LeadDevice|null */
-    private $trackedDevice = null;
 
     /**
      * DeviceTrackingService constructor.
      *
-     * @param CookieHelper         $cookieHelper
-     * @param EntityManager        $entityManager
-     * @param LeadDeviceRepository $leadDeviceRepository
-     * @param RequestStack         $requestStack
+     * @param CookieHelper           $cookieHelper
+     * @param EntityManagerInterface $entityManager
+     * @param LeadDeviceRepository   $leadDeviceRepository
+     * @param RandomHelperInterface  $randomHelper
+     * @param RequestStack           $requestStack
      */
     public function __construct(
         CookieHelper $cookieHelper,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         LeadDeviceRepository $leadDeviceRepository,
+        RandomHelperInterface $randomHelper,
         RequestStack $requestStack
     ) {
-        $this->cookieHelper         = $cookieHelper;
-        $this->entityManager        = $entityManager;
-        $this->leadDeviceRepository = $leadDeviceRepository;
-        $this->request              = $requestStack->getCurrentRequest();
+        $this->cookieHelper           = $cookieHelper;
+        $this->entityManager          = $entityManager;
+        $this->randomHelper           = $randomHelper;
+        $this->leadDeviceRepository   = $leadDeviceRepository;
+        $this->request                = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -71,9 +75,6 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
      */
     public function getTrackedDevice()
     {
-        if ($this->trackedDevice !== null) {
-            return $this->trackedDevice;
-        }
         $trackingId = $this->getTrackedIdentifier();
         if ($trackingId === null) {
             return null;
@@ -93,13 +94,14 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         $trackedDevice = $this->getTrackedDevice();
         if ($trackedDevice !== null && $replaceExistingTracking === false) {
             return $trackedDevice;
+        } elseif ($trackedDevice !== null && $replaceExistingTracking === true) {
+            $device = $trackedDevice;
         }
         if ($device->getTrackingId() === null || $replaceExistingTracking === true) {
             $device->setTrackingId($this->getUniqueTrackingIdentifier());
         }
         $this->entityManager->persist($device);
         $this->cookieHelper->setCookie('mautic_device_id', $device->getTrackingId(), 31536000);
-        $this->trackedDevice = $device;
 
         return $device;
     }
@@ -112,13 +114,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         if ($this->request === null) {
             return null;
         }
-        $deviceTrackingId = $this->request->cookies->get('mautic_device_id', null);
+        $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id', null);
         if ($deviceTrackingId === null) {
-            if ($this->request->getMethod() === 'GET') {
-                $deviceTrackingId = $this->request->query->get('mautic_device_id', null);
-            } else {
-                $deviceTrackingId = $this->request->request->get('mautic_device_id', null);
-            }
+            $deviceTrackingId = $this->request->get('mautic_device_id', null);
         }
 
         return $deviceTrackingId;
@@ -130,7 +128,7 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     private function getUniqueTrackingIdentifier()
     {
         do {
-            $generatedIdentifier = hash('sha1', uniqid(mt_rand()));
+            $generatedIdentifier = $this->randomHelper->generate(23);
             $device              = $this->leadDeviceRepository->getByTrackingId($generatedIdentifier);
         } while ($device !== null);
 
