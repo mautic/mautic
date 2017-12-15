@@ -29,7 +29,7 @@ class IntegrationEntityModel extends FormModel
     {
     }
 
-    public function getSyncedRecords(IntegrationObject $integrationObject, $integrationName, $recordList)
+    public function getSyncedRecords(IntegrationObject $integrationObject, $integrationName, $recordList, $internalEntityId = null)
     {
         if (!$formattedRecords = $this->formatListOfContacts($recordList)) {
             return [];
@@ -41,7 +41,7 @@ class IntegrationEntityModel extends FormModel
             $integrationName,
             $integrationObject->getType(),
             $integrationObject->getInternalType(),
-            null,
+            $internalEntityId,
             null,
             null,
             false,

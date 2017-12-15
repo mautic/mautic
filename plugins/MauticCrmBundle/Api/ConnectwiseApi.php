@@ -166,7 +166,7 @@ class ConnectwiseApi extends CrmApi
      */
     public function getCampaignMembers($campaignId, $page = 1)
     {
-        return $this->request('marketing/groups/'.$campaignId.'/contacts', ['page' => $page]);
+        return $this->request('marketing/groups/'.$campaignId.'/contacts', ['page' => $page, 'pageSize' => ConnectwiseIntegration::PAGESIZE]);
     }
 
     /**
