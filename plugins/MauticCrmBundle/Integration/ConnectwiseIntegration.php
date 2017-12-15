@@ -941,7 +941,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $saveCampaignMembers = array_merge($existingContactsIds, array_keys($contactsToFetch));
 
-                $this->saveCampaignMembers($saveCampaignMembers, $campaignMemberObject, $campaignId);
+                $this->saveCampaignMembers($saveCampaignMembers, $campaignMemberObject);
 
                 if (count($campaignsMembersResults) < self::PAGESIZE) {
                     // No use continuing as we have less results than page size
@@ -964,9 +964,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @param $allCampaignMembers
      * @param $campaignMemberObject
-     * @param $campaignId
+     * @param $campaignId @deprecated to be removed in 3.0
      */
-    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId)
+    public function saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId = null)
     {
         if (empty($allCampaignMembers)) {
             return;
