@@ -53,6 +53,60 @@ class SalesforceApiTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @testdox Test that a locked record request is retried up to 3 times with last one being successful so no exception should be thrown
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::checkIfLockedRequestShouldBeRetried()
+     */
+    public function testRecordLockedErrorIsRetriedThreeTimesWithLastOneSuccessful()
+    {
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $message = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
+        $integration->expects($this->at(1))
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    [
+                        'errorCode' => 'UNABLE_TO_LOCK_ROW',
+                        'message'   => $message,
+                    ],
+                ]
+            );
+
+        $integration->expects($this->at(2))
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    [
+                        'errorCode' => 'UNABLE_TO_LOCK_ROW',
+                        'message'   => $message,
+                    ],
+                ]
+            );
+
+        $integration->expects($this->at(3))
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    [
+                        'success' => true,
+                    ],
+                ]
+            );
+
+        $api = new SalesforceApi($integration);
+
+        try {
+            $api->request('/test');
+        } catch (ApiErrorException $exception) {
+            $this->fail('ApiErrorException thrown');
+        }
+    }
+
+    /**
      * @testdox Test that a locked record request is retried 2 times with 3rd being successful
      * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
      * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
@@ -65,7 +119,7 @@ class SalesforceApiTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $message = 'unable to obtain exclusive access to this record or 1 records: 70137000000Ugy3AAC';
-        $integration->expects($this->at(0))
+        $integration->expects($this->at(1))
             ->method('makeRequest')
             ->willReturn(
                 [
@@ -75,7 +129,7 @@ class SalesforceApiTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]
             );
-        $integration->expects($this->at(1))
+        $integration->expects($this->at(0))
             ->method('makeRequest')
             ->willReturn(
                 [
@@ -105,7 +159,7 @@ class SalesforceApiTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $integration->expects($this->once())
+        $integration->expects($this->exactly(2))
             ->method('authCallback');
 
         $message = 'Session expired';
@@ -124,10 +178,55 @@ class SalesforceApiTest extends \PHPUnit_Framework_TestCase
 
         try {
             $api->request('/test');
-
             $this->fail('ApiErrorException not thrown');
         } catch (ApiErrorException $exception) {
             $this->assertEquals($message, $exception->getMessage());
+        }
+    }
+
+    /**
+     * @testdox Test that a session expired should attempt a refresh but not throw an exception if successful on second request
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::analyzeResponse()
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::processError()
+     * @covers \MauticPlugin\MauticCrmBundle\Api\SalesforceApi::revalidateSession()
+     */
+    public function testSessionExpiredIsRefreshedWithoutThrowingExceptionOnSecondRequestWithSuccess()
+    {
+        $integration = $this->getMockBuilder(SalesforceIntegration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $integration->expects($this->once())
+            ->method('authCallback');
+
+        $message = 'Session expired';
+
+        // Test again but both attempts should fail resulting in
+        $integration->expects($this->at(1))
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    [
+                        'errorCode' => 'INVALID_SESSION_ID',
+                        'message'   => $message,
+                    ],
+                ]
+            );
+
+        $integration->expects($this->at(2))
+            ->method('makeRequest')
+            ->willReturn(
+                [
+                    ['success' => true],
+                ]
+            );
+
+        $api = new SalesforceApi($integration);
+
+        try {
+            $api->request('/test');
+        } catch (ApiErrorException $exception) {
+            $this->fail('ApiErrorException thrown');
         }
     }
 

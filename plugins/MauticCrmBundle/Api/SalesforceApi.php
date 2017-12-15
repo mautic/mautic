@@ -524,12 +524,12 @@ class SalesforceApi extends CrmApi
      */
     private function revalidateSession($isRetry)
     {
-        if (!$isRetry) {
-            throw new RetryRequestException();
-        }
-
         if ($refreshError = $this->integration->authCallback(['use_refresh_token' => true])) {
             throw new ApiErrorException($refreshError);
+        }
+
+        if (!$isRetry) {
+            throw new RetryRequestException();
         }
     }
 
