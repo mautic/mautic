@@ -307,15 +307,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id') && $fieldInfo['name'] != 'IsDeleted')
                                         || !isset($fieldInfo['name'])
                                         || (in_array(
-                                            $fieldInfo['type'],
-                                            ['reference']
-                                        ) && $fieldInfo['name'] != 'AccountId')
+                                                $fieldInfo['type'],
+                                                ['reference']
+                                            ) && $fieldInfo['name'] != 'AccountId')
                                     ) {
                                         continue;
                                     }
                                     switch ($fieldInfo['type']) {
                                         case 'boolean': $type = 'boolean';
-                                                        break;
+                                            break;
                                         case 'datetime': $type = 'datetime';
                                             break;
                                         case 'date': $type = 'date';
@@ -1336,19 +1336,23 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param $campaignId
+     * @param $settings
      *
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId, $settings)
     {
+        $silenceExceptions = true;
         $persistEntities   = $contactList   = $leadList   = $existingLeads   = $existingContacts   = [];
 
         try {
             $campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId);
         } catch (\Exception $e) {
             $this->logIntegrationError($e);
+            if (!$silenceExceptions) {
+                throw $e;
+            }
         }
-
         //prepare contacts to import to mautic contacts to delete from mautic
         if (isset($campaignsMembersResults['records']) && !empty($campaignsMembersResults['records'])) {
             foreach ($campaignsMembersResults['records'] as $campaignMember) {
