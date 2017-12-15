@@ -39,7 +39,7 @@ class SendGridMailBase
         $from        = new Email(current($froms), key($froms));
         $subject     = $message->getSubject();
 
-        $contentMain   = new Content($message->getContentType(), $message->getBody());
+        $contentMain   = new Content($this->getContentType($message), $message->getBody());
         $contentSecond = null;
 
         // Plain text message must be first if present
@@ -62,5 +62,15 @@ class SendGridMailBase
         }
 
         return $mail;
+    }
+
+    /**
+     * @param \Swift_Mime_Message $message
+     *
+     * @return string
+     */
+    private function getContentType(\Swift_Mime_Message $message)
+    {
+        return $message->getContentType() === 'text/plain' ? $message->getContentType() : 'text/html';
     }
 }

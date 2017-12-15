@@ -18,7 +18,10 @@ use SendGrid\Email;
 
 class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHtmlMessage()
+    /**
+     * @dataProvider contentTypeProvider
+     */
+    public function testHtmlMessage($contentType)
     {
         $plainTextMassageHelper = $this->getMockBuilder(PlainTextMassageHelper::class)
             ->disableOriginalConstructor()
@@ -42,7 +45,7 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
         $message->expects($this->once())
             ->method('getContentType')
             ->with()
-            ->willReturn('text/html');
+            ->willReturn($contentType);
 
         $message->expects($this->once())
             ->method('getBody')
@@ -73,6 +76,14 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($htmlContent, $contents[1]);
     }
 
+    public function contentTypeProvider()
+    {
+        return [
+            ['text/html'],
+            ['multipart/alternative'],
+        ];
+    }
+
     public function testPlainTextMessage()
     {
         $plainTextMassageHelper = $this->getMockBuilder(PlainTextMassageHelper::class)
@@ -94,7 +105,7 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
             ->with()
             ->willReturn('My subject');
 
-        $message->expects($this->once())
+        $message->expects($this->exactly(2))
             ->method('getContentType')
             ->with()
             ->willReturn('text/plain');
