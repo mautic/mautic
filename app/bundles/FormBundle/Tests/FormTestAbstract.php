@@ -235,10 +235,6 @@ class FormTestAbstract extends WebTestCase
             ->getMock();
 
         $leadModel->expects($this
-            ->any())->method('getTrackingCookie')
-            ->willReturn([$this->mockTrackingId, true]);
-
-        $leadModel->expects($this
             ->any())
             ->method('getCurrentLead')
             ->with($this->logicalOr(

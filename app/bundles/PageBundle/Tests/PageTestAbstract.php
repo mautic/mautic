@@ -131,6 +131,10 @@ class PageTestAbstract extends WebTestCase
                 )
             );
 
+        $deviceCreatorServiceMock  = $this->createMock(DeviceCreatorServiceInterface::class);
+        $deviceDetectorFactoryMock = $this->createMock(DeviceDetectorFactoryInterface::class);
+        $deviceTrackingServiceMock = $this->createMock(DeviceTrackingServiceInterface::class);
+
         $pageModel = new PageModel(
             $cookieHelper,
             $ipLookupHelper,
@@ -139,7 +143,10 @@ class PageTestAbstract extends WebTestCase
             $redirectModel,
             $trackableModel,
             $queueService,
-            $companyModel
+            $companyModel,
+            $deviceCreatorServiceMock,
+            $deviceDetectorFactoryMock,
+            $deviceTrackingServiceMock
         );
 
         $pageModel->setDispatcher($dispatcher);
