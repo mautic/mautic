@@ -22,15 +22,12 @@ final class DeviceCreatorService implements DeviceCreatorServiceInterface
 {
     /**
      * @param DeviceDetector $deviceDetector
-     * @param Lead|null      $assignedLead
+     * @param Lead           $assignedLead
      *
      * @return LeadDevice|null Null is returned if device can't be detected
      */
-    public function getCurrentFromDetector(DeviceDetector $deviceDetector, Lead $assignedLead = null)
+    public function getCurrentFromDetector(DeviceDetector $deviceDetector, Lead $assignedLead)
     {
-        if ($assignedLead !== null) {
-            @trigger_error('Parameter $assignedLead is deprecated and will be removed in 3.0', E_USER_DEPRECATED);
-        }
         $device = new LeadDevice();
         $device->setClientInfo($deviceDetector->getClient());
         $device->setDevice($deviceDetector->getDeviceName());
@@ -38,10 +35,6 @@ final class DeviceCreatorService implements DeviceCreatorServiceInterface
         $device->setDeviceModel($deviceDetector->getModel());
         $device->setDeviceOs($deviceDetector->getOs());
         $device->setDateAdded(new \DateTime());
-        if ($assignedLead === null) {
-            $assignedLead = new Lead();
-            $assignedLead->setNewlyCreated(true);
-        }
         $device->setLead($assignedLead);
 
         return $device;

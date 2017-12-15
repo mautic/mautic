@@ -22,9 +22,9 @@ interface DeviceCreatorServiceInterface
 {
     /**
      * @param DeviceDetector $deviceDetector
-     * @param Lead|null      $assignedLead
+     * @param Lead           $assignedLead
      *
      * @return LeadDevice|null Null is returned if device can't be detected
      */
-    public function getCurrentFromDetector(DeviceDetector $deviceDetector, Lead $assignedLead = null);
+    public function getCurrentFromDetector(DeviceDetector $deviceDetector, Lead $assignedLead);
 }
