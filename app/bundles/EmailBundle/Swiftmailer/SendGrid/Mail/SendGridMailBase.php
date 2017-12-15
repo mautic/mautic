@@ -38,16 +38,28 @@ class SendGridMailBase
         $froms       = $message->getFrom();
         $from        = new Email(current($froms), key($froms));
         $subject     = $message->getSubject();
-        $contentHtml = new Content('text/html', $message->getBody());
-        $contentText = new Content('text/plain', $this->plainTextMassageHelper->getPlainTextFromMessageNotStatic($message));
+
+        $contentMain   = new Content($message->getContentType(), $message->getBody());
+        $contentSecond = null;
+
+        // Plain text message must be first if present
+        if ($contentMain->getType() !== 'text/plain') {
+            $plainText = $this->plainTextMassageHelper->getPlainTextFromMessageNotStatic($message);
+            if ($plainText) {
+                $contentSecond = $contentMain;
+                $contentMain   = new Content('text/plain', $plainText);
+            }
+        }
 
         // Sendgrid class requires to pass an TO email even if we do not have any general one
         // Pass a dummy email and clear it in the next 2 lines
         $to                    = 'dummy-email-to-be-deleted@example.com';
-        $mail                  = new Mail($from, $subject, $to, $contentText);
+        $mail                  = new Mail($from, $subject, $to, $contentMain);
         $mail->personalization = [];
 
-        $mail->addContent($contentHtml);
+        if ($contentSecond) {
+            $mail->addContent($contentSecond);
+        }
 
         return $mail;
     }

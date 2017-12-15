@@ -18,7 +18,7 @@ use SendGrid\Email;
 
 class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
 {
-    public function testBaseMessage()
+    public function testHtmlMessage()
     {
         $plainTextMassageHelper = $this->getMockBuilder(PlainTextMassageHelper::class)
             ->disableOriginalConstructor()
@@ -40,9 +40,9 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
             ->willReturn('My subject');
 
         $message->expects($this->once())
-            ->method('getBody')
+            ->method('getContentType')
             ->with()
-            ->willReturn('HTML body');
+            ->willReturn('text/html');
 
         $message->expects($this->once())
             ->method('getBody')
@@ -71,5 +71,109 @@ class SendGridMailBaseTest extends \PHPUnit_Framework_TestCase
         $htmlContent = new Content('text/html', 'HTML body');
         $this->assertEquals($plainText, $contents[0]);
         $this->assertEquals($htmlContent, $contents[1]);
+    }
+
+    public function testPlainTextMessage()
+    {
+        $plainTextMassageHelper = $this->getMockBuilder(PlainTextMassageHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $sendGridMailBase = new SendGridMailBase($plainTextMassageHelper);
+
+        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+            ->getMock();
+
+        $message->expects($this->once())
+            ->method('getFrom')
+            ->with()
+            ->willReturn(['email@example.com' => 'My name']);
+
+        $message->expects($this->once())
+            ->method('getSubject')
+            ->with()
+            ->willReturn('My subject');
+
+        $message->expects($this->once())
+            ->method('getContentType')
+            ->with()
+            ->willReturn('text/plain');
+
+        $message->expects($this->once())
+            ->method('getBody')
+            ->with()
+            ->willReturn('Plain text');
+
+        $plainTextMassageHelper->expects($this->never())
+            ->method('getPlainTextFromMessageNotStatic');
+
+        $mail = $sendGridMailBase->getSendGridMail($message);
+
+        $personalizations = $mail->getPersonalizations();
+        $this->assertSame([], $personalizations);
+
+        $from = new Email('My name', 'email@example.com');
+        $this->assertEquals($from, $mail->getFrom());
+
+        $this->assertSame('My subject', $mail->getSubject());
+
+        $contents = $mail->getContents();
+        $this->assertCount(1, $contents);
+
+        $plainText   = new Content('text/plain', 'Plain text');
+        $this->assertEquals($plainText, $contents[0]);
+    }
+
+    public function testEmptyPlainTextMessage()
+    {
+        $plainTextMassageHelper = $this->getMockBuilder(PlainTextMassageHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $sendGridMailBase = new SendGridMailBase($plainTextMassageHelper);
+
+        $message = $this->getMockBuilder(\Swift_Mime_Message::class)
+            ->getMock();
+
+        $message->expects($this->once())
+            ->method('getFrom')
+            ->with()
+            ->willReturn(['email@example.com' => 'My name']);
+
+        $message->expects($this->once())
+            ->method('getSubject')
+            ->with()
+            ->willReturn('My subject');
+
+        $message->expects($this->once())
+            ->method('getContentType')
+            ->with()
+            ->willReturn('text/html');
+
+        $message->expects($this->once())
+            ->method('getBody')
+            ->with()
+            ->willReturn('HTML body');
+
+        $plainTextMassageHelper->expects($this->once())
+            ->method('getPlainTextFromMessageNotStatic')
+            ->with($message)
+            ->willReturn('');
+
+        $mail = $sendGridMailBase->getSendGridMail($message);
+
+        $personalizations = $mail->getPersonalizations();
+        $this->assertSame([], $personalizations);
+
+        $from = new Email('My name', 'email@example.com');
+        $this->assertEquals($from, $mail->getFrom());
+
+        $this->assertSame('My subject', $mail->getSubject());
+
+        $contents = $mail->getContents();
+        $this->assertCount(1, $contents);
+
+        $content   = new Content('text/html', 'HTML body');
+        $this->assertEquals($content, $contents[0]);
     }
 }
