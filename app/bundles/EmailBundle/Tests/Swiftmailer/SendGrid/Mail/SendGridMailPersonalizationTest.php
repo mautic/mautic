@@ -26,14 +26,32 @@ class SendGridMailPersonalizationTest extends \PHPUnit_Framework_TestCase
         $message = $this->getMockBuilder(\Swift_Mime_Message::class)
             ->getMock();
 
-        $mail = $this->getMockBuilder(Mail::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $message->expects($this->never())
             ->method('getCc');
 
+        $to = [
+            'info1@example.com' => 'Name 1',
+        ];
+        $message->expects($this->once())
+            ->method('getTo')
+            ->willReturn($to);
+
+        $mail                  = new Mail('from', 'subject', 'to', 'content');
+        $mail->personalization = [];
+
         $sendGridMailPersonalization->addPersonalizedDataToMail($mail, $message);
+
+        $personalization = $mail->getPersonalizations();
+        $this->assertCount(1, $personalization);
+
+        /**
+         * @var Personalization
+         */
+        $personalization = $personalization[0];
+        $tos             = $personalization->getTos();
+        $to              = $tos[0];
+        $toExpected      = new Email('Name 1', 'info1@example.com');
+        $this->assertEquals($toExpected, $to);
     }
 
     public function testPersonalization()
