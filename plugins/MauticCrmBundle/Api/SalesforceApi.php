@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 
@@ -15,7 +16,9 @@ class SalesforceApi extends CrmApi
     protected $requestSettings = [
         'encode_parameters' => 'json',
     ];
-    protected $apiRequestCounter = 0;
+    protected $apiRequestCounter   = 0;
+    protected $requestCounter      = 1;
+    protected $maxLockRetries      = 3;
 
     public function __construct(CrmAbstractIntegration $integration)
     {
@@ -30,7 +33,7 @@ class SalesforceApi extends CrmApi
      * @param        $operation
      * @param array  $elementData
      * @param string $method
-     * @param bool   $retry
+     * @param bool   $isRetry
      * @param null   $object
      * @param null   $queryUrl
      *
@@ -38,7 +41,7 @@ class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function request($operation, $elementData = [], $method = 'GET', $retry = false, $object = null, $queryUrl = null)
+    public function request($operation, $elementData = [], $method = 'GET', $isRetry = false, $object = null, $queryUrl = null)
     {
         if (!$object) {
             $object = $this->object;
@@ -59,38 +62,21 @@ class SalesforceApi extends CrmApi
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
         ++$this->apiRequestCounter;
 
-        if (!empty($response['errors'])) {
-            throw new ApiErrorException(implode(', ', $response['errors']));
-        } elseif (is_array($response)) {
-            $errors = [];
-            foreach ($response as $r) {
-                if (is_array($r) && !empty($r['errorCode']) && !empty($r['message'])) {
-                    // Check for expired session then retry if we can refresh
-                    if ($r['errorCode'] == 'INVALID_SESSION_ID' && !$retry) {
-                        $refreshError = $this->integration->authCallback(['use_refresh_token' => true]);
-
-                        if (empty($refreshError)) {
-                            return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
-                        } else {
-                            $errors[] = $refreshError;
-                        }
-                    }
-                    $errors[] = $r['message'];
-                }
-            }
-
-            if (!empty($errors)) {
-                throw new ApiErrorException(implode(', ', $errors));
-            }
+        try {
+            $this->analyzeResponse($response, $isRetry);
+        } catch (RetryRequestException $exception) {
+            return $this->request($operation, $elementData, $method, true, $object, $queryUrl);
         }
 
         return $response;
     }
 
     /**
-     * @param null|string $object
+     * @param null $object
      *
-     * @return mixed
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getLeadFields($object = null)
     {
@@ -105,6 +91,8 @@ class SalesforceApi extends CrmApi
      * @param array $data
      *
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function getPerson(array $data)
     {
@@ -147,6 +135,8 @@ class SalesforceApi extends CrmApi
      * @param array $data
      *
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function getCompany(array $data)
     {
@@ -186,11 +176,11 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * Creates Salesforce lead.
-     *
      * @param array $data
      *
-     * @return mixed
+     * @return array|mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function createLead(array $data)
     {
@@ -208,6 +198,8 @@ class SalesforceApi extends CrmApi
      * @param       $sfObject
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function createObject(array $data, $sfObject)
     {
@@ -227,7 +219,9 @@ class SalesforceApi extends CrmApi
      * @param       $sfObject
      * @param       $sfObjectId
      *
-     * @return array
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function updateObject(array $data, $sfObject, $sfObjectId)
     {
@@ -244,6 +238,8 @@ class SalesforceApi extends CrmApi
      * @param array $data
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function syncMauticToSalesforce(array $data)
     {
@@ -256,9 +252,11 @@ class SalesforceApi extends CrmApi
      * @param array $activity
      * @param       $object
      *
-     * @return array|mixed|string
+     * @return array
+     *
+     * @throws ApiErrorException
      */
-    public function createLeadActivity(array $activity, $object, $filters = [])
+    public function createLeadActivity(array $activity, $object)
     {
         $config              = $this->integration->getIntegrationSettings()->getFeatureSettings();
         $namespace           = (!empty($config['namespace'])) ? $config['namespace'].'__' : '';
@@ -316,10 +314,12 @@ class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param array  $query
-     * @param string $object
+     * @param $query
+     * @param $object
      *
-     * @return mixed
+     * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getLeads($query, $object)
     {
@@ -359,7 +359,9 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @return mixed
+     * @return bool|mixed
+     *
+     * @throws ApiErrorException
      */
     public function getOrganizationCreatedDate()
     {
@@ -377,6 +379,8 @@ class SalesforceApi extends CrmApi
 
     /**
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getCampaigns()
     {
@@ -392,6 +396,8 @@ class SalesforceApi extends CrmApi
      * @param $campaignId
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getCampaignMembers($campaignId)
     {
@@ -404,9 +410,11 @@ class SalesforceApi extends CrmApi
     /**
      * @param       $campaignId
      * @param       $object
-     * @param array $personIds
+     * @param array $people
      *
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function checkCampaignMembership($campaignId, $object, array $people)
     {
@@ -431,6 +439,8 @@ class SalesforceApi extends CrmApi
      * @param $campaignId
      *
      * @return mixed|string
+     *
+     * @throws ApiErrorException
      */
     public function getCampaignMemberStatus($campaignId)
     {
@@ -451,5 +461,93 @@ class SalesforceApi extends CrmApi
         $this->apiRequestCounter = 0;
 
         return $count;
+    }
+
+    /**
+     * @param mixed $response
+     * @param bool  $isRetry
+     *
+     * @throws ApiErrorException
+     * @throws RetryRequestException
+     */
+    private function analyzeResponse($response, $isRetry)
+    {
+        if (is_array($response)) {
+            if (!empty($response['errors'])) {
+                throw new ApiErrorException(implode(', ', $response['errors']));
+            }
+
+            foreach ($response as $lineItem) {
+                if (is_array($lineItem) && !empty($lineItem['errorCode']) && $error = $this->processError($lineItem, $isRetry)) {
+                    $errors[] = $error;
+                }
+            }
+
+            if (!empty($errors)) {
+                throw new ApiErrorException(implode(', ', $errors));
+            }
+        }
+    }
+
+    /**
+     * @param array $error
+     * @param       $isRetry
+     *
+     * @return string|false
+     *
+     * @throws ApiErrorException
+     * @throws RetryRequestException
+     */
+    private function processError(array $error, $isRetry)
+    {
+        switch ($error['errorCode']) {
+            case 'INVALID_SESSION_ID':
+                $this->revalidateSession($isRetry);
+                break;
+            case 'UNABLE_TO_LOCK_ROW':
+                $this->checkIfLockedRequestShouldBeRetried();
+                break;
+        }
+
+        if (!empty($error['message'])) {
+            return $error['message'];
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $isRetry
+     *
+     * @throws ApiErrorException
+     * @throws RetryRequestException
+     */
+    private function revalidateSession($isRetry)
+    {
+        if (!$isRetry) {
+            throw new RetryRequestException();
+        }
+
+        if ($refreshError = $this->integration->authCallback(['use_refresh_token' => true])) {
+            throw new ApiErrorException($refreshError);
+        }
+    }
+
+    /**
+     * @throws RetryRequestException
+     */
+    private function checkIfLockedRequestShouldBeRetried()
+    {
+        // The record is locked so let's wait a a few seconds and retry
+        if ($this->requestCounter < $this->maxLockRetries) {
+            sleep($this->requestCounter * 3);
+            ++$this->requestCounter;
+
+            throw new RetryRequestException();
+        }
+
+        $this->requestCounter = 1;
+
+        return false;
     }
 }
