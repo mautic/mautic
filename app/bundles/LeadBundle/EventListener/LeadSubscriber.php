@@ -13,6 +13,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -20,6 +21,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
+use Mautic\LeadBundle\Model\LeadModel;
 
 /**
  * Class LeadSubscriber.
@@ -39,15 +41,29 @@ class LeadSubscriber extends CommonSubscriber
     protected $ipLookupHelper;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
+     * @var LeadModel
+     */
+    protected $leadModel;
+
+    /**
      * LeadSubscriber constructor.
      *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
+     * @param IpLookupHelper       $ipLookupHelper
+     * @param AuditLogModel        $auditLogModel
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param LeadModel            $leadModel
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, CoreParametersHelper $coreParametersHelper, LeadModel $leadModel)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->auditLogModel        = $auditLogModel;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->leadModel            = $leadModel;
     }
 
     /**
@@ -64,6 +80,7 @@ class LeadSubscriber extends CommonSubscriber
             LeadEvents::NOTE_POST_SAVE       => ['onNotePostSave', 0],
             LeadEvents::NOTE_POST_DELETE     => ['onNoteDelete', 0],
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
+            LeadEvents::LEAD_IDENTIFIED      => ['onLeadIdentified', 0],
         ];
     }
 
@@ -145,7 +162,21 @@ class LeadSubscriber extends CommonSubscriber
                     $this->dispatcher->dispatch(LeadEvents::LEAD_UTMTAGS_ADD, $utmTagsEvent);
                 }
             }
+            // segments mapping
+            if ($event->isNew()) {
+                $this->leadModel->addToLists($lead, $this->coreParametersHelper->getParameter('segments_mapping_created'));
+            }
         }
+    }
+
+    /**
+     * Segments mapping.
+     *
+     * @param Events\LeadEvent $event
+     */
+    public function onLeadIdentified(Events\LeadEvent $event)
+    {
+        $this->leadModel->addToLists($event->getLead(), $this->coreParametersHelper->getParameter('segments_mapping_identified'));
     }
 
     /**
