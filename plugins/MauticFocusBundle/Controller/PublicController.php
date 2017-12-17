@@ -63,7 +63,7 @@ class PublicController extends CommonController
             if ($focus && $focus->isPublished() && $lead) {
                 $stat = $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $lead);
 
-                if ($this->dispatcher->hasListeners(FocusEvents::FOCUS_ON_OPEN)) {
+                if ($stat && $this->dispatcher->hasListeners(FocusEvents::FOCUS_ON_OPEN)) {
                     $event = new FocusOpenEvent($stat);
                     $this->dispatcher->dispatch(FocusEvents::FOCUS_ON_OPEN, $event);
                     unset($event);

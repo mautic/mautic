@@ -222,10 +222,11 @@ class FocusModel extends FormModel
         $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
         $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
         $focusContent = $tokenEvent->getContent();
-        $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
+        $formContent  = str_replace('</form>', '<input type="hidden" name="mauticform[focusId]" value="'.$focus->getId().'" /></form>', $cached['form']);
+        $focusContent = str_replace('{focus_form}', $formContent, $focusContent, $formReplaced);
         if (!$formReplaced && !empty($cached['form'])) {
             // Form token missing so just append the form
-            $focusContent .= $cached['form'];
+            $focusContent .= $formContent;
         }
 
         $focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.php')->escape($focusContent, 'js');
