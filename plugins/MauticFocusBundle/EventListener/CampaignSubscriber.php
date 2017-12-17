@@ -176,9 +176,11 @@ class CampaignSubscriber extends CommonSubscriber
             $this->trackingHelper->updateSession($values);
 
             return $event->setResult(false);
-        } elseif (!empty($eventDetails['stop'])) {
+        } elseif (!empty($eventDetails['stop']) && !empty($eventDetails['focus']) && $eventDetails['focus']->getId() == $focusId) {
             // Decision return true If we trigger it on open event
             return $event->setResult(true);
+        } else {
+            return $event->setResult(false);
         }
     }
 }
