@@ -80,10 +80,11 @@ class PageSubscriber extends CommonSubscriber
         $lead    = $this->leadModel->getCurrentLead();
         $replace = [];
         if (count($matches[1]) > 0) {
-            foreach ($matches[1] as $key => $field) {
-                $replace[] = $lead->getFieldValue($field);
+            if ($lead) {
+                foreach ($matches[1] as $key => $field) {
+                    $replace[] = $lead->getFieldValue($field);
+                }
             }
-
             $content = str_replace($matches[0], $replace, $content);
             $event->setContent($content);
         }
