@@ -153,7 +153,7 @@ class IndexSchemaHelper
 
         if (count($this->dropIndexes)) {
             foreach ($this->dropIndexes as $index) {
-                $sql[] = $platform->getDropIndexSQL($index);
+                $sql[] = $platform->getDropIndexSQL($index, $this->table);
             }
         }
 
