@@ -1061,7 +1061,6 @@ abstract class AbstractIntegration
                 case 'POST':
                 case 'PUT':
                 case 'PATCH':
-                    var_dump($parameters);
                     $connectorMethod = strtolower($method);
                     $result          = $connector->$connectorMethod($url, $parameters, $headers, $timeout);
                     break;
