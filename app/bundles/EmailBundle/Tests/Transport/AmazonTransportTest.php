@@ -134,7 +134,7 @@ PAYLOAD;
         $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
-        $this->assertEquals('mautic.email.complaint.reason.unknown', $rows[1]['emails']['richard@example.com']);
+        $this->assertEquals($translator->trans('mautic.email.complaint.reason.unknown'), $rows[1]['emails']['richard@example.com']);
     }
 
     /**
@@ -166,6 +166,6 @@ PAYLOAD;
         $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
 
         $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
-        $this->assertEquals('mautic.email.complaint.reason.abuse', $rows[1]['emails']['richard@example.com']);
+        $this->assertEquals($translator->trans('mautic.email.complaint.reason.abuse'), $rows[1]['emails']['richard@example.com']);
     }
 }
