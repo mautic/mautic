@@ -741,9 +741,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             ]
         );
 
-        // @todo map company reference
-        unset($mappedData['company']);
-
         return $mappedData;
     }
 
