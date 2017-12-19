@@ -821,12 +821,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                             sprintf('Name = "%s"', $fields['company']['value']),
                         ],
                     ]);
+
+                    $matched['company'] = ['identifier' => $foundCompanies[0]['identifier']];
                 } catch (ApiErrorException $e) {
                     // No matching companies were found
-                    continue;
                 }
 
-                $matched['company'] = ['identifier' => $foundCompanies[0]['identifier']];
+                continue;
             }
 
             if (isset($leadFields[$integrationKey])) {
