@@ -79,13 +79,13 @@ class FetchLeadsCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
 
-        $translator    = $container->get('translator');
-        $integration   = $input->getOption('integration');
-        $startDate     = $input->getOption('start-date');
-        $endDate       = $input->getOption('end-date');
-        $interval      = $input->getOption('time-interval');
-        $limit         = $input->getOption('limit');
-        $fetchAll      = $input->getOption('fetch-all');
+        $translator      = $container->get('translator');
+        $integration     = $input->getOption('integration');
+        $startDate       = $input->getOption('start-date');
+        $endDate         = $input->getOption('end-date');
+        $interval        = $input->getOption('time-interval');
+        $limit           = $input->getOption('limit');
+        $fetchAll        = $input->getOption('fetch-all');
         $objectsExecuted = null;
 
         if (!$interval) {
@@ -135,7 +135,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                     $output->writeln('<comment>'.$translator->trans('mautic.plugin.command.fetch.leads.starting').'</comment>');
 
                     $updated = $created = $processed = 0;
-                    foreach (array('Lead', 'Contact') as $syncObject) {
+                    foreach (['Lead', 'Contact'] as $syncObject) {
                         foreach ($config['objects'] as $configObject) {
                             // Be agnostic about plurals but enforce uppercase object name
                             // TODO is this the right approach for every CRM integration?
@@ -149,7 +149,7 @@ class FetchLeadsCommand extends ContainerAwareCommand
                                 );
 
                                 $objectList = [];
-                                $results  = $integrationObject->getLeads($params, null, $objectsExecuted, $objectList, $objectName);
+                                $results    = $integrationObject->getLeads($params, null, $objectsExecuted, $objectList, $objectName);
                                 if (is_array($results)) {
                                     list($justUpdated, $justCreated) = $results;
                                     $updated += (int) $justUpdated;
