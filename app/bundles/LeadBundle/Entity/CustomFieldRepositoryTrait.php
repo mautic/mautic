@@ -310,7 +310,7 @@ trait CustomFieldRepositoryTrait
         foreach ($values as $k => $r) {
             if (isset($fields[$k])) {
                 $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
-                
+
                 if (!is_null($r)) {
                     switch ($fields[$k]['type']) {
                         case 'number':
