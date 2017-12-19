@@ -75,7 +75,7 @@ class CampaignSubscriber extends CommonSubscriber
             $headers = !empty($config['headers']['list']) ? $config['headers']['list'] : '';
             $headers = array_flip(AbstractFormFieldHelper::parseList($headers));
             foreach ($headers as $key => $value) {
-                $headers[$key] = urlencode(TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true));
+                $headers[$key] = urldecode(TokenHelper::findLeadTokens($value, $lead->getProfileFields(), true));
             }
             $timeout = $config['timeout'];
 
