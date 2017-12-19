@@ -598,12 +598,12 @@ class ReportSubscriber extends CommonSubscriber
         }
     }
 
-    /** 
-    * Add the Do Not Contact table to the query builder
-    *
-    * @param QueryBuilder $qb
-    */
-    private function addDNCTable(QueryBuilder $qb) 
+    /**
+     * Add the Do Not Contact table to the query builder.
+     *
+     * @param QueryBuilder $qb
+     */
+    private function addDNCTable(QueryBuilder $qb)
     {
         $qb->leftJoin(
                 'e',
