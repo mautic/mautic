@@ -294,6 +294,9 @@ class ImportModel extends FormModel
      */
     public function process(Import $import, Progress $progress, $limit = 0)
     {
+        //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
+        ini_set('auto_detect_line_endings', true);
+
         try {
             $file = new \SplFileObject($import->getFilePath());
         } catch (\Exception $e) {
