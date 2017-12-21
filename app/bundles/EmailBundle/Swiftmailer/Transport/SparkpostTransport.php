@@ -270,7 +270,11 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
 
         if (!empty($message['attachments'])) {
-            $sparkPostMessage['attachments'] = $message['attachments'];
+            foreach ($message['attachments'] as $key => $attachment) {
+                $message['attachments'][$key]['data'] = $attachment['content'];
+                unset($message['attachments'][$key]['content']);
+            }
+            $sparkPostMessage['content']['attachments'] = $message['attachments'];
         }
 
         return $sparkPostMessage;
