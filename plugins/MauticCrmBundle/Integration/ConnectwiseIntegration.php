@@ -132,14 +132,6 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi
-     */
-    public function getApiHelper()
-    {
-        return parent::getApiHelper();
-    }
-
-    /**
      * {@inheritdoc}
      *
      * @return string
