@@ -1340,7 +1340,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId, $settings)
+    public function getCampaignMembers($campaignId, $settings = [])
     {
         $silenceExceptions = true;
         $persistEntities   = $contactList   = $leadList   = $existingLeads   = $existingContacts   = [];
