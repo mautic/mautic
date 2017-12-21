@@ -90,7 +90,7 @@ class ConnectwiseApi extends CrmApi
         }
 
         if ($conditions) {
-            $query['conditions'] = implode(' AND ', $conditions)];
+            $query['conditions'] = implode(' AND ', $conditions);
         }
 
         return $this->request('company/companies', $query);
