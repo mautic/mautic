@@ -21,9 +21,13 @@ use Symfony\Component\Form\FormBuilder;
 
 /**
  * Class ConnectwiseIntegration.
+ *
+ * @method \MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi getApiHelper
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
+    const PAGESIZE = 200;
+
     /**
      * {@inheritdoc}
      *
@@ -475,46 +479,56 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function getRecords($params, $object)
     {
-        //todo data priority
-        $executed            = null;
+        if (!$this->isAuthorized()) {
+            return 0;
+        }
+
+        $page                = 1;
+        $executed            = 0;
         $integrationEntities = [];
         try {
-            if ($this->isAuthorized()) {
-                $data = ($object == 'Contact')
-                    ? $this->getApiHelper()->getContacts($params)
-                    : $this->getApiHelper()->getCompanies(
-                        $params
-                    );
+            while ($records = ($object == 'Contact')
+                ? $this->getApiHelper()->getContacts($params, $page)
+                : $this->getApiHelper()->getCompanies($params, $page)) {
                 $mauticReferenceObject = ($object == 'Contact') ? 'lead' : 'company';
-                if (!empty($data)) {
-                    foreach ($data as $record) {
-                        if (is_array($record)) {
-                            $id            = $record['id'];
-                            $formattedData = $this->amendLeadDataBeforeMauticPopulate($record, $object);
-                            $entity        = ($object == 'Contact')
-                                ? $this->getMauticLead($formattedData)
-                                : $this->getMauticCompany(
-                                    $formattedData,
-                                    'company'
-                                );
-                            if ($entity) {
-                                $integrationEntities[] = $this->saveSyncedData($entity, $object, $mauticReferenceObject, $id);
-                                $this->em->detach($entity);
-                                unset($entity);
-                                ++$executed;
-                            }
+                foreach ($records as $record) {
+                    if (is_array($record)) {
+                        $id            = $record['id'];
+                        $formattedData = $this->amendLeadDataBeforeMauticPopulate($record, $object);
+                        $entity        = ($object == 'Contact')
+                            ? $this->getMauticLead($formattedData)
+                            : $this->getMauticCompany(
+                                $formattedData,
+                                'company'
+                            );
+                        if ($entity) {
+                            $integrationEntities[] = $this->saveSyncedData($entity, $object, $mauticReferenceObject, $id);
+                            $this->em->detach($entity);
+                            unset($entity);
+                            ++$executed;
                         }
                     }
                 }
+
                 if ($integrationEntities) {
                     $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
                     $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
                 }
 
-                return $executed;
+                // No use checking the next page if there are less records than the requested page size
+
+                if (count($records) < self::PAGESIZE) {
+                    break;
+                }
+
+                ++$page;
             }
+
+            return $executed;
         } catch (\Exception $e) {
-            $this->logIntegrationError($e);
+            if (404 !== $e->getCode()) {
+                $this->logIntegrationError($e);
+            }
         }
 
         return $executed;
@@ -604,10 +618,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @param array                          $config
+     * @param array|Lead $lead
+     * @param array      $config
      *
      * @return array|bool
+     *
+     * @throws ApiErrorException
      */
     public function pushLead($lead, $config = [])
     {
@@ -867,6 +883,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @return array
+     *
+     * @throws \Exception
      */
     public function getCampaignChoices()
     {
@@ -889,56 +907,58 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param $campaignId
-     * @param $settings
      *
-     * @throws \Exception
+     * @return bool
      */
-    public function getCampaignMembers($campaignId, $settings)
+    public function getCampaignMembers($campaignId)
     {
-        $silenceExceptions = (isset($settings['silence_exceptions'])) ? $settings['silence_exceptions'] : true;
-
-        $campaignsMembersResults = [];
-        $allCampaignMembers      = [];
-
-        try {
-            $campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId);
-        } catch (\Exception $e) {
-            $this->logIntegrationError($e);
-            if (!$silenceExceptions) {
-                throw $e;
-            }
-        }
-
-        if (empty($campaignsMembersResults)) {
+        if (!$this->isAuthorized()) {
             return false;
         }
 
-        $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
-        $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
+        try {
+            $page = 1;
+            while ($campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId, $page)) {
+                $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
+                $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
+                $contacts             = (array) $this->integrationEntityModel->getSyncedRecords(new IntegrationObject('Contact', 'lead'), $this->getName(), $recordList);
 
-        $contacts = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $recordList);
+                $existingContactsIds = array_column(array_filter(
+                    $contacts,
+                    function ($contact) {
+                        return $contact['internal_entity'] === 'lead';
+                    }
+                ), 'integration_entity_id');
 
-        $existingContactsIds = array_map(
-            function ($contact) {
-                return ($contact['integration_entity'] == 'Contact') ? $contact['integration_entity_id'] : [];
-            },
-            $contacts
-        );
+                $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));
 
-        $contactList = $this->getRecordList($campaignsMembersResults, 'id');
+                if (!empty($contactsToFetch)) {
+                    $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
+                    $params['Ids']         = $listOfContactsToFetch;
 
-        $contactsToFetch = array_diff_key($contactList, $existingContactsIds);
+                    $this->getLeads($params);
+                }
 
-        if (!empty($contactsToFetch)) {
-            $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
-            $params['Ids']         = $listOfContactsToFetch;
+                $saveCampaignMembers = array_merge($existingContactsIds, array_keys($contactsToFetch));
 
-            $this->getLeads($params);
+                $this->saveCampaignMembers($saveCampaignMembers, $campaignMemberObject, $campaignId);
 
-            $allCampaignMembers = array_merge($existingContactsIds, array_keys($contactsToFetch));
+                if (count($campaignsMembersResults) < self::PAGESIZE) {
+                    // No use continuing as we have less results than page size
+                    break;
+                }
+
+                ++$page;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            if (404 !== $e->getCode()) {
+                $this->logIntegrationError($e);
+            }
         }
 
-        $this->saveCampaignMembers($allCampaignMembers, $campaignMemberObject, $campaignId);
+        return false;
     }
 
     /**
@@ -957,14 +977,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
         $contacts = $this->integrationEntityModel->getSyncedRecords($mauticObject, $this->getName(), $recordList);
         //first find existing campaign members.
-        foreach ($contacts as $campaignMember) {
-            $existingCampaignMember = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $campaignMember['internal_entity_id']);
+        foreach ($contacts as $contact) {
+            $existingCampaignMember = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $campaignId, $contact['internal_entity_id']);
             if (empty($existingCampaignMember)) {
                 $persistEntities[] = $this->createIntegrationEntity(
                     $campaignMemberObject->getType(),
                     $campaignId,
                     $campaignMemberObject->getInternalType(),
-                    $campaignMember['internal_entity_id'],
+                    $contact['internal_entity_id'],
                     [],
                     false
                 );
@@ -988,9 +1008,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         $recordList = [];
 
         foreach ($records as $i => $record) {
-            if ($index and isset($record[$index])) {
+            if ($index && isset($record[$index])) {
                 $record = $record[$index];
             }
+
             $recordList[$record] = [
                 'id' => $record,
             ];
@@ -1001,12 +1022,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function getActivityTypes()
     {
-        $params       = [];
         $activities   = [];
-        $cwActivities = $this->getApiHelper()->getActivityTypes($params);
+        $cwActivities = $this->getApiHelper()->getActivityTypes();
 
         foreach ($cwActivities as $cwActivity) {
             if (isset($cwActivity['id'])) {
@@ -1019,12 +1041,13 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @return array
+     *
+     * @throws ApiErrorException
      */
     public function getMembers()
     {
-        $params    = [];
         $members   = [];
-        $cwMembers = $this->getApiHelper()->getMembers($params);
+        $cwMembers = $this->getApiHelper()->getMembers();
         foreach ($cwMembers as $cwMember) {
             if (isset($cwMember['id'])) {
                 $members[$cwMember['id']] = $cwMember['identifier'];
@@ -1040,6 +1063,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param $leadId
      *
      * @return IntegrationEntity|null
+     *
+     * @throws ApiErrorException
      */
     public function createActivity($config, $cwContactId, $leadId)
     {
@@ -1053,15 +1078,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $activities = $this->getApiHelper()->postActivity($activity);
 
             if (isset($activities['id'])) {
-                $integrationEntity = new IntegrationEntity();
-                $integrationEntity->setDateAdded(new \DateTime());
-                $integrationEntity->setIntegration($this->getName());
-                $integrationEntity->setIntegrationEntity('Activities');
-                $integrationEntity->setIntegrationEntityId($activities['id']);
-                $integrationEntity->setInternalEntity('lead');
-                $integrationEntity->setInternalEntityId($leadId);
-
-                return $integrationEntity;
+                return $this->createIntegrationEntity('Activities', $activities['id'], 'lead', $leadId, null, false);
             }
         }
 

@@ -307,15 +307,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id') && $fieldInfo['name'] != 'IsDeleted')
                                         || !isset($fieldInfo['name'])
                                         || (in_array(
-                                            $fieldInfo['type'],
-                                            ['reference']
-                                        ) && $fieldInfo['name'] != 'AccountId')
+                                                $fieldInfo['type'],
+                                                ['reference']
+                                            ) && $fieldInfo['name'] != 'AccountId')
                                     ) {
                                         continue;
                                     }
                                     switch ($fieldInfo['type']) {
                                         case 'boolean': $type = 'boolean';
-                                                        break;
+                                            break;
                                         case 'datetime': $type = 'datetime';
                                             break;
                                         case 'date': $type = 'date';
@@ -1340,7 +1340,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId, $settings)
+    public function getCampaignMembers($campaignId, $settings = [])
     {
         $silenceExceptions = true;
         $persistEntities   = $contactList   = $leadList   = $existingLeads   = $existingContacts   = [];
