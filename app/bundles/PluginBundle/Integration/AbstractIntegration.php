@@ -993,7 +993,7 @@ abstract class AbstractIntegration
         // Check for custom content-type header
         if (!empty($settings['content_type'])) {
             $settings['encoding_headers_set'] = true;
-            $headers[]                        = "Content-type: {$settings['content_type']}";
+            $headers[]                        = "Content-Type: {$settings['content_type']}";
         }
 
         if ($method !== 'GET') {

@@ -83,9 +83,14 @@ class ConnectwiseApi extends CrmApi
             'page'     => $page,
             'pageSize' => ConnectwiseIntegration::PAGESIZE,
         ];
+        $conditions = isset($params['conditions']) ? $params['conditions'] : [];
 
         if (isset($params['start'])) {
-            $query['conditions'] = 'lastUpdated > ['.$params['start'].']';
+            $conditions[] = 'lastUpdated > ['.$params['start'].']';
+        }
+
+        if ($conditions) {
+            $query['conditions'] = implode(' AND ', $conditions);
         }
 
         return $this->request('company/companies', $query);
