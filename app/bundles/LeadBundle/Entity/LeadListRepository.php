@@ -588,24 +588,24 @@ class LeadListRepository extends CommonRepository
      * @param QueryBuilder|null $parameterQ
      * @param null              $listId
      * @param bool              $isNot
+     * @param string            $leadTablePrefix
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|mixed
      */
-    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $isNot = false)
+    protected function generateSegmentExpression(array $filters, array &$parameters, QueryBuilder $q, QueryBuilder $parameterQ = null, $listId = null, $isNot = false, $leadTablePrefix = 'l')
     {
         if (null === $parameterQ) {
             $parameterQ = $q;
         }
 
-        $objectFilters          = $this->arrangeFilters($filters);
-        $this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0;
-
+        $objectFilters                     = $this->arrangeFilters($filters);
         $this->listFiltersInnerJoinCompany = false;
-        $expr                              = $this->getListFilterExpr($filters, $parameters, $q, $isNot, null, 'lead', $listId);
 
-        if ($this->hasCompanyFilter) {
-            $this->applyCompanyFieldFilters($q);
+        if ($this->hasCompanyFilter = isset($objectFilters['company']) && count($objectFilters['company']) > 0) {
+            $this->applyCompanyFieldFilters($q, $leadTablePrefix);
         }
+
+        $expr = $this->getListFilterExpr($filters, $parameters, $q, $isNot, null, 'lead', $listId);
 
         $paramType = null;
         foreach ($parameters as $k => $v) {
@@ -1435,7 +1435,7 @@ class LeadListRepository extends CommonRepository
 
                                 // Build a "live" query based on current filters to catch those that have not been processed yet
                                 $subQb      = $this->createFilterExpressionSubQuery('leads', $alias, null, null, $parameters, $leadId);
-                                $filterExpr = $this->generateSegmentExpression($listFilters, $parameters, $subQb, null, $id);
+                                $filterExpr = $this->generateSegmentExpression($listFilters, $parameters, $subQb, null, $id, false, $alias);
 
                                 // Left join membership to account for manually added and removed
                                 $membershipAlias = $this->generateRandomParameterName();
@@ -2047,13 +2047,14 @@ class LeadListRepository extends CommonRepository
      * If there is a negate comparison such as not equal, empty, isNotLike or isNotIn then contacts without companies should
      * be included but the way the relationship is handled needs to be different to optimize best for a posit vs negate.
      *
-     * @param $q
+     * @param QueryBuilder $q
+     * @param string       $leadTablePrefix
      */
-    private function applyCompanyFieldFilters($q)
+    private function applyCompanyFieldFilters(QueryBuilder $q, $leadTablePrefix = 'l')
     {
         $joinType = ($this->listFiltersInnerJoinCompany) ? 'join' : 'leftJoin';
         // Join company tables for query optimization
-        $q->$joinType('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'l.id = cl.lead_id')
+        $q->$joinType($leadTablePrefix, MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', "$leadTablePrefix.id = cl.lead_id")
             ->$joinType(
                 'cl',
                 MAUTIC_TABLE_PREFIX.'companies',
@@ -2062,6 +2063,6 @@ class LeadListRepository extends CommonRepository
             );
 
         // Return only unique contacts
-        $q->groupBy('l.id');
+        $q->groupBy("$leadTablePrefix.id");
     }
 }
