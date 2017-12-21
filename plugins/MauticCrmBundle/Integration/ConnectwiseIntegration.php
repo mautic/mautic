@@ -803,7 +803,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 }
             }
 
-            if ($integrationKey === 'company' && isset($fields['company']) && !empty($fields['company']['value'])) {
+            if ($integrationKey === 'company' && !empty($fields['company']['value'])) {
                 try {
                     $foundCompanies = $this->getApiHelper()->getCompanies([
                         'conditions' => [
