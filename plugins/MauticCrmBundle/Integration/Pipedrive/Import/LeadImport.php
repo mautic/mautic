@@ -61,7 +61,7 @@ class LeadImport extends AbstractImport
             return $this->create($data);
         }
 
-        /** @var $lead Lead **/
+        /** @var Lead $lead **/
         $lead         = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
         $data         = $this->convertPipedriveData($data);
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
