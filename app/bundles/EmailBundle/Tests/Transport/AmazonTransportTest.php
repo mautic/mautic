@@ -160,10 +160,7 @@ PAYLOAD;
         $jsonPayload = json_decode($payload, true);
 
         $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
-        $rows      = $transport->processJsonPayload($jsonPayload);
-
-        $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
-        $this->assertEquals($this->translator->trans('mautic.email.complaint.reason.unknown'), $rows[1]['emails']['richard@example.com']);
+        $transport->processJsonPayload($jsonPayload);
     }
 
     /**
@@ -197,9 +194,6 @@ PAYLOAD;
         $jsonPayload = json_decode($payload, true);
 
         $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
-        $rows      = $transport->processJsonPayload($jsonPayload);
-
-        $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
-        $this->assertEquals($this->translator->trans('mautic.email.complaint.reason.abuse'), $rows[1]['emails']['richard@example.com']);
+        $transport->processJsonPayload($jsonPayload);
     }
 }
