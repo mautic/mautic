@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadImport extends AbstractImport
@@ -62,7 +61,7 @@ class LeadImport extends AbstractImport
             return $this->create($data);
         }
 
-        /** @var $lead LeadModel */
+        /** @var $lead \Mautic\LeadBundle\Entity\Lead **/
         $lead         = $this->em->getRepository(Lead::class)->findOneById($integrationEntity->getInternalEntityId());
         $data         = $this->convertPipedriveData($data);
         $dataToUpdate = $this->getIntegration()->populateMauticLeadData($data);
