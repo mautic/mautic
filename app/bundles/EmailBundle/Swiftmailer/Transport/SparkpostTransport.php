@@ -328,38 +328,24 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 continue;
             }
 
-            // Process events sent from Mautic
-            if (!isset($event['rcpt_meta']['hashId'])) {
-                continue;
-            }
-
             if (isset($event['rcpt_type']) && 'to' !== $event['rcpt_type']) {
                 // Ignore cc/bcc
 
                 continue;
             }
 
-            $hashId = $event['rcpt_meta']['hashId'];
-
-            switch ($event['type']) {
-                case 'bounce':
-                    // Only parse hard bounces - https://support.sparkpost.com/customer/portal/articles/1929896-bounce-classification-codes
-                    if (in_array((int) $event['bounce_class'], [10, 30, 50, 51, 52, 53, 54, 90])) {
-                        $this->transportCallback->addFailureByHashId($hashId, $event['raw_reason']);
-                    }
-                    break;
-                case 'spam_complaint':
-                    $this->transportCallback->addFailureByHashId($hashId, $event['fbtype'], DoNotContact::UNSUBSCRIBED);
-                    break;
-                case 'out_of_band':
-                case 'policy_rejection':
-                    $this->transportCallback->addFailureByHashId($hashId, $event['raw_reason']);
-                    break;
-                case 'list_unsubscribe':
-                case 'link_unsubscribe':
-                    $this->transportCallback->addFailureByHashId($hashId, 'unsubscribed', DoNotContact::UNSUBSCRIBED);
-                    break;
+            if ('bounce' === $event['type'] && !in_array((int) $event['bounce_class'], [10, 30, 50, 51, 52, 53, 54, 90])) {
+                // Only parse hard bounces - https://support.sparkpost.com/customer/portal/articles/1929896-bounce-classification-codes
+                continue;
             }
+
+            if (isset($event['rcpt_meta']['hashId']) && $hashId = $event['rcpt_meta']['hashId']) {
+                $this->processCallbackByHashId($hashId, $event);
+
+                continue;
+            }
+
+            $this->processCallbackByEmailAddress($event['rcpt_to'], $event);
         }
     }
 
@@ -369,7 +355,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
      * @param array $message
      * @param array $response
      */
-    protected function processImmediateSendFeedback(array $message, array $response)
+    private function processImmediateSendFeedback(array $message, array $response)
     {
         if (!empty($response['errors'][0]['code']) && 1902 == (int) $response['errors'][0]['code']) {
             $comments     = $response['errors'][0]['description'];
@@ -380,6 +366,54 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $emailId = (!empty($metadata[$emailAddress]['emailId'])) ? $metadata[$emailAddress]['emailId'] : null;
                 $this->transportCallback->addFailureByContactId($metadata[$emailAddress]['leadId'], $comments, DoNotContact::BOUNCED, $emailId);
             }
+        }
+    }
+
+    /**
+     * @param       $hashId
+     * @param array $event
+     */
+    private function processCallbackByHashId($hashId, array $event)
+    {
+        switch ($event['type']) {
+            case 'bounce':
+                $this->transportCallback->addFailureByHashId($hashId, $event['raw_reason']);
+                break;
+            case 'spam_complaint':
+                $this->transportCallback->addFailureByHashId($hashId, $event['fbtype'], DoNotContact::UNSUBSCRIBED);
+                break;
+            case 'out_of_band':
+            case 'policy_rejection':
+                $this->transportCallback->addFailureByHashId($hashId, $event['raw_reason']);
+                break;
+            case 'list_unsubscribe':
+            case 'link_unsubscribe':
+                $this->transportCallback->addFailureByHashId($hashId, 'unsubscribed', DoNotContact::UNSUBSCRIBED);
+                break;
+        }
+    }
+
+    /**
+     * @param       $email
+     * @param array $event
+     */
+    private function processCallbackByEmailAddress($email, array $event)
+    {
+        switch ($event['type']) {
+            case 'bounce':
+                $this->transportCallback->addFailureByAddress($email, $event['raw_reason']);
+                break;
+            case 'spam_complaint':
+                $this->transportCallback->addFailureByAddress($email, $event['fbtype'], DoNotContact::UNSUBSCRIBED);
+                break;
+            case 'out_of_band':
+            case 'policy_rejection':
+                $this->transportCallback->addFailureByAddress($email, $event['raw_reason']);
+                break;
+            case 'list_unsubscribe':
+            case 'link_unsubscribe':
+                $this->transportCallback->addFailureByAddress($email, 'unsubscribed', DoNotContact::UNSUBSCRIBED);
+                break;
         }
     }
 }

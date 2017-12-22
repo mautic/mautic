@@ -108,33 +108,30 @@ class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransport
         }
 
         foreach ($events as $event) {
-            if (in_array($event['event'], [
-                'bounce',
-                'blocked',
-                'spam',
-                'unsub',
-            ])) {
-                if ($event['event'] === 'bounce' || $event['event'] === 'blocked') {
-                    $reason = $event['error_related_to'].' : '.$event['error'];
-                    $type   = DoNotContact::BOUNCED;
-                } elseif ($event['event'] === 'spam') {
-                    $reason = 'User reported email as spam, source :'.$event['source'];
-                    $type   = DoNotContact::BOUNCED;
-                } elseif ($event['event'] === 'unsub') {
-                    $reason = 'User unsubscribed';
-                    $type   = DoNotContact::UNSUBSCRIBED;
-                } else {
-                    continue;
-                }
+            if (!in_array($event['event'], ['bounce', 'blocked', 'spam', 'unsub'])) {
+                continue;
+            }
 
-                if (isset($event['CustomID']) && $event['CustomID'] !== '' && strpos($event['CustomID'], '-', 0) !== false) {
-                    list($leadIdHash, $leadEmail) = explode('-', $event['CustomID']);
-                    if ($event['email'] == $leadEmail) {
-                        $this->transportCallback->addFailureByHashId($leadIdHash, $reason, $type);
-                    }
-                } else {
-                    $this->transportCallback->addFailureByAddress($event['email'], $reason, $type);
+            if ($event['event'] === 'bounce' || $event['event'] === 'blocked') {
+                $reason = $event['error_related_to'].': '.$event['error'];
+                $type   = DoNotContact::BOUNCED;
+            } elseif ($event['event'] === 'spam') {
+                $reason = 'User reported email as spam, source: '.$event['source'];
+                $type   = DoNotContact::UNSUBSCRIBED;
+            } elseif ($event['event'] === 'unsub') {
+                $reason = 'User unsubscribed';
+                $type   = DoNotContact::UNSUBSCRIBED;
+            } else {
+                continue;
+            }
+
+            if (isset($event['CustomID']) && $event['CustomID'] !== '' && strpos($event['CustomID'], '-', 0) !== false) {
+                list($leadIdHash, $leadEmail) = explode('-', $event['CustomID']);
+                if ($event['email'] == $leadEmail) {
+                    $this->transportCallback->addFailureByHashId($leadIdHash, $reason, $type);
                 }
+            } else {
+                $this->transportCallback->addFailureByAddress($event['email'], $reason, $type);
             }
         }
     }

@@ -426,8 +426,8 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
 
         if (is_array($mandrillEvents)) {
             foreach ($mandrillEvents as $event) {
-                $isBounce      = in_array($event['event'], ['hard_bounce', 'soft_bounce', 'reject', 'spam', 'invalid']);
-                $isUnsubscribe = ('unsub' === $event['event']);
+                $isBounce      = in_array($event['event'], ['hard_bounce', 'reject']);
+                $isUnsubscribe = in_array($event['event'], ['spam', 'unsub']);
                 if ($isBounce || $isUnsubscribe) {
                     $type = ($isBounce) ? DoNotContact::BOUNCED : DoNotContact::UNSUBSCRIBED;
 
