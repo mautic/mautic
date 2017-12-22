@@ -108,14 +108,14 @@ class ChannelSubscriptionChange extends Event
      */
     private function getDncReasonVerb($reason)
     {
-        switch ($reason) {
-            case DoNotContact::IS_CONTACTABLE:
+        // use true matching or else 'foobar' == DoNotContact::IS_CONTACTABLE
+        switch (true) {
+            case DoNotContact::IS_CONTACTABLE === $reason:
                 return 'contactable';
-            case DoNotContact::BOUNCED:
+            case DoNotContact::BOUNCED === $reason:
                 return 'bounced';
-            case DoNotContact::MANUAL:
+            case DoNotContact::MANUAL === $reason:
                 return 'manual';
-            case DoNotContact::UNSUBSCRIBED:
             default:
                 return 'unsubscribed';
         }

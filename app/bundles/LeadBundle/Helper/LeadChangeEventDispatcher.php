@@ -84,7 +84,7 @@ class LeadChangeEventDispatcher
             return;
         }
 
-        if ((int) $this->changes['points'][1] <= 0) {
+        if ((int) $this->changes['points'][0] <= 0 && (int) $this->changes['points'][1] <= 0) {
             return;
         }
 

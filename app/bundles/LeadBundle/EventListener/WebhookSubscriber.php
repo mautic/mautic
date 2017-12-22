@@ -182,7 +182,10 @@ class WebhookSubscriber extends CommonSubscriber
                 'new_status' => $event->getNewStatusVerb(),
             ],
             [
-                'leadList',
+                'leadDetails',
+                'userList',
+                'publishDetails',
+                'ipAddress',
             ]
         );
     }
