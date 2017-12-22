@@ -31,7 +31,7 @@ trait LeadDetailsTrait
     protected function getAllEngagements(array $leads, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
         $session = $this->get('session');
-
+        
         if (null == $filters) {
             $filters = $session->get(
                 'mautic.plugin.timeline.filters',
