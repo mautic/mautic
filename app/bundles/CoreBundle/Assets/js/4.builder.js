@@ -130,7 +130,6 @@ Mautic.launchBuilder = function (formName, actionName) {
         // If Froala popup window open
         if(mQuery.find('.fr-popup:visible').length){
             if(!Mautic.isInViewport(builderPanel.find('.fr-view:visible'))) {
-                console.log(builderPanel.find('.fr-view:visible'));
                 builderPanel.find('.fr-view:visible').blur();
                 builderPanel.find('input:focus').blur();
             }
