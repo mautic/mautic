@@ -94,7 +94,7 @@ Mautic.launchBuilder = function (formName, actionName) {
         });
     }
 
-    var builderPanel = mQuery('.builder-panel');
+        var builderPanel = mQuery('.builder-panel');
     var builderContent = mQuery('.builder-content');
     var btnCloseBuilder = mQuery('.btn-close-builder');
     var applyBtn = mQuery('.btn-apply-builder');
@@ -127,7 +127,17 @@ Mautic.launchBuilder = function (formName, actionName) {
 
     // Blur and focus the focussed inputs to fix the browser autocomplete bug on scroll
     builderPanel.on('scroll', function(e) {
-        builderPanel.find('input:focus').blur();
+        // If Froala popup window open
+        if(mQuery.find('.fr-popup:visible').length){
+            if(!Mautic.isInViewport(builderPanel.find('.fr-view:visible'))) {
+                console.log(builderPanel.find('.fr-view:visible'));
+                builderPanel.find('.fr-view:visible').blur();
+                builderPanel.find('input:focus').blur();
+            }
+        }else{
+            builderPanel.find('input:focus').blur();
+
+        }
     });
 
     var overlay = mQuery('<div id="builder-overlay" class="modal-backdrop fade in"><div style="position: absolute; top:' + spinnerTop + 'px; left:' + spinnerLeft + 'px" class="builder-spinner"><i class="fa fa-spinner fa-spin fa-5x"></i></div></div>').css(builderCss).appendTo('.builder-content');
@@ -141,6 +151,16 @@ Mautic.launchBuilder = function (formName, actionName) {
     themeHtml = themeHtml.replace('</head>', assets+'</head>');
 
     Mautic.initBuilderIframe(themeHtml, btnCloseBuilder, applyBtn);
+};
+
+Mautic.isInViewport = function(el) {
+    var elementTop = mQuery(el).offset().top;
+    var elementBottom = elementTop + mQuery(el).outerHeight();
+
+    var viewportTop = mQuery(window).scrollTop();
+    var viewportBottom = viewportTop + mQuery(window).height();
+
+    return elementBottom > viewportTop && elementTop < viewportBottom;
 };
 
 /**
