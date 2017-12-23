@@ -94,7 +94,7 @@ Mautic.launchBuilder = function (formName, actionName) {
         });
     }
 
-        var builderPanel = mQuery('.builder-panel');
+    var builderPanel = mQuery('.builder-panel');
     var builderContent = mQuery('.builder-content');
     var btnCloseBuilder = mQuery('.btn-close-builder');
     var applyBtn = mQuery('.btn-apply-builder');
