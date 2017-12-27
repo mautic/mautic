@@ -13,6 +13,7 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 /**
@@ -139,7 +140,7 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 
         $message = [
             'html'    => $this->message->getBody(),
-            'text'    => MailHelper::getPlainTextFromMessage($this->message),
+            'text'    => PlainTextMassageHelper::getPlainTextFromMessage($this->message),
             'subject' => $this->message->getSubject(),
             'from'    => [
                 'name'  => $fromName,
