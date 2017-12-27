@@ -37,6 +37,8 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 
     /**
      * @var MauticFactory
+     *
+     * @deprecated 2.13.0 to be removed in 3.0; register transport as a service and pass dependencies
      */
     protected $factory;
 
@@ -261,6 +263,8 @@ abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 
     /**
      * @param MauticFactory $factory
+     *
+     * @deprecated 2.13.0 to be removed in 3.0; register transport as a service and pass dependencies
      */
     public function setMauticFactory(MauticFactory $factory)
     {

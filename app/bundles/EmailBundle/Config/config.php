@@ -322,6 +322,9 @@ return [
                 'arguments'    => [
                     '%mautic.mailer_amazon_region%',
                     'mautic.http.connector',
+                    'monolog.logger.mautic',
+                    'translator',
+                    'mautic.email.model.transport_callback',
                 ],
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
@@ -331,19 +334,20 @@ return [
             'mautic.transport.mandrill' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => [
+                    'translator',
+                    'mautic.email.model.transport_callback',
+                ],
                 'methodCalls'  => [
                     'setUsername'      => ['%mautic.mailer_user%'],
                     'setPassword'      => ['%mautic.mailer_api_key%'],
-                    'setMauticFactory' => ['mautic.factory'],
                 ],
             ],
             'mautic.transport.mailjet' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MailjetTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
-                    '',
-                    '',
-                    '',
+                    'mautic.email.model.transport_callback',
                     '%mautic.mailer_mailjet_sandbox%',
                     '%mautic.mailer_mailjet_sandbox_default_mail%',
                 ],
@@ -362,6 +366,11 @@ return [
             ],
             'mautic.transport.elasticemail' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\ElasticemailTransport',
+                'arguments'    => [
+                    'translator',
+                    'monolog.logger.mautic',
+                    'mautic.email.model.transport_callback',
+                ],
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
                     'setUsername' => ['%mautic.mailer_user%'],
@@ -382,9 +391,7 @@ return [
                 'arguments'    => [
                     '%mautic.mailer_api_key%',
                     'translator',
-                ],
-                'methodCalls' => [
-                    'setMauticFactory' => ['mautic.factory'],
+                    'mautic.email.model.transport_callback',
                 ],
             ],
             'mautic.helper.mailbox' => [
@@ -471,6 +478,14 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.email.fetcher' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
+                'arguments' => [
+                    'mautic.helper.mailbox',
+                    'event_dispatcher',
+                    'translator',
+                ],
+            ],
         ],
         'models' => [
             'mautic.email.model.email' => [
@@ -503,12 +518,12 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.email.fetcher' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
+            'mautic.email.model.transport_callback' => [
+                'class'     => \Mautic\EmailBundle\Model\TransportCallback::class,
                 'arguments' => [
-                    'mautic.helper.mailbox',
-                    'event_dispatcher',
-                    'translator',
+                    'mautic.lead.model.dnc',
+                    'mautic.message.search.contact',
+                    'mautic.email.repository.stat',
                 ],
             ],
         ],

@@ -12,21 +12,42 @@
 namespace Mautic\EmailBundle\Tests\Transport;
 
 use Joomla\Http\Http;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\Swiftmailer\Transport\AmazonTransport;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Monolog\Logger;
 
 /**
  * Class AmazonTransportTest.
  */
-class AmazonTransportTest extends KernelTestCase
+class AmazonTransportTest extends \PHPUnit_Framework_TestCase
 {
-    private $container;
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * @var Translator
+     */
+    private $translator;
 
     public function setUp()
     {
-        self::bootKernel();
+        $this->logger = $this->getMockBuilder(Logger::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->container = self::$kernel->getContainer();
+        $this->translator = $this->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translator->method('trans')
+            ->willReturnCallback(
+                function ($key) {
+                    return $key;
+                }
+            );
     }
 
     /**
@@ -34,8 +55,9 @@ class AmazonTransportTest extends KernelTestCase
      */
     public function testConfirmationCallbackSuccessfull()
     {
-        $logger     = $this->container->get('logger');
-        $translator = $this->container->get('translator');
+        $transportCallback = $this->getMockBuilder(TransportCallback::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         // Mock http connector
         $mockHttp = $this->getMockBuilder('Joomla\Http\Http')
@@ -43,7 +65,7 @@ class AmazonTransportTest extends KernelTestCase
             ->getMock();
 
         // Mock a successful response
-        $mockResponse = $this->getMockBuilder('Joomla\Http\Response')
+        $mockResponse       = $this->getMockBuilder('Joomla\Http\Response')
             ->getMock();
         $mockResponse->code = 200;
 
@@ -69,8 +91,8 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', $mockHttp);
-        $transport->processJsonPayload($jsonPayload, $logger, $translator);
+        $transport = new AmazonTransport('localhost', $mockHttp, $this->logger, $this->translator, $transportCallback);
+        $transport->processJsonPayload($jsonPayload);
     }
 
     /**
@@ -78,8 +100,13 @@ PAYLOAD;
      */
     public function testSingleBounceCallbackSuccessfull()
     {
-        $logger     = $this->container->get('logger');
-        $translator = $this->container->get('translator');
+        $transportCallback = $this->getMockBuilder(TransportCallback::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $transportCallback->expects($this->once())
+            ->method('addFailureByAddress')
+            ->with($this->equalTo('nope@nope.com'), $this->equalTo('smtp; 550 5.1.1 <nope@nope.com>: Recipient address rejected: User unknown in virtual alias table'), $this->equalTo(2));
 
         // payload which is sent by Amazon SES
         $payload = <<<PAYLOAD
@@ -98,11 +125,8 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http());
-        $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
-
-        $this->assertArrayHasKey('nope@nope.com', $rows[2]['emails']);
-        $this->assertContains('Recipient address rejected', $rows[2]['emails']['nope@nope.com']);
+        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport->processJsonPayload($jsonPayload);
     }
 
     /**
@@ -110,8 +134,13 @@ PAYLOAD;
      */
     public function testSingleComplaintWithoutFeedbackCallbackSuccessfull()
     {
-        $logger     = $this->container->get('logger');
-        $translator = $this->container->get('translator');
+        $transportCallback = $this->getMockBuilder(TransportCallback::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $transportCallback->expects($this->once())
+            ->method('addFailureByAddress')
+            ->with($this->equalTo('richard@example.com'), $this->equalTo('mautic.email.complaint.reason.unknown'), $this->equalTo(1));
 
         // payload which is sent by Amazon SES
         $payload = <<<PAYLOAD
@@ -130,11 +159,8 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http());
-        $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
-
-        $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
-        $this->assertEquals($translator->trans('mautic.email.complaint.reason.unknown'), $rows[1]['emails']['richard@example.com']);
+        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport->processJsonPayload($jsonPayload);
     }
 
     /**
@@ -142,8 +168,13 @@ PAYLOAD;
      */
     public function testSingleComplaintWithFeedbackCallbackSuccessfull()
     {
-        $logger     = $this->container->get('logger');
-        $translator = $this->container->get('translator');
+        $transportCallback = $this->getMockBuilder(TransportCallback::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $transportCallback->expects($this->once())
+            ->method('addFailureByAddress')
+            ->with($this->equalTo('richard@example.com'), $this->equalTo('mautic.email.complaint.reason.abuse'), $this->equalTo(1));
 
         // payload which is sent by Amazon SES
         $payload = <<<PAYLOAD
@@ -162,10 +193,7 @@ PAYLOAD;
 
         $jsonPayload = json_decode($payload, true);
 
-        $transport = new AmazonTransport('localhost', new Http());
-        $rows      = $transport->processJsonPayload($jsonPayload, $logger, $translator);
-
-        $this->assertArrayHasKey('richard@example.com', $rows[1]['emails']);
-        $this->assertEquals($translator->trans('mautic.email.complaint.reason.abuse'), $rows[1]['emails']['richard@example.com']);
+        $transport = new AmazonTransport('localhost', new Http(), $this->logger, $this->translator, $transportCallback);
+        $transport->processJsonPayload($jsonPayload);
     }
 }
