@@ -265,7 +265,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                     //6.x/community
 
                                     foreach ($fields['module_fields'] as $fieldInfo) {
-                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'bool', 'link', 'relate'])
+                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'link', 'relate'])
                                         ||
                                         ($fieldInfo['type'] == 'id' && $fieldInfo['name'] == 'id')
                                         )) {
