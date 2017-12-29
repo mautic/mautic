@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
+use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 
@@ -47,16 +48,15 @@ class SalesforceApi extends CrmApi
             $object = $this->object;
         }
 
-        $requestUrl = (!$queryUrl) ? sprintf($this->integration->getApiUrl().'/%s/%s', $object, $operation) : sprintf($queryUrl.'/%s', $operation);
+        $requestUrl = RequestUrl::get($this->integration->getApiUrl(), $queryUrl, $operation, $object);
+
         $settings   = $this->requestSettings;
         if ($method == 'PATCH') {
             $settings['headers'] = ['Sforce-Auto-Assign' => 'FALSE'];
         }
 
-        if (isset($queryUrl)) {
-            // Query commands can have long wait time while SF builds response as the offset increases
-            $settings['request_timeout'] = 300;
-        }
+        // Query commands can have long wait time while SF builds response as the offset increases
+        $settings['request_timeout'] = 300;
 
         // Wrap in a isAuthorized to refresh token if applicable
         $response = $this->integration->makeRequest($requestUrl, $elementData, $method, $settings);
@@ -314,8 +314,8 @@ class SalesforceApi extends CrmApi
     /**
      * Get Salesforce leads.
      *
-     * @param $query
-     * @param $object
+     * @param mixed  $query  String for a SOQL query or array to build query
+     * @param string $object
      *
      * @return mixed|string
      *
@@ -323,21 +323,25 @@ class SalesforceApi extends CrmApi
      */
     public function getLeads($query, $object)
     {
+        $queryUrl = $this->integration->getQueryUrl();
+
+        if (!is_array($query)) {
+            return $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
+        }
+
+        if (!empty($query['nextUrl'])) {
+            $queryType = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
+
+            return $this->request('query'.$queryType, [], 'GET', false, null, $queryUrl);
+        }
+
         $organizationCreatedDate = $this->getOrganizationCreatedDate();
-        $queryUrl                = $this->integration->getQueryUrl();
-        $ignoreConvertedLeads    = '';
-        if (isset($query['start'])) {
+        $fields                  = $this->integration->getFieldsForQuery($object);
+        if (!empty($fields) && isset($query['start'])) {
             if (strtotime($query['start']) < strtotime($organizationCreatedDate)) {
                 $query['start'] = date('c', strtotime($organizationCreatedDate.' +1 hour'));
             }
-        }
 
-        $fields = $this->integration->getFieldsForQuery($object);
-
-        if (!empty($query['nextUrl'])) {
-            $query  = str_replace('/services/data/v34.0/query', '', $query['nextUrl']);
-            $result = $this->request('query'.$query, [], 'GET', false, null, $queryUrl);
-        } elseif (!empty($fields) and isset($query['start'])) {
             $fields[] = 'Id';
             $fields   = implode(', ', array_unique($fields));
 
@@ -345,17 +349,19 @@ class SalesforceApi extends CrmApi
             if (isset($config['updateOwner']) && isset($config['updateOwner'][0]) && $config['updateOwner'][0] == 'updateOwner') {
                 $fields = 'Owner.Name, Owner.Email, '.$fields;
             }
-            if ($object == 'Lead') {
-                $ignoreConvertedLeads = ' and ConvertedContactId = NULL';
-            }
 
-            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end'].$ignoreConvertedLeads;
-            $result        = $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
-        } else {
-            $result = $this->request('queryAll', ['q' => $query], 'GET', false, null, $queryUrl);
+            $ignoreConvertedLeads = ($object == 'Lead') ? ' and ConvertedContactId = NULL' : '';
+
+            $getLeadsQuery = 'SELECT '.$fields.' from '.$object.' where LastModifiedDate>='.$query['start'].' and LastModifiedDate<='.$query['end']
+                .$ignoreConvertedLeads;
+
+            return $this->request('queryAll', ['q' => $getLeadsQuery], 'GET', false, null, $queryUrl);
         }
 
-        return $result;
+        return [
+            'totalSize' => 0,
+            'records'   => [],
+        ];
     }
 
     /**
@@ -393,18 +399,36 @@ class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param $campaignId
+     * @param      $campaignId
+     * @param null $modifiedSince
+     * @param null $queryUrl
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function getCampaignMembers($campaignId)
+    public function getCampaignMembers($campaignId, $modifiedSince = null, $queryUrl = null)
     {
-        $campaignMembersQuery = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
-        $result               = $this->request('query', ['q' => $campaignMembersQuery], 'GET', false, null, $this->integration->getQueryUrl());
+        $defaultSettings = $this->requestSettings;
 
-        return $result;
+        // Control batch size to prevent URL too long errors when fetching contact details via SOQL and to control Doctrine RAM usage for
+        // Mautic IntegrationEntity objects
+        $this->requestSettings['headers']['Sforce-Query-Options'] = 'batchSize=200';
+
+        if (null === $queryUrl) {
+            $queryUrl = $this->integration->getQueryUrl().'/query';
+        }
+
+        $query = "Select CampaignId, ContactId, LeadId, isDeleted from CampaignMember where CampaignId = '".trim($campaignId)."'";
+        if ($modifiedSince) {
+            $query .= ' and LastModifiedDate >= '.$modifiedSince;
+        }
+
+        $results = $this->request(null, ['q' => $query], 'GET', false, null, $queryUrl);
+
+        $this->requestSettings = $defaultSettings;
+
+        return $results;
     }
 
     /**

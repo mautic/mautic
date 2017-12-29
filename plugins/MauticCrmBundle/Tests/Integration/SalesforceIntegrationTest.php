@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\MauticCrmBundle\Tests;
+namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -123,6 +123,11 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      * @var int
      */
     protected $leadsCreatedCounter = 0;
+
+    public function setUp()
+    {
+        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+    }
 
     /**
      * Reset.
@@ -440,7 +445,7 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $sf->getCampaignMembers(1, []);
+        $sf->getCampaignMembers(1);
     }
 
     public function testGetCampaignMemberStatus()
@@ -1119,9 +1124,15 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
                                 if (isset($args[1]['q']) && strpos($args[0], 'from CampaignMember') !== false) {
                                     return [];
                                 } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Campaign') !== false) {
-                                    return 'fetched campaigns';
+                                    return [
+                                        'totalSize' => 0,
+                                        'records'   => [],
+                                    ];
                                 } elseif (isset($args[1]['q']) && strpos($args[1]['q'], 'from Account') !== false) {
-                                    return 'fetched accounts';
+                                    return [
+                                        'totalSize' => 0,
+                                        'records'   => [],
+                                    ];
                                 } elseif (isset($args[1]['q']) && $args[1]['q'] === 'SELECT CreatedDate from Organization') {
                                     return [
                                         'records' => [
