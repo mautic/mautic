@@ -28,8 +28,12 @@ class ListModelFunctionalTest extends MauticWebTestCase
         $segmentTestIncludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-include-segment-manual-members');
         $segmentTestExcludeMembershipManualMembersRef       = $this->fixtures->getReference('segment-test-exclude-segment-manual-members');
         $segmentTestExcludeMembershipWithoutOtherFiltersRef = $this->fixtures->getReference('segment-test-exclude-segment-without-other-filters');
-        $segmentTestIncludeWithUnrelatedManualRemovalRef    = $this->fixtures->getReference('segment-test-include-segment-with-unrelated-segment-manual-removal');
+        $segmentTestIncludeWithUnrelatedManualRemovalRef    = $this->fixtures->getReference(
+            'segment-test-include-segment-with-unrelated-segment-manual-removal'
+        );
         $segmentMembershipRegex                             = $this->fixtures->getReference('segment-membership-regexp');
+        $segmentCompanyFields                               = $this->fixtures->getReference('segment-company-only-fields');
+        $segmentMembershipCompanyOnlyFields                 = $this->fixtures->getReference('segment-including-segment-with-company-only-fields');
 
         // These expect filters to be part of the $lists passed to getLeadsByList so pass the entity
         $segmentContacts = $repo->getLeadsByList(
@@ -54,6 +58,8 @@ class ListModelFunctionalTest extends MauticWebTestCase
                 $segmentTestExcludeMembershipWithoutOtherFiltersRef,
                 $segmentTestIncludeWithUnrelatedManualRemovalRef,
                 $segmentMembershipRegex,
+                $segmentCompanyFields,
+                $segmentMembershipCompanyOnlyFields,
             ],
             ['countOnly' => true]
         );
@@ -176,6 +182,18 @@ class ListModelFunctionalTest extends MauticWebTestCase
             11,
             $segmentContacts[$segmentMembershipRegex->getId()]['count'],
             'There should be 11 contacts that match the regex with dayrep.com in it'
+        );
+
+        $this->assertEquals(
+            6,
+            $segmentContacts[$segmentCompanyFields->getId()]['count'],
+            'There should only be 6 in this segment (6 contacts belong to HostGator based in Houston)'
+        );
+
+        $this->assertEquals(
+            14,
+            $segmentContacts[$segmentMembershipCompanyOnlyFields->getId()]['count'],
+            'There should be 14 in this segment.'
         );
     }
 

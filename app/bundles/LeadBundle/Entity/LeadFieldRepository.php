@@ -206,6 +206,21 @@ class LeadFieldRepository extends CommonRepository
                         )
                     );
                 } else {
+                    switch ($operatorExpr) {
+                        case 'startsWith':
+                            $operatorExpr    = 'like';
+                            $value           = $value.'%';
+                            break;
+                        case 'endsWith':
+                            $operatorExpr   = 'like';
+                            $value          = '%'.$value;
+                            break;
+                        case 'contains':
+                            $operatorExpr   = 'like';
+                            $value          = '%'.$value.'%';
+                            break;
+                    }
+
                     $expr->add(
                         $q->expr()->$operatorExpr('l.'.$field, ':value')
                     );

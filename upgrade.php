@@ -387,11 +387,12 @@ function fetch_updates()
 
         // Fetch the package
         try {
-            download_package($update->package);
+            download_package($update);
         } catch (\Exception $e) {
             return [
                 false,
-                "Could not automatically download the package. Please download {$update->package}, place it in the same directory as this upgrade script, and try again.",
+                "Could not automatically download the package. Please download {$update->package}, place it in the same directory as this upgrade script, and try again. ".
+                "When moving the file, name it `{$update->version}-update.zip`",
             ];
         }
 
@@ -402,22 +403,23 @@ function fetch_updates()
 }
 
 /**
- * @param $package
+ * @param object $update
  *
  * @throws Exception
+ *
+ * @return bool
  */
-function download_package($package)
+function download_package($update)
 {
-    if (file_exists(__DIR__.'/'.basename($package))) {
+    $packageName = $update->version.'-update.zip';
+    $target      = __DIR__.'/'.$packageName;
+
+    if (file_exists($target)) {
         return true;
     }
 
-    $data = make_request($package);
+    $data = make_request($update->package);
 
-    // Set the filesystem target
-    $target = __DIR__.'/'.basename($package);
-
-    // Write the response to the filesystem
     if (!file_put_contents($target, $data)) {
         throw new \Exception();
     }
@@ -828,7 +830,6 @@ function move_mautic_core(array $status)
 
     foreach ($fileOnlyDirectories as $dir) {
         if (copy_files($dir, $errorLog)) {
-
             // At this point, we can remove the config directory
             $deleteDir = recursive_remove_directory(MAUTIC_UPGRADE_ROOT.$dir);
 

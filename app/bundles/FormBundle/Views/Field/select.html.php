@@ -38,15 +38,32 @@ endif;
 
 $options = (!empty($emptyOption)) ? [$emptyOption] : [];
 
-foreach ($list as $listValue => $listLabel):
-$selected  = ($listValue === $field['defaultValue']) ? ' selected="selected"' : '';
-$options[] = <<<HTML
+$optionBuilder = function (array $list) use (&$optionBuilder, $field, $view) {
+    $html = '';
+    foreach ($list as $listValue => $listLabel):
+        if (is_array($listLabel)) {
+            // This is an option group
+            $html .= <<<HTML
 
+                    <optgroup label="$listValue">
+                    {$optionBuilder($listLabel)}
+                    </optgroup>
+
+HTML;
+
+            continue;
+        }
+
+    $selected  = ($listValue === $field['defaultValue']) ? ' selected="selected"' : '';
+    $html .= <<<HTML
                     <option value="{$view->escape($listValue)}"{$selected}>{$view->escape($listLabel)}</option>
 HTML;
-endforeach;
+    endforeach;
 
-$optionsHtml = implode('', $options);
+    return $html;
+};
+
+$optionsHtml = $optionBuilder($list);
 $html        = <<<HTML
 
             <div $containerAttr>{$label}{$help}

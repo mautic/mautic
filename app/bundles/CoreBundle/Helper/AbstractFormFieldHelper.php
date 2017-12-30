@@ -109,7 +109,6 @@ abstract class AbstractFormFieldHelper
         // for BC purposes
         $checkNumericalKeys = true;
         if (!is_array($list)) {
-
             // Try to json decode first
             if (strpos($list, '{') === 0 && $json = json_decode($list, true)) {
                 $list = $json;

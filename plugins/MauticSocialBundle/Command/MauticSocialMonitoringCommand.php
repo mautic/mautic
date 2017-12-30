@@ -48,12 +48,7 @@ class MauticSocialMonitoringCommand extends ContainerAwareCommand
     {
         $this->setName('mautic:social:monitoring')
             ->setDescription('Looks at the records of monitors and iterates through them. ')
-            ->setHelp(
-                <<<'EOT'
-                I'm not sure what to put here yet
-EOT
-            )
-            ->addOption('mid', null, InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
+            ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
             ->addOption(
                 'batch-size',
                 null,

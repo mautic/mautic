@@ -31,13 +31,13 @@ class StatsApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($table = null, $itemsName = 'stats', $order = [], $where = [])
+    public function listAction($table = null, $itemsName = 'stats', $order = [], $where = [], $start = 0, $limit = 100)
     {
         $response = [];
         $where    = InputHelper::cleanArray(empty($where) ? $this->request->query->get('where', []) : $where);
         $order    = InputHelper::cleanArray(empty($order) ? $this->request->query->get('order', []) : $order);
-        $start    = (int) $this->request->query->get('start', 0);
-        $limit    = (int) $this->request->query->get('limit', 100);
+        $start    = (int) $this->request->query->get('start', $start);
+        $limit    = (int) $this->request->query->get('limit', $limit);
 
         // Ensure internal flag is not spoofed
         $this->sanitizeWhereClauseArrayFromRequest($where);

@@ -13,12 +13,13 @@ namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\PlainTextMassageHelper;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 
 /**
  * Class AbstractTokenArrayTransport.
  */
-abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
+abstract class AbstractTokenArrayTransport implements TokenTransportInterface
 {
     /**
      * @var \Swift_Message
@@ -37,6 +38,8 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 
     /**
      * @var MauticFactory
+     *
+     * @deprecated 2.13.0 to be removed in 3.0; register transport as a service and pass dependencies
      */
     protected $factory;
 
@@ -137,7 +140,7 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 
         $message = [
             'html'    => $this->message->getBody(),
-            'text'    => MailHelper::getPlainTextFromMessage($this->message),
+            'text'    => PlainTextMassageHelper::getPlainTextFromMessage($this->message),
             'subject' => $this->message->getSubject(),
             'from'    => [
                 'name'  => $fromName,
@@ -261,6 +264,8 @@ abstract class AbstractTokenArrayTransport implements InterfaceTokenTransport
 
     /**
      * @param MauticFactory $factory
+     *
+     * @deprecated 2.13.0 to be removed in 3.0; register transport as a service and pass dependencies
      */
     public function setMauticFactory(MauticFactory $factory)
     {

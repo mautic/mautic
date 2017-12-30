@@ -36,6 +36,7 @@ class LeadSubscriber extends CommonSubscriber
     {
         $this->pluginModel = $pluginModel;
     }
+
     /**
      * @return array
      */

@@ -11,7 +11,6 @@
 
 namespace Mautic\ReportBundle\Form\Type;
 
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
