@@ -96,9 +96,9 @@ if (!isset($isAjax)) {
             ?>
         </div>
 
-        <input type="hidden" name="mauticform[formId]" id="mauticform<?php echo $formName ?>_id" value="<?php echo $form->getId(); ?>"/>
+        <input type="hidden" name="mauticform[formId]" id="mauticform<?php echo $formName ?>_id" value="<?php echo $view->escape($form->getId()); ?>"/>
         <input type="hidden" name="mauticform[return]" id="mauticform<?php echo $formName ?>_return" value=""/>
-        <input type="hidden" name="mauticform[formName]" id="mauticform<?php echo $formName ?>_name" value="<?php echo ltrim($formName, '_'); ?>"/>
+        <input type="hidden" name="mauticform[formName]" id="mauticform<?php echo $formName ?>_name" value="<?php echo $view->escape(ltrim($formName, '_')); ?>"/>
 
         <?php echo (isset($formExtra)) ? $formExtra : ''; ?>
 </form>

@@ -29,7 +29,7 @@ $last_username = InputHelper::clean($last_username);
         <span class="input-group-addon"><i class="fa fa-user"></i></span>
         <label for="username" class="sr-only"><?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?></label>
         <input type="text" id="username" name="_username"
-               class="form-control input-lg" value="<?php echo $last_username ?>" required autofocus
+               class="form-control input-lg" value="<?php echo $view->escape($last_username) ?>" required autofocus
                placeholder="<?php echo $view['translator']->trans('mautic.user.auth.form.loginusername'); ?>" />
     </div>
     <div class="input-group mb-md">
@@ -48,7 +48,7 @@ $last_username = InputHelper::clean($last_username);
         </label>
     </div>
 
-    <input type="hidden" name="_csrf_token" value="<?php echo $view['form']->csrfToken('authenticate') ?>" />
+    <input type="hidden" name="_csrf_token" value="<?php echo $view->escape($view['form']->csrfToken('authenticate')) ?>" />
     <button class="btn btn-lg btn-primary btn-block" type="submit"><?php echo $view['translator']->trans('mautic.user.auth.form.loginbtn'); ?></button>
 
     <div class="mt-sm text-right">

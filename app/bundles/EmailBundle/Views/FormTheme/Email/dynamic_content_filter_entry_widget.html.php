@@ -47,7 +47,7 @@
                                     $callback  = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
                                     $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
                                     ?>
-                                    <option value="<?php echo $value; ?>" data-mautic="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators='<?php echo $operators; ?>' class="segment-filter fa <?php echo $icon; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
+                                    <option value="<?php echo $view->escape($value); ?>" data-mautic="available_<?php echo $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators='<?php echo $operators; ?>' class="segment-filter fa <?php echo $icon; ?>"><?php echo $view['translator']->trans($params['label']); ?></option>
                                 <?php endforeach; ?>
                             </optgroup>
                         <?php endforeach; ?>
