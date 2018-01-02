@@ -13,8 +13,10 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\ToBcBccFieldsTrait;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\EmailListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,13 +38,20 @@ class SubmitActionEmailType extends AbstractType
     private $translator;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * SubmitActionEmailType constructor.
      *
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface  $translator
+     * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper)
     {
-        $this->translator = $translator;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -89,6 +98,29 @@ class SubmitActionEmailType extends AbstractType
                 'data'       => $message,
             ]
         );
+
+        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
+            $default = (isset($options['data']['immediately'])) ? $options['data']['immediately'] : false;
+            $builder->add(
+                'immediately',
+                YesNoButtonGroupType::class,
+                [
+                    'label' => 'mautic.form.action.sendemail.immediately',
+                    'data'  => $default,
+                    'attr'  => [
+                        'tooltip'    => 'mautic.form.action.sendemail.immediately.desc',
+                    ],
+                ]
+            );
+        } else {
+            $builder->add(
+                'immediately',
+                HiddenType::class,
+                [
+                    'data'  => false,
+                ]
+            );
+        }
 
         $default = (isset($options['data']['copy_lead'])) ? $options['data']['copy_lead'] : true;
         $builder->add(

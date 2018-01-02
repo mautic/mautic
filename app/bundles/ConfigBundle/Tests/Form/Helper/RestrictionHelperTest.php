@@ -22,6 +22,7 @@ use Mautic\EmailBundle\EventListener\ProcessBounceSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredEmailType;
 use Mautic\EmailBundle\Form\Type\ConfigMonitoredMailboxesType;
+use Mautic\EmailBundle\Model\TransportType;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
@@ -266,6 +267,9 @@ class RestrictionHelperTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($unsubscriber, $looper));
+        $transportType = $this->getMockBuilder(TransportType::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
@@ -282,7 +286,7 @@ class RestrictionHelperTest extends TypeTestCase
                     new NumberType(),
                     new FormButtonsType(),
                     new ButtonGroupType(),
-                    new \Mautic\EmailBundle\Form\Type\ConfigType($translator),
+                    new \Mautic\EmailBundle\Form\Type\ConfigType($translator, $transportType),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($imapHelper),
                     new ConfigType($restrictionHelper),

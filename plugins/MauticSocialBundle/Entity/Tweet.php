@@ -12,6 +12,7 @@
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
@@ -137,7 +138,7 @@ class Tweet extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('tweets')
-            ->setCustomRepositoryClass('MauticPlugin\MauticSocialBundle\Entity\TweetRepository')
+            ->setCustomRepositoryClass(TweetRepository::class)
             ->addIndex(['text'], 'tweet_text_index')
             ->addIndex(['sent_count'], 'sent_count_index')
             ->addIndex(['favorite_count'], 'favorite_count_index')
@@ -145,39 +146,13 @@ class Tweet extends FormEntity
 
         $builder->addIdColumns();
         $builder->addCategory();
-
-        $builder->createField('mediaId', 'string')
-            ->columnName('media_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('mediaPath', 'string')
-            ->columnName('media_path')
-            ->nullable()
-            ->build();
-
-        $builder->createField('text', 'string')
-            ->build();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('favoriteCount', 'integer')
-            ->columnName('favorite_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retweetCount', 'integer')
-            ->columnName('retweet_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('language', 'string')
-            ->columnName('lang')
-            ->nullable()
-            ->build();
+        $builder->addNullableField('mediaId', Type::STRING, 'media_id');
+        $builder->addNullableField('mediaPath', Type::STRING, 'media_path');
+        $builder->addField('text', Type::STRING);
+        $builder->addNullableField('sentCount', Type::INTEGER, 'sent_count');
+        $builder->addNullableField('favoriteCount', Type::INTEGER, 'favorite_count');
+        $builder->addNullableField('retweetCount', Type::INTEGER, 'retweet_count');
+        $builder->addNullableField('language', Type::STRING, 'lang');
 
         $builder->createManyToOne('page', Page::class)
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
@@ -260,6 +235,7 @@ class Tweet extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -280,6 +256,7 @@ class Tweet extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;

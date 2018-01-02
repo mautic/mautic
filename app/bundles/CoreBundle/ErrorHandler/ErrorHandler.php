@@ -126,6 +126,11 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public static function getHandler()
         {
+            if (!self::$handler) {
+                // Handler has not been created so likely coming in through browser-kit client for tests
+                self::register('prod');
+            }
+
             return self::$handler;
         }
 

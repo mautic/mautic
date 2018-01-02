@@ -77,6 +77,7 @@ return [
             'mautic_mailer_transport_callback' => [
                 'path'       => '/mailer/{transport}/callback',
                 'controller' => 'MauticEmailBundle:Public:mailerCallback',
+                'method'     => ['GET', 'POST'],
             ],
             'mautic_email_preview' => [
                 'path'       => '/email/preview/{objectId}',
@@ -289,8 +290,11 @@ return [
                 'alias' => 'batch_send',
             ],
             'mautic.form.type.emailconfig' => [
-                'class'     => 'Mautic\EmailBundle\Form\Type\ConfigType',
-                'arguments' => ['translator'],
+                'class'     => \Mautic\EmailBundle\Form\Type\ConfigType::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.email.transport_type',
+                ],
                 'alias'     => 'emailconfig',
             ],
             'mautic.form.type.coreconfig_monitored_mailboxes' => [
@@ -322,6 +326,9 @@ return [
                 'arguments'    => [
                     '%mautic.mailer_amazon_region%',
                     'mautic.http.connector',
+                    'monolog.logger.mautic',
+                    'translator',
+                    'mautic.email.model.transport_callback',
                 ],
                 'methodCalls' => [
                     'setUsername' => ['%mautic.mailer_user%'],
@@ -331,19 +338,20 @@ return [
             'mautic.transport.mandrill' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MandrillTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => [
+                    'translator',
+                    'mautic.email.model.transport_callback',
+                ],
                 'methodCalls'  => [
                     'setUsername'      => ['%mautic.mailer_user%'],
                     'setPassword'      => ['%mautic.mailer_api_key%'],
-                    'setMauticFactory' => ['mautic.factory'],
                 ],
             ],
             'mautic.transport.mailjet' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\MailjetTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'arguments'    => [
-                    '',
-                    '',
-                    '',
+                    'mautic.email.model.transport_callback',
                     '%mautic.mailer_mailjet_sandbox%',
                     '%mautic.mailer_mailjet_sandbox_default_mail%',
                 ],
@@ -360,8 +368,77 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
+            'mautic.transport.sendgrid_api' => [
+                'class'        => \Mautic\EmailBundle\Swiftmailer\Transport\SendgridApiTransport::class,
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => [
+                    'mautic.transport.sendgrid_api.facade',
+                    'mautic.transport.sendgrid_api.calback',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.facade' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiFacade::class,
+                'arguments' => [
+                    'mautic.transport.sendgrid_api.sendgrid_wrapper',
+                    'mautic.transport.sendgrid_api.message',
+                    'mautic.transport.sendgrid_api.response',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.mail.base' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailBase::class,
+                'arguments' => [
+                    'mautic.helper.plain_text_message',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.mail.personalization' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailPersonalization::class,
+            ],
+            'mautic.transport.sendgrid_api.mail.metadata' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailMetadata::class,
+            ],
+            'mautic.transport.sendgrid_api.mail.attachment' => [
+                'class' => \Mautic\EmailBundle\Swiftmailer\SendGrid\Mail\SendGridMailAttachment::class,
+            ],
+            'mautic.transport.sendgrid_api.message' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiMessage::class,
+                'arguments' => [
+                    'mautic.transport.sendgrid_api.mail.base',
+                    'mautic.transport.sendgrid_api.mail.personalization',
+                    'mautic.transport.sendgrid_api.mail.metadata',
+                    'mautic.transport.sendgrid_api.mail.attachment',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.response' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridApiResponse::class,
+                'arguments' => [
+                    'monolog.logger.mautic',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.sendgrid_wrapper' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\SendGridWrapper::class,
+                'arguments' => [
+                    'mautic.transport.sendgrid_api.sendgrid',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.sendgrid' => [
+                'class'     => \SendGrid::class,
+                'arguments' => [
+                    '%mautic.mailer_api_key%',
+                ],
+            ],
+            'mautic.transport.sendgrid_api.calback' => [
+                'class'     => \Mautic\EmailBundle\Swiftmailer\SendGrid\Callback\SendGridApiCallback::class,
+                'arguments' => [
+                    'mautic.email.model.transport_callback',
+                ],
+            ],
             'mautic.transport.elasticemail' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\ElasticemailTransport',
+                'arguments'    => [
+                    'translator',
+                    'monolog.logger.mautic',
+                    'mautic.email.model.transport_callback',
+                ],
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
                 'methodCalls'  => [
                     'setUsername' => ['%mautic.mailer_user%'],
@@ -382,9 +459,7 @@ return [
                 'arguments'    => [
                     '%mautic.mailer_api_key%',
                     'translator',
-                ],
-                'methodCalls' => [
-                    'setMauticFactory' => ['mautic.factory'],
+                    'mautic.email.model.transport_callback',
                 ],
             ],
             'mautic.helper.mailbox' => [
@@ -458,17 +533,28 @@ return [
                 ],
             ],
             'mautic.helper.mailer' => [
-                'class'     => 'Mautic\EmailBundle\Helper\MailHelper',
+                'class'     => \Mautic\EmailBundle\Helper\MailHelper::class,
                 'arguments' => [
                     'mautic.factory',
                     'mailer',
                 ],
+            ],
+            'mautic.helper.plain_text_message' => [
+                'class'     => \Mautic\EmailBundle\Helper\PlainTextMassageHelper::class,
             ],
             'mautic.validator.email' => [
                 'class'     => \Mautic\EmailBundle\Helper\EmailValidator::class,
                 'arguments' => [
                     'translator',
                     'event_dispatcher',
+                ],
+            ],
+            'mautic.email.fetcher' => [
+                'class'     => \Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
+                'arguments' => [
+                    'mautic.helper.mailbox',
+                    'event_dispatcher',
+                    'translator',
                 ],
             ],
         ],
@@ -503,13 +589,17 @@ return [
                     'translator',
                 ],
             ],
-            'mautic.email.fetcher' => [
-                'class'     => \Mautic\EmailBundle\MonitoredEmail\Fetcher::class,
+            'mautic.email.model.transport_callback' => [
+                'class'     => \Mautic\EmailBundle\Model\TransportCallback::class,
                 'arguments' => [
-                    'mautic.helper.mailbox',
-                    'event_dispatcher',
-                    'translator',
+                    'mautic.lead.model.dnc',
+                    'mautic.message.search.contact',
+                    'mautic.email.repository.stat',
                 ],
+            ],
+            'mautic.email.transport_type' => [
+                'class'     => \Mautic\EmailBundle\Model\TransportType::class,
+                'arguments' => [],
             ],
         ],
         'commands' => [

@@ -27,7 +27,6 @@ $view['slots']->set(
                     $permissions['lead:lists:editother'],
                     $list->getCreatedBy()
                 ),
-                'clone'  => $permissions['lead:lists:editother'],
                 'delete' => $view['security']->hasEntityAccess(
                     $permissions['lead:lists:deleteother'],
                     $permissions['lead:lists:editother'],

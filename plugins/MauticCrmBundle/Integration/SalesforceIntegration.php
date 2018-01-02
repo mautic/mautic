@@ -307,15 +307,15 @@ class SalesforceIntegration extends CrmAbstractIntegration
                                     if ((!$fieldInfo['updateable'] && (!$fieldInfo['calculated'] && $fieldInfo['name'] != 'Id') && $fieldInfo['name'] != 'IsDeleted')
                                         || !isset($fieldInfo['name'])
                                         || (in_array(
-                                            $fieldInfo['type'],
-                                            ['reference']
-                                        ) && $fieldInfo['name'] != 'AccountId')
+                                                $fieldInfo['type'],
+                                                ['reference']
+                                            ) && $fieldInfo['name'] != 'AccountId')
                                     ) {
                                         continue;
                                     }
                                     switch ($fieldInfo['type']) {
                                         case 'boolean': $type = 'boolean';
-                                                        break;
+                                            break;
                                         case 'datetime': $type = 'datetime';
                                             break;
                                         case 'date': $type = 'date';
@@ -958,7 +958,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
     public function pushLeadActivity($params = [])
     {
         $executed = null;
-        $filters  = [];
 
         $query  = $this->getFetchQuery($params);
         $config = $this->mergeConfigToFeatureSettings([]);
@@ -971,6 +970,9 @@ class SalesforceIntegration extends CrmAbstractIntegration
             $salesForceObjects = $config['objects'];
         }
 
+        // Ensure that Contact is attempted before Lead
+        sort($salesForceObjects);
+
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $startDate             = new \DateTime($query['start']);
@@ -978,6 +980,10 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $limit                 = 100;
 
         foreach ($salesForceObjects as $object) {
+            if (!in_array($object, ['Contact', 'Lead'])) {
+                continue;
+            }
+
             try {
                 if ($this->isAuthorized()) {
                     // Get first batch
@@ -1340,7 +1346,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @throws \Exception
      */
-    public function getCampaignMembers($campaignId, $settings)
+    public function getCampaignMembers($campaignId, $settings = [])
     {
         $silenceExceptions = true;
         $persistEntities   = $contactList   = $leadList   = $existingLeads   = $existingContacts   = [];
