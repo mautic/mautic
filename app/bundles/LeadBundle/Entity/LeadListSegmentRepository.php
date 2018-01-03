@@ -12,22 +12,12 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Types\DateType;
-use Doctrine\DBAL\Types\FloatType;
-use Doctrine\DBAL\Types\IntegerType;
-use Doctrine\DBAL\Types\TimeType;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter;
-use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
-use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\LeadSegmentFilters;
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadListSegmentRepository
 {
@@ -37,17 +27,9 @@ class LeadListSegmentRepository
     private $entityManager;
 
     /**
-     * @var OperatorOptions
-     */
-    private $operatorOptions;
-
-    /**
      * @var EventDispatcherInterface
      */
     private $dispatcher;
-
-    /** @var TranslatorInterface */
-    private $translator;
 
     /**
      * @var bool
@@ -65,14 +47,10 @@ class LeadListSegmentRepository
 
     public function __construct(
         EntityManager $entityManager,
-        OperatorOptions $operatorOptions,
-        EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator
+        EventDispatcherInterface $dispatcher
     ) {
-        $this->entityManager   = $entityManager;
-        $this->operatorOptions = $operatorOptions;
-        $this->dispatcher      = $dispatcher;
-        $this->translator      = $translator;
+        $this->entityManager = $entityManager;
+        $this->dispatcher    = $dispatcher;
     }
 
     public function getNewLeadsByListCount($id, LeadSegmentFilters $leadSegmentFilters, array $batchLimiters)
@@ -198,13 +176,6 @@ class LeadListSegmentRepository
         $leadTableSchema    = $schema->listTableColumns(MAUTIC_TABLE_PREFIX.'leads');
         $companyTableSchema = $schema->listTableColumns(MAUTIC_TABLE_PREFIX.'companies');
 
-        $options = $this->operatorOptions->getFilterExpressionFunctionsNonStatic();
-
-        // Add custom filters operators
-        $event = new LeadListFiltersOperatorsEvent($options, $this->translator);
-        $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE, $event);
-        $options = $event->getOperators();
-
         $groups    = [];
         $groupExpr = $q->expr()->andX();
 
@@ -213,7 +184,6 @@ class LeadListSegmentRepository
 
             $column     = false;
             $field      = false;
-            $columnType = false;
 
             $filterField = $leadSegmentFilter->getField();
 
@@ -223,38 +193,6 @@ class LeadListSegmentRepository
             } elseif ($leadSegmentFilter->isCompanyType()) {
                 $column = isset($companyTableSchema[$filterField]) ? $companyTableSchema[$filterField] : false;
                 $field  = "comp.{$filterField}";
-            }
-
-            $operatorDetails = $options[$leadSegmentFilter->getOperator()];
-            $func            = $operatorDetails['expr'];
-
-            if ($column) {
-                // Format the field based on platform specific functions that DBAL doesn't support natively
-                $formatter  = AbstractFormatter::createFormatter($this->entityManager->getConnection());
-                $columnType = $column->getType();
-
-                switch ($leadSegmentFilter->getType()) {
-                    case 'datetime':
-                        if (!$columnType instanceof UTCDateTimeType) {
-                            $field = $formatter->toDateTime($field);
-                        }
-                        break;
-                    case 'date':
-                        if (!$columnType instanceof DateType && !$columnType instanceof UTCDateTimeType) {
-                            $field = $formatter->toDate($field);
-                        }
-                        break;
-                    case 'time':
-                        if (!$columnType instanceof TimeType && !$columnType instanceof UTCDateTimeType) {
-                            $field = $formatter->toTime($field);
-                        }
-                        break;
-                    case 'number':
-                        if (!$columnType instanceof IntegerType && !$columnType instanceof FloatType) {
-                            $field = $formatter->toNumeric($field);
-                        }
-                        break;
-                }
             }
 
             //the next one will determine the group
@@ -270,200 +208,7 @@ class LeadListSegmentRepository
             $exprParameter    = ":$parameter";
             $ignoreAutoFilter = false;
 
-            // Special handling of relative date strings
-            if ($leadSegmentFilter->getType() === 'datetime' || $leadSegmentFilter->getType() === 'date') {
-                $relativeDateStrings = $this->getRelativeDateStrings();
-                // Check if the column type is a date/time stamp
-                $isTimestamp = ($leadSegmentFilter->getType() === 'datetime' || $columnType instanceof UTCDateTimeType);
-                $getDate     = function ($string) use ($isTimestamp, $relativeDateStrings, $leadSegmentFilter, &$func) {
-                    $key             = array_search($string, $relativeDateStrings, true);
-                    $dtHelper        = new DateTimeHelper('midnight today', null, 'local');
-                    $requiresBetween = in_array($func, ['eq', 'neq'], true) && $isTimestamp;
-                    $timeframe       = str_replace('mautic.lead.list.', '', $key);
-                    $modifier        = false;
-                    $isRelative      = true;
-
-                    switch ($timeframe) {
-                        case 'birthday':
-                        case 'anniversary':
-                            $func                = 'like';
-                            $isRelative          = false;
-                            $leadSegmentFilter->setOperator('like');
-                            $leadSegmentFilter->setFilter('%'.date('-m-d'));
-                            break;
-                        case 'today':
-                        case 'tomorrow':
-                        case 'yesterday':
-                            if ($timeframe === 'yesterday') {
-                                $dtHelper->modify('-1 day');
-                            } elseif ($timeframe === 'tomorrow') {
-                                $dtHelper->modify('+1 day');
-                            }
-
-                            // Today = 2015-08-28 00:00:00
-                            if ($requiresBetween) {
-                                // eq:
-                                //  field >= 2015-08-28 00:00:00
-                                //  field < 2015-08-29 00:00:00
-
-                                // neq:
-                                // field < 2015-08-28 00:00:00
-                                // field >= 2015-08-29 00:00:00
-                                $modifier = '+1 day';
-                            } else {
-                                // lt:
-                                //  field < 2015-08-28 00:00:00
-                                // gt:
-                                //  field > 2015-08-28 23:59:59
-
-                                // lte:
-                                //  field <= 2015-08-28 23:59:59
-                                // gte:
-                                //  field >= 2015-08-28 00:00:00
-                                if (in_array($func, ['gt', 'lte'])) {
-                                    $modifier = '+1 day -1 second';
-                                }
-                            }
-                            break;
-                        case 'week_last':
-                        case 'week_next':
-                        case 'week_this':
-                            $interval = str_replace('week_', '', $timeframe);
-                            $dtHelper->setDateTime('midnight monday '.$interval.' week', null);
-
-                            // This week: Monday 2015-08-24 00:00:00
-                            if ($requiresBetween) {
-                                // eq:
-                                //  field >= Mon 2015-08-24 00:00:00
-                                //  field <  Mon 2015-08-31 00:00:00
-
-                                // neq:
-                                // field <  Mon 2015-08-24 00:00:00
-                                // field >= Mon 2015-08-31 00:00:00
-                                $modifier = '+1 week';
-                            } else {
-                                // lt:
-                                //  field < Mon 2015-08-24 00:00:00
-                                // gt:
-                                //  field > Sun 2015-08-30 23:59:59
-
-                                // lte:
-                                //  field <= Sun 2015-08-30 23:59:59
-                                // gte:
-                                //  field >= Mon 2015-08-24 00:00:00
-                                if (in_array($func, ['gt', 'lte'])) {
-                                    $modifier = '+1 week -1 second';
-                                }
-                            }
-                            break;
-
-                        case 'month_last':
-                        case 'month_next':
-                        case 'month_this':
-                            $interval = substr($key, -4);
-                            $dtHelper->setDateTime('midnight first day of '.$interval.' month', null);
-
-                            // This month: 2015-08-01 00:00:00
-                            if ($requiresBetween) {
-                                // eq:
-                                //  field >= 2015-08-01 00:00:00
-                                //  field <  2015-09:01 00:00:00
-
-                                // neq:
-                                // field <  2015-08-01 00:00:00
-                                // field >= 2016-09-01 00:00:00
-                                $modifier = '+1 month';
-                            } else {
-                                // lt:
-                                //  field < 2015-08-01 00:00:00
-                                // gt:
-                                //  field > 2015-08-31 23:59:59
-
-                                // lte:
-                                //  field <= 2015-08-31 23:59:59
-                                // gte:
-                                //  field >= 2015-08-01 00:00:00
-                                if (in_array($func, ['gt', 'lte'])) {
-                                    $modifier = '+1 month -1 second';
-                                }
-                            }
-                            break;
-                        case 'year_last':
-                        case 'year_next':
-                        case 'year_this':
-                            $interval = substr($key, -4);
-                            $dtHelper->setDateTime('midnight first day of '.$interval.' year', null);
-
-                            // This year: 2015-01-01 00:00:00
-                            if ($requiresBetween) {
-                                // eq:
-                                //  field >= 2015-01-01 00:00:00
-                                //  field <  2016-01-01 00:00:00
-
-                                // neq:
-                                // field <  2015-01-01 00:00:00
-                                // field >= 2016-01-01 00:00:00
-                                $modifier = '+1 year';
-                            } else {
-                                // lt:
-                                //  field < 2015-01-01 00:00:00
-                                // gt:
-                                //  field > 2015-12-31 23:59:59
-
-                                // lte:
-                                //  field <= 2015-12-31 23:59:59
-                                // gte:
-                                //  field >= 2015-01-01 00:00:00
-                                if (in_array($func, ['gt', 'lte'])) {
-                                    $modifier = '+1 year -1 second';
-                                }
-                            }
-                            break;
-                        default:
-                            $isRelative = false;
-                            break;
-                    }
-
-                    // check does this match php date params pattern?
-                    if ($timeframe !== 'anniversary' &&
-                        (stristr($string[0], '-') || stristr($string[0], '+'))) {
-                        $date = new \DateTime('now');
-                        $date->modify($string);
-
-                        $dateTime = $date->format('Y-m-d H:i:s');
-                        $dtHelper->setDateTime($dateTime, null);
-
-                        $isRelative = true;
-                    }
-
-                    if ($isRelative) {
-                        if ($requiresBetween) {
-                            $startWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
-
-                            $dtHelper->modify($modifier);
-                            $endWith = ($isTimestamp) ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
-
-                            // Use a between statement
-                            $func              = ($func == 'neq') ? 'notBetween' : 'between';
-                            $leadSegmentFilter->setFilter([$startWith, $endWith]);
-                        } else {
-                            if ($modifier) {
-                                $dtHelper->modify($modifier);
-                            }
-
-                            $details['filter'] = $isTimestamp ? $dtHelper->toUtcString('Y-m-d H:i:s') : $dtHelper->toUtcString('Y-m-d');
-                        }
-                    }
-                };
-
-                if (is_array($leadSegmentFilter->getFilter())) {
-                    foreach ($leadSegmentFilter->getFilter() as $filterValue) {
-                        $getDate($filterValue);
-                    }
-                } else {
-                    $getDate($leadSegmentFilter->getFilter());
-                }
-            }
+            $func = $leadSegmentFilter->getFunc();
 
             // Generate a unique alias
             $alias = $this->generateRandomParameterName();
@@ -1353,43 +1098,6 @@ class LeadListSegmentRepository
         }
 
         return $expr;
-    }
-
-    /**
-     * @return array
-     */
-    private function getRelativeDateStrings()
-    {
-        $keys = self::getRelativeDateTranslationKeys();
-
-        $strings = [];
-        foreach ($keys as $key) {
-            $strings[$key] = $this->translator->trans($key);
-        }
-
-        return $strings;
-    }
-
-    /**
-     * @return array
-     */
-    private static function getRelativeDateTranslationKeys()
-    {
-        return [
-            'mautic.lead.list.month_last',
-            'mautic.lead.list.month_next',
-            'mautic.lead.list.month_this',
-            'mautic.lead.list.today',
-            'mautic.lead.list.tomorrow',
-            'mautic.lead.list.yesterday',
-            'mautic.lead.list.week_last',
-            'mautic.lead.list.week_next',
-            'mautic.lead.list.week_this',
-            'mautic.lead.list.year_last',
-            'mautic.lead.list.year_next',
-            'mautic.lead.list.year_this',
-            'mautic.lead.list.anniversary',
-        ];
     }
 
     /**

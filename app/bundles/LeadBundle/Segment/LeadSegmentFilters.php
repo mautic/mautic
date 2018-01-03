@@ -11,8 +11,6 @@
 
 namespace Mautic\LeadBundle\Segment;
 
-use Mautic\LeadBundle\Entity\LeadList;
-
 class LeadSegmentFilters implements \Iterator, \Countable
 {
     /**
@@ -30,16 +28,11 @@ class LeadSegmentFilters implements \Iterator, \Countable
      */
     private $leadSegmentFilters = [];
 
-    public function __construct(LeadList $leadList)
+    public function addLeadSegmentFilter(LeadSegmentFilter $leadSegmentFilter)
     {
-        $filters = $leadList->getFilters();
-        foreach ($filters as $filter) {
-            $leadSegmentFilter          = new LeadSegmentFilter($filter);
-            $this->leadSegmentFilters[] = $leadSegmentFilter;
-
-            if ($leadSegmentFilter->isCompanyType()) {
-                $this->hasCompanyFilter = true;
-            }
+        $this->leadSegmentFilters[] = $leadSegmentFilter;
+        if ($leadSegmentFilter->isCompanyType()) {
+            $this->hasCompanyFilter = true;
         }
     }
 

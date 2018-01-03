@@ -51,6 +51,11 @@ class LeadSegmentFilter
      */
     private $operator;
 
+    /**
+     * @var string
+     */
+    private $func;
+
     public function __construct(array $filter)
     {
         $this->glue     = isset($filter['glue']) ? $filter['glue'] : null;
@@ -148,5 +153,21 @@ class LeadSegmentFilter
     public function setFilter($filter)
     {
         $this->filter = $filter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFunc()
+    {
+        return $this->func;
+    }
+
+    /**
+     * @param string $func
+     */
+    public function setFunc($func)
+    {
+        $this->func = $func;
     }
 }

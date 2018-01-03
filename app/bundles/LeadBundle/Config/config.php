@@ -767,14 +767,30 @@ return [
             ],
             'mautic.lead.model.lead_segment_filter_factory' => [
                 'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterFactory::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_date',
+                    'mautic.lead.model.lead_segment_filter_operator',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_filter_date' => [
+                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterDate::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_filter_operator' => [
+                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterOperator::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                    'mautic.lead.segment.operator_options',
+                ],
             ],
             'mautic.lead.repository.lead_list_segment_repository' => [
                 'class'     => \Mautic\LeadBundle\Entity\LeadListSegmentRepository::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'mautic.lead.segment.operator_options',
                     'event_dispatcher',
-                    'translator',
                 ],
             ],
             'mautic.lead.segment.operator_options' => [
