@@ -772,10 +772,16 @@ return [
                     'mautic.lead.model.lead_segment_filter_operator',
                 ],
             ],
+            'mautic.lead.model.relative_date' => [
+                'class'     => \Mautic\LeadBundle\Segment\RelativeDate::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'mautic.lead.model.lead_segment_filter_date' => [
                 'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterDate::class,
                 'arguments' => [
-                    'translator',
+                    'mautic.lead.model.relative_date',
                 ],
             ],
             'mautic.lead.model.lead_segment_filter_operator' => [

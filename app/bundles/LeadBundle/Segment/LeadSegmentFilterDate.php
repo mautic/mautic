@@ -12,16 +12,17 @@
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSegmentFilterDate
 {
-    /** @var TranslatorInterface */
-    private $translator;
+    /**
+     * @var RelativeDate
+     */
+    private $relativeDate;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(RelativeDate $relativeDate)
     {
-        $this->translator = $translator;
+        $this->relativeDate = $relativeDate;
     }
 
     public function fixDateOptions(LeadSegmentFilter $leadSegmentFilter)
@@ -42,7 +43,7 @@ class LeadSegmentFilterDate
 
     private function getDate($string, LeadSegmentFilter $leadSegmentFilter)
     {
-        $relativeDateStrings = $this->getRelativeDateStrings();
+        $relativeDateStrings = $this->relativeDate->getRelativeDateStrings();
 
         // Check if the column type is a date/time stamp
         $isTimestamp = $leadSegmentFilter->getType() === 'datetime';
@@ -227,42 +228,5 @@ class LeadSegmentFilterDate
                 $leadSegmentFilter->setFilter($filter);
             }
         }
-    }
-
-    /**
-     * @return array
-     */
-    private function getRelativeDateStrings()
-    {
-        $keys = self::getRelativeDateTranslationKeys();
-
-        $strings = [];
-        foreach ($keys as $key) {
-            $strings[$key] = $this->translator->trans($key);
-        }
-
-        return $strings;
-    }
-
-    /**
-     * @return array
-     */
-    private static function getRelativeDateTranslationKeys()
-    {
-        return [
-            'mautic.lead.list.month_last',
-            'mautic.lead.list.month_next',
-            'mautic.lead.list.month_this',
-            'mautic.lead.list.today',
-            'mautic.lead.list.tomorrow',
-            'mautic.lead.list.yesterday',
-            'mautic.lead.list.week_last',
-            'mautic.lead.list.week_next',
-            'mautic.lead.list.week_this',
-            'mautic.lead.list.year_last',
-            'mautic.lead.list.year_next',
-            'mautic.lead.list.year_this',
-            'mautic.lead.list.anniversary',
-        ];
     }
 }
