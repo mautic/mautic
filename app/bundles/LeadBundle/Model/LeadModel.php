@@ -1689,7 +1689,7 @@ class LeadModel extends FormModel
         foreach ($fields as $leadField => $importField) {
             // Prevent overwriting existing data with empty data
             if (array_key_exists($importField, $data) && !is_null($data[$importField]) && $data[$importField] != '') {
-                $fieldData[$leadField] = InputHelper::clean($data[$importField]);
+                $fieldData[$leadField] = InputHelper::_($data[$importField], 'string');
             }
         }
 
