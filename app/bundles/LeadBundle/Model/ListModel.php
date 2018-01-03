@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\LeadSegmentService;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -47,13 +48,19 @@ class ListModel extends FormModel
     protected $coreParametersHelper;
 
     /**
+     * @var LeadSegmentService
+     */
+    private $leadSegment;
+
+    /**
      * ListModel constructor.
      *
      * @param CoreParametersHelper $coreParametersHelper
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    public function __construct(CoreParametersHelper $coreParametersHelper, LeadSegmentService $leadSegment)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->leadSegment          = $leadSegment;
     }
 
     /**
@@ -782,6 +789,9 @@ class ListModel extends FormModel
         );
 
         // Get a count of leads to add
+        $newLeadsCount = $this->leadSegment->getNewLeadsByListCount($entity, $batchLimiters);
+        dump($newLeadsCount);
+        // Get a count of leads to add
         $newLeadsCount = $this->getLeadsByList(
             $list,
             true,
@@ -791,7 +801,8 @@ class ListModel extends FormModel
                 'batchLimiters' => $batchLimiters,
             ]
         );
-
+        dump($newLeadsCount);
+        exit;
         // Ensure the same list is used each batch
         $batchLimiters['maxId'] = (int) $newLeadsCount[$id]['maxId'];
 
@@ -1255,7 +1266,7 @@ class ListModel extends FormModel
      *
      * @return mixed
      */
-    public function getLeadsByList($lists, $idOnly = false, $args = [])
+    public function getLeadsByList($lists, $idOnly = false, array $args = [])
     {
         $args['idOnly'] = $idOnly;
 

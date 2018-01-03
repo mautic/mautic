@@ -752,10 +752,33 @@ return [
                 ],
             ],
             'mautic.lead.model.list' => [
-                'class'     => 'Mautic\LeadBundle\Model\ListModel',
+                'class'     => \Mautic\LeadBundle\Model\ListModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'mautic.lead.model.lead_segment_service',
                 ],
+            ],
+            'mautic.lead.model.lead_segment_service' => [
+                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentService::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'mautic.lead.repository.lead_list_segment_repository',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_filter_factory' => [
+                'class'     => \Mautic\LeadBundle\Segment\LeadSegmentFilterFactory::class,
+            ],
+            'mautic.lead.repository.lead_list_segment_repository' => [
+                'class'     => \Mautic\LeadBundle\Entity\LeadListSegmentRepository::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.segment.operator_options',
+                    'event_dispatcher',
+                    'translator',
+                ],
+            ],
+            'mautic.lead.segment.operator_options' => [
+                'class'     => \Mautic\LeadBundle\Segment\OperatorOptions::class,
             ],
             'mautic.lead.model.note' => [
                 'class' => 'Mautic\LeadBundle\Model\NoteModel',
