@@ -796,7 +796,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         foreach ($this->fetchCompanyFields() as $entityField) {
             if (isset($fieldData[$entityField['alias']])) {
-                $fieldData[$entityField['alias']] = InputHelper::clean($fieldData[$entityField['alias']]);
+                $fieldData[$entityField['alias']] = InputHelper::_($fieldData[$entityField['alias']], 'string');
 
                 if ('NULL' === $fieldData[$entityField['alias']]) {
                     $fieldData[$entityField['alias']] = null;
