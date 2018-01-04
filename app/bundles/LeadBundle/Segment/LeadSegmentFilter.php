@@ -178,6 +178,23 @@ class LeadSegmentFilter
     }
 
     /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'glue'     => $this->getGlue(),
+            'field'    => $this->getField(),
+            'object'   => $this->getObject(),
+            'type'     => $this->getType(),
+            'filter'   => $this->getFilter(),
+            'display'  => $this->getDisplay(),
+            'operator' => $this->getOperator(),
+            'func'     => $this->getFunc(),
+        ];
+    }
+
+    /**
      * @param string|array|bool|float|null $filter
      *
      * @return string|array|bool|float|null

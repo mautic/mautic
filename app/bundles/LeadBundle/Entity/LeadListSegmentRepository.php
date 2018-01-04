@@ -995,7 +995,7 @@ class LeadListSegmentRepository
             }
 
             if ($this->dispatcher && $this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
-                $event = new LeadListFilteringEvent($leadSegmentFilter, null, $alias, $func, $q, $this->entityManager);
+                $event = new LeadListFilteringEvent($leadSegmentFilter->toArray(), null, $alias, $func, $q, $this->entityManager);
                 $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
                 if ($event->isFilteringDone()) {
                     $groupExpr->add($event->getSubQuery());
