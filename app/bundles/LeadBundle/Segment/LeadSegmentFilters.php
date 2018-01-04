@@ -19,20 +19,29 @@ class LeadSegmentFilters implements \Iterator, \Countable
     private $position = 0;
 
     /**
+     * @var array|LeadSegmentFilter[]
+     */
+    private $leadSegmentFilters = [];
+
+    /**
      * @var bool
      */
     private $hasCompanyFilter = false;
 
     /**
-     * @var array|LeadSegmentFilter[]
+     * @var bool
      */
-    private $leadSegmentFilters = [];
+    private $listFiltersInnerJoinCompany = false;
 
     public function addLeadSegmentFilter(LeadSegmentFilter $leadSegmentFilter)
     {
         $this->leadSegmentFilters[] = $leadSegmentFilter;
         if ($leadSegmentFilter->isCompanyType()) {
             $this->hasCompanyFilter = true;
+            // Must tell getLeadsByList how to best handle the relationship with the companies table
+            if (!in_array($leadSegmentFilter->getFunc(), ['empty', 'neq', 'notIn', 'notLike'], true)) {
+                $this->listFiltersInnerJoinCompany = true;
+            }
         }
     }
 
@@ -110,5 +119,13 @@ class LeadSegmentFilters implements \Iterator, \Countable
     public function isHasCompanyFilter()
     {
         return $this->hasCompanyFilter;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isListFiltersInnerJoinCompany()
+    {
+        return $this->listFiltersInnerJoinCompany;
     }
 }

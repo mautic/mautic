@@ -37,11 +37,6 @@ class LeadListSegmentRepository
      */
     private $randomParameterName;
 
-    /**
-     * @var bool
-     */
-    private $listFiltersInnerJoinCompany = false;
-
     public function __construct(
         EntityManager $entityManager,
         EventDispatcherInterface $dispatcher,
@@ -153,7 +148,7 @@ class LeadListSegmentRepository
         $expr = $this->getListFilterExpr($leadSegmentFilters, $q, $listId);
 
         if ($leadSegmentFilters->isHasCompanyFilter()) {
-            $this->applyCompanyFieldFilters($q);
+            $this->applyCompanyFieldFilters($q, $leadSegmentFilters);
         }
 
         return $expr;
@@ -855,13 +850,6 @@ class LeadListSegmentRepository
                         continue;
                     }
 
-                    if ('company' === $object) {
-                        // Must tell getLeadsByList how to best handle the relationship with the companies table
-                        if (!in_array($func, ['empty', 'neq', 'notIn', 'notLike'], true)) {
-                            $this->listFiltersInnerJoinCompany = true;
-                        }
-                    }
-
                     switch ($func) {
                         case 'between':
                         case 'notBetween':
@@ -1134,11 +1122,12 @@ class LeadListSegmentRepository
      * If there is a negate comparison such as not equal, empty, isNotLike or isNotIn then contacts without companies should
      * be included but the way the relationship is handled needs to be different to optimize best for a posit vs negate.
      *
-     * @param QueryBuilder $q
+     * @param QueryBuilder       $q
+     * @param LeadSegmentFilters $leadSegmentFilters
      */
-    private function applyCompanyFieldFilters(QueryBuilder $q)
+    private function applyCompanyFieldFilters(QueryBuilder $q, LeadSegmentFilters $leadSegmentFilters)
     {
-        $joinType = $this->listFiltersInnerJoinCompany ? 'join' : 'leftJoin';
+        $joinType = $leadSegmentFilters->isListFiltersInnerJoinCompany() ? 'join' : 'leftJoin';
         // Join company tables for query optimization
         $q->$joinType('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'l.id = cl.lead_id')
             ->$joinType(
