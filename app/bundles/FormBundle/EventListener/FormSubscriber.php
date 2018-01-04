@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -46,17 +47,23 @@ class FormSubscriber extends CommonSubscriber
     protected $ipLookupHelper;
 
     /**
+     * @var CoreParametersHelper
+     */
+    protected $coreParametersHelper;
+
+    /**
      * FormSubscriber constructor.
      *
      * @param IpLookupHelper $ipLookupHelper
      * @param AuditLogModel  $auditLogModel
      * @param MailHelper     $mailer
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer)
+    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel, MailHelper $mailer, CoreParametersHelper $coreParametersHelper)
     {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
-        $this->mailer         = $mailer->getMailer();
+        $this->ipLookupHelper       = $ipLookupHelper;
+        $this->auditLogModel        = $auditLogModel;
+        $this->mailer               = $mailer->getMailer();
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -429,6 +436,11 @@ class FormSubscriber extends CommonSubscriber
     private function setMailer(array $config, array $tokens, $to)
     {
         $this->mailer->reset();
+
+        // ingore queue
+        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file' && $config['immediately']) {
+            $this->mailer = $this->mailer->getSampleMailer();
+        }
 
         $this->mailer->setTo($to);
         $this->mailer->setSubject($config['subject']);

@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Interface InterfaceCallbackTransport.
+ *
+ * @deprecated 2.12.1 to be removed in 3.0; use CallbackTransportInterface
  */
 interface InterfaceCallbackTransport
 {

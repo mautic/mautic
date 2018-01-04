@@ -350,6 +350,10 @@ class SendEmailToContact
 
         // Prevent the stat from saving
         foreach ($failedEmailAddresses as $failedEmail) {
+            if (!isset($this->statEntities[$failedEmail])) {
+                continue;
+            }
+
             /** @var Stat $stat */
             $stat = $this->statEntities[$failedEmail];
             // Add lead ID to list of failures

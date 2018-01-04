@@ -44,7 +44,7 @@ class IntegrationEntityRepository extends CommonRepository
         $integrationEntityIds = null
     ) {
         $q = $this->_em->getConnection()->createQueryBuilder()
-            ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity')
+            ->select('DISTINCT(i.integration_entity_id), i.id, i.internal_entity_id, i.integration_entity, i.internal_entity')
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');
 
         $q->where('i.integration = :integration')

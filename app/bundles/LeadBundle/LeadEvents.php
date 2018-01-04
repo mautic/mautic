@@ -148,6 +148,16 @@ final class LeadEvents
     const LEAD_IDENTIFIED = 'mautic.lead_identified';
 
     /**
+     * The mautic.lead_channel_subscription_changed event is dispatched when a lead's DNC status changes.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ChannelSubscriptionChange instance.
+     *
+     * @var string
+     */
+    const CHANNEL_SUBSCRIPTION_CHANGED = 'mautic.lead_channel_subscription_changed';
+
+    /**
      * The mautic.lead_build_search_commands event is dispatched when the search commands are built.
      *
      * The event listener receives a
