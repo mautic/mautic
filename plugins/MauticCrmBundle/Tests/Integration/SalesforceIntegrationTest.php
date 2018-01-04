@@ -188,10 +188,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(4, count($sfEntities));
     }
 
-    public function testThatMultipleMauticContactsAreNotDuplicatedInSF()
-    {
-    }
-
     public function testThatLeadsAreOnlyCreatedIfEnabled()
     {
         $this->sfObjects     = ['Contact'];
@@ -318,10 +314,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($lastSync instanceof \DateTime);
     }
 
-    public function testThatMissingRequiredDataIsPulledFromSfAndHydrated()
-    {
-    }
-
     public function testLeadsAreNotCreatedInSfIfFoundToAlreadyExistAsContacts()
     {
         $this->sfObjects     = ['Lead', 'Contact'];
@@ -374,14 +366,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $sf->pushLeads();
     }
 
-    public function testIntegrationEntityRecordIsCreatedForFoundSfContacts()
-    {
-    }
-
-    public function testNonMatchingMauticContactsAreCreated()
-    {
-    }
-
     public function testExceptionIsThrownIfSfReturnsErrorOnEmailLookup()
     {
         $this->sfObjects     = ['Lead'];
@@ -394,22 +378,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(ApiErrorException::class);
 
         $sf->pushLeads();
-    }
-
-    public function testIntegrationPushFindsDuplicate()
-    {
-    }
-
-    public function testIntegrationPushCreatesNew()
-    {
-    }
-
-    public function testApostropheInEmailDoesNotCauseDuplicates()
-    {
-    }
-
-    public function testExistingEntityRecordsDoesNotCreate()
-    {
     }
 
     public function testGetCampaigns()
@@ -781,8 +749,6 @@ class SalesforceIntegrationTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockFactory()
     {
-        defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
-
         $mockFactory = $this->getMockBuilder(MauticFactory::class)
             ->disableOriginalConstructor()
             ->getMock();
